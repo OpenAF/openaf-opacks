@@ -1,0 +1,39 @@
+{
+  "author": "nuno.aguiar@wedotechnologies.com",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "fixSheBang(outputPath + '/connectTunnels.js'); log('=== Please edit ' + outputPath + '/tunnels.json to configure for your needs.'); log('=== Execute \"opack exec Tunnels\" to startup your tunnels.'); log('=== You can also add more files in the same folder and execute \"opack exec Tunnels client1.json\"'); ",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "ssh",
+    "tunnels",
+    "port",
+    "forwarding"
+  ],
+  "bugs": {
+    "url": "http://192.168.40.110:8080/projects/openafscripts"
+  },
+  "repository": {
+    "type": "http",
+    "url": "http://192.168.40.110/svn/others/OpenAFScripts/Tunnels"
+  },
+  "description": "Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.",
+  "name": "Tunnels",
+  "main": "connectTunnels.js",
+  "license": "WeDo internal",
+  "version": "20170119",
+  "dependencies": {
+    "OpenAF": ">=20160901"
+  },
+  "files": [
+    ".package.json",
+    "connectTunnels.js",
+    "tunnels.json"
+  ],
+  "filesHash": {
+    "connectTunnels.js": "2e108a954b6a619af5fcd878a315c32f80475fae",
+    "tunnels.json": "0e67812418aa1e69b9037239aa67f7ab9a785ac9"
+  }
+}
