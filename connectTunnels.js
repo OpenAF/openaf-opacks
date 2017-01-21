@@ -1,4 +1,3 @@
-#!D:\wrk\workspace\OpenAF\openaf.bat -s -i script -f 
 // Author: nuno.aguiar@wedotecnologies.com
 // USAGE:
 //    opack exec Tunnels
