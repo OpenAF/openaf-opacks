@@ -2,7 +2,7 @@
   "author": "nuno.aguiar@wedotechnologies.com",
   "scripts": {
     "posterase": "",
-    "postinstall": "fixSheBang(outputPath + '/connectTunnels.js'); log('=== Please edit ' + outputPath + '/tunnels.json to configure for your needs.'); log('=== Execute \"opack exec Tunnels\" to startup your tunnels.'); log('=== You can also add more files in the same folder and execute \"opack exec Tunnels client1.json\"'); ",
+    "postinstall": "fixSheBang(outputPath + '/connectTunnels.js'); log('=== Please edit ' + outputPath + '/tunnels.yaml to configure for your needs.'); log('=== Execute \"opack exec Tunnels\" to startup your tunnels.'); log('=== You can also add more files in the same folder and execute \"opack exec Tunnels client1.yaml\"'); ",
     "preerase": "",
     "preinstall": ""
   },
@@ -30,10 +30,11 @@
   "files": [
     ".package.json",
     "connectTunnels.js",
-    "tunnels.json"
+    "tunnels.yaml"
   ],
   "filesHash": {
-    "connectTunnels.js": "2e108a954b6a619af5fcd878a315c32f80475fae",
-    "tunnels.json": "0e67812418aa1e69b9037239aa67f7ab9a785ac9"
+    ".package.json": "8fe8a47e1ad8bcba24da25b2bfa93fa45c4b649e",
+    "connectTunnels.js": "ed4688ecaa576a243a3dcce4bfc70bf4617fde02",
+    "tunnels.yaml": "f6f112170d8da332bed82a9809f7b983f4a294aa"
   }
 }

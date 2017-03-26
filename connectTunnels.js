@@ -2,7 +2,7 @@
 // USAGE:
 //    opack exec Tunnels
 //   OR
-//    opack exec Tunnels -arg clientXPTO.json
+//    opack exec Tunnels -arg clientXPTO.yaml
 //
 
 // Start
@@ -10,7 +10,7 @@ plugin("SSH");
 log("Init");
 
 var tunnels;
-var filename = "tunnels.json";
+var filename = "tunnels.yaml";
 
 // Search for alternative file on arguments
 var params = __expr.split(/ +/);
@@ -38,7 +38,10 @@ log("Reading " + tunnelsFile);
 
 // Try to read file
 try {
-  tunnels = io.readFile(tunnelsFile);
+  if (tunnelsFile.match(/\.yaml$/))
+     tunnels = io.readFileYAML(tunnelsFile);
+  else
+     tunnels = io.readFile(tunnelsFile);
 } catch(e) {
   logErr("Can't read " + tunnelsFile);
   java.lang.System.exit(0);
@@ -46,27 +49,34 @@ try {
 
 // Go from all hosts defined
 var sshs = {};
-for(hostname in tunnels) {
+parallel4Array(tunnels, function(hostname) {
   var host = tunnels[hostname];
 
-  log("[" + hostname + "] Connecting...");
-  sshs[hostname] = new SSH(host.host, host.port, host.user, host.pass, "", true);
+  while(1) {
+	  try {
+		  log("[" + hostname + "] Connecting...");
+		  sshs[hostname] = new SSH(host.host, host.port, host.user, host.pass, "", true);
 
-  // Go from all tunnels defined
-  log("[" + hostname + "] Creating tunnels");
-  for(i in host.tunnels) {
-     var tunnel = host.tunnels[i];
+		  // Go from all tunnels defined
+		  log("[" + hostname + "] Creating tunnels");
+		  for(i in host.tunnels) {
+		     var tunnel = host.tunnels[i];
 
-     // Check if it's a local or remote tunnel and connect
-     if(typeof tunnel.localHost === 'undefined') {
-       log("[" + hostname + ":" + i + "] " + tunnel.remoteHost + ":" + tunnel.remotePort + " -> local port " + tunnel.localPort);
-       sshs[hostname].tunnelLocal(tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);
-     } else {
-       log("[" + hostname + ":" + i + "] " + tunnel.localHost + ":" + tunnel.localPort + " <- from remote " + host.host + ":" + tunnel.remotePort);
-       sshs[hostname].tunnelRemoteBind(tunnel.remoteHost, tunnel.remotePort, tunnel.localHost, tunnel.localPort);
-     }
+		     // Check if it's a local or remote tunnel and connect
+		     if(typeof tunnel.localHost === 'undefined') {
+		       log("[" + hostname + ":" + i + "] " + tunnel.remoteHost + ":" + tunnel.remotePort + " -> local port " + tunnel.localPort);
+		       sshs[hostname].tunnelLocal(tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);
+		     } else {
+		       log("[" + hostname + ":" + i + "] " + tunnel.localHost + ":" + tunnel.localPort + " <- from remote " + host.host + ":" + tunnel.remotePort);
+		       sshs[hostname].tunnelRemoteBind(tunnel.remoteHost, tunnel.remotePort, tunnel.localHost, tunnel.localPort);
+		     }
+		  }
+	  } catch(e) {
+	     logErr(e);
+	  }
+	  sleep(2000);
   }
-}
+});
 
 // Script won't exit until tunnels or connection is dropped
 log("Ready to use.");
