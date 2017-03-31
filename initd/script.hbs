@@ -1,0 +1,26 @@
+#!/bin/sh
+
+case "$1" in
+
+start)
+	nohup sudo -u {{user}} {{openafPath}}/openaf --daemon {{openafScript}} -e "$@ {{params}}" >> {{log}} 2>&1 &
+	;;
+
+restart)
+	nohup sudo -u {{user}} {{openafPath}}/openaf --daemon {{openafScript}} -e "$@ {{params}}" >> {{log}} 2>&1 &
+	;;
+
+stop)
+	nohup sudo -u {{user}} {{openafPath}}/openaf --daemon {{openafScript}} -e "$@ {{params}}" >> {{log}} 2>&1 &
+	;;
+
+status)
+	sudo -u {{user}} {{openafPath}}/openaf --daemon {{openafScript}} -e "status"
+	;;
+
+*)	
+	echo "Usage {{initdScript}} {start|stop|reload|restart|force-reload|status}"
+	;;
+esac
+
+exit 0

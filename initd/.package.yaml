@@ -1,0 +1,34 @@
+author: nuno.aguiar@wedotechnologies.com
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - initd
+  - systemd
+  - startup
+  - restart
+bugs:
+  url: 'http://192.168.40.110:8080/others'
+repository:
+  type: http
+  url: 'http://192.168.40.110/svn/others/initd'
+description: Creates initd scripts to use with the openaf's --daemon command line option.
+name: initd
+main: main.js
+mainJob: generateInitScript.yaml
+license: Apache 2.0
+version: '20170329'
+dependencies:
+  openaf: '>=20170320'
+files:
+  - .package.yaml
+  - generateInitScript.yaml
+  - main.js
+  - script.hbs
+filesHash:
+  .package.yaml: 4647e05a9ce1d2058688e2c8b8eb3fe91e5d93db
+  generateInitScript.yaml: 5ba90a6270472fd737520de35bca51057f5a58a7
+  main.js: 3cce5cf5f2651973d5669e40881bbac3a2d41158
+  script.hbs: 80a8c36fd183eefa4a8465bea5d3adb9210317c1

@@ -1,0 +1,33 @@
+jobs:
+   # Init
+   #  
+   - name: GenerateInitScript Env
+     exec: >
+       args.path = getOPackPaths()["initd"] || ".";
+
+   # Generating initd file
+   #
+   - name: GenerateInitScript
+     from: GenerateInitScript Env
+     exec: >
+       if (isUnDef(args.script)) throw "Please provide a script=myscript.js parameter";
+       args.script = String(new java.io.File(args.script).getAbsolutePath());
+       args.initdScript = args.script.replace(/\.js$/, "");
+       if (isUnDef(args.user)) args.user = "wedo";
+       if (isUnDef(args.openafPath)) args.openafPath = getOpenAFPath();
+       if (isUnDef(args.log)) args.log = args.script.replace(/\.js$/, "") + ".log";
+
+       io.writeFileString(
+          args.script.replace(/\.js$/, ""), 
+          templify(io.readFileString(args.path + "/script.hbs"), {
+             initdScript : String(new java.io.File(args.initdScript).getName()),
+             user        : args.user,
+             openafPath  : args.openafPath,
+             openafScript: args.script,
+             log         : args.log
+          })
+       );
+       log("File '" + args.script.replace(/\.js$/, "") + "' created.");
+
+todo:
+   - GenerateInitScript
