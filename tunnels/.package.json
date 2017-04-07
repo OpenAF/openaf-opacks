@@ -22,6 +22,7 @@
   "description": "Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.",
   "name": "Tunnels",
   "main": "connectTunnels.js",
+  "mainJob": "",
   "license": "WeDo internal",
   "version": "20170119",
   "dependencies": {
@@ -33,8 +34,8 @@
     "tunnels.yaml"
   ],
   "filesHash": {
-    ".package.json": "8fe8a47e1ad8bcba24da25b2bfa93fa45c4b649e",
-    "connectTunnels.js": "ed4688ecaa576a243a3dcce4bfc70bf4617fde02",
-    "tunnels.yaml": "f6f112170d8da332bed82a9809f7b983f4a294aa"
+    ".package.json": "90ed4b3bfe639667a0a3759d00d25aae7d8c0ed8",
+    "connectTunnels.js": "153d58ab01fa3977d912d910162743912ee84e7f",
+    "tunnels.yaml": "fedf8d90210f97e991ce29d502315a680dcb2867"
   }
 }

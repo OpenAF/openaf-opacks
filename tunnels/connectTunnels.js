@@ -65,7 +65,10 @@ parallel4Array(tunnels, function(hostname) {
 		     // Check if it's a local or remote tunnel and connect
 		     if(typeof tunnel.localHost === 'undefined') {
 		       log("[" + hostname + ":" + i + "] " + tunnel.remoteHost + ":" + tunnel.remotePort + " -> local port " + tunnel.localPort);
-		       sshs[hostname].tunnelLocal(tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);
+		       if (tunnel.bindAll)
+		       	  sshs[hostname].tunnelLocalBind("0.0.0.0", tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);
+		       else
+		       	  sshs[hostname].tunnelLocal(tunnel.localPort, tunnel.remoteHost, tunnel.remotePort); 
 		     } else {
 		       log("[" + hostname + ":" + i + "] " + tunnel.localHost + ":" + tunnel.localPort + " <- from remote " + host.host + ":" + tunnel.remotePort);
 		       sshs[hostname].tunnelRemoteBind(tunnel.remoteHost, tunnel.remotePort, tunnel.localHost, tunnel.localPort);

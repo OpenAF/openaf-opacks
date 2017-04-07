@@ -19,6 +19,7 @@ Some app:
       localHost : 4.3.2.1
       localPort : 22
       remotePort: 2222
+      bindAll   : true
     portal:
       localPort : 8080
       remoteHost: 127.0.0.1
