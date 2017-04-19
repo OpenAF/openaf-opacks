@@ -9,13 +9,25 @@ jobs:
    #
    - name: GenerateInitScript
      from: GenerateInitScript Env
+     help: >
+       Generates a initd script for a given openaf script. Expects:
+         - script     (String)  The openaf script path.
+         - user       (String)  The user that will run the script (defaults to wedo).
+         - openafPath (String)  The path to openaf (defaults to the current being used).
+         - log        (String)  The file path where the script log should be placed (defaults to the script location + .log).
+         - cmd        (String)  The openaf cmd to use (defaults to daemon but script can be used if needed).
+         - params     (String)  The extra parameters to add while starting, stopping or restarting the openaf script.
      exec: >
        if (isUnDef(args.script)) throw "Please provide a script=myscript.js parameter";
+
        args.script = String(new java.io.File(args.script).getAbsolutePath());
        args.initdScript = args.script.replace(/\.js$/, "");
-       if (isUnDef(args.user)) args.user = "wedo";
+
+       if (isUnDef(args.user))       args.user = "wedo";
        if (isUnDef(args.openafPath)) args.openafPath = getOpenAFPath();
-       if (isUnDef(args.log)) args.log = args.script.replace(/\.js$/, "") + ".log";
+       if (isUnDef(args.log))        args.log = args.script.replace(/\.js$/, "") + ".log";
+       if (isUnDef(args.cmd))        args.cmd = "daemon"; // set this for script if needed
+       if (isUnDef(args.params))      args.params = "";
 
        io.writeFileString(
           args.script.replace(/\.js$/, ""), 
@@ -24,9 +36,12 @@ jobs:
              user        : args.user,
              openafPath  : args.openafPath,
              openafScript: args.script,
-             log         : args.log
+             logPath     : args.log,
+             cmd         : args.cmd,
+             params      : args.params
           })
        );
+       
        log("File '" + args.script.replace(/\.js$/, "") + "' created.");
 
 todo:

@@ -1,4 +1,4 @@
-author: nuno.aguiar@wedotechnologies.com
+author: nmaguiar@gmail.com
 scripts:
   preerase: ''
   posterase: ''
@@ -16,19 +16,17 @@ repository:
   url: 'http://192.168.40.110/svn/others/initd'
 description: Creates initd scripts to use with the openaf's --daemon command line option.
 name: initd
-main: main.js
+main: ''
 mainJob: generateInitScript.yaml
 license: Apache 2.0
-version: '20170329'
+version: '20170418'
 dependencies:
-  openaf: '>=20170320'
+  openaf: '>=20170410'
 files:
   - .package.yaml
   - generateInitScript.yaml
-  - main.js
   - script.hbs
 filesHash:
-  .package.yaml: 4647e05a9ce1d2058688e2c8b8eb3fe91e5d93db
-  generateInitScript.yaml: 5ba90a6270472fd737520de35bca51057f5a58a7
-  main.js: 3cce5cf5f2651973d5669e40881bbac3a2d41158
-  script.hbs: 80a8c36fd183eefa4a8465bea5d3adb9210317c1
+  .package.yaml: 5e5e415d101d6dd18ff93ff0af7bf3b2fb99dd95
+  generateInitScript.yaml: b0e5ee123dcafdbb7f6e263b905b6209fc9efc2b
+  script.hbs: 5b6eea5a1df6033557f9ca5fb9ccc4e4a6e9d733
