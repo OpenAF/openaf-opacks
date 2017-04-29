@@ -1,0 +1,43 @@
+include:
+   - googlePhoneNumber.yaml
+
+jobs:
+   # Set the library path
+   # 
+   - name: Set Env
+     exec: >
+       loadLib("googlePhoneNumber.js");
+       args.libpath = getOPackPaths()["GooglePhoneNumber"] + "/lib";
+
+   # Updates the google phone number jars
+   #
+   - name: Update Google Phone Number
+     from: Set Env
+     exec: >
+       GooglePhoneNumberUpdateJars(args.libpath);
+  
+   # Tests the google phone number new jars (if any)
+   #
+   - name: Test Google Phone Number
+     deps: 
+       - Update Google Phone Number
+     exec: >
+       var res = new GooglePhoneNumber(args.libpath).getInfo("011351911234567", "US");
+       print(af.toYAML(res));
+       if (res.countryCode != 351 || res.regionCode != 'PT' || res.e164 != '+351911234567')
+          throw "Something is wrong with the new libraries."
+
+   - name: Remove old libraries
+     from: Set Env
+     deps:  
+       - Test Google Phone Number
+     exec: >
+       $from(io.listFilenames(args.libpath)).ends(".jar.old").select(function(r) {
+          log('Removing ' + r);
+          af.rm(r);
+       });
+       
+todo:
+   - Update Google Phone Number
+   - Test Google Phone Number
+   - Remove old libraries 

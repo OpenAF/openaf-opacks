@@ -1,0 +1,13 @@
+jobs:
+   - name: GooglePhoneNumber get info
+     help: >
+       Given a args.number will return in args.output a map of information about the same phone number.
+       If args.country is not specified it will default to 'US'. If args.quiet the args.output won't be displayed.
+     exec: >
+       load("googlePhoneNumber.js");
+       if (isDef(args.number)) {
+          var info = new GooglePhoneNumber();
+          args.output = info.getInfo(args.number, args.country);
+          if (!args.quiet) print(af.toYAML(args.output));
+       }
+

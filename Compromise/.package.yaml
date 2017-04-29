@@ -1,0 +1,34 @@
+author: nmaguiar@gmail.com
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - Natural Language Processing
+  - Language
+  - npl
+  - Compromise
+bugs:
+  url: null
+repository:
+  type: http
+  url: 'http://192.168.40.110/others/Compromise'
+description: >-
+  Integrates the NPL Compromise lib
+  (https://github.com/nlp-compromise/compromise) into a opack.
+name: Compromise
+main: main.js
+mainJob: ''
+license: MIT
+version: '20170429'
+dependencies:
+  openaf: '>=20170401'
+files:
+  - .package.yaml
+  - compromise.js
+  - main.js
+filesHash:
+  .package.yaml: e0e8053a0a2e15fe32b497dbd4ef8529e3f79738
+  compromise.js: 4369b00388ee993ad632fa506f5a67f1c8931a17
+  main.js: 72ef7e68ea04014281ca8d0a875e5728395a6cbc
