@@ -26,7 +26,7 @@ GooglePhoneNumber.prototype.getInfo = function(aNumber, aLocation) {
 		"regionCode": String(this.pn.getRegionCodeForNumber(num)),
 		"numberType": String(this.pn.getNumberType(num)),
 		"nationalNumber": num.getNationalNumber(),
-		"normalized": Number(this.pn.normalizeDigitsOnly(num)),
+		"normalized": Number(this.pn.normalizeDigitsOnly(aNumber)),
 		"e164": String(this.pn.format(num,  Packages.com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat.E164)),
 		"nationalFormatted": String(this.pn.format(num,  Packages.com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat.NATIONAL)),
 		"internationalFormatted": String(this.pn.format(num,  Packages.com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)),
@@ -58,7 +58,7 @@ GooglePhoneNumber.prototype.isNANPA = function(num, aLocation) {
 }
 
 GooglePhoneNumber.prototype.getE164 = function(num, aLocation) {
-	return this.pn.format(this.__getNum(num, aLocation), Packages.com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat.E164);
+	return String(this.pn.format(this.__getNum(num, aLocation), Packages.com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat.E164));
 }
 
 GooglePhoneNumber.prototype.isPossibleNumber = function(num, aLocation) {
@@ -70,11 +70,11 @@ GooglePhoneNumber.prototype.isValidNumber = function(num, aLocation) {
 }
 
 GooglePhoneNumber.prototype.getRegionCode = function(num, aLocation) {
-	return this.pn.getRegionCodeForNumber(this.__getNum(num, aLocation)); 
+	return String(this.pn.getRegionCodeForNumber(this.__getNum(num, aLocation))); 
 }
 
 GooglePhoneNumber.prototype.getNumberType = function(num, aLocation) {
-	return this.pn.getNumberType(this.__getNum(num, aLocation));
+	return String(this.pn.getNumberType(this.__getNum(num, aLocation)));
 }
 
 GooglePhoneNumber.prototype.getTimeZone = function(num, aLocation) {
