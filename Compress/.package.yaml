@@ -21,10 +21,12 @@ version: '20170802'
 dependencies:
   openaf: '>=20170601'
 files:
+  - .odoc.db
   - .package.yaml
   - TAR.js
   - test/UAT.yaml
 filesHash:
-  .package.yaml: 81b73484348a8ba014a519dcc29edaca5e204786
+  .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb
+  .package.yaml: 25292d0c3e5d88e592c1acfc56dbc8641843bc5a
   TAR.js: 196c7ce3ddf54ce4b1055dad27aabd0b12a6b62e
-  test/UAT.yaml: 50650d3d129595fd4016dfaafad9a0961f22b2fb
+  test/UAT.yaml: a19aa105f8cec89b272bd53b4c71422e365a72d9

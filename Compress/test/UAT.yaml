@@ -1,16 +1,28 @@
+include:
+   - oJobTest.yaml
+
 jobs:
-   - name: Create sample tgz file
+   - name: Initialization
      exec: >
-        sh("tar czf test.tgz ../*");
+        global.opath = getOPackPath("Compress") || ".";       
+        global.opath = global.opath.replace(/\\/g, "/");
+        log("Path set to " + global.opath);
+ 
+   - name: Create sample tgz file
+     deps:
+        - Initialization
+     exec: >
+        sh("tar czf " + global.opath + "/test.tgz " + global.opath, "", undefined, true);
 
    - name: List files test
      deps:
         - Create sample tgz file
      exec: >
         loadLib("TAR.js");
-        var t = new TAR("test.tgz");
+        var t = new TAR(global.opath + "/test.tgz");
         sprint(t.listFiles());
 
 todo:
+   - Initialization
    - Create sample tgz file
    - List files test
