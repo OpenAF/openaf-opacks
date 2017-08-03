@@ -83,15 +83,16 @@ TAR.prototype.getFile = function(aSourceFile, aTargetFile) {
 	var cont = true;
 
 	while (e != null && cont) {
-		if (String(e.getName() == aSourceFile)) {
+		if (String(e.getName()) == aSourceFile) {
 			var out = io.writeFileStream(aTargetFile);
 			ioStreamCopy(out, this.input);
 
 			out.flush();
-
 			out.close();
 			cont = false;
-		}
+		} else {
+                  	e = this.input.getNextTarEntry();
+                }
 	}
 
 	this.__close();
@@ -112,9 +113,11 @@ TAR.prototype.getFileStream = function(aSourceFile) {
 	var cont = true;
 
 	while (e != null && cont) {
-		if (String(e.getName() == aSourceFile)) {
+		if (String(e.getName()) == aSourceFile) {
 			return this.input;
-		}
+		} else {
+                  	e = this.input.getNextTarEntry();
+                }
 	}
 
 	return undefined;
@@ -131,13 +134,18 @@ TAR.prototype.getFileBytes = function(aSourceFile) {
 
 	var e = this.input.getNextTarEntry();
 	var cont = true;
+        var res;
 
 	while (e != null && cont) {
-		if (String(e.getName() == aSourceFile)) {
-			return Packages.org.apache.commons.io.IOUtils.toByteArray(this.input);
-		}
+		if (String(e.getName()) == aSourceFile) {
+			res = Packages.org.apache.commons.io.IOUtils.toByteArray(this.input);
+			cont = false;
+		} else {
+                  	e = this.input.getNextTarEntry();
+                }
 	}	
 
 	this.__close();
+        return res;
 }
 

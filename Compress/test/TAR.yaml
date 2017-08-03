@@ -1,0 +1,64 @@
+include:
+   - oJobTest.yaml
+
+ojob:
+   sequential: true
+
+jobs:
+   - name: Initialization
+     exec: >
+        global.opath = getOPackPath("Compress") || ".";       
+        global.opath = global.opath.replace(/\\/g, "/");
+        log("Path set to " + global.opath);
+        
+        loadLib("TAR.js");
+ 
+   - name: Create sample tgz file
+     deps:
+        - Initialization
+     exec: >
+        af.rm(global.opath + "/test.tgz");
+        sh("tar czf " + global.opath + "/test.tgz " + global.opath, "", undefined, true);
+
+
+   - name: List files test
+     to  : oJob Test
+     deps:
+        - Create sample tgz file
+     args: 
+        func: >
+           var t = new TAR(global.opath + "/test.tgz");
+           var lF = t.listFiles();
+           ow.test.assert(lF.length > 0, true, "Problem while listing files from tar");
+           return lF;
+
+   - name: Get file test
+     to  : oJob Test
+     deps:
+        - Create sample tgz file
+     args:
+        func: > 
+           var t = new TAR(global.opath + "/test.tgz");
+           var testFile = $from(t.listFiles()).equals("isFile", true).at(0);
+           log("Using " + testFile.name + " to test");
+           t.getFile(testFile.name, global.opath + "/test/test.file"); 
+           var orig = sha1(io.readFileBytes("/" + testFile.name));
+           var fbytes = sha1(t.getFileBytes(testFile.name)); 
+           var ftarget = sha1(io.readFileStream(global.opath + "/test/test.file"));
+           var stream = t.getFileStream(testFile.name);
+           var fstream = sha1(stream);
+           stream.close();
+           ow.test.assert(orig, fbytes, "Problem with getFileBytes"); 
+           ow.test.assert(orig, ftarget, "Problem with getFile");
+           ow.test.assert(orig, fstream, "Problem with getFileStream");
+           af.rm(global.opath + "/test/test.file");
+           return true;
+
+todo:
+   - Initialization
+   - Create sample tgz file
+
+   - List files test
+   - Get file test
+
+   - oJob Test Results
