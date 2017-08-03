@@ -1,0 +1,30 @@
+author: nmaguiar@gmail.com
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - TAR
+  - Compress
+bugs:
+  url: 'https://github.com/nmaguiar/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/nmaguiar/openaf-opacks/master/Compress'
+description: Provides encapsulation for the Apache Compress library.
+name: Compress
+main: ''
+mainJob: ''
+license: 'https://github.com/nmaguiar/openaf/blob/master/LICENSE'
+version: '20170802'
+dependencies:
+  openaf: '>=20170601'
+files:
+  - .package.yaml
+  - TAR.js
+  - test/UAT.yaml
+filesHash:
+  .package.yaml: 81b73484348a8ba014a519dcc29edaca5e204786
+  TAR.js: 196c7ce3ddf54ce4b1055dad27aabd0b12a6b62e
+  test/UAT.yaml: 50650d3d129595fd4016dfaafad9a0961f22b2fb

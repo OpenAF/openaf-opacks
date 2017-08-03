@@ -1,0 +1,16 @@
+jobs:
+   - name: Create sample tgz file
+     exec: >
+        sh("tar czf test.tgz ../*");
+
+   - name: List files test
+     deps:
+        - Create sample tgz file
+     exec: >
+        loadLib("TAR.js");
+        var t = new TAR("test.tgz");
+        sprint(t.listFiles());
+
+todo:
+   - Create sample tgz file
+   - List files test
