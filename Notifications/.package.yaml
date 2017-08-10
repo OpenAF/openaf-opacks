@@ -1,0 +1,34 @@
+author: nmaguiar@gmail.com
+scripts:
+  posterase: ''
+  postinstall: >
+    log("Pushover: on openaf-console type help Pushover");
+  preerase: ''
+  preinstall: ''
+keywords:
+  - notifications
+  - push
+  - pushover
+  - slack
+bugs:
+  url: 'http://github.com/nmaguiar/openaf-opacks/issues'
+repository:
+  type: http
+  url: >-
+    https://raw.githubusercontent.com/nmaguiar/openaf-opacks/master/Notifications
+description: Provides libraries to use notifications services. Currently pushover.js.
+name: Notifications
+main: ''
+mainJob: ''
+license: 'https://github.com/nmaguiar/openaf-opacks/blob/master/LICENSE'
+version: '20170809'
+dependencies:
+  openaf: '>=20170701'
+files:
+  - .odoc.db
+  - .package.json
+  - pushover.js
+filesHash:
+  .odoc.db: e1021aaa90f81a0decc978b0a85c2c9083a8d86b
+  .package.json: b508505340bc57572772b122a54cd1175b4c4ecd
+  pushover.js: 7a43452c0c7bd03c719b6d4965035937eaecf443
