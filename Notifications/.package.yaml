@@ -29,6 +29,6 @@ files:
   - pushover.js
   - .package.yaml
 filesHash:
-  .odoc.db: e1021aaa90f81a0decc978b0a85c2c9083a8d86b
+  .odoc.db: a8bd8dae25dac9f5f1500c21b6bbb13020ca9460
   pushover.js: bdeca78008a68c2176b3016ffa472361ab299e53
-  .package.yaml: 271939373909e5203ee34db4c1baa725d9899636
+  .package.yaml: 88e7fe8e7d4412e8325e1638ae4a33daafd135e9
