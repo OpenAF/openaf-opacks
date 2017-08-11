@@ -1,7 +1,7 @@
 author: nmaguiar@gmail.com
 scripts:
   posterase: ''
-  postinstall: >
+  postinstall: |
     log("Pushover: on openaf-console type help Pushover");
   preerase: ''
   preinstall: ''
@@ -26,9 +26,9 @@ dependencies:
   openaf: '>=20170701'
 files:
   - .odoc.db
-  - .package.json
+  - .package.yaml
   - pushover.js
 filesHash:
   .odoc.db: e1021aaa90f81a0decc978b0a85c2c9083a8d86b
-  .package.json: b508505340bc57572772b122a54cd1175b4c4ecd
+  .package.yaml: 597170a3f61ced990dcfb998d2581601a7fb3e4e
   pushover.js: 7a43452c0c7bd03c719b6d4965035937eaecf443
