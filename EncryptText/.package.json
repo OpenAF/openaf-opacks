@@ -1,0 +1,36 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "fixSheBang(outputPath + '/encrypt-text.js');",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "crypt",
+    "encrypt",
+    "password"
+  ],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/EncryptText"
+  },
+  "description": "Encrypts a password by asking the user and not displaying on the shell session.",
+  "name": "EncryptText",
+  "main": "encrypt-text.js",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20150815",
+  "dependencies": {
+    "OpenAF": ">=20160816"
+  },
+  "files": [
+    ".package.json",
+    "encrypt-text.js"
+  ],
+  "filesHash": {
+    "encrypt-text.js": "cf0b4493802ddb5f58ffb0660a0ef7e9db6acf0e"
+  }
+}

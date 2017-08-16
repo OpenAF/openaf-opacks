@@ -1,0 +1,30 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CmdUtils"
+  },
+  "description": "Common object library for command utilities",
+  "name": "CmdUtils",
+  "main": "",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20150917",
+  "dependencies": {},
+  "files": [
+    ".package.json",
+    "inprogress.js"
+  ],
+  "filesHash": {
+    "inprogress.js": "300f5f5e33b96f9061f6a91203608910694c3c90"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "Oracle",
+    "SQLDeveloper",
+    "encrypt",
+    "decrypt",
+    "password"
+  ],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SQLDeveloperUtils"
+  },
+  "description": "Provides utilities for SQLDeveloper version >= 4 (like encrypt and decrypt SQLDeveloper passwords)",
+  "name": "SQLDeveloperUtils",
+  "main": "",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20150415",
+  "dependencies": {
+    "OpenAF": ">=20150414"
+  },
+  "files": [
+    ".package.json",
+    "lib/adf-share-ca.jar",
+    "lib/db-ca.jar",
+    "SQLDeveloperPasswordUtil.js"
+  ],
+  "filesHash": {
+    "lib/adf-share-ca.jar": "c00240d3a1bde2cff818411b3ea793475fb9b022",
+    "lib/db-ca.jar": "f87b915e2fcaca97b8f640eebefe717e87f8611f",
+    "SQLDeveloperPasswordUtil.js": "ce1296ffda315c907207fbf963ffde1771284da0"
+  }
+}

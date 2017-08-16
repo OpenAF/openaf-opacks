@@ -1,5 +1,5 @@
 {
-  "author": "nuno.aguiar@wedotechnologies.com",
+  "author": "Nuno Aguiar",
   "scripts": {
     "posterase": "",
     "postinstall": "fixSheBang(outputPath + '/connectTunnels.js'); log('=== Please edit ' + outputPath + '/tunnels.yaml to configure for your needs.'); log('=== Execute \"opack exec Tunnels\" to startup your tunnels.'); log('=== You can also add more files in the same folder and execute \"opack exec Tunnels client1.yaml\"'); ",

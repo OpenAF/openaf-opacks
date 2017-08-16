@@ -1,0 +1,26 @@
+jobs:
+   - name: Log to ElasticSearch
+     help: >
+       This job starts logging to ElasticSearch identified by:
+         - args.url    (String)  An ElasticSearch base URL
+         - args.user   (String)  An ElasticSearch user
+         - args.pass   (String)  An ElasticSearch password
+         - args.index  (String)  An ElasticSearch index
+         - args.hostid (String)  An log hostid 
+     exec: >
+       if (isUnDef(args.url)) throw "Please define an url for ElasticSearch";
+       if (isUnDef(args.user) || isUnDef(args.pass)) throw "Please define an user and password";
+       if (isUnDef(args.index)) throw "Please define an ElasticSearch index";
+       if (isUnDef(args.hostid)) throw "Please define an ElasticSearch hostid";
+
+       load("elasticsearch.js");
+       global.__es = new ElasticSearch(args.url, args.user, args.pass);
+       global.__es.startLog(args.index, args.hostid);
+
+   - name: Stop Log to ElasticSearch
+     type: shutdown
+     help: >
+       Stops logging to ElasticSearch.
+     exec: >
+       global.__es.stopLog();
+

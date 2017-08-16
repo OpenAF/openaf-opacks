@@ -1,0 +1,28 @@
+author: Nuno Aguiar
+scripts:
+  posterase: ''
+  postinstall: ''
+  preerase: ''
+  preinstall: ''
+keywords:
+  - Kubernetes
+  - Kube
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Kube'
+description: Kubernetes REST API access wrapper
+name: Kube
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20170426'
+dependencies:
+  OpenAF: '>=20170217'
+files:
+  - .package.yaml
+  - kube.js
+filesHash:
+  .package.yaml: 8b390f42503e7387b69d0515ac865d1f6b0b5c27
+  kube.js: f04d5869e048540d55c2b1d04d98c67bf8db85cd

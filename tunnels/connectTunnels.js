@@ -1,4 +1,4 @@
-// Author: nuno.aguiar@wedotecnologies.com
+// Author: Nuno Aguiar
 // USAGE:
 //    opack exec Tunnels
 //   OR

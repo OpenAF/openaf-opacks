@@ -1,0 +1,38 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "google",
+    "closure",
+    "compiler",
+    "javascript",
+    "minify"
+  ],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GoogleCompiler"
+  },
+  "description": "Google Closure Compiler, reducing size of Javascript files and makes them more efficient helping your application to load faster and reducing your bandwidth needs and provides warning for illegal JavaScript and warnings for potentially dangerous operations, helping you to produce JavaScript that is less buggy and easier to maintain.",
+  "name": "GoogleCompiler",
+  "main": "main.js",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20150902",
+  "dependencies": {},
+  "files": [
+    ".package.json",
+    "compiler.jar",
+    "main.js"
+  ],
+  "filesHash": {
+    "compiler.jar": "d2be36bcea206248c027d62904b37cd497f2dc03",
+    "main.js": "89210d7d4ad476d8cb2d6a910d9d8020fe1d5425"
+  }
+}

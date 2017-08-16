@@ -1,0 +1,45 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "ssl",
+    "installcert",
+    "keytool",
+    "https"
+  ],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/InstallCert"
+  },
+  "description": "Easy local installation of SSL certificates.",
+  "name": "InstallCert",
+  "main": "InstallCert.js",
+  "mainJob": "",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20170401",
+  "dependencies": {
+    "OpenAF": ">=20150902"
+  },
+  "files": [
+    ".package.json",
+    "InstallCert.js",
+    "lib/InstallCert$SavingTrustManager.class",
+    "lib/InstallCert.class",
+    "src/InstallCert.java"
+  ],
+  "filesHash": {
+    ".package.json": "368d148d5256ac1abe8b3ac0bf841be4438eea09",
+    "InstallCert.js": "d45113294ae5a1c4c05db62e305ba9204385c898",
+    "lib/InstallCert$SavingTrustManager.class": "29e86e17db020084290974bf6e4b170a96e64698",
+    "lib/InstallCert.class": "8cb550436fffa51b2a5ccc99083428b39d498c4c",
+    "src/InstallCert.java": "d8771d979c110e7765bec059e46addde2b633349"
+  }
+}

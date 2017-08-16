@@ -1,0 +1,29 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - ElasticSearch
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ElasticSearch'
+description: Provides ElasticSearch functionality for OpenAF scripts.
+name: ElasticSearch
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20170622'
+dependencies:
+  openaf: '>=20170601'
+files:
+  - .odoc.db
+  - elasticsearch.js
+  - ElasticSearch.yaml
+filesHash:
+  .odoc.db: b3e23d3c730ead4a4f318f85b6c900c337c6e477
+  elasticsearch.js: 5813c9edafe994b6391da5112828c0a509d66791
+  ElasticSearch.yaml: 7b723b144a38b373c941aa2c01cd32ded573694e
