@@ -11,7 +11,7 @@ keywords:
   - pushover
   - slack
 bugs:
-  url: 'http://github.com/nmaguiar/openaf-opacks/issues'
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
   url: >-
@@ -20,15 +20,15 @@ description: Provides libraries to use notifications services. Currently pushove
 name: Notifications
 main: ''
 mainJob: ''
-license: 'https://github.com/nmaguiar/openaf-opacks/blob/master/LICENSE'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170809'
 dependencies:
   openaf: '>=20170701'
 files:
   - .odoc.db
-  - pushover.js
   - .package.yaml
+  - pushover.js
 filesHash:
   .odoc.db: e1021aaa90f81a0decc978b0a85c2c9083a8d86b
-  pushover.js: bdeca78008a68c2176b3016ffa472361ab299e53
-  .package.yaml: 271939373909e5203ee34db4c1baa725d9899636
+  .package.yaml: 332632cb3461e750a55c9917dfdd499f465706ea
+  pushover.js: 7a43452c0c7bd03c719b6d4965035937eaecf443

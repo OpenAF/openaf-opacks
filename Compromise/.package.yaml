@@ -10,17 +10,17 @@ keywords:
   - npl
   - Compromise
 bugs:
-  url: null
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'http://192.168.40.110/others/Compromise'
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compromise'
 description: >-
   Integrates the NPL Compromise lib
   (https://github.com/nlp-compromise/compromise) into a opack.
 name: Compromise
 main: main.js
 mainJob: ''
-license: MIT
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170429'
 dependencies:
   openaf: '>=20170401'
@@ -29,6 +29,6 @@ files:
   - compromise.js
   - main.js
 filesHash:
-  .package.yaml: e0e8053a0a2e15fe32b497dbd4ef8529e3f79738
+  .package.yaml: c442140b4c990bd74e27c660f59e01426f372db0
   compromise.js: 4369b00388ee993ad632fa506f5a67f1c8931a17
   main.js: 72ef7e68ea04014281ca8d0a875e5728395a6cbc

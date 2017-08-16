@@ -10,15 +10,15 @@ keywords:
   - startup
   - restart
 bugs:
-  url: 'http://192.168.40.110:8080/others'
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'http://192.168.40.110/svn/others/initd'
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/initd'
 description: Creates initd scripts to use with the openaf's --daemon command line option.
 name: initd
 main: ''
 mainJob: generateInitScript.yaml
-license: Apache 2.0
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170418'
 dependencies:
   openaf: '>=20170410'
@@ -27,6 +27,6 @@ files:
   - generateInitScript.yaml
   - script.hbs
 filesHash:
-  .package.yaml: 5e5e415d101d6dd18ff93ff0af7bf3b2fb99dd95
+  .package.yaml: 8b0aecec0a835aa1dafa53b9de8f5dfc5bc8954b
   generateInitScript.yaml: b0e5ee123dcafdbb7f6e263b905b6209fc9efc2b
   script.hbs: 5b6eea5a1df6033557f9ca5fb9ccc4e4a6e9d733

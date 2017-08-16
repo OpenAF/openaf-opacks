@@ -8,25 +8,25 @@ keywords:
   - TAR
   - Compress
 bugs:
-  url: 'https://github.com/nmaguiar/openaf-opacks/issues'
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/nmaguiar/openaf-opacks/master/Compress'
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compress'
 description: Provides encapsulation for the Apache Compress library.
 name: Compress
 main: ''
 mainJob: ''
-license: 'https://github.com/nmaguiar/openaf/blob/master/LICENSE'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170802'
 dependencies:
   openaf: '>=20170601'
 files:
-  - TAR.js
-  - test/TAR.yaml
   - .odoc.db
   - .package.yaml
+  - TAR.js
+  - test/TAR.yaml
 filesHash:
-  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
-  test/TAR.yaml: f905dbcffc89eebe48f25a3fd4d8604086caff28
   .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb
-  .package.yaml: d3784045ac29ba2d70fccfea5c7446fc522faf6b
+  .package.yaml: 06a4c9ea2e43f09130ad61675f6a084386d7f2df
+  TAR.js: fdcb0371d9cb1009f77f41b60a2bfbfdf4535dae
+  test/TAR.yaml: 642a12d3efccb580706e31961adec8f74cdf9377

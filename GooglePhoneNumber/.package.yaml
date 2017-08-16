@@ -10,17 +10,17 @@ keywords:
   - i18n
   - Number
 bugs:
-  url: 'http://192.168.40.110:8080/others'
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'http://192.168.40.110/svn/others/GooglePhoneNumber'
+  url: 'https://github.com/OpenAF/openaf-opacks/blob/master/GooglePhoneNumber'
 description: >-
   Provides a wrapper to use the google phone number library
   (https://github.com/googlei18n/libphonenumber/).
 name: GooglePhoneNumber
 main: main.js
 mainJob: ''
-license: Apache 2.0
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170726'
 dependencies:
   openaf: '>=20170301'
@@ -36,7 +36,7 @@ files:
   - main.js
   - updateGooglePhoneNumber.yaml
 filesHash:
-  .package.yaml: 3f3a210d404c2c66382080d46a77b525636b153f
+  .package.yaml: 3da65be1c284cececb131b27998910253599028f
   googlePhoneNumber.js: 607c0d765e93f8a58539caa52f6f8ec8bfc5a0b7
   googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
   lib/carrier-1.65.jar: 194b3a5d8780335ea7628976cba308c93b74fd30

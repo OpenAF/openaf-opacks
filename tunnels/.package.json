@@ -13,17 +13,17 @@
     "forwarding"
   ],
   "bugs": {
-    "url": "http://192.168.40.110:8080/projects/openafscripts"
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
   },
   "repository": {
     "type": "http",
-    "url": "http://192.168.40.110/svn/others/OpenAFScripts/Tunnels"
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/tunnels"
   },
   "description": "Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.",
   "name": "Tunnels",
   "main": "connectTunnels.js",
   "mainJob": "",
-  "license": "WeDo internal",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
   "version": "20170119",
   "dependencies": {
     "OpenAF": ">=20160901"
@@ -34,7 +34,7 @@
     "tunnels.yaml"
   ],
   "filesHash": {
-    ".package.json": "90ed4b3bfe639667a0a3759d00d25aae7d8c0ed8",
+    ".package.json": "fa566f2b113db7de1dcb7932a1896fb8cdd26c0a",
     "connectTunnels.js": "153d58ab01fa3977d912d910162743912ee84e7f",
     "tunnels.yaml": "fedf8d90210f97e991ce29d502315a680dcb2867"
   }
