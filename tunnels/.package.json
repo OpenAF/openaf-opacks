@@ -24,7 +24,7 @@
   "main": "connectTunnels.js",
   "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
-  "version": "20170119",
+  "version": "20170801",
   "dependencies": {
     "OpenAF": ">=20160901"
   },
@@ -34,8 +34,8 @@
     "tunnels.yaml"
   ],
   "filesHash": {
-    ".package.json": "fa566f2b113db7de1dcb7932a1896fb8cdd26c0a",
-    "connectTunnels.js": "153d58ab01fa3977d912d910162743912ee84e7f",
+    ".package.json": "f7f68efe47c8728a505a4978c6693f0d041d1d7c",
+    "connectTunnels.js": "a437569d0753a7928ddd8633707074d047cdadc9",
     "tunnels.yaml": "fedf8d90210f97e991ce29d502315a680dcb2867"
   }
 }
