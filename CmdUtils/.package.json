@@ -17,6 +17,7 @@
   "description": "Common object library for command utilities",
   "name": "CmdUtils",
   "main": "",
+  "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
   "version": "20150917",
   "dependencies": {},
@@ -25,6 +26,7 @@
     "inprogress.js"
   ],
   "filesHash": {
-    "inprogress.js": "300f5f5e33b96f9061f6a91203608910694c3c90"
+    ".package.json": "6faa56bf8f69f339a290d2fd712ab649198b7779",
+    "inprogress.js": "b8ffb19a50f26993d27bf79a6c31d7cd626213ef"
   }
 }

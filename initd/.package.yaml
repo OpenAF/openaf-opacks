@@ -27,6 +27,6 @@ files:
   - generateInitScript.yaml
   - script.hbs
 filesHash:
-  .package.yaml: 8b0aecec0a835aa1dafa53b9de8f5dfc5bc8954b
+  .package.yaml: 98a8c50c3975e78370e183d77afaae636480f3a5
   generateInitScript.yaml: b0e5ee123dcafdbb7f6e263b905b6209fc9efc2b
   script.hbs: 5b6eea5a1df6033557f9ca5fb9ccc4e4a6e9d733

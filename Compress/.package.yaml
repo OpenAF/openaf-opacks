@@ -27,6 +27,6 @@ files:
   - test/TAR.yaml
 filesHash:
   .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb
-  .package.yaml: 06a4c9ea2e43f09130ad61675f6a084386d7f2df
-  TAR.js: fdcb0371d9cb1009f77f41b60a2bfbfdf4535dae
-  test/TAR.yaml: 642a12d3efccb580706e31961adec8f74cdf9377
+  .package.yaml: f34a5f15e61e24f03f85067eaed5c2f0305bf32f
+  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
+  test/TAR.yaml: f905dbcffc89eebe48f25a3fd4d8604086caff28

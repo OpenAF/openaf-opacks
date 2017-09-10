@@ -16,7 +16,7 @@ description: Kubernetes REST API access wrapper
 name: Kube
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20170426'
 dependencies:
   OpenAF: '>=20170217'
@@ -24,5 +24,5 @@ files:
   - .package.yaml
   - kube.js
 filesHash:
-  .package.yaml: 8b390f42503e7387b69d0515ac865d1f6b0b5c27
+  .package.yaml: 801bb64293be0dfbed016c5c860127cc7bf251ec
   kube.js: f04d5869e048540d55c2b1d04d98c67bf8db85cd
