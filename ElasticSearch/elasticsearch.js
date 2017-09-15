@@ -7,8 +7,8 @@
  */
 var ElasticSearch = function(aURL, aUser, aPassword) {
 	if (isUnDef(aURL)) throw "Please provide aURL";
-	if (isUnDef(aUser)) throw "Please provide aUser";
-	if (isUnDef(aPassword)) throw "Please provide aPassword";
+	//if (isUnDef(aUser)) throw "Please provide aUser";
+	//if (isUnDef(aPassword)) throw "Please provide aPassword";
 
 	this.url = aURL;
 	this.user = aUser;
