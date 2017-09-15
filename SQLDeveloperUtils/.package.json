@@ -23,6 +23,7 @@
   "description": "Provides utilities for SQLDeveloper version >= 4 (like encrypt and decrypt SQLDeveloper passwords)",
   "name": "SQLDeveloperUtils",
   "main": "",
+  "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
   "version": "20150415",
   "dependencies": {
@@ -35,8 +36,9 @@
     "SQLDeveloperPasswordUtil.js"
   ],
   "filesHash": {
+    ".package.json": "08939bae0d131a108ac8cb459be88e923101e6e6",
     "lib/adf-share-ca.jar": "c00240d3a1bde2cff818411b3ea793475fb9b022",
     "lib/db-ca.jar": "f87b915e2fcaca97b8f640eebefe717e87f8611f",
-    "SQLDeveloperPasswordUtil.js": "ce1296ffda315c907207fbf963ffde1771284da0"
+    "SQLDeveloperPasswordUtil.js": "97f56fb5b16543e112bc11d12c87d403c8fe2ae7"
   }
 }

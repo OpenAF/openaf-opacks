@@ -21,6 +21,7 @@
   "description": "Encrypts a password by asking the user and not displaying on the shell session.",
   "name": "EncryptText",
   "main": "encrypt-text.js",
+  "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
   "version": "20150815",
   "dependencies": {
@@ -31,6 +32,7 @@
     "encrypt-text.js"
   ],
   "filesHash": {
-    "encrypt-text.js": "cf0b4493802ddb5f58ffb0660a0ef7e9db6acf0e"
+    ".package.json": "da65d2bc98907355dba2aaf3b53bf96354824f5f",
+    "encrypt-text.js": "2a8bf753339ed19c531ccbf44e9003a8d3a0da8c"
   }
 }

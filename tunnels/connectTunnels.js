@@ -64,20 +64,22 @@ parallel4Array(tunnels, function(hostname) {
 
 		     // Check if it's a local or remote tunnel and connect
 		     if(typeof tunnel.localHost === 'undefined') {
-		       log("[" + hostname + ":" + i + "] " + tunnel.remoteHost + ":" + tunnel.remotePort + " -> local port " + tunnel.localPort);
-		       if (tunnel.bindAll)
-		       	  sshs[hostname].tunnelLocalBind("0.0.0.0", tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);
-		       else
-		       	  sshs[hostname].tunnelLocal(tunnel.localPort, tunnel.remoteHost, tunnel.remotePort); 
+			   log("[" + hostname + ":" + i + "] " + tunnel.remoteHost + ":" + tunnel.remotePort + " -> local port " + tunnel.localPort);
+			   sshs[hostname].tunnelLocalBind("0.0.0.0", tunnel.localPort, tunnel.remoteHost, tunnel.remotePort);      
 		     } else {
 		       log("[" + hostname + ":" + i + "] " + tunnel.localHost + ":" + tunnel.localPort + " <- from remote " + host.host + ":" + tunnel.remotePort);
 		       sshs[hostname].tunnelRemoteBind(tunnel.remoteHost, tunnel.remotePort, tunnel.localHost, tunnel.localPort);
 		     }
 		  }
+		  while(1) {
+			  sshs[hostname].exec("echo 1");
+			  sleep(30000);
+		  }
 	  } catch(e) {
-	     logErr(e);
+		  try { sshs[hostname].close(); } catch(ee) {}
+		  logErr(e);
+		  sleep(2000);
 	  }
-	  sleep(2000);
   }
 });
 
