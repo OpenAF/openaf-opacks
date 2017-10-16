@@ -24,5 +24,4 @@ files:
   - .package.yaml
   - kube.js
 filesHash:
-  .package.yaml: f0860b42b806b5784c086cab42d9964921afa910
-  kube.js: f04d5869e048540d55c2b1d04d98c67bf8db85cd
+  kube.js: 1be7935d50c90e24c6ecf9519ce598d4f94b0320
