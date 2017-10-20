@@ -44,7 +44,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var prevOut = out.length;
 	var prevTime = now();
 	while ((now() - prevTime) < 150) {
-		sleep(50);
+		//sleep(50);
 		if (out.length > prevOut) {
 			prevOut = out.length;
 			prevTime = now();
