@@ -19,9 +19,9 @@ mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20171019'
 dependencies:
-  OpenAF: '>=20170927'
+  OpenAF: '>=20171020'
 files:
   - .package.yaml
   - kube.js
 filesHash:
-  kube.js: 1842d6a14bbdbc2f349d5a4d1f9dc263273a44e6
+  kube.js: 8a9f9b37a508e57f3772bdd7744e3ab8975aa32e

@@ -8,7 +8,7 @@ var Kube = function (aURL, aUser, aPass) {
 
 Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var h = new HTTP();
-	if (isDef(this.user)) h.login(this.user, this.pass);
+	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url.replace(/^http/i, "ws"));
 
 	var pre = (doSH) ? "command=/bin/sh&command=-c&" : "";
 	var cmd = pre + "stderr=true&command=" + aCommand.split(/ +/).join("&command=");
@@ -56,7 +56,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 
 Kube.prototype.getNamespaces = function (full) {
 	var h = new HTTP();
-	if (isDef(this.user)) h.login(this.user, this.pass);
+	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
 
 	var res = JSON.parse(h.exec(this.url + "/api/v1/pods").response);
 
@@ -68,7 +68,7 @@ Kube.prototype.getNamespaces = function (full) {
 
 Kube.prototype.getNames = function (aNamespace, full) {
 	var h = new HTTP();
-	if (isDef(this.user)) h.login(this.user, this.pass);
+	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
 
 	var res = JSON.parse(h.exec(this.url + "/api/v1/pods").response);
 
