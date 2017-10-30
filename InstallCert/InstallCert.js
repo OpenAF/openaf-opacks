@@ -8,5 +8,5 @@ if (typeof classPath === 'undefined') {
 var javaHome  = String(java.lang.System.getProperty("java.home"));
 var params = __expr.replace(/exec InstallCert/i, "");
 var sep = java.io.File.separator;
-sh("\"" + javaHome + sep + "bin" + sep + "java -cp \"" + classPath + "\" InstallCert " + params, "", null, true);
+sh("\"" + javaHome + sep + "bin" + sep + "java\" -cp \"" + classPath + "\" InstallCert " + params, "", null, true);
 if (__exitcode != 0) printErr(__stderr);
