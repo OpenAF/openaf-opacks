@@ -7,7 +7,7 @@ jobs:
    - name: Set Env
      exec: >
        loadLib("googlePhoneNumber.js");
-       args.libpath = getOPackPaths()["GooglePhoneNumber"] + "/lib";
+       args.libpath = (isDef(getOPackPaths()["GooglePhoneNumber"])) ? getOPackPaths()["GooglePhoneNumber"] + "/lib" : "./lib";
 
    # Updates the google phone number jars
    #

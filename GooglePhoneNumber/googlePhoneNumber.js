@@ -1,5 +1,5 @@
 var GooglePhoneNumber = function(aLibPath) {
-	if (isUnDef(aLibPath)) aLibPath = (isDef(getOPackPaths()["GooglePhoneNumber"]) ? getOPackPaths()["GooglePhoneNumber"]+"/lib" : "/lib");
+	if (isUnDef(aLibPath)) aLibPath = (isDef(getOPackPaths()["GooglePhoneNumber"]) ? getOPackPaths()["GooglePhoneNumber"]+"/lib" : "./lib");
 	this.LIB_PATH = (new java.io.File(aLibPath)).getAbsolutePath();
 
         if (Object.keys(Packages.com.google.i18n.phonenumbers.PhoneNumberUtil).length <= 2) {
