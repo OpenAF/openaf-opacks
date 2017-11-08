@@ -25,6 +25,6 @@ files:
   - elasticsearch.js
   - ElasticSearch.yaml
 filesHash:
-  .odoc.db: 8d5a2564f7b19389eb39c506871c38906c9683a3
-  elasticsearch.js: f2855891e35b25df6df3088be9fdc032af04a6a3
-  ElasticSearch.yaml: 094f425fe03f890cd847876a81256e7bb661f5ec
+  .odoc.db: 69c89ca0837daf5e74e4e021384f9957fe30294f
+  elasticsearch.js: 8b96bfc35370bdfae84410693f2fd882a5c59552
+  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
