@@ -40,21 +40,23 @@ ElasticSearch.prototype.deleteIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonRemove(this.url + "/" + aIndex, {}, {}, this.user, this.pass);
+	return ow.obj.rest.jsonRemove(this.url + "/" + aIndex, {}, this.user, this.pass);
 }
 
 /**
  * <odoc>
- * <key>ElasticSearch.renameIndex(anOriginalIndex, aNewIndex) : Map</key>
- * Tries to rename anOriginalIndex to aNewIndex (reindex) and returns the result.
+ * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex) : Map</key>
+ * Tries to copy anOriginalIndex to aNewIndex (reindex) and returns the result.
  * </odoc>
  */
-ElasticSearch.prototype.renameIndex = function(anOrigIndex, aNewIndex) {
+ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex) {
 	ow.loadObj();
 
 	if (isUnDef(anOrigIndex) || isUnDef(aNewIndex)) throw "Please provide an original index and the new index name";
 
-	return ow.obj.rest.jsonSet(this.url + "/_reindex", {}, { source : { index: anOrigIndex }, dest: { index: aNewIndex }}, this.user, this.pass);
+	var res = ow.obj.rest.jsonSet(this.url + "/_reindex", {}, { source : { index: anOrigIndex }, dest: { index: aNewIndex }}, this.user, this.pass);
+
+	return res;
 }
 
 ElasticSearch.prototype.getClusterHealth = function() {
