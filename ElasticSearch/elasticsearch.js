@@ -115,7 +115,7 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 	});
 }
 
-/**
+/** 
  * <odoc>
  * <key>ElasticSearch.startLog(aIndex, aHostId, localCopy)</key>
  * Starts sending all OpenAF logging to ElasticSearch on aIndex using aHostId (defaults to aIndex if not provided).

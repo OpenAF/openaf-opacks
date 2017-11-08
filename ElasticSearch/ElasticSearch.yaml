@@ -1,6 +1,6 @@
 jobs:
    # Redirect logging to ElasticSearch
-   #
+   # 
    - name: Log to ElasticSearch
      help: >
        This job starts logging to ElasticSearch identified by:
