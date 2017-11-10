@@ -54,7 +54,7 @@ ElasticSearch.prototype.closeIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonSet(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
+	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
 }
 
 /**
@@ -68,7 +68,7 @@ ElasticSearch.prototype.openIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonSet(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
+	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
 }
 
 /**
