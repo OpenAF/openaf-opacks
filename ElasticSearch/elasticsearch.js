@@ -45,6 +45,34 @@ ElasticSearch.prototype.deleteIndex = function(aIndex) {
 
 /**
  * <odoc>
+ * <key>ElasticSearch.closeIndex(aIndex) : Map</key>
+ * Tries to close aIndex on Elastic Search and returns the result.
+ * </odoc>
+ */
+ElasticSearch.prototype.closeIndex = function(aIndex) {
+	ow.loadObj();
+
+	if (isUnDef(aIndex)) throw "Please provide aIndex";
+
+	return ow.obj.rest.jsonSet(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
+}
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.openIndex(aIndex) : Map</key>
+ * Tries to open aIndex on Elastic Search and returns the result.
+ * </odoc>
+ */
+ElasticSearch.prototype.openIndex = function(aIndex) {
+	ow.loadObj();
+
+	if (isUnDef(aIndex)) throw "Please provide aIndex";
+
+	return ow.obj.rest.jsonSet(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
+}
+
+/**
+ * <odoc>
  * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex) : Map</key>
  * Tries to copy anOriginalIndex to aNewIndex (reindex) and returns the result.
  * </odoc>
