@@ -138,6 +138,7 @@ ow.ch.__types.gist = {
  * </odoc> 
  */
 var GIST = function(aMap) {
+    if (isUnDef(aMap)) aMap = {};
     this.ch = (isDef(aMap.ch)) ? aMap.ch : "__gist";
     $ch(this.ch).create(true, "gist", aMap);
 };
