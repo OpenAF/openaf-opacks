@@ -8,20 +8,22 @@ keywords:
   - github
   - gist
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GIST
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GIST'
 description: Provides an OpenAF channel implementation to use GitHub's GIST.
 name: GIST
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20171110'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20171111'
 dependencies:
   openaf: '>=20171111'
 files:
-  - gist.js
   - .package.yaml
+  - gist.js
+  - README.md
 filesHash:
-  gist.js: 07864b642da1b734691468c2f2e1c4ef684a292b
+  gist.js: c9ec9a207e0024feb9e5c34f6a0e2afa0df92407
+  README.md: c2335e4459efb37caf2632d1e1169fec9d2fefc6

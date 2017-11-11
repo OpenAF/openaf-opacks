@@ -53,10 +53,11 @@ ow.ch.__types.gist = {
         gist.public = (isUnDef(aK.public)) ? false : aK.public;
         gist.description = (isUnDef(aK.description)) ? "" : aK.description;
         gist.files = {};
-        if (isUnDef(aV.files)) {
+        if (isUnDef(aV.files) || isDef(aK.file)) {
             if(isObject(aV) || isString(aV) || isNumber(aV) || isArray(aV)) {
-                gist.files["object.json"] = {};
-                gist.files["object.json"].content = stringify(aV);
+                var filename = (isDef(aK.file)) ? aK.file : "object.json";
+                gist.files[filename] = {};
+                gist.files[filename].content = stringify(aV);
             } else {
                 throw "You need to provie an object or string or number or array or a files map with filenames and contents.";
             }
@@ -93,22 +94,26 @@ ow.ch.__types.gist = {
         if (isUnDef(aK.id)) throw "You need to provide a GIST id and, optionally, a 'file'name.";
 
         var data = ow.obj.rest.jsonGet(this.__gistURL + "/gists/" + aK.id, {}, undefined, undefined, undefined, auth);
+        var res;
         if (isDef(aK.file)) {
             if (isDef(data.files) && isDef(data.files[aK.file])) {
                 if (isDef(data.files[aK.file].content)) 
-                    return data.files[aK.file];
+                    res = data.files[aK.file];
                 else
-                    return merge({ content: ow.obj.rest.get(data.files[aK.file].raw_url, {}, undefined, undefined, undefined, auth) }, data.files[aK.file]);
+                    res = merge({ content: ow.obj.rest.get(data.files[aK.file].raw_url, {}, undefined, undefined, undefined, auth) }, data.files[aK.file]);
             } else {
                 return undefined;
             }
         } else {
             if (isDef(data.files["object.json"])) {
-                return data.files["object.json"];
+                res = data.files["object.json"];
             } else {
-                return data;
+                res = data;
             }
         }
+
+        if (isDef(res.type) && res.type == "application/json") res.content = jsonParse(res.content);
+        return res;
     },
     pop          : function(aName) { return undefined; },
     shift        : function(aName) { return undefined; },
