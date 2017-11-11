@@ -65,7 +65,7 @@ ow.ch.__types.gist = {
             for(var file in aV.files) {
                 gist.files[file] = {};
                 if (isUnDef(aV.files[file].content)) throw "Each file needs to have a 'content' key with the corresponding content.";
-                gist.files[file].content = aV.files[file].content;
+                gist.files[file].content = stringify(aV.files[file].content);
             }
         }
         if (isDef(aK.id)) {
@@ -188,7 +188,7 @@ GIST.prototype.clip = function(aFile, aDescription, aContent, isPublic) {
 GIST.prototype.getClip = function(aId, aFile) {
     var filename = (isDef(aFile)) ? aFile : "object.json";
 
-    return this.getCh().get({ id: aId, file: filename });
+    return this.getCh().get({ id: aId, file: filename }).content;
 }
 
 /**
@@ -243,5 +243,5 @@ GIST.prototype.unClip = function(aID) {
  * </odoc>
  */
 GIST.prototype.close = function() {
-    $(this.ch).destroy();
+    $ch(this.ch).destroy();
 };
