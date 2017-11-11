@@ -188,7 +188,9 @@ GIST.prototype.clip = function(aFile, aDescription, aContent, isPublic) {
 GIST.prototype.getClip = function(aId, aFile) {
     var filename = (isDef(aFile)) ? aFile : "object.json";
 
-    return this.getCh().get({ id: aId, file: filename }).content;
+    var res = this.getCh().get({ id: aId, file: filename });
+    
+    if (isDef(res.content)) return res.content; else return res;
 }
 
 /**
