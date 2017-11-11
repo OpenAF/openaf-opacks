@@ -190,7 +190,7 @@ GIST.prototype.getClip = function(aId, aFile) {
 
     var res = this.getCh().get({ id: aId, file: filename });
     
-    if (isDef(res.content)) return res.content; else return res;
+    if (isDef(res) && isDef(res.content)) return res.content; else return res;
 }
 
 /**
