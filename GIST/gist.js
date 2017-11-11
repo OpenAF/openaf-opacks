@@ -129,3 +129,119 @@ ow.ch.__types.gist = {
         return ow.obj.rest.jsonRemove(this.__gistURL + "/gists/" + aK.id, undefined, undefined, undefined, undefined, auth);
     }
 };
+
+/**
+ * <odoc>
+ * <key>GIST(aOptionsMap) : GIST</key>
+ * Creates a GIST object for easier manipulation of a "gist" openaf channel. 
+ * A channel "__gist" will be created. To override this use aOptionsMap.ch to provide a different channel name.
+ * </odoc> 
+ */
+var GIST = function(aMap) {
+    this.ch = (isDef(aMap.ch)) ? aMap.ch : "__gist";
+    $ch(this.ch).create(true, "gist", aMap);
+};
+
+/**
+ * <odoc>
+ * <key>GIST.getCh() : Channel</key>
+ * Returns the current gist channel being use.
+ * </odoc>
+ */
+GIST.prototype.getCh = function() {
+    return $ch(this.ch);
+};
+
+/**
+ * <odoc>
+ * <key>GIST.clip(aFile, aDescription, aContent, isPublic) : String</key>
+ * Creates a new GIST given aFile (a filename), aDescription, aContent (an object, string, array or number). Optionally you
+ * can specify if the GIST should be public with isPublic = true. If successfull returns the GIST id, URL and file URL.
+ * </odoc>
+ */
+GIST.prototype.clip = function(aFile, aDescription, aContent, isPublic) {
+    var aK = { public: isPublic, description: aDescription }, aV = {};
+    var filename = (isDef(aFile)) ? aFile : "object.json";
+    
+    aV.files = {};
+    aV.files[aFile] = { content: aContent };
+    var res;
+    try {
+        res = this.getCh().set(aK, aV);
+    } catch(e) {
+        throw e;
+    }
+
+    return {
+        id: res.id,
+        gistURL: res.html_url,
+        fileURL: res.files[filename].raw_url
+    };
+};
+
+/**
+ * <odoc>
+ * <key>GIST.getClip(aId, aFile) : Object</key>
+ * Tries to retrieve aFile from the GIST aId returning it's contents.
+ * </odoc>
+ */
+GIST.prototype.getClip = function(aId, aFile) {
+    var filename = (isDef(aFile)) ? aFile : "object.json";
+
+    return this.getCh().get({ id: aId, file: filename });
+}
+
+/**
+ * <odoc>
+ * <key>GIST.setClip(aId, aFile, aContent) : String</key>
+ * Tries to change aId GIST, for the aFile (a filename) with aContent (an object, string, array or number). Returns the GIST id, URL and file URL.
+ * </odoc>
+ */
+GIST.prototype.setClip = function(aId, aFile, aContent) {
+    var aK = { id: aId };
+    var aV = {
+        files: {}
+    };
+    var filename = (isDef(aFile)) ? aFile : "object.json";
+    aV.files[filename] = { content: aContent };
+    var res;
+    try {
+        res = this.getCh().set(aK, aV);
+    } catch(e) {
+        throw e;
+    }
+    
+    return {
+        id: res.id,
+        gistURL: res.html_url,
+        fileURL: res.files[filename].raw_url
+    };
+};
+
+/**
+ * <odoc>
+ * <key>GIST.unClip(aID)</key>
+ * Tries to delete a GIST with the provided aID.
+ * </odoc>
+ */
+GIST.prototype.unClip = function(aID) {
+    var res;
+
+    try {
+        res = this.getCh().unset({id: aID});
+    } catch(e) {
+        throw e;
+    }
+
+    return res;
+}
+
+/**
+ * <odoc>
+ * <key>GIST.close()</key>
+ * Destroys the current gist channel (no data will be losted since is stored in GitHub)
+ * </odoc>
+ */
+GIST.prototype.close = function() {
+    $(this.ch).destroy();
+};

@@ -21,9 +21,11 @@ version: '20171111'
 dependencies:
   openaf: '>=20171111'
 files:
+  - .odoc.db
   - .package.yaml
   - gist.js
   - README.md
 filesHash:
-  gist.js: c9ec9a207e0024feb9e5c34f6a0e2afa0df92407
+  .odoc.db: bd647dd129d53586cabf3afdd70bac3b5711addd
+  gist.js: 0ecd8bb8a6e58f810b38ae7eec2533c72d7bf2a7
   README.md: c2335e4459efb37caf2632d1e1169fec9d2fefc6
