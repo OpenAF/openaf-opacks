@@ -1,0 +1,27 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - github
+  - gist
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GIST
+description: Provides an OpenAF channel implementation to use GitHub's GIST.
+name: GIST
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20171110'
+dependencies:
+  openaf: '>=20171111'
+files:
+  - gist.js
+  - .package.yaml
+filesHash:
+  gist.js: 07864b642da1b734691468c2f2e1c4ef684a292b
