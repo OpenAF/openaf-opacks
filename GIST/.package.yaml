@@ -23,9 +23,9 @@ dependencies:
 files:
   - .odoc.db
   - .package.yaml
-  - README.md
   - gist.js
+  - README.md
 filesHash:
   .odoc.db: bd647dd129d53586cabf3afdd70bac3b5711addd
-  README.md: c2335e4459efb37caf2632d1e1169fec9d2fefc6
-  gist.js: 99ae57aa8dfee27a46a22c4398ba2e22f2cee3af
+  gist.js: 883e4abf73cf44ce6f4f04239c3847c20ee6b58c
+  README.md: f5b2267751c7165ba71059f01cb57318e95ace31

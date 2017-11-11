@@ -53,19 +53,25 @@ ow.ch.__types.gist = {
         gist.public = (isUnDef(aK.public)) ? false : aK.public;
         gist.description = (isUnDef(aK.description)) ? "" : aK.description;
         gist.files = {};
-        if (isUnDef(aV.files) || isDef(aK.file)) {
-            if(isObject(aV) || isString(aV) || isNumber(aV) || isArray(aV)) {
+        if ( isDef(aK.file) || (aV != null && isUnDef(aV.files)) ) {
+            if(aV == null || isObject(aV) || isString(aV) || isNumber(aV) || isArray(aV)) {
                 var filename = (isDef(aK.file)) ? aK.file : "object.json";
                 gist.files[filename] = {};
-                gist.files[filename].content = stringify(aV, undefined, "");
+                if (aV == null)
+                    gist.files[filename] = null;
+                else
+                    gist.files[filename].content = stringify(aV, undefined, "");
             } else {
-                throw "You need to provie an object or string or number or array or a files map with filenames and contents.";
+                throw "You need to provide an object or string or number or array or a files map with filenames and contents.";
             }
         } else {
             for(var file in aV.files) {
                 gist.files[file] = {};
-                if (isUnDef(aV.files[file].content)) throw "Each file needs to have a 'content' key with the corresponding content.";
-                gist.files[file].content = stringify(aV.files[file].content, undefined, "");
+                if (aV.files[file] != null && isUnDef(aV.files[file].content)) throw "Each file needs to have a 'content' key with the corresponding content.";
+                if (aV.files[file] == null)
+                    gist.files[file] = null;
+                else
+                    gist.files[file].content = stringify(aV.files[file].content, undefined, "");
             }
         }
         if (isDef(aK.id)) {
@@ -206,7 +212,10 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
         files: {}
     };
     var filename = (isDef(aFile)) ? aFile : "object.json";
-    aV.files[filename] = { content: aContent };
+    if (aContent == null) 
+        aV.files[filename] = null;
+    else
+        aV.files[filename] = { content: aContent };
     var res;
     try {
         res = this.getCh().set(aK, aV);
@@ -217,7 +226,7 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
     return {
         id: res.id,
         gistURL: res.html_url,
-        fileURL: res.files[filename].raw_url
+        fileURL: (isDef(res.files[filename]) && isDef(res.files[filename].raw_url)) ? res.files[filename].raw_url : undefined
     };
 };
 
@@ -232,6 +241,32 @@ GIST.prototype.unClip = function(aID) {
 
     try {
         res = this.getCh().unset({id: aID});
+    } catch(e) {
+        throw e;
+    }
+
+    return res;
+}
+
+/**
+ * <odoc>
+ * <key>GIST.getVersions(aID) : Array</key>
+ * Tries to retrieve all versions of the clip/gist aID sorted by change date.
+ * </odoc>
+ */
+GIST.prototype.getVersions = function(aID) {
+    var res; 
+
+    try {
+        res = $from(this.getCh().get({ id: aID }).history)
+              .sort("committed_at")
+              .select((r) => {
+                  return {
+                      version: r.version,
+                      versionId: aID + "/" + r.version,
+                      date: r.committed_at
+                  };
+              });
     } catch(e) {
         throw e;
     }
