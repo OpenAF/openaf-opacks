@@ -17,7 +17,7 @@ name: GIST
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20171112'
+version: '20171113'
 dependencies:
   openaf: '>=20171111'
 files:
@@ -26,6 +26,6 @@ files:
   - gist.js
   - README.md
 filesHash:
-  .odoc.db: bd647dd129d53586cabf3afdd70bac3b5711addd
-  gist.js: 883e4abf73cf44ce6f4f04239c3847c20ee6b58c
+  .odoc.db: f9186962a239c072c9968e7047c37b12dfe436bb
+  gist.js: af7e78f65804612fa98fac6983b5023ff61ff12b
   README.md: f5b2267751c7165ba71059f01cb57318e95ace31

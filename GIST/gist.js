@@ -118,7 +118,9 @@ ow.ch.__types.gist = {
             }
         }
 
-        if (isDef(res.type) && res.type == "application/json") res.content = jsonParse(res.content);
+        if (isDef(res.type) && 
+            (res.type == "application/json" || res.type == "application/javascript"))
+            res.content = jsonParse(res.content);
         return res;
     },
     pop          : function(aName) { return undefined; },
