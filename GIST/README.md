@@ -73,6 +73,18 @@ If you have a GIST ID and a filename it's very easy to rebuild the original obje
 }
 ````
 
+Even without the GIST opack you can use the *fileURL* to retrieve it directly:
+
+````javascript
+> ow.obj.rest.jsonGet("https://gist.githubusercontent.com/myGitHubUser/93b2ee53ddc307/raw/1a2c34e5e6d7e89/myobj.json")
+{
+    "a": null,
+    "b": 1,
+    "c": "a",
+    "d": true
+}
+````
+
 ### Modify an existing clipped object
 
 If you use **.clip()** a new GIST will created so how can you change an existing GIST file? Just provide the GIST ID, file and the new object to **.setClip**:
