@@ -88,7 +88,21 @@ The **.setClip** function will return again the GIST ID, GIST URL and file URL i
 > g.getClip("93b2ee53ddc307/e2ce131c0c8b5fbbcc", "myobj.json");
 ````
 
-### Unclip a GIST
+### Get a list of all GIST
+
+You can obtain a list of your GISTs (if you provided your GitHub account) by executing:
+
+````javascript
+> g.getClips()
+````
+
+This will return an array with id, description and filenames for each GIST. If you want more details regarding a GIST files just execute:
+
+````javascript
+> g.getClips("93b2ee53ddc307");
+````
+
+### Unclip a GISTs
 
 Using the GIST ID execute:
 

@@ -199,8 +199,31 @@ GIST.prototype.getClip = function(aId, aFile) {
 
     var res = this.getCh().get({ id: aId, file: filename });
     
-    if (isDef(res) && isDef(res.content)) return res.content; else return res;
-}
+    if (isDef(res) && isDef(res.content)) {
+        return res.content; 
+    } else {
+        return res;
+    }
+};
+
+/**
+ * <odoc>
+ * <key>GIST.getClips(aId) : Array</key>
+ * Returns a list of GIST ids, descriptions and files available. If aID is provided only a detail list
+ * of the corresponding GIST files will be returned.
+ * </odoc>
+ */
+GIST.prototype.getClips = function(aId) {
+    var res = [];
+
+    if (isDef(aId)) {
+        res = ow.obj.fromObj2Array($from(this.getCh().getKeys()).equals("id", aId).at(0).files);
+    } else {
+        res = $from(g.getCh().getKeys()).select((r) => { return { id: r.id, description: r.description, files: Object.keys(r.files) }});
+    }
+    
+    return res;
+};
 
 /**
  * <odoc>
