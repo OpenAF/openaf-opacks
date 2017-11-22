@@ -23,7 +23,7 @@ ow.ch.__types.gist = {
         var list;
         var auth;
 
-        if (isDef(this.__gist[aName].token)) {
+        if (isDef(this.__gist) && isDef(this.__gist[aName].token)) {
             auth = { Authorization: "token " + this.__gist[aName].token };
         }
 
@@ -45,7 +45,7 @@ ow.ch.__types.gist = {
     set          : function(aName, aK, aV, aTimestamp, x) {
         var auth;
         
-        if (isDef(this.__gist[aName].token)) {
+        if (isDef(this.__gist) && isDef(this.__gist[aName].token)) {
             auth = { Authorization: "token " + this.__gist[aName].token };
         }
 
@@ -93,7 +93,7 @@ ow.ch.__types.gist = {
     get          : function(aName, aK, x) {
         var auth;
 
-        if (isDef(this.__gist[aName].token)) {
+        if (isDef(this.__gist) && isDef(this.__gist[aName].token)) {
             auth = { Authorization: "token " + this.__gist[aName].token };
         }
 
@@ -128,7 +128,7 @@ ow.ch.__types.gist = {
     unset        : function(aName, aK) { 
         var auth;
         
-        if (isDef(this.__gist[aName].token)) {
+        if (isDef(this.__gist) && isDef(this.__gist[aName].token)) {
             auth = { Authorization: "token " + this.__gist[aName].token };
         }
 
