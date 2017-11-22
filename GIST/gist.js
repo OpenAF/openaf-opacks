@@ -217,9 +217,10 @@ GIST.prototype.getClips = function(aId) {
     var res = [];
 
     if (isDef(aId)) {
-        res = ow.obj.fromObj2Array($from(this.getCh().getKeys()).equals("id", aId).at(0).files);
+        var tmp = this.getCh().get({ id: aId });
+        if (isDef(tmp)) res = ow.obj.fromObj2Array(tmp.files);
     } else {
-        res = $from(g.getCh().getKeys()).select((r) => { return { id: r.id, description: r.description, files: Object.keys(r.files) }});
+        res = $from(g.getCh().getKeys()).select((r) => { return { id: r.id, description: r.description, files: Object.keys(r.files) }; });
     }
     
     return res;
