@@ -297,7 +297,33 @@ GIST.prototype.getVersions = function(aID) {
     }
 
     return res;
-}
+};
+
+/**
+ * <odoc>
+ * <key>GIST.encrypt(aMap, aKey) : String</key>
+ * Returns an encrypted string version of aMap to use if needed using the provided aKey to be decrypted later by GIST.decrypt.
+ * </odoc>
+ */
+GIST.prototype.encrypt = function(aObject, aKey) {
+    if (isObject(aObject)) {
+        return af.encrypt(stringify(aObject, undefined, ""), aKey);
+    } else {
+        return af.encrypt(String(aObject), aKey);
+    }
+};
+
+/**
+ * <odoc>
+ * <key>GIST.decrypt(aString. aKey) : String</key>
+ * Returns a decrypted version of aString that was previously encrypted using GIST.encrypt for the provided aKey.
+ * </odoc>
+ */
+GIST.prototype.decrypt = function(aString, aKey) {
+    if (isString(aString)) {
+        return jsonParse(af.decrypt(aString, key));
+    }
+};
 
 /**
  * <odoc>
