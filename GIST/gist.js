@@ -321,7 +321,7 @@ GIST.prototype.encrypt = function(aObject, aKey) {
  */
 GIST.prototype.decrypt = function(aString, aKey) {
     if (isString(aString)) {
-        return jsonParse(af.decrypt(aString, key));
+        return jsonParse(af.decrypt(aString, aKey));
     }
 };
 
