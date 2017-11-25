@@ -1,0 +1,33 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - apis
+  - weather
+  - geoip
+  - ip
+  - currency
+  - countries
+  - country
+  - trivia
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs
+description: A collection of public REST APIs for currency check, country info, numbers & dates trivia, GeoIP, weather and a test service.
+name: APIs
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20171124'
+dependencies:
+  openaf: '>=20171101'
+files:
+  - apis.js
+  - .package.yaml
+filesHash:
+  apis.js: 206766242ddf7402f7fd87c2d7d1de7e7c0cd24b
