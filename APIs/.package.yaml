@@ -14,20 +14,24 @@ keywords:
   - country
   - trivia
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs
-description: A collection of public REST APIs for currency check, country info, numbers & dates trivia, GeoIP, weather and a test service.
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs'
+description: >-
+  A collection of public REST APIs for currency check, country info, numbers &
+  dates trivia, GeoIP, weather and a test service.
 name: APIs
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20171124'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20171125'
 dependencies:
   openaf: '>=20171101'
 files:
-  - apis.js
   - .package.yaml
+  - .odoc.db
+  - apis.js
 filesHash:
+  .odoc.db: 53d5eaa4b89a9d08123736caaefb49238884c8fd
   apis.js: 206766242ddf7402f7fd87c2d7d1de7e7c0cd24b
