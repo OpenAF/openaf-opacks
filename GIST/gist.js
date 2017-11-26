@@ -220,7 +220,7 @@ GIST.prototype.getClips = function(aId) {
         var tmp = this.getCh().get({ id: aId });
         if (isDef(tmp)) res = ow.obj.fromObj2Array(tmp.files);
     } else {
-        res = $from(g.getCh().getKeys()).select((r) => { return { id: r.id, description: r.description, files: Object.keys(r.files) }; });
+        res = $from(this.getCh().getKeys()).select((r) => { return { id: r.id, description: r.description, files: Object.keys(r.files) }; });
     }
     
     return res;
@@ -322,6 +322,7 @@ GIST.prototype.encrypt = function(aObject, aKey) {
  */
 GIST.prototype.decrypt = function(aString, aKey) {
     if (isString(aString)) {
+        aString = aString.replace(/^"(.+)"$/, "$1");
         return jsonParse(af.decrypt(aString, aKey));
     }
 };
