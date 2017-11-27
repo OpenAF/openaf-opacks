@@ -190,6 +190,17 @@ GIST.prototype.clip = function(aFile, aDescription, aContent, isPublic) {
 
 /**
  * <odoc>
+ * <key>GIST.encryptClip(aKey, aFile, aDescription, aContent, isPublic) : String</key>
+ * Creates a new GIST given aFile (a filename), aDescription, aContent (an object, string, array or number) encrypted with aKey. Optionally you
+ * can specify if the GIST should be public with isPublic = true. If successfull returns the GIST id, URL and file URL.
+ * </odoc>
+ */
+GIST.prototype.encryptClip = function(aKey, aFile, aDescription, aContent, isPublic) {
+    return this.clip(aFile, aDescription, this.encrypt(stringify(aContent), aKey), isPublic);
+};
+
+/**
+ * <odoc>
  * <key>GIST.getClip(aId, aFile) : Object</key>
  * Tries to retrieve aFile from the GIST aId returning it's contents.
  * </odoc>
@@ -205,6 +216,16 @@ GIST.prototype.getClip = function(aId, aFile) {
         return res;
     }
 };
+
+/**
+ * <odoc>
+ * <key>GIST.getEncryptClip(aKey, aId, aFile) : Object</key>
+ * Tries to retrieve aFile from the GIST aId returning it's encrypted contents decrypted.
+ * </odoc>
+ */
+GIST.prototype.getEncryptClip = function(aKey, aId, aFile) {
+    return jsonParse(this.decrypt(this.getClip(aId, aFile), aKey));
+}
 
 /**
  * <odoc>
@@ -254,6 +275,17 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
         gistURL: res.html_url,
         fileURL: (isDef(res.files[filename]) && isDef(res.files[filename].raw_url)) ? res.files[filename].raw_url : undefined
     };
+};
+
+/**
+ * <odoc>
+ * <key>GIST.setEncryptClip(aKey, aId, aFile, aContent) : String</key>
+ * Tries to change aId GIST, for the aFile (a filename) with aContent (an object, string, array or number) encrypted
+ * with aKey. Returns the GIST id, URL and file URL.
+ * </odoc>
+ */
+GIST.prototype.setEncryptClip = function(aKey, aId, aFile, aContent) {
+    return this.setClip(aId, aFile, this.encrypt(stringify(aContent), aKey));
 };
 
 /**
