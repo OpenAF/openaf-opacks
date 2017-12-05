@@ -155,14 +155,14 @@
                 lattlong: aLat + "," + aLog
             }));
             if (isDef(woeid) && isArray(woeid) && woeid.length > 0)
-                return ow.obj.rest.jsonGet("http://www.metaweather.com/api", { location: woeid[0].woeid });
+                return ow.obj.rest.jsonGet("http://www.metaweather.com/api", { location: woeid[0].woeid });
         },
         getByCity: function(aCity) {
             var woeid = ow.obj.rest.jsonGet("http://www.metaweather.com/api/location/search/?" + exports.serialize({
                 query: aCity
             }));
             if (isDef(woeid) && isArray(woeid) && woeid.length > 0)
-                return ow.obj.rest.jsonGet("http://www.metaweather.com/api", { location: woeid[0].woeid });
+                return ow.obj.rest.jsonGet("http://www.metaweather.com/api", { location: woeid[0].woeid });
         }
     };
 
