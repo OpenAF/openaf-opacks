@@ -29,9 +29,9 @@ version: '20171204'
 dependencies:
   openaf: '>=20171101'
 files:
-  - .odoc.db
   - .package.yaml
+  - .odoc.db
   - apis.js
 filesHash:
   .odoc.db: 53d5eaa4b89a9d08123736caaefb49238884c8fd
-  apis.js: ea29f765ddf6b478b066d3f920a68cd980ba0099
+  apis.js: d1ca7814032ccf45592ee9155e443fdcd708ccf3
