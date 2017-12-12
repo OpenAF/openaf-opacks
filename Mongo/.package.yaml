@@ -30,9 +30,9 @@ files:
   - lib/mongodb-driver-core-3.6.0.jar
   - mongo.js
 filesHash:
-  .odoc.db: abdd01e28226895fc6d0af71f8cadcee41b44b64
+  .odoc.db: 8410a7890e7c112cc146c7b33d33ee9c4927fc5d
   lib/bson-3.6.0.jar: 3234a5c7dba80fcaf0bf9d77d9604ec3daec8bde
   lib/mongo-java-driver-3.6.0.jar: 30c6123b38d813e4497763990598e35ad5b25b88
   lib/mongodb-driver-3.6.0.jar: 48c9b7760deb579a8bd663a3c68f9b15145ff4f9
   lib/mongodb-driver-core-3.6.0.jar: b7b5deefe4a46710d95a97f1458bec17d5b3be28
-  mongo.js: 8eb64767e1f0d7edd7c68918bf57bc3745beaf17
+  mongo.js: 6ce0e7dd93838d252ce470be2428e4a0ee8e6a1c

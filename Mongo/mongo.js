@@ -129,6 +129,16 @@ var MongoUtil = function(aURL) {
 
 /**
  * <odoc>
+ * <key>MongoUtil.close()</key>
+ * Closes the current MongoDB connection.
+ * </odoc>
+ */
+MongoUtil.prototype.close = function() {
+    this.__m.close();
+};
+
+/**
+ * <odoc>
  * <key>MongoUtil.getDatabaseNames() : Array</key>
  * Returns an array of the current database names.
  * </odoc>
@@ -136,7 +146,7 @@ var MongoUtil = function(aURL) {
 MongoUtil.prototype.getDatabaseNames = function() {
     var res = [];
     var ar = this.__m.getDatabaseNames();
-    var i = ar.interator();
+    var i = ar.iterator();
     while(i.hasNext()) {
         res.push(String(i.next()));
     }
@@ -157,4 +167,5 @@ MongoUtil.prototype.getCollectionNames = function(aDatabase) {
     while(i.hasNext()) {
         res.push(String(i.next()));
     }
-}
+    return res;
+};
