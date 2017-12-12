@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - MongoDB
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Mongo'
+description: >-
+  An OpenAF channels implementation ('mongo') to access collections on MongoDBs.
+  It also includes an utility object (e.g. MongoUtil).
+name: Mongo
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: 20171211
+dependencies:
+  packa: '>=20171201'
+files:
+  - .odoc.db
+  - .package.yaml
+  - lib/bson-3.6.0.jar
+  - lib/mongo-java-driver-3.6.0.jar
+  - lib/mongodb-driver-3.6.0.jar
+  - lib/mongodb-driver-core-3.6.0.jar
+  - mongo.js
+filesHash:
+  .odoc.db: abdd01e28226895fc6d0af71f8cadcee41b44b64
+  lib/bson-3.6.0.jar: 3234a5c7dba80fcaf0bf9d77d9604ec3daec8bde
+  lib/mongo-java-driver-3.6.0.jar: 30c6123b38d813e4497763990598e35ad5b25b88
+  lib/mongodb-driver-3.6.0.jar: 48c9b7760deb579a8bd663a3c68f9b15145ff4f9
+  lib/mongodb-driver-core-3.6.0.jar: b7b5deefe4a46710d95a97f1458bec17d5b3be28
+  mongo.js: 8eb64767e1f0d7edd7c68918bf57bc3745beaf17
