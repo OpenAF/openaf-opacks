@@ -35,4 +35,4 @@ filesHash:
   lib/mongo-java-driver-3.6.0.jar: 30c6123b38d813e4497763990598e35ad5b25b88
   lib/mongodb-driver-3.6.0.jar: 48c9b7760deb579a8bd663a3c68f9b15145ff4f9
   lib/mongodb-driver-core-3.6.0.jar: b7b5deefe4a46710d95a97f1458bec17d5b3be28
-  mongo.js: 6ce0e7dd93838d252ce470be2428e4a0ee8e6a1c
+  mongo.js: 0a9132cd53c0aa9823d0b1396bcfaefa646a0137
