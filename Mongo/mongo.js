@@ -124,6 +124,7 @@ ow.ch.__types.mongo = {
  * </odoc>
  */
 var MongoUtil = function(aURL) {
+    this.__url = aURL;
     this.__m = new Packages.com.mongodb.MongoClient(new Packages.com.mongodb.MongoClientURI(aURL));
 };
 
@@ -168,4 +169,24 @@ MongoUtil.prototype.getCollectionNames = function(aDatabase) {
         res.push(String(i.next()));
     }
     return res;
+};
+
+/**
+ * <odoc>
+ * <key>MongoUtil.getCh(aDatabase, aCollectionName, aChName) : Channel</key>
+ * Creates and returns a new channel with aChName (or aCollectionName if aChName is not defined) for the 
+ * given MongoDB aDatabase and aCollectionName.
+ * </odoc>
+ */
+MongoUtil.prototype.getCh = function(aDatabase, aCollectionName, aChName) {
+    if (isUnDef(aDatabase) && isUnDef(aCollectionName)) throw "Need to define aDatabase and aCollectionName";
+    if (isUnDef(aChName)) aChName = aCollectionName;
+
+    $ch(aChName).create(1, "mongo", {
+        url: this.__url,
+        database: aDatabase,
+        collection: aCollectionName
+    });
+
+    return $ch(aName);
 };
