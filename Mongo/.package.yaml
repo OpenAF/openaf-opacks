@@ -20,7 +20,7 @@ mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: 20171211
 dependencies:
-  packa: '>=20171201'
+  openaf: '>=20171201'
 files:
   - .odoc.db
   - .package.yaml
