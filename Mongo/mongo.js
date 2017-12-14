@@ -42,6 +42,7 @@ ow.ch.__types.mongo = {
         return this.get(aName, full);
     },
     getAll: function(aName, full) {
+        if (this.__c[aName].count() <= 0) return [];
         if (isUnDef(full)) full = {};
 
         var r = this.__c[aName].find(new Packages.org.bson.Document(full));
@@ -51,11 +52,13 @@ ow.ch.__types.mongo = {
             var res = [];
             var i = r.iterator();
             while(i.hasNext()) {
-                res.push(jsonParse(i.next().toJson()));
+                var val = jsonParse(i.next().toJson());
+                if (val != null) res.push(val);
             }
 
             // convert
             traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
+            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
             return res;
         }
     },
@@ -74,8 +77,11 @@ ow.ch.__types.mongo = {
     },
     set          : function(aName, ak, av, aTimestamp) {
         if (isUnDef(av)) return undefined;
-        ak = { _id: ak };
-        av = merge(ak, av);
+        if (isUnDef(ak._id)) ak = { _id: ak };
+        if (isDef(ak._id)) 
+            av._id = ak._id;
+        else
+            av._id = ak;
         try {
             this.__c[aName].insertOne(new Packages.org.bson.Document(av));
         } catch(e) {
@@ -97,6 +103,7 @@ ow.ch.__types.mongo = {
         } else {
             var res = jsonParse(r.toJson());
             traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
+            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
             return res;
         }
     },
