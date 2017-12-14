@@ -188,5 +188,5 @@ MongoUtil.prototype.getCh = function(aDatabase, aCollectionName, aChName) {
         collection: aCollectionName
     });
 
-    return $ch(aName);
+    return $ch(aChName);
 };
