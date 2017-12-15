@@ -82,6 +82,11 @@ ow.ch.__types.mongo = {
             av._id = ak._id;
         else
             av._id = ak;
+
+        // convert dates
+        traverse(av, (k, v, p, o) => { if(isNumber(v) && v % 1 == 0) o[k] = new java.lang.Long(v).longValue(); });
+        traverse(av, (k, v, p, o) => { if(isDate(v)) o[k] = new java.util.Date(v.getTime()); });
+
         try {
             this.__c[aName].insertOne(new Packages.org.bson.Document(av));
         } catch(e) {
