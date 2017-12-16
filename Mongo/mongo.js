@@ -83,9 +83,14 @@ ow.ch.__types.mongo = {
         else
             av._id = ak;
 
-        // convert dates
-        traverse(av, (k, v, p, o) => { if(isNumber(v) && v % 1 == 0) o[k] = new java.lang.Long(v).longValue(); });
-        traverse(av, (k, v, p, o) => { if(isDate(v)) o[k] = new java.util.Date(v.getTime()); });
+        // convert dates and other types
+        ow.loadObj();
+        traverse(av, (k, v, p, o) => { 
+            ow.obj.setPath(av, p, v);
+            if(isNumber(v) && v % 1 == 0)                  ow.obj.setPath(av, p, new java.lang.Long(v).longValue()); 
+            if(isDate(v))                                  ow.obj.setPath(av, p, new java.util.Date(v.getTime()));
+            if(isString(v) && isDate(new Date(v) != null)) ow.obj.setPath(av, p, new java.util.Date((new Date(v)).getTime())); 
+        });
 
         try {
             this.__c[aName].insertOne(new Packages.org.bson.Document(av));

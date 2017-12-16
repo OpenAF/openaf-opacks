@@ -18,9 +18,9 @@ name: Mongo
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20171214
+version: 20171215
 dependencies:
-  openaf: '>=20171201'
+  openaf: '>=20171215'
 files:
   - .odoc.db
   - .package.yaml
@@ -30,9 +30,9 @@ files:
   - lib/mongodb-driver-core-3.6.0.jar
   - mongo.js
 filesHash:
-  .odoc.db: 5ed294e49ab8294520b64f18f8633ae1687ec0b7
+  .odoc.db: 8449635b345d248ef9ce18830e9c8cc0a2cb141f
   lib/bson-3.6.0.jar: 3234a5c7dba80fcaf0bf9d77d9604ec3daec8bde
   lib/mongo-java-driver-3.6.0.jar: 30c6123b38d813e4497763990598e35ad5b25b88
   lib/mongodb-driver-3.6.0.jar: 48c9b7760deb579a8bd663a3c68f9b15145ff4f9
   lib/mongodb-driver-core-3.6.0.jar: b7b5deefe4a46710d95a97f1458bec17d5b3be28
-  mongo.js: 3658959e5d9b9f5dd94eda5d86a4ccf3a0a75ddf
+  mongo.js: 9180fb5b74b6411db69ee039706aae7d1881ffb4
