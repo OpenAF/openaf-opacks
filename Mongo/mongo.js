@@ -85,11 +85,12 @@ ow.ch.__types.mongo = {
 
         // convert dates and other types
         ow.loadObj();
-        traverse(av, (k, v, p, o) => { 
-            ow.obj.setPath(av, p, v);
-            if(isNumber(v) && v % 1 == 0)                  ow.obj.setPath(av, p, new java.lang.Long(v).longValue()); 
-            if(isDate(v))                                  ow.obj.setPath(av, p, new java.util.Date(v.getTime()));
-            if(isString(v) && isDate(new Date(v) != null)) ow.obj.setPath(av, p, new java.util.Date((new Date(v)).getTime())); 
+    
+        traverse(av, function(k, v, p, o) { 
+            var path = (isDef(p) && p.length > 0) ? p + "." + k : k;
+            if(isNumber(v) && v % 1 == 0)                  ow.obj.setPath(av, path, new java.lang.Long(v).longValue()); 
+            if(isDate(v))                                  ow.obj.setPath(av, path, new java.util.Date(v.getTime()));
+            if(isString(v) && isDate(new Date(v)))         ow.obj.setPath(av, path, new java.util.Date((new Date(v)).getTime()));
         });
 
         try {
