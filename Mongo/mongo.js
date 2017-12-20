@@ -34,7 +34,7 @@ ow.ch.__types.mongo = {
         // TODO
         var aKs = this.getKeys(aName);
 
-        for(let i in aKs) {
+        for(var i in aKs) {
             aFunction(aKs[i], this.get(aName, aKs[i], x));
         }
     },
@@ -101,7 +101,7 @@ ow.ch.__types.mongo = {
     },
     setAll       : function(aName, anArrayOfKeys, anArrayOfMapData, aTimestamp) {
         // Could implement in a faster way
-        for(let i in anArrayOfMapData) {
+        for(var i in anArrayOfMapData) {
             this.set(aName, ow.loadObj().filterKeys(anArrayOfKeys, anArrayOfMapData[i]), anArrayOfMapData[i], aTimestamp);
         }
     },
