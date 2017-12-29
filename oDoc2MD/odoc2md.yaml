@@ -1,0 +1,57 @@
+jobs:
+  # Initialize variables
+  #
+  - name: Init
+    exec: |
+      global.home = isDef(args.withDirectory) 
+                    ? args.withDirectory 
+                    : (isDef(getOPackPath("oDoc2MD"))) 
+                      ? getOPackPath("oDoc2MD")
+                      : ".";
+      global.output = global.home + "/output";
+      
+      if (isDef(args.translateFile)) 
+         global.translate = io.readFileYAML(args.translateFile);
+      else
+         global.translate = { scope: "Built-in functions", afbase: "AF", iocore: "IO" };
+      
+      // TODO: Need to add custom path and ids
+
+      loadLib(global.home + "/odoc2md.js");
+
+  # Clean the output
+  #
+  - name: Clean output
+    deps:
+      - Init
+    exec: |
+      io.rm(global.output);
+      io.mkdir(global.output);
+
+  # Convert a args.id to the markdown version
+  #
+  - name: Convert to MD
+    deps:
+      - Init
+      - Clean output
+    exec: |
+      log("Generating " + args.id + " on " + global.output + "...");
+      id2MD(args.id, void 0, global.home + "/odocId.md.hbs", global.output + "/" + args.id + ".md", global.translate);
+
+  # Generates a markdown index
+  #  
+  - name: Generate MD index
+    deps:
+      - Init
+      - Clean output
+    exec: |
+      log("Generating index...");
+      index2MD($from(searchHelp("")).distinct("id").sort(), global.home + "/odocIndex.md.hbs", global.output + "/all.md", global.translate);
+
+todo:
+  - Init
+  - Clean output
+  - Generate MD index
+  - name: Convert to MD
+    args: >
+      $from($from(searchHelp("")).distinct("id").sort()).select((r) => { return { id: r } })

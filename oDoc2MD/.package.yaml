@@ -1,0 +1,34 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - oDoc
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/oDoc2MD
+description: Generating markdown documentation based on existing oDoc databases.
+name: oDoc2MD
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: 20171228
+dependencies:
+  OpenAF: '>=20170701'
+files:
+  - odoc2md.js
+  - .odoc.db
+  - odocId.md.hbs
+  - odocIndex.md.hbs
+  - odoc2md.yaml
+  - .package.yaml
+filesHash:
+  odoc2md.js: 9afa0ddae4a558f9e1b56a258aa50185a8649991
+  .odoc.db: 75a7e0590b6981d4cf91334d32d3410e5174ef24
+  odocId.md.hbs: 1e5b9a6dd861f8cff3c2a1e50118a1dbafcdba68
+  odocIndex.md.hbs: d3a7c56b3ec8f9e356da55b67e192b657438f2f5
+  odoc2md.yaml: e2f8607c604bf531cc6b2f5e62efbabfbd11347b
