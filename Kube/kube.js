@@ -1,17 +1,31 @@
+/**
+ * <odoc>
+ * <key>Kube.Kube(aURL, aUser, aPass)</key>
+ * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass.
+ * </odoc>
+ */
 var Kube = function (aURL, aUser, aPass) {
 	plugin("HTTP");
 	ow.loadFormat();
 	this.url = aURL;
 	this.user = aUser;
 	this.pass = aPass;
-}
+};
 
+/**
+ * <odoc>
+ * <key>Kube.exec(aNamespace, aPodName, aCommand, aTimeout, doSH) : String</key>
+ * Tries to executed aCommand on aPodName of aNamespace. If defined, it will wait for the defined aTimeout and/or execute the aCommand on a /bin/sh if doSH = true.
+ * aCommand can be either a string or an array. Do note that it might be necessary to URL encode some parts of commands.
+ * </odoc>
+ */
 Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var h = new HTTP();
 	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url.replace(/^http/i, "ws"));
 
 	var pre = (doSH) ? "command=/bin/sh&command=-c&" : "";
-	var cmd = pre + "stderr=true&command=" + aCommand.split(/ +/).join("&command=");
+	if (!isArray(aCommand)) aCommand = aCommand.split(/ +/);
+	var cmd = pre + "stderr=true&command=" + aCommand.join("&command=");
 	var session;
 	var out = "";
 
@@ -49,11 +63,17 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 			prevOut = out.length;
 			prevTime = now();
 		}
-	};
+	}
 	session.stop();
 	return out;
-}
+};
 
+/**
+ * <odoc>
+ * <key>Kube.getNamespaces(full) : Array</key>
+ * Tries to retrieve the list of namespaces on the current k8s cluster. If full = true then all namespace information will be provided.
+ * </odoc>
+ */
 Kube.prototype.getNamespaces = function (full) {
 	var h = new HTTP();
 	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
@@ -64,8 +84,14 @@ Kube.prototype.getNamespaces = function (full) {
 		return res.items;
 	else
 		return Object.keys($stream(clone(res.items)).groupBy("metadata.namespace"));
-}
+};
 
+/**
+ * <odoc>
+ * <key>Kube.getNames(aNamespace, full) : Array</key>
+ * Tries to retrieve the list of pod names on aNamespace. If full = true then all pod information will be provided.
+ * </odoc>
+ */
 Kube.prototype.getNames = function (aNamespace, full) {
 	var h = new HTTP();
 	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
@@ -77,6 +103,6 @@ Kube.prototype.getNames = function (aNamespace, full) {
 	} else {
 		return $from(res.items).equals("metadata.namespace", aNamespace).select(function (rr) {
 			return rr.metadata.name;
-		})
+		});
 	}
-}
+};
