@@ -1,0 +1,32 @@
+author: Nuno Aguiar
+scripts:
+  posterase: ''
+  postinstall: ''
+  preerase: ''
+  preinstall: ''
+keywords: []
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/XChart'
+description: >-
+  Provides a wrapper to use the XChart java charts library. Allows the creation
+  of png (or others) images of charts and html/css inline images of charts.
+name: XChart
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20170322'
+dependencies: {}
+files:
+  - .package.yaml
+  - lib/xchart-3.5.0.jar
+  - README.md
+  - test/test.html
+  - xchart.js
+filesHash:
+  lib/xchart-3.5.0.jar: eafda298e7c2ef757089838debd7e10cf2573442
+  README.md: d3be56de158415aa82440b10826be28c4f7a3ea0
+  test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
+  xchart.js: 2edc516fa89aca4812bc3d4f88ecc8cefc242bac
