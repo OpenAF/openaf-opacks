@@ -1,0 +1,37 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - msaccess
+  - mdb
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/MDB'
+description: >-
+  Provides hability to read MS Access (mdb) files as a JDBC database or directly
+  using jackcess.
+name: MDB
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20180104'
+dependencies:
+  openaf: '>=20160601'
+files:
+  - .package.yaml
+  - lib/commons-lang-2.6.jar
+  - lib/hsqldb.jar
+  - lib/jackcess-2.1.8.jar
+  - lib/ucanaccess-4.0.2.jar
+  - MDB.js
+filesHash:
+  lib/commons-lang-2.6.jar: 0ce1edb914c94ebc388f086c6827e8bdeec71ac2
+  lib/hsqldb.jar: 195957160ed990dbc798207c0d577280d9919208
+  lib/jackcess-2.1.8.jar: dfc7156e11ce33bbcb7f4f6724a87b9d969f2fd6
+  lib/ucanaccess-4.0.2.jar: c700526cbd4e67a856bb0535713600dfaf0f312b
+  MDB.js: b7f5c9e38b83b7e16bf710671a81504e2cdc94c6
