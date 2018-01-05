@@ -1,0 +1,31 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - IMEI
+  - Luhn
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/IMEICheck'
+description: >-
+  Enables the checking of IMEIs for checksum validity and tries also to
+  determine the equipment brand from a public database
+name: IMEICheck
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20180104'
+dependencies:
+  openaf: '>=20170401'
+files:
+  - .package.yaml
+  - data/tacdb.csv
+  - imeiCheck.js
+filesHash:
+  data/tacdb.csv: 896e42d56d12d3e925bfbdadae567fb0ef7dd7a7
+  imeiCheck.js: 29389c128ea5547d8005242c06b3d9f7e5f2751c
