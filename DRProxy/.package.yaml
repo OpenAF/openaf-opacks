@@ -1,0 +1,34 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - reverse
+  - proxy
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/DRProxy'
+description: >-
+  DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs
+  communication. It allows the interception of pre-proxy and post-proxy requests
+  for any debug need.
+name: DRProxy
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20180108'
+dependencies:
+  OpenAF: '>=20180108'
+files:
+  - drproxy.js
+  - .package.yaml
+  - .odoc.db
+  - README.md
+filesHash:
+  drproxy.js: 44ece900dafadf154f0f6cf019aab02782334956
+  .odoc.db: 808e2380a9a1dbc55ebf1ba1838775a5fb0f4102
+  README.md: cd86592bb2eab20b0203ffc920e9b634c06f5c31
