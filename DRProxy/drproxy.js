@@ -47,6 +47,14 @@ var DRProxy = function(aMap) {
         this.shouldPos = true;
     }
 
+    if (isDef(aMap.host)) {
+        this.host = aMap.host;
+    } else {
+        var u = new java.net.URL(aMap.proxyTo);
+        this.host = String(u.getHost());
+        if (u.getDefaultPort() != u.getPort()) this.host += ":" + u.getPort();
+    }
+
     // Define which HTTPServer to use
     this.__hs = (isUnDef(aMap.httpd)) ? ow.server.httpd.start(this.proxy_port) : aMap.httpd;
     var parent = this;
@@ -54,7 +62,7 @@ var DRProxy = function(aMap) {
     // Default proxy function
     var fproxy = function(r) {
         try {
-            var fdata;
+            var fdata = "";
             // If PUT or POST take care of the extra content. Delete content-length
             if (r.method == "PUT" || r.method == "POST") {
                 if (isDef(r.files.content)) {
@@ -70,7 +78,12 @@ var DRProxy = function(aMap) {
                 delete r.header["content-length"];
             }
 
+            delete r.header.connection;
+            delete r.header.Connection;
+
             var is, response, resPre;
+            if (isDef(parent.host) && isDef(r.header)) r.header.host = parent.host;
+
             // Use the pre function if available
             if (parent.shouldPre) {
                 try {
@@ -90,12 +103,30 @@ var DRProxy = function(aMap) {
             // Proxy request only if there wasn't any returned result from a pre function
             if (isUnDef(resPre)) {
                 var ht = new ow.obj.http();
-                is = ht.exec(parent.proxy_to + r.originalURI, r.method, fdata, r.header, void 0, void 0, true);
-                response = {
-                    contentType: ht.responseType(),
-                    code: ht.responseCode(),
-                    header: ht.responseHeaders()
-                };
+                ht.setConfig({
+                    disableCookie: true,
+                    disableRedirectHandling: true
+                });
+                try {
+                    is = ht.exec(parent.proxy_to + r.originalURI, r.method, fdata, r.header, void 0, void 0, true, 30000);
+                    if (is == null || isUnDef(is)) is = "";
+                } catch(e) {
+                    is = af.fromInputStream2String(ht.outputObj);
+                    if (is == null || isUnDef(is)) {
+                        is = "";
+                        e.javaException.printStackTrace();
+                    }
+                }
+
+                try {
+                    response = {
+                        contentType: ht.responseType(),
+                        code: ht.responseCode(),
+                        header: ht.responseHeaders()
+                    };
+                } catch(e) {
+                    response = {};
+                }
             }
             
             // Merge the proxy request into the main request map
@@ -109,7 +140,7 @@ var DRProxy = function(aMap) {
                     // If pos function returned a result, use it
                     if (isDef(resPos)) {
                         if (!isJavaObject(resPos.stream) || isUnDef(resPos.response))
-                           throw "A preFunc should return a map with 'stream' (InputStream) and 'response'";
+                           throw "A posFunc should return a map with 'stream' (InputStream) and 'response'";
                         is = resPos.stream;
                         response = resPos.response;
                     }
@@ -121,13 +152,25 @@ var DRProxy = function(aMap) {
             if (parent.shouldLog) parent.log(r.originalURI, r);
 
             // Remove transfer-encoding and content-type as the HTTPServer will create them.
-            var heads = r.response.header;
-            delete heads["Transfer-Encoding"];
-            delete heads["transfer-encoding"];
-            delete heads["Content-Type"];
-            delete heads["content-type"];
+            var heads = {};
+            
+            if (isDef(r.response) && isDef(r.response.header)) {
+                heads = r.response.header;
 
-            return parent.__hs.replyStream(is, r.response.contentType, r.response.code, heads);
+                //delete heads["Transfer-Encoding"];
+                //delete heads["transfer-encoding"];
+                //delete heads["Content-Encoding"];
+                //delete heads["content-encoding"];
+                //delete heads["Content-Type"];
+                //delete heads["content-type"];
+                if (isDef(parent.host)) heads.host = parent.host;
+            }
+
+            if (!isString(is)) {
+                return parent.__hs.replyStream(is, r.response.contentType, r.response.code, heads);
+            } else {
+                return parent.__hs.reply(is, r.response.contentType, r.response.code, heads);
+            }
         } catch (e) {
             if (parent.shouldLog) parent.logErr(String(e),  r);
         }
@@ -149,13 +192,13 @@ DRProxy.prototype.stop = function() {
     ow.server.httpd.stop(this.__hs);
 };
 
-DRProxy.defaultLog = function(aMsg, r) { tlog("{{method}} {{originalURI}} | {{response.code}} {{response.contentType}} {{response.header.Content-Length}}", r); };
+DRProxy.defaultLog = function(aMsg, r) { tlog("{{method}} {{{originalURI}}} | {{response.code}} {{{response.contentType}}} {{response.header.Content-Length}}", r); };
 DRProxy.prototype.log = function(aMsg, r) { };
 
-DRProxy.defaultLogWarn = function(aMsg, r) { tlogWarn("{{method}} {{originalURI}} | {{response.code}} {{response.contentType}} {{response.header.Content-Length}}", r); };
+DRProxy.defaultLogWarn = function(aMsg, r) { tlogWarn("{{method}} {{{originalURI}}} | {{response.code}} {{{response.contentType}}} {{response.header.Content-Length}}", r); };
 DRProxy.prototype.logWarn = function(aMsg, r) { };
 
-DRProxy.defaultLogErr = function(aMsg, r) { tlogErr("{{method}} {{originalURI}} | " + aMsg, r); };
+DRProxy.defaultLogErr = function(aMsg, r) { tlogErr("{{method}} {{{originalURI}}} | " + aMsg, r); };
 DRProxy.prototype.logErr = function(aMsg, r) { };
 
 /**

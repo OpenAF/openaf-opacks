@@ -20,15 +20,15 @@ name: DRProxy
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180108'
+version: '20180114'
 dependencies:
-  OpenAF: '>=20180108'
+  OpenAF: '>=20180114'
 files:
-  - drproxy.js
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
+  - drproxy.js
   - README.md
 filesHash:
-  drproxy.js: 44ece900dafadf154f0f6cf019aab02782334956
   .odoc.db: 808e2380a9a1dbc55ebf1ba1838775a5fb0f4102
-  README.md: cd86592bb2eab20b0203ffc920e9b634c06f5c31
+  drproxy.js: 123161fbc029e886ab9fd8daaa22c6680278825f
+  README.md: 273ad76bc9a36083269e07c9b23a4a6b25101d6d
