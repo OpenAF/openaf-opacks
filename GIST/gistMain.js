@@ -18,11 +18,20 @@ if (!io.fileExists(GIST_FILE)) {
 var params = __expr.split(/ +/);
 if (isDef(gist)) {
     var showList = true;
-    if (isDef(params[0]) && params[0].length == 32 &&
-        isDef(params[1]) && params[1].length > 0) {
+    if (isDef(params[0]) && params[0].length == 32) {
         showList = false;
-        var out = gist.getClip(params[0], params[1]);
-        if (isObject(out)) sprint(out); else print(out);
+
+        if (isDef(params[1]) && params[1].length > 0) {
+            var out = gist.getClip(params[0], params[1]);
+
+            if (isObject(out)) sprint(out); else print(out);
+        } else {
+            $from(gist.getClips()).equals("id", params[0]).select((r) => {
+                for(let i in r.files) {
+                    tprint("{{id}} {{file}} ", merge(r, { file: r.files[i] }));
+                }
+            });
+        }
     }
 
     if (showList) {
