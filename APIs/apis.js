@@ -13,7 +13,7 @@
 
     /**
      * <odoc>
-     * <key>APIs.Currency</key>
+     * <key>apis.Currency</key>
      * From: http://fixer.io
      * Auth: none
      * </odoc>
@@ -21,7 +21,7 @@
     exports.Currency = {
         /**
          * <odoc>
-         * <key>APIs.Currency.getExchangeRates(aMap) : Map</key>
+         * <key>apis.Currency.getExchangeRates(aMap) : Map</key>
          * Returns a map with the currency exchanges between aMap.base currency with 3 letter
          * designation (defaults to EUR) a to the specific aMap.date (defaults to today). If
          * needed you can specify an array of currency symbols in aMap.symbols.
@@ -42,7 +42,7 @@
 
     /**
      * <odoc>
-     * <key>APIs.Countries</key>
+     * <key>apis.Countries</key>
      * From: https://restcountries.eu
      * Auth: none
      * 
@@ -97,7 +97,7 @@
 
     /**
      * <odoc>
-     * <key>APIs.Numbers</key>
+     * <key>apis.Numbers</key>
      * From: http://numbersapi.com
      * Auth: none
      * </odoc>
@@ -124,7 +124,7 @@
 
     /**
      * <odoc>
-     * <key>APIs.GeoIP</key>
+     * <key>apis.GeoIP</key>
      * From: https://freegeoip.net
      * Auth: none (limited requests)
      * </odoc>
@@ -137,7 +137,7 @@
 
     /**
      * <odoc>
-     * <key>APIs.Weather</key>
+     * <key>apis.Weather</key>
      * From: https://www.metaweather.com/api
      * Auth: none (limited requests)
      * 
@@ -168,7 +168,63 @@
 
     /**
      * <odoc>
-     * <key>APIs.test</key>
+     * <key>apis.ChuckNorrisJokes</key>
+     * From: https://api.chucknorris.io
+     * Auth: none
+     * </odoc>
+     */
+    exports.ChuckNorrisJokes = {
+        getJson: function() {
+            return ow.obj.rest.jsonGet("https://api.chucknorris.io/jokes/random");
+        },
+        get: function() {
+            return this.getJson().value;
+        }
+    };
+
+    /**
+     * <odoc>
+     * <key>apis.FakeData</key>
+     * From: http://jsonplaceholder.typicode.com
+     * Auth: none
+     * </odoc>
+     */
+    exports.FakeData = {
+        getPosts: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/posts" + extra);
+        },
+        getComments: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/comments" + extra);
+        },
+        getAlbums: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/albums" + extra);
+        },
+        getPhotos: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/photos" + extra);
+        },
+        getTodos: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/todos" + extra);
+        },
+        getUsers: function(extra) {
+            if (isDef(extra) && !extra.match(/^\//)) extra = "/" + extra;
+            if (isUnDef(extra)) extra = "";
+            return ow.obj.rest.jsonGet("https://jsonplaceholder.typicode.com/users" + extra);
+        },
+    };
+
+    /**
+     * <odoc>
+     * <key>apis.test</key>
      * From: https://httpbin.org
      * Auth: none
      * </odoc>
@@ -189,5 +245,5 @@
         remove: function(aBaseURI, aIndexMap, aLoginOrFunction, aPassword, aTimeout, aRequestMap) {
             return ow.obj.rest.jsonRemove("https://httpbin.org/delete", aIndexMap, aLoginOrFunction, aPassword, aTimeout, aRequestMap);
         }
-    }
+    };
 })();
