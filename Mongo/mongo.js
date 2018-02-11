@@ -88,9 +88,11 @@ ow.ch.__types.mongo = {
     
         traverse(av, function(k, v, p, o) { 
             var path = (isDef(p) && p.length > 0) ? p + "." + k : k;
-            if(isNumber(v) && v % 1 == 0)                  ow.obj.setPath(av, path, new java.lang.Long(v).longValue()); 
-            if(isDate(v))                                  ow.obj.setPath(av, path, new java.util.Date(v.getTime()));
-            if(isString(v) && isDate(new Date(v)))         ow.obj.setPath(av, path, new java.util.Date((new Date(v)).getTime()));
+            var changed = false;
+            if(!changed && isNumber(v) && v % 1 == 0)          { changed = true; ow.obj.setPath(av, path, new java.lang.Long(v).longValue()); }
+            if(!changed && isDate(v))                          { changed = true; ow.obj.setPath(av, path, new java.util.Date(v.getTime())); }
+            if(!changed && isString(v) && isDate(new Date(v))) { changed = true; ow.obj.setPath(av, path, new java.util.Date((new Date(v)).getTime())); }
+            if(!changed && !isObject(v))                       { changed = true; ow.obj.setPath(av, path, String(v)); }
         });
 
         try {
