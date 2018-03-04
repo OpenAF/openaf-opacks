@@ -26,23 +26,23 @@ version: '20171030'
 dependencies:
   openaf: '>=20170301'
 files:
-  - .package.yaml
   - googlePhoneNumber.js
   - googlePhoneNumber.yaml
-  - lib/carrier-1.72.jar
-  - lib/geocoder-2.82.jar
-  - lib/libphonenumber-8.8.5.jar
+  - updateGooglePhoneNumber.yaml
+  - .package.yaml
+  - main.js
   - lib/prefixmapper-2.82.jar
   - lib/protobuf-javanano-3.0.0-alpha-7.jar
-  - main.js
-  - updateGooglePhoneNumber.yaml
+  - lib/carrier-1.72.jar
+  - lib/libphonenumber-8.8.5.jar
+  - lib/geocoder-2.82.jar
 filesHash:
-  googlePhoneNumber.js: af82c8a8ed995b08fd65b1d7a27b39fcb7e8bfe5
-  googlePhoneNumber.yaml: 64d39b2692f25c3434eb7b1a3598100b4aea432e
-  lib/carrier-1.72.jar: b6379dd62e1a41ce31d88888ce9f7d1dfe6a6f79
-  lib/geocoder-2.82.jar: 5bec37ce3a8a33891582c319434b0bbdc744390f
-  lib/libphonenumber-8.8.5.jar: c752630a2421ba1a8d41e2c2bfae705a6eb1119c
+  googlePhoneNumber.js: 5cdc370296f68a9e09d59a5789567a5bf5bfeca1
+  googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
+  updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
+  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
   lib/prefixmapper-2.82.jar: a98d4a324b1cefd6ac11fc3e206fa68d3d91ce7e
   lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
-  main.js: 1719264c86d6a9569dd4dbc5eb8b62e054d3616e
-  updateGooglePhoneNumber.yaml: 8c2f0c1e2dc8c6dceffba74a198f79b1e25cee3a
+  lib/carrier-1.72.jar: b6379dd62e1a41ce31d88888ce9f7d1dfe6a6f79
+  lib/libphonenumber-8.8.5.jar: c752630a2421ba1a8d41e2c2bfae705a6eb1119c
+  lib/geocoder-2.82.jar: 5bec37ce3a8a33891582c319434b0bbdc744390f
