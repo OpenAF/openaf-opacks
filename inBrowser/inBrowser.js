@@ -3,7 +3,7 @@
     ow.loadServer();
 
     var hss = {}, chs, port, stampMap;
-    var packPath = getOPackPath("inBrowser") || io.fileInfo(".").canonicalPath;
+    var packPath = getOPackPath("inBrowser").replace(/\\/g, "/") || io.fileInfo(".").canonicalPath;
 
     var hbs = ow.template.loadHBSs({
         e: packPath + "/inBrowser.hbs"
@@ -23,7 +23,7 @@
     function checkinHS(uuid) {
         delete hss[uuid];
 
-        if (Object.keys(hss).length <= 0) hs.stop();
+        if (Object.keys(hss).length <= 0) chs.stop();
     }
 
     /**
@@ -72,7 +72,8 @@
      * <key>inBrowser.edit(aObject, aMap) : Map</key>
      * Edits aObject in a browser window with aMap options. When the browser window is closed all the
      * changes will be returned as a map. aMap can have the following options: wordwrap (boolean) to indicate 
-     * if the browser windows should word wrap; width, height (number) the size of the popup window if choosen by 
+     * if the browser windows should word wrap; fontsize (string) the font size to use (e.g. medium, small, large); 
+     * width, height (number) the size of the popup window if choosen by 
      * right-click; theme (string) a ace theme (ace/theme/*).
      * </odoc>
      */
@@ -85,6 +86,7 @@
         if (isUnDef(aMap) || !isObject(aMap)) aMap = {};
         if (isDef(stampMap)) aMap = merge(stampMap, aMap);
         if (aMap.ro && isString(aObj) && isUnDef(aMap.exec)) aMap = merge(aMap, { exec: true });
+        if (isUnDef(aMap.fontsize)) aMap.fontsize = "medium";
 
         var hs = checkoutHS(id);
 
@@ -94,7 +96,8 @@
         routes["/" + id] = (r) => {
             return chs.replyOKHTML(hbs("e", {
                 id: id,
-                title: aMap.title
+                title: aMap.title,
+                fontsize: aMap.fontsize
             }));
         };
         delroutes["/" + id] = nullFunc;
@@ -222,7 +225,8 @@
      * <key>inBrowser.show(aObject, aMap) : String</key>
      * Shows aObject (or evaluates aObject if a string) in a browser window with aMap options. 
      * aMap can have the following options: wordwrap (boolean) to indicate 
-     * if the browser windows should word wrap; width, height (number) the size of the popup window if choosen by 
+     * if the browser windows should word wrap; fontsize (string) the font size to use (e.g. medium, small, large);
+     * width, height (number) the size of the popup window if choosen by 
      * right-click; theme (string) a ace theme (ace/theme/*). Returns the associated uuid with this browser window communication.
      * </odoc>
      */
@@ -248,7 +252,8 @@
      * Shows aObject (or evaluates aObject if a string) in a browser window, periodically updating every aTime (in ms),
      * with aMap options. 
      * aMap can have the following options: wordwrap (boolean) to indicate 
-     * if the browser windows should word wrap; width, height (number) the size of the popup window if choosen by 
+     * if the browser windows should word wrap; fontsize (string) the font size to use (e.g. medium, small, large);
+     * width, height (number) the size of the popup window if choosen by 
      * right-click; theme (string) a ace theme (ace/theme/*). Returns the associated uuid with this browser window communication.
      * </odoc>
      */
