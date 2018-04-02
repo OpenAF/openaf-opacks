@@ -4,7 +4,7 @@
     plugin("ZIP");
 
     var hss = {}, chs, port, stampMap;
-    var packPath = io.fileInfo(".").canonicalPath || getOPackPath("inBrowser").replace(/\\/g, "/");
+    var packPath = (isDef(getOPackPath("inBrowser") ? getOPackPath("inBrowser").replace(/\\/g, "/") : io.fileInfo(".").canonicalPath);
 
     var hbs = ow.template.loadHBSs({
         e: packPath + "/inBrowser.hbs"
