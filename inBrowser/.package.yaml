@@ -789,5 +789,5 @@ filesHash:
   gui/_js/worker-php.js: 718668de6fb5cc2953f6d562452ca1d9fa1bd2a2
   gui/_js/worker-xml.js: 498d2d9dc049845480e1453578915ef0d555eb68
   gui/_js/worker-xquery.js: 0a449fefa4aa87331e1f9d90061b24ab25267a4f
-  inBrowser.hbs: 40f6bfeb004e15498c50ae765874f47f2baa7847
+  inBrowser.hbs: 0ba3a299f9a3828cc11dc8255dac54c65f180466
   inBrowser.js: 83bc28fccaa45645c2bda4c21b2e8fb10a83c4a1
