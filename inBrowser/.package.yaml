@@ -16,7 +16,7 @@ bugs:
 repository:
   type: http
   url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/inBrowser'
-description: A nice description
+description: Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.
 name: inBrowser
 main: ''
 mainJob: ''
