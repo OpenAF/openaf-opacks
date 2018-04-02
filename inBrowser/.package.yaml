@@ -53,5 +53,5 @@ filesHash:
   gui/_images/openaf.png: 2287f19313c67b8c7b0952fe501fcc199ff4fc2b
   gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
   gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
-  inBrowser.hbs: 62ef38f690ca1ffaa3d1f22831800000f4bcbd5a
-  inBrowser.js: d2687452058c7c81e9dec9f8d564a2000da1e56c
+  inBrowser.hbs: 6425e8b68a5ee9e03efdc79f3d50423cc27e6333
+  inBrowser.js: 3bb6a386e4a3be6fd92c2446632937c0d8a27671
