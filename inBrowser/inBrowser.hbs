@@ -1,0 +1,162 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>OpenAF-console</title>
+    <link href="/_css/jquery.contextMenu.min.css" rel="stylesheet"/>
+    <link href="/css/materialize-icon.css" rel="stylesheet"/>
+    <link rel="shortcut icon" type="image/png" href="/_images/openaf.png"/>
+    <style>
+        .contextmenu-custom {
+            font-family: Arial, sans-serif;
+            font-size  : small;
+        }
+    </style>
+</head>
+
+<body>
+    {{#if title}}<div class="contextmenu-custom" style="heigth: 32; text-align: left"><img height="22" align="right" src="/_images/openaf.png"><b>{{title}}</b></div>
+    <div class="context-menu-one" id="editor" style="position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange"></div>
+    {{else}}
+    <div class="context-menu-one" id="editor" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"></div>
+    {{/if}}
+    <script src="/js/jquery.js"></script>
+    <script src="/_js/jquery.contextMenu.min.js"></script>
+    <script src="/_js/jquery.ui.position.min.js"></script>
+    <script src="/_js/ace.js"></script>
+    <script>
+        var doKill = true, wordwrap = false, height = 200, width = 400;
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        function send() {
+            try {
+                var value = editor.getValue();
+                $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
+            } catch(e) {
+                alert(e);
+            }
+        }
+
+        function refresh() {
+            //var value = editor.getValue();
+            $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
+                try {
+                    editor.session.setValue(pdata.e);
+                    editor.session.setMode("ace/mode/" + pdata.t);
+                    editor.clearSelection();
+                    type = pdata.t;
+                } catch(e) {
+                    alert(e);
+                }
+            }});
+        }
+
+        function toogleWordWrap() {
+            wordwrap = !wordwrap;
+            editor.session.setUseWrapMode(wordwrap);
+        }
+
+        window.onbeforeunload = function(event) {
+            if (doKill) {
+                send();
+                $.ajax({ async: false, type: 'GET', url: '/{{id}}/e/q', success: function(d) {}});
+            } 
+        }   
+
+        // ACE
+        var editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/json");
+        editor.setShowPrintMargin(false);
+        var type = "json";
+        var confMap = {};
+        var imPopup = false;
+
+        if (getUrlParameter("p") == 1) {
+            imPopup = true;
+        }
+
+        refresh();
+
+        $(function() {
+            $.contextMenu({
+                selector: '.context-menu-one', 
+                className: 'contextmenu-custom material-icons',
+                callback: function(key, options) {
+                    switch(key) {
+                    case "popup": 
+                        var newwin = window.open("/{{id}}/e.html?p=1", null, "height=" + height + ",width=" + width + ",status=no,toolbar=no,menubar=no,location=no,title=OpenAF-console");
+                        newwin.focus();
+                        doKill = false;
+                        window.close();
+                        break;
+                    case "reload":
+                        refresh();
+                        break;
+                    case "wordwrap":   
+                        toogleWordWrap();
+                        break;
+                    case "yaml":
+                        send();
+                        type = "yaml";
+                        editor.session.setMode("ace/mode/yaml");
+                        refresh();
+                        break;
+                    case "json":
+                        send();
+                        type = "json";
+                        editor.session.setMode("ace/mode/json");
+                        refresh();
+                        break;
+                    case "text":
+                        send();
+                        type = "text";
+                        editor.session.setMode("ace/mode/text");
+                        refresh();
+                        break;
+                    };
+                },
+                items: {
+                    "yaml"    : {name: "in YAML" },
+                    "json"    : {name: "in JSON" },
+                    "sep1"    : "---------",
+                    "wordwrap": {name: "toggle Word Wrap"},
+                    "sep2"    : "---------",
+                    "reload"  : {name: "Reload" }, 
+                    "popup"   : {name: "Popup", disabled: () => { return imPopup; }}
+                }
+            });  
+        });
+
+        $.get("/{{id}}/e/m", (data) => {
+            if (data.ro) {
+                editor.setReadOnly(true);
+                $("a").remove("#save");
+            }
+            if (data.watch) {
+                window.setInterval(function(){
+                    refresh();
+                }, data.watch);
+            }
+            if (data.wordwrap) {
+                wordwrap = !data.wordwrap;
+                toogleWordWrap();
+            }
+            if (data.width) {
+                width = data.width;
+            }
+            if (data.height) {
+                height = data.height;
+            }
+            if (data.theme) {
+                editor.setTheme("ace/theme/" + data.theme);
+            }
+        });
+    </script>
+</body>
