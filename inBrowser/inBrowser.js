@@ -1,9 +1,10 @@
 (function() {
     ow.loadTemplate();
     ow.loadServer();
+    plugin("ZIP");
 
     var hss = {}, chs, port, stampMap;
-    var packPath = getOPackPath("inBrowser").replace(/\\/g, "/") || io.fileInfo(".").canonicalPath;
+    var packPath = io.fileInfo(".").canonicalPath || getOPackPath("inBrowser").replace(/\\/g, "/");
 
     var hbs = ow.template.loadHBSs({
         e: packPath + "/inBrowser.hbs"
@@ -86,7 +87,7 @@
         if (isUnDef(aMap) || !isObject(aMap)) aMap = {};
         if (isDef(stampMap)) aMap = merge(stampMap, aMap);
         if (aMap.ro && isString(aObj) && isUnDef(aMap.exec)) aMap = merge(aMap, { exec: true });
-        if (isUnDef(aMap.fontsize)) aMap.fontsize = "medium";
+        if (isUnDef(aMap.fontsize)) aMap.fontsize = "12px";
 
         var hs = checkoutHS(id);
 
@@ -107,6 +108,18 @@
         };
         routes["/_js"] = (r) => { 
             return ow.server.httpd.replyFile(chs, packPath + "/gui/_js", "/_js", r.uri);
+        };
+        routes["/_ace"] = (r) => {
+            try {
+                var zip = new ZIP();
+                var ext = r.uri.replace(/.+\.(\w+)$/, "$1");
+                return chs.replyBytes(
+                    zip.streamGetFile(packPath + "/gui/_ace/ace.zip", r.uri.replace(/\/_ace\//, "")), 
+                    isDef(ow.server.httpd.mimes[ext]) ? ow.server.httpd.mimes[ext] : "application/octet-stream"
+                );
+            } catch(e) {
+                return chs.reply("Not found!", ow.server.httpd.mimes.TXT, ow.server.httpd.codes.NOTFOUND);
+            }
         };
         routes["/_images"] = (r) => { 
             return ow.server.httpd.replyFile(chs, packPath + "/gui/_images", "/_images", r.uri);

@@ -3,7 +3,11 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    {{#if title}}
+    <title>{{title}}</title>
+    {{else}}
     <title>OpenAF-console</title>
+    {{/if}}
     <link href="/_css/jquery.contextMenu.min.css" rel="stylesheet"/>
     <link href="/css/materialize-icon.css" rel="stylesheet"/>
     <link rel="shortcut icon" type="image/png" href="/_images/openaf.png"/>
@@ -24,7 +28,7 @@
     <script src="/js/jquery.js"></script>
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
-    <script src="/_js/ace.js"></script>
+    <script src="/_ace/ace.js"></script>
     <script>
         var doKill = true, wordwrap = false, height = 200, width = 400;
 
