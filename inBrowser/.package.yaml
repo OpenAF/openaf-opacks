@@ -16,7 +16,9 @@ bugs:
 repository:
   type: http
   url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/inBrowser'
-description: Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.
+description: >-
+  Provides a mini browser editor intended to use from openaf-console to edit
+  objects or perform show/watch in a browser window.
 name: inBrowser
 main: ''
 mainJob: ''
@@ -788,4 +790,4 @@ filesHash:
   gui/_css/font/context-menu-icons.ttf: 85caaf81a2af9178ef4f650e0caf1d0834a415ad
   gui/_css/font/context-menu-icons.eot: 21929f70a396694d9341b5ef5b97b7348aff22ef
   inBrowser.hbs: 5037fc049acc3705a794b40cbaa16bd80d5c9e77
-  inBrowser.js: 11097e954c998cb755c135c20fe1d608d01920a7
+  inBrowser.js: aec2f1ef8fc372d70dbb526e15d38b33e6a52f08

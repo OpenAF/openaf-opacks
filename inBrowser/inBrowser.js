@@ -6,7 +6,7 @@
     var packPath = getOPackPath("inBrowser") || io.fileInfo(".").canonicalPath;
 
     var hbs = ow.template.loadHBSs({
-        e: "inBrowser.hbs"
+        e: packPath + "/inBrowser.hbs"
     });
 
     function checkoutHS(uuid) {
