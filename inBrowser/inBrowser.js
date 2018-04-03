@@ -1,10 +1,12 @@
 (function() {
     ow.loadTemplate();
     ow.loadServer();
+    ow.template.addConditionalHelpers();
     plugin("ZIP");
 
     var hss = {}, chs, port, stampMap;
-    var packPath = (isDef(getOPackPath("inBrowser")) ? getOPackPath("inBrowser").replace(/\\/g, "/") : io.fileInfo(".").canonicalPath);
+    //var packPath = (isDef(getOPackPath("inBrowser")) ? getOPackPath("inBrowser").replace(/\\/g, "/") : io.fileInfo(".").canonicalPath);
+    var packPath = io.fileInfo(".").canonicalPath;
 
     var hbs = ow.template.loadHBSs({
         e: packPath + "/inBrowser.hbs"
@@ -24,7 +26,10 @@
     function checkinHS(uuid) {
         delete hss[uuid];
 
-        if (Object.keys(hss).length <= 0) chs.stop();
+        if (Object.keys(hss).length <= 0) {
+            if (isDef(chs)) ow.server.httpd.stop(chs);
+            chs = void 0;
+        }
     }
 
     /**
@@ -88,6 +93,11 @@
         if (isDef(stampMap)) aMap = merge(stampMap, aMap);
         if (aMap.ro && isString(aObj) && isUnDef(aMap.exec)) aMap = merge(aMap, { exec: true });
         if (isUnDef(aMap.fontsize)) aMap.fontsize = "12px";
+        if (isUnDef(aMap.type)) aMap.type = "json";
+
+        if (aMap.type == "xml") {
+            plugin("XML");
+        }
 
         var hs = checkoutHS(id);
 
@@ -98,7 +108,9 @@
             return chs.replyOKHTML(hbs("e", {
                 id: id,
                 title: aMap.title,
-                fontsize: aMap.fontsize
+                fontsize: aMap.fontsize,
+                type: aMap.type,
+                ocli: getOPackPath("OpenCli")
             }));
         };
         delroutes["/" + id] = nullFunc;
@@ -150,6 +162,21 @@
                         resText = r.params.e;
                         resType = "json";
                         break;
+                    case "pmap":
+                        res = af.fromPMap(r.params.e);
+                        resText = r.params.e;
+                        resType = "pmap";
+                        break;
+                    case "parametermap":
+                        res = af.fromParameterMap(r.params.e);
+                        resText = r.params.e;
+                        resType = "parametermap";                    
+                        break;
+                    case "xml":
+                        res = (new XML(r.params.e)).w();
+                        resText = r.params.e;
+                        resType = "xml";
+                        break;
                     default:
                         res = r.params.e;
                         resText = r.params.e;
@@ -172,13 +199,13 @@
 
             if (isString(aObj) && aMap.exec) {
                 obj = af.eval(aObj);
-                if (isObject(obj)) type = "json"; else type = "text";
+                if (type != "xml" || isUnDef(type)) { if (isObject(obj)) type = "json"; else type = "text"; }
             } else {
                 if (isDef(res)) {
                     obj = res;
                 } else {
                     obj = aObj;
-                    if (isObject(obj)) type = "json"; else type = "text";
+                    if (type != "xml" || isUnDef(type)) { if (isObject(obj)) type = "json"; else type = "text"; }
                 }
             }
 
@@ -195,6 +222,25 @@
                     res = obj;
                     resType = "json";
                     type = "json";
+                    break;
+                case "pmap":
+                    resText = af.toPMap(obj);
+                    res = obj;
+                    resType = "pmap";
+                    type = "pmap";
+                    break;
+                case "parametermap":
+                    resText = af.toParameterMap(obj);
+                    res = obj;
+                    resType = "parametermap";
+                    type = "parametermap";                
+                    break;
+                case "xml":
+                    if (typeof obj == "xml")    resText = af.fromXML(obj);
+                    if (typeof obj == "string") resText = (new XML(obj)).w();
+                    res = obj;
+                    resType = "xml";
+                    type = "xml";
                     break;
                 default:
                     res = obj;
@@ -223,12 +269,12 @@
         while(keepRunning && !(hss[id].stop)) {
             sleep(1000);
         }
-        checkinHS(id);
 
         // TODO: until ow.server.httpd can delete routes
         ow.server.httpd.route(chs,
             ow.server.httpd.mapWithExistingRoutes(chs,
                 ow.server.httpd.mapRoutesWithLibs(chs, delroutes)));
+        checkinHS(id);
 
         return res;
     };

@@ -53,7 +53,11 @@
             $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
                 try {
                     editor.session.setValue(pdata.e);
-                    editor.session.setMode("ace/mode/" + pdata.t);
+                    if (pdata.t != "pmap" && pdata.t != "parametermap") {
+                        editor.session.setMode("ace/mode/" + pdata.t);
+                    } else {  
+                        editor.session.setMode("ace/mode/xml");
+                    }
                     editor.clearSelection();
                     type = pdata.t;
                 } catch(e) {
@@ -78,7 +82,7 @@
         var editor = ace.edit("editor");
         editor.session.setMode("ace/mode/json");
         editor.setShowPrintMargin(false);
-        var type = "json";
+        var type = "{{type}}";
         var confMap = {};
         var imPopup = false;
 
@@ -118,6 +122,24 @@
                         editor.session.setMode("ace/mode/json");
                         refresh();
                         break;
+                    case "xml":
+                        send();
+                        type = "xml";
+                        editor.session.setMode("ace/mode/xml");
+                        refresh();
+                        break;
+                    case "pmap":
+                        send();
+                        type = "pmap";
+                        editor.session.setMode("ace/mode/xml");
+                        refresh();
+                        break;
+                    case "parametermap":
+                        send();
+                        type = "parametermap";
+                        editor.session.setMode("ace/mode/xml");
+                        refresh();
+                        break;                        
                     case "text":
                         send();
                         type = "text";
@@ -127,8 +149,16 @@
                     };
                 },
                 items: {
+                {{#is type 'xml'}}
+                    "xml"     : {name: "in XML"},
+                {{else}}
                     "yaml"    : {name: "in YAML" },
                     "json"    : {name: "in JSON" },
+                {{#if ocli}}
+                    "pmap"    : {name: "in PMap" },
+                    "parametermap": {name: "in ParameterMap" },
+                {{/if}}
+                {{/is}}
                     "sep1"    : "---------",
                     "wordwrap": {name: "toggle Word Wrap"},
                     "sep2"    : "---------",
@@ -160,6 +190,9 @@
             }
             if (data.theme) {
                 editor.setTheme("ace/theme/" + data.theme);
+            }
+            if (data.type) {
+                type = data.type;
             }
         });
     </script>
