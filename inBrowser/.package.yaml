@@ -54,4 +54,4 @@ filesHash:
   gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
   gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
   inBrowser.hbs: d7f47b36840152021a32829af5049c155da8bc54
-  inBrowser.js: d7fddfb4899f087bf3d8c4697f0eea892faa3b0e
+  inBrowser.js: c72d635cf0b27b6c24f3c5a034bd41259e124e26
