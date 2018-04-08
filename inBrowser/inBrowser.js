@@ -74,6 +74,25 @@
 
     /**
      * <odoc>
+     * <key>inBrowser.listThemes() : Array</key>
+     * Tries to obtain a list of ACE themes that can be used.
+     * </odoc>
+     */
+    exports.listThemes = function() {
+        plugin("ZIP");
+        var zip = new ZIP();
+
+        return $from(
+            ow.loadObj().fromObj2Array(zip.list(getOPackPath("inBrowser") + "/gui/_ace/ace.zip")))
+            .starts("name", "theme")
+            .select((r) => { 
+                return r.name.replace(/theme-(\w+)\.js/, "$1")
+            })
+            .sort();
+    };
+
+    /**
+     * <odoc>
      * <key>inBrowser.edit(aObject, aMap) : Map</key>
      * Edits aObject in a browser window with aMap options. When the browser window is closed all the
      * changes will be returned as a map. aMap can have the following options: wordwrap (boolean) to indicate 
