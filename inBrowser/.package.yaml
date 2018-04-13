@@ -23,7 +23,7 @@ name: inBrowser
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180403'
+version: '20180412'
 dependencies:
   openaf: '>=20180301'
 files:
@@ -42,7 +42,7 @@ files:
   - inBrowser.hbs
   - inBrowser.js
 filesHash:
-  .odoc.db: 46bf1e93ddbefe0bff833ddc43755f35c560c1a7
+  .odoc.db: 26bd5f82b68542f997ef27600446e8365a425088
   gui/_ace/ace.zip: 60936e5431fd8760306cba905a3f2602e7d370e6
   gui/_css/font/context-menu-icons.eot: 21929f70a396694d9341b5ef5b97b7348aff22ef
   gui/_css/font/context-menu-icons.ttf: 85caaf81a2af9178ef4f650e0caf1d0834a415ad
@@ -53,5 +53,5 @@ filesHash:
   gui/_images/openaf.png: 2287f19313c67b8c7b0952fe501fcc199ff4fc2b
   gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
   gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
-  inBrowser.hbs: d7f47b36840152021a32829af5049c155da8bc54
-  inBrowser.js: 359786c6e26ef778dfe316e5abf967c7c7849c07
+  inBrowser.hbs: 784c95d0c5cdc86b8e352edc7959fbde371862d8
+  inBrowser.js: 57086bb9778575b7cc2f2b789ef2ceba61644a4b

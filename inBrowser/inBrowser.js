@@ -98,12 +98,30 @@
      * changes will be returned as a map. aMap can have the following options: wordwrap (boolean) to indicate 
      * if the browser windows should word wrap; fontsize (string) the font size to use (e.g. medium, small, large); 
      * width, height (number) the size of the popup window if choosen by 
-     * right-click; theme (string) a ace theme (ace/theme/*).
+     * right-click; theme (string) a ace theme (ace/theme/*); exec (boolean) forces aObject to be executed; save (string)
+     * provides a function text to execute when save is executed on the browser receiving __in as the saved object from the browser 
+     * (e.g. var o = inBrowser.edit(o, { edit: "o = __in"}), if defined the function will not wait for the browser to be closed, if not 
+     * a string it will default to "aObject = __in" (if aObject is string or exec = true).
      * </odoc>
      */
     exports.edit = function(aObj, aMap, forceId) {
+        if (isUnDef(aMap)) aMap = {};
+        if (isUnDef(aMap.save)) return __edit(aObj, aMap);
+
+        var id = genUUID();
+        var p = $do(() => { 
+            __edit(aObj, aMap, id); 
+        });
+
+        if (isUnDef(hss[id])) hss[id] = {};
+        hss[id].p = p;
+
+        return id;
+    };
+
+    function __edit(aObj, aMap, forceId) {
         var keepRunning = true;
-        var res, resText, resType;
+        var res, resText, resType, resFunc;
 
         var id = (isDef(forceId)) ? forceId : genUUID();
 
@@ -117,6 +135,16 @@
             plugin("XML");
         }
 
+        if (isDef(aMap.save)) {
+            if (isString(aMap.save)) {
+                resFunc = new Function('__in', aMap.save);
+            } else {
+                if (isString(aObj) || aMap.exec) {
+                    resFunc = new Function('__in', aObj + " = __in;");
+                }
+            }
+        }
+
         var hs = checkoutHS(id);
 
         var routes = {}, delroutes = {};
@@ -128,7 +156,8 @@
                 title: aMap.title,
                 fontsize: aMap.fontsize,
                 type: aMap.type,
-                ocli: getOPackPath("OpenCli")
+                ocli: getOPackPath("OpenCli"),
+                save: (!(isDef(aMap.save)))
             }));
         };
         delroutes["/" + id] = nullFunc;
@@ -208,6 +237,10 @@
                 }
             }
 
+            if (isDef(resFunc)) {
+                resFunc(res);
+            } 
+
             return chs.replyOKText("");
         };
         delroutes["/" + id + "/e/u"] = nullFunc;
@@ -284,7 +317,7 @@
 
         java.awt.Desktop.getDesktop().browse(new java.net.URI("http://127.0.0.1:" + port + "/" + id + "/e.html"));
 
-        while(keepRunning && !(hss[id].stop)) {
+        while(keepRunning && isDef(hss[id]) && !(hss[id].stop)) {
             sleep(1000);
         }
 
@@ -314,7 +347,7 @@
 
         var id = genUUID();
         var p = $do(() => { 
-            this.edit(obj, map, id); 
+            __edit(obj, map, id); 
         });
 
         if (isUnDef(hss[id])) hss[id] = {};
@@ -341,7 +374,7 @@
         map = merge(map, { watch: aTime, ro: true });
         var id = genUUID();
         var p = $do(() => { 
-            this.edit(obj, map, id); 
+            __edit(obj, map, id); 
         });
 
         if (isUnDef(hss[id])) hss[id] = {};
