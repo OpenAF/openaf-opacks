@@ -66,6 +66,13 @@
             }});
         }
 
+        function popup() {
+            var newwin = window.open("/{{id}}/e.html?p=1", null, "height=" + height + ",width=" + width + ",status=no,toolbar=no,menubar=no,location=no,title=OpenAF-console");
+            newwin.focus();
+            doKill = false;
+            window.close();
+        }
+
         function toogleWordWrap() {
             wordwrap = !wordwrap;
             editor.session.setUseWrapMode(wordwrap);
@@ -82,9 +89,10 @@
         var editor = ace.edit("editor");
         editor.session.setMode("ace/mode/json");
         editor.setShowPrintMargin(false);
+
         var type = "{{type}}";
         var confMap = {};
-        var imPopup = false;
+        var imPopup = false, imSave = true;
 
         if (getUrlParameter("p") == 1) {
             imPopup = true;
@@ -99,16 +107,16 @@
                 callback: function(key, options) {
                     switch(key) {
                     case "popup": 
-                        var newwin = window.open("/{{id}}/e.html?p=1", null, "height=" + height + ",width=" + width + ",status=no,toolbar=no,menubar=no,location=no,title=OpenAF-console");
-                        newwin.focus();
-                        doKill = false;
-                        window.close();
+                        popup();
                         break;
                     case "reload":
                         refresh();
                         break;
                     case "wordwrap":   
                         toogleWordWrap();
+                        break;
+                    case "save":
+                        send();
                         break;
                     case "yaml":
                         send();
@@ -163,6 +171,7 @@
                     "wordwrap": {name: "toggle Word Wrap"},
                     "sep2"    : "---------",
                     "reload"  : {name: "Reload" }, 
+                    "save"    : {name: "Save", disabled: () => { return imSave; }},
                     "popup"   : {name: "Popup", disabled: () => { return imPopup; }}
                 }
             });  
@@ -194,6 +203,31 @@
             if (data.type) {
                 type = data.type;
             }
+            if (data.save) {
+                imSave = !(data.save);
+            }
         });
+
+        editor.commands.addCommand({
+            name   : "save",
+            bindKey: { win: "Ctrl-S", mac: "Command-S" },
+            exec   : function(editor) {
+                if (!imSave) send();
+            }
+        });
+        editor.commands.addCommand({
+            name   : "reload",
+            bindKey: { win: "Ctrl-R", mac: "Command-R" },
+            exec   : function(editor) {
+                refresh();
+            }
+        });  
+        editor.commands.addCommand({
+            name   : "popup",
+            bindKey: { win: "Ctrl-Alt-P", mac: "Ctrl-Option-P" },
+            exec   : function(editor) {
+                if (!imPopup) popup();
+            }
+        });                  
     </script>
 </body>
