@@ -200,29 +200,34 @@
                 if (isDef(r.params.t)) {
                     switch(r.params.t) {
                     case "yaml": 
-                        res = af.fromYAML(r.params.e);
+                        try { res = af.fromYAML(r.params.e); } catch(e) {}
                         resText = r.params.e;
                         resType = "yaml";
                         break;
                     case "json":
-                        res = jsonParse(r.params.e);
+                        try { res = jsonParse(r.params.e); } catch(e) {}
                         resText = r.params.e;
                         resType = "json";
                         break;
                     case "pmap":
-                        res = af.fromPMap(r.params.e);
+                        try { res = af.fromPMap(r.params.e); } catch(e) {}
                         resText = r.params.e;
                         resType = "pmap";
                         break;
                     case "parametermap":
-                        res = af.fromParameterMap(r.params.e);
+                        try { res = af.fromParameterMap(r.params.e); } catch(e) {}
                         resText = r.params.e;
                         resType = "parametermap";                    
                         break;
                     case "xml":
-                        res = (new XML(r.params.e)).w();
+                        try { res = (new XML(r.params.e)).w(); } catch(e) {}
                         resText = r.params.e;
                         resType = "xml";
+                        break;
+                    case "table":
+                        res = r.params.e;
+                        resText = r.params.e;
+                        resType = "table";
                         break;
                     default:
                         res = r.params.e;
@@ -259,7 +264,7 @@
                     if (type != "xml" || isUnDef(type)) { if (isObject(obj)) type = "json"; else type = "text"; }
                 }
             }
-
+            
             if (isDef(r.params.t)) {
                 switch(r.params.t) {
                 case "yaml":
@@ -275,16 +280,30 @@
                     type = "json";
                     break;
                 case "pmap":
-                    resText = af.toPMap(obj);
-                    res = obj;
-                    resType = "pmap";
-                    type = "pmap";
+                    if (!isArray(obj)) {
+                        resText = af.toPMap(obj);
+                        res = obj;
+                        resType = "pmap";
+                        type = "pmap";
+                    } else {
+                        resText = stringify(obj);
+                        res = obj;
+                        resType = "json";
+                        type = "json";
+                    }
                     break;
                 case "parametermap":
-                    resText = af.toParameterMap(obj);
+                    if (!isArray(obj)) {
+                        resText = af.toParameterMap(obj);
+                        resType = "parametermap";
+                        type = "parametermap"; 
+                    } else {
+                        resText = stringify(obj);
+                        res = obj;
+                        resType = "json";
+                        type = "json";
+                    }
                     res = obj;
-                    resType = "parametermap";
-                    type = "parametermap";                
                     break;
                 case "xml":
                     if (typeof obj == "xml")    resText = af.fromXML(obj);
@@ -292,6 +311,12 @@
                     res = obj;
                     resType = "xml";
                     type = "xml";
+                    break;
+                case "table":
+                    res = obj;
+                    resText = obj;
+                    resType = "table";
+                    type = "table";
                     break;
                 default:
                     res = obj;

@@ -16,21 +16,51 @@
             font-family: Arial, sans-serif;
             font-size  : {{fontsize}};
         }
+        .avalue {
+        color: #0000AA;
+        font-size: small;
+        }
+        .avalueNA {
+        color: #AAAAAA;
+        font-size: small;
+        }
+        .atable {
+        border: 1px solid lightgray;
+        border-spacing: 0;
+        line-height: 1;
+        box-sizing: border-box;
+        border-collapse: collapse;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        color: #0000AA;
+        margin-top: 5;
+        margin-left: 5;
+        margin-right: 5;
+        margin-bottom: 5;
+        font-size: {{fontsize}};
+        }
+        .atablecell, .atablehead {
+        padding: 3px;
+        border: 1px solid lightgray;
+        font-size: small;
+        text-align: center;
+        }        
     </style>
 </head>
 
 <body>
     {{#if title}}<div class="contextmenu-custom" style="heigth: 32; text-align: left"><img height="22" align="right" src="/_images/openaf.png"><b>{{title}}</b></div>
-    <div class="context-menu-one" id="editor" style="position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
     {{else}}
-    <div class="context-menu-one" id="editor" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
     {{/if}}
     <script src="/js/jquery.js"></script>
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
     <script src="/_ace/ace.js"></script>
     <script>
-        var doKill = true, wordwrap = false, height = 200, width = 400;
+        var doKill = true, wordwrap = false, height = 200, width = 400, tableData, oldEditor;
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -39,31 +69,106 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         };
 
+        function render(aValue, aType) {
+            // If undefined
+            if (typeof aValue === 'undefined') {
+                aValue = "not available";
+                aType = "undefined";
+            }
+
+            // If object
+            var _render = (aValue) => {
+                if (typeof aValue != 'object') return aValue;
+
+                var out = "";
+                if (aValue instanceof Array && aValue.length > 0) {
+                    var out = "<table class=\"atable\"><tr>";
+                    for(var i in aValue[0]) {
+                        out += "<th class=\"atablehead\"><b>" + i + "</b></th>";
+                    }
+                    out += "</tr>";
+                    for(var x in aValue) {
+                        out += "<tr>";
+                        for(var y in aValue[x]) {
+                            out += "<td class=\"atablecell\">" + _render(aValue[x][y]) + "</td>";
+                        }
+                        out += "</tr>";
+                    }
+                    out += "</table>";
+                } else {
+                    var out = "<table class=\"atable\">";
+                    for(var i in aValue) {
+                        out += "<tr><td class=\"atablecell\"><b>" + i + "</b></td><td class=\"atablecell\">" + _render(aValue[i]) + "</td></tr>";
+                    }
+                    out += "</table>";
+                }
+                return out;
+            };
+
+            if (typeof aValue == 'object') {
+                var out = "";
+                out += _render(aValue);
+                aValue = out;
+            }
+
+            switch(aType) {
+                case "date"     : return (new Date(aValue)).toLocaleString() + "";
+                case "undefined": return "<span class=\"avalueNA\">" + aValue + "</span>";
+                default:
+                    return "<span class=\"avalue\">" + aValue + "</span>";
+            }
+        }
+
         function send() {
-            try {
-                var value = editor.getValue();
-                $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
-            } catch(e) {
-                alert(e);
+            if (type == "table") {
+                try {
+                    var value = tableData;
+                    $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
+                } catch(e) {
+                    alert(e);
+                }
+            } else {
+                try {
+                    var value = editor.getValue();
+                    $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
+                } catch(e) {
+                    alert(e);
+                }
             }
         }
 
         function refresh() {
             //var value = editor.getValue();
-            $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
-                try {
-                    editor.session.setValue(pdata.e);
-                    if (pdata.t != "pmap" && pdata.t != "parametermap") {
-                        editor.session.setMode("ace/mode/" + pdata.t);
-                    } else {  
-                        editor.session.setMode("ace/mode/xml");
+            if (type == "table") {
+                $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
+                    try {
+                        $("#shower").html(render(pdata.e), typeof pdata.e);
+                        type = pdata.t;
+                        tableData = pdata.e;
+                        $("#shower").show();
+                        $("#editor").hide();
+                    } catch(e) {
+                        alert(e);
                     }
-                    editor.clearSelection();
-                    type = pdata.t;
-                } catch(e) {
-                    alert(e);
-                }
-            }});
+                }});
+            } else {
+                $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
+                    try {
+                        $("#shower").hide();
+                        $("#editor").show();
+                        editor.session.setValue(pdata.e);
+                        if (pdata.t != "pmap" && pdata.t != "parametermap") {
+                            editor.session.setMode("ace/mode/" + pdata.t);
+                        } else {  
+                            editor.session.setMode("ace/mode/xml");
+                        }
+                        editor.clearSelection();
+                        type = pdata.t;
+                    } catch(e) {
+                        alert(e);
+                    }
+                }});
+            }
         }
 
         function popup() {
@@ -154,6 +259,11 @@
                         editor.session.setMode("ace/mode/text");
                         refresh();
                         break;
+                    case "table":
+                        send();
+                        type = "table";
+                        refresh();
+                        break;
                     };
                 },
                 items: {
@@ -162,8 +272,9 @@
                 {{else}}
                     "yaml"    : {name: "in YAML" },
                     "json"    : {name: "in JSON" },
+                    "table"   : {name: "in a table"},
                 {{#if ocli}}
-                    "pmap"    : {name: "in PMap" },
+                    "pmap"        : {name: "in PMap" },
                     "parametermap": {name: "in ParameterMap" },
                 {{/if}}
                 {{/is}}
