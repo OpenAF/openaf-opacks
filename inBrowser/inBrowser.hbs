@@ -50,15 +50,18 @@
 <body>
     {{#if title}}<div class="contextmenu-custom" style="heigth: 32; text-align: left"><img height="22" align="right" src="/_images/openaf.png"><b>{{title}}</b></div>
     <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
-    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="background-color: white; filter: invert({{tableInverse}}%); width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
     {{else}}
     <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
-    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="background-color: white; filter: invert({{tableInverse}}%); width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
     {{/if}}
     <script src="/js/jquery.js"></script>
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
     <script src="/_ace/ace.js"></script>
+    <script src="/_js/highcharts.js"></script>
+    <script src="/_js/highcharts-3d.js"></script>
+    <script src="/_js/highcharts-more.js"></script>
     <script>
         var doKill = true, wordwrap = false, height = 200, width = 400, tableData, oldEditor;
 
@@ -67,6 +70,10 @@
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        function chart(aContainer, aData) {
+            //Highcharts.chart(aContainer);
         };
 
         function render(aValue, aType) {
@@ -120,7 +127,7 @@
         }
 
         function send() {
-            if (type == "table") {
+            if (type == "table" || type == "chart") {
                 try {
                     var value = tableData;
                     $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
@@ -139,10 +146,11 @@
 
         function refresh() {
             //var value = editor.getValue();
-            if (type == "table") {
+            if (type == "table" || type == "chart") {
                 $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
                     try {
-                        $("#shower").html(render(pdata.e), typeof pdata.e);
+                        if (type == "table") $("#shower").html(render(pdata.e), pdata.t);
+                        if (type == "chart") chart("shower", pdata.e);
                         type = pdata.t;
                         tableData = pdata.e;
                         $("#shower").show();
@@ -264,6 +272,11 @@
                         type = "table";
                         refresh();
                         break;
+                    case "chart":
+                        send();
+                        type = "chart";
+                        refresh();
+                        break;                        
                     };
                 },
                 items: {
@@ -273,6 +286,7 @@
                     "yaml"    : {name: "in YAML" },
                     "json"    : {name: "in JSON" },
                     "table"   : {name: "in a table"},
+                    "chart"   : {name: "in a chart"},
                 {{#if ocli}}
                     "pmap"        : {name: "in PMap" },
                     "parametermap": {name: "in ParameterMap" },

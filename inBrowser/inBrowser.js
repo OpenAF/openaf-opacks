@@ -157,7 +157,9 @@
                 fontsize: aMap.fontsize,
                 type: aMap.type,
                 ocli: getOPackPath("OpenCli"),
-                save: (!(isDef(aMap.save)))
+                save: (!(isDef(aMap.save))),
+                tableInverse: ((isDef(aMap.tableInverse) ? aMap.tableInverse : 0)),
+                chartOptions: ((isDef(aMap.chartOptions) ? stringify(aMap.chartOptions, void 0, "") : "{}"))
             }));
         };
         delroutes["/" + id] = nullFunc;
@@ -229,6 +231,11 @@
                         resText = r.params.e;
                         resType = "table";
                         break;
+                    case "chart":
+                        res = r.params.e;
+                        resText = r.params.e;
+                        resType = "chart";
+                        break;                        
                     default:
                         res = r.params.e;
                         resText = r.params.e;
@@ -318,6 +325,12 @@
                     resType = "table";
                     type = "table";
                     break;
+                case "chart":
+                    res = obj;
+                    resText = obj;
+                    resType = "chart";
+                    type = "chart";
+                    break;                    
                 default:
                     res = obj;
                     resText = obj;
