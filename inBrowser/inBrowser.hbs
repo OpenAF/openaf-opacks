@@ -50,17 +50,18 @@
 <body>
     {{#if title}}<div class="contextmenu-custom" style="heigth: 32; text-align: left"><img height="22" align="right" src="/_images/openaf.png"><b>{{title}}</b></div>
     <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
-    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="background-color: white; filter: invert({{tableInverse}}%); width: 100%; heigth: 100%; position: absolute; top: 32; right: 0; bottom: 0; left: 0; border-top: 1px dotted orange; font-size: {{fontsize}}"></div>
     {{else}}
     <div class="context-menu-one" id="editor" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
-    <div class="context-menu-one" id="shower" style="width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
+    <div class="context-menu-one" id="shower" style="background-color: white; filter: invert({{tableInverse}}%); width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
     {{/if}}
     <script src="/js/jquery.js"></script>
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
     <script src="/_ace/ace.js"></script>
+    <script src="/_js/Chart.bundle.min.js"></script>
     <script>
-        var doKill = true, wordwrap = false, height = 200, width = 400, tableData, oldEditor;
+        var doKill = true, wordwrap = false, height = 200, width = 400, tableData, chartObj;
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -69,7 +70,73 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         };
 
+        function chart(aContainer, aData) {
+            $("#" + aContainer).html("<canvas id='chart'></canvas>");
+
+            if (!(Array.isArray(aData))) {
+                alert("Can't generate a chart without an array.");
+                return;
+            }
+
+            var ii = -1;
+            var fcolor = (op) => {
+                ii++;
+                var o = ii % 6;
+                switch(o) {
+                case 0: return "rgba(255,99,132," + op + ")"
+                case 1: return "rgba(54, 162, 235, "+ op + ")"
+                case 2: return "rgba(255, 206, 86, "+ op + ")"
+                case 3: return "rgba(75, 192, 192, "+ op + ")"
+                case 4: return "rgba(153, 102, 255, "+ op + ")"
+                case 5: return "rgba(255, 159, 64, "+ op + ")"
+                }
+            };
+
+            var labels = [], datasets = [];
+            for(var i = 1; i < Object.keys(aData[0]).length; i++) {
+                datasets.push({
+                    label: Object.keys(aData[0])[i],
+                    data: [],
+                    borderColor: [],
+                    backgroundColor: [],
+                    borderWidth: 1
+                });
+            }
+
+            for(var i = 0; i < aData.length; i++) {
+                labels.push(aData[i][Object.keys(aData[i])[0]]);
+                for(var j = 0; j < datasets.length; j++) {
+                    datasets[j].data.push(aData[i][datasets[j].label]);
+                    var oo = fcolor(0.2);
+                    datasets[j].backgroundColor.push(oo);
+                    oo = oo.replace(", 0.2", ", 1");
+                    datasets[j].borderColor.push(oo);
+                    datasets[j].fill = false;
+                }
+            }
+
+            var options = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    animation: { 
+                        duration: 0, 
+                        responsiveAnimationDuration: 0 
+                    }
+                }
+            };
+
+            options = $.extend(true, options, {{{chartOptions}}});
+
+            chartObj = new Chart(document.getElementById("chart").getContext("2d"), options);
+        };
+
         function render(aValue, aType) {
+            chartObj = void 0;
+
             // If undefined
             if (typeof aValue === 'undefined') {
                 aValue = "not available";
@@ -120,7 +187,7 @@
         }
 
         function send() {
-            if (type == "table") {
+            if (type == "table" || type == "chart") {
                 try {
                     var value = tableData;
                     $.ajax({ async: false, type: "POST", url: "/{{id}}/e/u", data: { e: value, t: type }, success: () => {}});
@@ -139,10 +206,11 @@
 
         function refresh() {
             //var value = editor.getValue();
-            if (type == "table") {
+            if (type == "table" || type == "chart") {
                 $.ajax({ async: false, type: "GET", url: "/{{id}}/e/d", data: { t: type }, success: (pdata) => {
                     try {
-                        $("#shower").html(render(pdata.e), typeof pdata.e);
+                        if (type == "table") $("#shower").html(render(pdata.e), pdata.t);
+                        if (type == "chart") chart("shower", pdata.e);
                         type = pdata.t;
                         tableData = pdata.e;
                         $("#shower").show();
@@ -264,6 +332,11 @@
                         type = "table";
                         refresh();
                         break;
+                    case "chart":
+                        send();
+                        type = "chart";
+                        refresh();
+                        break;                        
                     };
                 },
                 items: {
@@ -273,6 +346,7 @@
                     "yaml"    : {name: "in YAML" },
                     "json"    : {name: "in JSON" },
                     "table"   : {name: "in a table"},
+                    "chart"   : {name: "in a chart"},
                 {{#if ocli}}
                     "pmap"        : {name: "in PMap" },
                     "parametermap": {name: "in ParameterMap" },
