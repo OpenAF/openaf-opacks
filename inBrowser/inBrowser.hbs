@@ -59,11 +59,9 @@
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
     <script src="/_ace/ace.js"></script>
-    <script src="/_js/highcharts.js"></script>
-    <script src="/_js/highcharts-3d.js"></script>
-    <script src="/_js/highcharts-more.js"></script>
+    <script src="/_js/Chart.bundle.min.js"></script>
     <script>
-        var doKill = true, wordwrap = false, height = 200, width = 400, tableData, oldEditor;
+        var doKill = true, wordwrap = false, height = 200, width = 400, tableData, chartObj;
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -73,10 +71,72 @@
         };
 
         function chart(aContainer, aData) {
-            //Highcharts.chart(aContainer);
+            $("#" + aContainer).html("<canvas id='chart'></canvas>");
+
+            if (!(Array.isArray(aData))) {
+                alert("Can't generate a chart without an array.");
+                return;
+            }
+
+            var ii = -1;
+            var fcolor = (op) => {
+                ii++;
+                var o = ii % 6;
+                switch(o) {
+                case 0: return "rgba(255,99,132," + op + ")"
+                case 1: return "rgba(54, 162, 235, "+ op + ")"
+                case 2: return "rgba(255, 206, 86, "+ op + ")"
+                case 3: return "rgba(75, 192, 192, "+ op + ")"
+                case 4: return "rgba(153, 102, 255, "+ op + ")"
+                case 5: return "rgba(255, 159, 64, "+ op + ")"
+                }
+            };
+
+            var labels = [], datasets = [];
+            for(var i = 1; i < Object.keys(aData[0]).length; i++) {
+                datasets.push({
+                    label: Object.keys(aData[0])[i],
+                    data: [],
+                    borderColor: [],
+                    backgroundColor: [],
+                    borderWidth: 1
+                });
+            }
+
+            for(var i = 0; i < aData.length; i++) {
+                labels.push(aData[i][Object.keys(aData[i])[0]]);
+                for(var j = 0; j < datasets.length; j++) {
+                    datasets[j].data.push(aData[i][datasets[j].label]);
+                    var oo = fcolor(0.2);
+                    datasets[j].backgroundColor.push(oo);
+                    oo = oo.replace(", 0.2", ", 1");
+                    datasets[j].borderColor.push(oo);
+                    datasets[j].fill = false;
+                }
+            }
+
+            var options = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    animation: { 
+                        duration: 0, 
+                        responsiveAnimationDuration: 0 
+                    }
+                }
+            };
+
+            options = $.extend(true, options, {{{chartOptions}}});
+
+            chartObj = new Chart(document.getElementById("chart").getContext("2d"), options);
         };
 
         function render(aValue, aType) {
+            chartObj = void 0;
+
             // If undefined
             if (typeof aValue === 'undefined') {
                 aValue = "not available";
