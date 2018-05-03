@@ -25,6 +25,6 @@ version: '20180502'
 dependencies: null
 files:
   - .package.yaml
-  - msbot.js
+  - MSBot.js
 filesHash:
-  msbot.js: 7659402a5cf2914cef8c7dd1c4bd4524cc5bfaaa
+  MSBot.js: 28eb1f7c1caf4840bd4a90bf7ea8247bb25065e5

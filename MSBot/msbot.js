@@ -1,5 +1,5 @@
 var packPath = (isDef(getOPackPath("MSBot")) ? getOPackPath("MSBot").replace(/\\/g, "/") : io.fileInfo(".").canonicalPath);
-af.externalAddClasspath("file:" + io.fileInfo(packPath).canonicalPath);
+af.externalAddClasspath("file:" + io.fileInfo(packPath).canonicalPath + "/");
 
 /**
  * <odoc>
@@ -21,7 +21,7 @@ af.externalAddClasspath("file:" + io.fileInfo(packPath).canonicalPath);
  * \
  * To handle responses and reply back simply subscribe the MSBot::conversations channel. Example:\
  * \
- * var sky = new BotFW("skype", "MyBot", "clientid", "clientsecret");\
+ * var sky = new MSBot("skype", "MyBot", "clientid", "clientsecret");\
  * sky.getConversationsCh().subscribe((aCh, aOp, aK, aV) => { ... sky.sendMsg(void 0, "Test", [ { id: aId, name "Test user"}], "Test"); ... });
  * sky.startEndpoint(3993, "0.0.0.0", "/mySSLKeys.jks", "changeit"); // see help MSBot.startEndpoint for more info\
  * \
@@ -94,16 +94,22 @@ MSBot.prototype.__receiveMsg = function(data) {
 };
 
 MSBot.prototype.__getToken = function() {
-	var tokenRes = (new HTTP()).exec("https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token", "POST", 
-		templify("grant_type={{grant_type}}&client_id={{client_id}}&client_secret={{client_secret}}&scope={{scope}}" , { 
+	try {
+		var body = templify("grant_type={{grant_type}}&client_id={{client_id}}&client_secret={{client_secret}}&scope={{scope}}" , { 
 			"grant_type": "client_credentials",
 			"client_id": this.clientId,
 			"client_secret": this.clientSecret,
 			"scope": "https://api.botframework.com/.default"
-		}
-	));
+		});
+		var tokenRes = (new ow.obj.http()).exec("https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token", "POST", body, {
+			"Content-Type": "application/x-www-form-urlencoded",
+			"Host": "login.microsoftonline.com"
+		});
 
-	return JSON.parse(tokenRes.response);
+		return jsonParse(tokenRes.response);
+	} catch(e) {
+		sprintErr(e);
+	}
 };
 
 /**
@@ -118,7 +124,7 @@ MSBot.prototype.sendMsg = function(aConversationId, aMessage, aToArray, aTopic) 
 
 	if ($from($ch(this.ch).getKeys()).equals("key", aConversationId).none()) {
 		try {
-			var res = ow.obj.rest.jsonCreate(this.serviceUrl + "/v3/conversations", {
+			var res = ow.obj.rest.jsonCreate(this.serviceUrl + "/v3/conversations", {}, {
 				bot: {
 					id: this.botId,
 					name: this.name
@@ -131,7 +137,7 @@ MSBot.prototype.sendMsg = function(aConversationId, aMessage, aToArray, aTopic) 
 					text: aMessage, 
 				},
 				channelData: {}
-			}, undefined, undefined, undefined, {
+			}, void 0, void 0, void 0, {
 				"Authorization": String(token.token_type + " " + token.access_token)
 			});
 			
@@ -149,15 +155,16 @@ MSBot.prototype.sendMsg = function(aConversationId, aMessage, aToArray, aTopic) 
 		}
 	} else {
 	  try {
-		var last = $ch(this.ch).get(aConversationId)
-		var res = ow.obj.rest.jsonCreate(last.serviceUrl + "/v3/conversations/" + aConversationId + "/activities", { 
+		var last = $ch(this.ch).get(aConversationId);
+
+		var res = ow.obj.rest.jsonCreate(last.serviceUrl + "/v3/conversations/" + aConversationId + "/activities", {}, { 
 			type: 'message', 
 			text: aMessage,
 			from: {
 				id: last.lastRecipientId,
 				name: last.lastRecipientName 
 			}
-		}, undefined, undefined, undefined, {
+		}, void 0, void 0, void 0, {
 			"Authorization": String(token.token_type + " " + token.access_token)
 		});
 
@@ -182,11 +189,12 @@ MSBot.prototype.sendMsg = function(aConversationId, aMessage, aToArray, aTopic) 
  */
 MSBot.prototype.startEndpoint = function(aPort, aHost, aKeyStore, aPass) {
 	var hss = ow.server.httpd.start(aPort, aHost, aKeyStore, aPass);
+	var parent = this;
 	ow.server.httpd.route(hss, {
 		"/": function(req) {
-			return hss.replyOKJSON(stringify(skyB.__receiveMsg(JSON.parse(req.files.postData))));
+			return hss.replyOKJSON(stringify(parent.__receiveMsg(jsonParse(req.files.postData))));
 		}
-	});
+	}, function(r) { return aHTTPd.reply("", "", 401, {}); });
 
 	return hss;
 };
