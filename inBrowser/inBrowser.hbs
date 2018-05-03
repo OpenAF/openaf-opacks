@@ -149,15 +149,24 @@
 
                 var out = "";
                 if (aValue instanceof Array && aValue.length > 0) {
-                    var out = "<table class=\"atable\"><tr>";
-                    for(var i in aValue[0]) {
-                        out += "<th class=\"atablehead\"><b>" + i + "</b></th>";
+                    var out = "";
+                    if (typeof aValue[0] != 'object') {
+                        out += "<table class=\"atable\"><tr>";
+                        for(var i in aValue[0]) {
+                            out += "<th class=\"atablehead\"><b>" + i + "</b></th>";
+                        }
+                        out += "</tr>";
+                    } else {
+                        out += "<table class=\"atable\">";
                     }
-                    out += "</tr>";
                     for(var x in aValue) {
                         out += "<tr>";
-                        for(var y in aValue[x]) {
-                            out += "<td class=\"atablecell\">" + _render(aValue[x][y]) + "</td>";
+                        if (typeof aValue[x] != 'object' && !Array.isArray(aValue[x])) {
+                            out += "<td class=\"atablecell\">" + aValue[x] + "</td>";
+                        } else {
+                            for(var y in aValue[x]) {
+                                out += "<td class=\"atablecell\">" + _render(aValue[x][y]) + "</td>";
+                            }
                         }
                         out += "</tr>";
                     }
