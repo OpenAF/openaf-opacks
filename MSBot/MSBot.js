@@ -77,7 +77,7 @@ MSBot.prototype.__receiveMsg = function(data) {
 	case "message":
 		var cId = data.conversation.id;
 		var v = $ch(this.ch).get(cId);
-		$ch(this.ch).set(cId, merge({
+		$ch(this.ch).set(cId, merge(v, {
 			"key": cId, 
 			"lastMessage": data.text,
 			"lastTimestamp": data.localTimestamp,
@@ -87,7 +87,7 @@ MSBot.prototype.__receiveMsg = function(data) {
  			"lastRecipientName": data.recipient.name,
 			"serviceUrl": data.serviceUrl,
  			"channelId": data.channelId
-		}, v));
+		}));
 		break;
 	}
 	return {};
