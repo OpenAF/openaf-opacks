@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - skype
+  - slack
+  - MS Bot Framework
+  - Bot
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/MSBot'
+description: >-
+  Provides a wrapper to access the MS Bot Framework to allow for skype, slack
+  and others interaction.
+name: MSBot
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20180502'
+dependencies: null
+files:
+  - .package.yaml
+  - msbot.js
+filesHash:
+  msbot.js: 7659402a5cf2914cef8c7dd1c4bd4524cc5bfaaa
