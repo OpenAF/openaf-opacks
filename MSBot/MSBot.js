@@ -108,7 +108,7 @@ MSBot.prototype.__getToken = function() {
 
 		return jsonParse(tokenRes.response);
 	} catch(e) {
-		sprintErr(e);
+		logErr(stringify(e));
 	}
 };
 
@@ -150,8 +150,7 @@ MSBot.prototype.sendMsg = function(aConversationId, aMessage, aToArray, aTopic) 
 
 			});
 		} catch(e) {
-			printErr(e);
-			e.javaException.printStackTrace();
+			logErr(e);
 		}
 	} else {
 	  try {
