@@ -53,6 +53,10 @@ ow.ch.__types.mongo = {
             var i = r.iterator();
             while(i.hasNext()) {
                 var val = jsonParse(i.next().toJson());
+                if (isDef(this.__o[aName].key) && isDef(val._id)) {
+                    val[this.__o[aName].key] = val._id;
+                    delete val._id;
+                }
                 if (val != null) res.push(val);
             }
 
@@ -73,10 +77,17 @@ ow.ch.__types.mongo = {
         if ($stream([res]).anyMatch(aMatch)) {
             return this.set(aName, aK, aV, aTimestamp);
         }
-        return undefined;		
+        return void 0;		
     },
     set          : function(aName, ak, av, aTimestamp) {
-        if (isUnDef(av)) return undefined;
+        if (isUnDef(av)) return void 0;
+        if (isDef(this.__o[aName].key) && isUnDef(ak._id)) {
+            ak._id = ak[this.__o[aName].key];
+            av._id = ak[this.__o[aName].key];
+
+            delete ak[this.__o[aName].key];
+            delete av[this.__o[aName].key];
+        }
         if (isUnDef(ak._id)) ak = { _id: ak };
         if (isDef(ak._id)) 
             av._id = ak._id;
@@ -115,6 +126,12 @@ ow.ch.__types.mongo = {
             return undefined;
         } else {
             var res = jsonParse(r.toJson());
+
+            if (isDef(this.__o[aName].key) && isDef(res._id)) {
+                val[this.__o[aName].key] = res._id;
+                delete res._id;
+            }
+
             traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
             traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
             return res;
@@ -193,20 +210,20 @@ MongoUtil.prototype.getCollectionNames = function(aDatabase) {
 
 /**
  * <odoc>
- * <key>MongoUtil.getCh(aDatabase, aCollectionName, aChName) : Channel</key>
+ * <key>MongoUtil.getCh(aDatabase, aCollectionName, aChName, extraChannelOptions) : Channel</key>
  * Creates and returns a new channel with aChName (or aCollectionName if aChName is not defined) for the 
  * given MongoDB aDatabase and aCollectionName.
  * </odoc>
  */
-MongoUtil.prototype.getCh = function(aDatabase, aCollectionName, aChName) {
+MongoUtil.prototype.getCh = function(aDatabase, aCollectionName, aChName, options) {
     if (isUnDef(aDatabase) && isUnDef(aCollectionName)) throw "Need to define aDatabase and aCollectionName";
     if (isUnDef(aChName)) aChName = aCollectionName;
 
-    $ch(aChName).create(1, "mongo", {
+    $ch(aChName).create(1, "mongo", merge(options, {
         url: this.__url,
         database: aDatabase,
         collection: aCollectionName
-    });
+    }));
 
     return $ch(aChName);
 };
