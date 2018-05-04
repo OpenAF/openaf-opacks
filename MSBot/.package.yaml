@@ -21,10 +21,10 @@ name: MSBot
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180502'
+version: '20180503'
 dependencies: null
 files:
   - .package.yaml
   - MSBot.js
 filesHash:
-  MSBot.js: 20f3aa6bab923aa9e4c33ea512a4ca313f95ad06
+  MSBot.js: 23a7b0d65ecd989e960ca3e4c1396b8b97cbd81d

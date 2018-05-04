@@ -86,7 +86,8 @@ MSBot.prototype.__receiveMsg = function(data) {
 			"lastRecipientId": data.recipient.id,
  			"lastRecipientName": data.recipient.name,
 			"serviceUrl": data.serviceUrl,
- 			"channelId": data.channelId
+			"channelId": data.channelId,
+			"modifiedDate": new Date()
 		}));
 		break;
 	}
