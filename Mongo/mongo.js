@@ -39,7 +39,35 @@ ow.ch.__types.mongo = {
         }
     },
     getKeys      : function(aName, full) {
-        return this.get(aName, full);
+        if (this.__c[aName].count() <= 0) return [];
+        if (isUnDef(full)) full = {};
+
+        var r = this.__c[aName].find(new Packages.org.bson.Document(full));
+        if (r.first() == null) {
+            return undefined;
+        } else {
+            var res = [];
+            var i = r.iterator();
+            while(i.hasNext()) {
+                var val = jsonParse(i.next().toJson());
+                if (val != null) {
+                    var key = {};
+                    if (isDef(this.__o[aName].key) && isDef(val._id)) {
+                        val[this.__o[aName].key] = val._id;
+                        key[this.__o[aName].key] = val._id;
+                        delete val._id;
+                    } else {
+                        key._id = val._id;
+                    }
+                    res.push(key);
+                }
+            }
+
+            // convert
+            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
+            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            return res;
+        }
     },
     getAll: function(aName, full) {
         if (this.__c[aName].count() <= 0) return [];
@@ -121,6 +149,11 @@ ow.ch.__types.mongo = {
     get          : function(aName, aKey) {
         if (isUnDef(aKey)) return undefined;
 
+        if (isDef(this.__o[aName].key) && isUnDef(aKey._id)) {
+            aKey._id = aKey[this.__o[aName].key];
+            delete aKey[this.__o[aName].key];
+         }
+
         var r = this.__c[aName].find(new Packages.org.bson.Document(aKey)).first();
         if (r == null) {
             return undefined;
@@ -128,7 +161,7 @@ ow.ch.__types.mongo = {
             var res = jsonParse(r.toJson());
 
             if (isDef(this.__o[aName].key) && isDef(res._id)) {
-                val[this.__o[aName].key] = res._id;
+                res[this.__o[aName].key] = res._id;
                 delete res._id;
             }
 
