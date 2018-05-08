@@ -56,6 +56,7 @@
     <div class="context-menu-one" id="shower" style="background-color: white; filter: invert({{tableInverse}}%); width: 100%; heigth: 100%; position: absolute; top: 0; right: 0; bottom: 0; left: 0; font-size: {{fontsize}}"></div>
     {{/if}}
     <script src="/js/jquery.js"></script>
+    <script src="/js/openafsigil.js"></script>
     <script src="/_js/jquery.contextMenu.min.js"></script>
     <script src="/_js/jquery.ui.position.min.js"></script>
     <script src="/_ace/ace.js"></script>
@@ -138,19 +139,19 @@
             chartObj = void 0;
 
             // If undefined
-            if (typeof aValue === 'undefined') {
+            if ($$(aValue).isUnDef()) {
                 aValue = "not available";
                 aType = "undefined";
             }
 
             // If object
             var _render = (aValue) => {
-                if (typeof aValue != 'object') return aValue;
+                if (!($$(aValue).isObject())) return aValue;
 
                 var out = "";
-                if (aValue instanceof Array && aValue.length > 0) {
+                if ($$(aValue).isArray() && aValue.length > 0) {
                     var out = "";
-                    if (typeof aValue[0] != 'object') {
+                    if ($$(aValue[0]).isMap()) {
                         out += "<table class=\"atable\"><tr>";
                         for(var i in aValue[0]) {
                             out += "<th class=\"atablehead\"><b>" + i + "</b></th>";
@@ -161,7 +162,7 @@
                     }
                     for(var x in aValue) {
                         out += "<tr>";
-                        if (typeof aValue[x] != 'object' && !Array.isArray(aValue[x])) {
+                        if (!($$(aValue[x]).isMap()) && !($$(aValue[x]).isArray())) {
                             out += "<td class=\"atablecell\">" + aValue[x] + "</td>";
                         } else {
                             for(var y in aValue[x]) {
@@ -181,7 +182,7 @@
                 return out;
             };
 
-            if (typeof aValue == 'object') {
+            if ($$(aValue).isObject()) {
                 var out = "";
                 out += _render(aValue);
                 aValue = out;
