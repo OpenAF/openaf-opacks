@@ -59,6 +59,22 @@ If successfull you will obtain, as a result:
 
 You can now provide this GIST ID to any other OpenAF script and together with the filename "myobj.json" it will be enough to rebuild this myObj. 
 
+#### Encrypting a clip
+
+You may wish to encrypt the contents of a "clip". To do so use **.encryptClip(aKey, aFile, aDescription, aObject, isPublic)**. It's similar to **.clip** with the extra aKey parameter:
+
+````javascript
+> var myObj = { a: null, b:1, c: "a", d: true};
+> g.encryptClip("1234567890123456", "myobj.json", "This is a copy of myobj", myObj);
+{
+  "id": "93b2ee53ddc307",
+  "gistURL": "https://gist.github.com/93b2ee53ddc307",
+  "fileURL": "https://gist.githubusercontent.com/myGitHubUser/93b2ee53ddc307/raw/b667d4a9e5eb59/myobj.json"
+}
+````
+
+**Note: Ensure the aKey is exactly 16 bytes long.**
+
 ### Getting clipped objects
 
 If you have a GIST ID and a filename it's very easy to rebuild the original object:
@@ -85,6 +101,10 @@ Even without the GIST opack you can use the *fileURL* to retrieve it directly:
 }
 ````
 
+#### Decrypting a clip
+
+If you previously encrypted a clip with **.encryptClip** you can decrypt it using **.getEncryptClip(aKey, aId, aFile)** similar, in turn, to **.getClip**.
+
 ### Modify an existing clipped object
 
 If you use **.clip()** a new GIST will created so how can you change an existing GIST file? Just provide the GIST ID, file and the new object to **.setClip**:
@@ -99,6 +119,10 @@ The **.setClip** function will return again the GIST ID, GIST URL and file URL i
 ````javascript
 > g.getClip("93b2ee53ddc307/e2ce131c0c8b5fbbcc", "myobj.json");
 ````
+
+#### Modifying an existing crypted clip
+
+To modify an existing crypted clip with **.encryptClip** you can use **.setEncryptClip(aKey, aId, aFile, aContent)** which is similar to **.setClip**.
 
 ### Get a list of all GIST
 

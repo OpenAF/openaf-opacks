@@ -28,7 +28,7 @@ ow.ch.__types.gist = {
         }
 
         if (isDef(this.__gist[aName].user)) 
-            list = ow.obj.rest.jsonGet(this.__gistURL + "/users/" + this.__gist[aName].user + "/gists", {}, undefined, undefined, undefined, auth);
+            list = ow.obj.rest.jsonGet(this.__gistURL + "/users/" + this.__gist[aName].user + "/gists", {}, void 0, void 0, void 0, auth);
         else
             list = ow.obj.rest.jsonGet(this.__gistURL + "/gists");
 
@@ -40,7 +40,7 @@ ow.ch.__types.gist = {
         return $from(list).sort("updated_at").select();
     },
     getSet       : function(aName, aMatch, aK, aV, aTimestamp) {
-        return undefined;
+        return void 0;
     },
     set          : function(aName, aK, aV, aTimestamp, x) {
         var auth;
@@ -60,7 +60,7 @@ ow.ch.__types.gist = {
                 if (aV == null)
                     gist.files[filename] = null;
                 else
-                    gist.files[filename].content = stringify(aV, undefined, "");
+                    gist.files[filename].content = stringify(aV, void 0, "");
             } else {
                 throw "You need to provide an object or string or number or array or a files map with filenames and contents.";
             }
@@ -71,16 +71,16 @@ ow.ch.__types.gist = {
                 if (aV.files[file] == null)
                     gist.files[file] = null;
                 else
-                    gist.files[file].content = stringify(aV.files[file].content, undefined, "");
+                    gist.files[file].content = stringify(aV.files[file].content, void 0, "");
             }
         }
         if (isDef(aK.id)) {
             var h = new ow.obj.http();
             var rmap = merge({"Content-Type":"application/x-www-form-urlencoded"}, auth);
-            var res = h.exec(this.__gistURL + "/gists/" + aK.id, "PATCH", stringify(gist, undefined, ""), rmap);
+            var res = h.exec(this.__gistURL + "/gists/" + aK.id, "PATCH", stringify(gist, void 0, ""), rmap);
             return jsonParse(res.response);
         } else {
-            return ow.obj.rest.jsonCreate(this.__gistURL + "/gists", {}, gist, undefined, undefined, undefined, auth);
+            return ow.obj.rest.jsonCreate(this.__gistURL + "/gists", {}, gist, void 0, void 0, void 0, auth);
         }
     },
     setAll       : function(aName, aKs, aVs, aTimestamp) {
@@ -99,16 +99,16 @@ ow.ch.__types.gist = {
 
         if (isUnDef(aK.id)) throw "You need to provide a GIST id and, optionally, a 'file'name.";
 
-        var data = ow.obj.rest.jsonGet(this.__gistURL + "/gists/" + aK.id, {}, undefined, undefined, undefined, auth);
+        var data = ow.obj.rest.jsonGet(this.__gistURL + "/gists/" + aK.id, {}, void 0, void 0, void 0, auth);
         var res;
         if (isDef(aK.file)) {
             if (isDef(data.files) && isDef(data.files[aK.file])) {
                 if (isDef(data.files[aK.file].content)) 
                     res = data.files[aK.file];
                 else
-                    res = merge({ content: ow.obj.rest.get(data.files[aK.file].raw_url, {}, undefined, undefined, undefined, auth) }, data.files[aK.file]);
+                    res = merge({ content: ow.obj.rest.get(data.files[aK.file].raw_url, {}, void 0, void 0, void 0, auth) }, data.files[aK.file]);
             } else {
-                return undefined;
+                return void 0;
             }
         } else {
             if (isDef(data.files["object.json"])) {
@@ -123,8 +123,8 @@ ow.ch.__types.gist = {
             res.content = jsonParse(res.content);
         return res;
     },
-    pop          : function(aName) { return undefined; },
-    shift        : function(aName) { return undefined; },
+    pop          : function(aName) { return void 0; },
+    shift        : function(aName) { return void 0; },
     unset        : function(aName, aK) { 
         var auth;
         
@@ -134,7 +134,7 @@ ow.ch.__types.gist = {
 
         if (isUnDef(aK.id)) throw "You need to provide the GIST id to delete it.";
 
-        return ow.obj.rest.jsonRemove(this.__gistURL + "/gists/" + aK.id, undefined, undefined, undefined, undefined, auth);
+        return ow.obj.rest.jsonRemove(this.__gistURL + "/gists/" + aK.id, void 0, void 0, void 0, void 0, auth);
     }
 };
 
@@ -273,7 +273,7 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
     return {
         id: res.id,
         gistURL: res.html_url,
-        fileURL: (isDef(res.files[filename]) && isDef(res.files[filename].raw_url)) ? res.files[filename].raw_url : undefined
+        fileURL: (isDef(res.files[filename]) && isDef(res.files[filename].raw_url)) ? res.files[filename].raw_url : void 0
     };
 };
 
@@ -340,7 +340,7 @@ GIST.prototype.getVersions = function(aID) {
  */
 GIST.prototype.encrypt = function(aObject, aKey) {
     if (isObject(aObject)) {
-        return af.encrypt(stringify(aObject, undefined, ""), aKey);
+        return af.encrypt(stringify(aObject, void 0, ""), aKey);
     } else {
         return af.encrypt(String(aObject), aKey);
     }
