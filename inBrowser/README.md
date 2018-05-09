@@ -40,3 +40,13 @@ From this menu you can choose different formats to edit (e.g. YAML, JSON) or to 
 
 ![table example](docs/table-example.png)
 ![chart example](docs/chart-example.png)
+
+## Keyboard shortcuts
+
+When using the main editors for YAML and JSON there are a couple of custom keyboard shortcuts:
+
+   * **Ctrl-S / Command-S** will try to save to the current contents back to the server
+   * **Ctrl-R / Command-R** will try to reload the contents from the server
+   * **Ctrl-Alt-P / Ctrl-Option-P** will popup the current window if possible
+
+Of course all the keyboard shortcuts for the ACE editor are still available including multicursor, find/replace, etc. Check them out on https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts.
