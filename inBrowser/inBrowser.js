@@ -100,7 +100,7 @@
      * width, height (number) the size of the popup window if choosen by 
      * right-click; theme (string) a ace theme (ace/theme/*); exec (boolean) forces aObject to be executed; save (string)
      * provides a function text to execute when save is executed on the browser receiving __in as the saved object from the browser 
-     * (e.g. var o = inBrowser.edit(o, { edit: "o = __in"}), if defined the function will not wait for the browser to be closed, if not 
+     * (e.g. var o = inBrowser.edit(o, { save: "o = __in"}), if defined the function will not wait for the browser to be closed, if not 
      * a string it will default to "aObject = __in" (if aObject is string or exec = true).
      * </odoc>
      */

@@ -31,19 +31,29 @@
         box-sizing: border-box;
         border-collapse: collapse;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-        color: #0000AA;
+        color: #000088;
         margin-top: 5;
         margin-left: 5;
         margin-right: 5;
         margin-bottom: 5;
         font-size: {{fontsize}};
         }
-        .atablecell, .atablehead {
+        .atablehead {
         padding: 3px;
         border: 1px solid lightgray;
         font-size: small;
         text-align: center;
         }        
+        .atablecell {
+        padding: 3px;
+        border: 1px solid lightgray;
+        color: #0000AA;
+        font-size: small;
+        text-align: center;       
+        }
+        .atablecell tr:nth-child(even) {
+        background: rgb(250, 250, 250);
+        }   
     </style>
 </head>
 
