@@ -16,7 +16,7 @@ name: ElasticSearch
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20171109'
+version: '20180515'
 dependencies:
   openaf: '>=20170601'
 files:
