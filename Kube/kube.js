@@ -7,7 +7,7 @@
 var Kube = function (aURL, aUser, aPass) {
 	plugin("HTTP");
 	ow.loadFormat();
-	this.url = aURL;
+	this.url = aURL; 
 	this.user = aUser;
 	this.pass = aPass;
 };
