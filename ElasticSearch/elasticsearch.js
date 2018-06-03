@@ -13,7 +13,7 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 	this.url = aURL;
 	this.user = aUser;
 	this.pass = aPassword;
-}
+};
 
 /**
  * <odoc>
@@ -27,7 +27,7 @@ ElasticSearch.prototype.createIndex = function(aIndex) {
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
 	return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, {}, this.user, this.pass);
-}
+};
 
 /**
  * <odoc>
@@ -41,7 +41,7 @@ ElasticSearch.prototype.deleteIndex = function(aIndex) {
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
 	return ow.obj.rest.jsonRemove(this.url + "/" + aIndex, {}, this.user, this.pass);
-}
+};
 
 /**
  * <odoc>
@@ -55,7 +55,7 @@ ElasticSearch.prototype.closeIndex = function(aIndex) {
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
 	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
-}
+};
 
 /**
  * <odoc>
@@ -69,7 +69,7 @@ ElasticSearch.prototype.openIndex = function(aIndex) {
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
 	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
-}
+};
 
 /**
  * <odoc>
@@ -85,55 +85,67 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex) {
 	var res = ow.obj.rest.jsonSet(this.url + "/_reindex", {}, { source : { index: anOrigIndex }, dest: { index: aNewIndex }}, this.user, this.pass);
 
 	return res;
-}
+};
 
 ElasticSearch.prototype.getClusterHealth = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.excludeNodeIP = function(aIP) {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonSet(this.url + "/_cluster/settings", {}, { transient: { "cluster.routing.allocation.exclude._ip": aIP } }, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getClusterStats = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cluster/stats", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getPendingTasks = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cluster/pending_tasks", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getNodeStats = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getIndices = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getNodes = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
-}
+};
 
 ElasticSearch.prototype.getCounts = function() {
 	ow.loadObj();
 
 	return ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
-}
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.search(aIndex, aSearchJSON) : aResultJSON</key>
+ * Performs a search on the corresponding aIndex given aSearchJSON.
+ * </odoc>
+ */
+ElasticSearch.prototype.search = function(aIndex, aSearchJSON) {
+	ow.loadObj();
+
+	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search", {}, aSearchJSON);
+};
 
 /**
  * <odoc>
@@ -157,7 +169,7 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 		user : parent.user,
 		pass : parent.pass
 	});
-}
+};
 
 /** 
  * <odoc>
@@ -182,7 +194,7 @@ ElasticSearch.prototype.startLog = function(aIndex, aHostId, localCopy) {
 	addOnOpenAFShutdown(function() {
 		parent.stopLog();
 	});
-}
+};
 
 /**
  * <odoc>
@@ -193,4 +205,4 @@ ElasticSearch.prototype.startLog = function(aIndex, aHostId, localCopy) {
 ElasticSearch.prototype.stopLog = function() {
 	stopLog();
 	$ch("__log::es").destroy();
-}
+};

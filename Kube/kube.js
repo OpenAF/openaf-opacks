@@ -7,7 +7,7 @@
 var Kube = function (aURL, aUser, aPass) {
 	plugin("HTTP");
 	ow.loadFormat();
-	this.url = aURL;
+	this.url = aURL; 
 	this.user = aUser;
 	this.pass = aPass;
 };
@@ -29,7 +29,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var session;
 	var out = "";
 
-	var client = h.wsConnect(this.url.replace(/^http/i, "ws") + "/api/v1/namespaces/" + aNamespace + "/pods/" + aPod + "/exec?" + encodeURI(cmd).replace(/\+/g, "%2B"),
+	var res = h.wsClient(this.url.replace(/^http/i, "ws") + "/api/v1/namespaces/" + aNamespace + "/pods/" + aPod + "/exec?" + encodeURI(cmd).replace(/\+/g, "%2B"),
 		function (s) {
 			session = s;
 		},
@@ -53,7 +53,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var start = now();
 	if (isUnDef(aTimeout)) aTimeout = 300000;
 	while (out.length < 1 && ((now() - start) < aTimeout)) {
-		client.get();
+		res.fut.get();
 	}
 	var prevOut = out.length;
 	var prevTime = now();
@@ -64,7 +64,9 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 			prevTime = now();
 		}
 	}
+	session.close();
 	session.stop();
+	res.client.stop();
 	return out;
 };
 
