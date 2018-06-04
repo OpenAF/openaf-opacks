@@ -23,9 +23,9 @@ version: '20180104'
 dependencies:
   openaf: '>=20170401'
 files:
+  - imeiCheck.js
   - .package.yaml
   - data/tacdb.csv
-  - imeiCheck.js
 filesHash:
-  data/tacdb.csv: 896e42d56d12d3e925bfbdadae567fb0ef7dd7a7
   imeiCheck.js: 29389c128ea5547d8005242c06b3d9f7e5f2751c
+  data/tacdb.csv: 2cf56c03efad8da1ee2c3ae0da0bcce7d146bc4e

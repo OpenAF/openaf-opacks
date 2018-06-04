@@ -27,35 +27,45 @@ version: '20180509'
 dependencies:
   openaf: '>=20180507'
 files:
-  - .odoc.db
   - .package.yaml
+  - .odoc.db
+  - docs/chart-example.png
+  - docs/table-example.png
+  - docs/example1.png
+  - docs/example2.png
+  - docs/right-click.png
+  - README.md
   - gui/_ace/ace.zip
-  - gui/_css/font/context-menu-icons.eot
-  - gui/_css/font/context-menu-icons.ttf
-  - gui/_css/font/context-menu-icons.woff
-  - gui/_css/font/context-menu-icons.woff2
-  - gui/_css/jquery.contextMenu.min.css
-  - gui/_images/openaf.ico
-  - gui/_images/openaf.png
-  - gui/_js/Chart.bundle.min.js
   - gui/_js/jquery.contextMenu.min.js
   - gui/_js/jquery.ui.position.min.js
+  - gui/_js/Chart.bundle.min.js
+  - gui/_images/openaf.ico
+  - gui/_images/openaf.png
+  - gui/_css/jquery.contextMenu.min.css
+  - gui/_css/font/context-menu-icons.woff2
+  - gui/_css/font/context-menu-icons.woff
+  - gui/_css/font/context-menu-icons.ttf
+  - gui/_css/font/context-menu-icons.eot
   - inBrowser.hbs
   - inBrowser.js
-  - README.md
 filesHash:
   .odoc.db: 26bd5f82b68542f997ef27600446e8365a425088
+  docs/chart-example.png: 3b4646ef09e9d57e7a3813af915cbde6bec3670a
+  docs/table-example.png: 716faf901fe6db5cbf7036c8a6eaff5db3ea4891
+  docs/example1.png: b9127b290381313da1bc7913a79ea58a74b767b1
+  docs/example2.png: b7684b94a4f5c11d09b8b04ef5a9f0df8998d5cd
+  docs/right-click.png: 96488e59a63b8a1b740a7fa7bbf7f75fa313a428
+  README.md: 65c567aa63c81282b5fdf1c55e2a5209f4ebc97b
   gui/_ace/ace.zip: 60936e5431fd8760306cba905a3f2602e7d370e6
-  gui/_css/font/context-menu-icons.eot: 21929f70a396694d9341b5ef5b97b7348aff22ef
-  gui/_css/font/context-menu-icons.ttf: 85caaf81a2af9178ef4f650e0caf1d0834a415ad
-  gui/_css/font/context-menu-icons.woff: 7be3d02b4e2196fe434c13741e6553e898365446
-  gui/_css/font/context-menu-icons.woff2: fc6e3bb6ba0ad9e04ed6b973ea7e022ff56c044d
-  gui/_css/jquery.contextMenu.min.css: ae2278d861e88262493d9e06686534885d0a8c9a
-  gui/_images/openaf.ico: 544d110dcb3ba387ea206011ede749f51393b134
-  gui/_images/openaf.png: 2287f19313c67b8c7b0952fe501fcc199ff4fc2b
-  gui/_js/Chart.bundle.min.js: 81639a5f38c61eda919d85f55cddc5befec6946b
   gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
   gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
+  gui/_js/Chart.bundle.min.js: 81639a5f38c61eda919d85f55cddc5befec6946b
+  gui/_images/openaf.ico: 544d110dcb3ba387ea206011ede749f51393b134
+  gui/_images/openaf.png: 2287f19313c67b8c7b0952fe501fcc199ff4fc2b
+  gui/_css/jquery.contextMenu.min.css: ae2278d861e88262493d9e06686534885d0a8c9a
+  gui/_css/font/context-menu-icons.woff2: fc6e3bb6ba0ad9e04ed6b973ea7e022ff56c044d
+  gui/_css/font/context-menu-icons.woff: 7be3d02b4e2196fe434c13741e6553e898365446
+  gui/_css/font/context-menu-icons.ttf: 85caaf81a2af9178ef4f650e0caf1d0834a415ad
+  gui/_css/font/context-menu-icons.eot: 21929f70a396694d9341b5ef5b97b7348aff22ef
   inBrowser.hbs: 542ee34a8fe7043891e9d50447fb7ed7c98afde9
   inBrowser.js: 1b475a33435c39ac9ad2a15a533f125404551a4f
-  README.md: fef6c3257fa55cac5ad7e42ef633eab665532923

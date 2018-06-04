@@ -25,11 +25,11 @@ dependencies:
 files:
   - .package.yaml
   - InstallCert.js
-  - lib/InstallCert$SavingTrustManager.class
   - lib/InstallCert.class
+  - lib/InstallCert$SavingTrustManager.class
   - src/InstallCert.java
 filesHash:
-  InstallCert.js: c53888c97d912a4a172f4fb485ca98c7e3553ba4
-  lib/InstallCert$SavingTrustManager.class: 29e86e17db020084290974bf6e4b170a96e64698
+  InstallCert.js: cbbfb69b915edf41bdf897c3cceaa1761e876acd
   lib/InstallCert.class: 8cb550436fffa51b2a5ccc99083428b39d498c4c
-  src/InstallCert.java: 71e1324372542e388c6999fd18f39d1d6f3d7d3e
+  lib/InstallCert$SavingTrustManager.class: 29e86e17db020084290974bf6e4b170a96e64698
+  src/InstallCert.java: d8771d979c110e7765bec059e46addde2b633349
