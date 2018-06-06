@@ -1,0 +1,21 @@
+jobs:
+  - name: Send Slack
+    help: >
+      Sends a messange to Slack. Expects:
+
+        webHookURL      (String) The Slack web hook URL
+        message         (String) A markdown Slack pre-message
+        attachments     (Array)  An array of maps (see https://api.slack.com/docs/message-formatting)
+
+    exec: |
+      _$(args.webHookURL).isString().$_("Please provide a Slack web hook URL");
+      _$(args.message).isString().$_("Please provide a message to send.");
+      args.attachments = _$(args.attachments).isArray().default(void 0);
+
+      loadLib("slack.js");
+      var sl = new Slack(args.webHookURL);
+      if (isUnDef(args.attachments)) {
+        sl.send(args.message);
+      } else {
+        sl.sendAttachments(args.message, args.attachments);
+      }

@@ -1,0 +1,17 @@
+jobs:
+  - name: Send Pushover
+    help: >
+      Sends a push notification using Pushover. Expects:
+
+        apiToken (String) The Pushover API token.
+        userId   (String) The Pushover user id.
+        message  (String) The push notification text message to send.
+
+    exec: |
+      _$(args.apiToken).isString().$_("Please provide a Pushover API token.");
+      _$(args.userId).isString().$_("Please provide a Pushover user id.");
+      _$(args.message).isString().$_("Please provide a message to send.");
+
+      loadLib("pushover.js");
+      var ph = new Pushover(args.apiToken);
+      ph.send(args.userId, args.message);

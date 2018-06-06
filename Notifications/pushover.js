@@ -8,7 +8,7 @@
 var Pushover = function(anAPIToken) {
     plugin("HTTP");
     this.token = anAPIToken;
-}
+};
 
 /**
  * <odoc>
@@ -25,4 +25,4 @@ Pushover.prototype.send = function(aUserId, aMessage) {
     } else {
         throw "You need to provide a message. Received: " + aMessage;
     }
-}
+};

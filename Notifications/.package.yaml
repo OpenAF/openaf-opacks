@@ -21,15 +21,19 @@ name: Notifications
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20170818'
+version: '20180605'
 dependencies:
   openaf: '>=20170701'
 files:
-  - pushover.js
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
+  - pushover.js
+  - pushover.yaml
   - slack.js
+  - slack.yaml
 filesHash:
-  pushover.js: bdeca78008a68c2176b3016ffa472361ab299e53
   .odoc.db: a443c2152bf8346bb148c6aba60bbe786767f426
-  slack.js: 77c363a85d379cf52cb2ab716e0a582f04494a84
+  pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf
+  pushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
+  slack.js: ad3fd8cb2d56e1f76577529fdd6e140273c9e1f3
+  slack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
