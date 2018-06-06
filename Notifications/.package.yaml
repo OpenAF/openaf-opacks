@@ -27,13 +27,13 @@ dependencies:
 files:
   - .odoc.db
   - .package.yaml
+  - notificationsPushover.yaml
+  - notificationsSlack.yaml
   - pushover.js
-  - pushover.yaml
   - slack.js
-  - slack.yaml
 filesHash:
   .odoc.db: a443c2152bf8346bb148c6aba60bbe786767f426
+  notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
+  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
   pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf
-  pushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
   slack.js: ad3fd8cb2d56e1f76577529fdd6e140273c9e1f3
-  slack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
