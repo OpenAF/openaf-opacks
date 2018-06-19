@@ -1,0 +1,43 @@
+{
+  "author": "Nuno Aguiar",
+  "scripts": {
+    "posterase": "",
+    "postinstall": "",
+    "preerase": "",
+    "preinstall": ""
+  },
+  "keywords": [
+    "copy",
+    "files",
+    "move",
+    "done"
+  ],
+  "bugs": {
+    "url": "https://github.com/OpenAF/openaf-opacks/issues"
+  },
+  "repository": {
+    "type": "http",
+    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CopyFiles"
+  },
+  "description": "Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.",
+  "name": "CopyFiles",
+  "main": "lib/main.js",
+  "mainJob": "",
+  "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
+  "version": "20170528",
+  "dependencies": {
+    "OpenAF": ">=20160901"
+  },
+  "files": [
+    ".package.json",
+    "lib/copyFiles.js",
+    "lib/main.js",
+    "sample.js"
+  ],
+  "filesHash": {
+    ".package.json": "562fb8159a294f6fae451438a3487cff7c5140f1",
+    "lib/copyFiles.js": "751e0b0503555b48ab99693f4c361cb2f3267360",
+    "lib/main.js": "87da33e2b540be6f4c787210b2ff3ba948e52e79",
+    "sample.js": "7f5c262ea1c21dd20e0e4ecb5d50e9365b286ebb"
+  }
+}
