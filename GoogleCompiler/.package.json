@@ -29,11 +29,11 @@
   "dependencies": {},
   "files": [
     ".package.json",
-    "main.js",
-    "compiler.jar"
+    "compiler.jar",
+    "main.js"
   ],
   "filesHash": {
-    "main.js": "45a4aecfa38f31d2e09b3b6830712cb4303024e5",
-    "compiler.jar": "4f274c34bc6539571afbf3a797ad51448d432945"
+    "compiler.jar": "4f274c34bc6539571afbf3a797ad51448d432945",
+    "main.js": "45a4aecfa38f31d2e09b3b6830712cb4303024e5"
   }
 }
