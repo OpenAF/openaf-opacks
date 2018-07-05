@@ -17,7 +17,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180524'
+version: '20180704'
 dependencies:
   OpenAF: '>=20180524'
 files:
@@ -26,4 +26,4 @@ files:
   - kube.js
 filesHash:
   .odoc.db: c9277911f82410327ca28222a0120a02b278946a
-  kube.js: 863c65a390cf3a67ac7950156bc579c4444d8ba9
+  kube.js: d89166032ed8b3c5148f17f16b96fe337a4cf18d

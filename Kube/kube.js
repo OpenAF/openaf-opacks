@@ -25,7 +25,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 
 	var pre = (doSH) ? "command=/bin/sh&command=-c&" : "";
 	if (!isArray(aCommand)) aCommand = aCommand.split(/ +/);
-	var cmd = pre + "stderr=true&command=" + aCommand.join("&command=");
+	var cmd = pre + "stdout=true&stderr=true&command=" + aCommand.join("&command=");
 	var session;
 	var out = "";
 
