@@ -1,0 +1,27 @@
+author: miguel fernandes
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - Serialize Java Object
+  - Unserialize Java Object
+bugs:
+  url: URL to track bugs
+repository:
+  type: http
+  url: URL to main repository
+description: Package to Serialize and Unserialize Java Objects
+name: SerializedObjects
+main: SerializedObjects.js
+mainJob: ''
+license: The licence description
+version: '20180706'
+dependencies:
+  openaf: '>=20180706'
+files:
+  - .package.yaml
+  - SerializedObjects.js
+filesHash:
+  SerializedObjects.js: 8595779762e70642c0ee82be6ebc8bd93d131a4d
