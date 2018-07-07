@@ -1,4 +1,4 @@
-author: miguel fernandes
+author: Miguel Fernandes
 scripts:
   preerase: ''
   posterase: ''
@@ -7,16 +7,18 @@ scripts:
 keywords:
   - Serialize Java Object
   - Unserialize Java Object
+  - serialize
+  - unserialize
 bugs:
-  url: URL to track bugs
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: URL to main repository
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SerializedObjects
 description: Package to Serialize and Unserialize Java Objects
 name: SerializedObjects
-main: SerializedObjects.js
+main: ''
 mainJob: ''
-license: The licence description
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20180706'
 dependencies:
   openaf: '>=20180706'
