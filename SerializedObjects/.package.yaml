@@ -1,0 +1,29 @@
+author: Miguel Fernandes
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - Serialize Java Object
+  - Unserialize Java Object
+  - serialize
+  - unserialize
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SerializedObjects
+description: Package to Serialize and Unserialize Java Objects
+name: SerializedObjects
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20180706'
+dependencies:
+  openaf: '>=20180706'
+files:
+  - .package.yaml
+  - SerializedObjects.js
+filesHash:
+  SerializedObjects.js: 8595779762e70642c0ee82be6ebc8bd93d131a4d
