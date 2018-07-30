@@ -87,6 +87,28 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex) {
 	return res;
 };
 
+ElasticSearch.prototype.getShards = function(forQuery) {
+	ow.loadObj();
+
+	if (forQuery) {
+		var o = ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json&bytes=b", {}, this.user, this.pass);
+		return $from(o).select((r) => {
+			return {
+				index: r.index,
+				shard: r.shard,
+				primaryOrReplica: r.prirep,
+				state: r.state,
+				numberDocs: Number(r.docs),
+				storage: Number(r.store),
+				ip: r.ip,
+				node: r.node
+			};
+		});
+	} else {
+		return ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json", {}, this.user, this.pass);
+	}
+};
+
 ElasticSearch.prototype.getClusterHealth = function(forQuery) {
 	ow.loadObj();
 
