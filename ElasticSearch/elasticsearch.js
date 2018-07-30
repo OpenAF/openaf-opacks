@@ -87,10 +87,33 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex) {
 	return res;
 };
 
-ElasticSearch.prototype.getClusterHealth = function() {
+ElasticSearch.prototype.getClusterHealth = function(forQuery) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+	if (forQuery) {
+		var o = ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+
+		return $from(o).select((r) => {
+			return {
+				epoch: Number(r.epoch),
+				timestamp: String(r.timestamp),
+				cluster: r.cluster,
+				status: r.status,
+				nodeTotal: Number(r["node.total"]),
+				nodeData: Number(r["node.data"]),
+				shards: Number(r.shards),
+				primaryShards: Number(r.pri),
+				relocatingShards: Number(r.relo),
+				initializingShards: Number(r.init),
+				unassignedShards: Number(r.unassign),
+				pendingTasks: Number(r.pending_tasks),
+				maxTaskWaitTime: String(r.max_task_wait_time),
+				activeShardsPercent: parseFloat(r.active_shards_percent)
+			};
+		});		
+	} else {
+		return ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+	}
 };
 
 ElasticSearch.prototype.excludeNodeIP = function(aIP) {
@@ -117,22 +140,72 @@ ElasticSearch.prototype.getNodeStats = function() {
 	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats", {}, this.user, this.pass);
 };
 
-ElasticSearch.prototype.getIndices = function() {
+ElasticSearch.prototype.getIndices = function(forQuery) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
+	if (forQuery) {
+		var o = ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json&bytes=b", {}, this.user, this.pass);
+
+		return $from(o).select((r) => {
+			return {
+				health: r.health,
+				status: r.status,
+				index: r.index,
+				uuid: r.uuid,
+				primaryShards: Number(r.pri),
+				replicas: Number(r.rep),
+				docsCount: Number(r["docs.count"]),
+				docsDeleted: Number(r["docs.deleted"]),
+				storeSize: Number(r["store.size"]),
+				primaryStoreSize: Number(r["pri.store.size"])
+			};
+		});
+	} else {
+		return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
+	}
 };
 
-ElasticSearch.prototype.getNodes = function() {
+ElasticSearch.prototype.getNodes = function(forQuery) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+	if (forQuery) {
+		var o = ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+
+		return $from(o).select((r) => {
+			return {
+				ip: String(r.ip),
+				heapPercent: Number(r["heap.percent"]),
+				ramPercent: Number(r["ram.percent"]),
+				cpu: Number(r.cpu),
+				load1m: Number(r.load_1m),
+				load5m: Number(r.load_5m),
+				load15m: Number(r.load_15m),
+				nodesRole: String(r["node.role"]),
+				master: String(r.master),
+				name: String(r.name)
+			};
+		});
+	} else {
+		return ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+	}
 };
 
-ElasticSearch.prototype.getCounts = function() {
+ElasticSearch.prototype.getCounts = function(forQuery) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+	if (forQuery) {
+		var o = ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+
+		return $from(o).select((r) => {
+			return {
+				epoch: Number(r.epoch),
+				timestamp: r.timestamp,
+				count: Number(r.count)
+			};
+		});		
+	} else {
+		return ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+	}
 };
 
 /**
