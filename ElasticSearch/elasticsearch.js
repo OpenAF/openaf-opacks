@@ -17,16 +17,21 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 
 /**
  * <odoc>
- * <key>ElasticSearch.createIndex(aIndex) : Map</key>
+ * <key>ElasticSearch.createIndex(aIndex, aNumberOfShards, aNumberOfReplicas, extraOptions) : Map</key>
  * Tries to create aIndex on Elastic Search and returns the result.
  * </odoc>
  */
-ElasticSearch.prototype.createIndex = function(aIndex) {
+ElasticSearch.prototype.createIndex = function(aIndex, aNumberOfShards, aNumberOfReplicas, extraOptions) {
 	ow.loadObj();
+	var options = {};
+
+	if (isDef(aNumberOfShards)) options = merge(options, { settings: { index: { number_of_shards: aNumberOfShards } }});
+	if (isDef(aNumberOfReplicas)) options = merge(options, { settings: { index: { number_of_replicas: aNumberOfReplicas } }});
+	if (isDef(extraOptions)) options = merge(options, extraOptions);
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, {}, this.user, this.pass);
+	return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, options, this.user, this.pass);
 };
 
 /**
@@ -73,18 +78,44 @@ ElasticSearch.prototype.openIndex = function(aIndex) {
 
 /**
  * <odoc>
- * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex) : Map</key>
- * Tries to copy anOriginalIndex to aNewIndex (reindex) and returns the result.
+ * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex, aTimeout, extraOptions) : Map</key>
+ * Tries to copy anOriginalIndex to aNewIndex (reindex) and returns the result. 
+ * "aTimeout" allows the request to exit gracefully while the reindex operation continues (e.g. "60m").
+ * "extraOptions" will be merged into the request (e.g. { conflicts: "proceed" })
  * </odoc>
  */
-ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex) {
+ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, extraOptions) {
 	ow.loadObj();
+	if (isUnDef(extraOptions)) extraOptions = {};
+	var extra = "";
+	if (isDef(aTimeout) && isString(aTimeout)) extra = "timeout=" + aTimeout;
 
 	if (isUnDef(anOrigIndex) || isUnDef(aNewIndex)) throw "Please provide an original index and the new index name";
 
-	var res = ow.obj.rest.jsonSet(this.url + "/_reindex", {}, { source : { index: anOrigIndex }, dest: { index: aNewIndex }}, this.user, this.pass);
+	var res = ow.obj.rest.jsonCreate(this.url + "/_reindex", {}, merge({ source : { index: anOrigIndex }, dest: { index: aNewIndex }}, extraOptions), this.user, this.pass);
 
 	return res;
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.getTasks(actionsFilter, isDetailed) : Map</key>
+ * Retrieves the current tasks in each cluster node. Optionally you can specify an actionsFilter (e.g. "*reindex") and
+ * determined if the output should be detailed (e.g. isDetailed = true).
+ * </odoc>
+ */
+ElasticSearch.prototype.getTasks = function(actionsFilter, isDetailed) {
+	ow.loadObj();
+	var ops = {};
+	var extra = ""; //GET /_tasks?actions=*reindex&detailed
+	if (isDef(actionsFilter) || isDef(isDetailed)) {
+		extra = "?" + ow.obj.rest.writeQuery({
+			detailed: isDetailed,
+			actions : actionsFilter
+		});
+	}
+
+	return ow.obj.rest.jsonGet(this.url + "/_tasks" + extra, this.user, this.pass);
 };
 
 ElasticSearch.prototype.getShards = function(forQuery) {
