@@ -332,3 +332,157 @@ ElasticSearch.prototype.stopLog = function() {
 	stopLog();
 	$ch("__log::es").destroy();
 };
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.createScroll(aIndex, aSearchJSON, aSize, aTime, sliceId, sliceMax) : Map</key>
+ * Creates a scrollable result set usefull for batch processing on the provided aIndex using aSearchJSON (if not 
+ * defined will default to match all). Optionally you can also specify a size per request (defaults to 10), aTime for
+ * the scrollable result set to "live" on the cluster (defaults to 1 minute), sliceId/sliceMax for paralell processing (call multiple times
+ * the createScroll function with a different sliceId but the same sliceMax and then use each result with nextScroll). 
+ * The result will be a map with the first results and the information needed to use for nextScroll.
+ * </odoc>
+ */
+ElasticSearch.prototype.createScroll = function(aIndex, aSearchJSON, aSize, aTime, sliceId, sliceMax) {
+	ow.loadObj();
+	aTime = _$(aTime).isString().default("1m");
+	aSearchJSON = _$(aSearchJSON).isObject().default({ query: { match_all: {} } });
+	aSize = _$(aSize).isNumber().default("10");
+	aSearchJSON.size = aSize;
+
+	if(isDef(sliceId) && isDef(sliceMax) && isNumber(sliceId) && isNumber(sliceMax)) {
+	   aSearchJSON.slice = {
+		  id: sliceId,
+		  max: sliceMax
+	   };
+	}
+
+	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search?scroll=" + aTime, {}, aSearchJSON);
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.nextScroll(aScrollMap, aTime) : Map</key>
+ * After creating a scrollable result set with createScroll the corresponding result can be used to obtain the next set of 
+ * results until map.hits.hits.length == 0. Optionally you can specify aTime for the scrollable result set to "live" on the 
+ * cluster resetting the previous call aTime count (defaults to 1 minute).
+ * </odoc>
+ */
+ElasticSearch.prototype.nextScroll = function(aScrollMap, aTime) {
+	ow.loadObj();
+
+	aTime = _$(aTime).isString().default("1m");
+
+	return ow.obj.rest.jsonCreate(this.url + "/_search/scroll", {}, {
+	   scroll: aTime,
+	   scroll_id: aScrollMap._scroll_id
+	});
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.deleteScroll(aScrollMap) : Map</key>
+ * Given the result of createScroll or nextScroll it will try to delete the scrollable result set from the cluster. Note: If the 
+ * result set is "exausted" it might throw an exception.
+ * </odoc>
+ */
+ElasticSearch.prototype.deleteScroll = function(aScrollMap) {
+	ow.loadObj();
+
+	return ow.obj.rest.jsonRemove(this.url + "/_search/scroll", {}, { scroll_id: aScrollMap._scroll_id });
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.deleteAllScrols() : Map</key>
+ * Tries to delete all active scrollable result set previously created on the cluster.
+ * </odoc>
+ */
+ElasticSearch.prototype.deleteAllScrolls = function() {
+	ow.loadObj();
+
+	return ow.obj.rest.jsonRemove(this.url + "/_search/scroll/_all", {}, {});
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.getNodesStats() : Map</key>
+ * Retrieves statistics (including number of scrollable result sets) for all cluster nodes.
+ * </odoc>
+ */
+ElasticSearch.prototype.getNodesStats = function() {
+	ow.loadObj();
+
+	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats/indices/search", {}, {});
+};
+
+ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aLogFunc, batchSize, numThreads) {
+	var __batchSize = _$(batchSize).isNumber("BatchSize needs to be a number.").default(100);
+	var __threads   = _$(numThreads).isNumber("Threads needs to be a number.").default(getNumberOfCores());
+	var __index     = _$(aIndex).isString("Index needs to be a string.").$_("Please provide an index pattern aIndex=something*");
+	var func        = _$(aOutputFunc).isFunction("OutputFunc needs to be a function.").$_("Please provide aOutputFunc");
+	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
+		aLogFunc = () => {};
+	}
+
+	var __iniBulk = [];
+	for(var ii = 0; ii < __threads; ii++) {
+        var res = this.createScroll(__index, void 0, __batchSize, void 0, ii, __threads);
+        res.__index = ii + 1;
+		__iniBulk.push(res);
+		aLogFunc({
+			op: "init",
+			threadId: res.__index,
+			totalThread: __iniBulk[ii].hits.total
+		});
+	}
+	
+	var parent = this;
+	parallel4Array(__iniBulk, function(ini) {
+		try {
+			var res = ini; 
+			aLogFunc({
+				op: "start",
+				threadId: ini.__index,
+				totalThread: ini.hits.total
+			});
+			while(res.hits.hits.length > 0) {
+				res.hits.hits.forEach((v) => {
+					aOutputFunc(v._source);
+				});
+				res = parent.nextScroll(res);
+			}
+			aLogFunc({
+				op: "done",
+				threadId: ini.__index,
+				totalThread: ini.hits.total
+			});
+		} catch(e) {
+			aLogFunc({
+				op: "error",
+				threadId: ini.__index,
+				totalThread: ini.hits.total,
+				exception: e
+			});
+		}
+		return true;
+	}, __threads);
+
+	try {
+		for(var is in __iniBulk) {
+			this.deleteScroll(__iniBulk[is]);
+		}
+	} catch(e) { }
+};
+
+ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aLogFunc, batchSize, numThreads) {
+	var wstream = io.writeFileStream(aFilename);
+
+	var parent = this;
+	this.exportIndex(aIndex, function(v) {
+		var m = stringify(v._source, void 0, "") + "\n";
+		ioStreamWrite(wstream, m, m.length, false);
+	}, aLogFunc, batchSize, numThreads);
+
+	wstream.close();
+};
