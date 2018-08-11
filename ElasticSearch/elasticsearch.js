@@ -416,6 +416,15 @@ ElasticSearch.prototype.getNodesStats = function() {
 	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats/indices/search", {}, {});
 };
 
+/**
+ * <odoc>
+ * <key>ElasticSearch.exportIndex(aIndex, aOutputFunc, aLogFunc, aBatchSize, aNumThreads)</key>
+ * Given aIndex will bulk export all documents using the aOutputFunc and calling providing each document as a parameter. Optionally if aLogFunc is
+ * provided it will be called with a map containing op (e.g. init, start, error and done), the threadId and totalThread created. The parameter aBatchSize
+ * allows to define a different number of documents sent per bulk call in each thread (defaults to 100). The parameter aNumThreads allows to specify the 
+ * number of threads that will be used (defaults to the number of cores detected).
+ * </odoc>
+ */
 ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aLogFunc, batchSize, numThreads) {
 	var __batchSize = _$(batchSize).isNumber("BatchSize needs to be a number.").default(100);
 	var __threads   = _$(numThreads).isNumber("Threads needs to be a number.").default(getNumberOfCores());
@@ -475,12 +484,104 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aLogFunc, ba
 	} catch(e) { }
 };
 
+/**
+ * <odoc>
+ * <key>ElasticSearch.importIndex2File(aFnIndex, aFilename, aFnId, idKey, aLogFunc, batchSize)</key>
+ * Given aFilename (in NDJSON format) it will try to bulk import each document line into the returned indexed by the aFnIndex function that receives the document
+ * as a parameter. aFnIndex can also be a string. Optionally you can provided aFnId function to calculate the id field from each map which can also be specified in idKey.
+ * aFnIndex defaults to sha1 from the stringify version of each document and idKey defaults to "id". The function aLogFunc, if provided, will be executed receiving a 
+ * map with op (e.g. start, error and done), uuid with unique identification of each thread used and size with the data size being handle by each thread. The optional
+ * parameter batchSize can also be provided so that each bulk import thread uses a different maximum size from the default 20MB.
+ * </odoc>
+ */
+ElasticSearch.prototype.importIndex2File = function(aFnIndex, aFilename, aFnId, idKey, aLogFunc, batchSize) {
+	ow.loadObj();
+	var rstream = io.readFileStream(aFilename);
+
+	var parent = this;
+	var data = "", cdata = 0;
+	batchSize = _$(batchSize).isNumber().default(20 * 1024 * 1024);
+	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
+	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(j)); });
+	idKey = _$(idKey).default("id");
+
+	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
+		aLogFunc = () => {};
+	}
+
+	var res;
+	function sendBulk(tdata) {
+		ops.push($do(() => {
+			var uuid = genUUID();
+			if (isDef(aLogFunc)) aLogFunc({
+				op: "start",
+				uuid: uuid,
+				size: tdata.length
+			});
+			var h = new ow.obj.http();
+			if (isDef(parent.user)) h.login(parent.user, parent.pass);
+			res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
+			if (jsonParse(res.response).errors) throw "Errors on bulk operation";
+			if (isDef(aLogFunc)) aLogFunc({
+				op: "done",
+				uuid: uuid,
+				size: tdata.length,
+				result: jsonParse(res.response)
+			});
+		}).catch((e) => {
+			if (isDef(aLogFunc)) aLogFunc({
+				op: "error",
+				uuid: uuid,
+				exception: e,
+				code: h.responseCode(),
+				type: h.responseType(),
+				result: jsonParse(res.response)
+			});
+		}));
+	}
+
+	var ops = [];
+	ioStreamReadLines(rstream, (line) => {
+		var j = jsonParse(line);
+		data += stringify({
+			index: {
+				_index: aIndex(j),
+				_type : idKey,
+				_id   : aFnId(j)
+			}
+		}, void 0, "") + "\n";
+		data += line + "\n";
+		cdata++;
+		if (data.length >= batchSize) {
+			sendBulk(String(data));
+			data = "";
+		}
+	});
+
+	if (data != "") {
+		sendBulk(String(data));
+		data = "";
+	}
+	rstream.close();
+	$doWait($doAll(ops));
+
+	return cdata;
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aLogFunc, aBatchSize, aNumThreads)</key>
+ * Given the provided aIndex uses ElasticSearch.exportIndex to generate a NDJSON on aFilename. Additionally you can provide aLogFunc, aBatchSize and
+ *  aNumThreads. See help for ElasticSearch.exportIndex for more.
+ * </odoc>
+ */
 ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aLogFunc, batchSize, numThreads) {
 	var wstream = io.writeFileStream(aFilename);
 
 	var parent = this;
 	this.exportIndex(aIndex, function(v) {
-		var m = stringify(v._source, void 0, "") + "\n";
+		var s = (isDef(v._source) ? v._source : v);
+		var m = stringify(s, void 0, "") + "\n";
 		ioStreamWrite(wstream, m, m.length, false);
 	}, aLogFunc, batchSize, numThreads);
 
