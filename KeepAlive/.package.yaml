@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  posterase: ''
+  postinstall: ''
+  preerase: ''
+  preinstall: ''
+keywords:
+  - keepalive
+  - openaf
+  - openaf-console
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/KeepAlive'
+  url: 'https://openaf.io/opacks/KeepAlive.opack'
+description: >-
+  Keeps AF connections alive so that they don't timeout by sending pings
+  regularly (useful with OpenAF-console)
+name: KeepAlive
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20180813'
+dependencies: {}
+files:
+  - .package.yaml
+  - keepalive.js
+filesHash:
+  keepalive.js: d9b7090cbfd263bb3ec7b3bd18244e1687bb61ee
