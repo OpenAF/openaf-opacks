@@ -1,6 +1,6 @@
-var TIME_INTERVAL = 120000;
+var KEEPALIVE_TIME_INTERVAL = 120000;
 
-plugins("Threads");
+plugin("Threads");
 
 var KEEPALIVE = function() {
 	this.threads = new Threads();
@@ -17,7 +17,7 @@ KEEPALIVE.prototype.add = function(aAF) {
 };
 
 KEEPALIVE.prototype.start = function(atInterval) {
-	if (typeof atInterval === 'undefined') atInterval = TIME_INTERVAL;
+	if (isUnDef(atInterval)) atInterval = KEEPALIVE_TIME_INTERVAL;
 	this.threads.startWithFixedRate(atInterval);
 	print("KEEPALIVE: Started ping every " + (atInterval / 1000) + "s. Don't forget to stop \"keepalive.stop()\" or exit with ^C.");
 };
@@ -26,4 +26,9 @@ KEEPALIVE.prototype.stop = function() {
 	this.threads.stop();
 };
 
-var keepalive = new KEEPALIVE();
+var keepalive;
+if (isUnDef(getOPackPath("OpenCli"))) {
+	print("KEEPALIVE: This oPack works only in conjuction with the OpenCli opack.");
+} else {
+	keepalive = new KEEPALIVE(KEEPALIVE_TIME_INTERVAL);
+}

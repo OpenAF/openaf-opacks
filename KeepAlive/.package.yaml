@@ -26,5 +26,7 @@ dependencies: {}
 files:
   - .package.yaml
   - keepalive.js
+  - README.md
 filesHash:
-  keepalive.js: d9b7090cbfd263bb3ec7b3bd18244e1687bb61ee
+  keepalive.js: 73b17e711807a38200625c85ac501f5c7744b091
+  README.md: 97209f3d283b5c252f28a068ce53e3e3b3d6e841
