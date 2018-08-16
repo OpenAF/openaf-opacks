@@ -1,9 +1,9 @@
 author: Nuno Aguiar
 scripts:
   preerase: ''
-  posterase: ''
+  posterase: 'Please remove "loadLib(\"inBrowser.js\");" from your ~/.openaf-console_profile or c:/users/myuser/.openaf-console_profile.'
   preinstall: ''
-  postinstall: ''
+  postinstall: 'Please add "loadLib(\"inBrowser.js\");" to your ~/.openaf-console_profile or c:/users/myuser/.openaf-console_profile.'
 keywords:
   - ace
   - editor
