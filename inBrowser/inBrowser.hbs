@@ -224,6 +224,36 @@
             }
         }
 
+        function beautify() {
+            var canContinue = true;
+            var _o = editor.getSession().getAnnotations(); 
+            _o.forEach((v) => { 
+                if (v.type == "error") { 
+                    canContinue = false; 
+                } 
+            });
+
+            if (canContinue && type != "table" && type != "chart") {
+                var value = editor.getValue();
+                $.ajax({ async: false, type: "POST", url: "/{{id}}/e/b", data: { e: value, t: type }, success: (pdata) => {
+                    try {
+                        $("#shower").hide();
+                        $("#editor").show();
+                        editor.session.setValue(pdata.e);
+                        if (pdata.t != "pmap" && pdata.t != "parametermap") {
+                            editor.session.setMode("ace/mode/" + pdata.t);
+                        } else {  
+                            editor.session.setMode("ace/mode/xml");
+                        }
+                        editor.clearSelection();
+                        type = pdata.t;
+                    } catch(e) {
+                        alert(e);
+                    }
+                }});
+            }
+        }
+
         function refresh() {
             //var value = editor.getValue();
             if (type == "table" || type == "chart") {
@@ -235,6 +265,7 @@
                         tableData = pdata.e;
                         $("#shower").show();
                         $("#editor").hide();
+                        imBeautify = true;
                     } catch(e) {
                         alert(e);
                     }
@@ -252,6 +283,7 @@
                         }
                         editor.clearSelection();
                         type = pdata.t;
+                        imBeautify = false;
                     } catch(e) {
                         alert(e);
                     }
@@ -285,7 +317,7 @@
 
         var type = "{{type}}";
         var confMap = {};
-        var imPopup = false, imSave = true;
+        var imPopup = false, imSave = true, imBeautify = false;
 
         if (getUrlParameter("p") == 1) {
             imPopup = true;
@@ -328,6 +360,9 @@
                         type = "xml";
                         editor.session.setMode("ace/mode/xml");
                         refresh();
+                        break;
+                    case "beautify":
+                        beautify();
                         break;
                     case "pmap":
                         send();
@@ -374,6 +409,7 @@
                 {{/is}}
                     "sep1"    : "---------",
                     "wordwrap": {name: "toggle Word Wrap"},
+                    "beautify": {name: "Beautify", disabled: () => { return imBeautify; }},
                     "sep2"    : "---------",
                     "reload"  : {name: "Reload" }, 
                     "save"    : {name: "Save", disabled: () => { return imSave; }},
@@ -382,10 +418,66 @@
             });  
         });
 
+        function setKeys(useInReadOnly) {
+            editor.commands.addCommand({
+                name   : "save",
+                bindKey: { win: "Ctrl-S", mac: "Ctrl-S" },
+                exec   : function(editor) {
+                    if (!imSave) send();
+                }
+            });
+            editor.commands.addCommand({
+                name   : "reload",
+                bindKey: { win: "Ctrl-R", mac: "Ctrl-R" },
+                exec   : function(editor) {
+                    refresh();
+                }
+            });  
+            editor.commands.addCommand({
+                name   : "popup",
+                bindKey: { win: "Ctrl-Alt-P", mac: "Ctrl-Option-P" },
+                exec   : function(editor) {
+                    if (!imPopup) popup();
+                }
+            }); 
+            editor.commands.addCommand({
+                name   : "beautify",
+                bindKey: { win: "Ctrl-Alt-B", mac: "Ctrl-Option-B" },
+                exec   : function(editor) {
+                    beautify();
+                }
+            }); 
+            
+            if (useInReadOnly) {
+                editor.commands.on("exec", function(e) {
+                    switch(e.command.name) {
+                    case "reload": 
+                        refresh(); 
+                        break;
+                    case "popup" : 
+                        if (!imPopup) popup(); 
+                        break;
+                    default: 
+                        if (!e.command.readOnly) e.preventDefault();
+                    }
+                });
+            }
+            
+            $("body").keydown(function(e) {
+                if (type == "table" || type == "chart") {
+                    var evtobj = window.event ? event : e
+                    if (evtobj.keyCode == 82 && evtobj.ctrlKey) {
+                        refresh();
+                    }
+                }
+            });
+        }
+
         $.get("/{{id}}/e/m", (data) => {
             if (data.ro) {
-                editor.setReadOnly(true);
+                //editor.setReadOnly(true);
                 $("a").remove("#save");
+                setKeys(true);
             }
             if (data.watch) {
                 window.setInterval(function(){
@@ -413,26 +505,6 @@
             }
         });
 
-        editor.commands.addCommand({
-            name   : "save",
-            bindKey: { win: "Ctrl-S", mac: "Command-S" },
-            exec   : function(editor) {
-                if (!imSave) send();
-            }
-        });
-        editor.commands.addCommand({
-            name   : "reload",
-            bindKey: { win: "Ctrl-R", mac: "Command-R" },
-            exec   : function(editor) {
-                refresh();
-            }
-        });  
-        editor.commands.addCommand({
-            name   : "popup",
-            bindKey: { win: "Ctrl-Alt-P", mac: "Ctrl-Option-P" },
-            exec   : function(editor) {
-                if (!imPopup) popup();
-            }
-        });                  
+        setKeys();
     </script>
 </body>
