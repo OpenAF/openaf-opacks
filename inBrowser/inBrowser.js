@@ -11,6 +11,20 @@
         e: packPath + "/inBrowser.hbs"
     });
 
+    if (isDef(addAlias) && isFunction(addAlias)) {
+        addAlias('btheme=__inb.theme=__aliasparam');
+        addAlias('bnotheme=delete __inb.theme');
+        addAlias('btitle=__inb.title=__aliasparam');
+        addAlias('bnotitle=delete __inb.title');
+        addAlias('bshow=af.eval("inBrowser.show(\\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge(__inb, {exec:1}));");');
+        addAlias('bedit=af.eval("inBrowser.edit(\\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge(__inb, {exec:1, save: \\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + " = __in\\\"}))");');
+        addAlias('bwatch=af.eval("inBrowser.watch(" + __aliasparam.replace(/(\\d+) +(.+)/, "$1") + ", \\\"" + __aliasparam.replace(/(\\d+) +(.+)/, "$2").replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge({ exec: 1 }, __inb));");');
+    }
+
+    if (isUnDef(global.__inb)) {
+        global.__inb = {};
+    }
+
     function checkoutHS(uuid) {
         if (isDef(chs) && Object.keys(hss).length > 0) return chs;
 
@@ -348,6 +362,73 @@
             return chs.replyOKJSON(stringify({ e: resText, t: type}));
         };
         delroutes["/" + id + "/e/d"] = nullFunc;
+
+        routes["/" + id + "/e/b"] = (r) => {
+            var resText, resType;
+            if (isDef(r.params.t)) {
+                var _res;
+                resText = r.params.e;
+                switch(r.params.t) {
+                case "yaml":
+                    try { _res = af.fromYAML(r.params.e); } catch(e) {}
+                    resText = af.toYAML(_res);
+                    resType = "yaml";
+                    break;
+                case "json":
+                    try { _res = jsonParse(r.params.e); } catch(e) {}
+                    resText = stringify(_res);
+                    resType = "json";
+                    type = "json";
+                    break;
+                case "pmap":
+                    try { _res = af.fromPMap(r.params.e); } catch(e) {}
+                    if (!isArray(_res)) {
+                        try { 
+                            resText = af.toPMap(_res); 
+                            resType = "pmap";
+                        } catch(e) { 
+                            printErr(e.message);
+                        }
+                    } else {
+                        resText = stringify(_res);
+                        resType = "json";
+                    }
+                    break;
+                case "parametermap":
+                    try { _res = af.fromParameterMap(r.params.e); } catch(e) {}
+                    if (!isArray(_res)) {
+                        try {
+                            resText = af.toParameterMap(_res);
+                            resType = "parametermap";
+                        } catch(e) {
+                            printErr(e.message);
+                        }
+                    } else {
+                        resText = stringify(_res);
+                        resType = "json";
+                    }
+                    break;
+                case "xml":
+                    try { _res = (new XML(r.params.e)).w(); } catch(e) {}
+                    if (typeof _res == "xml")    resText = af.fromXML(_res);
+                    if (typeof _res == "string") resText = (new XML(_res)).w();
+                    resType = "xml";
+                    break;                
+                default:
+                    _res = r.params.e;
+                    resText = _res;
+                    resType = "text";
+                    break;
+                }
+            } else {
+                var _res = r.params.e;
+                resText = _res;
+                resType = "text";
+            }
+
+            return chs.replyOKJSON(stringify({ e: resText, t: resType}));
+        };
+        delroutes["/" + id + "/e/b"] = nullFunc;
 
         ow.server.httpd.route(chs, 
             ow.server.httpd.mapWithExistingRoutes(chs, 
