@@ -42,14 +42,14 @@
         padding: 3px;
         border: 1px solid lightgray;
         font-size: small;
-        text-align: center;
+        text-align: left;
         }        
         .atablecell {
         padding: 3px;
         border: 1px solid lightgray;
         color: #0000AA;
         font-size: small;
-        text-align: center;       
+        text-align: left;       
         }
         .atablecell tr:nth-child(even) {
         background: rgb(250, 250, 250);
@@ -164,7 +164,7 @@
                     if ($$(aValue[0]).isMap()) {
                         out += "<table class=\"atable\"><tr>";
                         for(var i in aValue[0]) {
-                            out += "<th class=\"atablehead\"><b>" + i + "</b></th>";
+                            out += "<th class=\"atablehead\" style=\"text-align: center\"><b>" + i + "</b></th>";
                         }
                         out += "</tr>";
                     } else {
@@ -173,10 +173,10 @@
                     for(var x in aValue) {
                         out += "<tr>";
                         if (!($$(aValue[x]).isMap()) && !($$(aValue[x]).isArray())) {
-                            out += "<td class=\"atablecell\">" + aValue[x] + "</td>";
+                            out += "<td class=\"atablecell\" style=\"text-align: center\">" + aValue[x] + "</td>";
                         } else {
                             for(var y in aValue[x]) {
-                                out += "<td class=\"atablecell\">" + _render(aValue[x][y]) + "</td>";
+                                out += "<td class=\"atablecell\" style=\"text-align: center\">" + _render(aValue[x][y]) + "</td>";
                             }
                         }
                         out += "</tr>";
@@ -185,7 +185,7 @@
                 } else {
                     var out = "<table class=\"atable\">";
                     for(var i in aValue) {
-                        out += "<tr><td class=\"atablecell\"><b>" + i + "</b></td><td class=\"atablecell\">" + _render(aValue[i]) + "</td></tr>";
+                        out += "<tr><td class=\"atablecell\" style=\"text-align: right; vertical-align: top\"><b>" + i + "</b></td><td class=\"atablecell\">" + _render(aValue[i]) + "</td></tr>";
                     }
                     out += "</table>";
                 }
@@ -421,14 +421,14 @@
         function setKeys(useInReadOnly) {
             editor.commands.addCommand({
                 name   : "save",
-                bindKey: { win: "Ctrl-S", mac: "Ctrl-S" },
+                bindKey: { win: "Alt-S", mac: "Ctrl-S" },
                 exec   : function(editor) {
                     if (!imSave) send();
                 }
             });
             editor.commands.addCommand({
                 name   : "reload",
-                bindKey: { win: "Ctrl-R", mac: "Ctrl-R" },
+                bindKey: { win: "Alt-R", mac: "Ctrl-R" },
                 exec   : function(editor) {
                     refresh();
                 }
@@ -466,7 +466,7 @@
             $("body").keydown(function(e) {
                 if (type == "table" || type == "chart") {
                     var evtobj = window.event ? event : e
-                    if (evtobj.keyCode == 82 && evtobj.ctrlKey) {
+                    if (evtobj.keyCode == 82 && evtobj.altKey) {
                         refresh();
                     }
                 }

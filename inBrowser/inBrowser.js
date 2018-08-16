@@ -434,8 +434,12 @@
             ow.server.httpd.mapWithExistingRoutes(chs, 
                 ow.server.httpd.mapRoutesWithLibs(chs, routes)));
 
-        java.awt.Desktop.getDesktop().browse(new java.net.URI("http://127.0.0.1:" + port + "/" + id + "/e.html"));
-
+        try {
+            java.awt.Desktop.getDesktop().browse(new java.net.URI("http://127.0.0.1:" + port + "/" + id + "/e.html"));
+        } catch(e) {
+            print("Open a browser on: http://127.0.0.1:" + port + "/" + id);
+        }
+        
         while(keepRunning && isDef(hss[id]) && !(hss[id].stop)) {
             sleep(1000);
         }
