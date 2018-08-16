@@ -494,85 +494,95 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
  * as a parameter. aFnIndex can also be a string. Optionally you can provided aMap.fnId function to calculate the id field from each map which can also be specified in aMap.idKey.
  * aMap.fnIndex defaults to sha1 from the stringify version of each document and aMap.idKey defaults to "id". The function aMap.logFunc, if provided, will be executed receiving a 
  * map with op (e.g. start, error and done), uuid with unique identification of each thread used and size with the data size being handle by each thread. The optional
- * parameter aMap.batchSize can also be provided so that each bulk import thread uses a different maximum size from the default 20MB. If the optional parameter aMap.transformFn 
+ * parameter aMap.batchSize can also be provided so that each bulk import thread uses a different maximum size from the default 10MB. If the optional parameter aMap.transformFn 
  * is provided that function will be executed for each document and the returned transformed documented will be the one used on the import.
  * </odoc>
  */
 ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 	ow.loadObj();
 	aMap = _$(aMap).isMap().default({});
-	var aFnId = aMap.aFnId, idKey = aMap.idKey, aTransformFn = aMap.transformFn, aLogFunc = aMap.transformFn, batchSize = aMap.batchSize;
+	var aFnId = aMap.aFnId, idKey = aMap.idKey, aTransformFn = aMap.transformFn, aLogFunc = aMap.logFunc, batchSize = aMap.batchSize;
 
+	if (isUnDef(aLogFunc)) {
+		aLogFunc = (r) => {
+			if (r.op == "error") sprintErr(r);
+		};
+	}
+	
 	var rstream = io.readFileStream(aFilename);
 	var parent = this;
 	var data = "", cdata = 0;
 
-	batchSize = _$(batchSize).isNumber().default(20 * 1024 * 1024);
+	batchSize = _$(batchSize).isNumber().default(9 * 1024 * 1024);
 	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
 	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(j)); });
 	idKey = _$(idKey).default("id");
 	_$(aTransformFn).isFunction();
 
 	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
-		aLogFunc = () => {};
+			aLogFunc = () => {};
 	}
 
 	var res;
 	function sendBulk(tdata) {
-		ops.push($do(() => {
-			var uuid = genUUID();
-			if (isDef(aLogFunc)) aLogFunc({
-				op: "start",
-				uuid: uuid,
-				size: tdata.length
-			});
-			var h = new ow.obj.http();
-			if (isDef(parent.user)) h.login(parent.user, parent.pass);
-			res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
-			if (jsonParse(res.response).errors) throw "Errors on bulk operation";
-			if (isDef(aLogFunc)) aLogFunc({
-				op: "done",
-				uuid: uuid,
-				size: tdata.length,
-				result: jsonParse(res.response)
-			});
-		}).catch((e) => {
-			if (isDef(aLogFunc)) aLogFunc({
-				op: "error",
-				uuid: uuid,
-				exception: e,
-				code: h.responseCode(),
-				type: h.responseType(),
-				result: jsonParse(res.response)
-			});
-		}));
+			ops.push($do((_s,_f) => {
+					var uuid = genUUID();
+					if (isDef(aLogFunc)) aLogFunc({
+							op: "start",
+							uuid: uuid,
+							size: tdata.length
+					});
+					try {
+					   var h = new ow.obj.http();
+					   if (isDef(parent.user)) h.login(parent.user, parent.pass);
+					   res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
+					   if (jsonParse(res.response).errors) throw "Errors on bulk operation";
+					   if (isDef(aLogFunc)) aLogFunc({
+							op: "done",
+							uuid: uuid,
+							size: tdata.length,
+							result: jsonParse(res.response)
+					   });
+					} catch(e) {
+					   _f({ e: e, uuid: uuid});
+					}
+			}).catch((e) => {
+					try{
+					if (isDef(aLogFunc)) aLogFunc({
+							op: "error",
+							uuid: e.uuid,
+							exception: e.e
+					});
+					}catch(ee) { sprint(ee); }
+			}));
 	}
 
 	var ops = [];
 	ioStreamReadLines(rstream, (line) => {
 		var j = jsonParse(line);
-		data += stringify({
-			index: {
-				_index: aIndex(j),
-				_type : idKey,
-				_id   : aFnId(j)
-			}
+		var tmp = stringify({
+				index: {
+						_index: aIndex(j),
+						_type : idKey,
+						_id   : aFnId(j)
+				}
 		}, void 0, "") + "\n";
 		if (isDef(aTransformFn)) {
-			data += stringify(aTransformFn(jsonParse(line)), void 0, "") + "\n";
+				tmp += stringify(aTransformFn(jsonParse(line)), void 0, "") + "\n";
 		} else {
-			data += line + "\n";
+				tmp += line + "\n";
 		}
+		if (data.length + tmp.length >= batchSize) {
+				sendBulk(String(data));
+				data = "";
+		}
+		data += tmp;
 		cdata++;
-		if (data.length >= batchSize) {
-			sendBulk(String(data));
-			data = "";
-		}
 	});
 
 	if (data != "") {
-		sendBulk(String(data));
-		data = "";
+			sendBulk(String(data));
+			data = "";
 	}
 	rstream.close();
 	$doWait($doAll(ops));
@@ -590,6 +600,12 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	aMap = _$(aMap).isMap().default({});
 	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads;
+
+	if (isUnDef(aLogFunc)) {
+		aLogFunc = (r) => {
+			if (r.op == "error") sprintErr(r);
+		};
+	}
 
 	var wstream = io.writeFileStream(aFilename);
 
