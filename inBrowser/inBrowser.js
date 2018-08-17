@@ -19,6 +19,12 @@
         addAlias('bshow=af.eval("inBrowser.show(\\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge(__inb, {exec:1}));");');
         addAlias('bedit=af.eval("inBrowser.edit(\\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge(__inb, {exec:1, save: \\\"" + __aliasparam.replace(/([\\\"|\\\'])/g, "\\\\$1") + " = __in\\\"}))");');
         addAlias('bwatch=af.eval("inBrowser.watch(" + __aliasparam.replace(/(\\d+) +(.+)/, "$1") + ", \\\"" + __aliasparam.replace(/(\\d+) +(.+)/, "$2").replace(/([\\\"|\\\'])/g, "\\\\$1") + "\\\", merge({ exec: 1 }, __inb));");');
+
+        // Extra for OpenCli
+        if (isDef(getOPackPath("OpenCli"))) {
+            addAlias('beditMashupByName=inBrowser.edit("ow.waf.mashups.getMashupByName(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
+            addAlias('beditMashupByUUID=inBrowser.edit("ow.waf.mashups.getMashupByUUID(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
+        }
     }
 
     if (isUnDef(global.__inb)) {
