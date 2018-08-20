@@ -17,6 +17,23 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 
 /**
  * <odoc>
+ * <key>ElasticSearch.getIndexMapping(aIndex) : Map</key>
+ * Retrieves the current mapping of aIndex.
+ * </odoc>
+ */
+ElasticSearch.prototype.getIndexMapping = function(aIndex) {
+	ow.loadObj();
+
+	var res = ow.obj.rest.jsonGet(es.url + "/" + aIndex + "/_mapping");
+	if (isDef(res[aIndex])) {
+		return res[aIndex];
+	} else {
+		return void 0;
+	}
+};
+
+/**
+ * <odoc>
  * <key>ElasticSearch.createIndex(aIndex, aNumberOfShards, aNumberOfReplicas, extraOptions) : Map</key>
  * Tries to create aIndex on Elastic Search and returns the result.
  * </odoc>
