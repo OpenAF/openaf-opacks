@@ -78,23 +78,60 @@ ElasticSearch.prototype.openIndex = function(aIndex) {
 
 /**
  * <odoc>
- * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex, aTimeout, extraOptions) : Map</key>
+ * <key>ElasticSearch.reIndex(anOriginalIndex, aNewIndex, aTimeout, extraOptions, taskCallback, slices) : Map</key>
  * Tries to copy anOriginalIndex to aNewIndex (reindex) and returns the result. 
  * "aTimeout" allows the request to exit gracefully while the reindex operation continues (e.g. "60m").
- * "extraOptions" will be merged into the request (e.g. { conflicts: "proceed" })
+ * "extraOptions" will be merged into the request (e.g. { conflicts: "proceed" }).
+ * If the function taskCallback is defined the reindex will be handled as a task (helpfull if you have a http timeout
+ * of 1 minute) and the taskCallback called every second with the current task info (if the function returns a number it will
+ * be used as the new sleep time between calls in order not to overload the cluster). If slices is defined it will be included
+ * on the reindex call (in ES >= 6.x you can use slices=auto)
  * </odoc>
  */
-ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, extraOptions) {
+ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, extraOptions, taskCallback, slices) {
 	ow.loadObj();
 	if (isUnDef(extraOptions)) extraOptions = {};
-	var extra = "";
-	if (isDef(aTimeout) && isString(aTimeout)) extra = "timeout=" + aTimeout;
+	var extra = (isDef(slices) ? "?slices=" + slices : "?");
+	if (isDef(aTimeout) && isString(aTimeout)) extra += "&timeout=" + aTimeout;
 
 	if (isUnDef(anOrigIndex) || isUnDef(aNewIndex)) throw "Please provide an original index and the new index name";
 
-	var res = ow.obj.rest.jsonCreate(this.url + "/_reindex", {}, merge({ source : { index: anOrigIndex }, dest: { index: aNewIndex }}, extraOptions), this.user, this.pass);
+	var res;
+	if (isDef(taskCallback) && isFunction(taskCallback)) {
+		extra += "&wait_for_completion=false";
+		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+		var t = 1000;
+		do {
+			sleep(t);
+			var task = this.getTask(res.task);
+			var tr = taskCallback(task);
+
+			if (isDef(tr)) t = tr;
+		} while (isDef(task) && t > 0)
+		return;
+	} else {
+		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+	}
 
 	return res;
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.getTask(aTaskRef) : Map</key>
+ * Tries to retrieve the aTaskReg (in the format [node]:[task]) and returns the corresponding info. It will return
+ * undefined if no information for the task exists (which means it's no longer running).
+ * </odoc>
+ */
+ElasticSearch.prototype.getTask = function(aTaskRef) {
+    ow.loadObj();
+    _$(aTaskRef).isString().check((v)=>{ return aTaskRef.indexOf(":") >= 0; }).$_("You need to provide a task ref (node:id)");
+  	var res = this.getTasks(); 
+
+	var [node, id] = aTaskRef.split(/:/);
+
+	if (isUnDef(res.nodes[node])) return void 0;
+	return res.nodes[node].tasks[node + ":" + id];
 };
 
 /**
