@@ -27,7 +27,7 @@ name: inBrowser
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180817'
+version: '20180822'
 dependencies:
   openaf: '>=20180507'
 files:
@@ -71,5 +71,5 @@ filesHash:
   gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
   gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
   inBrowser.hbs: 4617570cd400e96c4191ab7413b26618e647b12a
-  inBrowser.js: 4ab26d8e0772b562f3097166a6827c0e1390df9a
+  inBrowser.js: 16fc209be97d3460335cf375b25413d1e2052d65
   README.md: 8ce2bf2fa79cea953a8e2615a14ffc6af0666859

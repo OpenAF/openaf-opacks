@@ -22,8 +22,8 @@
 
         // Extra for OpenCli
         if (isDef(getOPackPath("OpenCli"))) {
-            addAlias('beditMashupByName=inBrowser.edit("ow.waf.mashups.getMashupByName(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
-            addAlias('beditMashupByUUID=inBrowser.edit("ow.waf.mashups.getMashupByUUID(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
+            addAlias('beditMashupByName=inBrowser.edit("ow.loadWAF().mashups.getMashupByName(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
+            addAlias('beditMashupByUUID=inBrowser.edit("ow.loadWAF().mashups.getMashupByUUID(af,__aliasparam)",merge(__inb,{save:"ow.waf.mashups.saveMashup(af, __in)",exec:1}))');
         }
     }
 
