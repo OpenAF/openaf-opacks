@@ -2,10 +2,10 @@ ow.loadCh();
 
 var path = getOPackPath("Mongo") || String((new java.io.File("")).getAbsolutePath()).replace(/\\/g, "/");
 
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-java-driver-3.6.0.jar");
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-core-3.6.0.jar");
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-3.6.0.jar");
-af.externalAddClasspath("file:///" + path + "/lib/bson-3.6.0.jar");
+af.externalAddClasspath("file:///" + path + "/lib/mongodb-java-driver-3.8.1.jar");
+af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-core-3.8.1.jar");
+af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-3.8.1.jar");
+af.externalAddClasspath("file:///" + path + "/lib/bson-3.8.1.jar");
 
 ow.ch.__types.mongo = {
     create       : function(aName, shouldCompress, options) {

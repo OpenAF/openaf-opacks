@@ -18,21 +18,21 @@ name: Mongo
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20180503
+version: 20180913
 dependencies:
   openaf: '>=20171218'
 files:
   - .odoc.db
   - .package.yaml
-  - lib/bson-3.6.0.jar
-  - lib/mongo-java-driver-3.6.0.jar
-  - lib/mongodb-driver-3.6.0.jar
-  - lib/mongodb-driver-core-3.6.0.jar
+  - lib/bson-3.8.1.jar
+  - lib/mongo-java-driver-3.8.1.jar
+  - lib/mongodb-driver-3.8.1.jar
+  - lib/mongodb-driver-core-3.8.1.jar
   - mongo.js
 filesHash:
   .odoc.db: 515fe2958811ff8e7a0941e3e58149bea2b18f52
-  lib/bson-3.6.0.jar: 3234a5c7dba80fcaf0bf9d77d9604ec3daec8bde
-  lib/mongo-java-driver-3.6.0.jar: 30c6123b38d813e4497763990598e35ad5b25b88
-  lib/mongodb-driver-3.6.0.jar: 48c9b7760deb579a8bd663a3c68f9b15145ff4f9
-  lib/mongodb-driver-core-3.6.0.jar: b7b5deefe4a46710d95a97f1458bec17d5b3be28
-  mongo.js: 677b1743a3f794229415d3aeb8071becd144c08e
+  lib/bson-3.8.1.jar: 08385a746a3824826494ddafa64c8e220872cfce
+  lib/mongo-java-driver-3.8.1.jar: a97932453b7185bbc18f4a4c368f9862554496d5
+  lib/mongodb-driver-3.8.1.jar: 115885a2430245e13a440ebc2e178ddce2822f8d
+  lib/mongodb-driver-core-3.8.1.jar: ca7672fad39304433ae08780ca5f90aae5842fb6
+  mongo.js: d4ee530d37f2c571c8c5f047390171b50fb683cb
