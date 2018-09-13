@@ -8,6 +8,12 @@ af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-3.8.1.jar");
 af.externalAddClasspath("file:///" + path + "/lib/bson-3.8.1.jar");
 
 ow.ch.__types.mongo = {
+    __typeConvert: function(aMap) {
+        traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberDecimal"])) o[k] = Number(v["$numberDecimal"]) });
+        traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = Number(v["$numberLong"]) });
+        traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+        return aMap;
+    },
     create       : function(aName, shouldCompress, options) {
         if (isUnDef(options)) options = {};
         if (isUnDef(options.database))   options.database = "default";
@@ -64,8 +70,9 @@ ow.ch.__types.mongo = {
             }
 
             // convert
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = Number(v["$numberLong"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            res = this.__typeConvert(res);
             return res;
         }
     },
@@ -89,8 +96,9 @@ ow.ch.__types.mongo = {
             }
 
             // convert
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = Number(v["$numberLong"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            res = this.__typeConvert(res);
             return res;
         }
     },
@@ -128,7 +136,9 @@ ow.ch.__types.mongo = {
         traverse(av, function(k, v, p, o) { 
             var path = (isDef(p) && p.length > 0) ? p + "." + k : k;
             var changed = false;
+            if(!changed && (typeof v == "boolean"))            { changed = true; ow.obj.setPath(av, path, new java.lang.Boolean(v).booleanValue()); }
             if(!changed && isNumber(v) && v % 1 == 0)          { changed = true; ow.obj.setPath(av, path, new java.lang.Long(v).longValue()); }
+            if(!changed && isNumber(v) && v % 1 != 0)          { changed = true; ow.obj.setPath(av, path, new java.lang.Double(v).doubleValue()); }
             if(!changed && isDate(v))                          { changed = true; ow.obj.setPath(av, path, new java.util.Date(v.getTime())); }
             if(!changed && isString(v) && isDate(new Date(v))) { changed = true; ow.obj.setPath(av, path, new java.util.Date((new Date(v)).getTime())); }
             if(!changed && !isObject(v))                       { changed = true; ow.obj.setPath(av, path, String(v)); }
@@ -165,8 +175,9 @@ ow.ch.__types.mongo = {
                 delete res._id;
             }
 
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = v["$numberLong"] });
-            traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$numberLong"])) o[k] = Number(v["$numberLong"]) });
+            //traverse(res, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
+            res = this.__typeConvert(res);
             return res;
         }
     },

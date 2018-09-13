@@ -10,7 +10,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Mongo'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Mongo'
+  url: https://openaf.io/opacks/Mongo.opack
 description: >-
   An OpenAF channels implementation ('mongo') to access collections on MongoDBs.
   It also includes an utility object (e.g. MongoUtil).
@@ -35,4 +36,4 @@ filesHash:
   lib/mongo-java-driver-3.8.1.jar: a97932453b7185bbc18f4a4c368f9862554496d5
   lib/mongodb-driver-3.8.1.jar: 115885a2430245e13a440ebc2e178ddce2822f8d
   lib/mongodb-driver-core-3.8.1.jar: ca7672fad39304433ae08780ca5f90aae5842fb6
-  mongo.js: d4ee530d37f2c571c8c5f047390171b50fb683cb
+  mongo.js: 27fc33c6ff274523f454265602f41ffd72890ad1
