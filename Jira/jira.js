@@ -1,5 +1,7 @@
 ow.loadObj();
 
+// Check https://docs.atlassian.com/software/jira/docs/api/REST/7.12.0/
+
 var JIRA = function(aJiraURL, aLogin, aPass) {
     this.url = aJiraURL;
     __setUserAgent("Mozilla");
@@ -28,11 +30,22 @@ JIRA.prototype.getIssue = function(aIssueId) {
         { cookie: this.session });
 };
 
-JIRA.prototype.search = function(aJQL) {
-    return ow.obj.rest.jsonGet(this.url + "/rest/api/2/search?jql=" + ow.obj.rest.writeQuery(aJQL),
+JIRA.prototype.search = function(aJQL, aExtra) {
+    return ow.obj.rest.jsonCreate(this.url + "/rest/api/2/search",
         {},
+        merge({ jql: aJQL }, aExtra),
         void 0,
         void 0,
         void 0,
         { cookie: this.sesion });
+};
+
+JIRA.prototype.getStatus = function(aIssueId) {
+    if (isUnDef(aIssueId)) aIssueId = "";
+    return ow.obj.rest.jsonGet(this.url + "/rest/api/2/status/" + aIssueId,
+        {},
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session });
 };
