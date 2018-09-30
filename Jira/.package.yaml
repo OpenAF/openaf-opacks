@@ -7,20 +7,20 @@ scripts:
 keywords:
   - jira
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Jira
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Jira'
 description: Wrapper for the JIRA REST API
 name: Jira
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20180928
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: 20180929
 dependencies:
   openaf: '>=20180601'
 files:
-  - jira.js
   - .package.yaml
+  - jira.js
 filesHash:
-  jira.js: 168ead0a79e93d1db39065ca25cd0e35b62406e5
+  jira.js: f0012e2e164de2c6ff71306daed9c27a1dd1c643
