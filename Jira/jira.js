@@ -128,6 +128,17 @@ JIRA.prototype.createIssue = function(fields) {
     );
 };
 
+JIRA.prototype.createSubIssue = function(aParentIssueKey, fields) {
+    return ow.obj.rest.jsonCreate(this.url + "/rest/api/2/issue/",
+        {},
+        { fields: merge({ parent: { key: aParentIssueKey } }, fields) },
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session }
+    );
+};
+
 JIRA.prototype.getStatuses = function(aIssueId) {
     return ow.obj.rest.jsonGet(this.url + "/rest/api/latest/issue/" + aIssueId + "/transitions?expand=transitions.fields",
         {},
