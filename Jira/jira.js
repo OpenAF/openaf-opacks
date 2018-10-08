@@ -8,7 +8,22 @@ var JIRA = function(aJiraURL, aLogin, aPass) {
     this.login(aLogin, aPass);
 };
 
+// Utils
+// ----------------------------------------------------------------
+JIRA.prototype.getTemplate = function(aFilename, data, extra) {
+    var res = {};
+
+    if (aFilename.match(/\.json$/)) {  
+        res = parseJson(templify(io.readFileString(getOPackPath("Jira") + "/templates/" + aFilename), data));
+    } else {
+        res = af.fromYAML(templify(io.readFileString(getOPackPath("Jira") + "/templates/" + aFilename), data));
+    }
+
+    return merge(res, extra);
+};
+
 // Session
+// ----------------------------------------------------------------
 
 JIRA.prototype.login = function(aLogin, aPass) {
     var ses = ow.obj.rest.jsonCreate(this.url + "/rest/auth/1/session", 
@@ -44,6 +59,7 @@ JIRA.prototype.logout = function() {
 };
 
 // Issues
+// ----------------------------------------------------------------
 
 JIRA.prototype.getProjects = function() {
     return ow.obj.rest.jsonGet(this.url + "/rest/api/2/issue/createmeta",
@@ -75,11 +91,15 @@ JIRA.prototype.getProjectIssueTypes = function(aProjectKey) {
 
 JIRA.prototype.getIssueTypeFields = function(aProjectKey, aIssueTypeId) {
     _$(aProjectKey).isString("Please provide a project key.");
-    _$(aIssueTypeId).isNumber("Please provide a numeric issue type id.");
 
     return $from(this.getProjectIssueTypes(aProjectKey))
     .equals("id", aIssueTypeId)
+    .orEquals("name", aIssueTypeId)
     .at(0).fields;
+};
+
+JIRA.prototype.getIssueTypeField = function(aProjectKey, aIssueTypeId, aField) {
+    return this.getIssueTypeFields(aProjectKey, aIssueTypeId)[aField];
 };
 
 JIRA.prototype.getIssue = function(aIssueId) {
@@ -97,7 +117,61 @@ JIRA.prototype.browseIssue = function(aIssueId) {
     java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
 };
 
+JIRA.prototype.createIssue = function(fields) {
+    return ow.obj.rest.jsonCreate(this.url + "/rest/api/2/issue/",
+        {},
+        { fields: fields },
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session }
+    );
+};
+
+JIRA.prototype.getStatuses = function(aIssueId) {
+    return ow.obj.rest.jsonGet(this.url + "/rest/api/latest/issue/" + aIssueId + "/transitions?expand=transitions.fields",
+        {},
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session }
+    ).transitions;
+};
+
+JIRA.prototype.updateStatus = function(aIssueId, aStatusId, fields, update) {
+    if (isString(aStatusId)) {
+        var sts = this.getStatuses(aIssueId);
+        var stsS = $from(sts).equals("name", aStatusId).at(0);
+        if (isUnDef(stsS)) throw("Status '" + aStatusId + "' not found.");
+        aStatusId = stsS.id;
+    }
+
+    var data = {
+        transition: {
+            id: aStatusId
+        }
+    };
+
+    if (isDef(fields)) {
+        data = merge(data, { fields: fields });
+    }
+
+    if (isDef(update)) {
+        data = merge(data, { update: update });
+    }
+
+    return ow.obj.rest.jsonCreate(this.url + "/rest/api/latest/issue/" + aIssueId + "/transitions?expand=transitions.fields",
+        {},
+        data,
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session }
+    );
+};
+
 // Search
+// ----------------------------------------------------------------
 
 JIRA.prototype.search = function(aJQL, aExtra) {
     return ow.obj.rest.jsonCreate(this.url + "/rest/api/2/search",
@@ -126,6 +200,10 @@ JIRA.prototype.searchMyIssues = function(maxResults) {
             priority: r.fields.priority.name
         };
     });
+};
+
+JIRA.prototype.printMyIssues = function(maxResults) {
+    return printTable(this.searchMyIssues(maxResults), void 0, true, true);
 };
 
 // Get info

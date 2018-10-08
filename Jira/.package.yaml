@@ -16,11 +16,11 @@ name: Jira
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20180929
+version: 20181007
 dependencies:
   openaf: '>=20180601'
 files:
   - .package.yaml
   - jira.js
 filesHash:
-  jira.js: f0012e2e164de2c6ff71306daed9c27a1dd1c643
+  jira.js: 42f9b6e619643711b313035b081bb10d52b747cd
