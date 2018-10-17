@@ -103,7 +103,7 @@ Even without the GIST opack you can use the *fileURL* to retrieve it directly:
 
 #### Decrypting a clip
 
-If you previously encrypted a clip with **.encryptClip** you can decrypt it using **.getEncryptClip(aKey, aId, aFile)** similar, in turn, to **.getClip**.
+If you previously encrypted a clip with **.encryptClip** you can decrypt it using **.getEncryptedClip(aKey, aId, aFile)** similar, in turn, to **.getClip**.
 
 ### Modify an existing clipped object
 

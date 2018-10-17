@@ -51,7 +51,11 @@ ow.ch.__types.gist = {
 
         var gist = {};
         gist.public = (isUnDef(aK.public)) ? false : aK.public;
-        gist.description = (isUnDef(aK.description)) ? "" : aK.description;
+        if (isDef(aV.description) || isDef(aK.description)) {
+            gist.description = (isUnDef(aK.description) && isUnDef(aV.description)) ? "" : aK.description;
+            if (isDef(aV.description)) gist.description = aV.description;
+        }
+
         gist.files = {};
         if ( isDef(aK.file) || (aV != null && isUnDef(aV.files)) ) {
             if(aV == null || isObject(aV) || isString(aV) || isNumber(aV) || isArray(aV)) {
@@ -59,8 +63,10 @@ ow.ch.__types.gist = {
                 gist.files[filename] = {};
                 if (aV == null)
                     gist.files[filename] = null;
-                else
-                    gist.files[filename].content = stringify(aV, void 0, "");
+                else {
+                    if (isObject(aV) || isArray(aV))  gist.files[filename].content = stringify(aV, void 0, "");
+                    if (isString(aV) || isNumber(aV)) gist.files[filename].content = String(aV);
+                }
             } else {
                 throw "You need to provide an object or string or number or array or a files map with filenames and contents.";
             }
@@ -70,8 +76,10 @@ ow.ch.__types.gist = {
                 if (aV.files[file] != null && isUnDef(aV.files[file].content)) throw "Each file needs to have a 'content' key with the corresponding content.";
                 if (aV.files[file] == null)
                     gist.files[file] = null;
-                else
-                    gist.files[file].content = stringify(aV.files[file].content, void 0, "");
+                else {
+                    if (isObject(aV.files[file].content) || isArray(aV.files[file].content))  gist.files[file].content = stringify(aV.files[file].content, void 0, "");
+                    if (isString(aV.files[file].content) || isNumber(aV.files[file].content)) gist.files[file].content = String(aV.files[file].content);
+                }
             }
         }
         if (isDef(aK.id)) {
@@ -219,11 +227,11 @@ GIST.prototype.getClip = function(aId, aFile) {
 
 /**
  * <odoc>
- * <key>GIST.getEncryptClip(aKey, aId, aFile) : Object</key>
+ * <key>GIST.getEncryptedClip(aKey, aId, aFile) : Object</key>
  * Tries to retrieve aFile from the GIST aId returning it's encrypted contents decrypted.
  * </odoc>
  */
-GIST.prototype.getEncryptClip = function(aKey, aId, aFile) {
+GIST.prototype.getEncryptedClip = function(aKey, aId, aFile) {
     return jsonParse(this.decrypt(this.getClip(aId, aFile), aKey));
 }
 
@@ -249,11 +257,11 @@ GIST.prototype.getClips = function(aId) {
 
 /**
  * <odoc>
- * <key>GIST.setClip(aId, aFile, aContent) : String</key>
+ * <key>GIST.setClip(aId, aFile, aContent, aDescription) : String</key>
  * Tries to change aId GIST, for the aFile (a filename) with aContent (an object, string, array or number). Returns the GIST id, URL and file URL.
  * </odoc>
  */
-GIST.prototype.setClip = function(aId, aFile, aContent) {
+GIST.prototype.setClip = function(aId, aFile, aContent, aDescription) {
     var aK = { id: aId };
     var aV = {
         files: {}
@@ -263,6 +271,9 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
         aV.files[filename] = null;
     else
         aV.files[filename] = { content: aContent };
+
+    if (isDef(aDescription)) aV.description = aDescription;
+    
     var res;
     try {
         res = this.getCh().set(aK, aV);
@@ -279,13 +290,23 @@ GIST.prototype.setClip = function(aId, aFile, aContent) {
 
 /**
  * <odoc>
- * <key>GIST.setEncryptClip(aKey, aId, aFile, aContent) : String</key>
+ * <key>GIST.copyClipFile(aTargetId, aSourceId, aFile)</key>
+ * Tries to copy aFile from the source gist aSourceId into the target gist aTargetId.
+ * </odoc>
+ */
+GIST.prototype.copyClipFile = function(aTargetId, aSourceId, aFile) {
+    this.setClip(aTargetId, aFile, this.getClip(aSourceId, aFile));
+};
+
+/**
+ * <odoc>
+ * <key>GIST.setEncryptedClip(aKey, aId, aFile, aContent, aDescription) : String</key>
  * Tries to change aId GIST, for the aFile (a filename) with aContent (an object, string, array or number) encrypted
  * with aKey. Returns the GIST id, URL and file URL.
  * </odoc>
  */
-GIST.prototype.setEncryptClip = function(aKey, aId, aFile, aContent) {
-    return this.setClip(aId, aFile, this.encrypt(stringify(aContent), aKey));
+GIST.prototype.setEncryptedClip = function(aKey, aId, aFile, aContent, aDescription) {
+    return this.setClip(aId, aFile, this.encrypt(stringify(aContent), aKey), aDescription);
 };
 
 /**
@@ -367,4 +388,30 @@ GIST.prototype.decrypt = function(aString, aKey) {
  */
 GIST.prototype.close = function() {
     $ch(this.ch).destroy();
+};
+
+/**
+ * <odoc>
+ * <key>GIST.browseClip(aId)</key>
+ * Tries to open the browser to show the aId provided clip.
+ * </odoc>
+ */
+GIST.prototype.browseClip = function(aId) {
+    var url = "https://gist.github.com/" + aId;
+
+    java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+};
+
+/**
+ * <odoc>
+ * <key>GIST.getGit(aId, aDir)</key>
+ * Clones the GIST git repository with aId to aDir.
+ * </odoc>
+ */
+GIST.prototype.getGit = function(aId, aDir) {
+    plugin("GIT");
+
+    var git = new GIT();
+    git.clone("https://gist.github.com/" + aId + ".git", aDir);
+    git.close();
 };
