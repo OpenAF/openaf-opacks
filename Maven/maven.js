@@ -17,6 +17,60 @@ Maven.prototype._getURL = function() {
 
 /**
  * <odoc>
+ * <key>Maven.search(aTerm) : Array</key>
+ * Tries to search aTerm in maven.org and then fallsback to archetype-catalog.xml returning an array with groupId and artifactId.
+ * </odoc>
+ */
+Maven.prototype.search = function(aTerm) {
+    plugin("XML");
+    ow.loadObj();
+
+    var r = [];
+    var res = ow.obj.rest.jsonGet("https://search.maven.org/solrsearch/select?" + ow.obj.rest.writeQuery({ q: aTerm, rows: 999, wt: "json" }));
+    if (isDef(res.response.docs) && isArray(res.response.docs)) {
+        for(var ii = 0; ii < res.response.docs.length; ii++) {
+            r.push({
+                groupId: res.response.docs[ii].g,
+                artifactId: res.response.docs[ii].a
+            });
+        }
+    }
+
+    if (r.length > 0) return $from(r).sort("groupId").select();
+
+    var xml = new XML(ow.obj.rest.get(this._getURL() + "/archetype-catalog.xml").response).toNativeXML();
+    res = xml.archetypes.archetype.(new RegExp(".*" + aTerm + ".*", "i").test(artifactId));
+    for(var ii = 0 ; ii < res.length(); ii++) {
+        r.push({
+            groupId: res.groupId[ii].toString(),
+            artifactId: res.artifactId[ii].toString(),
+            description: res.description[ii].toString()
+        });
+    }
+
+    res = xml.archetypes.archetype.(new RegExp(".*" + aTerm + ".*", "i").test(groupId));
+    for(var ii = 0 ; ii < res.length(); ii++) {
+        r.push({
+            groupId: res.groupId[ii].toString(),
+            artifactId: res.artifactId[ii].toString(),
+            description: res.description[ii].toString()
+        });
+    }
+
+    if (r.length > 0) return $from(r).distinct();
+
+    res = xml.archetypes.archetype.(new RegExp(".*" + aTerm + ".*", "i").test(description));
+    for(var ii = 0 ; ii < res.length(); ii++) {
+        r.push({
+            groupId: res.groupId[ii].toString(),
+            artifactId: res.artifactId[ii].toString(),
+            description: res.description[ii].toString()
+        });
+    }
+};
+
+/**
+ * <odoc>
  * <key>Maven.getLatestVersion(aURI) : String</key>
  * Get the latest version from the provide aURI for a Maven 2 repository.
  * </odoc>

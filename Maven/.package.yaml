@@ -17,7 +17,7 @@ name: Maven
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180918'
+version: '20181018'
 dependencies:
   OpenAF: '>=20180601'
 files:
