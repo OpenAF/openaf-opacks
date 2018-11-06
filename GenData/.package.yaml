@@ -84,6 +84,6 @@ filesHash:
   lists/telecom/list_phonePatterns.yaml: 20dcef4f12d7a27c31ffeccb1f72922a11985b69
   lists/telecom/list_phonePrefixes.yaml: f64f36a30468c85dea1ca40efac03e9007f1aeb1
   lists/telecom/list_phoneTACs.yaml: 6007724d703f1291c12450e2274f3f327742d7a1
-  README.md: 76efa0bf9522122d00b5df82d993909d21870353
+  README.md: 8b28a01cccef6046151dac737ec18012b5a2e6d7
   utils/genHelp.js: 0b164ab05cc50456ceed72d715736b55fd0ddba2
   utils/telecom/getPhonePatterns.js: fc03e02f68c8878313701934119da905994e9f5f

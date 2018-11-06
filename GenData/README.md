@@ -26,7 +26,7 @@ genData()
 .generate((g, f) => { 
     return { 
         name  : g.getFromList("names").name,
-        number: f.genPhone(g, "GB", "mobile" , true).phone 
+        number: f.genPhone(g, "GB", "mobile").phone 
     }; 
 }, 3).dump()
 ````
@@ -37,15 +37,15 @@ results in a similar result to:
 [
   {
     "name": "Kian Walsh",
-    "number": "+4917996438144"
+    "number": "7991699324"
   },
   {
     "name": "Jeffrey Shannon",
-    "number": "+4917176757845"
+    "number": "7921242841"
   },
   {
     "name": "Alondra Schroeder",
-    "number": "+4916387928346"
+    "number": "7572383939"
   }
 ]
 ````
