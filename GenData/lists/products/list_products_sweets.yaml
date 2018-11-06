@@ -1,0 +1,241 @@
+- category: Ingredients
+  item: Almond
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Balushahi
+  measuringUnit: Kg
+  description: |-
+    Ingredients Used in Balushahi :
+    Maida Flour,Sugar,Milk,Ghee,Khoya,Cashew
+  salesPrice: 6.49
+- category: Ladoos
+  item: Besan Ladoo
+  measuringUnit: Kg
+  description: >-
+    Soft Sweet Made From Gram Flour With Sugar & Assorted Dry Nuts. 
+
+    Ingredients : Sugar, Bengal Gram Flour, Clarified Butter, Almond, Pistachio,
+    Edible Gum, Cucumber Seed & Cardamom Powder.
+  salesPrice: 6.22
+- category: Ingredients
+  item: Cashew nut
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Chhena gaja
+  measuringUnit: Kg
+  description: >-
+    Chhena gajas are prepared by combining chhena, similar to cottage cheese,
+    and sooji (semolina), and kneading the dough thoroughly
+  salesPrice: 6.88
+- category: Bengali sweets
+  item: Chocolate sandesh
+  measuringUnit: Kg
+  description: null
+  salesPrice: 6.8
+- category: All sweets
+  item: Coconut Burfi
+  measuringUnit: Kg
+  description: |-
+    Ingredients :
+    Coconut barfi: coconut, sugar, and milk, square and yellow colored
+  salesPrice: 4.56
+- category: All sweets
+  item: Coconut peda
+  measuringUnit: Kg
+  description: >-
+    Coconut peda are simply delicious fudge recipe made from coconut and milk
+    powder
+  salesPrice: 3.6
+- category: Sweets Box
+  item: Diwali special
+  measuringUnit: Qty
+  description: null
+  salesPrice: 8.99
+- category: Ingredients
+  item: Dry Coconut
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: Ingredients
+  item: Ghee
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Ghevar
+  measuringUnit: Kg
+  description: >-
+    a sweet food made of ground sesame seeds mixed with sugar syrup or honey and
+    sometimes other flavourings
+  salesPrice: 6.15
+- category: Gift Card
+  item: Gift Card 1000
+  measuringUnit: Qty
+  description: null
+  salesPrice: 4.99
+- category: Gift Card
+  item: Gift Card 500
+  measuringUnit: Qty
+  description: null
+  salesPrice: 2.99
+- category: Ingredients
+  item: Gram Flour
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Gulab Jamun
+  measuringUnit: Kg
+  description: >-
+    Sweet Dumplings Soaked In Sugar Syrup. 
+
+    Ingredients : Sugar, Water, Milk Solids, Refined Palmolein Oil, Wheat Flour
+    & Cardamomcontains Milk & Glutenmay Contain Sulphite.
+  salesPrice: 2.35
+- category: Ingredients
+  item: Jaggery
+  measuringUnit: Kg
+  description: Brown sugar from sugar cane or from a palm tree
+  salesPrice: 0
+- category: All sweets
+  item: Jalebi
+  measuringUnit: Kg
+  description: >-
+    A sweet food that consists wheat flour (maida flour) batter in pretzel or
+    circular shapes, which are then soaked in sugar syrup.
+  salesPrice: 2.75
+- category: All sweets
+  item: Kaju katli
+  measuringUnit: Kg
+  description: >-
+    Exotic Sweets Made From Assorted Cashew Nuts, Pistachio & Saffron. 
+
+    Ingredients: Cashew Nut, Sugar, Pistachio, Cardamom, Saffron, Sunset Yellow
+    (E 110), Potassium Sorbate (E 202) & Silver Leaves Contains Cashew.
+  salesPrice: 7.4
+- category: Ingredients
+  item: Mango
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Mango modak
+  measuringUnit: Kg
+  description: |-
+    Ingredients:
+    1/2 cup thickened Mango pulp
+    3/4 cup sugar
+    1/2 cup khava (Khoya in Hindi)
+    1 tsp ghee
+  salesPrice: 6.5
+- category: All sweets
+  item: Matka kulfi
+  measuringUnit: Kg
+  description: |-
+    Ingredients for Matka Kulfi Recipe :
+
+    Milk 1 1/2 litres
+    Sugar 1/4 cup
+    Saffron (kesar) a few strands
+    Almonds toasted 10-12
+    Green cardamom powder a pinch
+  salesPrice: 2.2
+- category: Ingredients
+  item: Milk
+  measuringUnit: litre
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Milk cake
+  measuringUnit: Kg
+  description: >-
+    A sweet food made by cooking a mixture of milk, sugar, and rice or a similar
+    grain in the oven.
+  salesPrice: 4.6
+- category: Ladoos
+  item: Motichoor ladoo
+  measuringUnit: Kg
+  description: null
+  salesPrice: 5.5
+- category: All sweets
+  item: Mysore pak
+  measuringUnit: Kg
+  description: >-
+    Mysore pak is a rich sweet dish prepared in Ghee, from Southern India,
+    usually served as dessert. It is made of generous amounts of ghee, sugar,
+    gram flour, and often cardamom.
+  salesPrice: 7.25
+- category: Ingredients
+  item: Oil
+  measuringUnit: litre
+  description: null
+  salesPrice: 0
+- category: Ingredients
+  item: Peanut
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: All sweets
+  item: Peanut chikki
+  measuringUnit: Kg
+  description: null
+  salesPrice: 2.7
+- category: Ingredients
+  item: Raisin
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: Sweets Box
+  item: Raksha Bandhan special
+  measuringUnit: Qty
+  description: null
+  salesPrice: 12.99
+- category: Bengali sweets
+  item: Rasagulla
+  measuringUnit: Kg
+  description: null
+  salesPrice: 2
+- category: Bengali sweets
+  item: Rasmalai
+  measuringUnit: Kg
+  description: null
+  salesPrice: 3.3
+- category: Ingredients
+  item: Refined flour
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: Ingredients
+  item: Saffron
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: Ingredients
+  item: Semolina
+  measuringUnit: Kg
+  description: a sweet food made by cooking grains of crushed wheat with milk and sugar
+  salesPrice: 0
+- category: All sweets
+  item: Silver paper barfi
+  measuringUnit: Kg
+  description: null
+  salesPrice: 2.34
+- category: All sweets
+  item: Sohan Halwa
+  measuringUnit: Kg
+  description: null
+  salesPrice: 5.99
+- category: Ingredients
+  item: Sugar
+  measuringUnit: Kg
+  description: null
+  salesPrice: 0
+- category: Sweets Box
+  item: Wedding special
+  measuringUnit: Qty
+  description: null
+  salesPrice: 11
