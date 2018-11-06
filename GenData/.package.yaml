@@ -1,0 +1,89 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - generate
+  - dummy
+  - data
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/GenData.opack'
+description: >-
+  Helps in the quick generation of dummy data with already provided lists,
+  custom lists, already provided functions (including telecom functions) and
+  lists.
+name: GenData
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20181105'
+dependencies:
+  openaf: '>=20180601'
+files:
+  - .odoc.db
+  - .package.yaml
+  - funcs/baseFuncs.js
+  - funcs/baseGens.js
+  - funcs/clientFuncs.js
+  - funcs/telecomFuncs.js
+  - genData.js
+  - libs/automaton-1.11-8.jar
+  - libs/generex-1.0.2.jar
+  - libs/update.js
+  - lists/clients/list_addresses.yaml
+  - lists/clients/list_clients.yaml
+  - lists/clients/list_companies.yaml
+  - lists/clients/list_emaildomains.yaml
+  - lists/clients/list_emails.yaml
+  - lists/clients/list_names.yaml
+  - lists/other/list_things.yaml
+  - lists/products/list_food.yaml
+  - lists/products/list_products_computer_peripherals.yaml
+  - lists/products/list_products_electrical.yaml
+  - lists/products/list_products_electronics.yaml
+  - lists/products/list_products_mobile_phone_store.yaml
+  - lists/products/list_products_retail.yaml
+  - lists/products/list_products_sweets.yaml
+  - lists/telecom/list_phoneOperators.yaml
+  - lists/telecom/list_phonePatterns.yaml
+  - lists/telecom/list_phonePrefixes.yaml
+  - lists/telecom/list_phoneTACs.yaml
+  - README.md
+  - utils/genHelp.js
+  - utils/telecom/getPhonePatterns.js
+filesHash:
+  .odoc.db: 12f1f9d69eee1e020019c97766f8b3cf8a9cdea8
+  funcs/baseFuncs.js: a4d348275eb7f769a0ca22dde5223547cc525f76
+  funcs/baseGens.js: 1509f94aee5f971d504fb8c64579a4befe892013
+  funcs/clientFuncs.js: c75b55e5d663dfc771227171e7cc4a1353bc852b
+  funcs/telecomFuncs.js: 7d410a19201333514b9d811d6ed8f09244b16273
+  genData.js: b2da13840516ea21ac9637f217c60645983477f6
+  libs/automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
+  libs/generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
+  libs/update.js: a0ed4cbd814352784cdbdde05deea39a9b49c0eb
+  lists/clients/list_addresses.yaml: 8b80d62a8ce1a12dbc9822ca58dbcc793029ba59
+  lists/clients/list_clients.yaml: ffb4652ce2884ccf21b8ba5a1aa76e6f9086a3a1
+  lists/clients/list_companies.yaml: f92b8a48acbea50fa4c88a8c30b435da0e2583b1
+  lists/clients/list_emaildomains.yaml: ca9c48a559ce3c41366f3ce83ef2cc01eee7638a
+  lists/clients/list_emails.yaml: 24723fc932bf8452ace8113bbdedc15b5cd23c16
+  lists/clients/list_names.yaml: 6c688567212138b28d85e839771b1b533d63cde0
+  lists/other/list_things.yaml: 8ca4dac60db6974b7c626669ed3d0b4272f6689a
+  lists/products/list_food.yaml: 347e44ac42c1a092933d5dc81ebea904aeaf7c8d
+  lists/products/list_products_computer_peripherals.yaml: 2357fcf7f6866bdcedfb6925c897a46ba92765e1
+  lists/products/list_products_electrical.yaml: 121e6d901583c932c8682a821e014d079c280a17
+  lists/products/list_products_electronics.yaml: ac23311d9817c5c45904b138e086afb1a4a53d08
+  lists/products/list_products_mobile_phone_store.yaml: 4ef001bbee00c52ddf16f056cf22bd1ff75dce11
+  lists/products/list_products_retail.yaml: af39602f8eb536ea33a2f8786a8f88d62f84b0df
+  lists/products/list_products_sweets.yaml: e55158069d89b73b0992fb946e94d1b0bb9f86ab
+  lists/telecom/list_phoneOperators.yaml: 8f25c385f1f953fbc2191b5f5c5b02761dad355a
+  lists/telecom/list_phonePatterns.yaml: 20dcef4f12d7a27c31ffeccb1f72922a11985b69
+  lists/telecom/list_phonePrefixes.yaml: f64f36a30468c85dea1ca40efac03e9007f1aeb1
+  lists/telecom/list_phoneTACs.yaml: 6007724d703f1291c12450e2274f3f327742d7a1
+  README.md: 76efa0bf9522122d00b5df82d993909d21870353
+  utils/genHelp.js: 0b164ab05cc50456ceed72d715736b55fd0ddba2
+  utils/telecom/getPhonePatterns.js: fc03e02f68c8878313701934119da905994e9f5f

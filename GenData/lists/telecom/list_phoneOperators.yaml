@@ -1,0 +1,107 @@
+# From https://www.imei.info/carriers
+# From https://www.itu.int/pub/T-SP-E.118-2012 
+
+# https://www.imei.info/carriers
+- operator : "BT"
+  country  : "GB"
+  mcc      : "234"
+  mnc      : "00"
+  simIssuer:
+    - 894400
+    - 894401
+    - 894405 
+- operator: "O2"
+  country  : "GB"
+  mcc     : "234"
+  mnc     : "02"
+- operator: "Orange"
+  country  : "GB"
+  mcc     : "234"
+  mnc     : "33"
+- operator: "Vodafone"
+  country  : "GB"
+  mcc     : "234"
+  mnc     : "100"
+- operator : "Virgin Mobile"
+  country  : "GB"
+  mcc      : "234"
+  mnc      : "38"
+  simIssuer:
+    - 8988239
+    - 894410
+- operator : "Tesco Mobile"
+  country  : "GB"
+  mcc      : "234"
+  mnc      : "100"
+  simIssuer:
+    - 894435
+    - 894428
+    - 894488
+- operator: "T-Mobile"
+  country  : "GB"
+  mcc     : "234"
+  mnc     : "30"
+- operator: "ATT"
+  country : "US"
+  mcc     : "310"
+  mnc     : "016"
+- operator: "ATT Mobile"
+  country : "US"
+  mcc     : "310"
+  mnc     : "380"
+- operator: "Sprint"
+  country : "US"
+  mcc     : "310"
+  mnc     : "120"
+- operator: "Suncom"
+  country : "US"
+  mcc     : "310"
+  mnc     : "490"
+- operator: "T-Mobile"
+  country : "US"
+  mcc     : "310"
+  mnc     : "026"
+- operator: "Ting"
+  country : "US"
+  mcc     : "310"
+  mnc     : "260"
+- operator: "TracFone"
+  country : "US"
+  mcc     : "310"
+  mnc     : "999"
+- operator: "Union Telephone"
+  country : "US"
+  mcc     : "310"
+  mnc     : "020"
+- operator: "US Cellular"
+  country : "US"
+  mcc     : "310"
+  mnc     : "066"
+- operator : "Verizon Wireless"
+  country : "US"
+  mcc      : "310"
+  mnc      : "004"
+  simIssuer: 
+    - 891433
+    - 891444
+    - 891483
+    - 891486
+    - 891487
+    - 891480
+    - 891808
+- operator: "Viaero"
+  country : "US"
+  mcc     : "310"
+  mnc     : "450"
+- operator: "Virgin Mobile"
+  country : "US"
+  mcc     : "310"
+  mnc     : "053"
+- operator: "West Central Wireless"
+  country : "US"
+  mcc     : "310"
+  mnc     : "180"
+- operator: "XIT Communications"
+  country : "US"
+  mcc     : "310"
+  mnc     : "950"

@@ -1,0 +1,197 @@
+- category: MOBILES
+  item: BlackBerry Z10
+  measuringUnit: Qty
+  description: BlackBerry Z10 (Charcoal Black)
+  brand: Black Berry
+  color: Charcoal Black
+  salesPrice: 434.9
+- category: CAMERAS
+  item: 'Canon EOS 600D SLR (Black, with Kit II EF S18-135mm IS Lens)'
+  measuringUnit: Qty
+  description: 'Canon EOS 600D SLR (Black, with Kit II EF S18-135mm IS Lens)'
+  brand: Canon
+  color: Black
+  salesPrice: 120
+- category: LAPTOPS
+  item: Dell Inspiron 15R Laptop (3rd Gen Ci7/ 4GB/ 1TB/ Win7 HB/ 1GB Graph)
+  measuringUnit: Qty
+  description: "Dell Inspiron 15R Laptop (3rd Gen Ci7/ 4GB/ 1TB/ Win7 HB/ 1GB Graph)\r\n(Silver & Black, Silver and Black)"
+  brand: Dell
+  color: Silver & Black
+  salesPrice: 582.85
+- category: MOBILES
+  item: HTC One X ( with 32 GB)
+  measuringUnit: Qty
+  description: 'HTC One X (Brown Gray, with 32 GB)'
+  brand: HTC
+  color: Brown Gray
+  salesPrice: 349.99
+- category: HOME THEATERS
+  item: JBL Cinema BD100 5.1 Home Theatre System
+  measuringUnit: Qty
+  description: JBL Cinema BD100 5.1 Home Theatre System
+  brand: JBL
+  color: Black
+  salesPrice: 227.99
+- category: LAPTOPS
+  item: >-
+    Lenovo Essential B480 (59-343080) Laptop (3rd Gen Ci5/ 2GB/ 500GB/ Win7
+    Prof)
+  measuringUnit: Qty
+  description: >-
+    Lenovo Essential B480 (59-343080) Laptop (3rd Gen Ci5/ 2GB/ 500GB/ Win7
+    Prof)
+  brand: Lenovo
+  color: Black
+  salesPrice: 410
+- category: LAPTOPS
+  item: >-
+    Lenovo Ideapad Yoga 11 (59-345700) Netbook (Tegra Quad-core/ 2GB/ 64GB SSD/
+    Win RT)
+  measuringUnit: Qty
+  description: >-
+    Lenovo Ideapad Yoga 11 (59-345700) Netbook (Tegra Quad-core/ 2GB/ 64GB SSD/
+    Win RT)(Razor Grey)
+  brand: Lenovo
+  color: Razor Gray
+  salesPrice: 562.79
+- category: TV Items
+  item: LG 32LD340 LCD TV
+  measuringUnit: Qty
+  description: LG 32LD340 LCD TV
+  brand: LG
+  color: Black
+  salesPrice: 120
+- category: TV Items
+  item: LG 42LK430
+  measuringUnit: Qty
+  description: LG 42LK430
+  brand: LG
+  color: Black
+  salesPrice: 121
+- category: TV Items
+  item: LG CINEMA 3D
+  measuringUnit: Qty
+  description: LG-LED-3
+  brand: LG
+  color: Blue Ray
+  salesPrice: 120
+- category: TV Items
+  item: LG moves 300 84-inch 4K/Ultra HD TV
+  measuringUnit: Qty
+  description: LG moves 300 84-inch 4K/Ultra HD TV
+  brand: LG
+  color: Brown Gray
+  salesPrice: 123
+- category: TV Items
+  item: LG SMARTLIVE 500
+  measuringUnit: Qty
+  description: LG SMARTLIVE 500
+  brand: LG
+  color: Black
+  salesPrice: 110
+- category: CAMERAS
+  item: Nikon Coolpix L810 Point & Shoot
+  measuringUnit: Qty
+  description: Nikon Coolpix L810 Point & Shoot
+  brand: Nikon
+  color: Black
+  salesPrice: 110
+- category: CAMERAS
+  item: 'Nikon D5100 SLR (Black, with AF-S 18-55mm VR Kit Lens)'
+  measuringUnit: Qty
+  description: 'Nikon D5100 SLR (Black, with AF-S 18-55mm VR Kit Lens)'
+  brand: Nikon
+  color: Black
+  salesPrice: 100
+- category: MOBILES
+  item: Nokia Lumia 620
+  measuringUnit: Qty
+  description: "Nokia Lumia 620\r\n(White)"
+  brand: Nokia
+  color: White
+  salesPrice: 149.99
+- category: HOME THEATERS
+  item: Philips HTS5561 Blu Ray 3D 5.1 Home Theatre System
+  measuringUnit: Qty
+  description: Philips HTS5561 Blu Ray 3D 5.1 Home Theatre System
+  brand: Philips
+  color: Blue Ray
+  salesPrice: 269.99
+- category: CAMERAS
+  item: Samsung F90 Camcorder (Black)
+  measuringUnit: Qty
+  description: Samsung F90 Camcorder (Black)
+  brand: Samsung
+  color: Black
+  salesPrice: 130
+- category: MOBILES
+  item: Samsung Galaxy Ace S5830i ( with 2 GB Micro SD Card)
+  measuringUnit: Qty
+  description: 'Samsung Galaxy Ace S5830i (Onyx Black, with 2 GB Micro SD Card)'
+  brand: Samsung
+  color: Onyx Black
+  salesPrice: 92
+- category: MOBILES
+  item: Samsung Galaxy Y S5360 ( with bundled 8 GB Memory Card)
+  measuringUnit: Qty
+  description: 'Samsung Galaxy Y S5360 (Absolute Black, with bundled 8 GB Memory Card)'
+  brand: Samsung
+  color: Absolute Black
+  salesPrice: 56.99
+- category: LAPTOPS
+  item: Samsung NP350V5C-S06IN Laptop (3rd Gen Ci7/ 8GB/ 1TB/ Win7 HP/ 2GB Graph)
+  measuringUnit: Qty
+  description: "Samsung NP350V5C-S06IN Laptop (3rd Gen Ci7/ 8GB/ 1TB/ Win7 HP/ 2GB Graph)\r\n(Silver)"
+  brand: Samsung
+  color: Silver
+  salesPrice: 529.9
+- category: CAMERAS
+  item: Sony Alpha A77VM SLR
+  measuringUnit: Qty
+  description: Sony Alpha A77VM SLR
+  brand: Sony
+  color: Black
+  salesPrice: 140
+- category: HOME THEATERS
+  item: Sony BDV-N990 5.1 Home Theatre System
+  measuringUnit: Qty
+  description: Sony BDV-N990 5.1 Home Theatre System
+  brand: Sony
+  color: Black
+  salesPrice: 390
+- category: HOME THEATERS
+  item: Sony HT-DDW5500 6.2 Home Theatre System
+  measuringUnit: Qty
+  description: Sony HT-DDW5500 6.2 Home Theatre System
+  brand: Sony
+  color: Black
+  salesPrice: 379.99
+- category: HOME THEATERS
+  item: Sony HT-M5 5.2 Home Theatre System
+  measuringUnit: Qty
+  description: Sony HT-M5 5.2 Home Theatre System
+  brand: Sony
+  color: Black
+  salesPrice: 489.99
+- category: LAPTOPS
+  item: Sony VAIO E14A25CN Laptop (3rd Gen Ci5/ 4GB/ 750GB/ Win8/ 2GB Graph)
+  measuringUnit: Qty
+  description: "Sony VAIO E14A25CN Laptop (3rd Gen Ci5/ 4GB/ 750GB/ Win8/ 2GB Graph)\r\n(Black))"
+  brand: Sony
+  color: Black
+  salesPrice: 570
+- category: LAPTOPS
+  item: Sony VAIO E14A25CN/PI Laptop (3rd Gen Ci5/ 4GB/ 750GB/ Win8/ 2GB Graph)
+  measuringUnit: Qty
+  description: "Sony VAIO E14A25CN/PI Laptop (3rd Gen Ci5/ 4GB/ 750GB/ Win8/ 2GB Graph)\r\n(Pink)"
+  brand: Sony
+  color: Pink
+  salesPrice: 589
+- category: MOBILES
+  item: Sony Xperia J
+  measuringUnit: Qty
+  description: Sony Xperia J (Black)
+  brand: Sony
+  color: Black
+  salesPrice: 134.99

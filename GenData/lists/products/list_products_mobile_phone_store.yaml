@@ -1,0 +1,233 @@
+- category: Tablets
+  item: Apple 16 GB iPad Mini
+  measuringUnit: Qty
+  description: "5 MP Primary camera\niOS 7\niOS 8 Upgradable\n1.2 MP Secondary Camera"
+  salesPrice: 204.9
+- category: Tablets
+  item: Apple iPad Air 2
+  measuringUnit: Qty
+  description: "9.7 inch Touchscreen\n8 MP Primary Camera\niOS 8\n1.2 MP Secondary Camera"
+  salesPrice: 529
+- category: Tablets
+  item: Apple iPad Air 2 Wi-Fi
+  measuringUnit: Qty
+  description: "iOS 8\n8 MP Primary Camera\n1.2 MP Secondary Camera\n9.7 inch Touchscreen"
+  salesPrice: 429
+- category: Smartphones
+  item: Apple iPhone 4S (8 GB)
+  measuringUnit: Qty
+  description: null
+  salesPrice: 170
+- category: Smartphones
+  item: Apple iPhone 5c
+  measuringUnit: Qty
+  description: null
+  salesPrice: 214.99
+- category: Smartphones
+  item: Apple iPhone 6
+  measuringUnit: Qty
+  description: null
+  salesPrice: 358.99
+- category: Smartphones
+  item: Apple iPhone 6s
+  measuringUnit: Qty
+  description: null
+  salesPrice: 464.99
+- category: Accessories
+  item: Back Cover for Apple iPhone 5S
+  measuringUnit: Qty
+  description: null
+  salesPrice: 4
+- category: Giftcards
+  item: Gift Card 1000
+  measuringUnit: Qty
+  description: null
+  salesPrice: 10
+- category: Giftcards
+  item: Gift Card 2000
+  measuringUnit: Qty
+  description: null
+  salesPrice: 20
+- category: Giftcards
+  item: Gift Card 500
+  measuringUnit: Qty
+  description: null
+  salesPrice: 5
+- category: Accessories
+  item: How to Chill Like A Cat Case
+  measuringUnit: Qty
+  description: null
+  salesPrice: 11.85
+- category: Accessories
+  item: iPro IP 43 Powerbank 20800 mAh
+  measuringUnit: Qty
+  description: null
+  salesPrice: 17.49
+- category: Accessories
+  item: iPro IP1042 Powerbank 10400 mAh
+  measuringUnit: Qty
+  description: null
+  salesPrice: 27.99
+- category: Accessories
+  item: JBL T200A Headset
+  measuringUnit: Qty
+  description: null
+  salesPrice: 13.99
+- category: Accessories
+  item: Leather Look-Alike Case for IPhone 6
+  measuringUnit: Qty
+  description: null
+  salesPrice: 11.85
+- category: Accessories
+  item: Mguru M20 Power Bank 20000 mAh
+  measuringUnit: Qty
+  description: null
+  salesPrice: 14.49
+- category: Accessories
+  item: Mguru Power Bank 40000 mAh
+  measuringUnit: Qty
+  description: null
+  salesPrice: 6.99
+- category: Accessories
+  item: Motorola Lumineers Wired Headset
+  measuringUnit: Qty
+  description: null
+  salesPrice: 5.99
+- category: Basic Phones
+  item: Nokia 105
+  measuringUnit: Qty
+  description: null
+  salesPrice: 13.29
+- category: Basic Phones
+  item: Nokia 130
+  measuringUnit: Qty
+  description: null
+  salesPrice: 17.59
+- category: Basic Phones
+  item: Nokia 222
+  measuringUnit: Qty
+  description: null
+  salesPrice: 29.65
+- category: Smartphones
+  item: Nokia 230 DS
+  measuringUnit: Qty
+  description: null
+  salesPrice: 41.75
+- category: Smartphones
+  item: Nokia Asha 210
+  measuringUnit: Qty
+  description: null
+  salesPrice: 45.84
+- category: Basic Phones
+  item: Nokia Asha 311
+  measuringUnit: Qty
+  description: null
+  salesPrice: 34.99
+- category: Smartphones
+  item: Nokia Lumia 520
+  measuringUnit: Qty
+  description: null
+  salesPrice: 60
+- category: Smartphones
+  item: Nokia Lumia 530
+  measuringUnit: Qty
+  description: null
+  salesPrice: 59.49
+- category: Smartphones
+  item: Nokia Lumia 620
+  measuringUnit: Qty
+  description: null
+  salesPrice: 75.4
+- category: Smartphones
+  item: Nokia X2
+  measuringUnit: Qty
+  description: null
+  salesPrice: 74.5
+- category: Smartphones
+  item: OnePlus 2 S Black 16 GB
+  measuringUnit: Qty
+  description: >-
+    Standstone Black 16 GB with 13MP primary camera with f/2.0 Aperture, 1.3 µm
+    Pixels, 6-lenses, Dual LED Flash, advanced Laser Autofocus with Optical
+    Image Stabilisation (OIS) and 5MP front facing camera.
+  salesPrice: 209.99
+- category: Basic Phones
+  item: Samsung B229
+  measuringUnit: Qty
+  description: "1.52 inch Screen\nAlphamuneric Keypad\n1000 mAh Battery"
+  salesPrice: 19.99
+- category: Smartphones
+  item: Samsung Galaxy A8
+  measuringUnit: Qty
+  description: null
+  salesPrice: 265.86
+- category: Smartphones
+  item: Samsung Galaxy Ace NXT
+  measuringUnit: Qty
+  description: null
+  salesPrice: 52.99
+- category: Smartphones
+  item: Samsung Galaxy J1 Ace
+  measuringUnit: Qty
+  description: null
+  salesPrice: 62.9
+- category: Smartphones
+  item: Samsung Galaxy S5
+  measuringUnit: Qty
+  description: null
+  salesPrice: 219.99
+- category: Smartphones
+  item: Samsung Galaxy S6 Edge
+  measuringUnit: Qty
+  description: "6MP primary camera with optical image stabilization, auto focus, LED flash and 5MP front facing camera\n5.1-inch (12.95 centimeters) super AMOLED capacitive touchscreen with 1440 x 2560 pixels resolution, 577 ppi pixel density and 16M color support\nAndroid v5.0.2 Lollipop operating system with 1.5GHz Cortex-A53 quad core and 2.1GHz Cortex-A57 quad core processor, Mali-T760 GPU, 3GB RAM, 32GB internal memory and single SIM"
+  salesPrice: 409
+- category: Smartphones
+  item: Samsung Galaxy S7 Edge
+  measuringUnit: Qty
+  description: "QHD S AMOLED Display\n4 GB RAM | 32 GB ROM\nDual Pixel Camera\n3600 mAh Battery"
+  salesPrice: 569
+- category: Smartphones
+  item: Samsung Galaxy S7
+  measuringUnit: Qty
+  description: "Android v6 (Marshmallow) OS\n12 MP Primary Camera\n5 MP Secondary Camera\n5.1 inch Super AMOLED Touchscreen\n2.3 GHz + 1.6 GHz Exynos 8890 Octa Core Processor\nExpandable Storage Capacity of 200 GB"
+  salesPrice: 489
+- category: Tablets
+  item: Samsung Galaxy Tab A T355
+  measuringUnit: Qty
+  description: "8 cm Display\n16 GB Storage\nAndroid OS"
+  salesPrice: 191.99
+- category: Basic Phones
+  item: Samsung Guru E1200
+  measuringUnit: Qty
+  description: "1.5 inch TFT Screen\n2G Network Support\nAlphanumeric Keypad\nAnti-dust Keypad"
+  salesPrice: 11.9
+- category: Basic Phones
+  item: Samsung Guru Music 2
+  measuringUnit: Qty
+  description: "Operating System Version: NA\nPrimary Camera: 0 megapixel\nSim Type: Dual Sim\nSecondary Camera: 0 megapixel"
+  salesPrice: 16.5
+- category: Accessories
+  item: SanDisk Basic 8 GB  Memory Card
+  measuringUnit: Qty
+  description: "Capacity 16 GB\nClass 10\nRead Speed 48MB/s\nWater-proof"
+  salesPrice: 1.89
+- category: Accessories
+  item: SanDisk Ultra 8 GB MicroSDHC  Memory Card
+  measuringUnit: Qty
+  description: "Capacity 16 GB\nClass 10\nRead Speed 48MB/s\nWater-proof"
+  salesPrice: 4.49
+- category: Accessories
+  item: Sony MDR-XB450AP Wired Headphones
+  measuringUnit: Qty
+  description: "Over the Ear Headphone\nWired Connectivity\nOver the Head"
+  salesPrice: 22.4
+- category: Accessories
+  item: Sony NWZ-WH303
+  measuringUnit: Qty
+  description: "Wired Connectivity\nCircumaural Headphone\nWireless Music Player\nOn the Ear Headphone"
+  salesPrice: 81.99
+- category: Accessories
+  item: Transcend 32 GB Memory Card
+  measuringUnit: Qty
+  description: "Class 4\n4 MB/s Write Speed\n32 GB Card"
+  salesPrice: 5.77
