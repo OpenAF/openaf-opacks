@@ -42,6 +42,7 @@ var GenData = function(chGen, chDump) {
     this.list = {};
     this.listType = {};
     this.extraFuncs = {};
+    this.parallel = false;
 
     listFilesRecursive(getOPackPath("GenData") + "/funcs").forEach((v) => {
         this.extraFuncs = merge(this.extraFuncs, require(v.canonicalPath));
@@ -68,6 +69,11 @@ GenData.prototype.getDumpCh = function() {
     return $ch(this.chDump);
 };
 
+GenData.prototype.setParallel = function(aFlag) {
+    this.parallel = aFlag;
+    return this;
+};
+
 // GENERATE FUNCTIONS
 // ------------------
 
@@ -83,14 +89,28 @@ GenData.prototype.generate = function(aFunc, numberOfSamples) {
     if (isUnDef(numberOfSamples)) numberOfSamples = 1;
     var res = [];
 
-    for (var ii = 0; ii < numberOfSamples; ii++) {
-        var rec = {};
-        rec = aFunc(this, this.extraFuncs);
-        if (isObject(rec)) {
-            rec.___i = nowNano();
-            res.push(rec);
-        } else {
-            throw "not an object: '" + rec + "'";
+    if (this.parallel) {
+        var parent = this;
+        var arr = new Array(numberOfSamples).join().split(',');
+        res = parallel4Array(arr, function(v) {
+            var rec = aFunc(parent, parent.extraFuncs);
+            if (isObject(rec)) {
+                rec.___i = nowNano();
+                return rec;
+            } else {
+                return void 0;
+            }
+        });
+    } else {
+        for (var ii = 0; ii < numberOfSamples; ii++) {
+            var rec = {};
+            rec = aFunc(this, this.extraFuncs);
+            if (isObject(rec)) {
+                rec.___i = nowNano();
+                res.push(rec);
+            } else {
+                throw "not an object: '" + rec + "'";
+            }
         }
     }
 
@@ -113,10 +133,19 @@ GenData.prototype.generateFromList = function(aName, aFunc) {
     if (this.listType[aName] == "C") lis = this.list[aName].getKeys();
     if (this.listType[aName] == "S") lis = this.list[aName];
 
-    for(var ii in lis) {
-        var rec = aFunc(this, this.extraFuncs, lis[ii]);
-        rec.___i = nowNano();
-        res.push(rec);
+    if (this.parallel) {
+        var parent = this;
+        res = parallel4Array(lis, function(v) {
+            var rec = aFunc(parent, parent.extraFuncs, v);
+            rec.___i = nowNano();
+            return rec;
+        });
+    } else {
+        for(var ii in lis) {
+            var rec = aFunc(this, this.extraFuncs, lis[ii]);
+            rec.___i = nowNano();
+            res.push(rec);
+        }
     }
 
     this.getGenCh().setAll(["___i"], res);
@@ -134,10 +163,19 @@ GenData.prototype.generateFromArray = function(anArray, aFunc) {
     _$(anArray).isArray("Need to provide an array.");
     var res = [];
 
-    for(var ii in anArray) {
-        var rec = aFunc(this, this.extraFuncs, anArray[ii]);
-        rec.___i = nowNano();
-        res.push(rec);
+    if (this.parallel) {
+        var parent = this;
+        res = parallel4Array(anArray, function() {
+            var rec = aFunc(parent, parent.extraFuncs, anArray[ii]);
+            rec.___i = nowNano();
+            return rec;
+        });
+    } else {
+        for(var ii in anArray) {
+            var rec = aFunc(this, this.extraFuncs, anArray[ii]);
+            rec.___i = nowNano();
+            res.push(rec);
+        }
     }
 
     this.getGenCh().setAll(["___i"], res);

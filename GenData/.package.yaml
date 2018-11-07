@@ -21,12 +21,13 @@ name: GenData
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20181105'
+version: '20181106'
 dependencies:
   openaf: '>=20180601'
 files:
   - .odoc.db
   - .package.yaml
+  - docs/Examples.md
   - funcs/baseFuncs.js
   - funcs/baseGens.js
   - funcs/clientFuncs.js
@@ -58,11 +59,12 @@ files:
   - utils/telecom/getPhonePatterns.js
 filesHash:
   .odoc.db: 12f1f9d69eee1e020019c97766f8b3cf8a9cdea8
+  docs/Examples.md: 6cfc73339b296281cc64a8854214e303b471554f
   funcs/baseFuncs.js: a4d348275eb7f769a0ca22dde5223547cc525f76
   funcs/baseGens.js: 1509f94aee5f971d504fb8c64579a4befe892013
   funcs/clientFuncs.js: c75b55e5d663dfc771227171e7cc4a1353bc852b
-  funcs/telecomFuncs.js: 7d410a19201333514b9d811d6ed8f09244b16273
-  genData.js: b2da13840516ea21ac9637f217c60645983477f6
+  funcs/telecomFuncs.js: edf25c82c74fa9d18bc40f693c8b86e5a8d51fb6
+  genData.js: fbda6c60deb9631af87d3d47b5a01ec6158f41eb
   libs/automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
   libs/generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
   libs/update.js: a0ed4cbd814352784cdbdde05deea39a9b49c0eb

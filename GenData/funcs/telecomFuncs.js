@@ -1,4 +1,9 @@
 (function() {
+    exports.genFullPhone = function(aGenData, aCountry, aType) {
+        var p = this.genPhone(aGenData, aCountry, aType, false, true);
+        return "+" + p.countryCode + p.phone;
+    };
+
     /**
      * <odoc>
      * <key>GenData.funcs.genPhone(aGenData, aCountry, aType, addOperator, addCountryCode) : Object</key>
@@ -89,10 +94,14 @@
             opr = aGenData.getFromList("genData::phoneTACs");
         }
 
-        return {
-            imei: String(opr.tac) + aGenData.randomLongString(15 - (opr.tac.length)),
-            model: opr.name
-        };
+        if (isDef(opr)) {
+            return {
+                imei: String(opr.tac) + aGenData.randomLongString(15 - (opr.tac.length)),
+                model: opr.name
+            };
+        } else {
+            throw "Model not found.";
+        }
     };
 
     /**
