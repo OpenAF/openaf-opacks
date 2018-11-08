@@ -82,7 +82,7 @@ filesHash:
   lists/products/list_products_mobile_phone_store.yaml: 4ef001bbee00c52ddf16f056cf22bd1ff75dce11
   lists/products/list_products_retail.yaml: af39602f8eb536ea33a2f8786a8f88d62f84b0df
   lists/products/list_products_sweets.yaml: e55158069d89b73b0992fb946e94d1b0bb9f86ab
-  lists/telecom/list_phoneOperators.yaml: 8f25c385f1f953fbc2191b5f5c5b02761dad355a
+  lists/telecom/list_phoneOperators.yaml: a871ec0255e687de1352bef62d31adc13fa839d7
   lists/telecom/list_phonePatterns.yaml: 20dcef4f12d7a27c31ffeccb1f72922a11985b69
   lists/telecom/list_phonePrefixes.yaml: f64f36a30468c85dea1ca40efac03e9007f1aeb1
   lists/telecom/list_phoneTACs.yaml: 6007724d703f1291c12450e2274f3f327742d7a1

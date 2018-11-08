@@ -2,86 +2,86 @@
 # From https://www.itu.int/pub/T-SP-E.118-2012 
 
 # https://www.imei.info/carriers
-- operator : "BT"
-  country  : "GB"
-  mcc      : "234"
-  mnc      : "00"
+- operator: BT
+  country: GB
+  mcc: '234'
+  mnc: '00'
   simIssuer:
     - 894400
     - 894401
-    - 894405 
-- operator: "O2"
-  country  : "GB"
-  mcc     : "234"
-  mnc     : "02"
-- operator: "Orange"
-  country  : "GB"
-  mcc     : "234"
-  mnc     : "33"
-- operator: "Vodafone"
-  country  : "GB"
-  mcc     : "234"
-  mnc     : "100"
-- operator : "Virgin Mobile"
-  country  : "GB"
-  mcc      : "234"
-  mnc      : "38"
+    - 894405
+- operator: O2
+  country: GB
+  mcc: '234'
+  mnc: '02'
+- operator: Orange
+  country: GB
+  mcc: '234'
+  mnc: '33'
+- operator: Vodafone
+  country: GB
+  mcc: '234'
+  mnc: '100'
+- operator: Virgin Mobile
+  country: GB
+  mcc: '234'
+  mnc: '38'
   simIssuer:
     - 8988239
     - 894410
-- operator : "Tesco Mobile"
-  country  : "GB"
-  mcc      : "234"
-  mnc      : "100"
+- operator: Tesco Mobile
+  country: GB
+  mcc: '234'
+  mnc: '100'
   simIssuer:
     - 894435
     - 894428
     - 894488
-- operator: "T-Mobile"
-  country  : "GB"
-  mcc     : "234"
-  mnc     : "30"
-- operator: "ATT"
-  country : "US"
-  mcc     : "310"
-  mnc     : "016"
-- operator: "ATT Mobile"
-  country : "US"
-  mcc     : "310"
-  mnc     : "380"
-- operator: "Sprint"
-  country : "US"
-  mcc     : "310"
-  mnc     : "120"
-- operator: "Suncom"
-  country : "US"
-  mcc     : "310"
-  mnc     : "490"
-- operator: "T-Mobile"
-  country : "US"
-  mcc     : "310"
-  mnc     : "026"
-- operator: "Ting"
-  country : "US"
-  mcc     : "310"
-  mnc     : "260"
-- operator: "TracFone"
-  country : "US"
-  mcc     : "310"
-  mnc     : "999"
-- operator: "Union Telephone"
-  country : "US"
-  mcc     : "310"
-  mnc     : "020"
-- operator: "US Cellular"
-  country : "US"
-  mcc     : "310"
-  mnc     : "066"
-- operator : "Verizon Wireless"
-  country : "US"
-  mcc      : "310"
-  mnc      : "004"
-  simIssuer: 
+- operator: T-Mobile
+  country: GB
+  mcc: '234'
+  mnc: '30'
+- operator: ATT
+  country: US
+  mcc: '310'
+  mnc: '016'
+- operator: ATT Mobile
+  country: US
+  mcc: '310'
+  mnc: '380'
+- operator: Sprint
+  country: US
+  mcc: '310'
+  mnc: '120'
+- operator: Suncom
+  country: US
+  mcc: '310'
+  mnc: '490'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '026'
+- operator: Ting
+  country: US
+  mcc: '310'
+  mnc: '260'
+- operator: TracFone
+  country: US
+  mcc: '310'
+  mnc: '999'
+- operator: Union Telephone
+  country: US
+  mcc: '310'
+  mnc: '020'
+- operator: US Cellular
+  country: US
+  mcc: '310'
+  mnc: '066'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '004'
+  simIssuer:
     - 891433
     - 891444
     - 891483
@@ -89,19 +89,6711 @@
     - 891487
     - 891480
     - 891808
-- operator: "Viaero"
-  country : "US"
-  mcc     : "310"
-  mnc     : "450"
-- operator: "Virgin Mobile"
-  country : "US"
-  mcc     : "310"
-  mnc     : "053"
-- operator: "West Central Wireless"
-  country : "US"
-  mcc     : "310"
-  mnc     : "180"
-- operator: "XIT Communications"
-  country : "US"
-  mcc     : "310"
-  mnc     : "950"
+- operator: Viaero
+  country: US
+  mcc: '310'
+  mnc: '450'
+- operator: Virgin Mobile
+  country: US
+  mcc: '310'
+  mnc: '053'
+- operator: West Central Wireless
+  country: US
+  mcc: '310'
+  mnc: '180'
+- operator: XIT Communications
+  country: US
+  mcc: '310'
+  mnc: '950'
+- operator: A-Mobile
+  country: GE
+  mcc: '289'
+  mnc: '88'
+- operator: A-Mobile
+  country: GE
+  mcc: '289'
+  mnc: '68'
+- operator: Aquafon
+  country: GE
+  mcc: '289'
+  mnc: '67'
+- operator: Afghan Telecom Corp. (AT)
+  country: AF
+  mcc: '412'
+  mnc: '88'
+- operator: Afghan Telecom Corp. (AT)
+  country: AF
+  mcc: '412'
+  mnc: '80'
+- operator: Afghan Wireless/AWCC
+  country: AF
+  mcc: '412'
+  mnc: '01'
+- operator: Areeba/MTN
+  country: AF
+  mcc: '412'
+  mnc: '40'
+- operator: Etisalat
+  country: AF
+  mcc: '412'
+  mnc: '50'
+- operator: Etisalat
+  country: AF
+  mcc: '412'
+  mnc: '30'
+- operator: Roshan/TDCA
+  country: AF
+  mcc: '412'
+  mnc: '20'
+- operator: WaselTelecom (WT)
+  country: AF
+  mcc: '412'
+  mnc: '03'
+- operator: AMC/Cosmote
+  country: AL
+  mcc: '276'
+  mnc: '01'
+- operator: Eagle Mobile
+  country: AL
+  mcc: '276'
+  mnc: '03'
+- operator: PLUS Communication Sh.a
+  country: AL
+  mcc: '276'
+  mnc: '04'
+- operator: Vodafone
+  country: AL
+  mcc: '276'
+  mnc: '02'
+- operator: ATM Mobils
+  country: DZ
+  mcc: '603'
+  mnc: '01'
+- operator: Orascom / DJEZZY
+  country: DZ
+  mcc: '603'
+  mnc: '02'
+- operator: Oreedo/Wataniya / Nedjma
+  country: DZ
+  mcc: '603'
+  mnc: '03'
+- operator: Blue Sky Communications
+  country: AS
+  mcc: '544'
+  mnc: '11'
+- operator: Mobiland
+  country: AD
+  mcc: '213'
+  mnc: '03'
+- operator: MoviCel
+  country: AO
+  mcc: '631'
+  mnc: '04'
+- operator: Unitel
+  country: AO
+  mcc: '631'
+  mnc: '02'
+- operator: Cable and Wireless
+  country: AI
+  mcc: '365'
+  mnc: '840'
+- operator: Digicell / Wireless Vent. Ltd
+  country: AI
+  mcc: '365'
+  mnc: '010'
+- operator: APUA PCS
+  country: AG
+  mcc: '344'
+  mnc: '030'
+- operator: C & W
+  country: AG
+  mcc: '344'
+  mnc: '920'
+- operator: DigiCel/Cing. Wireless
+  country: AG
+  mcc: '344'
+  mnc: '930'
+- operator: Claro/ CTI/AMX
+  country: AR
+  mcc: '722'
+  mnc: '310'
+- operator: Claro/ CTI/AMX
+  country: AR
+  mcc: '722'
+  mnc: '330'
+- operator: Claro/ CTI/AMX
+  country: AR
+  mcc: '722'
+  mnc: '320'
+- operator: Compania De Radiocomunicaciones Moviles SA
+  country: AR
+  mcc: '722'
+  mnc: '010'
+- operator: Movistar/Telefonica
+  country: AR
+  mcc: '722'
+  mnc: '070'
+- operator: Nextel
+  country: AR
+  mcc: '722'
+  mnc: '020'
+- operator: Telecom Personal S.A.
+  country: AR
+  mcc: '722'
+  mnc: '341'
+- operator: Telecom Personal S.A.
+  country: AR
+  mcc: '722'
+  mnc: '340'
+- operator: ArmenTel/Beeline
+  country: AM
+  mcc: '283'
+  mnc: '01'
+- operator: Karabakh Telecom
+  country: AM
+  mcc: '283'
+  mnc: '04'
+- operator: Orange
+  country: AM
+  mcc: '283'
+  mnc: '10'
+- operator: Vivacell
+  country: AM
+  mcc: '283'
+  mnc: '05'
+- operator: Digicel
+  country: AW
+  mcc: '363'
+  mnc: '20'
+- operator: Digicel
+  country: AW
+  mcc: '363'
+  mnc: '02'
+- operator: Setar GSM
+  country: AW
+  mcc: '363'
+  mnc: '01'
+- operator: AAPT Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '14'
+- operator: Advanced Comm Tech Pty.
+  country: AU
+  mcc: '505'
+  mnc: '24'
+- operator: Airnet Commercial Australia Ltd..
+  country: AU
+  mcc: '505'
+  mnc: 09
+- operator: Department of Defense
+  country: AU
+  mcc: '505'
+  mnc: '04'
+- operator: Dialogue Communications Pty Ltd
+  country: AU
+  mcc: '505'
+  mnc: '26'
+- operator: H3G Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '12'
+- operator: H3G Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '06'
+- operator: Localstar Holding Pty. Ltd
+  country: AU
+  mcc: '505'
+  mnc: '88'
+- operator: Lycamobile Pty Ltd
+  country: AU
+  mcc: '505'
+  mnc: '19'
+- operator: Railcorp/Vodafone
+  country: AU
+  mcc: '505'
+  mnc: 08
+- operator: Railcorp/Vodafone
+  country: AU
+  mcc: '505'
+  mnc: '99'
+- operator: Railcorp/Vodafone
+  country: AU
+  mcc: '505'
+  mnc: '13'
+- operator: Singtel Optus
+  country: AU
+  mcc: '505'
+  mnc: '90'
+- operator: Singtel Optus
+  country: AU
+  mcc: '505'
+  mnc: '02'
+- operator: Telstra Corp. Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '72'
+- operator: Telstra Corp. Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '71'
+- operator: Telstra Corp. Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '01'
+- operator: Telstra Corp. Ltd.
+  country: AU
+  mcc: '505'
+  mnc: '11'
+- operator: The Ozitel Network Pty.
+  country: AU
+  mcc: '505'
+  mnc: '05'
+- operator: Victorian Rail Track Corp. (VicTrack)
+  country: AU
+  mcc: '505'
+  mnc: '16'
+- operator: Vodafone
+  country: AU
+  mcc: '505'
+  mnc: '03'
+- operator: Vodafone
+  country: AU
+  mcc: '505'
+  mnc: '07'
+- operator: A1 MobilKom
+  country: AT
+  mcc: '232'
+  mnc: '02'
+- operator: A1 MobilKom
+  country: AT
+  mcc: '232'
+  mnc: '11'
+- operator: A1 MobilKom
+  country: AT
+  mcc: '232'
+  mnc: '01'
+- operator: A1 MobilKom
+  country: AT
+  mcc: '232'
+  mnc: 09
+- operator: T-Mobile/Telering
+  country: AT
+  mcc: '232'
+  mnc: '15'
+- operator: H3G
+  country: AT
+  mcc: '232'
+  mnc: '14'
+- operator: H3G
+  country: AT
+  mcc: '232'
+  mnc: '10'
+- operator: 3/Orange/One Connect
+  country: AT
+  mcc: '232'
+  mnc: '06'
+- operator: 3/Orange/One Connect
+  country: AT
+  mcc: '232'
+  mnc: '05'
+- operator: 3/Orange/One Connect
+  country: AT
+  mcc: '232'
+  mnc: '12'
+- operator: Spusu/Mass Response
+  country: AT
+  mcc: '232'
+  mnc: '17'
+- operator: T-Mobile/Telering
+  country: AT
+  mcc: '232'
+  mnc: '07'
+- operator: T-Mobile/Telering
+  country: AT
+  mcc: '232'
+  mnc: '04'
+- operator: T-Mobile/Telering
+  country: AT
+  mcc: '232'
+  mnc: '03'
+- operator: Tele2
+  country: AT
+  mcc: '232'
+  mnc: '19'
+- operator: A1 MobilKom
+  country: AT
+  mcc: '232'
+  mnc: 08
+- operator: UPC Austria
+  country: AT
+  mcc: '232'
+  mnc: '13'
+- operator: Azercell Telekom B.M.
+  country: AZ
+  mcc: '400'
+  mnc: '01'
+- operator: Azerfon.
+  country: AZ
+  mcc: '400'
+  mnc: '04'
+- operator: Caspian American Telecommunications LLC (CATEL)
+  country: AZ
+  mcc: '400'
+  mnc: '03'
+- operator: J.V. Bakcell GSM 2000
+  country: AZ
+  mcc: '400'
+  mnc: '02'
+- operator: Bahamas Telco. Comp.
+  country: BS
+  mcc: '364'
+  mnc: '30'
+- operator: Bahamas Telco. Comp.
+  country: BS
+  mcc: '364'
+  mnc: '39'
+- operator: Bahamas Telco. Comp.
+  country: BS
+  mcc: '364'
+  mnc: '390'
+- operator: Smart Communications
+  country: BS
+  mcc: '364'
+  mnc: '03'
+- operator: Batelco
+  country: BH
+  mcc: '426'
+  mnc: '01'
+- operator: ZAIN/Vodafone
+  country: BH
+  mcc: '426'
+  mnc: '02'
+- operator: VIVA
+  country: BH
+  mcc: '426'
+  mnc: '04'
+- operator: Robi/Aktel
+  country: BD
+  mcc: '470'
+  mnc: '02'
+- operator: Citycell
+  country: BD
+  mcc: '470'
+  mnc: '06'
+- operator: Citycell
+  country: BD
+  mcc: '470'
+  mnc: '05'
+- operator: GrameenPhone
+  country: BD
+  mcc: '470'
+  mnc: '01'
+- operator: Orascom/Banglalink
+  country: BD
+  mcc: '470'
+  mnc: '03'
+- operator: TeleTalk
+  country: BD
+  mcc: '470'
+  mnc: '04'
+- operator: Airtel/Warid
+  country: BD
+  mcc: '470'
+  mnc: '07'
+- operator: LIME
+  country: BB
+  mcc: '342'
+  mnc: '600'
+- operator: Cingular Wireless
+  country: BB
+  mcc: '342'
+  mnc: '810'
+- operator: Digicel
+  country: BB
+  mcc: '342'
+  mnc: '750'
+- operator: Digicel
+  country: BB
+  mcc: '342'
+  mnc: '050'
+- operator: Sunbeach
+  country: BB
+  mcc: '342'
+  mnc: '820'
+- operator: BelCel JV
+  country: BY
+  mcc: '257'
+  mnc: '03'
+- operator: BeST
+  country: BY
+  mcc: '257'
+  mnc: '04'
+- operator: Mobile Digital Communications
+  country: BY
+  mcc: '257'
+  mnc: '01'
+- operator: MTS
+  country: BY
+  mcc: '257'
+  mnc: '02'
+- operator: Base/KPN
+  country: BE
+  mcc: '206'
+  mnc: '20'
+- operator: Belgacom/Proximus
+  country: BE
+  mcc: '206'
+  mnc: '01'
+- operator: Lycamobile Belgium
+  country: BE
+  mcc: '206'
+  mnc: '06'
+- operator: Mobistar/Orange
+  country: BE
+  mcc: '206'
+  mnc: '10'
+- operator: SNCT/NMBS
+  country: BE
+  mcc: '206'
+  mnc: '02'
+- operator: Telenet BidCo NV
+  country: BE
+  mcc: '206'
+  mnc: '05'
+- operator: DigiCell
+  country: BZ
+  mcc: '702'
+  mnc: '67'
+- operator: International Telco (INTELCO)
+  country: BZ
+  mcc: '702'
+  mnc: '68'
+- operator: Bell Benin/BBCOM
+  country: BJ
+  mcc: '616'
+  mnc: '04'
+- operator: Etisalat/MOOV
+  country: BJ
+  mcc: '616'
+  mnc: '02'
+- operator: GloMobile
+  country: BJ
+  mcc: '616'
+  mnc: '05'
+- operator: Libercom
+  country: BJ
+  mcc: '616'
+  mnc: '01'
+- operator: MTN/Spacetel
+  country: BJ
+  mcc: '616'
+  mnc: '03'
+- operator: Bermuda Digital Communications Ltd (BDC)
+  country: BM
+  mcc: '350'
+  mnc: '000'
+- operator: CellOne Ltd
+  country: BM
+  mcc: '350'
+  mnc: '99'
+- operator: DigiCel / Cingular
+  country: BM
+  mcc: '350'
+  mnc: '10'
+- operator: M3 Wireless Ltd
+  country: BM
+  mcc: '350'
+  mnc: '02'
+- operator: Telecommunications (Bermuda & West Indies) Ltd (Digicel Bermuda)
+  country: BM
+  mcc: '350'
+  mnc: '01'
+- operator: B-Mobile
+  country: BT
+  mcc: '402'
+  mnc: '11'
+- operator: Bhutan Telecom Ltd (BTL)
+  country: BT
+  mcc: '402'
+  mnc: '17'
+- operator: TashiCell
+  country: BT
+  mcc: '402'
+  mnc: '77'
+- operator: Entel Pcs
+  country: BO
+  mcc: '736'
+  mnc: '02'
+- operator: Viva/Nuevatel
+  country: BO
+  mcc: '736'
+  mnc: '01'
+- operator: Tigo
+  country: BO
+  mcc: '736'
+  mnc: '03'
+- operator: BH Mobile
+  country: BA
+  mcc: '218'
+  mnc: '90'
+- operator: Eronet Mobile
+  country: BA
+  mcc: '218'
+  mnc: '03'
+- operator: M-Tel
+  country: BA
+  mcc: '218'
+  mnc: '05'
+- operator: BeMOBILE
+  country: BW
+  mcc: '652'
+  mnc: '04'
+- operator: Mascom Wireless (Pty) Ltd.
+  country: BW
+  mcc: '652'
+  mnc: '01'
+- operator: Orange
+  country: BW
+  mcc: '652'
+  mnc: '02'
+- operator: Claro/Albra/America Movil
+  country: BR
+  mcc: '724'
+  mnc: '12'
+- operator: Claro/Albra/America Movil
+  country: BR
+  mcc: '724'
+  mnc: '38'
+- operator: Claro/Albra/America Movil
+  country: BR
+  mcc: '724'
+  mnc: '05'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '01'
+- operator: CTBC Celular SA (CTBC)
+  country: BR
+  mcc: '724'
+  mnc: '34'
+- operator: CTBC Celular SA (CTBC)
+  country: BR
+  mcc: '724'
+  mnc: '33'
+- operator: CTBC Celular SA (CTBC)
+  country: BR
+  mcc: '724'
+  mnc: '32'
+- operator: TIM
+  country: BR
+  mcc: '724'
+  mnc: 08
+- operator: Nextel (Telet)
+  country: BR
+  mcc: '724'
+  mnc: '39'
+- operator: Nextel (Telet)
+  country: BR
+  mcc: '724'
+  mnc: '00'
+- operator: Oi (TNL PCS / Oi)
+  country: BR
+  mcc: '724'
+  mnc: '31'
+- operator: Brazil Telcom
+  country: BR
+  mcc: '724'
+  mnc: '16'
+- operator: Amazonia Celular S/A
+  country: BR
+  mcc: '724'
+  mnc: '24'
+- operator: Oi (TNL PCS / Oi)
+  country: BR
+  mcc: '724'
+  mnc: '30'
+- operator: PORTO SEGURO TELECOMUNICACOES
+  country: BR
+  mcc: '724'
+  mnc: '54'
+- operator: Sercontel Cel
+  country: BR
+  mcc: '724'
+  mnc: '15'
+- operator: CTBC/Triangulo
+  country: BR
+  mcc: '724'
+  mnc: '07'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '19'
+- operator: TIM
+  country: BR
+  mcc: '724'
+  mnc: '03'
+- operator: TIM
+  country: BR
+  mcc: '724'
+  mnc: '02'
+- operator: TIM
+  country: BR
+  mcc: '724'
+  mnc: '04'
+- operator: Unicel do Brasil Telecomunicacoes Ltda
+  country: BR
+  mcc: '724'
+  mnc: '37'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '10'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '06'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '23'
+- operator: Vivo S.A./Telemig
+  country: BR
+  mcc: '724'
+  mnc: '11'
+- operator: Caribbean Cellular
+  country: VG
+  mcc: '348'
+  mnc: '570'
+- operator: Digicel
+  country: VG
+  mcc: '348'
+  mnc: '770'
+- operator: LIME
+  country: VG
+  mcc: '348'
+  mnc: '170'
+- operator: b-mobile
+  country: BN
+  mcc: '528'
+  mnc: '02'
+- operator: Datastream (DTSCom)
+  country: BN
+  mcc: '528'
+  mnc: '11'
+- operator: Telekom Brunei Bhd (TelBru)
+  country: BN
+  mcc: '528'
+  mnc: '01'
+- operator: BTC Mobile EOOD (vivatel)
+  country: BG
+  mcc: '284'
+  mnc: '06'
+- operator: BTC Mobile EOOD (vivatel)
+  country: BG
+  mcc: '284'
+  mnc: '03'
+- operator: Telenor/Cosmo/Globul
+  country: BG
+  mcc: '284'
+  mnc: '05'
+- operator: MobilTel AD
+  country: BG
+  mcc: '284'
+  mnc: '01'
+- operator: TeleCel
+  country: BF
+  mcc: '613'
+  mnc: '03'
+- operator: TeleMob-OnaTel
+  country: BF
+  mcc: '613'
+  mnc: '01'
+- operator: Airtel/ZAIN/CelTel
+  country: BF
+  mcc: '613'
+  mnc: '02'
+- operator: Africel / Safaris
+  country: BI
+  mcc: '642'
+  mnc: '02'
+- operator: Lumitel/Viettel
+  country: BI
+  mcc: '642'
+  mnc: 08
+- operator: Onatel / Telecel
+  country: BI
+  mcc: '642'
+  mnc: '03'
+- operator: Smart Mobile / LACELL
+  country: BI
+  mcc: '642'
+  mnc: '07'
+- operator: Spacetel / Econet / Leo
+  country: BI
+  mcc: '642'
+  mnc: '82'
+- operator: Spacetel / Econet / Leo
+  country: BI
+  mcc: '642'
+  mnc: '01'
+- operator: Cambodia Advance Communications Co. Ltd (CADCOMMS)
+  country: KH
+  mcc: '456'
+  mnc: '04'
+- operator: Smart Mobile
+  country: KH
+  mcc: '456'
+  mnc: '02'
+- operator: Metfone
+  country: KH
+  mcc: '456'
+  mnc: 08
+- operator: MFone/Camshin/Cellcard
+  country: KH
+  mcc: '456'
+  mnc: '18'
+- operator: Mobitel/Cam GSM
+  country: KH
+  mcc: '456'
+  mnc: '01'
+- operator: QB/Cambodia Adv. Comms.
+  country: KH
+  mcc: '456'
+  mnc: '03'
+- operator: Smart Mobile
+  country: KH
+  mcc: '456'
+  mnc: '06'
+- operator: Smart Mobile
+  country: KH
+  mcc: '456'
+  mnc: '05'
+- operator: Sotelco/Beeline
+  country: KH
+  mcc: '456'
+  mnc: 09
+- operator: MTN
+  country: CM
+  mcc: '624'
+  mnc: '01'
+- operator: Nextel
+  country: CM
+  mcc: '624'
+  mnc: '04'
+- operator: Orange
+  country: CM
+  mcc: '624'
+  mnc: '02'
+- operator: BC Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '652'
+- operator: Bell Aliant
+  country: CA
+  mcc: '302'
+  mnc: '630'
+- operator: Bell Mobility
+  country: CA
+  mcc: '302'
+  mnc: '651'
+- operator: Bell Mobility
+  country: CA
+  mcc: '302'
+  mnc: '610'
+- operator: CityWest Mobility
+  country: CA
+  mcc: '302'
+  mnc: '670'
+- operator: Clearnet
+  country: CA
+  mcc: '302'
+  mnc: '361'
+- operator: Clearnet
+  country: CA
+  mcc: '302'
+  mnc: '360'
+- operator: DMTS Mobility
+  country: CA
+  mcc: '302'
+  mnc: '380'
+- operator: Globalstar Canada
+  country: CA
+  mcc: '302'
+  mnc: '710'
+- operator: Latitude Wireless
+  country: CA
+  mcc: '302'
+  mnc: '640'
+- operator: FIDO (Rogers AT&T/ Microcell)
+  country: CA
+  mcc: '302'
+  mnc: '370'
+- operator: mobilicity
+  country: CA
+  mcc: '302'
+  mnc: '320'
+- operator: MT&T Mobility
+  country: CA
+  mcc: '302'
+  mnc: '702'
+- operator: MTS Mobility
+  country: CA
+  mcc: '302'
+  mnc: '655'
+- operator: MTS Mobility
+  country: CA
+  mcc: '302'
+  mnc: '660'
+- operator: NB Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '701'
+- operator: New Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '703'
+- operator: Public Mobile
+  country: CA
+  mcc: '302'
+  mnc: '760'
+- operator: Quebectel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '657'
+- operator: Rogers AT&T Wireless
+  country: CA
+  mcc: '302'
+  mnc: '720'
+- operator: Sask Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '680'
+- operator: Sask Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '654'
+- operator: Sask Tel Mobility
+  country: CA
+  mcc: '302'
+  mnc: '780'
+- operator: Tbay Mobility
+  country: CA
+  mcc: '302'
+  mnc: '656'
+- operator: Telus Mobility
+  country: CA
+  mcc: '302'
+  mnc: '220'
+- operator: Telus Mobility
+  country: CA
+  mcc: '302'
+  mnc: '653'
+- operator: Videotron
+  country: CA
+  mcc: '302'
+  mnc: '500'
+- operator: WIND
+  country: CA
+  mcc: '302'
+  mnc: '490'
+- operator: CV Movel
+  country: CV
+  mcc: '625'
+  mnc: '01'
+- operator: T+ Telecom
+  country: CV
+  mcc: '625'
+  mnc: '02'
+- operator: Digicel Cayman Ltd
+  country: KY
+  mcc: '346'
+  mnc: '050'
+- operator: Digicel Ltd.
+  country: KY
+  mcc: '346'
+  mnc: '006'
+- operator: LIME / Cable & Wirel.
+  country: KY
+  mcc: '346'
+  mnc: '140'
+- operator: Centrafr. Telecom+
+  country: CF
+  mcc: '623'
+  mnc: '01'
+- operator: Nationlink
+  country: CF
+  mcc: '623'
+  mnc: '04'
+- operator: Orange/Celca
+  country: CF
+  mcc: '623'
+  mnc: '03'
+- operator: Telecel Centraf.
+  country: CF
+  mcc: '623'
+  mnc: '02'
+- operator: Salam/Sotel
+  country: TD
+  mcc: '622'
+  mnc: '04'
+- operator: Tchad Mobile
+  country: TD
+  mcc: '622'
+  mnc: '02'
+- operator: Tigo/Milicom/Tchad Mobile
+  country: TD
+  mcc: '622'
+  mnc: '03'
+- operator: Airtel/ZAIN/Celtel
+  country: TD
+  mcc: '622'
+  mnc: '01'
+- operator: Blue Two Chile SA
+  country: CL
+  mcc: '730'
+  mnc: '06'
+- operator: Celupago SA
+  country: CL
+  mcc: '730'
+  mnc: '11'
+- operator: Cibeles Telecom SA
+  country: CL
+  mcc: '730'
+  mnc: '15'
+- operator: Claro
+  country: CL
+  mcc: '730'
+  mnc: '03'
+- operator: Entel Telefonia
+  country: CL
+  mcc: '730'
+  mnc: '10'
+- operator: Entel Telefonia Mov
+  country: CL
+  mcc: '730'
+  mnc: '01'
+- operator: Netline Telefonica Movil Ltda
+  country: CL
+  mcc: '730'
+  mnc: '14'
+- operator: Nextel SA
+  country: CL
+  mcc: '730'
+  mnc: 09
+- operator: Nextel SA
+  country: CL
+  mcc: '730'
+  mnc: '05'
+- operator: Nextel SA
+  country: CL
+  mcc: '730'
+  mnc: '04'
+- operator: Sociedad Falabella Movil SPA
+  country: CL
+  mcc: '730'
+  mnc: '19'
+- operator: TELEFONICA
+  country: CL
+  mcc: '730'
+  mnc: '02'
+- operator: TELEFONICA
+  country: CL
+  mcc: '730'
+  mnc: '07'
+- operator: Telestar Movil SA
+  country: CL
+  mcc: '730'
+  mnc: '12'
+- operator: TESAM SA
+  country: CL
+  mcc: '730'
+  mnc: '00'
+- operator: Tribe Mobile SPA
+  country: CL
+  mcc: '730'
+  mnc: '13'
+- operator: VTR Banda Ancha SA
+  country: CL
+  mcc: '730'
+  mnc: 08
+- operator: China Mobile GSM
+  country: CN
+  mcc: '460'
+  mnc: '00'
+- operator: China Mobile GSM
+  country: CN
+  mcc: '460'
+  mnc: '07'
+- operator: China Mobile GSM
+  country: CN
+  mcc: '460'
+  mnc: '02'
+- operator: China Space Mobile Satellite Telecommunications Co. Ltd (China Spacecom)
+  country: CN
+  mcc: '460'
+  mnc: '04'
+- operator: China Telecom
+  country: CN
+  mcc: '460'
+  mnc: '03'
+- operator: China Telecom
+  country: CN
+  mcc: '460'
+  mnc: '05'
+- operator: China Unicom
+  country: CN
+  mcc: '460'
+  mnc: '06'
+- operator: China Unicom
+  country: CN
+  mcc: '460'
+  mnc: '01'
+- operator: Avantel SAS
+  country: CO
+  mcc: '732'
+  mnc: '130'
+- operator: Movistar
+  country: CO
+  mcc: '732'
+  mnc: '102'
+- operator: TIGO/Colombia Movil
+  country: CO
+  mcc: '732'
+  mnc: '103'
+- operator: TIGO/Colombia Movil
+  country: CO
+  mcc: '732'
+  mnc: '001'
+- operator: Comcel S.A. Occel S.A./Celcaribe
+  country: CO
+  mcc: '732'
+  mnc: '101'
+- operator: Edatel S.A.
+  country: CO
+  mcc: '732'
+  mnc: '002'
+- operator: eTb
+  country: CO
+  mcc: '732'
+  mnc: '187'
+- operator: Movistar
+  country: CO
+  mcc: '732'
+  mnc: '123'
+- operator: TIGO/Colombia Movil
+  country: CO
+  mcc: '732'
+  mnc: '111'
+- operator: UNE EPM Telecomunicaciones SA ESP
+  country: CO
+  mcc: '732'
+  mnc: '142'
+- operator: UNE EPM Telecomunicaciones SA ESP
+  country: CO
+  mcc: '732'
+  mnc: '020'
+- operator: Virgin Mobile Colombia SAS
+  country: CO
+  mcc: '732'
+  mnc: '154'
+- operator: HURI - SNPT
+  country: KM
+  mcc: '654'
+  mnc: '01'
+- operator: Africell
+  country: CD
+  mcc: '630'
+  mnc: '90'
+- operator: Orange RDC sarl
+  country: CD
+  mcc: '630'
+  mnc: '86'
+- operator: SuperCell
+  country: CD
+  mcc: '630'
+  mnc: '05'
+- operator: TIGO/Oasis
+  country: CD
+  mcc: '630'
+  mnc: '89'
+- operator: Vodacom
+  country: CD
+  mcc: '630'
+  mnc: '01'
+- operator: Yozma Timeturns sprl (YTT)
+  country: CD
+  mcc: '630'
+  mnc: '88'
+- operator: Airtel/ZAIN
+  country: CD
+  mcc: '630'
+  mnc: '02'
+- operator: Airtel SA
+  country: CG
+  mcc: '629'
+  mnc: '01'
+- operator: Azur SA (ETC)
+  country: CG
+  mcc: '629'
+  mnc: '02'
+- operator: MTN/Libertis
+  country: CG
+  mcc: '629'
+  mnc: '10'
+- operator: Warid
+  country: CG
+  mcc: '629'
+  mnc: '07'
+- operator: Telecom Cook Islands
+  country: CK
+  mcc: '548'
+  mnc: '01'
+- operator: Claro
+  country: CR
+  mcc: '712'
+  mnc: '03'
+- operator: ICE
+  country: CR
+  mcc: '712'
+  mnc: '02'
+- operator: ICE
+  country: CR
+  mcc: '712'
+  mnc: '01'
+- operator: Movistar
+  country: CR
+  mcc: '712'
+  mnc: '04'
+- operator: Virtualis
+  country: CR
+  mcc: '712'
+  mnc: '20'
+- operator: T-Mobile/Cronet
+  country: HR
+  mcc: '219'
+  mnc: '01'
+- operator: Tele2
+  country: HR
+  mcc: '219'
+  mnc: '02'
+- operator: VIPnet d.o.o.
+  country: HR
+  mcc: '219'
+  mnc: '10'
+- operator: C-COM
+  country: CU
+  mcc: '368'
+  mnc: '01'
+- operator: EOCG Wireless NV
+  country: CW
+  mcc: '362'
+  mnc: '95'
+- operator: Polycom N.V./ Digicel
+  country: CW
+  mcc: '362'
+  mnc: '69'
+- operator: MTN/Areeba
+  country: CY
+  mcc: '280'
+  mnc: '10'
+- operator: PrimeTel PLC
+  country: CY
+  mcc: '280'
+  mnc: '20'
+- operator: Vodafone/CyTa
+  country: CY
+  mcc: '280'
+  mnc: '01'
+- operator: Compatel s.r.o.
+  country: CZ
+  mcc: '230'
+  mnc: 08
+- operator: O2
+  country: CZ
+  mcc: '230'
+  mnc: '02'
+- operator: T-Mobile / RadioMobil
+  country: CZ
+  mcc: '230'
+  mnc: '01'
+- operator: Travel Telekommunikation s.r.o.
+  country: CZ
+  mcc: '230'
+  mnc: '05'
+- operator: Ufone
+  country: CZ
+  mcc: '230'
+  mnc: '04'
+- operator: Vodafone
+  country: CZ
+  mcc: '230'
+  mnc: '99'
+- operator: Vodafone
+  country: CZ
+  mcc: '230'
+  mnc: '03'
+- operator: ApS KBUS
+  country: DK
+  mcc: '238'
+  mnc: '05'
+- operator: Banedanmark
+  country: DK
+  mcc: '238'
+  mnc: '23'
+- operator: CoolTEL ApS
+  country: DK
+  mcc: '238'
+  mnc: '28'
+- operator: H3G
+  country: DK
+  mcc: '238'
+  mnc: '06'
+- operator: Lycamobile Ltd
+  country: DK
+  mcc: '238'
+  mnc: '12'
+- operator: Mach Connectivity ApS
+  country: DK
+  mcc: '238'
+  mnc: '03'
+- operator: Mundio Mobile
+  country: DK
+  mcc: '238'
+  mnc: '07'
+- operator: NextGen Mobile Ltd (CardBoardFish)
+  country: DK
+  mcc: '238'
+  mnc: '04'
+- operator: TDC Denmark
+  country: DK
+  mcc: '238'
+  mnc: '01'
+- operator: TDC Denmark
+  country: DK
+  mcc: '238'
+  mnc: '10'
+- operator: Telenor/Sonofon
+  country: DK
+  mcc: '238'
+  mnc: '77'
+- operator: Telenor/Sonofon
+  country: DK
+  mcc: '238'
+  mnc: '02'
+- operator: Telia
+  country: DK
+  mcc: '238'
+  mnc: '20'
+- operator: Telia
+  country: DK
+  mcc: '238'
+  mnc: '30'
+- operator: Djibouti Telecom SA (Evatis)
+  country: DJ
+  mcc: '638'
+  mnc: '01'
+- operator: C & W
+  country: DM
+  mcc: '366'
+  mnc: '110'
+- operator: Cingular Wireless/Digicel
+  country: DM
+  mcc: '366'
+  mnc: '020'
+- operator: Wireless Ventures (Dominica) Ltd (Digicel Dominica)
+  country: DM
+  mcc: '366'
+  mnc: '050'
+- operator: Claro
+  country: DO
+  mcc: '370'
+  mnc: '02'
+- operator: Orange
+  country: DO
+  mcc: '370'
+  mnc: '01'
+- operator: TRIcom
+  country: DO
+  mcc: '370'
+  mnc: '03'
+- operator: Trilogy Dominicana S. A.
+  country: DO
+  mcc: '370'
+  mnc: '04'
+- operator: Alegro/Telcsa
+  country: EC
+  mcc: '740'
+  mnc: '02'
+- operator: MOVISTAR/OteCel
+  country: EC
+  mcc: '740'
+  mnc: '00'
+- operator: Claro/Porta
+  country: EC
+  mcc: '740'
+  mnc: '01'
+- operator: Orange/Mobinil
+  country: EG
+  mcc: '602'
+  mnc: '01'
+- operator: ETISALAT
+  country: EG
+  mcc: '602'
+  mnc: '03'
+- operator: Vodafone/Mirsfone
+  country: EG
+  mcc: '602'
+  mnc: '02'
+- operator: CLARO/CTE
+  country: SV
+  mcc: '706'
+  mnc: '01'
+- operator: Digicel
+  country: SV
+  mcc: '706'
+  mnc: '02'
+- operator: INTELFON SA de CV
+  country: SV
+  mcc: '706'
+  mnc: '05'
+- operator: Telefonica
+  country: SV
+  mcc: '706'
+  mnc: '04'
+- operator: Telemovil
+  country: SV
+  mcc: '706'
+  mnc: '03'
+- operator: HiTs-GE
+  country: GQ
+  mcc: '627'
+  mnc: '03'
+- operator: ORANGE/GETESA
+  country: GQ
+  mcc: '627'
+  mnc: '01'
+- operator: Eritel
+  country: ER
+  mcc: '657'
+  mnc: '01'
+- operator: EMT GSM
+  country: EE
+  mcc: '248'
+  mnc: '01'
+- operator: Radiolinja Eesti
+  country: EE
+  mcc: '248'
+  mnc: '02'
+- operator: Tele2 Eesti AS
+  country: EE
+  mcc: '248'
+  mnc: '03'
+- operator: Top Connect OU
+  country: EE
+  mcc: '248'
+  mnc: '04'
+- operator: ETH/MTN
+  country: ET
+  mcc: '636'
+  mnc: '01'
+- operator: Cable and Wireless South Atlantic Ltd (Falkland Islands
+  country: FK
+  mcc: '750'
+  mnc: '001'
+- operator: Edge Mobile Sp/F
+  country: FO
+  mcc: '288'
+  mnc: '03'
+- operator: Faroese Telecom
+  country: FO
+  mcc: '288'
+  mnc: '01'
+- operator: Kall GSM
+  country: FO
+  mcc: '288'
+  mnc: '02'
+- operator: DigiCell
+  country: FJ
+  mcc: '542'
+  mnc: '02'
+- operator: Vodafone
+  country: FJ
+  mcc: '542'
+  mnc: '01'
+- operator: Alands
+  country: FI
+  mcc: '244'
+  mnc: '14'
+- operator: Compatel Ltd
+  country: FI
+  mcc: '244'
+  mnc: '26'
+- operator: DNA/Finnet
+  country: FI
+  mcc: '244'
+  mnc: '04'
+- operator: DNA/Finnet
+  country: FI
+  mcc: '244'
+  mnc: '13'
+- operator: DNA/Finnet
+  country: FI
+  mcc: '244'
+  mnc: '03'
+- operator: DNA/Finnet
+  country: FI
+  mcc: '244'
+  mnc: '12'
+- operator: Elisa/Saunalahti
+  country: FI
+  mcc: '244'
+  mnc: '21'
+- operator: Elisa/Saunalahti
+  country: FI
+  mcc: '244'
+  mnc: '05'
+- operator: ID-Mobile
+  country: FI
+  mcc: '244'
+  mnc: '82'
+- operator: Mundio Mobile (Finland) Ltd
+  country: FI
+  mcc: '244'
+  mnc: '11'
+- operator: Nokia Oyj
+  country: FI
+  mcc: '244'
+  mnc: 09
+- operator: TDC Oy Finland
+  country: FI
+  mcc: '244'
+  mnc: '10'
+- operator: TeliaSonera
+  country: FI
+  mcc: '244'
+  mnc: '91'
+- operator: AFONE SA
+  country: FR
+  mcc: '208'
+  mnc: '27'
+- operator: Association Plate-forme Telecom
+  country: FR
+  mcc: '208'
+  mnc: '92'
+- operator: Astrium
+  country: FR
+  mcc: '208'
+  mnc: '28'
+- operator: Bouygues Telecom
+  country: FR
+  mcc: '208'
+  mnc: '20'
+- operator: Bouygues Telecom
+  country: FR
+  mcc: '208'
+  mnc: '88'
+- operator: Bouygues Telecom
+  country: FR
+  mcc: '208'
+  mnc: '21'
+- operator: Lliad/FREE Mobile
+  country: FR
+  mcc: '208'
+  mnc: '14'
+- operator: GlobalStar
+  country: FR
+  mcc: '208'
+  mnc: '07'
+- operator: GlobalStar
+  country: FR
+  mcc: '208'
+  mnc: '06'
+- operator: GlobalStar
+  country: FR
+  mcc: '208'
+  mnc: '05'
+- operator: Orange
+  country: FR
+  mcc: '208'
+  mnc: '29'
+- operator: Legos - Local Exchange Global Operation Services SA
+  country: FR
+  mcc: '208'
+  mnc: '17'
+- operator: Lliad/FREE Mobile
+  country: FR
+  mcc: '208'
+  mnc: '16'
+- operator: Lliad/FREE Mobile
+  country: FR
+  mcc: '208'
+  mnc: '15'
+- operator: Lycamobile SARL
+  country: FR
+  mcc: '208'
+  mnc: '25'
+- operator: MobiquiThings
+  country: FR
+  mcc: '208'
+  mnc: '24'
+- operator: MobiquiThings
+  country: FR
+  mcc: '208'
+  mnc: '03'
+- operator: Mundio Mobile (France) Ltd
+  country: FR
+  mcc: '208'
+  mnc: '31'
+- operator: NRJ
+  country: FR
+  mcc: '208'
+  mnc: '26'
+- operator: Virgin Mobile/Omer
+  country: FR
+  mcc: '208'
+  mnc: '89'
+- operator: Virgin Mobile/Omer
+  country: FR
+  mcc: '208'
+  mnc: '23'
+- operator: Orange
+  country: FR
+  mcc: '208'
+  mnc: '02'
+- operator: Orange
+  country: FR
+  mcc: '208'
+  mnc: '01'
+- operator: Orange
+  country: FR
+  mcc: '208'
+  mnc: '91'
+- operator: S.F.R.
+  country: FR
+  mcc: '208'
+  mnc: '11'
+- operator: S.F.R.
+  country: FR
+  mcc: '208'
+  mnc: '10'
+- operator: S.F.R.
+  country: FR
+  mcc: '208'
+  mnc: 09
+- operator: S.F.R.
+  country: FR
+  mcc: '208'
+  mnc: '13'
+- operator: SISTEER
+  country: FR
+  mcc: '208'
+  mnc: '04'
+- operator: Tel/Tel
+  country: FR
+  mcc: '208'
+  mnc: '00'
+- operator: Transatel SA
+  country: FR
+  mcc: '208'
+  mnc: '22'
+- operator: Bouygues/DigiCel
+  country: FG
+  mcc: '340'
+  mnc: '20'
+- operator: Orange Caribe
+  country: FG
+  mcc: '340'
+  mnc: '01'
+- operator: Outremer Telecom
+  country: FG
+  mcc: '340'
+  mnc: '02'
+- operator: TelCell GSM
+  country: FG
+  mcc: '340'
+  mnc: '11'
+- operator: TelCell GSM
+  country: FG
+  mcc: '340'
+  mnc: '03'
+- operator: Pacific Mobile Telecom (PMT)
+  country: PF
+  mcc: '547'
+  mnc: '15'
+- operator: Vini/Tikiphone
+  country: PF
+  mcc: '547'
+  mnc: '20'
+- operator: Azur/Usan S.A.
+  country: GA
+  mcc: '628'
+  mnc: '04'
+- operator: Libertis S.A.
+  country: GA
+  mcc: '628'
+  mnc: '01'
+- operator: MOOV/Telecel
+  country: GA
+  mcc: '628'
+  mnc: '02'
+- operator: Airtel/ZAIN/Celtel Gabon S.A.
+  country: GA
+  mcc: '628'
+  mnc: '03'
+- operator: Africel
+  country: GM
+  mcc: '607'
+  mnc: '02'
+- operator: Comium
+  country: GM
+  mcc: '607'
+  mnc: '03'
+- operator: Gamcel
+  country: GM
+  mcc: '607'
+  mnc: '01'
+- operator: Q-Cell
+  country: GM
+  mcc: '607'
+  mnc: '04'
+- operator: Geocell Ltd.
+  country: GE
+  mcc: '282'
+  mnc: '01'
+- operator: Iberiatel Ltd.
+  country: GE
+  mcc: '282'
+  mnc: '03'
+- operator: Magti GSM Ltd.
+  country: GE
+  mcc: '282'
+  mnc: '02'
+- operator: MobiTel/Beeline
+  country: GE
+  mcc: '282'
+  mnc: '04'
+- operator: Silknet
+  country: GE
+  mcc: '282'
+  mnc: '05'
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '17'
+- operator: DB Netz AG
+  country: DE
+  mcc: '262'
+  mnc: '10'
+- operator: Debitel
+  country: DE
+  mcc: '262'
+  mnc: n/a
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '77'
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '03'
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '05'
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '20'
+- operator: E-Plus
+  country: DE
+  mcc: '262'
+  mnc: '12'
+- operator: Group 3G UMTS
+  country: DE
+  mcc: '262'
+  mnc: '14'
+- operator: Lycamobile
+  country: DE
+  mcc: '262'
+  mnc: '43'
+- operator: Mobilcom
+  country: DE
+  mcc: '262'
+  mnc: '13'
+- operator: O2
+  country: DE
+  mcc: '262'
+  mnc: 08
+- operator: O2
+  country: DE
+  mcc: '262'
+  mnc: '11'
+- operator: O2
+  country: DE
+  mcc: '262'
+  mnc: '07'
+- operator: T-mobile/Telekom
+  country: DE
+  mcc: '262'
+  mnc: '01'
+- operator: T-mobile/Telekom
+  country: DE
+  mcc: '262'
+  mnc: '06'
+- operator: Telogic/ViStream
+  country: DE
+  mcc: '262'
+  mnc: '16'
+- operator: Vodafone D2
+  country: DE
+  mcc: '262'
+  mnc: 09
+- operator: Vodafone D2
+  country: DE
+  mcc: '262'
+  mnc: '04'
+- operator: Vodafone D2
+  country: DE
+  mcc: '262'
+  mnc: '02'
+- operator: Vodafone D2
+  country: DE
+  mcc: '262'
+  mnc: '42'
+- operator: Expresso Ghana Ltd
+  country: GH
+  mcc: '620'
+  mnc: '04'
+- operator: GloMobile
+  country: GH
+  mcc: '620'
+  mnc: '07'
+- operator: Milicom/Tigo
+  country: GH
+  mcc: '620'
+  mnc: '03'
+- operator: MTN
+  country: GH
+  mcc: '620'
+  mnc: '01'
+- operator: Vodafone
+  country: GH
+  mcc: '620'
+  mnc: '02'
+- operator: Airtel/ZAIN
+  country: GH
+  mcc: '620'
+  mnc: '06'
+- operator: CTS Mobile
+  country: GI
+  mcc: '266'
+  mnc: '06'
+- operator: eazi telecom
+  country: GI
+  mcc: '266'
+  mnc: 09
+- operator: Gibtel GSM
+  country: GI
+  mcc: '266'
+  mnc: '01'
+- operator: AMD Telecom SA
+  country: GR
+  mcc: '202'
+  mnc: '07'
+- operator: Cosmote
+  country: GR
+  mcc: '202'
+  mnc: '02'
+- operator: Cosmote
+  country: GR
+  mcc: '202'
+  mnc: '01'
+- operator: CyTa Mobile
+  country: GR
+  mcc: '202'
+  mnc: '14'
+- operator: Organismos Sidirodromon Ellados (OSE)
+  country: GR
+  mcc: '202'
+  mnc: '04'
+- operator: OTE Hellenic Telecommunications Organization SA
+  country: GR
+  mcc: '202'
+  mnc: '03'
+- operator: Tim/Wind
+  country: GR
+  mcc: '202'
+  mnc: 09
+- operator: Tim/Wind
+  country: GR
+  mcc: '202'
+  mnc: '10'
+- operator: Vodafone
+  country: GR
+  mcc: '202'
+  mnc: '05'
+- operator: Tele Greenland
+  country: GL
+  mcc: '290'
+  mnc: '01'
+- operator: Cable & Wireless
+  country: GD
+  mcc: '352'
+  mnc: '110'
+- operator: Digicel
+  country: GD
+  mcc: '352'
+  mnc: '030'
+- operator: Digicel
+  country: GD
+  mcc: '352'
+  mnc: '050'
+- operator: Dauphin Telecom SU (Guadeloupe Telecom)
+  country: GP
+  mcc: '340'
+  mnc: 08
+- operator: ''
+  country: GP
+  mcc: '340'
+  mnc: '10'
+- operator: Docomo
+  country: GU
+  mcc: '310'
+  mnc: '370'
+- operator: Docomo
+  country: GU
+  mcc: '310'
+  mnc: '470'
+- operator: GTA Wireless
+  country: GU
+  mcc: '310'
+  mnc: '140'
+- operator: Guam Teleph. Auth.
+  country: GU
+  mcc: '310'
+  mnc: '033'
+- operator: IT&E OverSeas
+  country: GU
+  mcc: '310'
+  mnc: '032'
+- operator: Wave Runner LLC
+  country: GU
+  mcc: '311'
+  mnc: '250'
+- operator: Claro
+  country: GT
+  mcc: '704'
+  mnc: '01'
+- operator: Telefonica
+  country: GT
+  mcc: '704'
+  mnc: '03'
+- operator: TIGO/COMCEL
+  country: GT
+  mcc: '704'
+  mnc: '02'
+- operator: MTN/Areeba
+  country: GN
+  mcc: '611'
+  mnc: '04'
+- operator: Celcom
+  country: GN
+  mcc: '611'
+  mnc: '05'
+- operator: Intercel
+  country: GN
+  mcc: '611'
+  mnc: '03'
+- operator: Orange/Sonatel/Spacetel
+  country: GN
+  mcc: '611'
+  mnc: '01'
+- operator: SotelGui
+  country: GN
+  mcc: '611'
+  mnc: '02'
+- operator: GuineTel
+  country: GW
+  mcc: '632'
+  mnc: '01'
+- operator: Orange
+  country: GW
+  mcc: '632'
+  mnc: '03'
+- operator: SpaceTel
+  country: GW
+  mcc: '632'
+  mnc: '02'
+- operator: Cellink Plus
+  country: GY
+  mcc: '738'
+  mnc: '02'
+- operator: DigiCel
+  country: GY
+  mcc: '738'
+  mnc: '01'
+- operator: Comcel
+  country: HT
+  mcc: '372'
+  mnc: '01'
+- operator: Digicel
+  country: HT
+  mcc: '372'
+  mnc: '02'
+- operator: National Telecom SA (NatCom)
+  country: HT
+  mcc: '372'
+  mnc: '03'
+- operator: Digicel
+  country: HN
+  mcc: '708'
+  mnc: '040'
+- operator: HonduTel
+  country: HN
+  mcc: '708'
+  mnc: '030'
+- operator: SERCOM/CLARO
+  country: HN
+  mcc: '708'
+  mnc: '001'
+- operator: Telefonica/CELTEL
+  country: HN
+  mcc: '708'
+  mnc: '002'
+- operator: China Mobile/Peoples
+  country: HK
+  mcc: '454'
+  mnc: '28'
+- operator: China Mobile/Peoples
+  country: HK
+  mcc: '454'
+  mnc: '13'
+- operator: China Mobile/Peoples
+  country: HK
+  mcc: '454'
+  mnc: '12'
+- operator: China Motion
+  country: HK
+  mcc: '454'
+  mnc: 09
+- operator: China Unicom Ltd
+  country: HK
+  mcc: '454'
+  mnc: '07'
+- operator: China-HongKong Telecom Ltd (CHKTL)
+  country: HK
+  mcc: '454'
+  mnc: '11'
+- operator: Citic Telecom Ltd.
+  country: HK
+  mcc: '454'
+  mnc: '01'
+- operator: CSL Ltd.
+  country: HK
+  mcc: '454'
+  mnc: '18'
+- operator: CSL Ltd.
+  country: HK
+  mcc: '454'
+  mnc: '02'
+- operator: CSL Ltd.
+  country: HK
+  mcc: '454'
+  mnc: '00'
+- operator: CSL/New World PCS Ltd.
+  country: HK
+  mcc: '454'
+  mnc: '10'
+- operator: H3G/Hutchinson
+  country: HK
+  mcc: '454'
+  mnc: '14'
+- operator: H3G/Hutchinson
+  country: HK
+  mcc: '454'
+  mnc: '05'
+- operator: H3G/Hutchinson
+  country: HK
+  mcc: '454'
+  mnc: '04'
+- operator: H3G/Hutchinson
+  country: HK
+  mcc: '454'
+  mnc: '03'
+- operator: HKT/PCCW
+  country: HK
+  mcc: '454'
+  mnc: '29'
+- operator: HKT/PCCW
+  country: HK
+  mcc: '454'
+  mnc: '16'
+- operator: HKT/PCCW
+  country: HK
+  mcc: '454'
+  mnc: '19'
+- operator: HKT/PCCW
+  country: HK
+  mcc: '454'
+  mnc: '20'
+- operator: shared by private TETRA systems
+  country: HK
+  mcc: '454'
+  mnc: '47'
+- operator: shared by private TETRA systems
+  country: HK
+  mcc: '454'
+  mnc: '40'
+- operator: Truephone
+  country: HK
+  mcc: '454'
+  mnc: 08
+- operator: Vodafone/SmarTone
+  country: HK
+  mcc: '454'
+  mnc: '06'
+- operator: Vodafone/SmarTone
+  country: HK
+  mcc: '454'
+  mnc: '17'
+- operator: Vodafone/SmarTone
+  country: HK
+  mcc: '454'
+  mnc: '15'
+- operator: Pannon/Telenor
+  country: HU
+  mcc: '216'
+  mnc: '01'
+- operator: T-mobile/Magyar
+  country: HU
+  mcc: '216'
+  mnc: '30'
+- operator: UPC Magyarorszag Kft.
+  country: HU
+  mcc: '216'
+  mnc: '71'
+- operator: Vodafone
+  country: HU
+  mcc: '216'
+  mnc: '70'
+- operator: Amitelo
+  country: IS
+  mcc: '274'
+  mnc: 09
+- operator: IceCell
+  country: IS
+  mcc: '274'
+  mnc: '07'
+- operator: Siminn
+  country: IS
+  mcc: '274'
+  mnc: 08
+- operator: Siminn
+  country: IS
+  mcc: '274'
+  mnc: '01'
+- operator: NOVA
+  country: IS
+  mcc: '274'
+  mnc: '11'
+- operator: VIKING/IMC
+  country: IS
+  mcc: '274'
+  mnc: '04'
+- operator: Vodafone/Tal hf
+  country: IS
+  mcc: '274'
+  mnc: '05'
+- operator: Vodafone/Tal hf
+  country: IS
+  mcc: '274'
+  mnc: '03'
+- operator: Vodafone/Tal hf
+  country: IS
+  mcc: '274'
+  mnc: '02'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '29'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '28'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '25'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '17'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '42'
+- operator: Aircel
+  country: IN
+  mcc: '404'
+  mnc: '33'
+- operator: Aircel Digilink India
+  country: IN
+  mcc: '404'
+  mnc: '01'
+- operator: Aircel Digilink India
+  country: IN
+  mcc: '404'
+  mnc: '15'
+- operator: Aircel Digilink India
+  country: IN
+  mcc: '404'
+  mnc: '60'
+- operator: AirTel
+  country: IN
+  mcc: '405'
+  mnc: '53'
+- operator: Barakhamba Sales & Serv.
+  country: IN
+  mcc: '404'
+  mnc: '86'
+- operator: Barakhamba Sales & Serv.
+  country: IN
+  mcc: '404'
+  mnc: '13'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '34'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '66'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '55'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '72'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '77'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '64'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '54'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '71'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '76'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '62'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '53'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '59'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '75'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '51'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '58'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '81'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '74'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '38'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '57'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '80'
+- operator: BSNL
+  country: IN
+  mcc: '404'
+  mnc: '73'
+- operator: Bharti Airtel Limited (Delhi)
+  country: IN
+  mcc: '404'
+  mnc: '10'
+- operator: Bharti Airtel Limited (Karnataka) (India)
+  country: IN
+  mcc: '404'
+  mnc: '045'
+- operator: CellOne A&N
+  country: IN
+  mcc: '404'
+  mnc: '79'
+- operator: Escorts Telecom Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '87'
+- operator: Escorts Telecom Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '82'
+- operator: Escorts Telecom Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '89'
+- operator: Escorts Telecom Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '88'
+- operator: Escotel Mobile Communications
+  country: IN
+  mcc: '404'
+  mnc: '12'
+- operator: Escotel Mobile Communications
+  country: IN
+  mcc: '404'
+  mnc: '19'
+- operator: Escotel Mobile Communications
+  country: IN
+  mcc: '404'
+  mnc: '56'
+- operator: Fascel Limited
+  country: IN
+  mcc: '405'
+  mnc: '05'
+- operator: Fascel
+  country: IN
+  mcc: '404'
+  mnc: '05'
+- operator: Hexacom India
+  country: IN
+  mcc: '404'
+  mnc: '70'
+- operator: Hexcom India
+  country: IN
+  mcc: '404'
+  mnc: '16'
+- operator: Idea Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '07'
+- operator: Idea Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '04'
+- operator: Idea Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '24'
+- operator: Idea Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '22'
+- operator: Idea Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '78'
+- operator: Mahanagar Telephone Nigam
+  country: IN
+  mcc: '404'
+  mnc: '69'
+- operator: Mahanagar Telephone Nigam
+  country: IN
+  mcc: '404'
+  mnc: '68'
+- operator: Reliable Internet Services
+  country: IN
+  mcc: '404'
+  mnc: '83'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '18'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '85'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: 09
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '36'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '52'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '50'
+- operator: Reliance Telecom Private
+  country: IN
+  mcc: '404'
+  mnc: '67'
+- operator: RPG Cellular
+  country: IN
+  mcc: '404'
+  mnc: '41'
+- operator: Spice
+  country: IN
+  mcc: '404'
+  mnc: '14'
+- operator: Spice
+  country: IN
+  mcc: '404'
+  mnc: '44'
+- operator: Sterling Cellular Ltd.
+  country: IN
+  mcc: '404'
+  mnc: '11'
+- operator: TATA / Karnataka
+  country: IN
+  mcc: '405'
+  mnc: '034'
+- operator: Usha Martin Telecom
+  country: IN
+  mcc: '404'
+  mnc: '30'
+- operator: Axis/Natrindo
+  country: ID
+  mcc: '510'
+  mnc: 08
+- operator: Esia (PT Bakrie Telecom) (CDMA)
+  country: ID
+  mcc: '510'
+  mnc: '99'
+- operator: Flexi (PT Telkom) (CDMA)
+  country: ID
+  mcc: '510'
+  mnc: '07'
+- operator: H3G CP
+  country: ID
+  mcc: '510'
+  mnc: '89'
+- operator: Indosat/Satelindo/M3
+  country: ID
+  mcc: '510'
+  mnc: '21'
+- operator: Indosat/Satelindo/M3
+  country: ID
+  mcc: '510'
+  mnc: '01'
+- operator: PT Pasifik Satelit Nusantara (PSN)
+  country: ID
+  mcc: '510'
+  mnc: '00'
+- operator: PT Sampoerna Telekomunikasi Indonesia (STI)
+  country: ID
+  mcc: '510'
+  mnc: '27'
+- operator: PT Smartfren Telecom Tbk
+  country: ID
+  mcc: '510'
+  mnc: '28'
+- operator: PT Smartfren Telecom Tbk
+  country: ID
+  mcc: '510'
+  mnc: 09
+- operator: PT. Excelcom
+  country: ID
+  mcc: '510'
+  mnc: '11'
+- operator: Telkomsel
+  country: ID
+  mcc: '510'
+  mnc: '10'
+- operator: Antarctica
+  country: N/A
+  mcc: '901'
+  mnc: '13'
+- operator: Mobile Telecommunications Company of Esfahan JV-PJS (MTCE)
+  country: IR
+  mcc: '432'
+  mnc: '19'
+- operator: MTCE
+  country: IR
+  mcc: '432'
+  mnc: '70'
+- operator: MTN/IranCell
+  country: IR
+  mcc: '432'
+  mnc: '35'
+- operator: Rightel
+  country: IR
+  mcc: '432'
+  mnc: '20'
+- operator: Taliya
+  country: IR
+  mcc: '432'
+  mnc: '32'
+- operator: MCI/TCI
+  country: IR
+  mcc: '432'
+  mnc: '11'
+- operator: TKC/KFZO
+  country: IR
+  mcc: '432'
+  mnc: '14'
+- operator: Asia Cell
+  country: IQ
+  mcc: '418'
+  mnc: '05'
+- operator: Itisaluna and Kalemat
+  country: IQ
+  mcc: '418'
+  mnc: '92'
+- operator: Korek
+  country: IQ
+  mcc: '418'
+  mnc: '82'
+- operator: Korek
+  country: IQ
+  mcc: '418'
+  mnc: '40'
+- operator: Mobitel (Iraq-Kurdistan) and Moutiny
+  country: IQ
+  mcc: '418'
+  mnc: '45'
+- operator: Orascom Telecom
+  country: IQ
+  mcc: '418'
+  mnc: '30'
+- operator: ZAIN/Atheer/Orascom
+  country: IQ
+  mcc: '418'
+  mnc: '20'
+- operator: Sanatel
+  country: IQ
+  mcc: '418'
+  mnc: 08
+- operator: Access Telecom Ltd.
+  country: IE
+  mcc: '272'
+  mnc: '04'
+- operator: Clever Communications Ltd
+  country: IE
+  mcc: '272'
+  mnc: 09
+- operator: eircom Ltd
+  country: IE
+  mcc: '272'
+  mnc: '07'
+- operator: Three/H3G
+  country: IE
+  mcc: '272'
+  mnc: '05'
+- operator: Tesco Mobile/Liffey Telecom
+  country: IE
+  mcc: '272'
+  mnc: '11'
+- operator: Lycamobile
+  country: IE
+  mcc: '272'
+  mnc: '13'
+- operator: Meteor Mobile Ltd.
+  country: IE
+  mcc: '272'
+  mnc: '03'
+- operator: Three/O2/Digifone
+  country: IE
+  mcc: '272'
+  mnc: '02'
+- operator: Vodafone Eircell
+  country: IE
+  mcc: '272'
+  mnc: '01'
+- operator: Alon Cellular Ltd
+  country: IL
+  mcc: '425'
+  mnc: '14'
+- operator: Cellcom ltd.
+  country: IL
+  mcc: '425'
+  mnc: '02'
+- operator: Golan Telekom
+  country: IL
+  mcc: '425'
+  mnc: 08
+- operator: Home Cellular Ltd
+  country: IL
+  mcc: '425'
+  mnc: '15'
+- operator: Hot Mobile/Mirs
+  country: IL
+  mcc: '425'
+  mnc: '77'
+- operator: Hot Mobile/Mirs
+  country: IL
+  mcc: '425'
+  mnc: '07'
+- operator: Orange/Partner Co. Ltd.
+  country: IL
+  mcc: '425'
+  mnc: '01'
+- operator: Pelephone
+  country: IL
+  mcc: '425'
+  mnc: '03'
+- operator: Pelephone
+  country: IL
+  mcc: '425'
+  mnc: '12'
+- operator: Rami Levy Hashikma Marketing Communications Ltd
+  country: IL
+  mcc: '425'
+  mnc: '16'
+- operator: Telzar/AZI
+  country: IL
+  mcc: '425'
+  mnc: '19'
+- operator: BT Italia SpA
+  country: IT
+  mcc: '222'
+  mnc: '34'
+- operator: Elsacom
+  country: IT
+  mcc: '222'
+  mnc: '02'
+- operator: Fastweb SpA
+  country: IT
+  mcc: '222'
+  mnc: 08
+- operator: Fix Line
+  country: IT
+  mcc: '222'
+  mnc: '00'
+- operator: Hi3G
+  country: IT
+  mcc: '222'
+  mnc: '99'
+- operator: IPSE 2000
+  country: IT
+  mcc: '222'
+  mnc: '77'
+- operator: Lycamobile Srl
+  country: IT
+  mcc: '222'
+  mnc: '35'
+- operator: Noverca Italia Srl
+  country: IT
+  mcc: '222'
+  mnc: '07'
+- operator: PosteMobile SpA
+  country: IT
+  mcc: '222'
+  mnc: '33'
+- operator: RFI Rete Ferroviaria Italiana SpA
+  country: IT
+  mcc: '222'
+  mnc: '30'
+- operator: Telecom Italia Mobile SpA
+  country: IT
+  mcc: '222'
+  mnc: '48'
+- operator: Telecom Italia Mobile SpA
+  country: IT
+  mcc: '222'
+  mnc: '43'
+- operator: TIM
+  country: IT
+  mcc: '222'
+  mnc: '01'
+- operator: Vodafone
+  country: IT
+  mcc: '222'
+  mnc: '10'
+- operator: Vodafone
+  country: IT
+  mcc: '222'
+  mnc: '06'
+- operator: WIND (Blu) -
+  country: IT
+  mcc: '222'
+  mnc: '88'
+- operator: WIND (Blu) -
+  country: IT
+  mcc: '222'
+  mnc: '44'
+- operator: Aircomm SA
+  country: CI
+  mcc: '612'
+  mnc: '07'
+- operator: Atlantik Tel./Moov
+  country: CI
+  mcc: '612'
+  mnc: '02'
+- operator: Comium
+  country: CI
+  mcc: '612'
+  mnc: '04'
+- operator: Comstar
+  country: CI
+  mcc: '612'
+  mnc: '01'
+- operator: MTN
+  country: CI
+  mcc: '612'
+  mnc: '05'
+- operator: Orange
+  country: CI
+  mcc: '612'
+  mnc: '03'
+- operator: OriCell
+  country: CI
+  mcc: '612'
+  mnc: '06'
+- operator: Cable & Wireless
+  country: JM
+  mcc: '338'
+  mnc: '020'
+- operator: Cable & Wireless
+  country: JM
+  mcc: '338'
+  mnc: '110'
+- operator: Cable & Wireless
+  country: JM
+  mcc: '338'
+  mnc: '180'
+- operator: DIGICEL/Mossel
+  country: JM
+  mcc: '338'
+  mnc: '050'
+- operator: Y-Mobile
+  country: JP
+  mcc: '440'
+  mnc: '00'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '54'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '79'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '07'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '73'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '55'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '88'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '50'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '74'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '70'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '89'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '51'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '75'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '56'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '441'
+  mnc: '70'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '52'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '76'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '71'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '53'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '77'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: 08
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '72'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '32'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '61'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '18'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '91'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '40'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '66'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '35'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '93'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: 09
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '49'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '29'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '60'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '19'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '90'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '33'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '41'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '67'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '14'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '94'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '10'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '62'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '39'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '30'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '45'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '24'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '42'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '68'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '15'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '98'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '11'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '63'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '01'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '38'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '26'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '23'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '21'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '44'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '13'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '34'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '69'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '16'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '99'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '64'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '37'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '25'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '02'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '22'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '43'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '27'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '31'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '87'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '17'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '65'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '36'
+- operator: NTT Docomo
+  country: JP
+  mcc: '441'
+  mnc: '92'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '03'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '12'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '58'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '28'
+- operator: NTT Docomo
+  country: JP
+  mcc: '440'
+  mnc: '99'
+- operator: Okinawa Cellular Telephone
+  country: JP
+  mcc: '440'
+  mnc: '78'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '43'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '93'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '48'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '06'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '441'
+  mnc: '61'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '44'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '94'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '04'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '441'
+  mnc: '62'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '45'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '20'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '96'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '40'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '441'
+  mnc: '63'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '47'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '95'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '41'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '441'
+  mnc: '64'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '46'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '97'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '42'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '90'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '441'
+  mnc: '65'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '92'
+- operator: SoftBank Mobile Corp
+  country: JP
+  mcc: '440'
+  mnc: '98'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '85'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '83'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '81'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '80'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '86'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '84'
+- operator: KDDI Corporation
+  country: JP
+  mcc: '440'
+  mnc: '82'
+- operator: Orange/Petra
+  country: JO
+  mcc: '416'
+  mnc: '77'
+- operator: Umniah Mobile Co.
+  country: JO
+  mcc: '416'
+  mnc: '03'
+- operator: Xpress
+  country: JO
+  mcc: '416'
+  mnc: '02'
+- operator: ZAIN /J.M.T.S
+  country: JO
+  mcc: '416'
+  mnc: '01'
+- operator: Beeline/KaR-Tel LLP
+  country: KZ
+  mcc: '401'
+  mnc: '01'
+- operator: Dalacom/Altel
+  country: KZ
+  mcc: '401'
+  mnc: '07'
+- operator: K-Cell
+  country: KZ
+  mcc: '401'
+  mnc: '02'
+- operator: Tele2/NEO/MTS
+  country: KZ
+  mcc: '401'
+  mnc: '77'
+- operator: Econet Wireless
+  country: KE
+  mcc: '639'
+  mnc: '05'
+- operator: Orange
+  country: KE
+  mcc: '639'
+  mnc: '07'
+- operator: Safaricom Ltd.
+  country: KE
+  mcc: '639'
+  mnc: '02'
+- operator: Airtel/Zain/Celtel Ltd.
+  country: KE
+  mcc: '639'
+  mnc: '03'
+- operator: Kiribati Frigate
+  country: KI
+  mcc: '545'
+  mnc: 09
+- operator: Sun Net
+  country: KP
+  mcc: '467'
+  mnc: '193'
+- operator: KT Freetel Co. Ltd.
+  country: KR
+  mcc: '450'
+  mnc: '04'
+- operator: KT Freetel Co. Ltd.
+  country: KR
+  mcc: '450'
+  mnc: 08
+- operator: KT Freetel Co. Ltd.
+  country: KR
+  mcc: '450'
+  mnc: '02'
+- operator: LG Telecom
+  country: KR
+  mcc: '450'
+  mnc: '06'
+- operator: SK Telecom
+  country: KR
+  mcc: '450'
+  mnc: '03'
+- operator: SK Telecom Co. Ltd
+  country: KR
+  mcc: '450'
+  mnc: '05'
+- operator: Viva
+  country: KW
+  mcc: '419'
+  mnc: '04'
+- operator: Wataniya
+  country: KW
+  mcc: '419'
+  mnc: '03'
+- operator: Zain
+  country: KW
+  mcc: '419'
+  mnc: '02'
+- operator: AkTel LLC
+  country: KG
+  mcc: '437'
+  mnc: '03'
+- operator: Beeline/Bitel
+  country: KG
+  mcc: '437'
+  mnc: '01'
+- operator: MEGACOM
+  country: KG
+  mcc: '437'
+  mnc: '05'
+- operator: O!/NUR Telecom
+  country: KG
+  mcc: '437'
+  mnc: 09
+- operator: ETL Mobile
+  country: LA
+  mcc: '457'
+  mnc: '02'
+- operator: Lao Tel
+  country: LA
+  mcc: '457'
+  mnc: '01'
+- operator: Beeline/Tigo/Millicom
+  country: LA
+  mcc: '457'
+  mnc: 08
+- operator: UNITEL/LAT
+  country: LA
+  mcc: '457'
+  mnc: '03'
+- operator: Bite
+  country: LV
+  mcc: '247'
+  mnc: '05'
+- operator: Latvian Mobile Phone
+  country: LV
+  mcc: '247'
+  mnc: '01'
+- operator: SIA Camel Mobile
+  country: LV
+  mcc: '247'
+  mnc: 09
+- operator: SIA IZZI
+  country: LV
+  mcc: '247'
+  mnc: 08
+- operator: SIA Master Telecom
+  country: LV
+  mcc: '247'
+  mnc: '07'
+- operator: SIA Rigatta
+  country: LV
+  mcc: '247'
+  mnc: '06'
+- operator: Tele2
+  country: LV
+  mcc: '247'
+  mnc: '02'
+- operator: TRIATEL/Telekom Baltija
+  country: LV
+  mcc: '247'
+  mnc: '03'
+- operator: Cellis
+  country: LB
+  mcc: '415'
+  mnc: '35'
+- operator: Cellis
+  country: LB
+  mcc: '415'
+  mnc: '33'
+- operator: Cellis
+  country: LB
+  mcc: '415'
+  mnc: '32'
+- operator: FTML Cellis
+  country: LB
+  mcc: '415'
+  mnc: '34'
+- operator: MIC2/LibanCell/MTC
+  country: LB
+  mcc: '415'
+  mnc: '37'
+- operator: MIC2/LibanCell/MTC
+  country: LB
+  mcc: '415'
+  mnc: '39'
+- operator: MIC2/LibanCell/MTC
+  country: LB
+  mcc: '415'
+  mnc: '38'
+- operator: MIC1 (Alfa)
+  country: LB
+  mcc: '415'
+  mnc: '01'
+- operator: MIC2/LibanCell/MTC
+  country: LB
+  mcc: '415'
+  mnc: '03'
+- operator: MIC2/LibanCell/MTC
+  country: LB
+  mcc: '415'
+  mnc: '36'
+- operator: Econet/Ezi-cel
+  country: LS
+  mcc: '651'
+  mnc: '02'
+- operator: Vodacom Lesotho
+  country: LS
+  mcc: '651'
+  mnc: '01'
+- operator: CELLCOM
+  country: LR
+  mcc: '618'
+  mnc: '07'
+- operator: Comium BVI
+  country: LR
+  mcc: '618'
+  mnc: '04'
+- operator: Libercell
+  country: LR
+  mcc: '618'
+  mnc: '02'
+- operator: LibTelco
+  country: LR
+  mcc: '618'
+  mnc: '20'
+- operator: Lonestar
+  country: LR
+  mcc: '618'
+  mnc: '01'
+- operator: Al-Madar
+  country: LY
+  mcc: '606'
+  mnc: '02'
+- operator: Al-Madar
+  country: LY
+  mcc: '606'
+  mnc: '01'
+- operator: Hatef
+  country: LY
+  mcc: '606'
+  mnc: '06'
+- operator: Libyana
+  country: LY
+  mcc: '606'
+  mnc: '00'
+- operator: Libyana
+  country: LY
+  mcc: '606'
+  mnc: '03'
+- operator: CUBIC (Liechtenstein
+  country: LI
+  mcc: '295'
+  mnc: '06'
+- operator: First Mobile AG
+  country: LI
+  mcc: '295'
+  mnc: '07'
+- operator: Orange
+  country: LI
+  mcc: '295'
+  mnc: '02'
+- operator: Swisscom FL AG
+  country: LI
+  mcc: '295'
+  mnc: '01'
+- operator: Alpmobile/Tele2
+  country: LI
+  mcc: '295'
+  mnc: '77'
+- operator: Telecom FL1 AG
+  country: LI
+  mcc: '295'
+  mnc: '05'
+- operator: Bite
+  country: LT
+  mcc: '246'
+  mnc: '02'
+- operator: Omnitel
+  country: LT
+  mcc: '246'
+  mnc: '01'
+- operator: Tele2
+  country: LT
+  mcc: '246'
+  mnc: '03'
+- operator: Millicom Tango GSM
+  country: LU
+  mcc: '270'
+  mnc: '77'
+- operator: P+T/Post LUXGSM
+  country: LU
+  mcc: '270'
+  mnc: '01'
+- operator: Orange/VOXmobile S.A.
+  country: LU
+  mcc: '270'
+  mnc: '99'
+- operator: C.T.M. TELEMOVEL+
+  country: MO
+  mcc: '455'
+  mnc: '01'
+- operator: C.T.M. TELEMOVEL+
+  country: MO
+  mcc: '455'
+  mnc: '04'
+- operator: China Telecom
+  country: MO
+  mcc: '455'
+  mnc: '02'
+- operator: Hutchison Telephone Co. Ltd
+  country: MO
+  mcc: '455'
+  mnc: '05'
+- operator: Hutchison Telephone Co. Ltd
+  country: MO
+  mcc: '455'
+  mnc: '03'
+- operator: Smartone Mobile
+  country: MO
+  mcc: '455'
+  mnc: '00'
+- operator: Smartone Mobile
+  country: MO
+  mcc: '455'
+  mnc: '06'
+- operator: ONE/Cosmofone
+  country: MK
+  mcc: '294'
+  mnc: '75'
+- operator: ONE/Cosmofone
+  country: MK
+  mcc: '294'
+  mnc: '02'
+- operator: T-Mobile/Mobimak
+  country: MK
+  mcc: '294'
+  mnc: '01'
+- operator: VIP Mobile
+  country: MK
+  mcc: '294'
+  mnc: '03'
+- operator: Airtel/MADACOM
+  country: MG
+  mcc: '646'
+  mnc: '01'
+- operator: Orange/Soci
+  country: MG
+  mcc: '646'
+  mnc: '02'
+- operator: Sacel
+  country: MG
+  mcc: '646'
+  mnc: '03'
+- operator: Telma
+  country: MG
+  mcc: '646'
+  mnc: '04'
+- operator: TNM/Telekom Network Ltd.
+  country: MW
+  mcc: '650'
+  mnc: '01'
+- operator: Airtel/Zain/Celtel ltd.
+  country: MW
+  mcc: '650'
+  mnc: '10'
+- operator: Art900
+  country: MY
+  mcc: '502'
+  mnc: '01'
+- operator: Baraka Telecom Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '151'
+- operator: CelCom
+  country: MY
+  mcc: '502'
+  mnc: '198'
+- operator: CelCom
+  country: MY
+  mcc: '502'
+  mnc: '19'
+- operator: CelCom
+  country: MY
+  mcc: '502'
+  mnc: '13'
+- operator: Digi Telecommunications
+  country: MY
+  mcc: '502'
+  mnc: '16'
+- operator: Digi Telecommunications
+  country: MY
+  mcc: '502'
+  mnc: '10'
+- operator: Electcoms Wireless Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '20'
+- operator: Maxis
+  country: MY
+  mcc: '502'
+  mnc: '17'
+- operator: Maxis
+  country: MY
+  mcc: '502'
+  mnc: '12'
+- operator: MTX Utara
+  country: MY
+  mcc: '502'
+  mnc: '11'
+- operator: Webe/Packet One Networks (Malaysia) Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '153'
+- operator: Samata Communications Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '155'
+- operator: Tron/Talk Focus Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '154'
+- operator: U Mobile
+  country: MY
+  mcc: '502'
+  mnc: '18'
+- operator: XOX Com Sdn Bhd
+  country: MY
+  mcc: '502'
+  mnc: '195'
+- operator: 'YES'
+  country: MY
+  mcc: '502'
+  mnc: '152'
+- operator: Dhiraagu/C&W
+  country: MV
+  mcc: '472'
+  mnc: '01'
+- operator: Ooredo/Wataniya
+  country: MV
+  mcc: '472'
+  mnc: '02'
+- operator: Malitel
+  country: ML
+  mcc: '610'
+  mnc: '01'
+- operator: Orange/IKATEL
+  country: ML
+  mcc: '610'
+  mnc: '02'
+- operator: GO Mobile
+  country: MT
+  mcc: '278'
+  mnc: '21'
+- operator: Melita
+  country: MT
+  mcc: '278'
+  mnc: '77'
+- operator: Vodafone
+  country: MT
+  mcc: '278'
+  mnc: '01'
+- operator: UTS Caraibe
+  country: MQ
+  mcc: '340'
+  mnc: '12'
+- operator: Chinguitel SA
+  country: MR
+  mcc: '609'
+  mnc: '02'
+- operator: Mattel
+  country: MR
+  mcc: '609'
+  mnc: '01'
+- operator: Mauritel
+  country: MR
+  mcc: '609'
+  mnc: '10'
+- operator: Emtel Ltd
+  country: MU
+  mcc: '617'
+  mnc: '10'
+- operator: Mahanagar Telephone
+  country: MU
+  mcc: '617'
+  mnc: '03'
+- operator: Mahanagar Telephone
+  country: MU
+  mcc: '617'
+  mnc: '02'
+- operator: Orange/Cellplus
+  country: MU
+  mcc: '617'
+  mnc: '01'
+- operator: AT&T/IUSACell
+  country: MX
+  mcc: '334'
+  mnc: '050'
+- operator: AT&T/IUSACell
+  country: MX
+  mcc: '334'
+  mnc: '040'
+- operator: AT&T/IUSACell
+  country: MX
+  mcc: '334'
+  mnc: '04'
+- operator: AT&T/IUSACell
+  country: MX
+  mcc: '334'
+  mnc: '50'
+- operator: Movistar/Pegaso
+  country: MX
+  mcc: '334'
+  mnc: '030'
+- operator: Movistar/Pegaso
+  country: MX
+  mcc: '334'
+  mnc: '03'
+- operator: NEXTEL
+  country: MX
+  mcc: '334'
+  mnc: 090
+- operator: NEXTEL
+  country: MX
+  mcc: '334'
+  mnc: '010'
+- operator: NEXTEL
+  country: MX
+  mcc: '334'
+  mnc: 09
+- operator: NEXTEL
+  country: MX
+  mcc: '334'
+  mnc: '01'
+- operator: Operadora Unefon SA de CV
+  country: MX
+  mcc: '334'
+  mnc: 080
+- operator: Operadora Unefon SA de CV
+  country: MX
+  mcc: '334'
+  mnc: '070'
+- operator: SAI PCS
+  country: MX
+  mcc: '334'
+  mnc: '060'
+- operator: TelCel/America Movil
+  country: MX
+  mcc: '334'
+  mnc: '020'
+- operator: TelCel/America Movil
+  country: MX
+  mcc: '334'
+  mnc: '02'
+- operator: FSM Telecom
+  country: FM
+  mcc: '550'
+  mnc: '01'
+- operator: Eventis Mobile
+  country: MD
+  mcc: '259'
+  mnc: '04'
+- operator: IDC/Unite
+  country: MD
+  mcc: '259'
+  mnc: '05'
+- operator: IDC/Unite
+  country: MD
+  mcc: '259'
+  mnc: '99'
+- operator: IDC/Unite
+  country: MD
+  mcc: '259'
+  mnc: '03'
+- operator: Moldcell
+  country: MD
+  mcc: '259'
+  mnc: '02'
+- operator: Orange/Voxtel
+  country: MD
+  mcc: '259'
+  mnc: '01'
+- operator: Monaco Telecom
+  country: MC
+  mcc: '212'
+  mnc: '10'
+- operator: Monaco Telecom
+  country: MC
+  mcc: '212'
+  mnc: '01'
+- operator: G-Mobile Corporation Ltd
+  country: MN
+  mcc: '428'
+  mnc: '98'
+- operator: Mobicom
+  country: MN
+  mcc: '428'
+  mnc: '99'
+- operator: Skytel Co. Ltd
+  country: MN
+  mcc: '428'
+  mnc: '91'
+- operator: Skytel Co. Ltd
+  country: MN
+  mcc: '428'
+  mnc: '00'
+- operator: Unitel
+  country: MN
+  mcc: '428'
+  mnc: '88'
+- operator: Monet/T-mobile
+  country: ME
+  mcc: '297'
+  mnc: '02'
+- operator: Mtel
+  country: ME
+  mcc: '297'
+  mnc: '03'
+- operator: Telenor/Promonte GSM
+  country: ME
+  mcc: '297'
+  mnc: '01'
+- operator: Cable & Wireless
+  country: MS
+  mcc: '354'
+  mnc: '860'
+- operator: IAM/Itissallat
+  country: MA
+  mcc: '604'
+  mnc: '01'
+- operator: INWI/WANA
+  country: MA
+  mcc: '604'
+  mnc: '02'
+- operator: Medi Telecom
+  country: MA
+  mcc: '604'
+  mnc: '00'
+- operator: mCel
+  country: MZ
+  mcc: '643'
+  mnc: '01'
+- operator: Movitel
+  country: MZ
+  mcc: '643'
+  mnc: '03'
+- operator: Vodacom
+  country: MZ
+  mcc: '643'
+  mnc: '04'
+- operator: Myanmar Post & Teleco.
+  country: MM
+  mcc: '414'
+  mnc: '01'
+- operator: Oreedoo
+  country: MM
+  mcc: '414'
+  mnc: '05'
+- operator: Telenor
+  country: MM
+  mcc: '414'
+  mnc: '06'
+- operator: Leo / Orascom
+  country: NA
+  mcc: '649'
+  mnc: '03'
+- operator: MTC
+  country: NA
+  mcc: '649'
+  mnc: '01'
+- operator: Switch/Nam. Telec.
+  country: NA
+  mcc: '649'
+  mnc: '02'
+- operator: Ncell
+  country: NP
+  mcc: '429'
+  mnc: '02'
+- operator: NT Mobile / Namaste
+  country: NP
+  mcc: '429'
+  mnc: '01'
+- operator: Smart Cell
+  country: NP
+  mcc: '429'
+  mnc: '04'
+- operator: 6GMOBILE BV
+  country: NL
+  mcc: '204'
+  mnc: '14'
+- operator: Aspider Solutions
+  country: NL
+  mcc: '204'
+  mnc: '23'
+- operator: Elephant Talk Communications Premium Rate Services Netherlands BV
+  country: NL
+  mcc: '204'
+  mnc: '05'
+- operator: Intercity Mobile Communications BV
+  country: NL
+  mcc: '204'
+  mnc: '17'
+- operator: KPN Telecom B.V.
+  country: NL
+  mcc: '204'
+  mnc: '10'
+- operator: KPN Telecom B.V.
+  country: NL
+  mcc: '204'
+  mnc: 08
+- operator: KPN Telecom B.V.
+  country: NL
+  mcc: '204'
+  mnc: '69'
+- operator: KPN/Telfort
+  country: NL
+  mcc: '204'
+  mnc: '12'
+- operator: Lancelot BV
+  country: NL
+  mcc: '204'
+  mnc: '28'
+- operator: Lycamobile Ltd
+  country: NL
+  mcc: '204'
+  mnc: 09
+- operator: Mundio/Vectone Mobile
+  country: NL
+  mcc: '204'
+  mnc: '06'
+- operator: NS Railinfrabeheer B.V.
+  country: NL
+  mcc: '204'
+  mnc: '21'
+- operator: Private Mobility Nederland BV
+  country: NL
+  mcc: '204'
+  mnc: '24'
+- operator: T-Mobile B.V.
+  country: NL
+  mcc: '204'
+  mnc: '98'
+- operator: T-Mobile B.V.
+  country: NL
+  mcc: '204'
+  mnc: '16'
+- operator: T-mobile/former Orange
+  country: NL
+  mcc: '204'
+  mnc: '20'
+- operator: Tele2
+  country: NL
+  mcc: '204'
+  mnc: '02'
+- operator: Teleena Holding BV
+  country: NL
+  mcc: '204'
+  mnc: '07'
+- operator: Unify Mobile
+  country: NL
+  mcc: '204'
+  mnc: '68'
+- operator: UPC Nederland BV
+  country: NL
+  mcc: '204'
+  mnc: '18'
+- operator: Vodafone Libertel
+  country: NL
+  mcc: '204'
+  mnc: '04'
+- operator: Voiceworks Mobile BV
+  country: NL
+  mcc: '204'
+  mnc: '03'
+- operator: Ziggo BV
+  country: NL
+  mcc: '204'
+  mnc: '15'
+- operator: Cingular Wireless
+  country: AN
+  mcc: '362'
+  mnc: '630'
+- operator: TELCELL GSM
+  country: AN
+  mcc: '362'
+  mnc: '51'
+- operator: SETEL GSM
+  country: AN
+  mcc: '362'
+  mnc: '91'
+- operator: UTS Wireless
+  country: AN
+  mcc: '362'
+  mnc: '951'
+- operator: OPT Mobilis
+  country: NC
+  mcc: '546'
+  mnc: '01'
+- operator: 2degrees
+  country: NZ
+  mcc: '530'
+  mnc: '28'
+- operator: Spark/NZ Telecom
+  country: NZ
+  mcc: '530'
+  mnc: '05'
+- operator: Spark/NZ Telecom
+  country: NZ
+  mcc: '530'
+  mnc: '02'
+- operator: Telstra
+  country: NZ
+  mcc: '530'
+  mnc: '04'
+- operator: Two Degrees Mobile Ltd
+  country: NZ
+  mcc: '530'
+  mnc: '24'
+- operator: Vodafone
+  country: NZ
+  mcc: '530'
+  mnc: '01'
+- operator: Walker Wireless Ltd.
+  country: NZ
+  mcc: '530'
+  mnc: '03'
+- operator: Empresa Nicaraguense de Telecomunicaciones SA (ENITEL)
+  country: NI
+  mcc: '710'
+  mnc: '21'
+- operator: Movistar
+  country: NI
+  mcc: '710'
+  mnc: '30'
+- operator: Claro
+  country: NI
+  mcc: '710'
+  mnc: '73'
+- operator: MOOV/TeleCel
+  country: NE
+  mcc: '614'
+  mnc: '03'
+- operator: Orange/Sahelc.
+  country: NE
+  mcc: '614'
+  mnc: '04'
+- operator: Orange/Sahelc.
+  country: NE
+  mcc: '614'
+  mnc: '01'
+- operator: Airtel/Zain/CelTel
+  country: NE
+  mcc: '614'
+  mnc: '02'
+- operator: Airtel/ZAIN/Econet
+  country: NG
+  mcc: '621'
+  mnc: '20'
+- operator: ETISALAT
+  country: NG
+  mcc: '621'
+  mnc: '60'
+- operator: Glo Mobile
+  country: NG
+  mcc: '621'
+  mnc: '50'
+- operator: M-Tel/Nigeria Telecom. Ltd.
+  country: NG
+  mcc: '621'
+  mnc: '40'
+- operator: MTN
+  country: NG
+  mcc: '621'
+  mnc: '30'
+- operator: Starcomms
+  country: NG
+  mcc: '621'
+  mnc: '99'
+- operator: Visafone
+  country: NG
+  mcc: '621'
+  mnc: '25'
+- operator: Visafone
+  country: NG
+  mcc: '621'
+  mnc: '01'
+- operator: Niue Telecom
+  country: NU
+  mcc: '555'
+  mnc: '01'
+- operator: Com4 AS
+  country: 'NO'
+  mcc: '242'
+  mnc: 09
+- operator: ICE Nordisk Mobiltelefon AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '14'
+- operator: Jernbaneverket (GSM-R)
+  country: 'NO'
+  mcc: '242'
+  mnc: '20'
+- operator: Jernbaneverket (GSM-R)
+  country: 'NO'
+  mcc: '242'
+  mnc: '21'
+- operator: Lycamobile Ltd
+  country: 'NO'
+  mcc: '242'
+  mnc: '23'
+- operator: Netcom
+  country: 'NO'
+  mcc: '242'
+  mnc: '02'
+- operator: Network Norway AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '22'
+- operator: Network Norway AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '05'
+- operator: ICE Nordisk Mobiltelefon AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '06'
+- operator: TDC Mobil A/S
+  country: 'NO'
+  mcc: '242'
+  mnc: 08
+- operator: Tele2
+  country: 'NO'
+  mcc: '242'
+  mnc: '04'
+- operator: Telenor
+  country: 'NO'
+  mcc: '242'
+  mnc: '12'
+- operator: Telenor
+  country: 'NO'
+  mcc: '242'
+  mnc: '01'
+- operator: Teletopia
+  country: 'NO'
+  mcc: '242'
+  mnc: '03'
+- operator: Ventelo AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '017'
+- operator: Ventelo AS
+  country: 'NO'
+  mcc: '242'
+  mnc: '07'
+- operator: Nawras
+  country: OM
+  mcc: '422'
+  mnc: '03'
+- operator: Oman Mobile/GTO
+  country: OM
+  mcc: '422'
+  mnc: '02'
+- operator: Instaphone
+  country: PK
+  mcc: '410'
+  mnc: 08
+- operator: Mobilink
+  country: PK
+  mcc: '410'
+  mnc: '01'
+- operator: Telenor
+  country: PK
+  mcc: '410'
+  mnc: '06'
+- operator: UFONE/PAKTel
+  country: PK
+  mcc: '410'
+  mnc: '03'
+- operator: Warid Telecom
+  country: PK
+  mcc: '410'
+  mnc: '07'
+- operator: ZONG/CMPak
+  country: PK
+  mcc: '410'
+  mnc: '04'
+- operator: Palau Mobile Corp. (PMC) (Palau
+  country: PW
+  mcc: '552'
+  mnc: '80'
+- operator: Palau National Communications Corp. (PNCC) (Palau
+  country: PW
+  mcc: '552'
+  mnc: '01'
+- operator: Jawwal
+  country: PS
+  mcc: '425'
+  mnc: '05'
+- operator: Wataniya Mobile
+  country: PS
+  mcc: '425'
+  mnc: '06'
+- operator: Cable & W./Mas Movil
+  country: PA
+  mcc: '714'
+  mnc: '01'
+- operator: Claro
+  country: PA
+  mcc: '714'
+  mnc: '03'
+- operator: Digicel
+  country: PA
+  mcc: '714'
+  mnc: '04'
+- operator: Movistar
+  country: PA
+  mcc: '714'
+  mnc: '020'
+- operator: Movistar
+  country: PA
+  mcc: '714'
+  mnc: '02'
+- operator: Digicel
+  country: PG
+  mcc: '537'
+  mnc: '03'
+- operator: GreenCom PNG Ltd
+  country: PG
+  mcc: '537'
+  mnc: '02'
+- operator: Pacific Mobile
+  country: PG
+  mcc: '537'
+  mnc: '01'
+- operator: Claro/Hutchison
+  country: PY
+  mcc: '744'
+  mnc: '02'
+- operator: Compa
+  country: PY
+  mcc: '744'
+  mnc: '03'
+- operator: Hola/VOX
+  country: PY
+  mcc: '744'
+  mnc: '01'
+- operator: TIM/Nucleo/Personal
+  country: PY
+  mcc: '744'
+  mnc: '05'
+- operator: Tigo/Telecel
+  country: PY
+  mcc: '744'
+  mnc: '04'
+- operator: Claro /Amer.Mov./TIM
+  country: PE
+  mcc: '716'
+  mnc: '10'
+- operator: Claro /Amer.Mov./TIM
+  country: PE
+  mcc: '716'
+  mnc: '20'
+- operator: GlobalStar
+  country: PE
+  mcc: '716'
+  mnc: '01'
+- operator: GlobalStar
+  country: PE
+  mcc: '716'
+  mnc: '02'
+- operator: Movistar
+  country: PE
+  mcc: '716'
+  mnc: '06'
+- operator: Nextel
+  country: PE
+  mcc: '716'
+  mnc: '07'
+- operator: Nextel
+  country: PE
+  mcc: '716'
+  mnc: '17'
+- operator: Viettel Mobile
+  country: PE
+  mcc: '716'
+  mnc: '15'
+- operator: Fix Line
+  country: PH
+  mcc: '515'
+  mnc: '00'
+- operator: Globe Telecom
+  country: PH
+  mcc: '515'
+  mnc: '02'
+- operator: Globe Telecom
+  country: PH
+  mcc: '515'
+  mnc: '01'
+- operator: Next Mobile
+  country: PH
+  mcc: '515'
+  mnc: '88'
+- operator: RED Mobile/Cure
+  country: PH
+  mcc: '515'
+  mnc: '18'
+- operator: Smart
+  country: PH
+  mcc: '515'
+  mnc: '03'
+- operator: SUN/Digitel
+  country: PH
+  mcc: '515'
+  mnc: '05'
+- operator: Aero2 SP.
+  country: PL
+  mcc: '260'
+  mnc: '17'
+- operator: AMD Telecom.
+  country: PL
+  mcc: '260'
+  mnc: '18'
+- operator: CallFreedom Sp. z o.o.
+  country: PL
+  mcc: '260'
+  mnc: '38'
+- operator: Cyfrowy POLSAT S.A.
+  country: PL
+  mcc: '260'
+  mnc: '12'
+- operator: e-Telko
+  country: PL
+  mcc: '260'
+  mnc: 08
+- operator: Lycamobile
+  country: PL
+  mcc: '260'
+  mnc: 09
+- operator: Mobyland
+  country: PL
+  mcc: '260'
+  mnc: '16'
+- operator: Mundio Mobile Sp. z o.o.
+  country: PL
+  mcc: '260'
+  mnc: '36'
+- operator: Play/P4
+  country: PL
+  mcc: '260'
+  mnc: '07'
+- operator: NORDISK Polska
+  country: PL
+  mcc: '260'
+  mnc: '11'
+- operator: Orange/IDEA/Centertel
+  country: PL
+  mcc: '260'
+  mnc: '05'
+- operator: Orange/IDEA/Centertel
+  country: PL
+  mcc: '260'
+  mnc: '03'
+- operator: PKP Polskie Linie Kolejowe S.A.
+  country: PL
+  mcc: '260'
+  mnc: '35'
+- operator: Play/P4
+  country: PL
+  mcc: '260'
+  mnc: '06'
+- operator: Play/P4
+  country: PL
+  mcc: '260'
+  mnc: '98'
+- operator: Polkomtel/Plus
+  country: PL
+  mcc: '260'
+  mnc: '01'
+- operator: Sferia
+  country: PL
+  mcc: '260'
+  mnc: '10'
+- operator: Sferia
+  country: PL
+  mcc: '260'
+  mnc: '14'
+- operator: Sferia
+  country: PL
+  mcc: '260'
+  mnc: '13'
+- operator: T-Mobile/ERA
+  country: PL
+  mcc: '260'
+  mnc: '34'
+- operator: T-Mobile/ERA
+  country: PL
+  mcc: '260'
+  mnc: '02'
+- operator: Tele2
+  country: PL
+  mcc: '260'
+  mnc: '15'
+- operator: Tele2
+  country: PL
+  mcc: '260'
+  mnc: '04'
+- operator: Lycamobile
+  country: PT
+  mcc: '268'
+  mnc: '04'
+- operator: NOS/Optimus
+  country: PT
+  mcc: '268'
+  mnc: '03'
+- operator: NOS/Optimus
+  country: PT
+  mcc: '268'
+  mnc: '07'
+- operator: MEO/TMN
+  country: PT
+  mcc: '268'
+  mnc: '06'
+- operator: Vodafone
+  country: PT
+  mcc: '268'
+  mnc: '01'
+- operator: Puerto Rico Telephone Company Inc. (PRTC)
+  country: PR
+  mcc: '330'
+  mnc: '110'
+- operator: Puerto Rico Telephone Company Inc. (PRTC)
+  country: PR
+  mcc: '330'
+  mnc: '11'
+- operator: Ooredoo/Qtel
+  country: QA
+  mcc: '427'
+  mnc: '01'
+- operator: Vodafone
+  country: QA
+  mcc: '427'
+  mnc: '02'
+- operator: Orange
+  country: RE
+  mcc: '647'
+  mnc: '00'
+- operator: Outremer Telecom
+  country: RE
+  mcc: '647'
+  mnc: '02'
+- operator: SFR
+  country: RE
+  mcc: '647'
+  mnc: '10'
+- operator: Cosmote
+  country: RO
+  mcc: '226'
+  mnc: '03'
+- operator: Enigma Systems
+  country: RO
+  mcc: '226'
+  mnc: '11'
+- operator: Lycamobile
+  country: RO
+  mcc: '226'
+  mnc: '16'
+- operator: Orange
+  country: RO
+  mcc: '226'
+  mnc: '10'
+- operator: RCS&RDS Digi Mobile
+  country: RO
+  mcc: '226'
+  mnc: '05'
+- operator: Romtelecom SA
+  country: RO
+  mcc: '226'
+  mnc: '02'
+- operator: Telemobil/Zapp
+  country: RO
+  mcc: '226'
+  mnc: '06'
+- operator: Vodafone
+  country: RO
+  mcc: '226'
+  mnc: '01'
+- operator: Telemobil/Zapp
+  country: RO
+  mcc: '226'
+  mnc: '04'
+- operator: Baykal Westcom
+  country: RU
+  mcc: '250'
+  mnc: '12'
+- operator: BeeLine/VimpelCom
+  country: RU
+  mcc: '250'
+  mnc: '28'
+- operator: DTC/Don Telecom
+  country: RU
+  mcc: '250'
+  mnc: '10'
+- operator: Kuban GSM
+  country: RU
+  mcc: '250'
+  mnc: '13'
+- operator: MOTIV/LLC Ekaterinburg-2000
+  country: RU
+  mcc: '250'
+  mnc: '35'
+- operator: Megafon
+  country: RU
+  mcc: '250'
+  mnc: '02'
+- operator: MTS
+  country: RU
+  mcc: '250'
+  mnc: '01'
+- operator: NCC
+  country: RU
+  mcc: '250'
+  mnc: '03'
+- operator: NTC
+  country: RU
+  mcc: '250'
+  mnc: '16'
+- operator: OJSC Altaysvyaz
+  country: RU
+  mcc: '250'
+  mnc: '19'
+- operator: Orensot
+  country: RU
+  mcc: '250'
+  mnc: '11'
+- operator: Printelefone
+  country: RU
+  mcc: '250'
+  mnc: '92'
+- operator: Sibchallenge
+  country: RU
+  mcc: '250'
+  mnc: '04'
+- operator: StavTelesot
+  country: RU
+  mcc: '250'
+  mnc: '44'
+- operator: Tele2/ECC/Volgogr.
+  country: RU
+  mcc: '250'
+  mnc: '20'
+- operator: Telecom XXL
+  country: RU
+  mcc: '250'
+  mnc: '93'
+- operator: UralTel
+  country: RU
+  mcc: '250'
+  mnc: '17'
+- operator: UralTel
+  country: RU
+  mcc: '250'
+  mnc: '39'
+- operator: BeeLine/VimpelCom
+  country: RU
+  mcc: '250'
+  mnc: '99'
+- operator: Yenisey Telecom
+  country: RU
+  mcc: '250'
+  mnc: '05'
+- operator: ZAO SMARTS
+  country: RU
+  mcc: '250'
+  mnc: '15'
+- operator: ZAO SMARTS
+  country: RU
+  mcc: '250'
+  mnc: '07'
+- operator: Airtel
+  country: RW
+  mcc: '635'
+  mnc: '14'
+- operator: MTN/Rwandacell
+  country: RW
+  mcc: '635'
+  mnc: '10'
+- operator: TIGO
+  country: RW
+  mcc: '635'
+  mnc: '13'
+- operator: Cable & Wireless
+  country: KN
+  mcc: '356'
+  mnc: '110'
+- operator: Digicel
+  country: KN
+  mcc: '356'
+  mnc: '50'
+- operator: UTS Cariglobe
+  country: KN
+  mcc: '356'
+  mnc: '70'
+- operator: Cable & Wireless
+  country: LC
+  mcc: '358'
+  mnc: '110'
+- operator: Cingular Wireless
+  country: LC
+  mcc: '358'
+  mnc: '30'
+- operator: Digicel (St Lucia) Limited
+  country: LC
+  mcc: '358'
+  mnc: '50'
+- operator: Samoatel Mobile
+  country: WS
+  mcc: '549'
+  mnc: '27'
+- operator: Telecom Samoa Cellular Ltd.
+  country: WS
+  mcc: '549'
+  mnc: '01'
+- operator: Prima Telecom
+  country: SM
+  mcc: '292'
+  mnc: '01'
+- operator: CSTmovel
+  country: ST
+  mcc: '626'
+  mnc: '01'
+- operator: AeroMobile
+  country: N/A
+  mcc: '901'
+  mnc: '14'
+- operator: InMarSAT
+  country: N/A
+  mcc: '901'
+  mnc: '11'
+- operator: Maritime Communications Partner AS
+  country: N/A
+  mcc: '901'
+  mnc: '12'
+- operator: Thuraya Satellite
+  country: N/A
+  mcc: '901'
+  mnc: '05'
+- operator: Zain
+  country: SA
+  mcc: '420'
+  mnc: '07'
+- operator: Etihad/Etisalat/Mobily
+  country: SA
+  mcc: '420'
+  mnc: '03'
+- operator: Lebara Mobile
+  country: SA
+  mcc: '420'
+  mnc: '06'
+- operator: STC/Al Jawal
+  country: SA
+  mcc: '420'
+  mnc: '01'
+- operator: Virgin Mobile
+  country: SA
+  mcc: '420'
+  mnc: '05'
+- operator: Zain
+  country: SA
+  mcc: '420'
+  mnc: '04'
+- operator: Expresso/Sudatel
+  country: SN
+  mcc: '608'
+  mnc: '03'
+- operator: Orange/Sonatel
+  country: SN
+  mcc: '608'
+  mnc: '01'
+- operator: TIGO/Sentel GSM
+  country: SN
+  mcc: '608'
+  mnc: '02'
+- operator: MTS/Telekom Srbija
+  country: RS
+  mcc: '220'
+  mnc: '03'
+- operator: Telenor/Mobtel
+  country: RS
+  mcc: '220'
+  mnc: '01'
+- operator: Telenor/Mobtel
+  country: RS
+  mcc: '220'
+  mnc: '02'
+- operator: VIP Mobile
+  country: RS
+  mcc: '220'
+  mnc: '05'
+- operator: Airtel
+  country: SC
+  mcc: '633'
+  mnc: '10'
+- operator: C&W
+  country: SC
+  mcc: '633'
+  mnc: '01'
+- operator: Smartcom
+  country: SC
+  mcc: '633'
+  mnc: '02'
+- operator: Africel
+  country: SL
+  mcc: '619'
+  mnc: '03'
+- operator: Airtel/Zain/Celtel
+  country: SL
+  mcc: '619'
+  mnc: '01'
+- operator: Comium
+  country: SL
+  mcc: '619'
+  mnc: '04'
+- operator: Africel
+  country: SL
+  mcc: '619'
+  mnc: '05'
+- operator: Tigo/Millicom
+  country: SL
+  mcc: '619'
+  mnc: '02'
+- operator: Mobitel
+  country: SL
+  mcc: '619'
+  mnc: '25'
+- operator: GRID Communications Pte Ltd
+  country: SG
+  mcc: '525'
+  mnc: '12'
+- operator: MobileOne Ltd
+  country: SG
+  mcc: '525'
+  mnc: '03'
+- operator: Singtel
+  country: SG
+  mcc: '525'
+  mnc: '01'
+- operator: Singtel
+  country: SG
+  mcc: '525'
+  mnc: '07'
+- operator: Singtel
+  country: SG
+  mcc: '525'
+  mnc: '02'
+- operator: Starhub
+  country: SG
+  mcc: '525'
+  mnc: '06'
+- operator: Starhub
+  country: SG
+  mcc: '525'
+  mnc: '05'
+- operator: 4Ka
+  country: SK
+  mcc: '231'
+  mnc: '03'
+- operator: O2
+  country: SK
+  mcc: '231'
+  mnc: '06'
+- operator: Orange
+  country: SK
+  mcc: '231'
+  mnc: '01'
+- operator: Orange
+  country: SK
+  mcc: '231'
+  mnc: '05'
+- operator: Orange
+  country: SK
+  mcc: '231'
+  mnc: '15'
+- operator: T-Mobile
+  country: SK
+  mcc: '231'
+  mnc: '02'
+- operator: T-Mobile
+  country: SK
+  mcc: '231'
+  mnc: '04'
+- operator: Zeleznice Slovenskej republiky (ZSR)
+  country: SK
+  mcc: '231'
+  mnc: '99'
+- operator: Mobitel
+  country: SI
+  mcc: '293'
+  mnc: '41'
+- operator: SI.Mobil
+  country: SI
+  mcc: '293'
+  mnc: '40'
+- operator: Slovenske zeleznice d.o.o.
+  country: SI
+  mcc: '293'
+  mnc: '10'
+- operator: T-2 d.o.o.
+  country: SI
+  mcc: '293'
+  mnc: '64'
+- operator: Telemach/TusMobil/VEGA
+  country: SI
+  mcc: '293'
+  mnc: '70'
+- operator: bemobile
+  country: SB
+  mcc: '540'
+  mnc: '02'
+- operator: BREEZE
+  country: SB
+  mcc: '540'
+  mnc: '10'
+- operator: BREEZE
+  country: SB
+  mcc: '540'
+  mnc: '01'
+- operator: Golis
+  country: SO
+  mcc: '637'
+  mnc: '30'
+- operator: HorTel
+  country: SO
+  mcc: '637'
+  mnc: '19'
+- operator: Nationlink
+  country: SO
+  mcc: '637'
+  mnc: '10'
+- operator: Nationlink
+  country: SO
+  mcc: '637'
+  mnc: '60'
+- operator: Somafone
+  country: SO
+  mcc: '637'
+  mnc: '04'
+- operator: Somtel
+  country: SO
+  mcc: '637'
+  mnc: '82'
+- operator: Somtel
+  country: SO
+  mcc: '637'
+  mnc: '71'
+- operator: Telesom
+  country: SO
+  mcc: '637'
+  mnc: '01'
+- operator: 8.ta
+  country: ZA
+  mcc: '655'
+  mnc: '02'
+- operator: Cape Town Metropolitan
+  country: ZA
+  mcc: '655'
+  mnc: '21'
+- operator: Cell C
+  country: ZA
+  mcc: '655'
+  mnc: '07'
+- operator: MTN
+  country: ZA
+  mcc: '655'
+  mnc: '12'
+- operator: MTN
+  country: ZA
+  mcc: '655'
+  mnc: '10'
+- operator: Sentech
+  country: ZA
+  mcc: '655'
+  mnc: '06'
+- operator: Vodacom
+  country: ZA
+  mcc: '655'
+  mnc: '01'
+- operator: Wireless Business Solutions (Pty) Ltd
+  country: ZA
+  mcc: '655'
+  mnc: '19'
+- operator: Gemtel Ltd (South Sudan
+  country: SS
+  mcc: '659'
+  mnc: '03'
+- operator: MTN South Sudan (South Sudan
+  country: SS
+  mcc: '659'
+  mnc: '02'
+- operator: Network of The World Ltd (NOW) (South Sudan
+  country: SS
+  mcc: '659'
+  mnc: '04'
+- operator: Zain South Sudan (South Sudan
+  country: SS
+  mcc: '659'
+  mnc: '06'
+- operator: Lycamobile SL
+  country: ES
+  mcc: '214'
+  mnc: '23'
+- operator: Digi Spain Telecom SL
+  country: ES
+  mcc: '214'
+  mnc: '22'
+- operator: BT Espana  SAU
+  country: ES
+  mcc: '214'
+  mnc: '15'
+- operator: Cableuropa SAU (ONO)
+  country: ES
+  mcc: '214'
+  mnc: '18'
+- operator: Euskaltel SA
+  country: ES
+  mcc: '214'
+  mnc: 08
+- operator: fonYou Wireless SL
+  country: ES
+  mcc: '214'
+  mnc: '20'
+- operator: ION Mobile
+  country: ES
+  mcc: '214'
+  mnc: '32'
+- operator: Jazz Telecom SAU
+  country: ES
+  mcc: '214'
+  mnc: '21'
+- operator: Lleida
+  country: ES
+  mcc: '214'
+  mnc: '26'
+- operator: Lycamobile SL
+  country: ES
+  mcc: '214'
+  mnc: '25'
+- operator: Movistar
+  country: ES
+  mcc: '214'
+  mnc: '07'
+- operator: Movistar
+  country: ES
+  mcc: '214'
+  mnc: '05'
+- operator: Orange
+  country: ES
+  mcc: '214'
+  mnc: 09
+- operator: Orange
+  country: ES
+  mcc: '214'
+  mnc: '03'
+- operator: Orange
+  country: ES
+  mcc: '214'
+  mnc: '11'
+- operator: R Cable y Telec. Galicia SA
+  country: ES
+  mcc: '214'
+  mnc: '17'
+- operator: Simyo/KPN
+  country: ES
+  mcc: '214'
+  mnc: '19'
+- operator: Telecable de Asturias SA
+  country: ES
+  mcc: '214'
+  mnc: '16'
+- operator: Truphone
+  country: ES
+  mcc: '214'
+  mnc: '27'
+- operator: Vodafone
+  country: ES
+  mcc: '214'
+  mnc: '01'
+- operator: Vodafone Enabler Espana SL
+  country: ES
+  mcc: '214'
+  mnc: '06'
+- operator: Yoigo
+  country: ES
+  mcc: '214'
+  mnc: '04'
+- operator: Airtel
+  country: LK
+  mcc: '413'
+  mnc: '05'
+- operator: Etisalat/Tigo
+  country: LK
+  mcc: '413'
+  mnc: '03'
+- operator: H3G Hutchison
+  country: LK
+  mcc: '413'
+  mnc: 08
+- operator: Mobitel Ltd.
+  country: LK
+  mcc: '413'
+  mnc: '01'
+- operator: MTN/Dialog
+  country: LK
+  mcc: '413'
+  mnc: '02'
+- operator: Ameris
+  country: PM
+  mcc: '308'
+  mnc: '01'
+- operator: C & W
+  country: VC
+  mcc: '360'
+  mnc: '110'
+- operator: Cingular
+  country: VC
+  mcc: '360'
+  mnc: '100'
+- operator: Cingular
+  country: VC
+  mcc: '360'
+  mnc: '10'
+- operator: Digicel
+  country: VC
+  mcc: '360'
+  mnc: '050'
+- operator: Digicel
+  country: VC
+  mcc: '360'
+  mnc: '70'
+- operator: Canar Telecom
+  country: SD
+  mcc: '634'
+  mnc: '00'
+- operator: MTN
+  country: SD
+  mcc: '634'
+  mnc: '22'
+- operator: MTN
+  country: SD
+  mcc: '634'
+  mnc: '02'
+- operator: Sudani One
+  country: SD
+  mcc: '634'
+  mnc: '15'
+- operator: Sudani One
+  country: SD
+  mcc: '634'
+  mnc: '07'
+- operator: Vivacell
+  country: SD
+  mcc: '634'
+  mnc: '05'
+- operator: Vivacell
+  country: SD
+  mcc: '634'
+  mnc: 08
+- operator: ZAIN/Mobitel
+  country: SD
+  mcc: '634'
+  mnc: '06'
+- operator: ZAIN/Mobitel
+  country: SD
+  mcc: '634'
+  mnc: '01'
+- operator: Digicel
+  country: SR
+  mcc: '746'
+  mnc: '03'
+- operator: Telesur
+  country: SR
+  mcc: '746'
+  mnc: '01'
+- operator: Telecommunicatiebedrijf Suriname (TELESUR)
+  country: SR
+  mcc: '746'
+  mnc: '02'
+- operator: UNIQA
+  country: SR
+  mcc: '746'
+  mnc: '04'
+- operator: Swazi MTN
+  country: SZ
+  mcc: '653'
+  mnc: '10'
+- operator: SwaziTelecom
+  country: SZ
+  mcc: '653'
+  mnc: '01'
+- operator: 42 Telecom AB
+  country: SE
+  mcc: '240'
+  mnc: '16'
+- operator: 42 Telecom AB
+  country: SE
+  mcc: '240'
+  mnc: '35'
+- operator: Beepsend
+  country: SE
+  mcc: '240'
+  mnc: '26'
+- operator: NextGen Mobile Ltd (CardBoardFish)
+  country: SE
+  mcc: '240'
+  mnc: '30'
+- operator: CoolTEL Aps
+  country: SE
+  mcc: '240'
+  mnc: '28'
+- operator: Digitel Mobile Srl
+  country: SE
+  mcc: '240'
+  mnc: '25'
+- operator: Eu Tel AB
+  country: SE
+  mcc: '240'
+  mnc: '22'
+- operator: Fogg Mobile AB
+  country: SE
+  mcc: '240'
+  mnc: '27'
+- operator: Generic Mobile Systems Sweden AB
+  country: SE
+  mcc: '240'
+  mnc: '18'
+- operator: Gotalandsnatet AB
+  country: SE
+  mcc: '240'
+  mnc: '17'
+- operator: H3G Access AB
+  country: SE
+  mcc: '240'
+  mnc: '02'
+- operator: H3G Access AB
+  country: SE
+  mcc: '240'
+  mnc: '04'
+- operator: ID Mobile
+  country: SE
+  mcc: '240'
+  mnc: '36'
+- operator: Infobip Ltd.
+  country: SE
+  mcc: '240'
+  mnc: '23'
+- operator: Lindholmen Science Park AB
+  country: SE
+  mcc: '240'
+  mnc: '11'
+- operator: Lycamobile Ltd
+  country: SE
+  mcc: '240'
+  mnc: '12'
+- operator: Mercury International Carrier Services
+  country: SE
+  mcc: '240'
+  mnc: '29'
+- operator: Mundio Mobile (Sweden) Ltd
+  country: SE
+  mcc: '240'
+  mnc: '19'
+- operator: Spring Mobil AB
+  country: SE
+  mcc: '240'
+  mnc: '10'
+- operator: Svenska UMTS-N
+  country: SE
+  mcc: '240'
+  mnc: '05'
+- operator: TDC Sverige AB
+  country: SE
+  mcc: '240'
+  mnc: '14'
+- operator: Tele2 Sverige AB
+  country: SE
+  mcc: '240'
+  mnc: '07'
+- operator: Telenor (Vodafone)
+  country: SE
+  mcc: '240'
+  mnc: '24'
+- operator: Telenor (Vodafone)
+  country: SE
+  mcc: '240'
+  mnc: 08
+- operator: Telenor (Vodafone)
+  country: SE
+  mcc: '240'
+  mnc: '06'
+- operator: Telia Mobile
+  country: SE
+  mcc: '240'
+  mnc: '01'
+- operator: Ventelo Sverige AB
+  country: SE
+  mcc: '240'
+  mnc: '13'
+- operator: Wireless Maingate AB
+  country: SE
+  mcc: '240'
+  mnc: '20'
+- operator: Wireless Maingate Nordic AB
+  country: SE
+  mcc: '240'
+  mnc: '15'
+- operator: BebbiCell AG
+  country: CH
+  mcc: '228'
+  mnc: '51'
+- operator: Comfone AG
+  country: CH
+  mcc: '228'
+  mnc: 09
+- operator: Comfone AG
+  country: CH
+  mcc: '228'
+  mnc: '05'
+- operator: TDC Sunrise
+  country: CH
+  mcc: '228'
+  mnc: '07'
+- operator: Lycamobile AG
+  country: CH
+  mcc: '228'
+  mnc: '54'
+- operator: Mundio Mobile AG
+  country: CH
+  mcc: '228'
+  mnc: '52'
+- operator: Salt/Orange
+  country: CH
+  mcc: '228'
+  mnc: '03'
+- operator: Swisscom
+  country: CH
+  mcc: '228'
+  mnc: '01'
+- operator: TDC Sunrise
+  country: CH
+  mcc: '228'
+  mnc: '12'
+- operator: TDC Sunrise
+  country: CH
+  mcc: '228'
+  mnc: '02'
+- operator: TDC Sunrise
+  country: CH
+  mcc: '228'
+  mnc: 08
+- operator: upc cablecom GmbH
+  country: CH
+  mcc: '228'
+  mnc: '53'
+- operator: MTN/Spacetel
+  country: SY
+  mcc: '417'
+  mnc: '02'
+- operator: Syriatel Holdings
+  country: SY
+  mcc: '417'
+  mnc: 09
+- operator: Syriatel Holdings
+  country: SY
+  mcc: '417'
+  mnc: '01'
+- operator: ACeS Taiwan - ACeS Taiwan Telecommunications Co Ltd
+  country: TW
+  mcc: '466'
+  mnc: '68'
+- operator: Asia Pacific Telecom Co. Ltd (APT)
+  country: TW
+  mcc: '466'
+  mnc: '05'
+- operator: Chunghwa Telecom LDM
+  country: TW
+  mcc: '466'
+  mnc: '92'
+- operator: Chunghwa Telecom LDM
+  country: TW
+  mcc: '466'
+  mnc: '11'
+- operator: Far EasTone
+  country: TW
+  mcc: '466'
+  mnc: '02'
+- operator: Far EasTone
+  country: TW
+  mcc: '466'
+  mnc: '03'
+- operator: Far EasTone
+  country: TW
+  mcc: '466'
+  mnc: '07'
+- operator: Far EasTone
+  country: TW
+  mcc: '466'
+  mnc: '01'
+- operator: Far EasTone
+  country: TW
+  mcc: '466'
+  mnc: '06'
+- operator: Global Mobile Corp.
+  country: TW
+  mcc: '466'
+  mnc: '10'
+- operator: International Telecom Co. Ltd (FITEL)
+  country: TW
+  mcc: '466'
+  mnc: '56'
+- operator: KG Telecom
+  country: TW
+  mcc: '466'
+  mnc: '88'
+- operator: TransAsia
+  country: TW
+  mcc: '466'
+  mnc: '99'
+- operator: Taiwan Cellular
+  country: TW
+  mcc: '466'
+  mnc: '97'
+- operator: Mobitai
+  country: TW
+  mcc: '466'
+  mnc: '93'
+- operator: T-Star/VIBO
+  country: TW
+  mcc: '466'
+  mnc: '89'
+- operator: VMAX Telecom Co. Ltd
+  country: TW
+  mcc: '466'
+  mnc: 09
+- operator: Babilon-M
+  country: TK
+  mcc: '436'
+  mnc: '04'
+- operator: Bee Line
+  country: TK
+  mcc: '436'
+  mnc: '05'
+- operator: CJSC Indigo Tajikistan
+  country: TK
+  mcc: '436'
+  mnc: '02'
+- operator: Tcell/JC Somoncom
+  country: TK
+  mcc: '436'
+  mnc: '12'
+- operator: MLT/TT mobile
+  country: TK
+  mcc: '436'
+  mnc: '03'
+- operator: Tcell/JC Somoncom
+  country: TK
+  mcc: '436'
+  mnc: '01'
+- operator: Benson Informatics Ltd
+  country: TZ
+  mcc: '640'
+  mnc: 08
+- operator: Dovetel (T) Ltd
+  country: TZ
+  mcc: '640'
+  mnc: '06'
+- operator: Halotel/Viettel Ltd
+  country: TZ
+  mcc: '640'
+  mnc: 09
+- operator: Smile Communications Tanzania Ltd
+  country: TZ
+  mcc: '640'
+  mnc: '11'
+- operator: Tanzania Telecommunications Company Ltd (TTCL)
+  country: TZ
+  mcc: '640'
+  mnc: '07'
+- operator: TIGO/MIC
+  country: TZ
+  mcc: '640'
+  mnc: '02'
+- operator: Tri Telecomm. Ltd.
+  country: TZ
+  mcc: '640'
+  mnc: '01'
+- operator: Vodacom Ltd
+  country: TZ
+  mcc: '640'
+  mnc: '04'
+- operator: Airtel/ZAIN/Celtel
+  country: TZ
+  mcc: '640'
+  mnc: '05'
+- operator: Zantel/Zanzibar Telecom
+  country: TZ
+  mcc: '640'
+  mnc: '03'
+- operator: ACeS Thailand - ACeS Regional Services Co Ltd
+  country: TH
+  mcc: '520'
+  mnc: '20'
+- operator: ACT Mobile
+  country: TH
+  mcc: '520'
+  mnc: '15'
+- operator: Advanced Wireless Networks/AWN
+  country: TH
+  mcc: '520'
+  mnc: '03'
+- operator: AIS/Advanced Info Service
+  country: TH
+  mcc: '520'
+  mnc: '01'
+- operator: Digital Phone Co.
+  country: TH
+  mcc: '520'
+  mnc: '23'
+- operator: Hutch/CAT CDMA
+  country: TH
+  mcc: '520'
+  mnc: '00'
+- operator: Total Access (DTAC)
+  country: TH
+  mcc: '520'
+  mnc: '05'
+- operator: Total Access (DTAC)
+  country: TH
+  mcc: '520'
+  mnc: '18'
+- operator: True Move/Orange
+  country: TH
+  mcc: '520'
+  mnc: '04'
+- operator: True Move/Orange
+  country: TH
+  mcc: '520'
+  mnc: '99'
+- operator: Telin/ Telkomcel
+  country: TP
+  mcc: '514'
+  mnc: '01'
+- operator: Timor Telecom
+  country: TP
+  mcc: '514'
+  mnc: '02'
+- operator: Telecel/MOOV
+  country: TG
+  mcc: '615'
+  mnc: '02'
+- operator: Telecel/MOOV
+  country: TG
+  mcc: '615'
+  mnc: '03'
+- operator: Togo Telecom/TogoCELL
+  country: TG
+  mcc: '615'
+  mnc: '01'
+- operator: Shoreline Communication
+  country: TO
+  mcc: '539'
+  mnc: '43'
+- operator: Tonga Communications
+  country: TO
+  mcc: '539'
+  mnc: '01'
+- operator: Bmobile/TSTT
+  country: TT
+  mcc: '374'
+  mnc: '120'
+- operator: Bmobile/TSTT
+  country: TT
+  mcc: '374'
+  mnc: '12'
+- operator: Digicel
+  country: TT
+  mcc: '374'
+  mnc: '130'
+- operator: LaqTel Ltd.
+  country: TT
+  mcc: '374'
+  mnc: '140'
+- operator: Orange
+  country: TN
+  mcc: '605'
+  mnc: '01'
+- operator: Oreedo/Orascom
+  country: TN
+  mcc: '605'
+  mnc: '03'
+- operator: TuniCell/Tunisia Telecom
+  country: TN
+  mcc: '605'
+  mnc: '02'
+- operator: TuniCell/Tunisia Telecom
+  country: TN
+  mcc: '605'
+  mnc: '06'
+- operator: AVEA/Aria
+  country: TR
+  mcc: '286'
+  mnc: '03'
+- operator: AVEA/Aria
+  country: TR
+  mcc: '286'
+  mnc: '04'
+- operator: Turkcell
+  country: TR
+  mcc: '286'
+  mnc: '01'
+- operator: Vodafone-Telsim
+  country: TR
+  mcc: '286'
+  mnc: '02'
+- operator: MTS/Barash Communication
+  country: TM
+  mcc: '438'
+  mnc: '01'
+- operator: Altyn Asyr/TM-Cell
+  country: TM
+  mcc: '438'
+  mnc: '02'
+- operator: Cable & Wireless (TCI) Ltd
+  country: TC
+  mcc: '376'
+  mnc: '350'
+- operator: Digicel TCI Ltd
+  country: TC
+  mcc: '376'
+  mnc: '050'
+- operator: IslandCom Communications Ltd.
+  country: TC
+  mcc: '376'
+  mnc: '352'
+- operator: Tuvalu Telecommunication Corporation (TTC)
+  country: TV
+  mcc: '553'
+  mnc: '01'
+- operator: Airtel/Celtel
+  country: UG
+  mcc: '641'
+  mnc: '01'
+- operator: i-Tel Ltd
+  country: UG
+  mcc: '641'
+  mnc: '66'
+- operator: K2 Telecom Ltd
+  country: UG
+  mcc: '641'
+  mnc: '30'
+- operator: MTN Ltd.
+  country: UG
+  mcc: '641'
+  mnc: '10'
+- operator: Orange
+  country: UG
+  mcc: '641'
+  mnc: '14'
+- operator: Smile Communications Uganda Ltd
+  country: UG
+  mcc: '641'
+  mnc: '33'
+- operator: Suretelecom Uganda Ltd
+  country: UG
+  mcc: '641'
+  mnc: '18'
+- operator: Uganda Telecom Ltd.
+  country: UG
+  mcc: '641'
+  mnc: '11'
+- operator: Airtel/Warid
+  country: UG
+  mcc: '641'
+  mnc: '22'
+- operator: Astelit/LIFE
+  country: UA
+  mcc: '255'
+  mnc: '06'
+- operator: Golden Telecom
+  country: UA
+  mcc: '255'
+  mnc: '05'
+- operator: Golden Telecom
+  country: UA
+  mcc: '255'
+  mnc: '39'
+- operator: Intertelecom Ltd (IT)
+  country: UA
+  mcc: '255'
+  mnc: '04'
+- operator: KyivStar
+  country: UA
+  mcc: '255'
+  mnc: '67'
+- operator: KyivStar
+  country: UA
+  mcc: '255'
+  mnc: '03'
+- operator: Telesystems Of Ukraine CJSC (TSU)
+  country: UA
+  mcc: '255'
+  mnc: '21'
+- operator: TriMob LLC
+  country: UA
+  mcc: '255'
+  mnc: '07'
+- operator: UMC/MTS
+  country: UA
+  mcc: '255'
+  mnc: '50'
+- operator: Beeline
+  country: UA
+  mcc: '255'
+  mnc: '02'
+- operator: UMC/MTS
+  country: UA
+  mcc: '255'
+  mnc: '01'
+- operator: Beeline
+  country: UA
+  mcc: '255'
+  mnc: '68'
+- operator: DU
+  country: AE
+  mcc: '424'
+  mnc: '03'
+- operator: Etisalat
+  country: AE
+  mcc: '431'
+  mnc: '02'
+- operator: Etisalat
+  country: AE
+  mcc: '424'
+  mnc: '02'
+- operator: Etisalat
+  country: AE
+  mcc: '430'
+  mnc: '02'
+- operator: Airtel/Vodafone
+  country: GB
+  mcc: '234'
+  mnc: '03'
+- operator: BT Group
+  country: GB
+  mcc: '234'
+  mnc: '77'
+- operator: BT Group
+  country: GB
+  mcc: '234'
+  mnc: '76'
+- operator: Cable and Wireless
+  country: GB
+  mcc: '234'
+  mnc: '07'
+- operator: Cable and Wireless
+  country: GB
+  mcc: '234'
+  mnc: '92'
+- operator: Cable and Wireless Isle of Man
+  country: GB
+  mcc: '234'
+  mnc: '36'
+- operator: Cloud9/wire9 Tel.
+  country: GB
+  mcc: '234'
+  mnc: '18'
+- operator: Everyth. Ev.wh.
+  country: GB
+  mcc: '235'
+  mnc: '02'
+- operator: FlexTel
+  country: GB
+  mcc: '234'
+  mnc: '17'
+- operator: Guernsey Telecoms
+  country: GB
+  mcc: '234'
+  mnc: '55'
+- operator: HaySystems
+  country: GB
+  mcc: '234'
+  mnc: '14'
+- operator: H3G Hutchinson
+  country: GB
+  mcc: '234'
+  mnc: '94'
+- operator: H3G Hutchinson
+  country: GB
+  mcc: '234'
+  mnc: '20'
+- operator: Inquam Telecom Ltd
+  country: GB
+  mcc: '234'
+  mnc: '75'
+- operator: Jersey Telecom
+  country: GB
+  mcc: '234'
+  mnc: '50'
+- operator: JSC Ingenicum
+  country: GB
+  mcc: '234'
+  mnc: '35'
+- operator: Lycamobile
+  country: GB
+  mcc: '234'
+  mnc: '26'
+- operator: Manx Telecom
+  country: GB
+  mcc: '234'
+  mnc: '58'
+- operator: Mapesbury C. Ltd
+  country: GB
+  mcc: '234'
+  mnc: '01'
+- operator: Marthon Telecom
+  country: GB
+  mcc: '234'
+  mnc: '28'
+- operator: O2 Ltd.
+  country: GB
+  mcc: '234'
+  mnc: '10'
+- operator: O2 Ltd.
+  country: GB
+  mcc: '234'
+  mnc: '11'
+- operator: OnePhone
+  country: GB
+  mcc: '234'
+  mnc: 08
+- operator: Opal Telecom
+  country: GB
+  mcc: '234'
+  mnc: '16'
+- operator: Everyth. Ev.wh./Orange
+  country: GB
+  mcc: '234'
+  mnc: '34'
+- operator: PMN/Teleware
+  country: GB
+  mcc: '234'
+  mnc: '19'
+- operator: Railtrack Plc
+  country: GB
+  mcc: '234'
+  mnc: '12'
+- operator: Routotelecom
+  country: GB
+  mcc: '234'
+  mnc: '22'
+- operator: Sky UK Limited
+  country: GB
+  mcc: '234'
+  mnc: '57'
+- operator: Stour Marine
+  country: GB
+  mcc: '234'
+  mnc: '24'
+- operator: Synectiv Ltd.
+  country: GB
+  mcc: '234'
+  mnc: '37'
+- operator: Everyth. Ev.wh./T-Mobile
+  country: GB
+  mcc: '234'
+  mnc: '31'
+- operator: Everyth. Ev.wh./T-Mobile
+  country: GB
+  mcc: '234'
+  mnc: '32'
+- operator: Vodafone
+  country: GB
+  mcc: '234'
+  mnc: '27'
+- operator: Tismi
+  country: GB
+  mcc: '234'
+  mnc: 09
+- operator: Truphone
+  country: GB
+  mcc: '234'
+  mnc: '25'
+- operator: Jersey Telecom
+  country: GB
+  mcc: '234'
+  mnc: '51'
+- operator: Vectofone Mobile Wifi
+  country: GB
+  mcc: '234'
+  mnc: '23'
+- operator: Vodafone
+  country: GB
+  mcc: '234'
+  mnc: '91'
+- operator: Vodafone
+  country: GB
+  mcc: '234'
+  mnc: '15'
+- operator: Wave Telecom Ltd
+  country: GB
+  mcc: '234'
+  mnc: '78'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '050'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '880'
+- operator: Aeris Comm. Inc.
+  country: US
+  mcc: '310'
+  mnc: '850'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '640'
+- operator: Airtel Wireless LLC
+  country: US
+  mcc: '310'
+  mnc: '510'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '190'
+- operator: Allied Wireless Communications Corporation
+  country: US
+  mcc: '312'
+  mnc: 090
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '130'
+- operator: Arctic Slope Telephone Association Cooperative Inc.
+  country: US
+  mcc: '310'
+  mnc: '710'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '410'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '170'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '150'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '680'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '070'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '560'
+- operator: AT&T Wireless Inc.
+  country: US
+  mcc: '310'
+  mnc: '980'
+- operator: Bluegrass Wireless LLC
+  country: US
+  mcc: '311'
+  mnc: '800'
+- operator: Bluegrass Wireless LLC
+  country: US
+  mcc: '311'
+  mnc: '440'
+- operator: Bluegrass Wireless LLC
+  country: US
+  mcc: '311'
+  mnc: '810'
+- operator: Cable & Communications Corp.
+  country: US
+  mcc: '310'
+  mnc: '900'
+- operator: California RSA No. 3 Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '590'
+- operator: Cambridge Telephone Company Inc.
+  country: US
+  mcc: '311'
+  mnc: '500'
+- operator: Caprock Cellular Ltd.
+  country: US
+  mcc: '310'
+  mnc: '830'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '010'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '279'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '484'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '910'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '284'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '489'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '273'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '289'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '278'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '483'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '890'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '283'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '488'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '272'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '288'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '277'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '482'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '590'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '282'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '487'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '271'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '287'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '276'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '481'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '013'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '281'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '486'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '270'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '286'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '275'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '480'
+- operator: Verizon Wireless
+  country: US
+  mcc: '310'
+  mnc: '012'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '280'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '485'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '110'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '285'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '274'
+- operator: Verizon Wireless
+  country: US
+  mcc: '311'
+  mnc: '390'
+- operator: Cellular Network Partnership LLC
+  country: US
+  mcc: '312'
+  mnc: '280'
+- operator: Cellular Network Partnership LLC
+  country: US
+  mcc: '312'
+  mnc: '270'
+- operator: Cellular Network Partnership LLC
+  country: US
+  mcc: '310'
+  mnc: '360'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '190'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '030'
+- operator: Choice Phone LLC
+  country: US
+  mcc: '311'
+  mnc: '120'
+- operator: Choice Phone LLC
+  country: US
+  mcc: '310'
+  mnc: '480'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '630'
+- operator: Cincinnati Bell Wireless LLC
+  country: US
+  mcc: '310'
+  mnc: '420'
+- operator: Coleman County Telco /Trans TX
+  country: US
+  mcc: '310'
+  mnc: '620'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '040'
+- operator: Consolidated Telcom
+  country: US
+  mcc: '310'
+  mnc: '06'
+- operator: Consolidated Telcom
+  country: US
+  mcc: '310'
+  mnc: '60'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '26'
+- operator: ''
+  country: US
+  mcc: '312'
+  mnc: '380'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '930'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '240'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: 080
+- operator: Cross Valliant Cellular Partnership
+  country: US
+  mcc: '310'
+  mnc: '700'
+- operator: Cross Wireless Telephone Co.
+  country: US
+  mcc: '312'
+  mnc: '030'
+- operator: Cross Wireless Telephone Co.
+  country: US
+  mcc: '311'
+  mnc: '140'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '520'
+- operator: Custer Telephone Cooperative Inc.
+  country: US
+  mcc: '312'
+  mnc: '040'
+- operator: Dobson Cellular Systems
+  country: US
+  mcc: '310'
+  mnc: '440'
+- operator: E.N.M.R. Telephone Coop.
+  country: US
+  mcc: '310'
+  mnc: '990'
+- operator: East Kentucky Network LLC
+  country: US
+  mcc: '312'
+  mnc: '130'
+- operator: East Kentucky Network LLC
+  country: US
+  mcc: '312'
+  mnc: '120'
+- operator: East Kentucky Network LLC
+  country: US
+  mcc: '310'
+  mnc: '750'
+- operator: Edge Wireless LLC
+  country: US
+  mcc: '310'
+  mnc: 090
+- operator: Elkhart TelCo. / Epic Touch Co.
+  country: US
+  mcc: '310'
+  mnc: '610'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '210'
+- operator: Farmers
+  country: US
+  mcc: '311'
+  mnc: '311'
+- operator: Fisher Wireless Services Inc.
+  country: US
+  mcc: '311'
+  mnc: '460'
+- operator: GCI Communication Corp.
+  country: US
+  mcc: '311'
+  mnc: '370'
+- operator: GCI Communication Corp.
+  country: US
+  mcc: '310'
+  mnc: '430'
+- operator: Get Mobile Inc.
+  country: US
+  mcc: '310'
+  mnc: '920'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '970'
+- operator: Illinois Valley Cellular RSA 2 Partnership
+  country: US
+  mcc: '311'
+  mnc: '340'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '030'
+- operator: Iowa RSA No. 2 Limited Partnership
+  country: US
+  mcc: '312'
+  mnc: '170'
+- operator: Iowa RSA No. 2 Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '410'
+- operator: Iowa Wireless Services LLC
+  country: US
+  mcc: '310'
+  mnc: '770'
+- operator: Jasper
+  country: US
+  mcc: '310'
+  mnc: '650'
+- operator: Kaplan Telephone Company Inc.
+  country: US
+  mcc: '310'
+  mnc: '870'
+- operator: Keystone Wireless LLC
+  country: US
+  mcc: '312'
+  mnc: '180'
+- operator: Keystone Wireless LLC
+  country: US
+  mcc: '310'
+  mnc: '690'
+- operator: Lamar County Cellular
+  country: US
+  mcc: '311'
+  mnc: '310'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: 090
+- operator: Matanuska Tel. Assn. Inc.
+  country: US
+  mcc: '310'
+  mnc: '040'
+- operator: Message Express Co. / Airlink PCS
+  country: US
+  mcc: '310'
+  mnc: '780'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '660'
+- operator: Michigan Wireless LLC
+  country: US
+  mcc: '311'
+  mnc: '330'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '000'
+- operator: Minnesota South. Wirel. Co. / Hickory
+  country: US
+  mcc: '310'
+  mnc: '400'
+- operator: Missouri RSA No 5 Partnership
+  country: US
+  mcc: '311'
+  mnc: '920'
+- operator: Missouri RSA No 5 Partnership
+  country: US
+  mcc: '311'
+  mnc: '020'
+- operator: Missouri RSA No 5 Partnership
+  country: US
+  mcc: '311'
+  mnc: '010'
+- operator: Missouri RSA No 5 Partnership
+  country: US
+  mcc: '312'
+  mnc: '220'
+- operator: Missouri RSA No 5 Partnership
+  country: US
+  mcc: '312'
+  mnc: '010'
+- operator: Mohave Cellular LP
+  country: US
+  mcc: '310'
+  mnc: '350'
+- operator: MTPCS LLC
+  country: US
+  mcc: '310'
+  mnc: '570'
+- operator: NEP Cellcorp Inc.
+  country: US
+  mcc: '310'
+  mnc: '290'
+- operator: Nevada Wireless LLC
+  country: US
+  mcc: '310'
+  mnc: '34'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '380'
+- operator: New-Cell Inc.
+  country: US
+  mcc: '310'
+  mnc: '600'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '100'
+- operator: Nexus Communications Inc.
+  country: US
+  mcc: '311'
+  mnc: '300'
+- operator: North Carolina RSA 3 Cellular Tel. Co.
+  country: US
+  mcc: '310'
+  mnc: '130'
+- operator: North Dakota Network Company
+  country: US
+  mcc: '311'
+  mnc: '610'
+- operator: North Dakota Network Company
+  country: US
+  mcc: '312'
+  mnc: '230'
+- operator: Northeast Wireless Networks LLC
+  country: US
+  mcc: '311'
+  mnc: '710'
+- operator: Northstar
+  country: US
+  mcc: '310'
+  mnc: '670'
+- operator: Northstar
+  country: US
+  mcc: '310'
+  mnc: '011'
+- operator: Northwest Missouri Cellular Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '420'
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '540'
+- operator: Panhandle Telephone Cooperative Inc.
+  country: US
+  mcc: '310'
+  mnc: '760'
+- operator: PCS ONE
+  country: US
+  mcc: '310'
+  mnc: '580'
+- operator: PetroCom
+  country: US
+  mcc: '311'
+  mnc: '170'
+- operator: Pine Belt Cellular Inc.
+  country: US
+  mcc: '311'
+  mnc: '670'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: 080
+- operator: ''
+  country: US
+  mcc: '310'
+  mnc: '790'
+- operator: Plateau Telecommunications Inc.
+  country: US
+  mcc: '310'
+  mnc: '100'
+- operator: Poka Lambro Telco Ltd.
+  country: US
+  mcc: '310'
+  mnc: '940'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '730'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '540'
+- operator: Public Service Cellular Inc.
+  country: US
+  mcc: '310'
+  mnc: '500'
+- operator: RSA 1 Limited Partnership
+  country: US
+  mcc: '312'
+  mnc: '160'
+- operator: RSA 1 Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '430'
+- operator: Sagebrush Cellular Inc.
+  country: US
+  mcc: '311'
+  mnc: '350'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '910'
+- operator: SIMMETRY
+  country: US
+  mcc: '310'
+  mnc: '46'
+- operator: SLO Cellular Inc / Cellular One of San Luis
+  country: US
+  mcc: '311'
+  mnc: '260'
+- operator: Smith Bagley Inc.
+  country: US
+  mcc: '310'
+  mnc: '320'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '15'
+- operator: Southern Communications Services Inc.
+  country: US
+  mcc: '316'
+  mnc: '011'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '312'
+  mnc: '530'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '316'
+  mnc: '010'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '312'
+  mnc: '190'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '311'
+  mnc: '880'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '311'
+  mnc: '870'
+- operator: Sprint Spectrum
+  country: US
+  mcc: '311'
+  mnc: '490'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '230'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '31'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '220'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '270'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '210'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '200'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '250'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '160'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '240'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '660'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '300'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '280'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '330'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '800'
+- operator: T-Mobile
+  country: US
+  mcc: '310'
+  mnc: '310'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '740'
+- operator: Telemetrix Inc.
+  country: US
+  mcc: '310'
+  mnc: '740'
+- operator: Testing
+  country: US
+  mcc: '310'
+  mnc: '14'
+- operator: Texas RSA 15B2 Limited Partnership
+  country: US
+  mcc: '310'
+  mnc: '860'
+- operator: Thumb Cellular Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '830'
+- operator: Thumb Cellular Limited Partnership
+  country: US
+  mcc: '311'
+  mnc: '050'
+- operator: TMP Corporation
+  country: US
+  mcc: '310'
+  mnc: '460'
+- operator: Uintah Basin Electronics Telecommunications Inc.
+  country: US
+  mcc: '312'
+  mnc: '290'
+- operator: Uintah Basin Electronics Telecommunications Inc.
+  country: US
+  mcc: '311'
+  mnc: '860'
+- operator: Uintah Basin Electronics Telecommunications Inc.
+  country: US
+  mcc: '310'
+  mnc: '960'
+- operator: United States Cellular Corp.
+  country: US
+  mcc: '311'
+  mnc: '220'
+- operator: United States Cellular Corp.
+  country: US
+  mcc: '310'
+  mnc: '730'
+- operator: United Wireless Communications Inc.
+  country: US
+  mcc: '311'
+  mnc: '650'
+- operator: USA 3650 AT&T
+  country: US
+  mcc: '310'
+  mnc: '38'
+- operator: VeriSign
+  country: US
+  mcc: '310'
+  mnc: '520'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '003'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '23'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '24'
+- operator: Unknown
+  country: US
+  mcc: '310'
+  mnc: '25'
+- operator: West Virginia Wireless
+  country: US
+  mcc: '310'
+  mnc: '530'
+- operator: Westlink Communications LLC
+  country: US
+  mcc: '310'
+  mnc: '340'
+- operator: ''
+  country: US
+  mcc: '311'
+  mnc: '150'
+- operator: 'Wisconsin RSA #7 Limited Partnership'
+  country: US
+  mcc: '311'
+  mnc: '070'
+- operator: Yorkville Telephone Cooperative
+  country: US
+  mcc: '310'
+  mnc: '390'
+- operator: Ancel/Antel
+  country: UY
+  mcc: '748'
+  mnc: '01'
+- operator: Ancel/Antel
+  country: UY
+  mcc: '748'
+  mnc: '03'
+- operator: Claro/AM Wireless
+  country: UY
+  mcc: '748'
+  mnc: '10'
+- operator: MOVISTAR
+  country: UY
+  mcc: '748'
+  mnc: '07'
+- operator: Bee Line/Unitel
+  country: UZ
+  mcc: '434'
+  mnc: '04'
+- operator: Buztel
+  country: UZ
+  mcc: '434'
+  mnc: '01'
+- operator: MTS/Uzdunrobita
+  country: UZ
+  mcc: '434'
+  mnc: '07'
+- operator: Ucell/Coscom
+  country: UZ
+  mcc: '434'
+  mnc: '05'
+- operator: Uzmacom
+  country: UZ
+  mcc: '434'
+  mnc: '02'
+- operator: DigiCel
+  country: VU
+  mcc: '541'
+  mnc: '05'
+- operator: SMILE
+  country: VU
+  mcc: '541'
+  mnc: '01'
+- operator: DigiTel C.A.
+  country: VE
+  mcc: '734'
+  mnc: '03'
+- operator: DigiTel C.A.
+  country: VE
+  mcc: '734'
+  mnc: '02'
+- operator: DigiTel C.A.
+  country: VE
+  mcc: '734'
+  mnc: '01'
+- operator: Movilnet C.A.
+  country: VE
+  mcc: '734'
+  mnc: '06'
+- operator: Movistar/TelCel
+  country: VE
+  mcc: '734'
+  mnc: '04'
+- operator: Beeline
+  country: VN
+  mcc: '452'
+  mnc: '07'
+- operator: Mobifone
+  country: VN
+  mcc: '452'
+  mnc: '01'
+- operator: S-Fone/Telecom
+  country: VN
+  mcc: '452'
+  mnc: '03'
+- operator: VietnaMobile
+  country: VN
+  mcc: '452'
+  mnc: '05'
+- operator: Viettel Mobile
+  country: VN
+  mcc: '452'
+  mnc: '04'
+- operator: Viettel Mobile
+  country: VN
+  mcc: '452'
+  mnc: 08
+- operator: Viettel Mobile
+  country: VN
+  mcc: '452'
+  mnc: '06'
+- operator: Vinaphone
+  country: VN
+  mcc: '452'
+  mnc: '02'
+- operator: Digicel
+  country: VI
+  mcc: '376'
+  mnc: '50'
+- operator: HITS/Y Unitel
+  country: YE
+  mcc: '421'
+  mnc: '04'
+- operator: MTN/Spacetel
+  country: YE
+  mcc: '421'
+  mnc: '02'
+- operator: Sabaphone
+  country: YE
+  mcc: '421'
+  mnc: '01'
+- operator: Yemen Mob. CDMA
+  country: YE
+  mcc: '421'
+  mnc: '03'
+- operator: Zamtel/Cell Z/MTS
+  country: ZM
+  mcc: '645'
+  mnc: '03'
+- operator: MTN/Telecel
+  country: ZM
+  mcc: '645'
+  mnc: '02'
+- operator: Airtel/Zain/Celtel
+  country: ZM
+  mcc: '645'
+  mnc: '01'
+- operator: Econet
+  country: ZW
+  mcc: '648'
+  mnc: '04'
+- operator: Net One
+  country: ZW
+  mcc: '648'
+  mnc: '01'
+- operator: Telecel
+  country: ZW
+  mcc: '648'
+  mnc: '03'
