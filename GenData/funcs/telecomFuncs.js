@@ -1,4 +1,10 @@
 (function() {
+    /**
+     * <odoc>
+     * <key>GenData.funcs.genFullPhone(aGenData, aCountry, aType) : String</key>
+     * Shortcut for GenData.funcs.genPhone where the country code with a '+' is prefixed to the phone number and returned.
+     * </odoc>
+     */
     exports.genFullPhone = function(aGenData, aCountry, aType) {
         var p = this.genPhone(aGenData, aCountry, aType, false, true);
         return "+" + p.countryCode + p.phone;
@@ -16,10 +22,10 @@
      */
     exports.genPhone = function(aGenData, aCountry, aType, addOperator, addCountryCode) {
         if (aGenData.existsList("genData::phonePatterns") == false) {
-            aGenData.loadList("genData::phonePatterns", getOPackPath("GenData") + "/lists/telecom/list_phonePatterns.yaml");
+            aGenData.loadList("genData::phonePatterns", aGenData.getPath() + "/lists/telecom/list_phonePatterns.yaml");
         }
         if (addOperator && aGenData.existsList("genData::phonePrefixes") == false) {
-            aGenData.loadList("genData::phonePrefixes", getOPackPath("GenData") + "/lists/telecom/list_phonePrefixes.yaml");
+            aGenData.loadList("genData::phonePrefixes", aGenData.getPath() + "/lists/telecom/list_phonePrefixes.yaml");
         }
 
         if (isUnDef(aType)) {
@@ -60,7 +66,7 @@
      */
     exports.genIMSI = function(aGenData, aCountry, anOperator) {
         if (aGenData.existsList("genData::phoneOperators") == false) {
-            aGenData.loadList("genData::phoneOperators", getOPackPath("GenData") + "/lists/telecom/list_phoneOperators.yaml");
+            aGenData.loadList("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_phoneOperators.yaml");
         }
 
         var opr;
@@ -83,7 +89,7 @@
      */
     exports.genIMEI = function(aGenData, aModel) {
         if (aGenData.existsList("genData::phoneTACs") == false) {
-            aGenData.loadList("genData::phoneTACs", getOPackPath("GenData") + "/lists/telecom/list_phoneTACs.yaml");
+            aGenData.loadList("genData::phoneTACs", aGenData.getPath()+ "/lists/telecom/list_phoneTACs.yaml");
         }
 
         var opr;
@@ -110,9 +116,9 @@
      * Given anOperator from aCountry (two-letter), from the lists/telecom/list_phoneOperators.yaml, will generate a possible SIM ICCID.
      * </odoc>
      */
-    exports.genICCID = function(aGenData, aCountry, anOperator) {
+    exports.genICCID = function(aGenData, anOperator) {
         if (aGenData.existsList("genData::phoneOperators") == false) {
-            aGenData.loadList("genData::phoneOperators", getOPackPath("GenData") + "/lists/telecom/list_phoneOperators.yaml");
+            aGenData.loadList("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_iin.yaml");
         }
 
         var getLuhn = function(aValue) {
@@ -127,7 +133,7 @@
         
         var opr;
         if (isDef(anOperator)) 
-            opr = $path(aGenData.getList("genData::phoneOperators"), "[?operator=='" + anOperator + "'] | [?country=='" + aCountry + "'] | [0]");
+            opr = aGenData.oneOf($path(aGenData.getList("genData::phoneOperators"), "[?operator=='" + anOperator + "'] | [0]").simIssuer);
         else 
             opr = aGenData.getFromList("genData::phoneOperators");
 

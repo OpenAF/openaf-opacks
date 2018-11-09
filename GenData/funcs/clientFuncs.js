@@ -10,7 +10,7 @@
         if (isUnDef(aAddressList)) {
             aAddressList = "GenData::AddressList";
             if (!(aGenData.existsList(aAddressList)))
-                aGenData.loadList("GenData::AddressList", getOPackPath("GenData") + "/lists/clients/list_addresses.yaml");
+                aGenData.loadList("GenData::AddressList", aGenData.getPath() + "/lists/clients/list_addresses.yaml");
         }
 
         var st = aGenData.getFromList(aAddressList); 

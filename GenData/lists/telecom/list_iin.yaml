@@ -1,0 +1,1866 @@
+- operator: Tryco International Inc.
+  simIssuer:
+    - 899301
+- operator: Albania Mobile Communications sh.a
+  simIssuer:
+    - 8935501
+- operator: Eagle Mobile Sh.a
+  simIssuer:
+    - 8935503
+- operator: Plus Communications Sh.a.
+  simIssuer:
+    - 8935504
+- operator: Vodafone Albania sha
+  simIssuer:
+    - 8935502
+- operator: ATM Mobilis (Algérie Telecom spa)
+  simIssuer:
+    - 8921301
+- operator: Servei de Telecomunicacions d'Andorra
+  simIssuer:
+    - 8937603
+- operator: Unitel sarl
+  simIssuer:
+    - 8924402
+- operator: Cable and Wireless (W.I.) Ltd
+  simIssuer:
+    - 891010
+    - 891011
+- operator: Telecom Argentina S.A.
+  simIssuer:
+    - 895400
+- operator: Telefónica de Argentina S.A.
+  simIssuer:
+    - 895454
+- operator: Armentel JV CJSC
+  simIssuer:
+    - 8937401
+- operator: K Telecom
+  simIssuer:
+    - 8937405
+- operator: PMF SAL
+  simIssuer:
+    - 8937404
+- operator: 'SETAR, Servicio di Telecomunicacion di'
+  simIssuer:
+    - 8929786
+- operator: AAPT Ltd
+  simIssuer:
+    - 896114
+- operator: EZI Phonecard Pty. Ltd.
+  simIssuer:
+    - 896188
+- operator: Hutchison 3G Australia Pty Ltd (H3GA)
+  simIssuer:
+    - 896106
+- operator: Singtel Optus Ltd.
+  simIssuer:
+    - 896102
+    - 896112
+    - 896121
+    - 896123
+- operator: Telstra Corporation Ltd.
+  simIssuer:
+    - 896100
+    - 896101
+    - 896161
+    - 896162
+- operator: Vodafone Pacific  Ltd.
+  simIssuer:
+    - 896103
+- operator: Norfolk Telecom
+  simIssuer:
+    - 8967210
+- operator: 3G Mobile Telecommunications GmbH
+  simIssuer:
+    - 894308
+- operator: Connect Austria Gesellschaft für
+  simIssuer:
+    - 894305
+- operator: Max.Mobil Telekommunikation Service
+  simIssuer:
+    - 894303
+- operator: Mobilikom Austria AG
+  simIssuer:
+    - 894301
+- operator: Tele.ring Telekom Service GmbH & Co.
+  simIssuer:
+    - 894307
+- operator: Azercell Telecom Joint Venture
+  simIssuer:
+    - 8999401
+- operator: Azerfon LLC
+  simIssuer:
+    - 8999404
+- operator: Caspian American Telecom LLC
+  simIssuer:
+    - 8999403
+- operator: Bahamas Telecommunications Company
+  simIssuer:
+    - 891282
+- operator: Bahrain Telecommunications Company
+  simIssuer:
+    - 8997301
+- operator: Zain Bahrain
+  simIssuer:
+    - 8997302
+- operator: Barbados Telephone Company Ltd.
+  simIssuer:
+    - 891012
+- operator: Belarusian Telecommunication Network
+  simIssuer:
+    - 8937503
+- operator: FE Velcom
+  simIssuer:
+    - 8937501
+- operator: The Mobile TeleSystems Joint Ltd Liability
+  simIssuer:
+    - 8937502
+- operator: BELGACOM société anonyme de droit public
+  simIssuer:
+    - 893200
+- operator: Elephant Talk Communication Schweiz
+  simIssuer:
+    - 893205
+- operator: KPN Orange Belgium N.V.
+  simIssuer:
+    - 893203
+- operator: Mobistar N.V.
+  simIssuer:
+    - 893202
+- operator: Society for Worldwide interbank Financial
+  simIssuer:
+    - 893201
+- operator: Belize Telecommunications Ltd. (BTL)
+  simIssuer:
+    - 8950167
+- operator: Intelco
+  simIssuer:
+    - 8950168
+- operator: Glomobile Benin Ltd
+  simIssuer:
+    - 8922905
+- operator: Cable and Wireless plc
+  simIssuer:
+    - 891013
+    - 894477
+- operator: The Bermuda Telephone Company Ltd.
+  simIssuer:
+    - 891232
+- operator: B-Mobile
+  simIssuer:
+    - 8997511
+- operator: Tashl Infocomm Ltd
+  simIssuer:
+    - 8997577
+- operator: Empresa Nacional de Telecomunicaciones
+  simIssuer:
+    - 8959102
+- operator: Nuevatel PCS de Bolivia S.A.
+  simIssuer:
+    - 8959101
+- operator: Telbo
+  simIssuer:
+    - 8959978
+- operator: BH Telecom
+  simIssuer:
+    - 8938701
+- operator: HT Mostar
+  simIssuer:
+    - 8938703
+- operator: 'Telekomunicaje RS, a.d. Banjaluka'
+  simIssuer:
+    - 8938705
+- operator: Botswana Telecommunications
+  simIssuer:
+    - 8926704
+- operator: Mascom Wireless (Pty) Ltd
+  simIssuer:
+    - 8926701
+- operator: Orange (Botswana) Pty Ltd
+  simIssuer:
+    - 8926702
+- operator: Amazonia Celular S/A
+  simIssuer:
+    - 895524
+- operator: BCP
+  simIssuer:
+    - 895505
+- operator: Brasil Telecom Celular S.A.
+  simIssuer:
+    - 895516
+- operator: IDT Brasil Telecomunicaçôes Ltda
+  simIssuer:
+    - 895526
+- operator: Sercomtel Celular S/A
+  simIssuer:
+    - 895515
+- operator: Telemig Celular S/A
+  simIssuer:
+    - 895523
+- operator: Cable and Wireless (W.I.) Ltd.
+  simIssuer:
+    - 891014
+    - 891019
+    - 891022
+    - 891024
+- operator: Caribbean Cellular Telephone d.b.a. CCT
+  simIssuer:
+    - 891348
+- operator: Cosmo Bulgaria Mobile Ltd.
+  simIssuer:
+    - 8935905
+- operator: Mobiltel EAD
+  simIssuer:
+    - 8935901
+- operator: Celtel Burkina SA
+  simIssuer:
+    - 8922602
+- operator: Telecel Faso
+  simIssuer:
+    - 8922603
+- operator: Lacell SU
+  simIssuer:
+    - 8925707
+- operator: CAMGSM
+  simIssuer:
+    - 8985501
+- operator: ALO Mobile Inc
+  simIssuer:
+    - 891250
+- operator: Bell Canada
+  simIssuer:
+    - 891236
+    - 891369
+    - 891789
+- operator: Bragg Communications Inc
+  simIssuer:
+    - 891035
+- operator: British Columbia Telephone Company Ltd.
+  simIssuer:
+    - 891228
+    - 891654
+- operator: First Networks Operation Inc.
+  simIssuer:
+    - 891037
+- operator: Globalive Wireless Management Corp.
+  simIssuer:
+    - 891490
+- operator: International Telecommunications
+  simIssuer:
+    - 891895
+- operator: Island Tel
+  simIssuer:
+    - 891482
+    - 891593
+- operator: Manitoba Telecom Services
+  simIssuer:
+    - 891456
+    - 891687
+- operator: Maritime Telegraph and Telephone
+  simIssuer:
+    - 891688
+    - 891699
+- operator: Microcell Solutions Inc.
+  simIssuer:
+    - 891370
+- operator: MTS Allstream Inc.
+  simIssuer:
+    - 891660
+- operator: New Brunswick Telephone Company Ltd.
+  simIssuer:
+    - 891628
+    - 891629
+- operator: Newfoundland Telephone Company Ltd.
+  simIssuer:
+    - 891635
+    - 891682
+- operator: Northwestel Inc.
+  simIssuer:
+    - 891930
+- operator: Quebec Telephone
+  simIssuer:
+    - 891835
+    - 891837
+- operator: Sask Tel
+  simIssuer:
+    - 891277
+    - 891727
+- operator: Tata Communications  Canada ULC
+  simIssuer:
+    - 891821
+- operator: Telebec Ltée
+  simIssuer:
+    - 891007
+- operator: Telus Communications Company
+  simIssuer:
+    - 891223
+- operator: Telus Communications Inc.
+  simIssuer:
+    - 891248
+    - 891258
+    - 891400
+- operator: Unitel Communications Inc.
+  simIssuer:
+    - 891869
+- operator: 'CV Móvel, S.A.'
+  simIssuer:
+    - 8923801
+- operator: T+Telecomunicações
+  simIssuer:
+    - 8923802
+- operator: Cable and Wireless (C.I.) Ltd.
+  simIssuer:
+    - 891015
+- operator: Celtel Tchad S.A.
+  simIssuer:
+    - 8923501
+- operator: Tchad Mobile - Libertis
+  simIssuer:
+    - 8923502
+- operator: China Telecom
+  simIssuer:
+    - 898600
+- operator: Edatel S.A. E.S.P.
+  simIssuer:
+    - 8957002
+- operator: Telefónica Móviles Colombia SA (Movistar)
+  simIssuer:
+    - 8957123
+- operator: Société nationale des télécommunications
+  simIssuer:
+    - 8926901
+- operator: Celtel Congo S.A.
+  simIssuer:
+    - 8924201
+- operator: Instituto Costarricense de Electricidad (ICE)
+  simIssuer:
+    - 8950601
+- operator: Atlantique Telecom Côte d'Ivoire
+  simIssuer:
+    - 8922502
+- operator: Comstar S.A.
+  simIssuer:
+    - 8922501
+- operator: Croatian  Telecom
+  simIssuer:
+    - 8938598
+- operator: VIP-NET GSM d.o.o
+  simIssuer:
+    - 8938591
+- operator: Empresa de Telecomunicaciones
+  simIssuer:
+    - 895301
+- operator: ANTELECOM N.V.
+  simIssuer:
+    - 8959900
+- operator: Curacao Telecom
+  simIssuer:
+    - 8959996
+- operator: UTS - SETEL
+  simIssuer:
+    - 8959991
+- operator: Cyprus Telecommunications Authority
+  simIssuer:
+    - 8935789
+- operator: LEMONTEL Ltd
+  simIssuer:
+    - 8935722
+- operator: PrimeTel Plc
+  simIssuer:
+    - 8935720
+- operator: Scancom (Cyprus) Ltd.
+  simIssuer:
+    - 8935710
+- operator: Mobilkom a.s.
+  simIssuer:
+    - 8942004
+- operator: 'Správa Zeleznicni Dopravni Cesty, s.o.'
+  simIssuer:
+    - 8942098
+- operator: Telefónica O2 Czech Republic a.s.
+  simIssuer:
+    - 8942005
+    - 8942020
+- operator: T-Mobile Czech Republic a.s.
+  simIssuer:
+    - 8942001
+- operator: Travel Telekommunikation s.r.o.
+  simIssuer:
+    - 8942007
+- operator: Vodafone Czech Republic a.s.
+  simIssuer:
+    - 8942031
+- operator: North East Asia Telephone and
+  simIssuer:
+    - 8985001
+- operator: Celtel Congo (RDC) sprl
+  simIssuer:
+    - 8924302
+- operator: Congo-Chine Telecom Sarl
+  simIssuer:
+    - 8924384
+- operator: Sait Telecom
+  simIssuer:
+    - 8924389
+- operator: Vodacom Congo RDC sprl
+  simIssuer:
+    - 8924301
+- operator: Hi3G Denmark ApS
+  simIssuer:
+    - 894506
+- operator: TDC Mobil A/S
+  simIssuer:
+    - 894501
+- operator: Telia Sonera A/S
+  simIssuer:
+    - 894503
+    - 894504
+- operator: Telecommunications of Dominica Ltd.
+  simIssuer:
+    - 891016
+- operator: Verizon Dominicana
+  simIssuer:
+    - 891650
+- operator: Consorcio Ecuatoriano de
+  simIssuer:
+    - 8959301
+- operator: Vodafone Egypt Telecommunications  S.A.E.
+  simIssuer:
+    - 892002
+- operator: Guinea Ecuatorial de Telecomunicaciones
+  simIssuer:
+    - 8924001
+- operator: Eritrea Telecommunication Services
+  simIssuer:
+    - 8929101
+- operator: Elion Enterprises Ltd
+  simIssuer:
+    - 8937204
+- operator: Estonian Mobile Telephone Company Ltd
+  simIssuer:
+    - 8937201
+- operator: Radiolinja Estonia Ltd (Radiolinja EESTI AS)
+  simIssuer:
+    - 8937202
+- operator: Ritabell Ltd
+  simIssuer:
+    - 8937203
+- operator: Ethiopian Telecommunications Corporation
+  simIssuer:
+    - 8925101
+- operator: Cable and Wireless Falkland Islands
+  simIssuer:
+    - 8950001
+- operator: Kall P/F
+  simIssuer:
+    - 8929802
+- operator: Digicel (Fiji) Ltd
+  simIssuer:
+    - 8967902
+- operator: Vodafone Fiji Ltd.
+  simIssuer:
+    - 8967901
+- operator: Alands Mobiltelefon Ab
+  simIssuer:
+    - 8935807
+- operator: DNA Finland Oy
+  simIssuer:
+    - 8935804
+    - 8935806
+- operator: Elisa Corporation
+  simIssuer:
+    - 8935802
+    - 8935803
+    - 8935805
+- operator: Saunalahti Group Oyj
+  simIssuer:
+    - 8935809
+- operator: TeliaSonera Finland Oyj
+  simIssuer:
+    - 8935801
+- operator: Bouygues Telecom Europa
+  simIssuer:
+    - 893320
+- operator: France Telecom
+  simIssuer:
+    - 893301
+- operator: Tikiphone
+  simIssuer:
+    - 8968901
+- operator: Celtel Gabon S.A.
+  simIssuer:
+    - 8924103
+- operator: Africell Gambia
+  simIssuer:
+    - 8922002
+- operator: Comium Gambia Ltd
+  simIssuer:
+    - 8922003
+- operator: Geocell Ltd.
+  simIssuer:
+    - 8999501
+- operator: Magticom Ltd.
+  simIssuer:
+    - 8999502
+- operator: AirData AG
+  simIssuer:
+    - 894923
+- operator: Deutsche Telekom AG
+  simIssuer:
+    - 894901
+    - 894902
+    - 894903
+- operator: E-Plus Mobilfunk GmbH (E-Plus)
+  simIssuer:
+    - 894921
+- operator: O2 (Germany) GmbH & Co.
+  simIssuer:
+    - 894922
+- operator: Vintage Wireless Networks Gesellschaft
+  simIssuer:
+    - 894931
+- operator: Viola Kabelgesellschaft mbH
+  simIssuer:
+    - 894926
+- operator: Vodafone D2 GmbH
+  simIssuer:
+    - 894920
+- operator: ACG Telesystems Ghana Ltd.
+  simIssuer:
+    - 8923309
+- operator: Ghana Telecommunications Co. Ltd.
+  simIssuer:
+    - 8923302
+- operator: CTS (Gibraltar) Ltd
+  simIssuer:
+    - 8935002
+- operator: Eazi Telecom Ltd
+  simIssuer:
+    - 8935009
+- operator: GIBTELECOM Ltd
+  simIssuer:
+    - 8935001
+- operator: COSMOTE
+  simIssuer:
+    - 893001
+- operator: Hellenic Telecommunication Organization
+  simIssuer:
+    - 893002
+- operator: Info-Quest S.A.
+  simIssuer:
+    - 893009
+- operator: Vodafone
+  simIssuer:
+    - 893005
+- operator: WIND Hellas (ex-TIM)
+  simIssuer:
+    - 893010
+- operator: TELE Greenland A/S
+  simIssuer:
+    - 8929901
+- operator: Grenada Telecommunications Ltd.
+  simIssuer:
+    - 891017
+- operator: France Caraïbe Mobiles
+  simIssuer:
+    - 8959001
+- operator: Saint Martin & Saint Barthelemy Tel Cell sarl
+  simIssuer:
+    - 8959003
+- operator: Wave Runner LLC
+  simIssuer:
+    - 891008
+- operator: Orange Guinée
+  simIssuer:
+    - 8922401
+- operator: Guiné Telecom - Companhia de
+  simIssuer:
+    - 8924509
+- operator: Guinétel S.A.
+  simIssuer:
+    - 8924501
+- operator: Spacetel Guinea-Bissau S.A.
+  simIssuer:
+    - 8924502
+- operator: Guyana Telephone and Telegraph
+  simIssuer:
+    - 8959202
+- operator: China Unicom International Ltd
+  simIssuer:
+    - 8985207
+- operator: China-Hongkong Telecom Ltd
+  simIssuer:
+    - 8985211
+- operator: Hong Kong Telecommunications Ltd
+  simIssuer:
+    - 8985219
+- operator: Hongkong CSL Ltd
+  simIssuer:
+    - 8985200
+- operator: Hutchison 3G HK Ltd
+  simIssuer:
+    - 8985203
+- operator: Hutchison Global Communications Ltd
+  simIssuer:
+    - 8985268
+- operator: Hutchison Telephone Company Ltd
+  simIssuer:
+    - 8985204
+- operator: Mandarin Communications Ltd
+  simIssuer:
+    - 8985216
+- operator: New World PCS Ltd
+  simIssuer:
+    - 8985210
+- operator: New World Telecommunication Ltd
+  simIssuer:
+    - 8985269
+- operator: Pacific Link Communication Ltd
+  simIssuer:
+    - 8985218
+- operator: PCCW-HKT
+  simIssuer:
+    - 8985230
+    - 8985280
+- operator: Peoples Telephone Company Ltd
+  simIssuer:
+    - 8985212
+- operator: SmartTone Mobile Communications Ltd
+  simIssuer:
+    - 8985206
+- operator: Trident Telecom Ventures Ltd
+  simIssuer:
+    - 8985208
+- operator: Wharf T&T  Ltd
+  simIssuer:
+    - 8985277
+- operator: Telenor Hungary Ltd
+  simIssuer:
+    - 893620
+- operator: WESTEL 900 Mobil Távközlési Rt.
+  simIssuer:
+    - 893630
+- operator: Hallo GSM
+  simIssuer:
+    - 8935405
+- operator: IceCell ehf
+  simIssuer:
+    - 8935407
+- operator: Iceland Telecom Ltd
+  simIssuer:
+    - 8935400
+- operator: IMC Island ehf
+  simIssuer:
+    - 8935404
+- operator: Islandesimi GSM
+  simIssuer:
+    - 8935403
+- operator: Ital hf
+  simIssuer:
+    - 8935402
+- operator: Aircel Digilink India Ltd
+  simIssuer:
+    - 899101
+- operator: Bharti Mobile Ltd
+  simIssuer:
+    - 899110
+- operator: BPL Mobile Communications
+  simIssuer:
+    - 899121
+- operator: Fascel Ltd
+  simIssuer:
+    - 899105
+- operator: Hutchison Essar South Ltd
+  simIssuer:
+    - 899130
+- operator: Mahanagar Telephone Nigam Ltd
+  simIssuer:
+    - 899168
+- operator: Reliance Telecom Ltd
+  simIssuer:
+    - 899109
+- operator: Spice Communications Ltd
+  simIssuer:
+    - 899114
+- operator: Sterling Cellular Ltd
+  simIssuer:
+    - 899111
+- operator: PT Pasifik Satelit Nusantara
+  simIssuer:
+    - 896200
+- operator: PT Satelit Palapa Indonesia (PT Satelindo)
+  simIssuer:
+    - 896201
+- operator: 'Kish free-zone organisation (KFZO), Payem'
+  simIssuer:
+    - 899814
+- operator: Telecommunications Company of Iran (TCI)
+  simIssuer:
+    - 899811
+- operator: Asiacell Communications LLC
+  simIssuer:
+    - 8996405
+- operator: Korek Telecom
+  simIssuer:
+    - 8996440
+- operator: Zain Iraq (previously Atheer)
+  simIssuer:
+    - 8996420
+- operator: Zain Iraq (previously Iraqna)
+  simIssuer:
+    - 8996430
+- operator: IDT Card Services Ireland Ltd
+  simIssuer:
+    - 8935304
+- operator: Liffey Telecom Ltd
+  simIssuer:
+    - 8935311
+- operator: Meteor Mobile Communications
+  simIssuer:
+    - 8935303
+- operator: Vodaphone GSM Network
+  simIssuer:
+    - 8935301
+- operator: Barak I.T.C.
+  simIssuer:
+    - 8997203
+- operator: Cellcom Israel Ltd
+  simIssuer:
+    - 8997202
+- operator: Golan Telecom Ltd
+  simIssuer:
+    - 8997208
+- operator: Pelephone Communications Ltd
+  simIssuer:
+    - 8997250
+- operator: Azienda Di Stato per i Servizi Telefonici
+  simIssuer:
+    - 893901
+- operator: Blu S.p.A.
+  simIssuer:
+    - 893998
+- operator: H3G S.p.A.
+  simIssuer:
+    - 893999
+- operator: IPSE 2000
+  simIssuer:
+    - 893977
+- operator: Vodafone Omnitel  S.p.A.
+  simIssuer:
+    - 893910
+- operator: Cable and Wireless Jamaica Ltd
+  simIssuer:
+    - 891018
+    - 891582
+- operator: Mossel Jamaica Ltd
+  simIssuer:
+    - 891050
+- operator: Cable and Wireless IDC Inc.
+  simIssuer:
+    - 898165
+- operator: KDDI Corporation
+  simIssuer:
+    - 898101
+    - 898130
+- operator: NTT DoCoMo Inc.
+  simIssuer:
+    - 898110
+- operator: Vodafone Co. Ltd.
+  simIssuer:
+    - 898120
+- operator: Willcom Inc.
+  simIssuer:
+    - 898170
+- operator: MobileCom
+  simIssuer:
+    - 8996277
+- operator: Kar-Tel Ltd
+  simIssuer:
+    - 8999701
+- operator: Celtel Kenya Ltd
+  simIssuer:
+    - 8925403
+- operator: Econet Wireless Kenya Ltd
+  simIssuer:
+    - 8925405
+- operator: Safaricom Ltd
+  simIssuer:
+    - 8925402
+- operator: Telkom Kenya Ltd
+  simIssuer:
+    - 8925407
+- operator: KT Corporation
+  simIssuer:
+    - 898201
+- operator: KTF Freetel Co. Ltd.
+  simIssuer:
+    - 898230
+- operator: Kuwait Telecom Company (VIVA)
+  simIssuer:
+    - 8996504
+- operator: Zain (ex-Mobile Telecommunications
+  simIssuer:
+    - 899659
+- operator: Bitel Ltd
+  simIssuer:
+    - 8999601
+- operator: Millicom Lao Company Ltd
+  simIssuer:
+    - 8985608
+- operator: Latvian Mobile Telephone Co. Ltd.
+  simIssuer:
+    - 8937101
+- operator: 'FTML, S.A.L.'
+  simIssuer:
+    - 8996101
+- operator: Libancell
+  simIssuer:
+    - 8996103
+- operator: Ogero Telecom
+  simIssuer:
+    - 8996105
+- operator: Tele-Com Mobile
+  simIssuer:
+    - 8926611
+- operator: Celcom Telecommunications Inc.
+  simIssuer:
+    - 8923134
+- operator: Comium Liberia Inc.
+  simIssuer:
+    - 8923104
+- operator: Lonestar Communications Corporation
+  simIssuer:
+    - 8923101
+- operator: Libyana Mobile Phone
+  simIssuer:
+    - 8921800
+- operator: Alpcom AG (formerly ALLCommunications
+  simIssuer:
+    - 8942377
+- operator: Cubic AG
+  simIssuer:
+    - 8942306
+- operator: Mobilkom Liechenstein AG
+  simIssuer:
+    - 8942305
+- operator: Orange (Liechtenstein) AG
+  simIssuer:
+    - 8942302
+- operator: Swisscom (Schweiz) AG
+  simIssuer:
+    - 8942301
+- operator: Bité GSM UAB
+  simIssuer:
+    - 8937002
+- operator: Tele2
+  simIssuer:
+    - 8937003
+- operator: UAB Omnitel
+  simIssuer:
+    - 8937001
+- operator: Entreprise de Postes et
+  simIssuer:
+    - 8935200
+    - 8935201
+- operator: Tango S.A.
+  simIssuer:
+    - 8935277
+- operator: Voxmobile
+  simIssuer:
+    - 8935299
+- operator: Companhia de Telecomunicaçôes de
+  simIssuer:
+    - 8985301
+- operator: Hutchison Telefone (Macau) Limitada
+  simIssuer:
+    - 8985303
+- operator: Smartone Comunicaçôes Móveis S.A.
+  simIssuer:
+    - 8985300
+- operator: Orange Madagascar
+  simIssuer:
+    - 8926102
+- operator: Celtel Malawi Ltd.
+  simIssuer:
+    - 8926502
+- operator: Binariang Sdn. Bhd.
+  simIssuer:
+    - 896001
+- operator: Celcom (Malaysia) Sdn. Bhd.
+  simIssuer:
+    - 896019
+- operator: Telekom Malaysia Berhad (TM)
+  simIssuer:
+    - 896000
+- operator: Time Telecommunications Sdn. Bhd.
+  simIssuer:
+    - 896088
+- operator: U Mobile Sdn Bhd
+  simIssuer:
+    - 896020
+- operator: Dhivehi Raajjey Ge Gulhun Private Ltd.
+  simIssuer:
+    - 8996001
+- operator: Ikatel
+  simIssuer:
+    - 8922302
+- operator: 3G Telecommunications Ltd
+  simIssuer:
+    - 8935677
+- operator: La Mauritano - Tunisienne de
+  simIssuer:
+    - 8922203
+- operator: Mauritel Mobiles
+  simIssuer:
+    - 8922202
+- operator: Emtel Ltd.
+  simIssuer:
+    - 8923002
+- operator: Managhar Telephone (Mauritius) Ltd
+  simIssuer:
+    - 8923003
+- operator: Mauritius Telecom Ltd. (MT)
+  simIssuer:
+    - 8923001
+- operator: Pegaso Comunicaciones y Sistemas S.A.
+  simIssuer:
+    - 895203
+- operator: 'Radiomóvil DIPSA, S.A. de C.V. (Telcel)'
+  simIssuer:
+    - 895202
+- operator: Teléfonos de México S.A. de C.V.
+  simIssuer:
+    - 895201
+- operator: FSM Telecommunication Corporation
+  simIssuer:
+    - 8969101
+- operator: I.M. Eventis Mobile s.r.l.
+  simIssuer:
+    - 8937304
+- operator: JSC Orange Moldova
+  simIssuer:
+    - 8937301
+- operator: Moldcell S.A.
+  simIssuer:
+    - 8937302
+- operator: Crnogorski Telekom AD
+  simIssuer:
+    - 8938200
+- operator: MTEL d.o.o. Podgorica
+  simIssuer:
+    - 8938203
+- operator: Promonte GSM
+  simIssuer:
+    - 8938201
+- operator: VM Sarl
+  simIssuer:
+    - 8925804
+- operator: Mobile Telecommunications Ltd.
+  simIssuer:
+    - 8926401
+- operator: Wireless Technologies Namibia Pty Ltd
+  simIssuer:
+    - 8926422
+- operator: Spice Nepal Private Ltd.
+  simIssuer:
+    - 8997702
+- operator: 6GMobile B.V.
+  simIssuer:
+    - 893102
+- operator: ACN Europe B.V.
+  simIssuer:
+    - 893101
+- operator: Blyk N.V.
+  simIssuer:
+    - 893103
+- operator: Brucop Netherlands B.V.
+  simIssuer:
+    - 893116
+- operator: Elephant Talk Communication Holding AG
+  simIssuer:
+    - 893105
+- operator: Intercity Communications B.V.
+  simIssuer:
+    - 893117
+- operator: 'KPN Telecom B.V., Card Services'
+  simIssuer:
+    - 893100
+    - 893110
+- operator: Lycamobile Netherlands
+  simIssuer:
+    - 893109
+- operator: Private Mobility Nederland BV
+  simIssuer:
+    - 893124
+- operator: Teleena Nederlands
+  simIssuer:
+    - 893107
+- operator: Telfort B.V.
+  simIssuer:
+    - 893126
+- operator: T-Mobile (ex-Dutchtone N.V.)
+  simIssuer:
+    - 893120
+- operator: UPC NL
+  simIssuer:
+    - 893118
+- operator: Vodafone Libertel B.V.
+  simIssuer:
+    - 893144
+- operator: Voiceworks BV
+  simIssuer:
+    - 893131
+- operator: Ziggo BV
+  simIssuer:
+    - 893115
+- operator: Office des Postes et des
+  simIssuer:
+    - 8968701
+- operator: Compass Communications Ltd
+  simIssuer:
+    - 896402
+- operator: GoTalk Communications pty Ltd
+  simIssuer:
+    - 896411
+- operator: Next Generation Network Ltd
+  simIssuer:
+    - 896415
+- operator: NZ Communications Ltd
+  simIssuer:
+    - 896424
+- operator: Pacific Funds Transfers Group Ltd
+  simIssuer:
+    - 896401
+- operator: Telecom New Zealand Ltd
+  simIssuer:
+    - 896400
+- operator: Telstra Clear Ltd
+  simIssuer:
+    - 896403
+- operator: Celtel Niger S.A.
+  simIssuer:
+    - 8922702
+- operator: PTI
+  simIssuer:
+    - 891025
+- operator: AeroMobile (Telenor Mobile Aviation AS)
+  simIssuer:
+    - 8988299
+- operator: Automobil Invest AS
+  simIssuer:
+    - 894705
+- operator: Netcom GSM
+  simIssuer:
+    - 894708
+- operator: Telenor AS
+  simIssuer:
+    - 894700
+- operator: Telenor Mobile Aviation AS
+  simIssuer:
+    - 894701
+- operator: Oman Mobile Telecommunication
+  simIssuer:
+    - 8996800
+- operator: CMPAK Ltd
+  simIssuer:
+    - 899204
+- operator: Mobilink
+  simIssuer:
+    - 899201
+- operator: Pak Telecom Mobile Ltd (UFONE)
+  simIssuer:
+    - 899203
+- operator: Telenor Pakistan
+  simIssuer:
+    - 899206
+- operator: Warid Telecom (Pvt) Ltd.
+  simIssuer:
+    - 899207
+- operator: Palau Mobile Corporation
+  simIssuer:
+    - 8968080
+- operator: Cable and Wireless Panama S.A.
+  simIssuer:
+    - 8950701
+- operator: Digicel (PNG) Ltd
+  simIssuer:
+    - 8967503
+- operator: AMX Paraguay S.A.
+  simIssuer:
+    - 8959502
+- operator: Hóla Paraguay S.A.
+  simIssuer:
+    - 8959501
+- operator: Núcleo S.A.
+  simIssuer:
+    - 8959505
+- operator: Telefónica del Peru S.A.
+  simIssuer:
+    - 895151
+- operator: 'Digital Telecommunications Phillipines, Inc.'
+  simIssuer:
+    - 896305
+- operator: International Communications Corporation
+  simIssuer:
+    - 896300
+- operator: Philippine Global Communications Inc.
+  simIssuer:
+    - 896301
+- operator: Philippine Long Distance Telephone
+  simIssuer:
+    - 896363
+- operator: Polkomtel S.A.
+  simIssuer:
+    - 894801
+- operator: Polska telefonia Cyfrowa
+  simIssuer:
+    - 894802
+- operator: Teleena Poland Ltd
+  simIssuer:
+    - 894819
+- operator: Companhia Portugesa Rádio Marconi
+  simIssuer:
+    - 8935198
+- operator: 'Main Road Telecomunicaçôes, SA'
+  simIssuer:
+    - 8935103
+- operator: PT Comunicaçôes S.A.
+  simIssuer:
+    - 8935199
+- operator: Refer Telecom Serviços de
+  simIssuer:
+    - 8935112
+- operator: Telecel Comunicaçôes Pessoais S.A.
+  simIssuer:
+    - 8935101
+- operator: Telecomunicaçôes Moveis Nacionais
+  simIssuer:
+    - 8935106
+- operator: Telecomunicações Moveis Nacionais
+  simIssuer:
+    - 8935180
+- operator: AT&T
+  simIssuer:
+    - 891283
+    - 891253
+    - 891288
+- operator: Puerto Rico Telephone Company (PTRC)
+  simIssuer:
+    - 891809
+- operator: 'Telefónica Larga Distancia, Inc. (TLDI)'
+  simIssuer:
+    - 891853
+- operator: Qatar Telecom Q.S.C.
+  simIssuer:
+    - 8997400
+- operator: Cosmorom S.A.
+  simIssuer:
+    - 894003
+- operator: Mobifon S.A.
+  simIssuer:
+    - 894001
+- operator: Orange Romania
+  simIssuer:
+    - 894010
+- operator: Romtelecom
+  simIssuer:
+    - 894002
+- operator: Telecom XXI
+  simIssuer:
+    - 897193
+- operator: Airtel Rwanda Ltd
+  simIssuer:
+    - 8925014
+- operator: MTN Rwandacell sarl
+  simIssuer:
+    - 8925000
+- operator: Cable & Wireless St. Kitts and Nevis Ltd.
+  simIssuer:
+    - 891020
+- operator: Cable and Wireless (St. Lucia) Ltd.
+  simIssuer:
+    - 891021
+- operator: SPM Telecom
+  simIssuer:
+    - 8950801
+- operator: SamoaTel
+  simIssuer:
+    - 8968502
+- operator: Companhia Santomese de
+  simIssuer:
+    - 8923912
+- operator: Preduzece za telekomunicacije "Telekom
+  simIssuer:
+    - 8938103
+- operator: TELENOR d.o.o.
+  simIssuer:
+    - 8938101
+- operator: Vip mobile d.o.o.
+  simIssuer:
+    - 8938105
+- operator: Cable and Wireless (Seychelles) Ltd.
+  simIssuer:
+    - 8924801
+- operator: Comium (Sierra Leone) Ltd
+  simIssuer:
+    - 8923233
+- operator: Datatel Network GSM (SL) Ltd
+  simIssuer:
+    - 8923240
+- operator: M1 Ltd
+  simIssuer:
+    - 896503
+- operator: Singapore Telecommunications Ltd
+  simIssuer:
+    - 896500
+    - 896501
+    - 896502
+- operator: StarHub Pte Ltd
+  simIssuer:
+    - 896505
+- operator: EUROTEL Bratislava a.s.
+  simIssuer:
+    - 8942102
+- operator: Orange Slovensko a.s.
+  simIssuer:
+    - 8942101
+- operator: Slovenské Telekomunikácie a.s. (Slovak
+  simIssuer:
+    - 8942103
+- operator: Mobitel telekomunikacijske stortive d.d.
+  simIssuer:
+    - 8938641
+- operator: SI.Mobil d.d.
+  simIssuer:
+    - 8938640
+- operator: T-2 d.o.o.
+  simIssuer:
+    - 8938664
+- operator: TUSMOBIL d.o.o.
+  simIssuer:
+    - 8938670
+- operator: Onkod Telecom Ltd
+  simIssuer:
+    - 8925270
+- operator: Mobile Telephone Networks (PTY) Ltd.
+  simIssuer:
+    - 892701
+- operator: Network of the World Ltd (NOW)
+  simIssuer:
+    - 8924905
+- operator: 'Cableuropa, S.A.U.'
+  simIssuer:
+    - 893418
+- operator: Euskaltel S.A.
+  simIssuer:
+    - 893402
+- operator: Jazz Telecom SA
+  simIssuer:
+    - 893421
+- operator: R Cable y Telecomunicaciones Coruña S.A.
+  simIssuer:
+    - 893406
+- operator: R Cable y Telecomunicaciones Galicia S.A.
+  simIssuer:
+    - 893425
+- operator: Retevisión Móvil
+  simIssuer:
+    - 893401
+- operator: Ruzorange sl
+  simIssuer:
+    - 893409
+- operator: 'Telecable de Asturias, SAU'
+  simIssuer:
+    - 893416
+- operator: Telecor SA
+  simIssuer:
+    - 893405
+- operator: Telefónica de España S.A.
+  simIssuer:
+    - 893434
+- operator: Telefónica Móviles España
+  simIssuer:
+    - 893407
+- operator: 'Vizzavi España, S.L.'
+  simIssuer:
+    - 893457
+- operator: Vodafone España S.A.
+  simIssuer:
+    - 893456
+- operator: 'Xfera Móviles, S.A.'
+  simIssuer:
+    - 893404
+- operator: Bharti Airtel Lanka
+  simIssuer:
+    - 899405
+- operator: Celltel Lanka Ltd.
+  simIssuer:
+    - 899403
+- operator: Dialog Telekom Ltd
+  simIssuer:
+    - 899402
+- operator: MTN - Sudan
+  simIssuer:
+    - 8924999
+- operator: Sudan Telecom Company Ltd (Sudatel)
+  simIssuer:
+    - 8924901
+- operator: International Communication Management
+  simIssuer:
+    - 8959701
+- operator: Abbla Mobile S.A.
+  simIssuer:
+    - 894606
+- operator: Götalandsnätet AB
+  simIssuer:
+    - 894605
+- operator: Hi3G Access AB
+  simIssuer:
+    - 894607
+- operator: Myindian AB
+  simIssuer:
+    - 894627
+- operator: Spring Mobil AB
+  simIssuer:
+    - 894610
+- operator: TDC Sverige AB
+  simIssuer:
+    - 894614
+- operator: Tele2 Sverige AB
+  simIssuer:
+    - 894620
+    - 894670
+    - 894671
+- operator: Telenor Mobile Sverige
+  simIssuer:
+    - 894609
+- operator: Telenor Sverige AB
+  simIssuer:
+    - 894608
+- operator: Telia Mobile AB
+  simIssuer:
+    - 894601
+- operator: Bebbicell AG
+  simIssuer:
+    - 894104
+- operator: Callventure Telecommunications
+  simIssuer:
+    - 894126
+- operator: Die Schweizerische Post Information
+  simIssuer:
+    - 894123
+- operator: In & Phone S.A.
+  simIssuer:
+    - 894122
+- operator: Lycatel GmbH
+  simIssuer:
+    - 894124
+- operator: MOBEE AG
+  simIssuer:
+    - 894150
+- operator: Orange Communications S.A.
+  simIssuer:
+    - 894103
+- operator: Sunrise Communications AG
+  simIssuer:
+    - 894102
+- operator: Swisscom
+  simIssuer:
+    - 894100
+    - 894101
+- operator: upc cablecom GmbH
+  simIssuer:
+    - 894125
+- operator: Celtel Tanzania Ltd.
+  simIssuer:
+    - 8925505
+- operator: CAT Telecom Public Company Ltd.
+  simIssuer:
+    - 896601
+- operator: TOT Corporation Public Company Ltd.
+  simIssuer:
+    - 896602
+- operator: Wireless Communications Services
+  simIssuer:
+    - 896610
+- operator: Makedonski telekomunikacii A.D.
+  simIssuer:
+    - 8938901
+- operator: Tonga Communications Corporation Ltd.
+  simIssuer:
+    - 8967601
+- operator: Telecommunications Services of Trinidad
+  simIssuer:
+    - 891023
+- operator: Telsim
+  simIssuer:
+    - 899002
+- operator: Turkcell
+  simIssuer:
+    - 899001
+- operator: Kyivstar
+  simIssuer:
+    - 8938003
+- operator: Ukrainian Mobile Communications
+  simIssuer:
+    - 8938001
+- operator: Ukrainian Radio Systems Sc
+  simIssuer:
+    - 8938002
+- operator: The Emirates Telecommunications
+  simIssuer:
+    - 899711
+- operator: Thuraya Satellite Telecommunications
+  simIssuer:
+    - 8988216
+- operator: ARINC
+  simIssuer:
+    - 894402
+- operator: Asda Stores Ltd
+  simIssuer:
+    - 894424
+- operator: BLYK Limited
+  simIssuer:
+    - 894480
+- operator: British Telecommunications plc (British
+  simIssuer:
+    - 894400
+    - 894401
+- operator: BT Skyphone
+  simIssuer:
+    - 894405
+- operator: Cable & Wireless Communications plc
+  simIssuer:
+    - 894422
+- operator: Cable & Wireless Guernsey Ltd
+  simIssuer:
+    - 894433
+- operator: CreditCall Communications Ltd.
+  simIssuer:
+    - 894417
+- operator: Disney Mobile UK Ltd
+  simIssuer:
+    - 894475
+- operator: Dolphin Telecom plc
+  simIssuer:
+    - 894421
+- operator: Energis Communications Ltd
+  simIssuer:
+    - 894455
+- operator: Epay Ltd
+  simIssuer:
+    - 894490
+- operator: FMS Solutions Ltd
+  simIssuer:
+    - 894404
+- operator: Hay Systems Ltd.
+  simIssuer:
+    - 894481
+- operator: Hutchison Microtel
+  simIssuer:
+    - 894412
+- operator: Hutchison3G UK Ltd
+  simIssuer:
+    - 894420
+- operator: ICO Global Communications
+  simIssuer:
+    - 898811
+- operator: In Touch Communication Services Ltd
+  simIssuer:
+    - 894489
+- operator: Inmarsat Ltd
+  simIssuer:
+    - 8987099
+- operator: Jersey Telenet Ltd
+  simIssuer:
+    - 894476
+- operator: Keygold.com Ltd
+  simIssuer:
+    - 894431
+- operator: Localphone Ltd
+  simIssuer:
+    - 894408
+- operator: Lycamobile UK Ltd
+  simIssuer:
+    - 894484
+- operator: Lycatel Distribution UK Ltd
+  simIssuer:
+    - 894485
+- operator: Manx Telecom
+  simIssuer:
+    - 894453
+- operator: Mapesbury Communications Ltd
+  simIssuer:
+    - 894415
+- operator: Marathon Telecom Ltd
+  simIssuer:
+    - 894403
+- operator: Mercury Personal Communications
+  simIssuer:
+    - 894430
+- operator: Nowtel UK Ltd
+  simIssuer:
+    - 894487
+- operator: OnePhone (UK) Ltd
+  simIssuer:
+    - 894409
+- operator: Opal Telecom Ltd.
+  simIssuer:
+    - 894478
+- operator: Stanhope Communications Plc
+  simIssuer:
+    - 894425
+- operator: Telecom Securicor Cellular Radio Ltd
+  simIssuer:
+    - 894411
+- operator: Teleena UK Ltd
+  simIssuer:
+    - 894407
+- operator: Televoice UK Ltd
+  simIssuer:
+    - 894427
+- operator: Tesco Communications Ltd
+  simIssuer:
+    - 894435
+- operator: Tesco Mobile Ltd
+  simIssuer:
+    - 894428
+- operator: Tesco Stores Ltd (trading as Tesco
+  simIssuer:
+    - 894488
+- operator: T-Mobile Billing & Service GmbH
+  simIssuer:
+    - 894429
+- operator: Tribandglobal Ltd.
+  simIssuer:
+    - 894434
+- operator: Unitel Communications Ltd
+  simIssuer:
+    - 894426
+- operator: Use Your Noodle Ltd
+  simIssuer:
+    - 894482
+- operator: Valuedial Ltd
+  simIssuer:
+    - 894406
+- operator: Vanilla Vouchers Ltd
+  simIssuer:
+    - 894432
+- operator: Virgin Mobile Telecommunications Ltd
+  simIssuer:
+    - 894423
+- operator: Vodafone Group Services Ltd
+  simIssuer:
+    - 8988239
+- operator: Vodafone plc
+  simIssuer:
+    - 894410
+- operator: Zamir Telecom Ltd
+  simIssuer:
+    - 894486
+- operator: 'African Communications Group, Inc.'
+  simIssuer:
+    - 891678
+- operator: Alascom Inc.
+  simIssuer:
+    - 891866
+- operator: ATC
+  simIssuer:
+    - 891123
+- operator: 'Atlas Telephone Company, Inc.'
+  simIssuer:
+    - 891918
+- operator: Bell of Pennsylvania
+  simIssuer:
+    - 891227
+    - 891272
+- operator: BellSouth Services
+  simIssuer:
+    - 891200
+    - 891300
+- operator: Chesapeake & Potomac Telephone
+  simIssuer:
+    - 891221
+    - 891276
+    - 891235
+    - 891278
+    - 891224
+    - 891279
+- operator: Chesapeake & Potomac telephone
+  simIssuer:
+    - 891220
+    - 891273
+- operator: China Telephone Company
+  simIssuer:
+    - 891246
+- operator: Citizen Utilities Company
+  simIssuer:
+    - 891111
+- operator: Com Systems
+  simIssuer:
+    - 891266
+    - 891350
+- operator: Corr Wireless Communications
+  simIssuer:
+    - 891080
+- operator: Creative Communications
+  simIssuer:
+    - 891555
+    - 891999
+- operator: Diamond State Telephone Company
+  simIssuer:
+    - 891226
+    - 891378
+- operator: Dobson Telephone Company Inc.
+  simIssuer:
+    - 891362
+    - 891382
+- operator: Duocash Inc.
+  simIssuer:
+    - 891006
+- operator: Eastern New Mexico Telephone Cooperative
+  simIssuer:
+    - 891868
+- operator: Eastern Telecommunication Services
+  simIssuer:
+    - 891357
+- operator: Endless Mountains Wireless LLC
+  simIssuer:
+    - 891004
+- operator: Farmers Cellular Telephone Inc.
+  simIssuer:
+    - 891311
+- operator: Fone America Incoporated
+  simIssuer:
+    - 891503
+- operator: GCI Communication Corp.
+  simIssuer:
+    - 891026
+- operator: Geneseo Communications Inc.
+  simIssuer:
+    - 891032
+- operator: Globe Wireless
+  simIssuer:
+    - 891028
+- operator: Greenfly LLC
+  simIssuer:
+    - 891680
+- operator: Hat Island Telephone Company
+  simIssuer:
+    - 891001
+- operator: Highland Cellular Inc.
+  simIssuer:
+    - 891003
+- operator: IDT Telecom Inc
+  simIssuer:
+    - 891034
+- operator: Iridium LLC
+  simIssuer:
+    - 898816
+- operator: ITT-US Transmission Systems Inc.
+  simIssuer:
+    - 891488
+    - 891888
+- operator: LiTel Telecommunications Corporation
+  simIssuer:
+    - 891432
+- operator: Long Distance Savers
+  simIssuer:
+    - 891036
+    - 891318
+- operator: Lycatel LLC
+  simIssuer:
+    - 891029
+- operator: MCI WorldCom
+  simIssuer:
+    - 891222
+    - 891950
+- operator: McLoud Telephone Company Inc.
+  simIssuer:
+    - 891663
+    - 891666
+- operator: Missouri Telephone Company
+  simIssuer:
+    - 891710
+- operator: Mortorola Solutions Inc
+  simIssuer:
+    - 891033
+- operator: 'NEP Cellcorp, Inc.'
+  simIssuer:
+    - 891009
+- operator: New England Telephone & Telegraph
+  simIssuer:
+    - 891638
+- operator: New Jersey Bell Telephone Company
+  simIssuer:
+    - 891229
+    - 891652
+- operator: New York Telephone Company
+  simIssuer:
+    - 891698
+- operator: North East Colorado Cellular Inc.
+  simIssuer:
+    - 891450
+- operator: NorthWestern Bell Telephone Company
+  simIssuer:
+    - 891692
+    - 891822
+- operator: Nynex Corporation
+  simIssuer:
+    - 891696
+- operator: Operator Assistance Network
+  simIssuer:
+    - 891625
+    - 891626
+- operator: Pacific Bell
+  simIssuer:
+    - 891781
+    - 891784
+- operator: Pacific Northwest Bell Telephone Company
+  simIssuer:
+    - 891872
+- operator: Panhandle Telephone Cooperative Inc.
+  simIssuer:
+    - 891937
+- operator: Paygo Mobile Llc
+  simIssuer:
+    - 891038
+- operator: Pine Tree Tel & Tel Company
+  simIssuer:
+    - 891474
+- operator: RCI Corporation
+  simIssuer:
+    - 891211
+    - 891724
+- operator: Rochester Telephone Corporation
+  simIssuer:
+    - 891782
+    - 891891
+- operator: San Marcos Long Distance
+  simIssuer:
+    - 891505
+- operator: San Marcos Telephone Company Inc.
+  simIssuer:
+    - 891005
+- operator: 'Siouxland PCS, Inc.'
+  simIssuer:
+    - 891090
+- operator: Southern New England Telephone
+  simIssuer:
+    - 891234
+    - 891763
+- operator: SouthWestern Bell Telephone Company
+  simIssuer:
+    - 891792
+    - 891798
+- operator: Sprint  Corporation
+  simIssuer:
+    - 891333
+    - 891877
+- operator: Standish Telephone Company
+  simIssuer:
+    - 891786
+- operator: Steelville Telephone Exchange Inc.
+  simIssuer:
+    - 891669
+- operator: Telecom North America Mobile Inc
+  simIssuer:
+    - 891030
+- operator: Telecom USA
+  simIssuer:
+    - 891366
+    - 891852
+- operator: Teleport Communications
+  simIssuer:
+    - 891824
+    - 891884
+- operator: 'Tenzing Communications, Inc.'
+  simIssuer:
+    - 891002
+- operator: TerreStar Networks Inc.
+  simIssuer:
+    - 891027
+- operator: Transaction Network Services Inc.
+  simIssuer:
+    - 891867
+- operator: TRT International Inc.
+  simIssuer:
+    - 891878
+- operator: US Intelco Networks Inc.
+  simIssuer:
+    - 891321
+- operator: Verizon Communications Corporation
+  simIssuer:
+    - 891433
+    - 891444
+    - 891483
+    - 891486
+    - 891487
+    - 891489
+    - 891808
+- operator: Verizon Wireless
+  simIssuer:
+    - 891480
+- operator: Vivaro Corporation
+  simIssuer:
+    - 891031
+- operator: Vyvx Telecom Inc.
+  simIssuer:
+    - 891464
+- operator: Whibey Telephone Company
+  simIssuer:
+    - 891000
+- operator: Wireless Communications Ventures dba
+  simIssuer:
+    - 891460
+    - 891530
+- operator: XEL Communications Inc.
+  simIssuer:
+    - 891777
+    - 891800
+- operator: XIT Rural Telephone Cooperative Inc.
+  simIssuer:
+    - 891948
+- operator: XIT Telecommunications & Technology Inc.
+  simIssuer:
+    - 891988
+- operator: AT&T of the Virgin Islands
+  simIssuer:
+    - 891284
+- operator: Administración Nacional de
+  simIssuer:
+    - 8959800
+- operator: ANCEL
+  simIssuer:
+    - 8959801
+- operator: Buztel
+  simIssuer:
+    - 8999801
+- operator: Daewoo Central Paging Company
+  simIssuer:
+    - 8999804
+- operator: Digicel Vanuatu
+  simIssuer:
+    - 8967805
+- operator: Telecom Vanuatu Ltd
+  simIssuer:
+    - 8967801
+- operator: Coporación Digitel C.A.
+  simIssuer:
+    - 895802
+- operator: 'Telcel Celular, C.A. (TELCEL)'
+  simIssuer:
+    - 895804
+- operator: Telecommunications Movilnet C.A.
+  simIssuer:
+    - 895806
+- operator: Vietnam Mobile Telecom Service Company
+  simIssuer:
+    - 898401
+- operator: Vietnam Telecom Service Company (GPC)
+  simIssuer:
+    - 898402
+- operator: Zambia Telecommunications Company Ltd
+  simIssuer:
+    - 8926003

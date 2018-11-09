@@ -1,5 +1,6 @@
 # From https://www.imei.info/carriers
 # From https://www.itu.int/pub/T-SP-E.118-2012 
+# From https://github.com/musalbas/mcc-mnc-table
 
 # https://www.imei.info/carriers
 - operator: BT

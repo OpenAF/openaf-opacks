@@ -21,8 +21,8 @@ var genData = function(chGen, chDump) {
 var GenData = function(chGen, chDump) {
     ow.loadFormat();
 
-    var opackpath = getOPackPath("GenData");
-    io.listFiles(opackpath + "/libs").files.forEach((v) => {
+    this.opackpath = getOPackPath("GenData") || ".";
+    io.listFiles(this.opackpath + "/libs").files.forEach((v) => {
         af.externalAddClasspath("file:///" + v.canonicalPath);
     });
 
@@ -44,9 +44,13 @@ var GenData = function(chGen, chDump) {
     this.extraFuncs = {};
     this.parallel = false;
 
-    listFilesRecursive(getOPackPath("GenData") + "/funcs").forEach((v) => {
+    listFilesRecursive(this.opackpath + "/funcs").forEach((v) => {
         this.extraFuncs = merge(this.extraFuncs, require(v.canonicalPath));
     });
+};
+
+GenData.prototype.getPath = function() {
+    return this.opackpath;
 };
 
 /**
@@ -197,6 +201,23 @@ GenData.prototype.randomRange = function(min, max) {
 
 /**
  * <odoc>
+ * <key>GenData.randomDateRange(aFormat, aMin, aMax) : Date</key>
+ * Generates a random date between aMin date string and aMax date string which the corresponding format is determined
+ * by aFormat. For example:\
+ * \
+ * randomDateRange("yyyyMMdd hhmm", "19991231 2300", "20000101 0200");\
+ * \
+ * </odoc>
+ */
+GenData.prototype.randomDateRange = function(aFormat, aMin, aMax) {
+    return new Date(this.randomRange(
+        ow.format.toDate(aMin, aFormat).getTime(),
+        ow.format.toDate(aMax, aFormat).getTime()
+    ));
+};
+
+/**
+ * <odoc>
  * <key>GenData.randomRegEx(aRegEx) : String</key>
  * Generates a sample string that complies with the provided aRegEx (regular expression).
  * </odoc>
@@ -329,8 +350,8 @@ GenData.prototype.loadList = function(aName, aFile) {
     var list = {};
     _$(aFile).isString("Please provide a filename");
 
-    if (!(io.fileExists(aFile)) && io.fileExists(getOPackPath("GenData")+"/" + aFile)) {
-        aFile =  getOPackPath("GenData") + "/" + aFile;
+    if (!(io.fileExists(aFile)) && io.fileExists(aGenData.getPath()+"/" + aFile)) {
+        aFile =  aGenData.getPath() + "/" + aFile;
     }
     if (aFile.endsWith("yaml") || aFile.endsWith("yml")) {
         list = io.readFileYAML(aFile);
@@ -496,6 +517,8 @@ GenData.prototype.containsList = function(aName, aObj) {
  * </odoc>
  */
 GenData.prototype.validate = function(aValidator) {
+    loadLodash();
+
     if (this.chGen == this.chDump) {
         this.chDump = "genDat::dump";
         $ch(this.chDump).destroy();
@@ -504,19 +527,41 @@ GenData.prototype.validate = function(aValidator) {
 
     var parent = this;
     var res = [];
-    parent.getGenCh().forEach((aK, aV) => {    
-        var test = clone(aV);
-        delete test.___i;
-        var isGood = aValidator(parent, parent.extraFuncs, test);
-        if (isObject(isGood)) {
-            res.___i = aV.___i;
-            res.push(isGood);
-        } else {
-            if (isGood) {
-                res.push(aV);
+    if (this.parallel) {
+        res = parallel4Array(parent.getGenCh().getKeys(), (aK) => {
+            var aV = parent.getGenCh().get(aK);
+            var test = clone(aV);
+            delete test.___i;
+            var isGood = aValidator(parent, parent.extraFuncs, test);
+            if (isObject(isGood)) {
+                isGood.___i = aV.___i;
+                return isGood;
+            } else {
+                if (isGood) {
+                    return aV;
+                } else {
+                    return void 0;
+                }
             }
-        }
-    });
+        });
+
+        res = _.compact(res);    
+    } else {
+        parent.getGenCh().forEach((aK, aV) => {    
+            var test = clone(aV);
+            delete test.___i;
+            var isGood = aValidator(parent, parent.extraFuncs, test);
+            if (isObject(isGood)) {
+                isGood.___i = aV.___i;
+                res.push(isGood);
+            } else {
+                if (isGood) {
+                    res.push(aV);
+                }
+            }
+        });
+    }
+
     parent.getDumpCh().setAll(["___i"], res);
 
     return this;
