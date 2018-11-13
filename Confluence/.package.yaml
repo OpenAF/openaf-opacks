@@ -1,0 +1,26 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - confluence
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Confluence.opack
+description: Wrapper for the Confluence REST API
+name: Confluence
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20181113'
+dependencies:
+  packa: '>=20181113'
+files:
+  - confluence.js
+  - .package.yaml
+filesHash:
+  confluence.js: eb303ea2020ec6daef321a785e5e72f9c731744c
