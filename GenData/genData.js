@@ -350,8 +350,8 @@ GenData.prototype.loadList = function(aName, aFile) {
     var list = {};
     _$(aFile).isString("Please provide a filename");
 
-    if (!(io.fileExists(aFile)) && io.fileExists(aGenData.getPath()+"/" + aFile)) {
-        aFile =  aGenData.getPath() + "/" + aFile;
+    if (!(io.fileExists(aFile)) && io.fileExists(this.getPath()+"/" + aFile)) {
+        aFile =  this.getPath() + "/" + aFile;
     }
     if (aFile.endsWith("yaml") || aFile.endsWith("yml")) {
         list = io.readFileYAML(aFile);
