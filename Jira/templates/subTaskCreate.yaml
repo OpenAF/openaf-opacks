@@ -1,0 +1,9 @@
+project:
+   key      : APROJECT
+issuetype:
+   name: Sub-task
+customfield_16000:
+   value: My team
+   id   : "12345"
+summary          : {{summary}}
+description      : {{description}}

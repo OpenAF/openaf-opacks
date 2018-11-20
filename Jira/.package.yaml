@@ -22,5 +22,13 @@ dependencies:
 files:
   - .package.yaml
   - jira.js
+  - README.md
+  - templates/subTaskCreate.yaml
+  - templates/taskCreate.yaml
+  - templates/taskDone.yaml
 filesHash:
-  jira.js: 23b56cbae808185661c4d827f00f6dd9439f56ca
+  jira.js: a19495471d71fa6cdf0cf4f2fa5172af701ede6d
+  README.md: a6f5c648ecf5f096eacf0d5042e0b9064525bf93
+  templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
+  templates/taskCreate.yaml: a0c97c6ee92c3b3eadfcf34ac9602347d9193355
+  templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38

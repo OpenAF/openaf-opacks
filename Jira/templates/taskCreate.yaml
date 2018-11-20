@@ -1,0 +1,11 @@
+project:
+   key      : APROJECT
+issuetype:
+   name: Task
+# $from(jira.getFieldSuggestions("cf[10700]", "Sprint prefix")).sort("value").select()
+customfield_10700: 1234
+customfield_16000:
+   value: My team
+   id   : "12345"
+summary          : {{summary}}
+description      : {{description}}
