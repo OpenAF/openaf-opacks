@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - Redis
+  - Jedis
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Redis'
+  url: https://openaf.io/opacks/Redis.opack
+description: Wrapper to access Redis using the java Jedis client.
+name: Redis
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20181201'
+dependencies:
+  openaf: '>=20181201'
+files:
+  - jedis-3.0.0-m1.jar
+  - redis.js
+  - .package.yaml
+filesHash:
+  jedis-3.0.0-m1.jar: 8fa03629033dde948feb97b995bb89d9727e3db4
+  redis.js: 1af0109153140cf40700dd0d8e1ce70d3613f318
