@@ -1,3 +1,9 @@
+/**
+ * <odoc>
+ * <key>Redis.Redis(aHost, aPort)</key>
+ * Creates a new Redis object instance to access the redis instance at aHost and the provided aPort.
+ * </odoc>
+ */
 var Redis = function(aHost, aPort) {
     $path(io.listFiles(getOPackPath("Redis")).files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
         af.externalAddClasspath("file:///" + v);
@@ -8,10 +14,23 @@ var Redis = function(aHost, aPort) {
     this.jedis = new Packages.redis.clients.jedis.Jedis(this.host, this.port);
 };
 
+/**
+ * <odoc>
+ * <key>Redis.getObj() : Jedis</key>
+ * Access the underlying Jedis java object in use.
+ * </odoc>
+ */
 Redis.prototype.getObj = function() {
     return this.jedis;
 };
 
+/**
+ * <odoc>
+ * <key>Redis.get(aKey) : Object</key>
+ * Tries to retrieve the corresponding value given the provided aKey. The returning object will be adapted 
+ * depending on the type of value.
+ * </odoc>
+ */
 Redis.prototype.get = function(aKeyName) {
     switch(String(this.type(aKeyName))) {
     case "hash"  :
@@ -35,6 +54,12 @@ Redis.prototype.get = function(aKeyName) {
     }
 };
 
+/**
+ * <odoc>
+ * <key>Redis.set(aKey, aValue, aType)</key>
+ * Tries to set the aValue to aKey. Optionally you can specify aType (e.g. hash, list, set, zset and string)
+ * </odoc>
+ */
 Redis.prototype.set = function(aKeyName, aValue, aType) {
     var type;
 
@@ -86,9 +111,17 @@ Redis.prototype.set = function(aKeyName, aValue, aType) {
     default:
         this.strings_set(aKeyName, aValue);
     }
+
+    return this;
 };
 
-Redis.prototype.getKeys = function(aKeyName, aSearchString) {
+/**
+ * <odoc>
+ * <key>Redis.getKeys(aSearchString) : Array</key>
+ * Returns the list of keys. If aSearchString is provided the returning list will be limited (by default aSearchString = "*").
+ * </odoc>
+ */
+Redis.prototype.getKeys = function(aSearchString) {
     aSearchString = _$(aSearchString).default("*");
     var res = this.jedis.keys(aSearchString);
     var arr = [];
@@ -98,14 +131,32 @@ Redis.prototype.getKeys = function(aKeyName, aSearchString) {
     return arr;
 };
 
+/**
+ * <odoc>
+ * <key>Redis.type(aKeyName) : String</key>
+ * Returns the type of the provided aKeyName.
+ * </odoc>
+ */
 Redis.prototype.type = function(aKeyName) {
     return this.jedis.type(aKeyName);
 };
 
+/**
+ * <odoc>
+ * <key>Redis.del(aKeyName)</key>
+ * Deletes the corresponding aKeyName.
+ * </odoc>
+ */
 Redis.prototype.del = function(aKeyName) {
     return this.jedis.del(aKeyName);
 };
 
+/**
+ * <odoc>
+ * <key>Redis.rename(aOldKeyName, aNewKeyName)</key>
+ * Tries to rename aOldKeyName to aNewKeyName.
+ * </odoc>
+ */
 Redis.prototype.rename = function(aOldKeyName, aNewKeyName) {
     return this.jedis.rename(aOldKeyName, aNewKeyName);
 };

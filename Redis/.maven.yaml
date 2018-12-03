@@ -1,0 +1,4 @@
+libs:
+  - artifact: redis.clients.jedis
+    template: jedis-{{version}}.jar
+    location: .

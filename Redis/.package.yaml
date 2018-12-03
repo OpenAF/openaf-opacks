@@ -8,23 +8,27 @@ keywords:
   - Redis
   - Jedis
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
   backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Redis'
-  url: https://openaf.io/opacks/Redis.opack
+  url: 'https://openaf.io/opacks/Redis.opack'
 description: Wrapper to access Redis using the java Jedis client.
 name: Redis
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20181201'
 dependencies:
-  openaf: '>=20181201'
+  openaf: '>=20181203'
 files:
-  - jedis-3.0.0-m1.jar
-  - redis.js
+  - .maven.yaml
+  - .odoc.db
   - .package.yaml
+  - jedis-3.0.0-rc1.jar
+  - redis.js
 filesHash:
-  jedis-3.0.0-m1.jar: 8fa03629033dde948feb97b995bb89d9727e3db4
-  redis.js: 1af0109153140cf40700dd0d8e1ce70d3613f318
+  .maven.yaml: df3056eca4e827a2dc79e924d2ffce5a2acc4e34
+  .odoc.db: 093fffadf304f23b07382c35e6d0ae67ed4906d9
+  jedis-3.0.0-rc1.jar: a8fc08bdc38e8eb221da904bc532bbbe2c70c60c
+  redis.js: 2abd9ad63b6500dfd2b04a7c723a898bb57059cb
