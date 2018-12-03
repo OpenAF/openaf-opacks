@@ -1,11 +1,9 @@
 ow.loadCh();
 
 var path = getOPackPath("Mongo") || String((new java.io.File("")).getAbsolutePath()).replace(/\\/g, "/");
-
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-java-driver-3.8.1.jar");
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-core-3.8.1.jar");
-af.externalAddClasspath("file:///" + path + "/lib/mongodb-driver-3.8.1.jar");
-af.externalAddClasspath("file:///" + path + "/lib/bson-3.8.1.jar");
+$path(io.listFiles(path + "/lib").files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
+    af.externalAddClasspath("file:///" + v);
+});
 
 ow.ch.__types.mongo = {
     __typeConvert: function(aMap) {

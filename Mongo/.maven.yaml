@@ -1,0 +1,4 @@
+libs:
+  - artifact: org.mongodb.mongo-java-driver
+    template: mongo-java-driver-{{version}}.jar
+    location: lib

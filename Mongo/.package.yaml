@@ -11,7 +11,7 @@ bugs:
 repository:
   type: http
   backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Mongo'
-  url: https://openaf.io/opacks/Mongo.opack
+  url: 'https://openaf.io/opacks/Mongo.opack'
 description: >-
   An OpenAF channels implementation ('mongo') to access collections on MongoDBs.
   It also includes an utility object (e.g. MongoUtil).
@@ -19,21 +19,17 @@ name: Mongo
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20180913
+version: 20181202
 dependencies:
   openaf: '>=20171218'
 files:
+  - .maven.yaml
   - .odoc.db
   - .package.yaml
-  - lib/bson-3.8.1.jar
-  - lib/mongo-java-driver-3.8.1.jar
-  - lib/mongodb-driver-3.8.1.jar
-  - lib/mongodb-driver-core-3.8.1.jar
+  - lib/mongo-java-driver-3.9.1.jar
   - mongo.js
 filesHash:
+  .maven.yaml: 02fa9c2e696e913571dfc57e131c8708e10c3af9
   .odoc.db: 515fe2958811ff8e7a0941e3e58149bea2b18f52
-  lib/bson-3.8.1.jar: 08385a746a3824826494ddafa64c8e220872cfce
-  lib/mongo-java-driver-3.8.1.jar: a97932453b7185bbc18f4a4c368f9862554496d5
-  lib/mongodb-driver-3.8.1.jar: 115885a2430245e13a440ebc2e178ddce2822f8d
-  lib/mongodb-driver-core-3.8.1.jar: ca7672fad39304433ae08780ca5f90aae5842fb6
-  mongo.js: 27fc33c6ff274523f454265602f41ffd72890ad1
+  lib/mongo-java-driver-3.9.1.jar: d313237180bf9f2f82e12f503d9617e6b070f792
+  mongo.js: 63f6195d4d01a5d2281975050d4caea16c5b9bbf
