@@ -4,7 +4,7 @@
  * Creates a new Redis object instance to access the redis instance at aHost and the provided aPort.
  * </odoc>
  */
-var Redis = function(aHost, aPort) {
+var Redis = function(aHost, aPort, aDBId) {
     $path(io.listFiles(getOPackPath("Redis")).files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
         af.externalAddClasspath("file:///" + v);
     });
@@ -12,6 +12,67 @@ var Redis = function(aHost, aPort) {
     this.port = aPort;
 
     this.jedis = new Packages.redis.clients.jedis.Jedis(this.host, this.port);
+    if (isDef(aDBId)) this.select(aDBId);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.select(aDBId)</key>
+ * Selects a different Redis database aDBId.
+ * </odoc>
+ */
+Redis.prototype.select = function(aDBId) {
+    return this.jedis.select(aDBId);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.ping()</key>
+ * Ping the current redis connection.
+ * </odoc>
+ */
+Redis.prototype.ping = function() {
+    return this.jedis.ping();
+};
+
+/**
+ * <odoc>
+ * <key>Redis.size() : Number</key>
+ * Returns the current size (number of keys) of the current Redis database.
+ * </odoc>
+ */
+Redis.prototype.size = function() {
+    return this.jedis.dbSize();
+};
+
+/**
+ * <odoc>
+ * <key>Redis.getCurrentDBId() : Number</key>
+ * Returns the current Redis database id.
+ * </odoc>
+ */
+Redis.prototype.getCurrentDBId = function() {
+    return this.jedis.getDB();
+};
+
+/**
+ * <odoc>
+ * <key>Redis.getLastSave() : Date</key>
+ * Returns the date of the last successfull saving in disk.
+ * </odoc>
+ */
+Redis.prototype.getLastSave = function() {
+    return new Date(this.jedis.lastsave() * 1000);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.close()</key>
+ * Closes the current connection.
+ * </odoc>
+ */
+Redis.prototype.close = function() {
+    return this.jedis.quit();
 };
 
 /**
@@ -159,6 +220,16 @@ Redis.prototype.del = function(aKeyName) {
  */
 Redis.prototype.rename = function(aOldKeyName, aNewKeyName) {
     return this.jedis.rename(aOldKeyName, aNewKeyName);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.move(aKeyName, aDBId)</key>
+ * Moves the current db aKeyName to aDBId.
+ * </odoc>
+ */
+Redis.prototype.move = function(aKeyName, aDBId) {
+    return this.jedis.move(aKeyName, aDBId);
 };
 
 // Strings

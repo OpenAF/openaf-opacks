@@ -29,6 +29,6 @@ files:
   - redis.js
 filesHash:
   .maven.yaml: df3056eca4e827a2dc79e924d2ffce5a2acc4e34
-  .odoc.db: 093fffadf304f23b07382c35e6d0ae67ed4906d9
+  .odoc.db: 757c9a43571194fd25c5c57a828fa77328eef74b
   jedis-3.0.0-rc1.jar: a8fc08bdc38e8eb221da904bc532bbbe2c70c60c
-  redis.js: 2abd9ad63b6500dfd2b04a7c723a898bb57059cb
+  redis.js: fb7e7ce9053c9b5956f47158f83f2ce31f54d3f9
