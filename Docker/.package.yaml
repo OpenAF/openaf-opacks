@@ -8,28 +8,30 @@ keywords:
   - docker
   - containers
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://openaf.io/opacks/Docker.opack
-description: A wrapper to access the amihaiemil/docker-java-api api to access a docker client.
+  url: 'https://openaf.io/opacks/Docker.opack'
+description: >-
+  A wrapper to access the amihaiemil/docker-java-api api to access a docker
+  client.
 name: Docker
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20190102'
 dependencies:
   openaf: '>=20180801'
 files:
   - .odoc.db
+  - .package.yaml
   - docker.js
-  - lib/docker-java-api-0.0.6-jar-with-dependencies.jar
+  - lib/docker-java-api-0.0.7-jar-with-dependencies.jar
   - lib/javax.json-1.1.4.jar
   - lib/javax.json-api-1.1.4.jar
-  - .package.yaml
 filesHash:
   .odoc.db: f92771d34d4d45c75bc7fb26fa19ae0cf0a50b3f
-  docker.js: 363c24d764d2ac5a5e93c1931f56ec653915515f
-  lib/docker-java-api-0.0.6-jar-with-dependencies.jar: fe777df8b294ee112785c4781ed405f9e3ec34ce
+  docker.js: 28f3599b48fa923ad7260e159ab3ac432fadbae2
+  lib/docker-java-api-0.0.7-jar-with-dependencies.jar: 8a99f38357ab2f1989bdbc9910fb25f2117a23f7
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
