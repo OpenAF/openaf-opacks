@@ -1,0 +1,34 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - opack
+  - server
+  - opackserver
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/oPackServer.opack'
+description: >-
+  Provides an ojob or docker container to launch a private oPack server and
+  easily add it to any OpenAF client.
+name: oPackServer
+main: ''
+mainJob: main.yaml
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190115'
+dependencies:
+  openaf: '>=20181229'
+files:
+  - .package.yaml
+  - Dockerfile
+  - main.yaml
+  - README.md
+filesHash:
+  Dockerfile: a3edbc6333c0878eaeebfd6c54aa6add9441efc2
+  main.yaml: 5c1ce3cc7318823d84936cb3132719e23d3adf5a
+  README.md: aef411d00659a5e4b0ca274280e3202775ebe35c

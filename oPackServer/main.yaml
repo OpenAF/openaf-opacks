@@ -1,0 +1,202 @@
+# Author     : Nuno Aguiar
+# How to run : ojob main.yaml OPACKSERVER_PATH=/some/dir/data OPACKSERVER_URL=http://127.0.0.1:8090 OPACKSERVER_INITRELOAD=true
+# Check the README.md
+
+consts:
+  # The port where the http will serve content
+  port  : &PORT   8090
+  # The port to manage the serve
+  mport : &MPORT  8100
+  # Where the pid file will be located
+  piddir: &PIDDIR opackServer.pid
+
+ojob:
+  daemon      : true
+  argsFromEnvs: true
+  unique      : 
+    pidFile     : *PIDDIR
+    killPrevious: false
+  logToConsole: false
+  channels    :
+    expose     : true
+    audit      : true
+    port       : *MPORT
+    create     :
+      - name: ops
+        type: dummy
+    permissions: rw
+    list       :
+      - ops
+
+include:
+  - oJobHTTPd.yaml
+
+todo:
+  - name: HTTP Start Server
+    args:
+      port   : *PORT
+      mapLibs: true
+
+  - name: Init
+  - name: Backend operations
+  - name: Prepare opacks
+  - name: Prepare default
+
+###########################################################
+# The code
+
+jobs:
+  # Initialize global variables
+  - name: Init
+    exec: |
+      global.path   = _$(args.OPACKSERVER_PATH).default("/data");
+      global.url    = _$(args.OPACKSERVER_URL).default("http://127.0.0.1:8090");
+
+      global.opacks = {};
+      global.lastCheck = {};
+      io.mkdir(global.path + "/opacks");
+
+      if (isDef(args.OPACKSERVER_INITRELOAD) || args.OPACKSERVER_INITRELOAD == "true") {
+        oJobRunJob("Check opacks", args);
+      }
+
+  # Prepare handler of opack files
+  - name: Prepare opacks
+    to  : HTTP Service
+    deps:
+      - Init
+    args: 
+      uri       : /opacks
+      port      : *PORT
+      execURI   : "return ow.server.httpd.replyFile(server, global.path + '/opacks', '/opacks', request.uri);"
+
+  # Prepare handler of default
+  - name: Prepare default
+    to  : HTTP Service
+    deps:
+      - Init
+    args:
+      uri    : /
+      port   : *PORT
+      execURI: |
+        if (request.uri == "/opack.db") {
+          return server.replyBytes(io.readFileBytes(global.path + "/opack.db"), "application/zip");
+        } else {
+          return server.replyOKText("");
+        }
+    exec: |
+      log("Available on " + global.url + "/opack.db");
+
+  # Prepare backend subscriber
+  - name    : Backend operations
+    deps    :
+      - Init
+    type    : subscribe
+    typeArgs:
+      chSubscribe: ops
+    exec    : |
+      if (args.op == "set" && isDef(args.k.op) && args.k.op == "reload") {
+        oJobRunJob("Init", args);
+        oJobRunJob("Check opacks", args);
+      }  
+      if (args.op == "set" && isDef(args.k.op) && args.k.op == "recheck") {
+        oJobRunJob("Check opacks", args);
+      }  
+
+  # Check if any opack changed
+  - name    : Check opacks
+    exec    : |
+      try {
+        log("Starting reload of opacks...");
+        var changed = false;
+
+        // Check all directories and opack files
+        //
+        $from(io.listFiles(global.path + "/opacks").files)
+        .select((r) => {
+          var packType = "", packInfo = {};
+          if (r.isDirectory) {
+            if (io.fileExists(r.canonicalPath + "/.package.json")) { packType = "json"; packInfo = io.fileInfo(r.canonicalPath + "/.package.json"); }
+            if (io.fileExists(r.canonicalPath + "/.package.yaml")) { packType = "yaml"; packInfo = io.fileInfo(r.canonicalPath + "/.package.yaml"); }
+            if (io.fileExists(r.canonicalPath + "/.package.yml"))  { packType = "yml"; packInfo = io.fileInfo(r.canonicalPath + "/.package.yml"); }
+          }
+
+          if (r.filename.endsWith(".opack")) {
+            packInfo = io.fileInfo(r.canonicalPath);
+            packType = "opack";
+          }
+
+          if (packType == "") return;
+ 
+          // Check last modified of .package.* file or opack to avoid unnecessary reprocessing
+          //
+          var pack = {}, check = false;
+          if (isDef(global.lastCheck[r.canonicalPath])) {
+            if (global.lastCheck[r.canonicalPath] < packInfo.lastModified) check = true;
+          } else {
+            check = true;
+          }
+
+          if (check) {
+            var pack = {};
+
+            switch(packType) {
+            case "json" : pack = io.readFile(r.canonicalPath + "/.package.json"); break;
+            case "yml"  : pack = io.readFileYAML(r.canonicalPath + "/.package.yml"); break;
+            case "yaml" : pack = io.readFileYAML(r.canonicalPath + "/.package.yaml"); break;
+            case "opack": 
+              plugin("ZIP"); 
+              var zip = new ZIP(); 
+              var packList = Object.keys(zip.list(r.canonicalPath));
+              if (packList.indexOf(".package.yaml") >= 0) pack = af.fromYAML(af.fromBytes2String(zip.streamGetFile(r.canonicalPath, ".package.yaml")));
+              if (packList.indexOf(".package.yml") >= 0) pack = af.fromYAML(af.fromBytes2String(zip.streamGetFile(r.canonicalPath, ".package.yml")));
+              if (packList.indexOf(".package.json") >= 0) pack = jsonParse(af.fromBytes2String(zip.streamGetFile(r.canonicalPath, ".package.json")));
+              break;
+            }
+
+            log("Reading package '" + pack.name + "'...");
+            pack.repository.type = "http";
+            pack.repository.url = global.url + "/opacks/" + r.filename;
+            global.opacks[pack.name] = pack;
+
+            // Rewrite package download info
+            //
+            log("Rewriting package '" + pack.name + "'");
+            switch(packType) {
+            case "json" : pack = io.writeFile(r.canonicalPath + "/.package.json", pack); break;
+            case "yml"  : pack = io.writeFileYAML(r.canonicalPath + "/.package.yml"), pack; break;
+            case "yaml" : pack = io.writeFileYAML(r.canonicalPath + "/.package.yaml", pack); break;
+            case "opack":
+              plugin("ZIP"); 
+              var zip = new ZIP(); 
+              var packList = Object.keys(zip.list(r.canonicalPath));
+              if (packList.indexOf(".package.yaml") >= 0) zip.streamPutFile(r.canonicalPath, ".package.yaml", af.fromString2Bytes(af.toYAML(pack)));
+              if (packList.indexOf(".package.yml") >= 0) zip.streamPutFile(r.canonicalPath, ".package.yml", af.fromString2Bytes(af.toYAML(pack)));
+              if (packList.indexOf(".package.json") >= 0) zip.streamPutFile(r.canonicalPath, ".package.json", af.fromString2Bytes(stringify(pack)));
+              break;
+            }
+
+            // Store last modified of .package.* file or opack to avoid unnecessary reprocessing
+            global.lastCheck[r.canonicalPath] = now();
+            changed = true;
+          }
+        });
+
+        // Regenerate .opack.db
+        if (changed) {
+          plugin("ZIP");
+
+          var zip = new ZIP();
+          zip.putFile("packages.json", stringify(global.opacks, void 0, ""));
+          var newzip = zip.generate({ compressionLevel: 9 });
+          zip.close();
+
+          log("Writing new opack.db...");
+          io.writeFileBytes(global.path + "/opack.db", newzip);
+          log("Wrote #" + Object.keys(global.opacks).length + " packages.");
+        }
+        log("Done reloading of opacks.");
+      } catch(e) {
+        logErr("Error while checking opacks: " + String(e));
+      }
+
