@@ -10,9 +10,10 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout) {
 	this.url = aURL; 
 	this.user = aUser;
 	this.pass = aPass;
-	//loadExternalJars(getOPackPath("Kube") || ".");
+	
+	loadExternalJars(getOPackPath("Kube") || ".");
 	aWSTimeout = _$(aWSTimeout).isNumber().default(5000);
-	loadExternalJars(".");
+	
 	this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
 	              .withMasterUrl(this.url)
 	              .withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))

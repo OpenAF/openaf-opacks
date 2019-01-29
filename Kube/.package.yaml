@@ -48,7 +48,7 @@ filesHash:
   jackson-dataformat-yaml-2.9.7.jar: a428edc4bb34a2da98a50eb759c26941d4e85960
   jackson-module-jaxb-annotations-2.7.5.jar: 76970966f107ce710f7dcf36be510b4b9607d634
   jul-to-slf4j-1.7.13.jar: 43759e986de5fec7045e35e9533e5ad2f6cd1b05
-  kube.js: 0cd16318629765033fbab2422014cadeb17fb0ea
+  kube.js: a3c65c1fe13cc72437d9b113f92f4d0d6eca158a
   kubernetes-client-4.1.1.jar: 60788139ca9c3495e7c244c395ceeefc4321b46b
   kubernetes-model-4.1.1.jar: 96621c249952a698333912f40474fb97d8f30fbe
   logging-interceptor-3.9.1.jar: 36e71ab9e903fc4d1b4a58d80572a91d9fd60caf
