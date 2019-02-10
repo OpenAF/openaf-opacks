@@ -20,15 +20,15 @@ name: oPackServer
 main: ''
 mainJob: main.yaml
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190115'
+version: '20190209'
 dependencies:
   openaf: '>=20181229'
 files:
-  - .package.yaml
   - Dockerfile
+  - .package.yaml
   - main.yaml
   - README.md
 filesHash:
-  Dockerfile: a3edbc6333c0878eaeebfd6c54aa6add9441efc2
-  main.yaml: 5c1ce3cc7318823d84936cb3132719e23d3adf5a
-  README.md: aef411d00659a5e4b0ca274280e3202775ebe35c
+  Dockerfile: 9d6694ebff092b470b76a2955f2c78bb53a0c573
+  main.yaml: 9f72ea4390b78fdbf7f4237b8c407ad9108dce6f
+  README.md: 2b6388ad35a00f63e9bc919198b3a1a266c480cd

@@ -110,6 +110,24 @@ jobs:
         log("Starting reload of opacks...");
         var changed = false;
 
+        // Convert folders to opacks
+        if (isDef(args.OPACKSERVER_FOLDER2OPACK) && args.OPACKSERVER_FOLDER2OPACK == "true") {
+          $from(io.listFiles(global.path + "/opacks").files)
+          .select((r) => {
+            if (r.isDirectory &&
+                (io.fileExists(r.canonicalPath + "/.package.json") ||
+                 io.fileExists(r.canonicalPath + "/.package.yaml") ||
+                 io.fileExists(r.canonicalPath + "/.package.yml"))) {
+              log("Packing " + r.canonicalPath + " to opack...");
+              var res = sh(getOpenAFPath() + "/opack pack " + r.canonicalPath, void 0, void 0, true, global.path + "/opacks", true);
+              if (res.exitcode == 0) {
+                log("Removing " + r.canonicalPath + "...");
+                io.rm(r.canonicalPath);
+              }
+            }
+          });
+        }
+
         // Check all directories and opack files
         //
         $from(io.listFiles(global.path + "/opacks").files)
@@ -169,10 +187,20 @@ jobs:
             case "opack":
               plugin("ZIP"); 
               var zip = new ZIP(); 
-              var packList = Object.keys(zip.list(r.canonicalPath));
-              if (packList.indexOf(".package.yaml") >= 0) zip.streamPutFile(r.canonicalPath, ".package.yaml", af.fromString2Bytes(af.toYAML(pack)));
-              if (packList.indexOf(".package.yml") >= 0) zip.streamPutFile(r.canonicalPath, ".package.yml", af.fromString2Bytes(af.toYAML(pack)));
-              if (packList.indexOf(".package.json") >= 0) zip.streamPutFile(r.canonicalPath, ".package.json", af.fromString2Bytes(stringify(pack)));
+              var target = r.canonicalPath;
+              if (isDef(args.OPACKSERVER_OPACKNOVERSION) && 
+                  args.OPACKSERVER_OPACKNOVERSION == "true" &&
+                  r.filename == pack.name + "-" + pack.version + ".opack") {
+                target = r.canonicalPath.replace(new RegExp("/" + r.filename + "$"), "/" + pack.name + ".opack");
+                log("Copying " + r.filename + " to " + pack.name + ".opack" + "...");
+                io.cp(r.canonicalPath, target);
+                pack.repository.url = global.url + "/opacks/" + pack.name + ".opack";
+                pack.repository.backurl = pack.repository.url;
+              }
+              var packList = Object.keys(zip.list(target));
+              if (packList.indexOf(".package.yaml") >= 0) zip.streamPutFile(target, ".package.yaml", af.fromString2Bytes(af.toYAML(pack)));
+              if (packList.indexOf(".package.yml") >= 0) zip.streamPutFile(target, ".package.yml", af.fromString2Bytes(af.toYAML(pack)));
+              if (packList.indexOf(".package.json") >= 0) zip.streamPutFile(target, ".package.json", af.fromString2Bytes(stringify(pack)));
               break;
             }
 
