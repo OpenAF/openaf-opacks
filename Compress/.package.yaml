@@ -11,7 +11,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compress'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compress'
+  url: 'https://openaf.io/opacks/Compress.opack'
 description: Provides encapsulation for the Apache Compress library.
 name: Compress
 main: ''

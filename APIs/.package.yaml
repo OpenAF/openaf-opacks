@@ -20,7 +20,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs'
+  url: 'https://openaf.io/opacks/APIs.opack'
 description: >-
   A collection of public REST APIs for currency check, country info, numbers &
   dates trivia, GeoIP, weather and a test service.

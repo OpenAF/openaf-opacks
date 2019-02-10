@@ -12,7 +12,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CmdUtils"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CmdUtils",
+    "url": "https://openaf.io/opacks/CmdUtils.opack"
   },
   "description": "Common object library for command utilities",
   "name": "CmdUtils",

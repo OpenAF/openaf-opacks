@@ -13,8 +13,9 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: >-
+  backurl: >-
     https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GooglePhoneNumber
+  url: 'https://openaf.io/opacks/GooglePhoneNumber.opack'
 description: >-
   Provides a wrapper to use the google phone number library
   (https://github.com/googlei18n/libphonenumber/).
@@ -22,27 +23,27 @@ name: GooglePhoneNumber
 main: main.js
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20181205'
+version: '20190209'
 dependencies:
   openaf: '>=20170301'
 files:
-  - .package.yaml
   - googlePhoneNumber.js
   - googlePhoneNumber.yaml
-  - lib/carrier-1.98.jar
-  - lib/geocoder-2.108.jar
-  - lib/libphonenumber-8.10.2.jar
-  - lib/prefixmapper-2.108.jar
-  - lib/protobuf-javanano-3.0.0-alpha-7.jar
-  - main.js
   - updateGooglePhoneNumber.yaml
+  - .package.yaml
+  - main.js
+  - lib/carrier-1.101.jar
+  - lib/protobuf-javanano-3.0.0-alpha-7.jar
+  - lib/geocoder-2.111.jar
+  - lib/libphonenumber-8.10.5.jar
+  - lib/prefixmapper-2.111.jar
 filesHash:
   googlePhoneNumber.js: 5cdc370296f68a9e09d59a5789567a5bf5bfeca1
   googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
-  lib/carrier-1.98.jar: fb3ca80b8aad89385a29d6c3f528b65ff65051e6
-  lib/geocoder-2.108.jar: 2cda0f49a1455f3e34c352b91bf3c052996d70dd
-  lib/libphonenumber-8.10.2.jar: 653b558566c2e502a56f69255c5faac03d4a4edc
-  lib/prefixmapper-2.108.jar: 6ea63041783c85f6d1cadff5e6af626091ecdc32
-  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
-  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
   updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
+  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
+  lib/carrier-1.101.jar: 32214b9bf15fde6899daee4c9ddcf8e5dfca2e25
+  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
+  lib/geocoder-2.111.jar: ef6ef552f7439eca47ce77543649ab38cddcec38
+  lib/libphonenumber-8.10.5.jar: bea6237cdab1ba3f0fe5eb4fd1f9389fa150265e
+  lib/prefixmapper-2.111.jar: 7eb7f07d1019041db9c67e3db955970dac1bbbce
