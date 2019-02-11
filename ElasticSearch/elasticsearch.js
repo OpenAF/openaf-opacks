@@ -117,18 +117,36 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, ext
 	if (isDef(taskCallback) && isFunction(taskCallback)) {
 		extra += "&wait_for_completion=false";
 		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
-		var t = 1000;
+		var t = 1000, task;
 		do {
 			sleep(t);
-			var task = this.getTask(res.task);
+			task = this.getTask(res.task);
 			var tr = taskCallback(task);
 
 			if (isDef(tr)) t = tr;
-		} while (isDef(task) && t > 0)
+		} while (isDef(task) && t > 0);
 		return;
 	} else {
 		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
 	}
+
+	return res;
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.forceMerge(aIndexExpression, maxNumSegments) : Map</key>
+ * Forces the merge of segments to improve performance for aIndexExpression (e.g. "index", "index-*", "index1,index2", "_all", etc...).
+ * Optionally you can specify the number of maxNumSegments per index (defaults to 1).
+ * </odoc>
+ */
+ElasticSearch.prototype.forceMerge = function(aIndexExpression, maxNumSegments) {
+	ow.loadObj();
+
+	maxNumSegments = _$(maxNumSegments).isNumber().default(1);
+	_$(aIndexExpression).$_("Please provide an index or index wildcard expression or _all.");
+	
+	var res = ow.obj.rest.jsonCreate(this.url + "/" + aIndexExpression + "/_forcemerge?max_num_segments=" + maxNumSegments);
 
 	return res;
 };
