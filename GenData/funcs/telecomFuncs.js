@@ -21,12 +21,8 @@
      * </odoc>
      */
     exports.genPhone = function(aGenData, aCountry, aType, addOperator, addCountryCode) {
-        if (aGenData.existsList("genData::phonePatterns") == false) {
-            aGenData.loadList("genData::phonePatterns", aGenData.getPath() + "/lists/telecom/list_phonePatterns.yaml");
-        }
-        if (addOperator && aGenData.existsList("genData::phonePrefixes") == false) {
-            aGenData.loadList("genData::phonePrefixes", aGenData.getPath() + "/lists/telecom/list_phonePrefixes.yaml");
-        }
+        aGenData.loadIfNotExists("genData::phonePatterns", aGenData.getPath() + "/lists/telecom/list_phonePatterns.yaml");
+        aGenData.loadIfNotExists("genData::phonePrefixes", aGenData.getPath() + "/lists/telecom/list_phonePrefixes.yaml");
 
         if (isUnDef(aType)) {
             aType = aGenData.oneOf([ 
@@ -65,9 +61,7 @@
      * </odoc>
      */
     exports.genIMSI = function(aGenData, aCountry, anOperator) {
-        if (aGenData.existsList("genData::phoneOperators") == false) {
-            aGenData.loadList("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_phoneOperators.yaml");
-        }
+        aGenData.loadIfNotExists("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_phoneOperators.yaml");
 
         var opr;
         if (isDef(anOperator)) 
@@ -88,9 +82,7 @@
      * </odoc>
      */
     exports.genIMEI = function(aGenData, aModel) {
-        if (aGenData.existsList("genData::phoneTACs") == false) {
-            aGenData.loadList("genData::phoneTACs", aGenData.getPath()+ "/lists/telecom/list_phoneTACs.yaml");
-        }
+        aGenData.loadIfNotExists("genData::phoneTACs", aGenData.getPath()+ "/lists/telecom/list_phoneTACs.yaml");
 
         var opr;
         if (isDef(aModel)) {
@@ -112,14 +104,12 @@
 
     /**
      * <odoc>
-     * <key>GenData.funcs.genICCID(aGenData, aCountry, anOperator) : String</key>
-     * Given anOperator from aCountry (two-letter), from the lists/telecom/list_phoneOperators.yaml, will generate a possible SIM ICCID.
+     * <key>GenData.funcs.genICCID(aGenData, anOperator) : String</key>
+     * Given anOperator, from the lists/telecom/list_phoneOperators.yaml, will generate a possible SIM ICCID.
      * </odoc>
      */
     exports.genICCID = function(aGenData, anOperator) {
-        if (aGenData.existsList("genData::phoneOperators") == false) {
-            aGenData.loadList("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_iin.yaml");
-        }
+        aGenData.loadIfNotExists("genData::operatorsIIN", aGenData.getPath() + "/lists/telecom/list_iin.yaml");
 
         var getLuhn = function(aValue) {
             aValue = String(aValue);
@@ -132,10 +122,12 @@
         };
         
         var opr;
-        if (isDef(anOperator)) 
-            opr = aGenData.oneOf($path(aGenData.getList("genData::phoneOperators"), "[?operator=='" + anOperator + "'] | [0]").simIssuer);
-        else 
-            opr = aGenData.getFromList("genData::phoneOperators");
+    
+        if (isDef(anOperator)) {
+            opr = $path(aGenData.getList("genData::operatorsIIN"), "[?operator=='" + anOperator + "'] | [0]");
+        } else {
+            opr = aGenData.getFromList("genData::operatorsIIN");
+        }
 
         //var mii = "89"; // Major industry identifier, 2 fixed digits, 89 for telecommunication
         //var countryCode = "1"; // 3 digits as defined in E.164

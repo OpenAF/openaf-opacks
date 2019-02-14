@@ -9,8 +9,7 @@
     exports.genUSAddress = function(aGenData, aAddressList) {
         if (isUnDef(aAddressList)) {
             aAddressList = "GenData::AddressList";
-            if (!(aGenData.existsList(aAddressList)))
-                aGenData.loadList("GenData::AddressList", aGenData.getPath() + "/lists/clients/list_addresses.yaml");
+            aGenData.loadIfNotExists("GenData::AddressList", aGenData.getPath() + "/lists/clients/list_addresses.yaml");
         }
 
         var st = aGenData.getFromList(aAddressList); 

@@ -95,11 +95,12 @@ GenData.prototype.generate = function(aFunc, numberOfSamples) {
 
     if (this.parallel) {
         var parent = this;
-        var arr = new Array(numberOfSamples).join().split(',');
+        // Probably divide in small chunks for big number of samples
+        var arr = Object.keys(new Array(numberOfSamples).join().split(','));
         res = parallel4Array(arr, function(v) {
             var rec = aFunc(parent, parent.extraFuncs);
             if (isObject(rec)) {
-                rec.___i = nowNano();
+                rec.___i = nowNano() + v;
                 return rec;
             } else {
                 return void 0;
@@ -342,7 +343,7 @@ GenData.prototype.existsList = function(aName) {
 
 /**
  * <odoc>
- * <key>GenData.loadList(aName, aFile) : GenData</key>
+ * <key>GenData.loadList(aName, aFile, noSync) : GenData</key>
  * Tries to load all values of an array JSON or YAML aFile into a list named aName for this GenData object instance.
  * </odoc>
  */
@@ -361,6 +362,15 @@ GenData.prototype.loadList = function(aName, aFile) {
 
     this.setList(aName, list);  
     return this;
+};
+
+GenData.prototype.loadIfNotExists = function(aName, aFile) {
+    var parent = this;
+    sync(() => {
+        if (parent.existsList(aName) == false) {
+            parent.loadList(aName, aFile);
+        }
+    }, this);  
 };
 
 /**
@@ -601,6 +611,20 @@ GenData.prototype.dump = function(aTimeout) {
     }
 
     return o;
+};
+
+GenData.prototype.dumpNDJSON = function(aFile, aEncode, aTimeout) {
+    aTimeout = _$(aTimeout).isNumber().default(void 0);
+    var stream = io.writeFileStream(aFile), delim = "";
+    this.getDumpCh().forEach((k, v) => {
+        delete v.___i;
+        var s = delim + stringify(v, void 0, "");
+        ioStreamWrite(stream, s, s.length, true);
+        delim = "\n";
+    });
+    stream.close();
+
+    return this;
 };
 
 GenData.prototype.__getDBArrays = function(arrKeys) {

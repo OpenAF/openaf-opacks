@@ -21,7 +21,7 @@
      * </odoc>
      */
     exports.genUsername = function(aGenData, aFullName) {
-        var names = aName.toLowerCase().split(/ +/);
+        var names = aFullName.toLowerCase().split(/ +/);
 
         return aGenData.oneOf([
             names[0] + names[1],
