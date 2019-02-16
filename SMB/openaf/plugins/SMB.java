@@ -74,7 +74,6 @@ public class SMB extends ScriptableObject {
 
 		if (shareURL.indexOf("smb://") == 0) {
 			shareURL = "smb://" + aDomain + ";" + URLEncoder.encode(AFCmdBase.afc.dIP(aUser), "UTF-8") + ":" + URLEncoder.encode(AFCmdBase.afc.dIP(aPassword), "UTF-8") + "@" + shareURL.substring(shareURL.indexOf("smb://") + 6);
-			System.out.println(shareURL);
 		}
 		//config = new BaseConfiguration(true);
 		context = new BaseContext(new PropertyConfiguration(System.getProperties()));
