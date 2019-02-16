@@ -11,7 +11,7 @@ keywords:
   - samba
   - windows
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
   url: 'https://openaf.io/opacks/plugin-SMB.opack'
@@ -19,24 +19,24 @@ description: OpenAF plugin to access samba/window shares.
 name: plugin-SMB
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190214'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190216'
 dependencies:
-  openaf: '>=20190214'
+  openaf: '>=20190216'
 files:
   - .maven.yaml
+  - .package.yaml
   - bcprov-jdk15on-1.58.jar
   - compile.yaml
   - jcifs-ng-2.1.1.jar
   - openaf/plugins/SMB.class
   - openaf/plugins/SMB.java
   - openaf-smb.jar
-  - .package.yaml
 filesHash:
   .maven.yaml: 477770ff7f926ecfc654b4615aaa97514e45a149
   bcprov-jdk15on-1.58.jar: 2c9aa1c4e3372b447ba5daabade4adf2a2264b12
-  compile.yaml: d4b12ae09adf3f27ceb6778d65192be62d9df853
+  compile.yaml: b3fc7d8d6bf8a8ab76ec487c1aa11fdd68d4fc1f
   jcifs-ng-2.1.1.jar: badfd9e401b2cb8001866faa661c7ab1f54607ee
-  openaf/plugins/SMB.class: adcd6b7cbae2f48449c83447b0fa303f26e728fc
+  openaf/plugins/SMB.class: 4ad30547ead6605c2699896bf28054b4eb064a8c
   openaf/plugins/SMB.java: 36ebc51e08c815eb19e6607f3cc35b03f21d64d3
-  openaf-smb.jar: ba6649f3f627b6ac6badf9ad8999bfb88e22bfb2
+  openaf-smb.jar: e3ab79ec9d67f3e0d7b13162c5c3049186a97435

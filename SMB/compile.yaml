@@ -44,7 +44,7 @@ jobs:
       classpath.push(getOpenAFJar());
       var sources = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.java')].filepath");
       var sep = java.io.File.pathSeparator;
-      sh("javac -cp \"" + classpath.join(sep) + "\" " + sources.join(" "), void 0, void 0, true, args.outputDir, true);
+      sh("javac -source 1.7 -target 1.7 -Xlint:deprecation -cp \"" + classpath.join(sep) + "\" " + sources.join(" "), void 0, void 0, true, args.outputDir, true);
  
   - name: Prepare SMB jar
     deps:
