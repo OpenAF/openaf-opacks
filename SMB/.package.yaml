@@ -24,19 +24,25 @@ version: '20190216'
 dependencies:
   openaf: '>=20190216'
 files:
-  - openaf/plugins/SMB.java
-  - openaf/plugins/SMB.class
+  - .maven.yaml
+  - .odoc.db
   - .package.yaml
   - bcprov-jdk15on-1.58.jar
-  - jcifs-ng-2.1.1.jar
   - compile.yaml
-  - .maven.yaml
+  - jcifs-ng-2.1.1.jar
   - plugin-smb.jar
+  - src/openaf/plugins/SMB.class
+  - src/openaf/plugins/SMB.java
+  - tests/autoTestSMB.js
+  - tests/autoTestSMB.yaml
 filesHash:
-  openaf/plugins/SMB.java: 9f17b3a2b7b3e2e35d0134254e1b93a012c94395
-  openaf/plugins/SMB.class: 5a6cd982882ec2397e24242f3b21141f0e0b5b62
-  bcprov-jdk15on-1.58.jar: 2c9aa1c4e3372b447ba5daabade4adf2a2264b12
-  jcifs-ng-2.1.1.jar: badfd9e401b2cb8001866faa661c7ab1f54607ee
-  compile.yaml: be7334d694e01c2ceafe89981c26556d8ecf02c1
   .maven.yaml: 477770ff7f926ecfc654b4615aaa97514e45a149
-  plugin-smb.jar: f806fe55b0a497f454547205ce21bd07f6ce084a
+  .odoc.db: fcec57a4a3aca6519f18478a47f6abea40d97234
+  bcprov-jdk15on-1.58.jar: 2c9aa1c4e3372b447ba5daabade4adf2a2264b12
+  compile.yaml: d5be5348eff807f6a34bebee3ebf8f879e5611bc
+  jcifs-ng-2.1.1.jar: badfd9e401b2cb8001866faa661c7ab1f54607ee
+  plugin-smb.jar: e9576949e7a0a19c4c5d7c73043fe23e554608ee
+  src/openaf/plugins/SMB.class: 5a6cd982882ec2397e24242f3b21141f0e0b5b62
+  src/openaf/plugins/SMB.java: 9f17b3a2b7b3e2e35d0134254e1b93a012c94395
+  tests/autoTestSMB.js: bfeb9b25141899d25b2e6dad15ab7e4a9b7b1fff
+  tests/autoTestSMB.yaml: f53ae337e3d4d2c9a5af03348523c1544d2bdc0c

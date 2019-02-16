@@ -1,0 +1,64 @@
+include:
+   - oJobTest.yaml
+
+ojob:
+   async: true
+
+todo:
+   - SMB::Connect
+   - SMB::List
+   - SMB::GetPutFile
+   - SMB::GetPutFileBytes
+   - Test results
+
+#################
+
+jobs:
+   #################
+   - name: SMB::Init
+     exec: |
+      args.tests = require("autoTestSMB.js");
+
+   - name: SMB::Connect
+     from: SMB::Init
+     to  : oJob Test
+     exec: args.func = args.tests.testConnect;
+
+   - name: SMB::List
+     deps:
+       - SMB::Connect
+     from: SMB::Init
+     to  : oJob Test
+     exec: args.func = args.tests.testList;
+
+   - name: SMB::GetPutFile
+     deps:
+       - SMB::Connect
+     from: SMB::Init
+     to  : oJob Test
+     exec: args.func = args.tests.testGetPutFile;
+
+   - name: SMB::GetPutFileBytes
+     deps:
+       - SMB::Connect
+     from: SMB::Init
+     to  : oJob Test
+     exec: args.func = args.tests.testGetPutFileBytes;     
+   
+   ####################
+   - name: Test results
+     from: oJob Test Results
+     deps:
+       - SMB::Connect
+       - SMB::List
+       - SMB::GetPutFile
+       - SMB::GetPutFileBytes
+     args:
+       quiet: true
+     exec: |
+       tprint("Tests PASSED: {{pass}}/{{count}}", args.results);
+       tprint("Tests FAILED: {{fail}}/{{count}}", args.results);
+       if (args.results.fail > 0) {
+         printErr("There are failed tests");
+         exit(-1);
+       }
