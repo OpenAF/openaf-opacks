@@ -39,7 +39,7 @@ jobs:
     args:
       - outputDir: *OUTPUT_DIR
     exec: |
-      io.rm(args.outputDir + "/openaf-smb.jar");
+      io.rm(args.outputDir + "/plugin-smb.jar");
       var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
       classpath.push(getOpenAFJar());
       var sources = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.java')].filepath");
@@ -57,5 +57,5 @@ jobs:
       var classes = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.class')].filepath");
       classes.forEach((afile) => {
         log("Packing " + afile.replace(args.outputDir + "/", "") + "...");
-        zip.streamPutFileStream(args.outputDir + "/openaf-smb.jar", afile.replace(args.outputDir + "/", ""), io.readFileStream(afile));
+        zip.streamPutFileStream(args.outputDir + "/plugin-smb.jar", afile.replace(args.outputDir + "/", ""), io.readFileStream(afile));
       });
