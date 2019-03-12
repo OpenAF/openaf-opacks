@@ -20,7 +20,7 @@ name: plugin-SMB
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190216'
+version: '20190311'
 dependencies:
   openaf: '>=20190216'
 files:
@@ -37,12 +37,12 @@ files:
   - tests/autoTestSMB.yaml
 filesHash:
   .maven.yaml: 477770ff7f926ecfc654b4615aaa97514e45a149
-  .odoc.db: fcec57a4a3aca6519f18478a47f6abea40d97234
+  .odoc.db: a9e61914843860edd5f57b0f4b2d7b307e3d9f6b
   bcprov-jdk15on-1.58.jar: 2c9aa1c4e3372b447ba5daabade4adf2a2264b12
   compile.yaml: d5be5348eff807f6a34bebee3ebf8f879e5611bc
   jcifs-ng-2.1.1.jar: badfd9e401b2cb8001866faa661c7ab1f54607ee
-  plugin-smb.jar: e9576949e7a0a19c4c5d7c73043fe23e554608ee
-  src/openaf/plugins/SMB.class: 5a6cd982882ec2397e24242f3b21141f0e0b5b62
-  src/openaf/plugins/SMB.java: 9f17b3a2b7b3e2e35d0134254e1b93a012c94395
+  plugin-smb.jar: 4a78a96b97a10eeae54a1d545814e4434394fb14
+  src/openaf/plugins/SMB.class: 193236148a049f2cdb538b267c6518839e2b3534
+  src/openaf/plugins/SMB.java: 2830c601409b9058dbe70f7d077359fa9496cc3d
   tests/autoTestSMB.js: bfeb9b25141899d25b2e6dad15ab7e4a9b7b1fff
   tests/autoTestSMB.yaml: f53ae337e3d4d2c9a5af03348523c1544d2bdc0c

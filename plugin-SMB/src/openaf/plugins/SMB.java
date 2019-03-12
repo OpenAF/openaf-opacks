@@ -72,9 +72,9 @@ public class SMB extends ScriptableObject {
 		//npa = new NtlmPasswordAuthentication(context, aDomain, AFCmdBase.afc.dIP(aUser), AFCmdBase.afc.dIP(aPassword));
 		this.aDomain = aDomain; this.aUser = aUser; this.aPassword = aPassword;
 
-		if (shareURL.indexOf("smb://") == 0) {
-			shareURL = "smb://" + aDomain + ";" + URLEncoder.encode(AFCmdBase.afc.dIP(aUser), "UTF-8") + ":" + URLEncoder.encode(AFCmdBase.afc.dIP(aPassword), "UTF-8") + "@" + shareURL.substring(shareURL.indexOf("smb://") + 6);
-		}
+		//if (shareURL.indexOf("smb://") == 0) {
+			//shareURL = "smb://" + aDomain + ";" + URLEncoder.encode(AFCmdBase.afc.dIP(aUser), "UTF-8") + ":" + URLEncoder.encode(AFCmdBase.afc.dIP(aPassword), "UTF-8") + "@" + shareURL.substring(shareURL.indexOf("smb://") + 6);
+		//}
 		//config = new BaseConfiguration(true);
 		context = new BaseContext(new PropertyConfiguration(System.getProperties()));
 		context = context.withCredentials(new jcifs.smb.NtlmPasswordAuthenticator(aDomain, AFCmdBase.afc.dIP(aUser), AFCmdBase.afc.dIP(aPassword)));
@@ -108,7 +108,11 @@ public class SMB extends ScriptableObject {
 		
 		SmbFile[] ss;
 		if (path != null && !(path instanceof Undefined)) {
-			SmbFile sf = new SmbFile((String) path, context);
+			String spath = (String) path;
+			if (spath.lastIndexOf("/") != (spath.length() - 1)) {
+				spath = spath.concat("/");
+			}
+			SmbFile sf = new SmbFile(spath, context);
 			sf.connect();
 			ss = sf.listFiles();
 		} else {
