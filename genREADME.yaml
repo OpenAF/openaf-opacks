@@ -1,0 +1,73 @@
+# author: Nuno Aguiar
+
+ojob:
+  async: true  
+  channels:
+    create:
+      - name: opacks
+        type: dummy
+      - name: outputs
+        type: simple
+
+todo:
+  - Gather opack info trigger
+  - Get list of opacks
+  - Generate README.md
+
+jobs:
+  #####################################
+  - name    : Gather opack info trigger
+    type    : subscribe
+    typeArgs:
+      chSubscribe: opacks
+    exec    : |
+      if (args.op != "set" && args.op != "setall") return;
+      if (args.op == "set") args.v = [ args.v ];
+      
+      for(var ii in args.v) {
+        var fileInfo = args.v[ii];
+
+        var pack;
+        if (io.fileExists(fileInfo.canonicalPath + "/.package.yaml")) {
+          pack = io.readFileYAML(fileInfo.canonicalPath + "/.package.yaml");
+        } else {
+          // it's json?
+          if (io.fileExists(fileInfo.canonicalPath + "/.package.json")) {
+            pack = io.readFile(fileInfo.canonicalPath + "/.package.json");
+          } else {
+            logWarn("Ignoring " + fileInfo.filename + "...");
+          }
+        }
+
+        $ch("outputs").set({ name: pack.name }, pack);
+      }
+
+  ##########################
+  - name: Get list of opacks
+    exec: |
+      $ch("opacks").setAll(["canonicalPath"],
+        $from(io.listFiles(".").files)
+        .equals("isDirectory", true)
+        .notEquals("filename", ".git")
+        .sort("filename")
+        .select()
+      );
+
+      $ch("opacks").waitForJobs();
+
+  - name: Generate README.md
+    deps: 
+      - Get list of opacks
+    exec: |
+      io.writeFileString("README.md", templify("\
+        # openaf-opacks\n\
+        \n\
+        List of OpenAF opacks:\n\
+        \n\
+        | Name   | Description   |\n\
+        |--------|---------------|\n\
+        {{#each opacks}}\n\
+        |{{name}}|{{description}}|\n\
+        {{/each}}\n\
+        \
+      ", { opacks: $ch("outputs").getAll() }));
