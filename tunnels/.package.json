@@ -17,7 +17,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/tunnels"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/tunnels",
+    "url": "https://openaf.io/opacks/tunnels.opack"
   },
   "description": "Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.",
   "name": "Tunnels",

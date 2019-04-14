@@ -11,7 +11,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Maven'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Maven'
+  url: 'https://openaf.io/opacks/Maven.opack'
 description: A Maven2 repositories access wrapper to get or update existing artifacts/jars.
 name: Maven
 main: ''

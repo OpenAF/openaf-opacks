@@ -11,7 +11,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/DRProxy'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/DRProxy'
+  url: 'https://openaf.io/opacks/DRProxy.opack'
 description: >-
   DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs
   communication. It allows the interception of pre-proxy and post-proxy requests

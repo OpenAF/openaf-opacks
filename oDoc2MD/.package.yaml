@@ -10,7 +10,8 @@ bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/oDoc2MD
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/oDoc2MD
+  url: 'https://openaf.io/opacks/oDoc2MD.opack'
 description: Generating markdown documentation based on existing oDoc databases.
 name: oDoc2MD
 main: ''

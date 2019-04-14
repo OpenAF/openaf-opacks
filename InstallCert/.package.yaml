@@ -13,7 +13,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/InstallCert'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/InstallCert'
+  url: 'https://openaf.io/opacks/InstallCert.opack'
 description: Easy local installation of SSL certificates.
 name: InstallCert
 main: InstallCert.js

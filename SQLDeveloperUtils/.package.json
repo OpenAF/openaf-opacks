@@ -18,7 +18,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SQLDeveloperUtils"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SQLDeveloperUtils",
+    "url": "https://openaf.io/opacks/SQLDeveloperUtils.opack"
   },
   "description": "Provides utilities for SQLDeveloper version >= 4 (like encrypt and decrypt SQLDeveloper passwords)",
   "name": "SQLDeveloperUtils",

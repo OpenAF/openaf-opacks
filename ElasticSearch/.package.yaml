@@ -10,7 +10,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ElasticSearch'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ElasticSearch'
+  url: 'https://openaf.io/opacks/ElasticSearch.opack'
 description: Provides ElasticSearch functionality for OpenAF scripts.
 name: ElasticSearch
 main: ''

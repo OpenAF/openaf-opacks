@@ -12,7 +12,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/UnixPAM'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/UnixPAM'
+  url: 'https://openaf.io/opacks/UnixPAM.opack'
 description: Provides UNIX PAM based authentication
 name: UnixPAM
 main: ''

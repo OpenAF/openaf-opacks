@@ -18,7 +18,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GoogleCompiler"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GoogleCompiler",
+    "url": "https://openaf.io/opacks/GoogleCompiler.opack"
   },
   "description": "Google Closure Compiler, reducing size of Javascript files and makes them more efficient helping your application to load faster and reducing your bandwidth needs and provides warning for illegal JavaScript and warnings for potentially dangerous operations, helping you to produce JavaScript that is less buggy and easier to maintain.",
   "name": "GoogleCompiler",

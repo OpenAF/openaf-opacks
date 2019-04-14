@@ -9,7 +9,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/XChart'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/XChart'
+  url: 'https://openaf.io/opacks/XChart.opack'
 description: >-
   Provides a wrapper to use the XChart java charts library. Allows the creation
   of png (or others) images of charts and html/css inline images of charts.

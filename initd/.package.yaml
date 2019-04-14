@@ -13,7 +13,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/initd'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/initd'
+  url: 'https://openaf.io/opacks/initd.opack'
 description: Creates initd scripts to use with the openaf's --daemon command line option.
 name: initd
 main: ''

@@ -15,7 +15,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Notifications'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Notifications'
+  url: 'https://openaf.io/opacks/Notifications.opack'
 description: Provides libraries to use notifications services. Currently pushover.js.
 name: Notifications
 main: ''

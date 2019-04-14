@@ -16,7 +16,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/EncryptText"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/EncryptText",
+    "url": "https://openaf.io/opacks/EncryptText.opack"
   },
   "description": "Encrypts a password by asking the user and not displaying on the shell session.",
   "name": "EncryptText",

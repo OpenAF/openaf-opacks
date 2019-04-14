@@ -13,7 +13,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compromise'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compromise'
+  url: 'https://openaf.io/opacks/Compromise.opack'
 description: >-
   Integrates the NPL Compromise lib
   (https://github.com/nlp-compromise/compromise) into a opack.

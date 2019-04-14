@@ -11,7 +11,8 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GIST'
+  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GIST'
+  url: 'https://openaf.io/opacks/GIST.opack'
 description: Provides an OpenAF channel implementation to use GitHub's GIST.
 name: GIST
 main: ''

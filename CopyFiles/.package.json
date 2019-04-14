@@ -17,7 +17,8 @@
   },
   "repository": {
     "type": "http",
-    "url": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CopyFiles"
+    "backurl": "https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/CopyFiles",
+    "url": "https://openaf.io/opacks/CopyFiles.opack"
   },
   "description": "Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.",
   "name": "CopyFiles",
