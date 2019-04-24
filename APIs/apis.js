@@ -246,4 +246,57 @@
             return ow.obj.rest.jsonRemove("https://httpbin.org/delete", aIndexMap, aLoginOrFunction, aPassword, aTimeout, aRequestMap);
         }
     };
+
+    /**
+     * <odoc>
+     * <key>apis.dnsOverHTTPS</key>
+     * From: https://developers.google.com/speed/public-dns/docs/dns-over-https
+     * Auth: none
+     * </odoc>
+     */
+    exports.dnsOverHTTPS = {
+        resolve: function(aName, aType) {
+            var res = $rest().get("https://dns.google.com/resolve?" + $rest().query({ name: aName, type: aType }));
+            if (isDef(res.Answer)) return res.Answer; else return void 0;
+        },
+
+        a: function(aName) {
+            return this.resolve(aName, "a");
+        },
+
+        aaaa: function(aName) {
+            return this.resolve(aName, "aaaa");
+        },
+
+        cname: function(aName) {
+            return this.resolve(aName, "cname");
+        },
+
+        mx: function(aName) {
+            return this.resolve(aName, "mx");
+        },
+
+        any: function(aName) {
+            return this.resolve(aName, "any");
+        }
+    };
+
+    /**
+     * <odoc>
+     * <key>apis.Facts</key>
+     * From: https://cat-fact.herokuapp.com
+     * Auth: none
+     * </odoc>
+     */
+    exports.Facts = {
+        getCatFacts: function() {
+            return $rest().get("https://cat-fact.herokuapp.com/facts/random?" + $rest().query({animal_type: "cat"}));
+        },
+        getDogFacts: function() {
+            return $rest().get("https://cat-fact.herokuapp.com/facts/random?" + $rest().query({animal_type: "dog"}));
+        },
+        getHorseFacts: function() {
+            return $rest().get("https://cat-fact.herokuapp.com/facts/random?" + $rest().query({animal_type: "horse"}));
+        }
+    };
 })();
