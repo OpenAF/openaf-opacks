@@ -93,6 +93,12 @@ Docker.prototype.getImages = function() {
    return r;
 };
 
+Docker.prototype.listImages = function() {
+   return $from(this.getImages()).select((r) => { return (r.RepoTags != null) ? r.RepoTags.join(",") : r.RepoDigests.join(",") }).sort();
+}
+
+
+
 /**
  * <odoc>
  * <key>Docker.pull(aImage, aTag) : Map</key>
@@ -125,8 +131,19 @@ Docker.prototype.prune = function() {
  * \
  * </odoc>
  */
-Docker.prototype.create = function(aContainer) {
+Docker.prototype.containerCreate = function(aContainer) {
    return this.docker.containers().create(this.__buildObj(aContainer));
+};
+
+/**
+ * <odoc>
+ * <key>Docker.containerCreate(aObj) : JavaObject</key>
+ * Tries to create a docker container with the provided aObj returning the container java
+ * object.
+ * </odoc>
+ */
+Docker.prototype.create = function(aContainer) {
+   return jsonParse(this.containerCreate(aContainer));
 };
 
 /**
@@ -143,6 +160,16 @@ Docker.prototype.getContainer = function(aId) {
    }
 
    return void 0;
+};
+
+/**
+ * <odoc>
+ * <key>Docker.getInfo(aId) : Map</key>
+ * Returns a info map for the aID corresponding container.
+ * </odoc>
+ */
+Docker.prototype.getInfo = function(aId) {
+   return jsonParse(String(this.getContainer(aId)));
 };
 
 /**
@@ -197,10 +224,76 @@ Docker.prototype.remove = function(aId) {
 
 /**
  * <odoc>
- * <key>Docker.logs(aId) : JavaObject</key>
+ * <key>Docker.containerLogs(aId) : JavaObject</key>
  * Returns the aId corresponding container logs Java Object.
  * </odoc>
  */
-Docker.prototype.logs = function(aId) {
+Docker.prototype.containerLogs = function(aId) {
    return this.getContainer(aId).logs();
 };
+
+/**
+ * <odoc>
+ * <key>Docker.logs(aId) : String</key>
+ * Returns the aID corresponding container logs in string format.
+ * </odoc>
+ */
+Docker.prototype.logs = function(aId) {
+   var o = String(this.getContainer(aId).logs()).split(/\n/);
+   var r = "";
+   for(var ii in o) {
+      r += o[ii].substring(8) + "\n";
+   }
+   return r;
+};
+
+/**
+ * <odoc>
+ * <key>Docker.execCmd(aImage, aCmd, aMapOfEnvs) : String</key>
+ * Tries to execute aCmd (string or array) on aImage docker container with aMapOfEnvs. It
+ * will start the container, wait for it to finish, remove the container and return the logs as a string.
+ * </odoc>
+ */
+Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) { 
+   if (isString(aCmd)) aCmd = String(aCmd).split(/ +/);
+   var evs = [];
+   if (isMap(aEnvs)) {
+      Object.keys(aEnvs).forEach((k) => {
+         evs.push(k + "=" + aEnvs[k]);
+      });
+   }
+
+   var c = this.create({ Cmd: aCmd, Image: aImage, Env: evs, AttachStdout: true, AttachStderr: true });
+   this.start(c.Id);
+   var state = this.getInfo(c.Id).State;
+   if (state == "created" || state == "running") {
+      while(state != "exited") {
+         state = this.getInfo(c.Id).State;
+         sleep(25); 
+      }
+   }
+   var res = this.logs(c.Id);
+   this.remove(c.Id);
+
+   return res;
+}
+
+/**
+ * <odoc>
+ * <key>Docker.do(aImage, aCmd, aMapOfEnvs) : Promise</key>
+ * Creates and returns a Promise to execute aCmd (string or array) on aImage docker container
+ * with aMapOfEnvs. It will start the container, wait for it to finish, remove the container and pass the logs as a string.
+ * </odoc>
+ */
+Docker.prototype.do = function(aImage, aCmd, aEnvs) {
+   var parent = this;
+   return $do(() => {
+      return parent.execCmd(aImage, aCmd, aEnvs);
+   }); 
+}
+
+Docker.prototype.imageExists = function(aImage) {
+   return $from(this.getImages())
+          .greaterEquals(["RepoTags.indexOf", aImage], 0)
+	  .any();
+}

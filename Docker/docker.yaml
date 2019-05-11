@@ -1,0 +1,37 @@
+# Author: Nuno Aguiar
+
+jobs:
+  ######################
+  - name: Docker Execute
+    help: >
+      Executes a command on a docker container. Expects
+        
+         image   (String)       The docker image to run the command.
+         cmd     (String/Array) The command to execute.
+         envs    (Map)          A map of environments variables.
+         rurl    (String)       Optional remote docker url.
+         pathSSL (String)       Optional path to SSL certificates. 
+
+      The result will be available in args.res.
+    exec: |
+      var dpath = getOPackPath("Docker");
+      if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+
+      var d = new Docker(args.rurl, args.pathSSL);
+      args.res = d.execCmd(args.image, args.cmd, args.envs);
+
+  ###########################
+  - name: Docker Execute JSON
+    help: >
+      Executes a command on a docker container. Expects
+        
+         image   (String)       The docker image to run the command.
+         cmd     (String/Array) The command to execute.
+         envs    (Map)          A map of environments variables.
+         rurl    (String)       Optional remote docker url.
+         pathSSL (String)       Optional path to SSL certificates. 
+
+      The result will be available in args.res as a map parsed from the logs.
+    from: Docker Execute
+    exec: |
+      args.res = jsonParse(args.res);
