@@ -93,11 +93,15 @@ Docker.prototype.getImages = function() {
    return r;
 };
 
+/**
+ * <odoc>
+ * <key>Docker.listImages() : Array</key>
+ * Returns an array of all the available image tags.
+ * </odoc>
+ */
 Docker.prototype.listImages = function() {
    return $from(this.getImages()).select((r) => { return (r.RepoTags != null) ? r.RepoTags.join(",") : r.RepoDigests.join(",") }).sort();
-}
-
-
+};
 
 /**
  * <odoc>
@@ -254,7 +258,12 @@ Docker.prototype.logs = function(aId) {
  * will start the container, wait for it to finish, remove the container and return the logs as a string.
  * </odoc>
  */
-Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) { 
+Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) {
+   _$(aImage).isString().$_("Please provide a image.");
+   _$(aCmd).$_("Please provide a command.");
+
+   aEnvs = _$(aEnvs).isMap().default({});
+   if (!(this.imageExists(aImage))) throw "Image '" + aImage + "' is not available.";
    if (isString(aCmd)) aCmd = String(aCmd).split(/ +/);
    var evs = [];
    if (isMap(aEnvs)) {
@@ -276,7 +285,7 @@ Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) {
    this.remove(c.Id);
 
    return res;
-}
+};
 
 /**
  * <odoc>
@@ -290,10 +299,17 @@ Docker.prototype.do = function(aImage, aCmd, aEnvs) {
    return $do(() => {
       return parent.execCmd(aImage, aCmd, aEnvs);
    }); 
-}
+};
 
+/**
+ * <odoc>
+ * <key>Docker.imageExists(aImage) : Boolean</key>
+ * Determines if aImage is available or not on the current docker.
+ * </odoc>
+ */
 Docker.prototype.imageExists = function(aImage) {
    return $from(this.getImages())
+          .notEquals("RepoTags", null)
           .greaterEquals(["RepoTags.indexOf", aImage], 0)
 	  .any();
-}
+};

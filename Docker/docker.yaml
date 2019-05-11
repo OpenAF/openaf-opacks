@@ -1,10 +1,32 @@
 # Author: Nuno Aguiar
 
 jobs:
+  ###################
+  - name: Docker Pull
+    help: >
+      Tries to pull a container. Expects:
+         image     (String)  The docker image to pull.
+         rurl      (String)  Optional remote docker url.
+         pathSSL   (String)  Optional path to SSL certificates.
+         notExists (Boolean) Only pull if it doesn't exist.
+    exec: |
+      var dpath = getOPackPath("Docker");
+      //if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+      load("docker.js");
+
+      var d = new Docker(args.rurl, args.pathSSL);
+      if (args.notExists) {
+        if (!d.imageExists(args.image)) {
+          d.pull(args.image);
+        }
+      } else {
+        d.pull(args.image);
+      }
+
   ######################
   - name: Docker Execute
     help: >
-      Executes a command on a docker container. Expects
+      Executes a command on a docker container. Expects:
         
          image   (String)       The docker image to run the command.
          cmd     (String/Array) The command to execute.
@@ -15,15 +37,16 @@ jobs:
       The result will be available in args.res.
     exec: |
       var dpath = getOPackPath("Docker");
-      if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+      //if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+      load("docker.js");
 
-      var d = new Docker(args.rurl, args.pathSSL);
+      var d = new Docker(args.rurl, args.pathSSL); 
       args.res = d.execCmd(args.image, args.cmd, args.envs);
 
   ###########################
   - name: Docker Execute JSON
     help: >
-      Executes a command on a docker container. Expects
+      Executes a command on a docker container. Expects:
         
          image   (String)       The docker image to run the command.
          cmd     (String/Array) The command to execute.
