@@ -314,3 +314,35 @@ Docker.prototype.imageExists = function(aImage) {
           .greaterEquals(["RepoTags.indexOf", aImage], 0)
 	  .any();
 };
+
+/**
+ * <odoc>
+ * <key>Docker.extraBind(aExtraMap, aBindExpression) : Map</key>
+ * Utility function to add a bind expression (e.g. "/host/folder:/container/folder:rw") to 
+ * aExtraMap to be used with create container. Returns the modify aExtraMap.
+ * </odoc>
+ */
+Docker.prototype.extraBind = function(aExtra, aBindExpression) {
+   if (isUnDef(aExtra)) aExtra = {};
+   if (isUnDef(aExtra.Binds) || (!(isArray(aExtra.Binds)))) aExtra.Binds = [];
+   aExtra.Binds.push(aBindExpression);
+
+   return aExtra;
+};
+
+/**
+ * <odoc>
+ * <key>Docker.extraNetwork(aExtraMap, aNetwork) : Map</key>
+ * Utility function to add a network to aExtraMap to be used with create container.
+ * Returns the modify aExtraMap.
+ * </odoc>
+ */
+Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
+   if (isUnDef(aExtra)) aExtra = {};
+   if (isUnDef(aExtra.NetworkingConfig) || (!(isArray(aExtra.NetworkingConfig)))) aExtra.NetworkingConfig = {};
+   if (isUnDef(aExtra.NetworkingConfig.EndpointsConfig) || (!(isMap(aExtra.NetworkingConfig.EndpointsConfig)))) aExtra.NetworkingConfig.EndpointsConfig = {};
+   
+   args.extra.NetworkingConfig.EndpointsConfig[aNetwork] = {};
+
+   return aExtra;
+};

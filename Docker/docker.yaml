@@ -38,7 +38,8 @@ jobs:
       The result will be available in args.res.
     exec: |
       var dpath = getOPackPath("Docker");
-      //if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+      if (isUnDef(dpath)) throw "No Docker oPack installed. Please install by executing 'opack install Docker'";
+      args.cmd = _$(args.cmd).default("");
       load("docker.js");
 
       var d = new Docker(args.rurl, args.pathSSL); 
