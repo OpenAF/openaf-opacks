@@ -33,6 +33,7 @@ jobs:
          envs    (Map)          A map of environments variables.
          rurl    (String)       Optional remote docker url.
          pathSSL (String)       Optional path to SSL certificates. 
+         extra   (Map)          Extra map entries for docker image creation.
 
       The result will be available in args.res.
     exec: |
@@ -41,7 +42,7 @@ jobs:
       load("docker.js");
 
       var d = new Docker(args.rurl, args.pathSSL); 
-      args.res = d.execCmd(args.image, args.cmd, args.envs);
+      args.res = d.execCmd(args.image, args.cmd, args.envs, args.extra);
 
   ###########################
   - name: Docker Execute JSON
@@ -53,6 +54,7 @@ jobs:
          envs    (Map)          A map of environments variables.
          rurl    (String)       Optional remote docker url.
          pathSSL (String)       Optional path to SSL certificates. 
+         extra   (Map)          Extra map entries for docker image creation.
 
       The result will be available in args.res as a map parsed from the logs.
     from: Docker Execute
