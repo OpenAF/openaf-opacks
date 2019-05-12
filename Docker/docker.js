@@ -253,14 +253,15 @@ Docker.prototype.logs = function(aId) {
 
 /**
  * <odoc>
- * <key>Docker.execCmd(aImage, aCmd, aMapOfEnvs) : String</key>
+ * <key>Docker.execCmd(aImage, aCmd, aMapOfEnvs, anExtraConfigMap) : String</key>
  * Tries to execute aCmd (string or array) on aImage docker container with aMapOfEnvs. It
  * will start the container, wait for it to finish, remove the container and return the logs as a string.
  * </odoc>
  */
-Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) {
+Docker.prototype.execCmd = function(aImage, aCmd, aEnvs, aExtra) {
    _$(aImage).isString().$_("Please provide a image.");
    _$(aCmd).$_("Please provide a command.");
+   aExtra = _$(aExtra).isMap().default({});
 
    aEnvs = _$(aEnvs).isMap().default({});
    if (!(this.imageExists(aImage))) throw "Image '" + aImage + "' is not available.";
@@ -272,7 +273,7 @@ Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) {
       });
    }
 
-   var c = this.create({ Cmd: aCmd, Image: aImage, Env: evs, AttachStdout: true, AttachStderr: true });
+   var c = this.create(merge({ Cmd: aCmd, Image: aImage, Env: evs, AttachStdout: true, AttachStderr: true }, aExtra));
    this.start(c.Id);
    var state = this.getInfo(c.Id).State;
    if (state == "created" || state == "running") {
@@ -289,15 +290,15 @@ Docker.prototype.execCmd = function(aImage, aCmd, aEnvs) {
 
 /**
  * <odoc>
- * <key>Docker.do(aImage, aCmd, aMapOfEnvs) : Promise</key>
+ * <key>Docker.do(aImage, aCmd, aMapOfEnvs, anExtraConfigMap) : Promise</key>
  * Creates and returns a Promise to execute aCmd (string or array) on aImage docker container
  * with aMapOfEnvs. It will start the container, wait for it to finish, remove the container and pass the logs as a string.
  * </odoc>
  */
-Docker.prototype.do = function(aImage, aCmd, aEnvs) {
+Docker.prototype.do = function(aImage, aCmd, aEnvs, aExtra) {
    var parent = this;
    return $do(() => {
-      return parent.execCmd(aImage, aCmd, aEnvs);
+      return parent.execCmd(aImage, aCmd, aEnvs, aExtra);
    }); 
 };
 
