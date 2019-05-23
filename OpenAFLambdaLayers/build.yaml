@@ -1,0 +1,147 @@
+# Author: Nuno Aguiar
+#
+
+ojob:
+  argsFromEnvs: true
+  async       : true
+
+todo:
+  - Get jvm
+  - Build minijvm layer
+  - Build openaf layer
+  - Move layers to output
+
+jobs:
+  #######################
+  - name: Download JRE
+    exec: |
+      ow.loadObj(); ow.loadFormat();
+      var h = new ow.obj.http();
+      
+      log("Downloading jre...");
+      var o = ow.obj.rest.jsonGet("https://api.adoptopenjdk.net/v2/latestAssets/nightly/openjdk8?openjdk_impl=openj9&os=linux&arch=x64&binary_type=jre&heap_size=normal");
+      var si = h.get(o[0].binary_link, void 0, void 0, true, void 0, true);
+      var so = io.writeFileStream("jre.tgz");
+      ioStreamCopy(so, si);
+
+  ######################
+  - name: Uncompress JRE
+    exec: |
+      ow.loadFormat();
+      log("Uncompressing...");
+      io.rm("jre");
+      sh("tar xzf jre.tgz", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("untar jre"));
+      sh("mv jdk*jre jre", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("mv jre"));
+      io.rm("jre.tgz");
+ 
+  #################################
+  - name: Remove unneed JRE parts
+    exec: |
+      log("Removing unneeded parts...");
+      io.rm("jre/man");
+      io.rm("jre/lib/ext/nashorn.jar");
+      io.rm("jre/lib/images");
+      io.rm("jre/legal");
+
+  ##################
+  - name: Repack JRE
+    exec: |
+      ow.loadFormat();
+      log("Repack JRE...");
+      io.rm("minijvm.zip");
+      sh("zip -9r minijvm.zip jre", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("unzip jre"));
+      //io.rm("jre");
+      log("Built minijvm.zip.");
+
+
+  ###############
+  - name: Get jvm
+    to  :
+      - Download JRE
+      - Uncompress JRE
+      - Remove unneed JRE parts
+
+  ###########################
+  - name: Build minijvm layer
+    deps:
+      - Get jvm
+    to  : 
+      - Repack JRE
+   
+
+
+  ####################### 
+  - name: Download OpenAF
+    exec: |
+      ow.loadObj(); ow.loadFormat();
+      var h = new ow.obj.http();
+
+      log("Downloading openaf...");
+      //var si = h.get("https://openaf.io/nightly/openaf.jar", void 0, void 0, false, void 0, true);
+      var si = h.get("https://openaf.io/openaf.jar", void 0, void 0, false, void 0, true);
+      var so = io.writeFileStream("openaf.jar");
+      ioStreamCopy(so, si);
+
+      io.rm("openaf");
+      io.mkdir("openaf");
+      io.mv("openaf.jar", "openaf/openaf.jar");
+      log("Downloaded openaf.");
+
+  ######################
+  - name: Prepare OpenAF
+    exec: |
+      ow.loadFormat();
+      log("Preparing openaf...");
+      global.jvmargs = " -Xquickstart -Xtune:virtualized -Xscmx16m -Xshareclasses:cacheDir=/opt/openaf,name=openaf,nonfatal ";
+      sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --repack", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix("oaf repack"));
+      sh("rm openaf/*_G35");
+      sh("rm openaf/openaf.jar.orig");
+      log("Done preparing openaf.");
+
+  #################################
+  - name: Install additional opacks
+    exec: |
+      ow.loadFormat();
+      log("Install additional opacks...");
+
+      args.OPACKS = _$(args.OPACKS).isString().default("ElasticSearch,Notifications,Kube,oJob-common");
+      var pcks = String(args.OPACKS).split(/,/);
+      if (isArray(pcks)) pcks.forEach((v) => {
+         sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix(v));
+      });
+
+      io.rm("openaf/openaf.jar");
+      io.rm("openaf-opacks.zip");
+      sh("chmod -R a+rw openaf");
+      sh("zip -9r openaf-opacks.zip openaf", void 0, void 0, true);
+
+  #####################
+  - name: Repack openaf
+    exec: | 
+      io.rm("openaf.zip");
+      sh("chmod -R a+rw openaf");
+      sh("zip -9r openaf.zip openaf", void 0, void 0, true);
+      sh("zip -9r openaf.zip lambda.js", void 0, void 0, true);
+      sh("zip -9r openaf.zip bootstrap", void 0, void 0, true);
+      log("Built openaf.zip.");
+      //io.rm("openaf/openaf.jar");
+
+  ##########################
+  - name: Build openaf layer
+    deps:
+      - Get jvm
+    to  :
+      - Download OpenAF
+      - Prepare OpenAF
+      - Repack openaf
+      - Install additional opacks
+
+  #############################
+  - name: Move layers to output
+    deps:
+      - Build openaf layer
+      - Build minijvm layer
+    exec: |
+      io.cp("openaf.zip", "/output/openaf.zip");
+      io.cp("openaf-opacks.zip", "/output/openaf-opacks.zip");
+      io.cp("minijvm.zip", "/output/minijvm.zip");

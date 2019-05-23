@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - aws
+  - lambda
+  - layers
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/OpenCliLambdaLayers.opack'
+description: Build the lambda layers to run OpenAF lambda functions
+name: OpenAFLambdaLayers
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190522'
+dependencies:
+  openaf: '>=20190424'
+files:
+  - .package.yaml
+  - bootstrap
+  - build.yaml
+  - Dockerfile
+  - lambda.js
+  - lambda.orig.js
+  - README.md
+filesHash:
+  bootstrap: a5b14c9147afccd840cff29d9ae4dd08b98992f1
+  build.yaml: 224391fb7f216605b0dc45b843e54ed3e38d71b6
+  Dockerfile: e4f4491c46ca4a3d532b7ff278e58157e2df8cab
+  lambda.js: 9f0be96d978151b6525830c1ae64906e4e360884
+  lambda.orig.js: 51d23128a79c6ce113d58e74ac8fff912f0cca7d
+  README.md: 60fd0c74c8e507370114d23dae99e3821e5f1aa6
