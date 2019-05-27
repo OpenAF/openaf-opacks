@@ -1,0 +1,8 @@
+# remove zip -d minio-6.0.7-all.jar org/apache/commons/logging/*
+# remove zip -d minio-6.0.7-all.jar com/fasterxml/jackson/core/*
+# remove zip -d minio-6.0.7-all.jar org/apache/commons/codec/*
+artifacts:
+  - id      : io.minio 
+    group   : minio
+    version : 6.0.7
+    template: minio-{{version}}-all.jar
