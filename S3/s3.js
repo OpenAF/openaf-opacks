@@ -13,10 +13,14 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion) {
 
     aURL = _$(aURL).default("https://s3.amazonaws.com");
 
-    if (isDef(aAccessKey))
-        this.s3 = new Packages.io.minio.MinioClient(aURL, Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret), aRegion);
-    else
+    if (isDef(aAccessKey)) {
+        if (isUnDef(aRegion))
+            this.s3 = new Packages.io.minio.MinioClient(aURL, Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret));
+        else
+            this.s3 = new Packages.io.minio.MinioClient(aURL, Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret), aRegion);
+    } else {
         this.s3 = new Packages.io.minio.MinioClient(aURL);
+    }
 };
 
 /**
@@ -328,6 +332,300 @@ S3.prototype.copyObject = function(aSourceBucket, aObjectName, aTargetBucket, aD
     } else {
         this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName);
     }
+};
+
+/**
+ * <odoc>
+ * <key>S3.compare(aBucket, aPrefix, aLocalPath) : Array</key>
+ * Given aBucket and "folder" aPrefix compares the corresponding objects with files in the aLocalPath provided returning
+ * an array of actions to make both "equal" in terms of object/file size and most recent modification. Should be use mainly for
+ * compare proposes. For sync actions please use S3.squashLocalActions, S3.squashRemoteActions and S3.syncActions.
+ * </odoc>
+ */
+S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
+    _$(aBucket).isString().$_("Please provide a bucket name.");
+    aPrefix = _$(aPrefix).isString().default("");
+    _$(aLocalPath).isString().$_("Please provide a local path.");
+    
+    if (!(aPrefix.endsWith("/")) && aPrefix.length > 0) aPrefix += "/";
+
+    ow.loadObj();
+    loadLodash();
+
+    var rlst = ow.obj.fromArray2Obj(this.listObjects(aBucket, aPrefix), "filename");
+    var slst = ow.obj.fromArray2Obj($from(listFilesRecursive(aLocalPath)).equals("isFile", true).select(), "canonicalPath");
+
+    var realLocalPath = String((new java.io.File(aLocalPath)).getCanonicalPath()).replace(/\\/g, "/") + "/";
+
+    // First pass
+    var actions = [];
+    for(var sf in slst) {
+        var sfname = aPrefix + sf.substring(realLocalPath.length, sf.length);
+        if (isDef(rlst[sfname])) {
+            if (slst[sf].size != rlst[sfname].size || slst[sf].lastModified != rlst[sfname].lastModified) {
+                if (slst[sf].lastModified != rlst[sfname].lastModified) {
+                    if (slst[sf].lastModified > rlst[sfname].lastModified) {
+                        actions.push({
+                            cmd: "put",
+                            status: "replace",
+                            source: sf,
+                            target: sfname,
+                            targetBucket: aBucket
+                        });
+                    } else {
+                        actions.push({
+                            cmd: "get",
+                            status: "replace",
+                            source: sfname,
+                            sourceBucket: aBucket,
+                            target: sf
+                        });
+                    }
+                } else {
+                    print("Conflict with the same modified dates: " + sfname + " (" + slst[sf].lastModified + ") vs " + sf + " (" + rlsft[sfname].lastModified + ") ");
+                }
+            }
+        } else {
+            actions.push({
+                cmd: "put",
+                status: "new",
+                source: sf,
+                target: aPrefix + sf.substring(realLocalPath.length, sf.length),
+                targetBucket: aBucket
+            });
+        }
+    }
+
+    // Second pass
+    for(var rf in rlst) {
+        var rsname = realLocalPath + rf.substring(aPrefix.length, rf.length);
+        if (isDef(slst[rsname])) {
+            if (rlst[rf].size != slst[rsname].size || rlst[rf].lastModified != slst[rsname].lastModified) {
+                if (rlst[rf].lastModified != slst[rsname].lastModified) {
+                    if (slst[rsname].lastModified > rlst[rf].lastModified) {
+                        actions.push({
+                            cmd: "put",
+                            status: "replace",
+                            source: rsname,
+                            target: rf,
+                            targetBucket: aBucket
+                        });
+                    } else {
+                        actions.push({
+                            cmd: "get",
+                            status: "replace",
+                            source: rf,
+                            sourceBucket: aBucket,
+                            target: rsname
+                        });
+                    }
+                } else {
+                    print("Conflict with the same modified dates: " + rsname + " (" + slst[rsname].lastModified + ") vs " + rf + " (" +  rlst[rf].lastModified + ") ");
+                }
+            }
+        } else {
+            actions.push({
+                cmd: "get",
+                status: "new",
+                source: rf,
+                sourceBucket: aBucket,
+                target: realLocalPath + rf.substring(aPrefix.length, rf.length)
+            });
+        }
+    }
+
+    return _.uniqBy(actions, (e) => { return e.cmd + e.sourceBucket + e.source + e.target + e.targetBucket; });
+};
+
+/**
+ * <odoc>
+ * <key>S3.deleteFolderActions(aBucket, aPrefix) : Array</key>
+ * Given aBucket and a "folder" aPrefix returns an array of actions to remove all objects under that "folder". Use S3.execActions
+ * to execute the returned actions.
+ * </odoc>
+ */
+S3.prototype.deleteFolderActions = function(aBucket, aPrefix) {
+    _$(aBucket).isString().$_("Please provide a bucket name.");
+    _$(aPrefix).isString().$_("Please provide a prefix.");
+
+    if (!(aPrefix.endsWith("/")) && aPrefix.length > 0) aPrefix += "/";
+
+    var actions = [];
+    var lst = this.listObjects(aBucket, aPrefix);
+    for(var vi in lst) {
+        var v = lst[vi];
+        actions.push({
+            cmd: "delRemote",
+            source: v.filename,
+            sourceBucket: aBucket
+        });
+    }
+    return actions;
+};
+
+/**
+ * <odoc>
+ * <key>S3.renameFolderActions(aBucket, aPrefix, aTargetBucket, aTargetPrefix) : Array</key>
+ * Given aBucket and a "folder" aPrefix returns an array of actions to "rename"/"move" all objects to a new aTargetBucket (can
+ * be the same) and a new "folder" aTargetPrefix.
+ * </odoc>
+ */
+S3.prototype.renameFolderActions = function(aBucket, aPrefix, aTargetBucket, aTargetPrefix) {
+    _$(aBucket).isString().$_("Please provide a bucket name.");
+    _$(aPrefix).isString().$_("Please provide a prefix.");
+    _$(aTargetBucket).isString().$_("Please provide a target bucket name.");
+    _$(aTargetPrefix).isString().$_("Please provide a target prefix.");
+
+    if (!(aPrefix.endsWith("/")) && aPrefix.length > 0) aPrefix += "/";
+    if (!(aTargetPrefix.endsWith("/")) && aTargetPrefix.length > 0) aTargetPrefix += "/";
+
+    var copyActions = [], delActions = [];
+    var lst = this.listObjects(aBucket, aPrefix);
+    for(var vi in lst) {
+        var v = lst[vi];
+        copyActions.push({
+            cmd: "copy",
+            source: v.filename,
+            sourceBucket: aBucket,
+            target: v.filename.replace(new RegExp("^" + aPrefix), aTargetPrefix),
+            targetBucket: aTargetBucket
+        });
+        delActions.push({
+            cmd: "delRemote",
+            source: v.filename,
+            sourceBucket: aBucket
+        });
+    }
+    return [copyActions, delActions];
+};
+
+/**
+ * <odoc>
+ * <key>S3.squashLocalActions(aBucket, aPrefix, aLocalPath) : Array</key>
+ * Given aBucket with a "folder" aPrefix will compare it to aLocalPath and return the an array of actions to squash the bucket/remote
+ * state on aLocalPath (by retrieving object/files from the bucket and deleting local files). The actions can be executed with S3.execActions.
+ * </odoc>
+ */
+S3.prototype.squashLocalActions = function(aBucket, aPrefix, aLocalPath) {
+    var actions = this.compare(aBucket, aPrefix, aLocalPath);
+    $from(actions)
+    .equals("cmd", "put")
+    .equals("status", "new")
+    .select((r) => { r.cmd = "delLocal"; });
+
+    $from(actions)
+    .equals("cmd", "put")
+    .equals("status", "replace")
+    .select((r) => { r.cmd = "void"; });
+
+    var ractions = [];
+    for(var ii in actions) { 
+        if (actions[ii].cmd != "void") {
+            ractions.push(actions[ii]);
+            delete actions[ii];
+        } 
+    }
+
+    return ractions;
+};
+
+/**
+ * <odoc>
+ * <key>S3.squashRemoteActions(aBucket, aPrefix, aLocalPath) : Array</key>
+ * Given aBucket with a "folder" aPrefix will compare it to aLocalPath and return the an array of actions to squash aLocalPath state with
+ * the bucket/remote (by sending object/files to the bucket and deleting bucket object/files). The actions can be executed with S3.execActions.
+ * </odoc>
+ */
+
+S3.prototype.squashRemoteActions = function(aBucket, aPrefix, aLocalPath) {
+    var actions = this.compare(aBucket, aPrefix, aLocalPath);
+    $from(actions)
+    .equals("cmd", "get")
+    .equals("status", "new")
+    .select((r) => { r.cmd = "delRemote"; });
+
+    $from(actions)
+    .equals("cmd", "get")
+    .equals("status", "replace")
+    .select((r) => { r.cmd = "void"; });
+
+    var ractions = [];
+    for(var ii in actions) { 
+        if (actions[ii].cmd != "void") {
+            ractions.push(actions[ii]);
+            delete actions[ii];
+        } 
+    }
+
+    return ractions;
+};
+
+/**
+ * <odoc>
+ * <key>S3.syncActions(aBucket, aPrefix, aLocalPath) : Array</key>
+ * Given aBucket and "folder" aPrefix compares the corresponding objects with files in the aLocalPath provided returning
+ * an array of actions to make both "equal" in terms of object/file size and most recent modification. The result should 
+ * be used, after review with S3.execActions. Do note that after updating objects will change their modified date making
+ * that each call to syncActions will always return actions. Use S3.squashLocalActions and S3.squashRemoteActions for 
+ * "syncing" in one direction only.
+ * </odoc>
+ */
+S3.prototype.syncActions = function(aBucket, aPrefix, aLocalPath) {
+    var actions = this.compare(aBucket, aPrefix, aLocalPath);
+
+    return actions;
+};
+
+/**
+ * <odoc>
+ * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction)</key>
+ * Given anArrayOfActions produce by other S3.*Actions functions will execute them in parallel recording changes with,
+ * optionally, the provided aLogFunction and aLogErrorFunction (that receive a text message). To execute actions with a 
+ * given order (for example: first copy then delete) each element of anArrayOfActions should be an array of actions (e.g.
+ * an array of copy actions on the first element and an array of delete actions on the second element).
+ * </odoc>
+ */
+S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction) {
+    var parent = this;
+
+    anArrayOfActions = _$(anArrayOfActions).isArray().default([]);
+    aLogFunction = _$(aLogFunction).isFunction().default(log);
+    aLogErrorFunction = _$(aLogErrorFunction).isFunction().default(logErr);
+
+    if (isArray(anArrayOfActions[0])) {
+        for(var ii in anArrayOfActions) {
+            this.execActions(anArrayOfActions[ii], aLogFunction, aLogErrorFunction);
+        }
+        return;
+    }
+
+    parallel4Array(anArrayOfActions, function(action) {
+        try {
+            switch(action.cmd) {
+            case 'get': 
+                aLogFunction("Get '" + action.sourceBucket + ":" + action.source + "' to '" + action.target + "'");
+                parent.getObject(action.sourceBucket, action.source, action.target);
+                break;
+            case 'put': 
+                aLogFunction("Put '" + action.source + "' in '" + action.targetBucket + ":" + action.target + "'");
+                parent.putObject(action.targetBucket, action.target, action.source);
+                break;
+            case 'copy':
+                aLogFunction("Copy '" + action.sourceBucket + ":" + action.source + "' to '" + action.targetBucket + ":" + action.target + "'");
+                parent.copyObject(action.sourceBucket, action.source, action.targetBucket, action.target);
+                break;
+            case 'delRemote':
+                aLogFunction("Delete '" + action.sourceBucket + ":" + action.source + "'");
+                parent.removeObject(action.sourceBucket, action.source);
+                break;
+            case 'delLocal':
+                aLogFunction("Local delete '" + action.source + "'");
+                io.rm(action.source);
+                break;
+            }
+            return true;
+        } catch(e) { aLogErrorFunction(e); return false; }
+    });
 };
 
 /**
