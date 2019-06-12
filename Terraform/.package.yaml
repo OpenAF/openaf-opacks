@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - terraform
+  - tf
+  - hcl
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Terraform.opack
+description: OpenAF's wrapper around Terraform's functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)
+name: Terraform
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20190612'
+dependencies:
+  OpenAF: '>=20190401'
+files:
+  - .odoc.db
+  - terraform.js
+  - .package.yaml
+filesHash:
+  .odoc.db: 4e7529b5100f17c12fec8736ed8cad5565aee834
+  terraform.js: 1cc83d6295ca7ed23161d182ea22282cae5a6e14
