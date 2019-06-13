@@ -1,0 +1,341 @@
+
+start
+  = _ sections:section* _ {
+    let root = {};
+
+    const extend = function(base, obj) {
+      for (let i in obj) {
+        if (obj.hasOwnProperty(i)) {
+           base[i] = obj[i];
+        }
+      }
+    };
+
+    sections.forEach(function (el) {
+      let parent = root[el.parent_key]
+      if (el.child_key) {
+        root[el.parent_key] || (root[el.parent_key] = {});
+
+        let child_object = {}
+        child_object[el.child_key] = el.value
+
+        root[el.parent_key][el.child_key] || (root[el.parent_key][el.child_key] = {})
+
+
+        let child_value = child_object[el.child_key]
+        extend(root[el.parent_key][el.child_key], child_value);
+
+      } else {
+        root[el.parent_key] = el.value;
+      }
+    });
+
+    return root;
+  }
+
+literal
+  = boolean
+  / object
+  / list
+  / block
+  / number
+  / string
+
+/* ----- section ----- */
+
+section
+  = parent_key:identifier _ value:section {
+    let child;
+    let child_key = false;
+    // console.log('foo %j', value);
+
+    switch(value.hint) {
+      case 'section':
+        if (value.parent_key && value.child_key) {
+          child_key = value.parent_key
+          child = {}
+          child[value.child_key] = value.value
+        } else {
+          child_key = value.parent_key
+          child = value.value;
+        }
+        break;
+      case 'block':
+        child = value.value;
+        break;
+      default:
+        child = value
+    };
+
+    return {
+      parent_key: parent_key,
+      hint: 'section',
+      value: child,
+      child_key: child_key
+    };
+  }
+  / block_member
+  / block
+
+/* ----- block ----- */
+
+block
+  = begin_object
+      members:(
+        first:block_member
+        rest:(_ m:block_member { return m; })*
+        {
+          let joined = {};
+          let value = [first]
+            .concat(rest)
+            .forEach(function (el) {
+              if (Array.isArray(el)) {
+
+                let parent_key = el[0]
+                let child_value = el[1].value
+
+                if (!joined[parent_key]) {
+                  joined[parent_key] = child_value
+                } else if (!Array.isArray(joined[parent_key])){
+
+                  let previousValue = joined[parent_key]
+
+                  joined[parent_key] = []
+                  joined[parent_key].push(previousValue)
+                  joined[parent_key].push(child_value)
+
+                } else {
+                  joined[parent_key].push(child_value)
+                }
+
+              } else if (el.value.hint) {
+                joined[el.parent_key] = el.value.value
+
+              } else {
+                joined[el.parent_key] = el.value;
+
+              }
+              return
+            });
+
+          return {hint: 'block', value: joined};
+        }
+      )?
+  end_object
+  { return members !== null ? members: {}; }
+
+block_member
+  = parent_key:identifier assignment value:literal _ {
+    return {parent_key: parent_key, hint: 'block_member', value: value};
+  }
+  / parent_key:identifier value:block _
+  / parent_key:identifier _ value:section {
+    let child;
+    let child_key = false;
+    // console.log('foo %j', value);
+
+    switch(value.hint) {
+      case 'section':
+        if (value.parent_key && value.child_key) {
+          child_key = value.parent_key
+          child = {}
+          child[value.child_key] = value.value
+        } else {
+          child_key = value.parent_key
+          child = value.value;
+        }
+        break;
+      case 'block':
+        child = value.value;
+        break;
+      default:
+        child = value
+    };
+
+    var m = {}; m[child_key] = child;
+    return {
+      parent_key: parent_key,
+      hint: 'block_member',
+      value: m,
+      child_key: child_key
+    };
+  }
+
+identifier
+  = first:[a-zA-Z_] rest:[a-zA-Z0-9_$-]* { return first + rest.join(""); }
+  / string
+
+/* ----- map ----- */
+
+object
+  = begin_object
+      members:(
+        first:object_member
+        rest:(value_separator m:object_member { return m; })*
+        value_separator?
+        {
+          let result = {hint: 'object'};
+
+          [first]
+          .concat(rest)
+          .forEach(function (e) {
+              result[e.name] = e.value;
+          });
+
+          return result;
+        }
+      )?
+  end_object
+  { return members !== null ? members: {}; }
+
+object_member
+  = name:string name_separator value:literal {
+    return { name: name, value: value };
+  }
+
+/* ----- list ----- */
+
+list
+  = begin_array first:literal rest:(value_separator literal)* end_array {
+    return [first].concat(rest.map(function(d) { return d[1]; }));
+  }
+  / begin_array end_array { return []; }
+
+/* ----- complex grammer ----- */
+
+begin_array     = _ "[" _
+begin_object    = _ "{" _
+end_array       = _ "]" _
+end_object      = _ "}" _
+name_separator  = _ ":" _
+value_separator = _ "," _
+assignment      = _ "=" _
+
+/* ----- string ----- */
+
+string "string"
+  = '"' chars:double_string_char* '"' { return chars.join(""); }
+
+double_string_char
+  = '("' chars:double_string_char* '")' { return '("' + chars.join("") + '")'; }
+  / !('"' / "\\") char_:. { return char_; }
+  / "\\" sequence:escape_sequence { return sequence; }
+
+escape_sequence
+  = character_escape_sequence
+  / "0" !digit { return "\0"; }
+  / hex_escape_sequence
+  / unicode_escape_sequence
+
+character_escape_sequence
+  = single_escape_character
+  / non_escape_character
+
+single_escape_character
+  = char_:['"\\bfnrtv] {
+    return char_
+    .replace("b", "\b")
+    .replace("f", "\f")
+    .replace("n", "\n")
+    .replace("r", "\r")
+    .replace("t", "\t")
+    .replace("v", "\x0B");
+  }
+
+non_escape_character
+  = !escape_character char_:. { return char_; }
+
+escape_character
+  = single_escape_character
+  / digit
+  / "x"
+  / "u"
+
+hex_escape_sequence
+  = "x" h1:hex_digit h2:hex_digit {
+      return String.fromCharCode(+("0x" + h1 + h2));
+  }
+
+unicode_escape_sequence
+  = "u" h1:hex_digit h2:hex_digit h3:hex_digit h4:hex_digit {
+      return String.fromCharCode(+("0x" + h1 + h2 + h3 + h4));
+  }
+
+/* ----- number ----- */
+
+number
+  = numeric:numeric power:power "b" { return numeric * Math.pow(1024, power); }
+  / numeric:numeric power:power { return numeric * Math.pow(1000, power); }
+  / numeric
+
+power
+  = [kK] { return 1; }
+  / [mM] { return 2; }
+  / [gG] { return 3; }
+
+numeric
+  = "-" _ number:number { return -number; }
+  / int_:int frac:frac exp:exp { return +(int_ + frac + exp); }
+  / int_:int frac:frac { return +(int_ + frac); }
+  / int_:int exp:exp { return +(int_ + exp); }
+  / frac:frac { return +frac; }
+  / int_:int { return +int_; }
+
+int
+  = digit19:digit19 digits:digits { return digit19 + digits; }
+  / digit:digit
+
+/* ----- boolean ----- */
+
+boolean
+  = true { return true; }
+  / false { return false; }
+
+true
+  = "true"
+
+false
+  = "false"
+
+/* ----- foundation ----- */
+
+frac
+  = "." digits:digits { return "." + digits; }
+
+exp
+  = e:e digits:digits { return e + digits; }
+
+digits
+  = digits:digit+ { return digits.join(""); }
+
+e
+  = e:[eE] sign:[+-]? { return sign ? e + sign : e; }
+
+digit
+  = [0-9]
+
+digit19
+  = [1-9]
+
+hex_digit
+  = [0-9a-fA-F]
+
+_ "whitespace"
+  = whitespace*
+
+whitespace
+  = [ \t\n\r]
+  / comment
+
+comment "comment"
+  = multi_line_comment
+  / single_line_comment
+
+multi_line_comment
+  = "/*" (multi_line_comment / (!"*/" .))* "*/"
+
+single_line_comment
+  = ("//" / "#") (!line_terminator .)*
+
+line_terminator
+  = [\n\r\u2028\u2029]
