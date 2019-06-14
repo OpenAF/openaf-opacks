@@ -1,0 +1,117 @@
+# Author: Nuno Aguiar
+
+jobs:
+
+  ##################
+  - name: JIRA Login
+    help: >
+      Logins into JIRA. Expects:
+       
+        url   (String)  The JIRA URL.
+        name  (String)  The JIRA's name for reference (if not provided defaults to the URL)
+        user  (String)  The JIRA username.
+        pass  (String)  The JIRA user's password.
+    exec: |
+      args.url  = _$(args.url).isString().$_("Please provide a JIRA URL.");
+      args.user = _$(args.user).isString().$_("Please provide a JIRA username.");
+      args.pass = _$(args.pass).isString().$_("Please provide a JIRA password.");
+      args.name = _$(args.name).isString().default(args.url);
+
+      loadLib("jira.js");
+      if (isUnDef(global.__JIRA)) global.__JIRA = {};
+      global.__JIRA[args.name] = new JIRA(args.url, args.user, args.pass);
+
+  ##########################
+  - name: JIRA Get My Issues
+    help: >
+      Returns a args.issues array for the current open issues assigned to the login user. Expects:
+
+        name  (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+    exec: |
+      args.name = _$(args.name)
+              .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+              .$_("Please provide a name.");
+
+      args.issues = global.__JIRA[args.name].searchMyIssues();
+
+  #########################
+  - name: JIRA Get Projects
+    help: >
+      Returns a args.projects array visible to the login user. Expects:
+
+        name  (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+    exec: |
+      args.name = _$(args.name)
+              .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+              .$_("Please provide a name.");
+
+      args.projects = global.__JIRA[args.name].getProjects();  
+
+  ###########################
+  - name: JIRA List templates
+    help: >
+      Returns a args.templates array of currently available templates. Expects:
+
+        name  (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+    exec: |
+      args.name = _$(args.name)
+              .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+              .$_("Please provide a name.");
+      
+      args.templates = global.__JIRA[args.name].listTemplates();
+
+  #########################
+  - name: JIRA Update issue
+    help: >
+      Updates an issue with a status and optionally more fields. Expects:
+
+        name           (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+        issue          (String)  The JIRA's issue key.
+        status         (String)  The JIRA's status id.
+        template       (String)  The template to use for updating the issue.
+        templateFields (Map)     Template fields used to fill the provided template.
+        fields         (Map)     Direct extra fields to update the issue with.
+    exec: |
+      args.name = _$(args.name)
+                  .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+                 .$_("Please provide a name.");
+      args.issue = _$(args.issue).isString().$_("Please provide an issue key.");
+      args.status = _$(args.status).isString().$_("Please provide a status id to update the issue.");
+      _$(args.template).isString();
+      _$(args.templateFields).isMap();
+      args.fields = _$(args.fields).isMap().default(void 0);
+
+      if (isDef(args.template)) {
+        if (isUnDef(args.fields)) args.fields = {};
+        args.fields = merge(args.fields, global.__JIRA[args.name].getTemplate(args.template, args.templateFields);
+      }
+      global.__JIRA[args.name].updateStatus(args.issue, args.status, args.fields);
+
+  ######################
+  - name: JIRA Get Issue
+    help: >
+      Returns a args.issue map for the corresponding issue. Expects:
+
+        name  (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+        issue (String)  The JIRA's issue key.
+    exec: |
+      args.name = _$(args.name)
+        .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+        .$_("Please provide a name.");
+      args.issue = _$(args.issue).isString().$_("Please provide an issue key.");
+
+      args.issue = global.__JIRA[args.name].getIssue(args.issue);  
+
+  ###################
+  - name: JIRA Logout
+    help: >
+      Logouts of JIRA. Expects:
+        
+        name  (String)  The JIRA's name for reference (if not provided on login default to the URL provided)
+    exec: |
+      args.name = _$(args.name)
+                  .check((v) => { return Object.keys(global.__JIRA).indexOf(v) >= 0; }, "Name not log in.")
+                  .$_("Please provide a name.");
+      
+      global.__JIRA[args.name].logout();
+      delete global.__JIRA[args.name];

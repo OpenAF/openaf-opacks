@@ -62,7 +62,7 @@ JIRA.prototype.getTemplate = function(aFilename, data, extra) {
 JIRA.prototype.login = function(aLogin, aPass) {
     var ses = ow.obj.rest.jsonCreate(this.url + "/rest/auth/1/session", 
         {}, 
-        { username: aLogin, password: Packages.openaf.AFCmdBase.afc.dIP(aPass) }, 
+        { username: String(Packages.openaf.AFCmdBase.afc.dIP(aLogin)), password: String(Packages.openaf.AFCmdBase.afc.dIP(aPass)) }, 
         void 0, 
         void 0, 
         void 0, 

@@ -1,5 +1,5 @@
 project:
-   key      : APROJECT
+   key      : {{project}}
 issuetype:
    name: Task
 # $from(jira.getFieldSuggestions("cf[10700]", "Sprint prefix")).sort("value").select()

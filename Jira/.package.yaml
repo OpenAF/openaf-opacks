@@ -16,19 +16,23 @@ name: Jira
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20181007
+version: 20190614
 dependencies:
   openaf: '>=20180601'
 files:
+  - .odoc.db
   - .package.yaml
   - jira.js
+  - jira.yaml
   - README.md
   - templates/subTaskCreate.yaml
   - templates/taskCreate.yaml
   - templates/taskDone.yaml
 filesHash:
-  jira.js: a19495471d71fa6cdf0cf4f2fa5172af701ede6d
-  README.md: a6f5c648ecf5f096eacf0d5042e0b9064525bf93
+  .odoc.db: 6b8717366d7d7e424e6256671f0524634c45a50b
+  jira.js: 502cbd2b2226e6212d38084421b836d7788eebce
+  jira.yaml: 6bc16bda81544b6fed9947fa552bf2ec4bf46da1
+  README.md: 537ba48f3f24cf9b15984008ffa28ed960f9f0ec
   templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
-  templates/taskCreate.yaml: a0c97c6ee92c3b3eadfcf34ac9602347d9193355
+  templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
   templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38

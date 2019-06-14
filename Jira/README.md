@@ -56,6 +56,7 @@ APROJECT-134|Open         |A issue 2        |29 days ago  |8 days ago    |N/A
 
 ````javascript
 > jira.createSubIssue("APROJECT-135", jira.getTemplate("subTaskCreate.yaml", {
+    project: "APROJECT",
     summary: "A sub-issue 3.1",
     description: "A new sub-issue 3.1 from issue 3"
 }))
