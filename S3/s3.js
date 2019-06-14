@@ -189,7 +189,7 @@ S3.prototype.getPresignedGetObject = function(aBucket, aObjectName, expireInSecs
     _$(aObjectName).isString().$_("Please provide an object name.");
 
     if (isDef(expireInSecs) && isNumber(expireInSecs)) {
-        return String(this.s3.presignedGetObject(aBucket, aObjectName), expireInSecs);
+        return String(this.s3.presignedGetObject(aBucket, aObjectName, expireInSecs));
     } else {
         return String(this.s3.presignedGetObject(aBucket, aObjectName));
     }
@@ -207,7 +207,7 @@ S3.prototype.getPresignedPutObject = function(aBucket, aObjectName, expireInSecs
     _$(aObjectName).isString().$_("Please provide an object name.");
 
     if (isDef(expireInSecs) && isNumber(expireInSecs)) {
-        return String(this.s3.presignedPutObject(aBucket, aObjectName), expireInSecs);
+        return String(this.s3.presignedPutObject(aBucket, aObjectName, expireInSecs));
     } else {
         return String(this.s3.presignedPutObject(aBucket, aObjectName));
     }
@@ -315,22 +315,29 @@ S3.prototype.removeObject = function(aBucket, aObjectName) {
 
 /**
  * <odoc>
- * <key>S3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, aMetaMap)</key>
- * Copies the aObjectName in aSourceBucket to aDestObjectName in aTargetBucket.
+ * <key>S3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, aMetaMap, aCopyOptions)</key>
+ * Copies the aObjectName in aSourceBucket to aDestObjectName in aTargetBucket. You can optionally define a new aMetaMap and/or
+ * aCopyOptions. aCopyOptions is a map with the following properties: matchETag (string), matchETagNone (string), modified, unmodified
  * </odoc>
  */
-S3.prototype.copyObject = function(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, aMetaMap) {
+S3.prototype.copyObject = function(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, aMetaMap, aCopyOptions) {
     _$(aSourceBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
     _$(aTargetBucket).isString().$_("Please provide a target bucket.");
     _$(aDestObjectName).isString().$_("Please provide a destination object name.");
 
+    var co = new Packages.io.minio.CopyConditions();
+    if (isDef(aCopyOptions) && isMap(aCopyOptions)) {
+        if (isDef(aCopyOptions.matchETag) && isString(aCopyOptions.matchETag)) { co.setMatchETag(aCopyOptions.matchETag); }
+        if (isDef(aCopyOptions.matchETagNone) && isString(aCopyOptions.matchETagNone)) { co.setMatchETagNone(aCopyOptions.matchETagNone); }
+        if (isDef(aCopyOptions.modified) && isDate(aCopyOptions.modified)) { co.setModified(aCopyOptions.modified); }
+        if (isDef(aCopyOptions.unmodified) && isDate(aCopyOptions.unmodified)) { co.setUnmodified(aCopyOptions.unmodified); }
+    }
     if (isDef(aMetaMap) && isMap(aMetaMap)) {
-        var co = new Packages.io.minio.CopyConditions();
         co.setReplaceMetadataDirective();
         this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, co, af.toJavaMap(aMetaMap));
     } else {
-        this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName);
+        this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, co);
     }
 };
 
@@ -578,14 +585,15 @@ S3.prototype.syncActions = function(aBucket, aPrefix, aLocalPath) {
 
 /**
  * <odoc>
- * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction)</key>
+ * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads)</key>
  * Given anArrayOfActions produce by other S3.*Actions functions will execute them in parallel recording changes with,
  * optionally, the provided aLogFunction and aLogErrorFunction (that receive a text message). To execute actions with a 
  * given order (for example: first copy then delete) each element of anArrayOfActions should be an array of actions (e.g.
- * an array of copy actions on the first element and an array of delete actions on the second element).
+ * an array of copy actions on the first element and an array of delete actions on the second element). Optionally you 
+ * can provide the number of threads.
  * </odoc>
  */
-S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction) {
+S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads) {
     var parent = this;
 
     anArrayOfActions = _$(anArrayOfActions).isArray().default([]);
@@ -625,7 +633,7 @@ S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFun
             }
             return true;
         } catch(e) { aLogErrorFunction(e); return false; }
-    });
+    }, numThreads);
 };
 
 /**
