@@ -5,6 +5,7 @@
   | Name   | Description   |
   |--------|---------------|
   |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, weather and a test service.|
+  |AWS|A ligthweigth and small set of AWS API calls to enhance functionality without having to include heavier AWS SDK dependencies when possible.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
   |Compromise|Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
