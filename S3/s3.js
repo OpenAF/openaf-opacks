@@ -236,7 +236,7 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
 
 /**
  * <odoc>
- * <key>S3.putObject(aBucket, aObjectName, aStream, aMetaMap)</key>
+ * <key>S3.putObjectStream(aBucket, aObjectName, aStream, aMetaMap)</key>
  * Puts the aStream into aBucket with the name aObjectName. Optionally you can provide a meta map.
  * Note: use "/" on the name to simulate folders.
  * </odoc>
