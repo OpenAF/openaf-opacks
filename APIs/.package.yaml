@@ -16,6 +16,9 @@ keywords:
   - jokes
   - fake
   - data
+  - dns
+  - google
+  - cloudflare
 bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
@@ -29,7 +32,7 @@ name: APIs
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180424'
+version: '20190207'
 dependencies:
   openaf: '>=20180424'
 files:
@@ -38,4 +41,4 @@ files:
   - apis.js
 filesHash:
   .odoc.db: 0721ddfdc603b5022ea40a4847249a7d4798ffa4
-  apis.js: 65d0abbb506bd2a44c54f9ce4f70a424a324d92b
+  apis.js: 13f2cc5e49806c79ba111ed1aee246d846852b8a

@@ -251,13 +251,25 @@
      * <odoc>
      * <key>apis.dnsOverHTTPS</key>
      * From: https://developers.google.com/speed/public-dns/docs/dns-over-https
+     * From: https://developers.cloudflare.com/1.1.1.1/dns-over-https/json-format/ 
      * Auth: none
      * </odoc>
      */
     exports.dnsOverHTTPS = {
-        resolve: function(aName, aType) {
-            var res = $rest().get("https://dns.google.com/resolve?" + $rest().query({ name: aName, type: aType }));
+        resolve: function(aName, aType, aProvider) {
+            aProvider = _$(aProvider).default("cloudflare");
+            
+            switch(aProvider) {
+            case "google"    :
+                var res = $rest().get("https://dns.google.com/resolve?" + $rest().query({ name: aName, type: aType }));
+                if (isDef(res.Answer)) return res.Answer; else return void 0;
+            case "cloudflare":
+                var res = $rest({ requestHeaders: { accept: "application/dns-json"  } })
+                          .get("https://1.1.1.1/dns-query?" + $rest()
+                          .query({ name: aName, type: aType }));
             if (isDef(res.Answer)) return res.Answer; else return void 0;
+            default: break;
+            }
         },
 
         a: function(aName) {
