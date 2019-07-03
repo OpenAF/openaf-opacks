@@ -78,11 +78,11 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var string_to_sign = "AWS4-HMAC-SHA256" + "\n" + amzdate + "\n" + credential_scope + "\n" + sha256(can_Request);
 
    // Part 3
-   var signing_key = this.__getSignatureKey(this.secretKey, datestamp, aRegion, aService);
+   var signing_key = this.__getSignatureKey(Packages.openaf.AFCmdBase.afc.dIP(this.secretKey), datestamp, aRegion, aService);
    var signature = ow.format.string.toHex(this.__HmacSHA256(string_to_sign, signing_key), "").toLowerCase();
 
    // Part 4
-   var authorization_header = "AWS4-HMAC-SHA256" + " " + "Credential=" + this.accessKey + "/" + credential_scope + ", " + "SignedHeaders=" + signed_headers + ", " + "Signature=" + signature;
+   var authorization_header = "AWS4-HMAC-SHA256" + " " + "Credential=" + Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope + ", " + "SignedHeaders=" + signed_headers + ", " + "Signature=" + signature;
 
    if (aMethod == "GET") {
       request = {
@@ -200,7 +200,7 @@ AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWa
  * <odoc>
  * <key>AWS.SQS_Delete(aQueueEndPoint, aRegion, aReceiptHandle) : Object</key>
  * Tries to send delete a message from the aQueueEndPoint on region aRegion given aReceiptHandle. If aReceiptHandle is actually a ReceiveMessageResponse/Result it will 
- * provide the aReceiptHandle from the message.
+ * provide the aReceiptHandle from the message. Optionally: aReceiptHandle can be an array with maps containing a ReceiptHandle property up to 10 elements.
  * </odoc>
  */
 AWS.prototype.SQS_Delete = function(aEndPoint, aRegion, aReceiptHandle) {
@@ -208,19 +208,71 @@ AWS.prototype.SQS_Delete = function(aEndPoint, aRegion, aReceiptHandle) {
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
    var aHost = String(url.getHost());
+   var res;
 
-   if (isMap(aReceiptHandle) && 
-       isDef(aReceiptHandle.ReceiveMessageResponse) &&
-       isDef(aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult)) {
-         aReceiptHandle = aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult.Message.ReceiptHandle;
-   };
+   if (isArray(aReceiptHandle)) {
+      if (aReceiptHandle.length > 10) throw "Can't delete more than 10 messages at a time due to AWS restrictions.";
+      var msg = {
+         Action: "DeleteMessageBatch",
+         Version: "2012-11-05"
+      };
+      msg = merge(msg, this.convertArray2Attrs("DeleteMessageBatchRequestEntry", aReceiptHandle));
+      res = this.postURLEncoded(aURL, aURI, "", msg, "sqs", aHost, aRegion);
+   } else {
+      if (isMap(aReceiptHandle) && 
+      isDef(aReceiptHandle.ReceiveMessageResponse) &&
+      isDef(aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult)) {
+        aReceiptHandle = aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult.Message.ReceiptHandle;
+      };
+      res = this.postURLEncoded(aURL, aURI, "", { 
+         Action: "DeleteMessage", 
+         QueueUrl: aURL,
+         ReceiptHandle: aReceiptHandle,
+         Version: "2012-11-05" 
+      }, "sqs", aHost, aRegion);
+   }
+   
+   if (isString(res)) res = af.fromXML2Obj(res);
+   return res;
+};
 
-   var res = this.postURLEncoded(aURL, aURI, "", { 
-      Action: "DeleteMessage", 
-      QueueUrl: aURL,
-      ReceiptHandle: aReceiptHandle,
-      Version: "2012-11-05" 
-   }, "sqs", aHost, aRegion);
+/**
+ * <odoc>
+ * <key>AWS.SQS_MessageVisibility(aQueueEndPoint, aRegion, aReceiptHandle, aVisibilityTimeout) : Object</key>
+ * Tries to change the visibility of a message in-flight from the aQueueEndPoint on region aRegion given aReceiptHandle. If aReceiptHandle is actually a ReceiveMessageResponse/Result it will 
+ * provide the aReceiptHandle from the message. aVisibilityTimeout is measure in seconds up to 12 hours. Optionally: aReceiptHandle can be an array with maps containing a ReceiptHandle and VisibilityTimeout properties up to 10 elements.
+ * </odoc>
+ */
+AWS.prototype.SQS_MessageVisibility = function(aEndPoint, aRegion, aReceiptHandle, aVisibilityTimeout) {
+   var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
+   var url = new java.net.URL(aURL);
+   var aURI = String(url.getPath());
+   var aHost = String(url.getHost());
+   var res;
+
+   if (isArray(aReceiptHandle)) {
+      if (aReceiptHandle.length > 10) throw "Can't change visibility of more than 10 messages at a time due to AWS restrictions.";
+      var msg = {
+         Action: "ChangeMessageVisibilityBatch",
+         Version: "2012-11-05"
+      };
+      msg = merge(msg, this.convertArray2Attrs("ChangeMessageVisibilityBatchRequestEntry", aReceiptHandle));
+      res = this.postURLEncoded(aURL, aURI, "", msg, "sqs", aHost, aRegion);
+   } else {
+      if (isMap(aReceiptHandle) && 
+         isDef(aReceiptHandle.ReceiveMessageResponse) &&
+         isDef(aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult)) {
+            aReceiptHandle = aReceiptHandle.ReceiveMessageResponse.ReceiveMessageResult.Message.ReceiptHandle;
+      };
+
+      var res = this.postURLEncoded(aURL, aURI, "", { 
+         Action: "ChangeMessageVisibility", 
+         QueueUrl: aURL,
+         ReceiptHandle: aReceiptHandle,
+         VisibilityTimeout: aVisibilityTimeout,
+         Version: "2012-11-05" 
+      }, "sqs", aHost, aRegion);
+   }
    
    if (isString(res)) res = af.fromXML2Obj(res);
    return res;

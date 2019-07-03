@@ -28,5 +28,5 @@ files:
   - .package.yaml
   - aws.js
 filesHash:
-  .odoc.db: b859aea580a7710f1c871c6eaa473dc48e5661b8
-  aws.js: 294667f5916bfc9c8cf178ec673efbfd37af6431
+  .odoc.db: 25b42928738d98dca2d4005d4043cf2ad979c0c7
+  aws.js: 401b0378bbe6f560a199b54ecd3e5c02fe660ee0
