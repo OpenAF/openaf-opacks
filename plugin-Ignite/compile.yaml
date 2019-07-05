@@ -1,0 +1,78 @@
+consts:
+  outputDir: &OUTPUT_DIR .
+
+ojob:
+  async: true
+
+todo:
+  - Clean up
+  - Download jars
+  - Compile Ignite plugin
+  - Prepare Ignite jar
+  - Prepare help
+
+jobs:
+  ################
+  - name: Clean up
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
+      classpath.forEach((afile) => {
+        io.rm(afile);
+      });
+      
+      var classes = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.class')].filepath");
+      classes.forEach((afile) => {
+        io.rm(afile);
+      });
+
+  #####################
+  - name: Download jars
+    deps:
+      - Clean up
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      ow.loadJava();
+      var arts = io.readFileYAML(".maven.yaml");
+      var maven = new ow.java.maven();
+      maven.processMavenFile(args.outputDir);
+
+  ##########################
+  - name: Compile Ignite plugin
+    deps:
+      - Download jars
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      io.rm(args.outputDir + "/plugin-ignite.jar");
+      var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
+      classpath.push(getOpenAFJar());
+      var sources = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.java')].filepath");
+      var sep = java.io.File.pathSeparator;
+      sh("javac -source 1.7 -target 1.7 -Xlint:deprecation -cp \"" + classpath.join(sep) + "\" " + sources.join(" "), void 0, void 0, true, args.outputDir, true);
+ 
+  ####################### 
+  - name: Prepare Ignite jar
+    deps:
+      - Compile Ignite plugin
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      plugin("ZIP");
+      var zip = new ZIP();
+      var classes = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.class')].filepath");
+      classes.forEach((afile) => {
+        log("Packing " + afile.replace(args.outputDir + "/src/", "") + "...");
+        zip.streamPutFileStream(args.outputDir + "/plugin-ignite.jar", afile.replace(args.outputDir + "/src/", ""), io.readFileStream(afile));
+      });
+
+  ####################
+  - name: Prepare help
+    deps:
+      - Compile Ignite plugin
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: | 
+      saveHelp(args.outputDir, { "Ignite": args.outputDir + "/src/openaf/plugins/Ignite.java" })

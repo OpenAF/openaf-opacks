@@ -1,0 +1,14 @@
+artifacts:
+
+  - id     : ignite-core
+    group  : org.apache.ignite
+    version: 2.7.5
+
+  - id     : ignite-shmem
+    group  : org.gridgain
+    version: 1.0.0
+  
+  - id     : cache-api
+    group  : javax.cache
+    version: 1.0.0
+
