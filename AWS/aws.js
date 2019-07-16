@@ -125,10 +125,27 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
 };
 
 /**
+ * <odoc>
+ * <key>AWS.getURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) : Object</key>
+ * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzTarget, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
+ * Returns the object returned by the API.
+ * </odoc>
+ */
+AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) {
+   var params = _$(aParams).isString().default("");
+
+   var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzTarget, aDate, aContentType);
+
+   return $rest({ 
+      urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
+      requestHeaders: extra
+   }).get(aURL, aArgs);
+};
+
+/**
  * SQS =========================
  */
 
-// <?xml version="1.0"?><SendMessageResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/"><SendMessageResult><MessageId>eea95448-6967-4bd5-8806-e7436fb421a1</MessageId><MD5OfMessageBody>1a1220a98e629a549411806d665f3887</MD5OfMessageBody><SequenceNumber>18846560619709167616</SequenceNumber></SendMessageResult><ResponseMetadata><RequestId>cf004e2d-1d00-5949-aa8f-1bbdf3964f18</RequestId></ResponseMetadata></SendMessageResponse>
 /**
  * <odoc>
  * <key>AWS.SQS_Send(aQueueEndPoint, aRegion, aMessageBody, aMessageGroupId, aMessageDeduplicationId) : Object</key>
@@ -345,4 +362,100 @@ AWS.prototype.LAMBDA_Invoke = function(aRegion, aFunctionName, aFunctionParams, 
    aURL += "?" + ow.obj.rest.writeQuery(params);
 
    return this.postURLEncoded(aURL, aURI, ow.obj.rest.writeQuery(params), aFunctionParams, "lambda", aHost, aRegion, void 0, void 0, "application/json");
+};
+
+/**
+ * RDS =========================
+ */
+/** 
+ * <odoc>
+ * <key>AWS.RDS_DescribeDBClusters(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared)</key>
+ * Tries to retrieve the aRegion RDS DB clusters information optionally providing aDBClusterIdentifier, aMaxRecords, aIncludeShared boolean and/or aMarker.
+ * See more in https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBClusters.html
+ * </odoc>
+ */
+AWS.prototype.RDS_DescribeDBClusters = function(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared) {
+   var aURL = "https://rds." + aRegion + ".amazonaws.com/";
+   
+   var params = { 
+      Action: "DescribeDBClusters", 
+      MaxRecords: aMaxRecords,
+      IncludeShared: aIncludeShared,
+      Marker: aMarker,
+      DBClusterIdentifier: aDBClusterIdentifier,
+      Version: "2014-10-31"
+   };
+
+   aURL += "?" + $rest().query(params);
+
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.getURLEncoded(aURL, aURI, $rest().query(params), {}, "rds", aHost, aRegion);
+   res = af.fromXML2Obj(res);
+
+   if (isDef(res.DescribeDBClustersResponse) && isDef(res.DescribeDBClustersResponse.DescribeDBClustersResult)) {
+      res = res.DescribeDBClustersResponse.DescribeDBClustersResult;
+   }
+   return res;
+};
+
+/** 
+ * <odoc>
+ * <key>AWS.RDS_DescribeDBClusters(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared)</key>
+ * Tries to retrieve the aRegion RDS DB clusters information optionally providing aDBClusterIdentifier, aMaxRecords, aIncludeShared boolean and/or aMarker.
+ * See more in https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html
+ * </odoc>
+ */
+AWS.prototype.RDS_DescribeDBInstances = function(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared) {
+   var aURL = "https://rds." + aRegion + ".amazonaws.com/";
+   
+   var params = { 
+      Action: "DescribeDBInstances", 
+      MaxRecords: aMaxRecords,
+      IncludeShared: aIncludeShared,
+      Marker: aMarker,
+      DBClusterIdentifier: aDBClusterIdentifier,
+      Version: "2014-10-31"
+   };
+
+   aURL += "?" + $rest().query(params);
+
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.getURLEncoded(aURL, aURI, $rest().query(params), {}, "rds", aHost, aRegion);
+   res = af.fromXML2Obj(res);
+
+   if (isDef(res.DescribeDBInstancesResponse) && isDef(res.DescribeDBInstancesResponse.DescribeDBInstancesResult)) {
+      res = res.DescribeDBInstancesResponse.DescribeDBInstancesResult;
+   }
+   return res;
+};
+
+/** 
+ * <odoc>
+ * <key>AWS.RDS_ModifyCurrentDBClusterCapacity(aRegion, aDBClusterIdentifier, aCapacity, aSecondsBeforeTimeout, aTimeoutAction)</key>
+ * Tries to change the aRegion RDS DB cluster to aCapacity (from 2 to 384) for aDBClusterIdentifier optionally providing aSecondsBeforeTimeout and aTimeoutAction (e.g. ForceApplyCapacityChange or RollbackCapacityChange).
+ * See more in https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_ModifyCurrentDBClusterCapacity.html
+ * </odoc>
+ */
+AWS.prototype.RDS_ModifyCurrentDBClusterCapacity = function(aRegion, aDBClusterIdentifier, aCapacity, aSecondsBeforeTimeout, aTimeoutAction) {
+   var aURL = "https://rds." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var params = { 
+      Action: "ModifyCurrentDBClusterCapacity", 
+      Capacity: aCapacity,
+      SecondsBeforeTimeout: aSecondsBeforeTimeout,
+      TimeoutAction: aTimeoutAction,
+      DBClusterIdentifier: aDBClusterIdentifier,
+      Version: "2014-10-31"
+   };
+
+   return af.fromXML2Obj(this.postURLEncoded(aURL, aURI, "", params, "rds", aHost, aRegion));
 };
