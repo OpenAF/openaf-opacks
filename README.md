@@ -34,6 +34,7 @@
   |oDoc2MD|Generating markdown documentation based on existing oDoc databases.|
   |oPackServer|Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
+  |plugin-Ignite|OpenAF plugin to access Ignite functionality.|
   |Redis|Wrapper to access Redis using the java Jedis client.|
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
