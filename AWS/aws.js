@@ -47,12 +47,13 @@ AWS.prototype.__getSignedHeaders = function(key, dateStamp, regionName, serviceN
    return ow.format.string.toHex(this.__getSignatureKey(key, dateStamp, regionName, serviceName), "").toLowerCase();
 };
 
-AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzTarget, aDate, aContentType) {
+AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType) {
    aPayload = _$(aPayload).isString().default("");
    aRequestParams = _$(aRequestParams).isString().default("");
    aURI = _$(aURI).isString().default("/");
    aMethod = aMethod.toUpperCase();
-   aAmzTarget = _$(aAmzTarget).isString().default(void 0); // for dynamo (https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
+   // for dynamo (https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
+   aAmzFields = _$(aAmzFields).isMap().default({});
    aDate = _$(aDate).isDate().default(new Date());
 
    // Part 1
@@ -65,9 +66,16 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var can_uri = aURI;
    var can_querystring = aRequestParams; // must be sorted by name
    //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
-   var can_headers = (isDef(content_type) ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "");
+   var can_headers = (isDef(content_type) ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n";
 
-   var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host;x-amz-date" + (isDef(aAmzTarget) ? ";x-amz-target": "");
+   var amzFieldsHeaders = Object.keys(aAmzFields), amzHeaders = [];
+   for (var amzFieldI in amzFieldsHeaders) {
+      can_headers += amzFieldsHeaders[amzFieldI].toLowerCase() + ":" + aAmzFields[amzFieldsHeaders[amzFieldI]] + "\n";
+      request[amzFieldsHeaders[amzFieldI]] = aAmzFields[amzFieldsHeaders[amzFieldI]];
+      amzHeaders.push(amzFieldsHeaders[amzFieldI].toLowerCase());
+   } 
+
+   var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host;x-amz-date" + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
 
    var payload_hash = sha256(aPayload);
 
@@ -85,17 +93,16 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var authorization_header = "AWS4-HMAC-SHA256" + " " + "Credential=" + Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope + ", " + "SignedHeaders=" + signed_headers + ", " + "Signature=" + signature;
 
    if (aMethod == "GET") {
-      request = {
+      request = merge(request, {
          "Content-Type": void 0,
          "X-Amz-Date": amzdate,
-         "X-Amz-Target": aAmzTarget,
          "Authorization": authorization_header
-      };
+      });
    } else {
-      request = {
+      request = merge(request, {
          "x-amz-date": amzdate,
          "Authorization": authorization_header
-      };
+      });
    }
    
    return request;
@@ -103,12 +110,12 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
 
 /**
  * <odoc>
- * <key>AWS.postURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) : Object</key>
- * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzTarget, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
+ * <key>AWS.postURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) : Object</key>
+ * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzFields, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
  * Returns the object returned by the API.
  * </odoc>
  */
-AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) {
+AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) {
    var params = _$(aParams).isString().default(""), payload = "";
    aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
 
@@ -116,7 +123,7 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
       payload = ow.obj.rest.writeQuery(aArgs);
    else
       payload = stringify(aArgs, void 0, "");
-   var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzTarget, aDate, aContentType);
+   var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, aContentType);
 
    return $rest({ 
       urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
@@ -126,15 +133,15 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
 
 /**
  * <odoc>
- * <key>AWS.getURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) : Object</key>
- * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzTarget, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
+ * <key>AWS.getURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) : Object</key>
+ * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzFields, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
  * Returns the object returned by the API.
  * </odoc>
  */
-AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzTarget, aDate, aContentType) {
+AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) {
    var params = _$(aParams).isString().default("");
 
-   var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzTarget, aDate, aContentType);
+   var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType);
 
    return $rest({ 
       urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
@@ -346,28 +353,54 @@ AWS.prototype.SQS_Purge = function(aEndPoint, aRegion) {
 
 /** 
  * <odoc>
- * <key>AWS.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion)</key>
- * Tries to invoke a AWS Lambda aFunctionName with the object aFunctionParams, optionally with aVersion, on aRegion. Returns
+ * <key>AWS.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion, aInvocationType, aLogType) : Object</key>
+ * Tries to invoke a AWS Lambda aFunctionName with the object aFunctionParams, optionally with aVersion and/or aInvocationType and/or aLogType, on aRegion. Returns
  * the AWS Function invocation return object.
+ * See more in: https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
  * </odoc>
  */
-AWS.prototype.LAMBDA_Invoke = function(aRegion, aFunctionName, aFunctionParams, aVersion) {
+AWS.prototype.LAMBDA_Invoke = function(aRegion, aFunctionName, aFunctionParams, aVersion, aInvocationType, aLogType) {
    var aURL = "https://lambda." + aRegion + ".amazonaws.com/2015-03-31/functions/" + aFunctionName + "/invocations";
    var url = new java.net.URL(aURL);
    var aHost = String(url.getHost());
    var aURI = String(url.getPath());
-   var params = {};
+   var params = {}, amzFields = {};
 
    if (isDef(aVersion)) params.Qualifier = aVersion;
+   if (isDef(aInvocationType)) amzFields["X-Amz-Invocation-Type"] = aInvocationType;
+   if (isDef(aLogType)) amzFields["X-Amz-Log-Type"] = aLogType;
    aURL += "?" + ow.obj.rest.writeQuery(params);
 
-   return this.postURLEncoded(aURL, aURI, ow.obj.rest.writeQuery(params), aFunctionParams, "lambda", aHost, aRegion, void 0, void 0, "application/json");
+   return this.postURLEncoded(aURL, aURI, ow.obj.rest.writeQuery(params), aFunctionParams, "lambda", aHost, aRegion, amzFields, void 0, "application/json");
+};
+
+/**
+ * <odoc>
+ * <key>AWS.LAMBDA_InvokeAsync(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType)</key>
+ * Tries to asynchronously invoke a AWS Lambda aFunctionName with the object aFunctionParams, optionally with aVersion and/or aInvocationType and/or aLogType, on aRegion.
+ * See more in: https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
+ * </odoc>
+ */
+AWS.prototype.LAMBDA_InvokeAsync = function(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType) {
+   return this.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion, "Event", aLogType);
+};
+
+/**
+ * <odoc>
+ * <key>AWS.LAMBDA_InvokeDryRun(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType) : Object</key>
+ * Tries to invoke, as a dry run, a AWS Lambda aFunctionName with the object aFunctionParams, optionally with aVersion and/or aInvocationType and/or aLogType, on aRegion. Returns
+ * the AWS Function invocation validation return object.
+ * See more in: https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
+ * </odoc>
+ */
+AWS.prototype.LAMBDA_InvokeDryRun = function(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType) {
+   return this.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion, "DryRun", aLogType);
 };
 
 /**
  * RDS =========================
  */
-/** 
+/**  
  * <odoc>
  * <key>AWS.RDS_DescribeDBClusters(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared)</key>
  * Tries to retrieve the aRegion RDS DB clusters information optionally providing aDBClusterIdentifier, aMaxRecords, aIncludeShared boolean and/or aMarker.
