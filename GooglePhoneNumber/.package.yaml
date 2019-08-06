@@ -23,27 +23,29 @@ name: GooglePhoneNumber
 main: main.js
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190407'
+version: '20190805'
 dependencies:
   openaf: '>=20170301'
 files:
+  - .package.yaml
   - googlePhoneNumber.js
   - googlePhoneNumber.yaml
-  - updateGooglePhoneNumber.yaml
-  - .package.yaml
-  - main.js
-  - lib/carrier-1.105.jar
+  - lib/carrier-1.112.jar
+  - lib/geocoder-2.122.jar
+  - lib/libphonenumber-8.10.16.jar
+  - lib/LICENSE
+  - lib/prefixmapper-2.122.jar
   - lib/protobuf-javanano-3.0.0-alpha-7.jar
-  - lib/geocoder-2.115.jar
-  - lib/libphonenumber-8.10.9.jar
-  - lib/prefixmapper-2.115.jar
+  - main.js
+  - updateGooglePhoneNumber.yaml
 filesHash:
   googlePhoneNumber.js: 5cdc370296f68a9e09d59a5789567a5bf5bfeca1
   googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
-  updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
-  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
-  lib/carrier-1.105.jar: ec0f993e15eda3a788d27b475b6d6149b7ca955f
+  lib/carrier-1.112.jar: f8e80cb72e66288922fd548550e8ca6f148fd40e
+  lib/geocoder-2.122.jar: b056586db07a481d856908c048107a2143de49a5
+  lib/libphonenumber-8.10.16.jar: 4cb2887a2cc51f66240085253a9057c197202a2a
+  lib/LICENSE: a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33
+  lib/prefixmapper-2.122.jar: f980b440233884f5849746e117cd21b78773b9b5
   lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
-  lib/geocoder-2.115.jar: 29c3611907d45c6d3b9d946563e4760a5761bbd5
-  lib/libphonenumber-8.10.9.jar: d5036d5f96888e54f44bc7c42c6d290a7f4e86b1
-  lib/prefixmapper-2.115.jar: 61088d81689ea1898aa2e4ba7973b87b71831001
+  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
+  updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
