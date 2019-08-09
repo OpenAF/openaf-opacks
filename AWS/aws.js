@@ -7,8 +7,10 @@
 var AWS = function(aAccessKey, aSecretKey) {
    ow.loadFormat();
    ow.loadObj();
-   this.accessKey = aAccessKey;
-   this.secretKey = aSecretKey;
+   this.accessKey = _$(aAccessKey).isString().default(getEnv("AWS_ACCESS_KEY_ID"));
+   this.secretKey = _$(aSecretKey).isString().default(getEnv("AWS_SECRET_ACCESS_KEY"));
+
+   this.region = getEnv("AWS_DEFAULT_REGION");
 };
 
 AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
@@ -162,6 +164,7 @@ AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHo
  * </odoc>
  */
 AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGroupdId, aMessageDeduplicationId) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\/+/, "").replace(/\/+$/, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -203,6 +206,7 @@ AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGrou
  * </odoc>
  */
 AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -228,6 +232,7 @@ AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWa
  * </odoc>
  */
 AWS.prototype.SQS_Delete = function(aEndPoint, aRegion, aReceiptHandle) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -268,6 +273,7 @@ AWS.prototype.SQS_Delete = function(aEndPoint, aRegion, aReceiptHandle) {
  * </odoc>
  */
 AWS.prototype.SQS_MessageVisibility = function(aEndPoint, aRegion, aReceiptHandle, aVisibilityTimeout) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -309,6 +315,7 @@ AWS.prototype.SQS_MessageVisibility = function(aEndPoint, aRegion, aReceiptHandl
  * </odoc>
  */
 AWS.prototype.SQS_GetQueueAttributes = function(aEndPoint, aRegion) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -332,6 +339,7 @@ AWS.prototype.SQS_GetQueueAttributes = function(aEndPoint, aRegion) {
  * </odoc>
  */
 AWS.prototype.SQS_Purge = function(aEndPoint, aRegion) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
    var url = new java.net.URL(aURL);
    var aURI = String(url.getPath());
@@ -360,6 +368,7 @@ AWS.prototype.SQS_Purge = function(aEndPoint, aRegion) {
  * </odoc>
  */
 AWS.prototype.LAMBDA_Invoke = function(aRegion, aFunctionName, aFunctionParams, aVersion, aInvocationType, aLogType) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://lambda." + aRegion + ".amazonaws.com/2015-03-31/functions/" + aFunctionName + "/invocations";
    var url = new java.net.URL(aURL);
    var aHost = String(url.getHost());
@@ -382,6 +391,7 @@ AWS.prototype.LAMBDA_Invoke = function(aRegion, aFunctionName, aFunctionParams, 
  * </odoc>
  */
 AWS.prototype.LAMBDA_InvokeAsync = function(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType) {
+   aRegion = _$(aRegion).isString().default(this.region);
    return this.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion, "Event", aLogType);
 };
 
@@ -394,6 +404,7 @@ AWS.prototype.LAMBDA_InvokeAsync = function(aRegion, aFunctionName, aFunctionPar
  * </odoc>
  */
 AWS.prototype.LAMBDA_InvokeDryRun = function(aRegion, aFunctionName, aFunctionParams, aVersion, aLogType) {
+   aRegion = _$(aRegion).isString().default(this.region);
    return this.LAMBDA_Invoke(aRegion, aFunctionName, aFunctionParams, aVersion, "DryRun", aLogType);
 };
 
@@ -408,6 +419,7 @@ AWS.prototype.LAMBDA_InvokeDryRun = function(aRegion, aFunctionName, aFunctionPa
  * </odoc>
  */
 AWS.prototype.RDS_DescribeDBClusters = function(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://rds." + aRegion + ".amazonaws.com/";
    
    var params = { 
@@ -442,6 +454,7 @@ AWS.prototype.RDS_DescribeDBClusters = function(aRegion, aDBClusterIdentifier, a
  * </odoc>
  */
 AWS.prototype.RDS_DescribeDBInstances = function(aRegion, aDBClusterIdentifier, aMaxRecords, aMarker, aIncludeShared) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://rds." + aRegion + ".amazonaws.com/";
    
    var params = { 
@@ -476,6 +489,7 @@ AWS.prototype.RDS_DescribeDBInstances = function(aRegion, aDBClusterIdentifier, 
  * </odoc>
  */
 AWS.prototype.RDS_ModifyCurrentDBClusterCapacity = function(aRegion, aDBClusterIdentifier, aCapacity, aSecondsBeforeTimeout, aTimeoutAction) {
+   aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://rds." + aRegion + ".amazonaws.com/";
    var url = new java.net.URL(aURL);
    var aHost = String(url.getHost());
@@ -504,7 +518,8 @@ AWS.prototype.RDS_ModifyCurrentDBClusterCapacity = function(aRegion, aDBClusterI
  */
 AWS.prototype.DYNAMO_ListTables = function(aRegion) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -529,7 +544,8 @@ AWS.prototype.DYNAMO_ListTables = function(aRegion) {
  */
 AWS.prototype.DYNAMO_DeleteTable = function(aRegion, aTableName) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -556,7 +572,8 @@ AWS.prototype.DYNAMO_DeleteTable = function(aRegion, aTableName) {
  */
 AWS.prototype.DYNAMO_CreateTable = function(aRegion, tableName, attrDefs, keySchema, globalSecondaryIdxs, localSecondaryIdxs, tags) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -676,7 +693,8 @@ AWS.prototype.__DYNAMO_Item_Convert = function(aMap) {
  */
 AWS.prototype.DYNAMO_PutItem = function(aRegion, aTableName, aItem, aConditionExpression, aExpressionAttrValues) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -706,7 +724,8 @@ AWS.prototype.DYNAMO_PutItem = function(aRegion, aTableName, aItem, aConditionEx
  */
 AWS.prototype.DYNAMO_GetItem = function(aRegion, aTableName, aKey, aProjectionExpression, shouldConsistentRead) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -741,7 +760,8 @@ AWS.prototype.DYNAMO_GetItem = function(aRegion, aTableName, aKey, aProjectionEx
  */
 AWS.prototype.DYNAMO_GetAllItems = function(aRegion, aTableName, aFilterExpression, aExpressionAttributeValues, shouldConsistentRead, aIndexName, aSelect) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -778,7 +798,8 @@ AWS.prototype.DYNAMO_GetAllItems = function(aRegion, aTableName, aFilterExpressi
  */
 AWS.prototype.DYNAMO_DeleteItem = function(aRegion, aTableName, aKey) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -806,7 +827,8 @@ AWS.prototype.DYNAMO_DeleteItem = function(aRegion, aTableName, aKey) {
  */
 AWS.prototype.DYNAMO_DescribeTable = function(aRegion, aTableName) {
    var aURL;
-   if (isUnDef(aRegion)) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   if (aRegion == "local") {
       aURL = "http://127.0.0.1:8000";
    } else {
       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
@@ -833,7 +855,7 @@ if (isUnDef(ow.ch.__types.dynamo)) ow.ch.__types.dynamo = {
       _$(options.accessKey).$_("Please provide an accessKey.");
       _$(options.secretKey).$_("Please provide a secretKey.");
       _$(options.tableName).$_("Please provde a table name.");
-      options.region = _$(options.region).default(void 0);
+      options.region = _$(options.region).default(getEnv("AWS_DEFAULT_REGION"));
 
       ow.loadObj();
       options.aws = new AWS(options.accessKey, options.secretKey);
