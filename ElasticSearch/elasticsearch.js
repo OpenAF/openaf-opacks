@@ -24,12 +24,63 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 ElasticSearch.prototype.getIndexMapping = function(aIndex) {
 	ow.loadObj();
 
-	var res = ow.obj.rest.jsonGet(es.url + "/" + aIndex + "/_mapping");
+	var res = ow.obj.rest.jsonGet(this.url + "/" + aIndex + "/_mapping");
 	if (isDef(res[aIndex])) {
 		return res[aIndex];
 	} else {
 		return void 0;
 	}
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.listTemplates() : Map</key>
+ * Returns a map with the current list of templates.
+ * </odoc>
+ */
+ElasticSearch.prototype.listTemplates = function() {
+	return $rest().get(this.url + "/_template");
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.setTemplate(aTemplateName, aTemplateMap) : Map</key>
+ * Creates or updates aTemplateName with aTemplateMap
+ * </odoc>
+ */
+ElasticSearch.prototype.setTemplate = function(aTemplateName, aTemplateMap) {
+	return $rest().put(this.url + "/_template/" + aTemplateName, aTemplateMap);
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.deleteTemplate(aTemplateName) : Map</key>
+ * Deletes aTemplateName.
+ * </odoc>
+ */
+ElasticSearch.prototype.deleteTemplate = function(aTemplateName, aTemplateMap) {
+	return $rest().delete(this.url + "/_template/" + aTemplateName);
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.setTemplatePriRep(aTemplateName, aListOfIndexPatterns, numPrimary, numReplica) : Map</key>
+ * Creates or updates aTemplateName with for aListOfIndexPatterns (e.g. ["prod-*", "dev-*"]) specifiyng the numPrimary shards and
+ * numReplica shards (if note defined defaults to numPrimary = 1 and numReplica = 1)
+ * </odoc>
+ */
+ElasticSearch.prototype.setTemplatePriRep = function(aTemplateName, aListOfIndexPatterns, numPrimary, numReplica) {
+	numPrimary = _$(numPrimary).isNumber().default(1);
+	numReplica = _$(numReplica).isNumber().default(1);
+
+	if (!isArray(aListOfIndexPatterns)) aListOfIndexPatterns = [ aListOfIndexPatterns ];
+	return $rest().put(this.url + "/_template/" + aTemplateName, { 
+		"index_patterns": aListOfIndexPatterns,
+		settings: {
+			"number_of_shards": numPrimary,
+			"number_of_replicas": numReplica
+		}
+	});
 };
 
 /**

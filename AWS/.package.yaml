@@ -1,0 +1,32 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - aws
+  - lambda
+  - sqs
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/AWS'
+description: >-
+  Simplified and light AWS API calls to avoid including the heavy AWS Java SDK.
+  Currently supports some Lambda and SQS functions.
+name: AWS
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190809'
+dependencies:
+  OpenAF: '>=20190716'
+files:
+  - .odoc.db
+  - .package.yaml
+  - aws.js
+filesHash:
+  .odoc.db: ca454c6248bcfe70418d7376e2635d9d56eb4993
+  aws.js: 903972ee54edbf729f1ac145aaf020a89910afc0

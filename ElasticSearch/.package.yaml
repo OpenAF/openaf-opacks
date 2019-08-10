@@ -19,13 +19,15 @@ mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20190810'
 dependencies:
-  openaf: '>=20180501'
+  openaf: '>=20190716'
 files:
-  - ElasticSearch.yaml
-  - elasticsearch.js
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
+  - elasticsearch.js
+  - ElasticSearch.yaml
 filesHash:
+  .odoc.db: c9656d335e568edfb1d133be3342343743aa22a9
+  elasticsearch.js: d0fd2e152d2db5bf9d36290b2dcc1dcc393e3330
   ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
   elasticsearch.js: f71a9f16e0fdfec68211599a6c6790f6fc9a2578
   .odoc.db: 943e43d4c2ac8ab987b561c5d9f6e5ca921263fc

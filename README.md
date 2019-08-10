@@ -5,6 +5,7 @@
   | Name   | Description   |
   |--------|---------------|
   |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, weather and a test service.|
+  |AWS|A ligthweigth and small set of AWS API calls to enhance functionality without having to include heavier AWS SDK dependencies when possible.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
   |Compromise|Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
@@ -33,6 +34,7 @@
   |oDoc2MD|Generating markdown documentation based on existing oDoc databases.|
   |oPackServer|Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
+  |plugin-Ignite|OpenAF plugin to access Ignite functionality.|
   |Redis|Wrapper to access Redis using the java Jedis client.|
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|

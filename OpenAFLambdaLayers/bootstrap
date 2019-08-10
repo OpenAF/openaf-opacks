@@ -1,4 +1,4 @@
 #!/bin/sh
 set -euo pipefail
 
-/opt/jre/bin/java -Xquickstart -Xtune:virtualized -Xscmx16m -Xshareclasses:cacheDir=/opt/openaf,name=openaf,readonly,nonfatal -Djava.system.class.loader=openaf.OAFdCL -jar /opt/openaf/openaf.jar -f /opt/lambda.js
+/opt/jre/bin/java -Xquickstart -Xtune:virtualized -Djava.system.class.loader=openaf.OAFdCL -jar /opt/openaf/openaf.jar -f /opt/lambda.js
