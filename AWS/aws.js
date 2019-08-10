@@ -1,14 +1,20 @@
 /**
  * <odoc>
- * <key>AWS.AWS(aAccessKey, aSecretKey)</key>
- * Creates an instance of AWS light simplified API access
+ * <key>AWS.AWS(aAccessKey, aSecretKey, aSessionToken)</key>
+ * Creates an instance of AWS light simplified API access. The accessKey, secretKey and temporary sessionToken will be 
+ * taken from environment variables or provided directly.
  * </odoc>
  */
-var AWS = function(aAccessKey, aSecretKey) {
+var AWS = function(aAccessKey, aSecretKey, aSessionToken) {
    ow.loadFormat();
    ow.loadObj();
-   this.accessKey = _$(aAccessKey).isString().default(getEnv("AWS_ACCESS_KEY_ID"));
-   this.secretKey = _$(aSecretKey).isString().default(getEnv("AWS_SECRET_ACCESS_KEY"));
+   this.accessKey = aAccessKey;
+   this.secretKey = aSecretKey;
+   this.stoken    = aSessionToken;
+
+   if (isUnDef(this.accessKey) && getEnv("AWS_ACCESS_KEY_ID") != null) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
+   if (isUnDef(this.secretKey) && getEnv("AWS_SECRET_ACCESS_KEY") != null) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
+   if (isUnDef(this.stoken) && getEnv("AWS_SESSION_TOKEN") != null) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
    this.region = getEnv("AWS_DEFAULT_REGION");
 };
@@ -55,7 +61,8 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    aURI = _$(aURI).isString().default("/");
    aMethod = aMethod.toUpperCase();
    // for dynamo (https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)
-   aAmzFields = _$(aAmzFields).isMap().default({});
+   aAmzFields = _$(aAmzFields).isMap().default({ });
+   if (isDef(this.stoken)) aAmzFields["X-Amz-Security-Token"] = this.stoken;
    aDate = _$(aDate).isDate().default(new Date());
 
    // Part 1
