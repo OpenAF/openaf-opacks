@@ -212,6 +212,10 @@ ElasticSearch.prototype.getShards = function(forQuery) {
 	}
 };
 
+ElasticSearch.prototype.getBreakerStats = function() {
+	return $rest({ login: this.user, pass: this.pass }).get(this.url + "/_nodes/stats/breaker");
+};
+
 ElasticSearch.prototype.getClusterHealth = function(forQuery) {
 	ow.loadObj();
 
