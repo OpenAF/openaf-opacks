@@ -11,14 +11,14 @@ In order to be able to run serveless AWS Lambda OpenAF scripts and oJobs the cur
 Build an AWS Lambda layers building container:
 
 ````
-$ docker build -t openafLambdaBuilder .
-$ docker run -ti --rm -v /mydir:/output openafLambdaBuilder
+$ docker build -t openaflambdabuilder .
+$ docker run -ti --rm -v /mydir:/output openaflambdabuilder
 ````
 
 If you need specific oPacks different from ElasticSearch, Notifications, Kube and oJob-common you can use the OPACKS argument to specify your own list:
 
 ````
-$ docker run -ti --rm -v /mydir:/output openafLambdaBuilder OPACKS=oJob-common,Mongo
+$ docker run -ti --rm -v /mydir:/output openaflambdabuilder OPACKS=oJob-common,aws,Mongo
 ````
 
 Note: please be aware that AWS imposes a maximum limit to the uncompressed size of each layer.
