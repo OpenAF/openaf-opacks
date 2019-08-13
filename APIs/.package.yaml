@@ -32,13 +32,13 @@ name: APIs
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190207'
+version: '20190812'
 dependencies:
   openaf: '>=20180424'
 files:
-  - .odoc.db
   - .package.yaml
+  - .odoc.db
   - apis.js
 filesHash:
-  .odoc.db: 0721ddfdc603b5022ea40a4847249a7d4798ffa4
+  .odoc.db: 47669c806165a93f7b0e300916df5a0aa1610e8b
   apis.js: 13f2cc5e49806c79ba111ed1aee246d846852b8a
