@@ -12,9 +12,9 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken) {
    this.secretKey = aSecretKey;
    this.stoken    = aSessionToken;
 
-   if (isUnDef(this.accessKey) && getEnv("AWS_ACCESS_KEY_ID") != null) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
-   if (isUnDef(this.secretKey) && getEnv("AWS_SECRET_ACCESS_KEY") != null) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
-   if (isUnDef(this.stoken) && getEnv("AWS_SESSION_TOKEN") != null) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
+   if (isUnDef(this.accessKey) && getEnv("AWS_ACCESS_KEY_ID") != "null") this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
+   if (isUnDef(this.secretKey) && getEnv("AWS_SECRET_ACCESS_KEY") != "null") this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
+   if (isUnDef(this.stoken) && getEnv("AWS_SESSION_TOKEN") != "null") this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
    this.region = getEnv("AWS_DEFAULT_REGION");
 };
@@ -103,7 +103,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
 
    if (aMethod == "GET") {
       request = merge(request, {
-         "Content-Type": void 0,
+         "Content-Type": (isDef(aContentType) ? aContentType : void 0),
          "X-Amz-Date": amzdate,
          "Authorization": authorization_header
       });
@@ -138,6 +138,44 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
       urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
       requestHeaders: extra   
    }).post(aURL, aArgs);
+};
+
+AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aDate, aContentType) {
+   var parent = this;
+   return function(aOps) {
+      aOps.reqHeaders = _$(aOps.reqHeaders).default({});
+      aVerb = aOps.aVerb.toLowerCase();
+
+      if (aVerb == "post" || aVerb == "put" || aVerb == "patch") {
+         var url = new java.net.URL(aOps.aBaseURL);
+         var aHost = String(url.getHost());
+         var aUri = String(url.getPath());
+         var params = String(url.getQuery());
+
+         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap);
+         if (params == "null") params = $rest().query(aOps.aIdxMap);
+         if (params == "" && aOps.aBaseURL.endsWith("?")) aOps.aBaseURL = aOps.aBaseURL.substring(0, aOps.aBaseURL.length -1);
+
+         aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
+         var aPayload = (aContentType == "application/x-www-form-urlencoded" ? $rest().query(aOps.aDataRowMap) : stringify(aOps.aDataRowMap, void 0, ""));
+         aPayload = _$(aPayload).default("");       
+         aOps.reqHeaders = merge(aOps.reqHeaders, 
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, aPayload, aAmzFields, aDate, aContentType));        
+      } else {
+         var url = new java.net.URL(aOps.aBaseURL);
+         var aHost = String(url.getHost());
+         var aUri = String(url.getPath());
+         var params = String(url.getQuery());
+
+         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap);
+         if (params == "null") params = $rest().query(aOps.aIdxMap);
+         
+         aOps.reqHeaders = merge(aOps.reqHeaders, 
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? void 0 : aContentType)));
+      }      
+
+      return aOps;
+   };
 };
 
 /**
