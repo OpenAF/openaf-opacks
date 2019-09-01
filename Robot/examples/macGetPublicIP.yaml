@@ -1,0 +1,57 @@
+init:
+  actions: &ACTIONS
+    # Get Safari
+    - fn: macAppFocus
+      in:
+        application: Safari
+    - fn: wait
+      in:
+        time: 500
+    # Create a new tab
+    - fn: keyPressComb
+      in:
+        keys:
+          - META
+          - T
+    # Go to the ifconfig.co site
+    - fn: keyPressStr
+      in:
+        text: |
+          http://ifconfig.co/json
+    - fn: wait
+      in:
+        time: 1500
+    # Copy all the output
+    - fn: keyPressComb
+      in:
+        keys:
+          - META
+          - A
+    - fn: keyPressComb
+      in:
+        keys:
+          - META
+          - C
+    # Close the tab
+    - fn: keyPressComb
+      in:
+        keys:
+          - META
+          - W
+          
+ojob:
+  opacks:
+    - Robot
+
+include:
+  - oJobRobot.yaml
+
+todo:
+  - Get Public IP from Safari
+
+jobs:
+  #--------------------------------
+  - name: Get Public IP from Safari
+    to  : Robot Play
+    args:
+      actions: *ACTIONS

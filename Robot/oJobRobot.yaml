@@ -1,0 +1,138 @@
+# Author: Nuno Aguiar
+
+jobs:
+  #----------------------
+  - name: Robot Play File
+    help: >
+      Executes a Robot play file. Expects:
+
+        file      (String)  The JSON/YAML file with the Robot actions.
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).
+        keyMap    (String)  The character to virtual keys combinations mapping (defaults to 'pt_pt.json').
+    exec: |
+      _$(args.file).isString().$_("Please provide a file.");
+
+      loadLib("robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.playFile(args.file);
+
+  #-----------------
+  - name: Robot Play
+    help: >
+      Executes a Robot play actions array. Expects:
+
+        actions   (Array)   The Robot actions.
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).
+        keyMap    (String)  The character to virtual keys combinations mapping (defaults to 'pt_pt.json').  
+    exec: |
+      loadLib("robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.play(args.actions);
+
+  #-----------------------
+  - name: Robot Mouse Move
+    help: >
+      Executes a Robot action to move the mouse. Expects:
+
+        x         (Number)  The x coordinate.
+        y         (Number)  The y coordinate.
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).
+    exec: |
+      _$(args.x).isNumber().$_("Please provide a x coordinate.");
+      _$(args.y).isNumber().$_("Please provide a y coordinate.");
+      args.autoDelay = _$(args.autoDelay).isNumber().default(void 0);
+      args.keyMap    = _$(args.keyMap).isString().default(void 0);
+
+      loadLib("./robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.mouseMove(args.x, args.y);
+
+#---------------------------------
+  - name: Robot Windows Mouse Move
+    help: >
+      Executes a Robot action to move the mouse to a Windows window. Expects:
+
+        title     (String)  The partial title of the Windows window
+        corner    (String)  One of the following: TL (top-left, default), TR (top-right), BL (bottom-left) and BR (bottom-right)        
+        x         (Number)  The x delta coordinate from the choosen corner of the window.
+        y         (Number)  The y delta coordinate from the choosen corner of the window.
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).
+    exec: |
+      args.autoDelay = _$(args.autoDelay).isNumber().default(void 0);
+      args.keyMap    = _$(args.keyMap).isString().default(void 0);
+
+      loadLib("./robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.winMouseMoveInWindow(args.title, args.corner, args.x, args.y);
+
+#-----------------------------
+  - name: Robot Mac Mouse Move
+    help: >
+      Executes a Robot action to move the mouse to a Mac application window. Expects:
+
+        application (String)  The application name.
+        corner      (String)  One of the following: TL (top-left, default), TR (top-right), BL (bottom-left) and BR (bottom-right)        
+        x           (Number)  The x delta coordinate from the choosen corner of the window.
+        y           (Number)  The y delta coordinate from the choosen corner of the window.
+        autoDelay   (Number)  The automatic delay between actions (defaults to 40).
+    exec: |
+      args.autoDelay = _$(args.autoDelay).isNumber().default(void 0);
+      args.keyMap    = _$(args.keyMap).isString().default(void 0);
+
+      loadLib("./robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.macMouseMoveInWindow(args.application, args.corner, args.x, args.y);
+
+  #------------------------------
+  - name: Robot Windows App Focus
+    help: >
+      Executes a Robot action to change the current application focus in Windows to a specific window title. Expects:
+
+        title     (String)  Part of the window title.
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).  
+    exec: |
+      _$(args.title).isString().$_("Please provide a window title.");
+
+      loadLib("robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.winAppFocus(args.title);
+
+  #--------------------------
+  - name: Robot Mac App Focus
+    help: >
+      Executes a Robot action to change the current application focus in Mac OS to a specific application. Expects:
+
+        application (String)  The application name.
+        autoDelay   (Number)  The automatic delay between actions (defaults to 40).  
+    exec: |
+      _$(args.application).isString().$_("Please provide an application name.");
+
+      loadLib("robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      robot.macAppFocus(args.application);
+
+  #----------------------------------------------
+  - name: Robot Get Interactive mouse coordinates
+    help: >
+      Interactively allows the user to select a point in the screen to retrieve the mouse x, y coordinates. Takes the coordinates once a keyboard key is hit. Expects:
+
+        autoDelay (Number)  The automatic delay between actions (defaults to 40).    
+
+      Sets in args:
+        
+        x         (Number)  The x coordinate.
+        y         (Number)  The x coordinate.
+    exec: |
+      loadLib("robot.js");
+      var robot = new Robot(args.autoDelay, args.keyMap);
+
+      var res = robot.interactiveMouseLocation(true);
+      args.x = res.x;
+      args.y = res.y;

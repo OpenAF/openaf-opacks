@@ -8,7 +8,7 @@
   |AWS|A ligthweigth and small set of AWS API calls to enhance functionality without having to include heavier AWS SDK dependencies when possible.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
-  |Compromise|Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
+  |Compromise|Integrates the [NPL Compromise lib](https://github.com/nlp-compromise/compromise) into a opack.|
   |Confluence|Wrapper for the Confluence REST API|
   |CopyFiles|Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.|
   |Docker|A wrapper to access the amihaiemil/docker-java-api api to access a docker client.|
@@ -36,6 +36,7 @@
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
   |plugin-Ignite|OpenAF plugin to access Ignite functionality.|
   |Redis|Wrapper to access Redis using the java Jedis client.|
+  |Robot|Wrapper of functionality that allows for the automation of keystrokes and mouse movements and clicks. |
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|

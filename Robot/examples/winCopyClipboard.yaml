@@ -1,0 +1,56 @@
+init:
+  windowName: &WINDOW_NAME myWindow
+
+include:
+  - oJobRobot.yaml
+
+ojob:
+  opacks:
+    - Robot
+
+todo:
+  - Remote copy to clipboard
+
+jobs:
+  #-------------------------------
+  - name: Remote copy to clipboard
+    to  : Robot Play
+    args:
+      actions:
+        - fn: winMouseMoveInWindow
+          in:
+            title : *WINDOW_NAME
+            corner: BL
+            'x'   : 20
+            'y'   : -20
+        - fn: mouseClick
+          in: {}
+        - fn: wait
+          in:
+            time: 500
+        - fn: keyPressStr
+          in:
+            text: 'C:\windows\notepad'
+        - fn: keyPress
+          in:
+            key: enter
+        - fn: wait
+          in:
+            time: 2000
+        - fn: keyPressStr4Clipboard
+          in: {}
+        - fn: keyPressComb
+          in:
+            keys: 
+              - CONTROL
+              - A
+        - fn: keyPressComb
+          in:
+            keys:
+              - CONTROL
+              - X
+        - fn: keyPressComb
+          in:
+            keys:
+              - ALT
+              - F4

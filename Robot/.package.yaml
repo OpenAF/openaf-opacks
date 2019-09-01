@@ -1,0 +1,52 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - robot
+  - keys
+  - mouse
+  - automate
+  - windows
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/Robot.opack'
+description: >-
+  Wrapper of functionality that allows for the automation of keystrokes and
+  mouse movements and clicks.
+name: Robot
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190901'
+dependencies:
+  openaf: '>=20190801'
+files:
+  - robot_win32.js
+  - .package.yaml
+  - vks/pt_PT.json
+  - vks/en_US.json
+  - .odoc.db
+  - README.md
+  - robot.js
+  - examples/winKeepAlive.yaml
+  - examples/macGetPublicIP.yaml
+  - examples/winExample.yaml
+  - examples/winCopyClipboard.yaml
+  - oJobRobot.yaml
+filesHash:
+  robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
+  vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e
+  vks/en_US.json: db1bf55439ce1ae5a02cfa6091db52414bb1a38d
+  .odoc.db: 7cfbaa4ff3769740d1d699246271c78e5d29ef59
+  README.md: ede3115b5f1431d9fd8b29d8d56c1541d35ff2d9
+  robot.js: aba2a5009acfab9a155db1f9c86cfb4ee03fcf48
+  examples/winKeepAlive.yaml: 99f730b3dbe9613e09f3bb0566d68e2ffad9ac1f
+  examples/macGetPublicIP.yaml: c66e3d1b157948615048ad23c17fe28fc81367ee
+  examples/winExample.yaml: d13e81c7df2710fdb9ec151baa31debf7f92e4a9
+  examples/winCopyClipboard.yaml: bd740294b2b9ca5bdd5def503802a3cf489a040f
+  oJobRobot.yaml: 826e961cd89eb81596f8f174cf94626dbf52429a

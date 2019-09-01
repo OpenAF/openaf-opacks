@@ -1,0 +1,74 @@
+include:
+  - oJobRobot.yaml
+  - oJobBasics.yaml
+
+ojob:
+  opacks:
+    - Robot
+
+jobs:
+  #--------------------
+  - name: Start Notepad
+    to  : oJob sh
+    args:
+      cmd: start /b c:/windows/notepad.exe
+
+  #--------------------
+  - name: Test Maximize
+    to  : Robot Play
+    args:
+      autoDelay: 200
+      actions  :
+        - fn: winAppFocus
+          in: 
+            title: "- Notepad"
+        - fn: keyPressComb
+          in:
+            keys:
+              - ALT
+              - SPACE
+        - fn: keyPress
+          in:
+            key: X
+
+  #-------------------
+  - name: Test Restore
+    to  : Robot Play
+    args:
+      autoDelay: 200
+      actions  :
+        - fn: winAppFocus
+          in: 
+            title: "- Notepad"
+        - fn: keyPressComb
+          in:
+            keys:
+              - ALT
+              - SPACE
+        - fn: keyPress
+          in:
+            key: R
+
+  #--------------------
+  - name: Test Minimize
+    to  : Robot Play
+    args:
+      autoDelay: 200
+      actions  :
+        - fn: winAppFocus
+          in: 
+            title: "- Notepad"
+        - fn: keyPressComb
+          in:
+            keys:
+              - ALT
+              - SPACE
+        - fn: keyPress
+          in:
+            key: N
+
+todo:
+  - Start Notepad
+  - Test Maximize
+  - Test Restore
+  - Test Minimize
