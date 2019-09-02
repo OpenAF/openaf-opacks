@@ -520,6 +520,43 @@ Robot.prototype.winMouseMoveInWindow = function(title, corner, x, y, forceDPI) {
     return this;
 };
 
+
+/**
+ * <odoc>
+ * <key>Robot.winListWindows() : Array</key>
+ * Uses the Windows API to return a list of all windows titles. The list is sorted and duplicates are removed.
+ * </odoc>
+ */
+Robot.prototype.winListWindows = function() {
+    if (ow.format.isWindows()) {
+        loadLib("robot_win32.js");
+        var w = new RobotWin32();
+        return w.listWindows();
+    }
+    return void 0;
+};
+
+/**
+ * <odoc>
+ * <key>Robot.winConvertScale2DPI(aScale) : Number</key>
+ * Tries to convert a Windows aScale percentage into the corresponding DPI number.
+ * </odoc>
+ */
+Robot.prototype.winConvertScale2DPI = function(aScale) {
+    switch(aScale) {
+    case 100: return 96;
+    case 125: return 120;
+    case 150: return 144;
+    case 200: return 192;
+    case 250: return 240;
+    case 300: return 288;
+    case 400: return 384;
+    case 500: return 480;
+    }
+
+    throw "Can't convert (possible values 100, 125, 150, 200, 250, 300, 400, 500).";
+};
+
 /**
  * <odoc>
  * <key>Robot.macMouseMoveInWindow(application, corner, x, y) : Robot</key>
@@ -656,7 +693,7 @@ Robot.prototype.keyPress = function(key, noDelay) {
  * <odoc>
  * <key>Robot.keyPressComb(keys, noDelay) : Robot</key>
  * Action that simulates pressing and releasing a combination of virtual keys provide with keys (an array of keys). For mod keys like SHIFT,
- * ALT_GRAPH, CONTROL and ALT it will automatically hold them and release them on the end. If noDelay = true the default autoDelay won't be used.
+ * ALT_GRAPH, META, WINDOWS, CONTROL and ALT it will automatically hold them and release them on the end. If noDelay = true the default autoDelay won't be used.
  * </odoc>
  */
 Robot.prototype.keyPressComb = function(keys, noDelay) {
@@ -670,7 +707,7 @@ Robot.prototype.keyPressComb = function(keys, noDelay) {
         if (isString(keys)) keys = [ keys ];
         for(var ai in keys) {
             var c = keys[ai];
-            if (c == "SHIFT" || c == "ALT_GRAPH" || c == "CONTROL" || c == "ALT" || c == "META") {
+            if (c == "SHIFT" || c == "ALT_GRAPH" || c == "CONTROL" || c == "ALT" || c == "META" || c == "WINDOWS") {
                 this.keyHold(c, true);
                 mods.push(c);
             } else {
