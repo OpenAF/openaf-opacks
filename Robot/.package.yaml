@@ -22,7 +22,7 @@ name: Robot
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190901'
+version: '20190902'
 dependencies:
   openaf: '>=20190801'
 files:
