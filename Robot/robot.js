@@ -439,7 +439,9 @@ Robot.prototype.winAppCoordinates = function(aTitleName) {
     if (ow.format.isWindows()) {
         loadLib("robot_win32.js");
         var w = new RobotWin32();
-        return w.getWindowCoordinates(w.findWindowByTitle(aTitleName));
+        var hw = w.findWindowByTitle(aTitleName);
+        if (hw == null) throw "Window '" + aTitleName + "' not found.";
+        return w.getWindowCoordinates(hw);
     }
     return void 0;
 };

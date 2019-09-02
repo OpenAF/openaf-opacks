@@ -46,7 +46,7 @@ filesHash:
   examples/winKeepAlive.yaml: 99f730b3dbe9613e09f3bb0566d68e2ffad9ac1f
   oJobRobot.yaml: 826e961cd89eb81596f8f174cf94626dbf52429a
   README.md: 655c961bc575f6d06c02d700ec8d8f550950c9e0
-  robot.js: 632fb71e895622a1b1e266814be5ae0f850e1cc9
+  robot.js: cda9d10ddad71e305618d6963bd64b5583e027c2
   robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
   vks/en_US.json: db1bf55439ce1ae5a02cfa6091db52414bb1a38d
   vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e
