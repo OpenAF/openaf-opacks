@@ -482,7 +482,7 @@ Robot.prototype.winAppDPI = function(aTitleName) {
 
 /**
  * <odoc>
- * <key>Robot.winMouseMoveInWindow(title, corner, x, y) : Robot</key>
+ * <key>Robot.winMouseMoveInWindow(title, corner, x, y, forceDPI) : Robot</key>
  * Action to try to find a Windows window with the partial title and given the corresponding windows coordinates
  * move the mouse to corner with a x and y delta. corner can be:\
  * \
@@ -493,7 +493,7 @@ Robot.prototype.winAppDPI = function(aTitleName) {
  * \
  * </odoc>
  */
-Robot.prototype.winMouseMoveInWindow = function(title, corner, x, y) {
+Robot.prototype.winMouseMoveInWindow = function(title, corner, x, y, forceDPI) {
     if (this.repeat) {
         this.repeatActions.push({
             fn: "winMouseMoveInWindow",
@@ -513,7 +513,7 @@ Robot.prototype.winMouseMoveInWindow = function(title, corner, x, y) {
         case "BR": x = m.right + x; y = m.bottom + y; break;
         case "TL": x = m.left + x; y = m.top + y; break;
         }
-        this.mouseMove(x, y, this.winAppDPI(title));
+        this.mouseMove(x, y, (isDef(forceDPI) ? forceDPI : this.winAppDPI(title)));
     }
     return this;
 };

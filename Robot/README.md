@@ -85,7 +85,7 @@ Here is a list of available actions:
 | **mouseMove** | Moves the mouse on the screen | { x: 12, y: 23 } |
 | **wait**      | Waits an amount of ms | { time: 100 } |
 | **winAppFocus** | (Windows only) Tries to bring the current focus to the a window by title | { } |
-| **winMouseMoveInWindow** | (Windows only) Tries to move the mouse relative to a window, by title. The corner can be "TL"(Top-Left), "TR" (Top-Right), "BL" (Bottom-Left) or "BR" (Bottom-Right). | { title: "Notepad", corner: "BL", x: 25, y: -25 } |
+| **winMouseMoveInWindow** | (Windows only) Tries to move the mouse relative to a window, by title. The corner can be "TL"(Top-Left), "TR" (Top-Right), "BL" (Bottom-Left) or "BR" (Bottom-Right). | { title: "Notepad", corner: "BL", x: 25, y: -25, dpi: 96 } |
 | **winPowerShell** | (Windows only) Executes the powershell commands | { script: "Write-Host 'Hello, World!'" } |
 | **macAppFocus** | (Mac OS only) Tries to bring the current focus the main window of an application | { application: "Terminal" } |
 | **macMouseMoveInWindow** | (Mac OS only) Tries to move the mouse relative to a window, by application name. The corner can be "TL"(Top-Left), "TR" (Top-Right), "BL" (Bottom-Left) or "BR" (Bottom-Right). | { application: "Terminal", corner: "BL", x: 25, y: -25 } |
