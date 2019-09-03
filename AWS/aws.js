@@ -555,6 +555,28 @@ AWS.prototype.RDS_ModifyCurrentDBClusterCapacity = function(aRegion, aDBClusterI
 /**
  * DYNAMO DB=======================
  */
+
+  /**
+  * <odoc>
+  * <key>AWS.DYNAMO_getCh(aRegion, aTable, aChName) : Channel</key>
+  * Creates aChName (defaults to aTable) to access a Dynamo aTable on aRegion.
+  * </odoc>
+  */
+AWS.prototype.DYNAMO_getCh = function(aRegion, aTable, aChName) {
+   _$(aRegion).$_("Please provide a region.");
+   _$(aTable).$_("Please provide a table.");
+
+   aChName = _$(aChName).isString().default(aTable);
+   $ch(aChName).create(1, "dynamo", {
+      accessKey: this.accessKey,
+      secretKey: this.secretKey,
+      tableName: aTable,
+      region: aRegion
+   });
+
+   return $ch(aChName);
+};
+
 /**
  * <odoc>
  * <key>AWS.DYNAMO_ListTables(aRegion) : Array</key>
@@ -646,7 +668,7 @@ AWS.prototype.__DYNAMO_Item_Deconvert = function(aMap) {
    var __translate = (v) => {
       for(let ii in v) {
          switch(ii) {
-         case "N": return Number(v[ii]);
+         case "N": return String(v[ii]);
          case "S": return String(v[ii]);
          case "BOOL": return Boolean(v[ii]);
          case "NULL": return null;
@@ -697,8 +719,8 @@ AWS.prototype.__DYNAMO_Item_Deconvert = function(aMap) {
 
 AWS.prototype.__DYNAMO_Item_Convert = function(aMap) {
    var __translate = (v) => {
-      if (isNumber(v)) { return { N: v }; }
-      if (isString(v)) { return { S: v }; }
+      if (isString(v)) { return { S: String(v) }; }
+      if (isNumber(v)) { return { N: String(v) }; }
       if (isBoolean(v)) { return { BOOL: v }; }
       if (isNull(v)) { return { NULL: v }; }
       if (isArray(v)) {
@@ -915,9 +937,12 @@ if (isUnDef(ow.ch.__types.dynamo)) ow.ch.__types.dynamo = {
       return options.aws.DYNAMO_GetAllItems(options.region, options.tableName, void 0, void 0, void 0, void 0, "COUNT").Count;
    },
    forEach      : function(aName, aFunction) {
-      /*Object.keys(this.__channels[aName]).forEach((element) => {
-         aFunction(this.__channels[aName][element].k, this.__channels[aName][element].v);
-      });*/
+      var options = this.__channels[aName];
+      var keys = $path(options.aws.DYNAMO_DescribeTable(options.region, options.tableName).Table.KeySchema, "[].AttributeName");
+      var oo = options.aws.DYNAMO_GetAllItems(options.region, options.tableName).Items;
+      oo.forEach((vv) => {
+         aFunction(ow.obj.filterKeys(keys, vv), vv);
+      });
    },
    getAll      : function(aName, full) {
       var options = this.__channels[aName];
