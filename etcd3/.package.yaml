@@ -1,0 +1,99 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - etcd
+  - etcd3
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/etcd3.opack'
+description: Wrapper to access etcd3 functionality as a client
+name: etcd3
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20190907'
+dependencies:
+  openaf: '>=20190801'
+files:
+  - netty-transport-4.1.38.Final.jar
+  - annotations-4.1.1.4.jar
+  - netty-common-4.1.38.Final.jar
+  - etcd-java-0.0.11.jar
+  - netty-codec-http-4.1.38.Final.jar
+  - netty-tcnative-boringssl-static-2.0.25.Final.jar
+  - netty-transport-native-epoll-5.0.0.Alpha2.jar
+  - animal-sniffer-annotations-1.18.jar
+  - netty-codec-http2-4.1.38.Final.jar
+  - netty-transport-native-epoll-4.1.38.Final-linux-x86_64.jar
+  - grpc-context-1.23.0.jar
+  - etcd3.js
+  - netty-handler-proxy-4.1.38.Final.jar
+  - .package.yaml
+  - error_prone_annotations-2.3.2.jar
+  - grpc-api-1.23.0.jar
+  - failureaccess-1.0.1.jar
+  - grpc-netty-1.23.0.jar
+  - netty-codec-4.1.38.Final.jar
+  - grpc-stub-1.23.0.jar
+  - netty-buffer-4.1.38.Final.jar
+  - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+  - checker-qual-2.8.1.jar
+  - protobuf-java-3.9.0.jar
+  - proto-google-common-protos-1.12.0.jar
+  - j2objc-annotations-1.3.jar
+  - netty-resolver-4.1.38.Final.jar
+  - grpc-core-1.23.0.jar
+  - netty-transport-native-unix-common-4.1.38.Final.jar
+  - netty-handler-4.1.38.Final.jar
+  - opencensus-api-0.21.0.jar
+  - grpc-protobuf-1.23.0.jar
+  - grpc-protobuf-lite-1.23.0.jar
+  - jsr305-3.0.2.jar
+  - opencensus-contrib-grpc-metrics-0.21.0.jar
+  - guava-28.1-jre.jar
+  - perfmark-api-0.17.0.jar
+  - netty-codec-socks-4.1.38.Final.jar
+filesHash:
+  netty-transport-4.1.38.Final.jar: cd8b612d5daa42d1be3bb3203e4857597d5db79b
+  annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
+  netty-common-4.1.38.Final.jar: 6f8aae763f743d91fb1ba1e9011dae0ef4f6ff34
+  etcd-java-0.0.11.jar: ec8bac1a95ece4510d03744e575a2b502872ad50
+  netty-codec-http-4.1.38.Final.jar: 4d55b3cdb74cd140d262de96987ebd369125a64c
+  netty-tcnative-boringssl-static-2.0.25.Final.jar: 185980556f9f083b5339825f19c9641c6c879417
+  netty-transport-native-epoll-5.0.0.Alpha2.jar: c7c1153856f310bf9ed514e12127cfa3e7a4efb9
+  animal-sniffer-annotations-1.18.jar: f7aa683ea79dc6681ee9fb95756c999acbb62f5d
+  netty-codec-http2-4.1.38.Final.jar: 0dc353dd011c512d5e631a4bee517b17ed3155c1
+  netty-transport-native-epoll-4.1.38.Final-linux-x86_64.jar: 4408c782913dbcbcc24c84f2143809d5bee6172b
+  grpc-context-1.23.0.jar: 94aedfbfeebc5a32bdfe6984289bb18abf93cf20
+  etcd3.js: 08076fe7f2a3ad99f0f23467a552289d88dc5a90
+  netty-handler-proxy-4.1.38.Final.jar: dbb09abb0c9c494cb651234eed428189eb730872
+  error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
+  grpc-api-1.23.0.jar: 903f250bc1d01299480e526a25cd974088699a48
+  failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
+  grpc-netty-1.23.0.jar: a166b3e2abb4b47810434ee6883435b6d789b2a6
+  netty-codec-4.1.38.Final.jar: ccfbdfc727cbf702350572a0b12fe92185ebf162
+  grpc-stub-1.23.0.jar: 2e9e6890a7e8402a9b715ce1fad0d1827e733e49
+  netty-buffer-4.1.38.Final.jar: d16cf15d29c409987cecde77407fbb6f1e16d262
+  listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
+  checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
+  protobuf-java-3.9.0.jar: 2adef7d20542c18530c46295b32bc26371dfd9b1
+  proto-google-common-protos-1.12.0.jar: 1140cc74df039deb044ed0e320035e674dc13062
+  j2objc-annotations-1.3.jar: ba035118bc8bac37d7eff77700720999acd9986d
+  netty-resolver-4.1.38.Final.jar: b00be4aa309e9b56e498191aa8c73e4f393759ed
+  grpc-core-1.23.0.jar: 82d0c88d65acf92fb3d66a0ee800b5da85258c39
+  netty-transport-native-unix-common-4.1.38.Final.jar: 9766528957092436ab0adb181b18d333657d7623
+  netty-handler-4.1.38.Final.jar: ebf1f2bd0dad5e16aa1fc48d32e5dbe507b38d53
+  opencensus-api-0.21.0.jar: 73c07fe6458840443f670b21c7bf57657093b4e1
+  grpc-protobuf-1.23.0.jar: 01428515d3aca8964dfdc4d4ba912d0fda0f41f2
+  grpc-protobuf-lite-1.23.0.jar: c030daf2f8c4185ee003e206c38e28987fe2684d
+  jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
+  opencensus-contrib-grpc-metrics-0.21.0.jar: f07d3a325f1fe69ee40d6b409086964edfef4e69
+  guava-28.1-jre.jar: b0e91dcb6a44ffb6221b5027e12a5cb34b841145
+  perfmark-api-0.17.0.jar: 97e81005e3a7f537366ffdf20e11e050303b58c1
+  netty-codec-socks-4.1.38.Final.jar: 9a6b2c27383061ac9b6de10e6f0f81a7283216f5
