@@ -2,7 +2,7 @@
 
 ow.loadCh();
 ow.loadFormat();
-if (Number(ow.format.getJavaVersion().split(/\./)[0]) < 8) throw "Only supports Java >= 1.8";
+if (Number(ow.format.getJavaVersion().replace(/^1\./, "").split(/\./)[0]) < 8) throw "Only supports Java >= 1.8";
 loadExternalJars(getOPackPath("etcd3") || ".");
 
 ow.ch.__types.etcd3 = {
