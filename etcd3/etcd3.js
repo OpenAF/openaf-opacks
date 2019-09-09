@@ -21,7 +21,7 @@ ow.ch.__types.etcd3 = {
         options.namespace = _$(options.namespace).isString().default(void 0);
         this.__channels[aName] = options;
 
-        this.__channels[aName].client = Packages.com.ibm.etcd.client.EtcdClient.forEndpoint(options.host, options.port).withPlainText().build();
+        this.__channels[aName].client = Packages.com.ibm.etcd.client.EtcdClient.forEndpoint(options.host, options.port).withPlainText();
         if (isDef(options.login) && isDef(options.pass)) {
             this.__channels[aName].client = this.__channels[aName].client.withCredentials(options.login, options.pass);
         }
@@ -148,7 +148,7 @@ ow.ch.__types.etcd3 = {
         return elem;
     },
     unset        : function(aName, aK, aTimestamp) {
-        this.__channels[aName].kvClient.delete(Packages.io.etcd.jetcd.ByteSequence.from(af.fromString2Bytes(stringify(aK, void 0, ""))));
+        this.__channels[aName].kvClient.delete(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, ""))).sync();
         //$rest({ preAction: this.__channels[aName].preAction, throwExceptions: this.__channels[aName].throwExceptions, default: this.__channels[aName].default }).delete(this.__channels[aName].url + "/v2/keys" + this.__channels[aName].folder + "/" + this.__escape(aK));
     }
 }
