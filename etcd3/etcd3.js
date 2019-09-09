@@ -22,6 +22,10 @@ ow.ch.__types.etcd3 = {
         this.__channels[aName] = options;
 
         this.__channels[aName].client = Packages.com.ibm.etcd.client.EtcdClient.forEndpoint(options.host, options.port).withPlainText().build();
+        if (isDef(options.login) && isDef(options.pass)) {
+            this.__channels[aName].client = this.__channels[aName].client.withCredentials(options.login, options.pass);
+        }
+        this.__channels[aName].client = this.__channels[aName].client.build();
         this.__channels[aName].kvClient = this.__channels[aName].client.getKvClient();
     },
     destroy      : function(aName) {
