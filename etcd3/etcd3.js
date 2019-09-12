@@ -100,13 +100,17 @@ ow.ch.__types.etcd3 = {
         }
     },
     getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
-        /*var res;
+        var lockClient = this.__channels[aName].client.getLockClient();
+        var lockKey = lockClient.lock(Packages.com.google.protobuf.ByteString.copyFromUtf8(this.__channels[aName].host + ":" + this.__channels[aName].port)).sync().getKey();
+
+        var res, rres;
         res = this.get(aName, aK);
         if ($stream([res]).anyMatch(aMatch)) {
-            return this.set(aName, aK, aV, aTimestamp);
+            rres = this.set(aName, aK, aV, aTimestamp);
         }
-        return void 0;*/
-        throw "Not implemented yet";
+
+        lockClient.unlock(lockKey).sync();
+        return rres;
     },
     set          : function(aName, aK, aV, aTimestamp) {
         //var res = $rest({ urlEncode:true, preAction: this.__channels[aName].preAction, throwExceptions: this.__channels[aName].throwExceptions, default: this.__channels[aName].default }).put(this.__channels[aName].url + "/v2/keys" + this.__channels[aName].folder + "/" + this.__escape(aK), { value: stringify(aV, void 0, "") });
