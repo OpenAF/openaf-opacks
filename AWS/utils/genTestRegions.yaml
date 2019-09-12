@@ -1,0 +1,42 @@
+# Author: Nuno Aguiar
+
+jobs:
+  #----------------------
+  - name: Copy openaf.jar
+    exec: |
+      io.cp(af.getOpenAFJar() + ".orig", "openaf.jar.orig");
+      io.cp(af.getOpenAFJar(), "openaf.jar");
+
+  #-------------------------------
+  - name: Optimize openaf.jar size
+    exec: |
+      ow.loadFormat();
+
+      print("Current size: " + ow.format.toBytesAbbreviation(io.fileInfo("openaf.jar").size));
+      $sh([ow.format.getJavaHome() + "/bin/java", "-jar", "openaf.jar", "--repack", "-e", "BSDiff,GIT,SVN,JMX,JMXServer,SSH,SNMP,SNMPServer,XLS,XML"])
+      .exec();
+
+      $sh()
+      .rm(".opack.db");
+
+      print("New size: " + ow.format.toBytesAbbreviation(io.fileInfo("openaf.jar").size));
+
+  #---------------------------------
+  - name: Include testRegions script
+    exec: |
+      plugin("ZIP");
+      var zip = new ZIP();
+      zip.streamPutFileStream("openaf.jar", ".openaf_profile", io.readFileStream("testRegions.js"), false);
+      zip.close();
+
+  #-------------------------
+  - name: Rename and cleanup
+    exec: |
+      io.mv("openaf.jar", "testRegions.jar");
+      io.rm("openaf.jar.orig");
+
+todo:
+  - Copy openaf.jar
+  - Optimize openaf.jar size
+  - Include testRegions script
+  - Rename and cleanup

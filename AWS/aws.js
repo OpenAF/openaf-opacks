@@ -1,3 +1,5 @@
+// Author: Nuno Aguiar
+
 /**
  * <odoc>
  * <key>AWS.AWS(aAccessKey, aSecretKey, aSessionToken)</key>
@@ -551,6 +553,49 @@ AWS.prototype.RDS_ModifyCurrentDBClusterCapacity = function(aRegion, aDBClusterI
 
    return af.fromXML2Obj(this.postURLEncoded(aURL, aURI, "", params, "rds", aHost, aRegion));
 };
+
+/**
+ * <odoc>
+ * <key>AWS.ECS_ListTaskDefinitions(aRegion, aParamsMap) : Map</key>
+ * Retrieves a list of ECS task definitions on a specific aRegion. Optional you can provide filtering with aParamsMap.
+ * </odoc>
+ */
+AWS.prototype.ECS_ListTaskDefinitions = function(aRegion, params) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   params = _$(params).isMap().default({});
+   var aURL = "https://ecs." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   return af.fromXML2Obj(this.postURLEncoded(aURL, aURI, "", merge({
+      Action: "ListTaskDefinitions"
+   }, params), "ecs", aHost, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerServiceV20141113.ListTaskDefinitions"
+   }));
+};
+
+/*AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   params = _$(params).isMap().default({});
+   var aURL = "https://ecs." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.postURLEncoded(aURL, aURI, "", merge({
+      Action: "RunTask",
+      taskDefinition: taskDefinition
+   }, params), "ecs", aHost, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerServiceV20141113.RunTask"
+   });
+   return res;
+   if (isMap(res))
+      return af.fromXML2Obj(res.error.response);
+   else {
+      return af.fromXML2Obj(res);
+   }
+};*/
 
 /**
  * DYNAMO DB=======================

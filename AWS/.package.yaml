@@ -20,13 +20,17 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190902'
+version: '20190912'
 dependencies:
   OpenAF: '>=20190716'
 files:
   - .odoc.db
   - .package.yaml
   - aws.js
+  - utils/genTestRegions.yaml
+  - utils/testRegions.js
 filesHash:
-  .odoc.db: ca454c6248bcfe70418d7376e2635d9d56eb4993
-  aws.js: 4e46a26b8aefb022d56c1e41dd75cc62e059514c
+  .odoc.db: bf42880afce06074b6e5cd0cc242b8a553960848
+  aws.js: 1d8bf33bf47a18d66688fb7030a77e2c73f8a115
+  utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
+  utils/testRegions.js: 692d6d9f763c4fb17d696c7fd814dc06801c7d08
