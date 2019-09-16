@@ -8,6 +8,9 @@ keywords:
   - aws
   - lambda
   - sqs
+  - rds
+  - ecs
+  - dynamo
 bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
@@ -15,12 +18,12 @@ repository:
   url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/AWS'
 description: >-
   Simplified and light AWS API calls to avoid including the heavy AWS Java SDK.
-  Currently supports some Lambda and SQS functions.
+  Currently supports some Lambda, RDS, ECS, DYNAMO and SQS functions.
 name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190912'
+version: '20190916'
 dependencies:
   OpenAF: '>=20190716'
 files:
@@ -30,7 +33,7 @@ files:
   - utils/genTestRegions.yaml
   - utils/testRegions.js
 filesHash:
-  .odoc.db: bf42880afce06074b6e5cd0cc242b8a553960848
-  aws.js: 1d8bf33bf47a18d66688fb7030a77e2c73f8a115
+  .odoc.db: b1965b9403e3ed81168dafb824f2f8361ed25b45
+  aws.js: e0d89189e62a59e5b3b11d335fb438362b7b42c8
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 692d6d9f763c4fb17d696c7fd814dc06801c7d08

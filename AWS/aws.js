@@ -36,6 +36,26 @@ AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
    return res;
 };
 
+AWS.prototype.flattenMap2Params = function(aMap) {
+   var res = {};
+   traverse(aMap, (aK, aV, aP, aO) => {
+      if (!isMap(aV) && !isArray(aV)) {
+         if (isNumber(aK)) {
+            res[aP.substr(1, aP.length) + ".Id." + (Number(aK) +1) ] = aV;
+         } else {
+            var mts = aP.match(/\[(\d+)\]/);
+            if (mts) {
+               res[aP.replace(/^\./, "").replace(/\[(\d+)\]/g, (r) => { return ".Id." + (Number(r.substr(1, r.length -2)) +1); }) + "." + aK] = aV;
+            } else {
+               res[(aP != "" ? aP.substr(1, aP.length) + "." : "") + aK] = aV; 
+            }
+         }
+      }
+   });
+
+   return res;
+};
+
 AWS.prototype.__HmacSHA256 = function(data, key) {
    var alg = "HmacSHA256";
    if (isString(key)) key = (new java.lang.String(key)).getBytes("UTF-8");
@@ -575,7 +595,35 @@ AWS.prototype.ECS_ListTaskDefinitions = function(aRegion, params) {
    }));
 };
 
-/*AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
+/**
+ * <odoc>
+ * <key>AWS.ECS_RunTask(aRegion, taskDefinition, params) : Map</key>
+ * Tries to provision a ECS task (taskDefinition) to run with the provided params. Example:\
+ * \
+ *   aws.ECS_RunTask("eu-west-1", "arn:aws:ecs:eu-west-1:1234567890123:task-definition/test:123", { \
+ *      cluster: "testCluster", \
+ *      launchType: "FARGATE", \
+ *      networkConfiguration: { \
+ *         awsvpcConfiguration: { \
+ *            assignPublicIp: "ENABLED", \
+ *            securityGroups: [ "sg-123ab123" ], \
+ *            subnets: [ "subnet-123ab123" ] \
+ *         }\
+ *      }, \
+ *      overrides: { \
+ *         containerOverrides: [ { \
+ *            name: "testContainer", \
+ *            environment: [ { \
+ *               name: "MSG", \
+ *               value: "Hello World" \
+ *            } ] \
+ *         } ] \
+ *      } \
+ *   });\
+ * \
+ * </odoc>
+ */
+AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
    aRegion = _$(aRegion).isString().default(this.region);
    params = _$(params).isMap().default({});
    var aURL = "https://ecs." + aRegion + ".amazonaws.com/";
@@ -586,16 +634,16 @@ AWS.prototype.ECS_ListTaskDefinitions = function(aRegion, params) {
    var res = this.postURLEncoded(aURL, aURI, "", merge({
       Action: "RunTask",
       taskDefinition: taskDefinition
-   }, params), "ecs", aHost, aRegion, {
+   }, this.flattenMap2Params(params)), "ecs", aHost, aRegion, {
       "X-Amz-Target": "AmazonEC2ContainerServiceV20141113.RunTask"
    });
-   return res;
+
    if (isMap(res))
       return af.fromXML2Obj(res.error.response);
    else {
       return af.fromXML2Obj(res);
    }
-};*/
+};
 
 /**
  * DYNAMO DB=======================
