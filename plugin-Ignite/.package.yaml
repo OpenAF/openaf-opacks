@@ -18,7 +18,7 @@ name: plugin-Ignite
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190705'
+version: '20190920'
 dependencies:
   openaf: '>=20190705'
 files:
