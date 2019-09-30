@@ -21,6 +21,19 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    this.region = aRegion || getEnv("AWS_DEFAULT_REGION");
 };
 
+/**
+ * <odoc>
+ * <key>AWS.getVirtualMFASessionToken(aRegion, mfaDeviceARN, aTokenCode, durationInSeconds) : AWS</key>
+ * Builds a new AWS object instance when access is restricted to MFA-based authentication given aRegion, a mfaDeviceARN, the current aTokenCode
+ * and a durationInSeconds (optional). Example:\
+ * \
+ *   var aws  = new AWS("AKIABC", "abc123");\
+ *   var naws = aws.getVirtualMFASessionToken("eu-west-1", "arn:aws:iam::123456789012:mfa/my_user", 123456, 3600);\
+ * \
+ *   naws.LAMBDA_Invoke("eu-west-1", "testFunction", { a: 1, b: 2 });\
+ * \
+ * </odoc>
+ */
 AWS.prototype.getVirtualMFASessionToken = function(aRegion, mfaDeviceARN, aTokenCode, durationInSeconds) {
    aRegion = _$(aRegion).isString().default(this.region);
    var aURL = "https://sts." + aRegion + ".amazonaws.com/";
@@ -46,6 +59,18 @@ AWS.prototype.getVirtualMFASessionToken = function(aRegion, mfaDeviceARN, aToken
    }
 };
 
+/**
+ * <odoc>
+ * <key>AWS.convertArray2Attrs(aParameter, anArray) : Map</key>
+ * Given anArray will convert it to a flatten AWS map for the provided aParameter. Example:\
+ * \
+ * aws.convertArray2Attrs("test", [ { a: 11, b: true }, { a: 22, b: false } ]);\
+ * // {\
+ * //   "test.1.Id": "0", "test.1.a": 11, "test.1.b": true,\
+ * //   "test.2.Id": "1", "test.2.a": 22, "test.2.b": false\
+ * // }\
+ * </odoc>
+ */
 AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
    var res = {};
    for(var ii in anArray) {
@@ -61,6 +86,23 @@ AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
    return res;
 };
 
+/**
+ * <odoc>
+ * <key>AWS.flattenMap2Params(aMap) : aMap</key>
+ * Converts any json aMap into a flatten AWS map representation. Example:\
+ * \
+ * aws.flattenMap2Params({ a: 1, b: [ 1, 2, 3 ], c: { x: 1, y: -1 } });\
+ * // {\
+ * //   "a": 1,\
+ * //   "b.Id.1": 1,\
+ * //   "b.Id.2": 2,\
+ * //   "b.Id.3": 3,\
+ * //   "c.x": 1,\
+ * //   "c.y": -1\
+ * // }\
+ * \
+ * </odoc>
+ */
 AWS.prototype.flattenMap2Params = function(aMap) {
    var res = {};
    traverse(aMap, (aK, aV, aP, aO) => {
@@ -190,6 +232,12 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
    }).post(aURL, aArgs);
 };
 
+/**
+ * <odoc>
+ * <key>AWS.restPreActionAWSSign4(aRegion, aService, aAmzFields, aDate, aContentType) : Function</key>
+ * Provides a preAction function to be used with $rest pre-actions for AWS signed rest requests.
+ * </odoc>
+ */
 AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aDate, aContentType) {
    var parent = this;
    return function(aOps) {
@@ -676,6 +724,12 @@ AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
    }
 };
 
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_DescribeLogGroups(aRegion, aLimit, aPrefix, nextToken) : Map</key>
+ * Gets a list of CloudWatch log groups from aRegion, given an optional aLimit, aPrefix and a nextToken.
+ * </odoc>
+ */
 AWS.prototype.CLOUDWATCH_LOGS_DescribeLogGroups = function(aRegion, aLimit, aPrefix, nextToken) {
    aRegion = _$(aRegion).isString().default(this.region);
    aLimit = _$(aLimit).isNumber().default(void 0);
@@ -698,6 +752,12 @@ AWS.prototype.CLOUDWATCH_LOGS_DescribeLogGroups = function(aRegion, aLimit, aPre
    return res;
 }; 
 
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_DescribeLogStreams(aRegion, aGroupName, aLimit, aPrefix, aDescending, aOrderBy, nextToken) : Map</key>
+ * Gets a list of CloudWatch log streams on a log aGroupName, from aRegion, given an optional aLimit, aOrderbY, aPrefix and a nextToken.
+ * </odoc>
+ */
 AWS.prototype.CLOUDWATCH_LOGS_DescribeLogStreams = function(aRegion, aGroupName, aLimit, aPrefix, aDescending, aOrderBy, nextToken) {
    aRegion = _$(aRegion).isString().default(this.region);
    aLimit = _$(aLimit).isNumber().default(void 0);
@@ -724,6 +784,12 @@ AWS.prototype.CLOUDWATCH_LOGS_DescribeLogStreams = function(aRegion, aGroupName,
    return res;
 };
 
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_GetLogEvents(aRegion, aGroupName, aStreamName, aLimit, startFromHead, startTime, endTime, nextToken) : Map</key>
+ * Gets a list of CloudWatch log streams events on a log aGroupName and aStreamName, from aRegion, given an optional aLimit, aOrderbY, aPrefix and a nextToken.
+ * </odoc>
+ */
 AWS.prototype.CLOUDWATCH_LOGS_GetLogEvents = function(aRegion, aGroupName, aStreamName, aLimit, startFromHead, startTime, endTime, nextToken) {
    aRegion = _$(aRegion).isString().default(this.region);
    _$(aGroupName).isString().$_("Please provide a group name.");
