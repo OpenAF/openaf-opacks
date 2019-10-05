@@ -19,6 +19,8 @@ ow.ch.__types.etcd3 = {
         _$(options.host).isString().$_("A string etcd daemon host is mandatory.");
         _$(options.port).$_("A string etcd daemon port is mandatory.");
         options.namespace = _$(options.namespace).isString().default(void 0);
+        options.keyStamp = _$(options.keyStamp).isMap().default(void 0);
+        options.stamp = _$(options.stamp).isMap().default(void 0);
         this.__channels[aName] = options;
 
         this.__channels[aName].client = Packages.com.ibm.etcd.client.EtcdClient.forEndpoint(options.host, options.port).withPlainText();
@@ -114,6 +116,8 @@ ow.ch.__types.etcd3 = {
     },
     set          : function(aName, aK, aV, aTimestamp) {
         //var res = $rest({ urlEncode:true, preAction: this.__channels[aName].preAction, throwExceptions: this.__channels[aName].throwExceptions, default: this.__channels[aName].default }).put(this.__channels[aName].url + "/v2/keys" + this.__channels[aName].folder + "/" + this.__escape(aK), { value: stringify(aV, void 0, "") });
+        if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
+        if (isDef(this.__channels[aName].stamp)) aV = merge(aV, this.__channels[aName].stamp);
         var res = this.__channels[aName].kvClient.put(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, "")), Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aV, void 0, ""))).sync();
         if (isDef(res) && res.hasPrevKv()) {
             return jsonParse(o.getPrevKv().getValue());
@@ -134,6 +138,7 @@ ow.ch.__types.etcd3 = {
         }
     },		
     get          : function(aName, aK) {
+        if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
         var res = this.__channels[aName].kvClient.get(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, ""))).sync();
         //var res = $rest({ preAction: this.__channels[aName].preAction, throwExceptions: this.__channels[aName].throwExceptions, default: this.__channels[aName].default }).get(this.__channels[aName].url + "/v2/keys" + this.__channels[aName].folder + "/" + this.__escape(aK));
         if (isDef(res) && res.getKvsCount() > 0)
@@ -152,7 +157,8 @@ ow.ch.__types.etcd3 = {
         return elem;
     },
     unset        : function(aName, aK, aTimestamp) {
+        if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
         this.__channels[aName].kvClient.delete(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, ""))).sync();
         //$rest({ preAction: this.__channels[aName].preAction, throwExceptions: this.__channels[aName].throwExceptions, default: this.__channels[aName].default }).delete(this.__channels[aName].url + "/v2/keys" + this.__channels[aName].folder + "/" + this.__escape(aK));
     }
-}
+};
