@@ -21,6 +21,7 @@ ow.ch.__types.etcd3 = {
         options.namespace = _$(options.namespace).isString().default(void 0);
         options.keyStamp = _$(options.keyStamp).isMap().default(void 0);
         options.stamp = _$(options.stamp).isMap().default(void 0);
+        options.watch = _$(options.watch).isBoolean().default(false);
         this.__channels[aName] = options;
 
         this.__channels[aName].client = Packages.com.ibm.etcd.client.EtcdClient.forEndpoint(options.host, options.port).withPlainText();
@@ -29,6 +30,60 @@ ow.ch.__types.etcd3 = {
         }
         this.__channels[aName].client = this.__channels[aName].client.build();
         this.__channels[aName].kvClient = this.__channels[aName].client.getKvClient();
+
+        if (options.watch) {
+            var parent = ow.ch;
+            var send = (aOp, aKey, aValue, aTimestamp, aUUID, x) => {
+                if (Object.keys(parent.subscribers[aName]).length > 0) {
+                    for(var _i in parent.subscribers[aName]) {
+                        if (isUnDef(parent.jobs[aName][_i])) {
+                            var f = (ii) => {
+                                return () => {		
+                                    try {		
+                                        parent.subscribers[aName][ii](aName, aOp, aKey, aValue, parent, aTimestamp, aUUID, x);
+                                    } catch(e) {}
+                                    return ii;
+                                };
+                            };
+                            parent.jobs[aName][_i] = $do(f(_i)).catch((e) => { 
+                                ow.ch.__errorHandle({ 
+                                    chName: aName,
+                                    op: aOp,
+                                    key: aKey
+                                }, e);
+                            });
+                        } else {				
+                            var f = (ii) => {
+                                return () => {
+                                    try {
+                                        parent.subscribers[aName][ii](aName, aOp, aKey, aValue, parent, aTimestamp, aUUID, x);
+                                    } catch(e) {}
+                                    return ii;
+                                };
+                            };
+                            parent.jobs[aName][_i].then(f(_i), ()=>{});
+                        }
+                    }
+                }
+            };
+            this.__channels[aName].kvClient.watch(Packages.com.ibm.etcd.client.kv.KvClient.ALL_KEYS).start({ 
+                onNext: event => { 
+                    var setActions = [], unsetActions = [];
+                    for(var oo = 0; oo < event.getEvents().size(); oo++) {
+                        var aK = jsonParse(af.fromBytes2String(event.getEvents().get(oo).getKv().getKey().toByteArray()));
+                        var aV = jsonParse(af.fromBytes2String(event.getEvents().get(oo).getKv().getValue().toByteArray()));
+                        switch (String(event.getEvents().get(oo).getType().toString())) {
+                        case "PUT": setActions.push({ k: aK, v: aV }); break;
+                        case "DELETE": unsetActions.push({ k: aK, v: aV }); break;
+                        }
+                    }
+                    setActions.map((v) => { send("set", v.k, v.v); });
+                    unsetActions.map((v) => { send("unset", v.k, v.v); });
+                }, 
+                onError: t => {}, 
+                onCompleted: () => {} 
+            });
+        }
     },
     destroy      : function(aName) {
         delete this.__channels[aName];

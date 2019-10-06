@@ -69,7 +69,7 @@ filesHash:
   netty-codec-http2-4.1.38.Final.jar: 0dc353dd011c512d5e631a4bee517b17ed3155c1
   netty-transport-native-epoll-4.1.38.Final-linux-x86_64.jar: 4408c782913dbcbcc24c84f2143809d5bee6172b
   grpc-context-1.23.0.jar: 94aedfbfeebc5a32bdfe6984289bb18abf93cf20
-  etcd3.js: 22929c30c651762480d6673a47bfb0046c40d78d
+  etcd3.js: 0cafe2b8bff3b0696091462e83db4326e6cc8b7d
   netty-handler-proxy-4.1.38.Final.jar: dbb09abb0c9c494cb651234eed428189eb730872
   error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
   grpc-api-1.23.0.jar: 903f250bc1d01299480e526a25cd974088699a48
