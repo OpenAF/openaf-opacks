@@ -17,7 +17,7 @@ name: etcd3
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190912'
+version: '20191007'
 dependencies:
   openaf: '>=20190801'
 files:
@@ -65,7 +65,7 @@ filesHash:
   checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
   error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
   etcd-java-0.0.11.jar: ec8bac1a95ece4510d03744e575a2b502872ad50
-  etcd3.js: 65fd9f7fe07e192a3b531d5d8785ad6219719843
+  etcd3.js: 377a96c9c5f843bfe7b85cf1f78e2d603da62ff7
   failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
   grpc-api-1.23.0.jar: 903f250bc1d01299480e526a25cd974088699a48
   grpc-context-1.23.0.jar: 94aedfbfeebc5a32bdfe6984289bb18abf93cf20
