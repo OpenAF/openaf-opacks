@@ -156,7 +156,12 @@
 
             // If object
             var _render = (aValue) => {
-                if (!($$(aValue).isObject())) return aValue;
+                if (!($$(aValue).isObject())) {
+                    if ($$(aValue).isNumber()) return "<span style=\"color: midnightblue\">" + aValue + "</span>";
+                    if ($$(aValue).isString()) return "<span style=\"color: DarkSlateGray\">" + aValue + "</span>";
+                    if (typeof aValue == "boolean") return "<span style=\"color: steelblue\">" + aValue + "</span>";
+                    return aValue;
+                }
 
                 var out = "";
                 if ($$(aValue).isArray() && aValue.length > 0) {
@@ -164,7 +169,7 @@
                     if ($$(aValue[0]).isMap()) {
                         out += "<table class=\"atable\"><tr>";
                         for(var i in aValue[0]) {
-                            out += "<th class=\"atablehead\" style=\"text-align: center\"><b>" + i + "</b></th>";
+                            out += "<td class=\"atablehead\" style=\"text-align: center\"><span style=\"color: darkblue;font-weight: bold;\">" + i + "</span></td>";
                         }
                         out += "</tr>";
                     } else {
@@ -173,7 +178,7 @@
                     for(var x in aValue) {
                         out += "<tr>";
                         if (!($$(aValue[x]).isMap()) && !($$(aValue[x]).isArray())) {
-                            out += "<td class=\"atablecell\" style=\"text-align: center\">" + aValue[x] + "</td>";
+                            out += "<td class=\"atablecell\" style=\"text-align: center\"><span style=\"color: darkblue;font-weight: bold;\">" + aValue[x] + "</span></td>";
                         } else {
                             for(var y in aValue[x]) {
                                 out += "<td class=\"atablecell\" style=\"text-align: center\">" + _render(aValue[x][y]) + "</td>";
@@ -185,7 +190,7 @@
                 } else {
                     var out = "<table class=\"atable\">";
                     for(var i in aValue) {
-                        out += "<tr><td class=\"atablecell\" style=\"text-align: right; vertical-align: top\"><b>" + i + "</b></td><td class=\"atablecell\">" + _render(aValue[i]) + "</td></tr>";
+                        out += "<tr><td class=\"atablecell\" style=\"text-align: right; vertical-align: top\"><span style=\"color: darkblue;font-weight: bold;\">" + i + "</span></td><td class=\"atablecell\">" + _render(aValue[i]) + "</td></tr>";
                     }
                     out += "</table>";
                 }
