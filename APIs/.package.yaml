@@ -32,7 +32,7 @@ name: APIs
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190812'
+version: '20191017'
 dependencies:
   openaf: '>=20180424'
 files:
