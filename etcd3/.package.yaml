@@ -64,7 +64,7 @@ filesHash:
   checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
   error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
   etcd-java-0.0.12.jar: 3e6396b10984863a9d9a9e81fab60566c02e0c0d
-  etcd3.js: ff267295eb04fc436d1cf1482f4426211a3c2981
+  etcd3.js: fa57f77b9c2f6432603b79b37e98d12663a623e3
   failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
   grpc-api-1.23.0.jar: 903f250bc1d01299480e526a25cd974088699a48
   grpc-context-1.23.0.jar: 94aedfbfeebc5a32bdfe6984289bb18abf93cf20

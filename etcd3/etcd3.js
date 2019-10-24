@@ -228,6 +228,7 @@ ow.ch.__types.etcd3 = {
             } else {
                 throw e;
             }
+        };
     },
     setAll       : function(aName, aKs, aVs, aTimestamp) {
         try {
