@@ -241,6 +241,16 @@ ElasticSearch.prototype.getTasks = function(actionsFilter, isDetailed) {
 	return ow.obj.rest.jsonGet(this.url + "/_tasks" + extra, this.user, this.pass);
 };
 
+/**
+ * <odoc>
+ * <key>ElasticSearch.cancelTask(aTaskId) : Map</key>
+ * Given aTaskId will try to cancel it.
+ * </odoc>
+ */
+ElasticSearch.prototype.cancelTask = function(aTaskId) {
+	return $rest().post(this.url + "/_tasks/" + aTaskId + "/_cancel");
+};
+
 ElasticSearch.prototype.getShards = function(forQuery) {
 	ow.loadObj();
 
@@ -343,6 +353,10 @@ ElasticSearch.prototype.getIndices = function(forQuery) {
 	} else {
 		return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
 	}
+};
+
+ElasticSearch.prototype.getIndice = function(aIndex) {
+	return $rest().get(this.url + "/_cat/indices/" + aIndex + "?format=json");
 };
 
 ElasticSearch.prototype.getNodes = function(forQuery) {
