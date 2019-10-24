@@ -36,9 +36,9 @@ version: '20191017'
 dependencies:
   openaf: '>=20180424'
 files:
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
   - apis.js
 filesHash:
-  .odoc.db: 47669c806165a93f7b0e300916df5a0aa1610e8b
-  apis.js: 13f2cc5e49806c79ba111ed1aee246d846852b8a
+  .odoc.db: 3b177e360bbcfee2000216c5bc31657a7e37dcdc
+  apis.js: 69f9e7d54fc9cf7864cd9f7a7263736769a5ce4e
