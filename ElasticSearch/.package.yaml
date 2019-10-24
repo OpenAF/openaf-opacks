@@ -21,11 +21,11 @@ version: '20191015'
 dependencies:
   openaf: '>=20190801'
 files:
-  - ElasticSearch.yaml
-  - elasticsearch.js
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
+  - elasticsearch.js
+  - ElasticSearch.yaml
 filesHash:
-  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
+  .odoc.db: bde66ae855979e3e11f7f5a1f406b549dd2d836f
   elasticsearch.js: 129ae55cdc797c88679f4186202447e8a14931a9
-  .odoc.db: c9656d335e568edfb1d133be3342343743aa22a9
+  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
