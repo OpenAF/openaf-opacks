@@ -311,4 +311,28 @@
             return $rest().get("https://cat-fact.herokuapp.com/facts/random?" + $rest().query({animal_type: "horse"}));
         }
     };
+
+    /**
+     * <odoc>
+     * <key>apis.UINames</key>
+     * From: https://github.com/thm/uinames
+     * Auth: none
+     */
+    exports.UINames = {
+        getBasicInfo: (anAmount, aGender, aRegion) => {
+            return $rest({ uriQuery: true }).get("https://uinames.com/api/", {
+                amount: anAmount,
+                gender: aGender,
+                region: aRegion
+            });
+        },
+        getExtra: (anAmount, aGender, aRegion) => {
+            return $rest({ uriQuery: true }).get("https://uinames.com/api/", {
+                amount: anAmount,
+                gender: aGender,
+                region: aRegion,
+                ext: true
+            });
+        },
+    };
 })();

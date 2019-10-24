@@ -7,7 +7,7 @@
  * taken from environment variables or provided directly.
  * </odoc>
  */
-var AWS = function(aAccessKey, aSecretKey, aSessionToken) {
+var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    ow.loadFormat();
    ow.loadObj();
    this.accessKey = aAccessKey;
@@ -18,9 +18,59 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken) {
    if (isUnDef(this.secretKey) && getEnv("AWS_SECRET_ACCESS_KEY") != "null") this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
    if (isUnDef(this.stoken) && getEnv("AWS_SESSION_TOKEN") != "null") this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
-   this.region = getEnv("AWS_DEFAULT_REGION");
+   this.region = aRegion || getEnv("AWS_DEFAULT_REGION");
 };
 
+/**
+ * <odoc>
+ * <key>AWS.getVirtualMFASessionToken(aRegion, mfaDeviceARN, aTokenCode, durationInSeconds) : AWS</key>
+ * Builds a new AWS object instance when access is restricted to MFA-based authentication given aRegion, a mfaDeviceARN, the current aTokenCode
+ * and a durationInSeconds (optional). Example:\
+ * \
+ *   var aws  = new AWS("AKIABC", "abc123");\
+ *   var naws = aws.getVirtualMFASessionToken("eu-west-1", "arn:aws:iam::123456789012:mfa/my_user", 123456, 3600);\
+ * \
+ *   naws.LAMBDA_Invoke("eu-west-1", "testFunction", { a: 1, b: 2 });\
+ * \
+ * </odoc>
+ */
+AWS.prototype.getVirtualMFASessionToken = function(aRegion, mfaDeviceARN, aTokenCode, durationInSeconds) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   var aURL = "https://sts." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aURI = String(url.getPath());
+   var aHost = String(url.getHost());
+
+   var res = this.postURLEncoded(aURL, aURI, "", {
+      Version        : "2011-06-15",
+      Action         : "GetSessionToken",
+      DurationSeconds: durationInSeconds,
+      SerialNumber   : mfaDeviceARN,
+      TokenCode      : aTokenCode
+   }, "sts", aHost, aRegion);
+   if (isString(res) && res.startsWith("<GetSessionTokenResponse ")) {
+      res = af.fromXML2Obj(res);
+      return new AWS(res.GetSessionTokenResponse.GetSessionTokenResult.Credentials.AccessKeyId, res.GetSessionTokenResponse.GetSessionTokenResult.Credentials.SecretAccessKey, res.GetSessionTokenResponse.GetSessionTokenResult.Credentials.SessionToken, aRegion);
+   } else {
+      if (isDef(res.error))
+         throw res.error.response;
+      else
+         throw res;
+   }
+};
+
+/**
+ * <odoc>
+ * <key>AWS.convertArray2Attrs(aParameter, anArray) : Map</key>
+ * Given anArray will convert it to a flatten AWS map for the provided aParameter. Example:\
+ * \
+ * aws.convertArray2Attrs("test", [ { a: 11, b: true }, { a: 22, b: false } ]);\
+ * // {\
+ * //   "test.1.Id": "0", "test.1.a": 11, "test.1.b": true,\
+ * //   "test.2.Id": "1", "test.2.a": 22, "test.2.b": false\
+ * // }\
+ * </odoc>
+ */
 AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
    var res = {};
    for(var ii in anArray) {
@@ -36,6 +86,23 @@ AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
    return res;
 };
 
+/**
+ * <odoc>
+ * <key>AWS.flattenMap2Params(aMap) : aMap</key>
+ * Converts any json aMap into a flatten AWS map representation. Example:\
+ * \
+ * aws.flattenMap2Params({ a: 1, b: [ 1, 2, 3 ], c: { x: 1, y: -1 } });\
+ * // {\
+ * //   "a": 1,\
+ * //   "b.Id.1": 1,\
+ * //   "b.Id.2": 2,\
+ * //   "b.Id.3": 3,\
+ * //   "c.x": 1,\
+ * //   "c.y": -1\
+ * // }\
+ * \
+ * </odoc>
+ */
 AWS.prototype.flattenMap2Params = function(aMap) {
    var res = {};
    traverse(aMap, (aK, aV, aP, aO) => {
@@ -101,9 +168,11 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
 
    var amzFieldsHeaders = Object.keys(aAmzFields), amzHeaders = [];
    for (var amzFieldI in amzFieldsHeaders) {
-      can_headers += amzFieldsHeaders[amzFieldI].toLowerCase() + ":" + aAmzFields[amzFieldsHeaders[amzFieldI]] + "\n";
       request[amzFieldsHeaders[amzFieldI]] = aAmzFields[amzFieldsHeaders[amzFieldI]];
-      amzHeaders.push(amzFieldsHeaders[amzFieldI].toLowerCase());
+      if (amzFieldsHeaders[amzFieldI] != "X-Amz-Security-Token") {
+         amzHeaders.push(amzFieldsHeaders[amzFieldI].toLowerCase());
+         can_headers += amzFieldsHeaders[amzFieldI].toLowerCase() + ":" + aAmzFields[amzFieldsHeaders[amzFieldI]] + "\n";
+      }
    } 
 
    var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host;x-amz-date" + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
@@ -131,8 +200,9 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
       });
    } else {
       request = merge(request, {
+         "Content-Type": (isDef(aContentType) ? aContentType : void 0),
          "x-amz-date": amzdate,
-         "Authorization": authorization_header
+         "Authorization": authorization_header,
       });
    }
    
@@ -162,6 +232,12 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
    }).post(aURL, aArgs);
 };
 
+/**
+ * <odoc>
+ * <key>AWS.restPreActionAWSSign4(aRegion, aService, aAmzFields, aDate, aContentType) : Function</key>
+ * Provides a preAction function to be used with $rest pre-actions for AWS signed rest requests.
+ * </odoc>
+ */
 AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aDate, aContentType) {
    var parent = this;
    return function(aOps) {
@@ -208,6 +284,7 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
  * </odoc>
  */
 AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) {
+   if (isObject(aParams)) aParams = $rest().query(aParams);
    var params = _$(aParams).isString().default("");
 
    var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType);
@@ -505,6 +582,8 @@ AWS.prototype.RDS_DescribeDBClusters = function(aRegion, aDBClusterIdentifier, a
    var aURI = String(url.getPath());
 
    var res = this.getURLEncoded(aURL, aURI, $rest().query(params), {}, "rds", aHost, aRegion);
+   if (isDef(res.error)) return res;
+
    res = af.fromXML2Obj(res);
 
    if (isDef(res.DescribeDBClustersResponse) && isDef(res.DescribeDBClustersResponse.DescribeDBClustersResult)) {
@@ -646,6 +725,103 @@ AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
 };
 
 /**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_DescribeLogGroups(aRegion, aLimit, aPrefix, nextToken) : Map</key>
+ * Gets a list of CloudWatch log groups from aRegion, given an optional aLimit, aPrefix and a nextToken.
+ * </odoc>
+ */
+AWS.prototype.CLOUDWATCH_LOGS_DescribeLogGroups = function(aRegion, aLimit, aPrefix, nextToken) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   aLimit = _$(aLimit).isNumber().default(void 0);
+   aPrefix = _$(aPrefix).isString().default(void 0);
+   nextToken = _$(nextToken).isString().default(void 0);
+
+   var aURL = "https://logs." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.postURLEncoded(aURL, aURI, "", {
+      limit: aLimit,
+      logGroupNamePrefix: aPrefix,
+      nextToken: nextToken
+   }, "logs", aHost, aRegion, {
+      "X-Amz-Target": "Logs_20140328.DescribeLogGroups"
+   }, void 0, "application/x-amz-json-1.1");
+
+   return res;
+}; 
+
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_DescribeLogStreams(aRegion, aGroupName, aLimit, aPrefix, aDescending, aOrderBy, nextToken) : Map</key>
+ * Gets a list of CloudWatch log streams on a log aGroupName, from aRegion, given an optional aLimit, aOrderbY, aPrefix and a nextToken.
+ * </odoc>
+ */
+AWS.prototype.CLOUDWATCH_LOGS_DescribeLogStreams = function(aRegion, aGroupName, aLimit, aPrefix, aDescending, aOrderBy, nextToken) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   aLimit = _$(aLimit).isNumber().default(void 0);
+   aPrefix = _$(aPrefix).isString().default(void 0);
+   nextToken = _$(nextToken).isString().default(void 0);
+   aOrderBy = _$(aOrderBy).isString().default(void 0);
+
+   var aURL = "https://logs." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.postURLEncoded(aURL, aURI, "", {
+      descending         : aDescending,
+      limit              : aLimit,
+      logGroupName       : aGroupName,
+      logStreamNamePrefix: aPrefix,
+      orderBy            : aOrderBy,
+      nextToken          : nextToken
+   }, "logs", aHost, aRegion, {
+      "X-Amz-Target": "Logs_20140328.DescribeLogStreams"
+   }, void 0, "application/x-amz-json-1.1");
+
+   return res;
+};
+
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_LOGS_GetLogEvents(aRegion, aGroupName, aStreamName, aLimit, startFromHead, startTime, endTime, nextToken) : Map</key>
+ * Gets a list of CloudWatch log streams events on a log aGroupName and aStreamName, from aRegion, given an optional aLimit, aOrderbY, aPrefix and a nextToken.
+ * </odoc>
+ */
+AWS.prototype.CLOUDWATCH_LOGS_GetLogEvents = function(aRegion, aGroupName, aStreamName, aLimit, startFromHead, startTime, endTime, nextToken) {
+   aRegion = _$(aRegion).isString().default(this.region);
+   _$(aGroupName).isString().$_("Please provide a group name.");
+   _$(aStreamName).isString().$_("Please provide a stream name.");
+   aLimit = _$(aLimit).isNumber().default(void 0);
+   startFromHead = _$(startFromHead).isString().default(void 0);
+   nextToken = _$(nextToken).isString().default(void 0);
+   startTime = _$(startTime).isString().default(void 0);
+   endTime = _$(endTime).isString().default(void 0);
+
+   var aURL = "https://logs." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var res = this.postURLEncoded(aURL, aURI, "", {
+      endTime      : endTime,
+      limit        : aLimit,
+      logGroupName : aGroupName,
+      logStreamName: aStreamName,
+      nextToken    : nextToken,
+      startFromHead: startFromHead,
+      startTime    : startTime
+   }, "logs", aHost, aRegion, {
+      "X-Amz-Target": "Logs_20140328.GetLogEvents"
+   }, void 0, "application/x-amz-json-1.1");
+
+   return res;
+};
+
+
+/**
  * DYNAMO DB=======================
  */
 
@@ -656,7 +832,7 @@ AWS.prototype.ECS_RunTask = function(aRegion, taskDefinition, params) {
   * </odoc>
   */
 AWS.prototype.DYNAMO_getCh = function(aRegion, aTable, aChName) {
-   _$(aRegion).$_("Please provide a region.");
+   aRegion = _$(aRegion).isString().default(this.region);
    _$(aTable).$_("Please provide a table.");
 
    aChName = _$(aChName).isString().default(aTable);
