@@ -23,17 +23,31 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190930'
+version: '20191024'
 dependencies:
   OpenAF: '>=20190716'
 files:
   - .odoc.db
   - .package.yaml
   - aws.js
+  - aws_cloudwatch.js
+  - aws_core.js
+  - aws_dynamo.js
+  - aws_ecs.js
+  - aws_lambda.js
+  - aws_rds.js
+  - aws_sqs.js
   - utils/genTestRegions.yaml
   - utils/testRegions.js
 filesHash:
-  .odoc.db: a0efe3add5a9389579f39c597738106ba4caea52
-  aws.js: b983467a5bd9d71d7417501a2a28099e5ce4adcd
+  .odoc.db: 69b709141091042a5c88bddb8e8d984eede2776d
+  aws.js: e24620a839acc248a0604a7665d519a9c6fe8291
+  aws_cloudwatch.js: 3f04d1bbc7d54217fff6663cfa237c1f126de48d
+  aws_core.js: 61c5e00dfc63ddeb499192ab2d59cd55653d15d5
+  aws_dynamo.js: 0a32d74f49240abb40218827c5d26632551400a0
+  aws_ecs.js: 3fc26bea880c123792d92cd6a453ba0f81883fab
+  aws_lambda.js: e206da89b743f86cb6c79c66eefa4ce6f343283e
+  aws_rds.js: 15518551361378139b152192e479ef764d741e70
+  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 692d6d9f763c4fb17d696c7fd814dc06801c7d08
