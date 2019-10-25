@@ -225,7 +225,7 @@ loadLib("aws_core.js");
        TableName: aTableName,
        Item: this.__DYNAMO_Item_Convert(aItem),
        ConditionExpression: aConditionExpression,
-       ExpressionAttributeValues: aExpressionAttrValues
+       ExpressionAttributeValues: this.__DYNAMO_Item_Convert(aExpressionAttrValues)
     };
  
     return this.postURLEncoded(aURL, aURI, "", params, "dynamodb", aHost, aRegion, {
@@ -449,13 +449,23 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
        return this.getKeys(aName, full);
     },
     getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
-       /*var res;
-       res = this.get(aName, aK);
-       if ($stream([res]).anyMatch(aMatch)) {
-          return this.set(aName, aK, aV, aTimestamp);
-       }
-       return void 0;*/
-       throw "Not implemented yet.";
+      var options = this.__channels[aName];
+      var conditions = [], keysV = {};
+      _$(aMatch, "match").isMap().$_();
+
+      var addKeysAndConditions = (aMap) => {
+         var keys = Object.keys(aMap);
+         for(var ii in keys) {
+            var kk = conditions.length;
+            conditions.push(keys[ii] + " = :v" + kk);
+            keysV[":v" + kk] = aMap[keys[ii]];
+         }
+      };
+
+      addKeysAndConditions(aMatch);
+      addKeysAndConditions(aK);
+
+      return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV, conditions.join(" and "), keysV);
     },
     set          : function(aName, aK, aV, aTimestamp) {
        var options = this.__channels[aName];
