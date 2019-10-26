@@ -1,0 +1,29 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - pastebin
+  - paste
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/pastebin.opack'
+description: Wrapper around PasteBin functionality.
+name: PasteBin
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20191025'
+dependencies:
+  openaf: '>=20190901'
+files:
+  - .odoc.db
+  - .package.yaml
+  - pastebin.js
+filesHash:
+  .odoc.db: b53f72f3fe9c4fc1501331a029c441ad2aee5d17
+  pastebin.js: f2466218146c0abd05578df80fd1a9b98d140799
