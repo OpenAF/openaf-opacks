@@ -220,7 +220,7 @@ ow.ch.__types.etcd3 = {
             if (isDef(res) && res.hasPrevKv()) {
                 return jsonParse(o.getPrevKv().getValue());
             } else {
-                return void 0;
+                return aK;
             }
         } catch(e) {
             if (isDef(this.__channels[aName].throwExceptions) && !this.__channels[aName].throwExceptions) {
