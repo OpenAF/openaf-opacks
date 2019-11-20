@@ -17,7 +17,7 @@ name: etcd3
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20191007'
+version: '20191119'
 dependencies:
   openaf: '>=20190801'
 files:
@@ -26,16 +26,16 @@ files:
   - annotations-4.1.1.4.jar
   - checker-qual-2.8.1.jar
   - error_prone_annotations-2.3.2.jar
-  - etcd-java-0.0.12.jar
+  - etcd-java-0.0.13.jar
   - etcd3.js
   - failureaccess-1.0.1.jar
-  - grpc-api-1.23.0.jar
-  - grpc-context-1.23.0.jar
-  - grpc-core-1.23.0.jar
-  - grpc-netty-1.23.0.jar
-  - grpc-protobuf-1.23.0.jar
-  - grpc-protobuf-lite-1.23.0.jar
-  - grpc-stub-1.23.0.jar
+  - grpc-api-1.24.1.jar
+  - grpc-context-1.24.1.jar
+  - grpc-core-1.24.1.jar
+  - grpc-netty-1.24.1.jar
+  - grpc-protobuf-1.24.1.jar
+  - grpc-protobuf-lite-1.24.1.jar
+  - grpc-stub-1.24.1.jar
   - guava-28.1-jre.jar
   - j2objc-annotations-1.3.jar
   - jsr305-3.0.2.jar
@@ -63,16 +63,16 @@ filesHash:
   annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
   error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
-  etcd-java-0.0.12.jar: 3e6396b10984863a9d9a9e81fab60566c02e0c0d
+  etcd-java-0.0.13.jar: 53f5261862d365d271b99628d23443348d73009f
   etcd3.js: fa57f77b9c2f6432603b79b37e98d12663a623e3
   failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
-  grpc-api-1.23.0.jar: 903f250bc1d01299480e526a25cd974088699a48
-  grpc-context-1.23.0.jar: 94aedfbfeebc5a32bdfe6984289bb18abf93cf20
-  grpc-core-1.23.0.jar: 82d0c88d65acf92fb3d66a0ee800b5da85258c39
-  grpc-netty-1.23.0.jar: a166b3e2abb4b47810434ee6883435b6d789b2a6
-  grpc-protobuf-1.23.0.jar: 01428515d3aca8964dfdc4d4ba912d0fda0f41f2
-  grpc-protobuf-lite-1.23.0.jar: c030daf2f8c4185ee003e206c38e28987fe2684d
-  grpc-stub-1.23.0.jar: 2e9e6890a7e8402a9b715ce1fad0d1827e733e49
+  grpc-api-1.24.1.jar: 7bbdb6041e82a741804378160a90a4f41cac696b
+  grpc-context-1.24.1.jar: 77485a74c2553ae0efeefd8917d4b09ccecb0465
+  grpc-core-1.24.1.jar: 16abedf794f6597f3839b452d1b32438a53a6781
+  grpc-netty-1.24.1.jar: 44e74b879dd2a4fbec1571ea45311e0cd8cf2030
+  grpc-protobuf-1.24.1.jar: b4794f4b135ea38dbac8816803065cf4e8f77ed6
+  grpc-protobuf-lite-1.24.1.jar: 0ae3345903b0ba1de89ffa25890f54ec08e5380b
+  grpc-stub-1.24.1.jar: 08e0b4b6ea6d8bc99de3da7d79c2168ff90f5d13
   guava-28.1-jre.jar: b0e91dcb6a44ffb6221b5027e12a5cb34b841145
   j2objc-annotations-1.3.jar: ba035118bc8bac37d7eff77700720999acd9986d
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
