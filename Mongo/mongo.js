@@ -147,6 +147,8 @@ ow.ch.__types.mongo = {
         } catch(e) {
             this.__c[aName].replaceOne(Packages.org.bson.BsonDocument.parse(stringify(ak)), new Packages.org.bson.Document(av));
         }
+
+	return ak;
     },
     setAll       : function(aName, anArrayOfKeys, anArrayOfMapData, aTimestamp) {
         // Could implement in a faster way
