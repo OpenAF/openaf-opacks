@@ -7,12 +7,38 @@
  */
 var ElasticSearch = function(aURL, aUser, aPassword) {
 	if (isUnDef(aURL)) throw "Please provide aURL";
-	//if (isUnDef(aUser)) throw "Please provide aUser";
-	//if (isUnDef(aPassword)) throw "Please provide aPassword";
 
 	this.url = aURL;
 	this.user = aUser;
 	this.pass = aPassword;
+	this.restmap = {
+		login: this.user,
+		pass : this.pass
+	};
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.setRESTMap(aMap)</key>
+ * Sets the options aMap to be used with $rest calls to ElasticSearch. Please check help for $rest.get for available
+ * options.
+ * </odoc>
+ */
+ElasticSearch.prototype.setRESTMap = function(aMap) {
+	this.restmap = merge(aMap, {
+		login: this.user,
+		pass : this.pass
+	});
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.setPreAction(aPreAction)</key>
+ * Sets a preAction function to be used on every $rest call. Please check more on help for $rest.get.
+ * </odoc>
+ */
+ElasticSearch.prototype.setPreAction = function(aPreAction) {
+	this.restmap.preAction = aPreAction;
 };
 
 /**
@@ -24,7 +50,8 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 ElasticSearch.prototype.getIndexMapping = function(aIndex) {
 	ow.loadObj();
 
-	var res = ow.obj.rest.jsonGet(this.url + "/" + aIndex + "/_mapping");
+	//var res = ow.obj.rest.jsonGet(this.url + "/" + aIndex + "/_mapping");
+	var res = $rest(this.restmap).get(this.url + "/" + aIndex + "/_mapping");
 	if (isDef(res[aIndex])) {
 		return res[aIndex];
 	} else {
@@ -39,7 +66,7 @@ ElasticSearch.prototype.getIndexMapping = function(aIndex) {
  * </odoc>
  */
 ElasticSearch.prototype.listTemplates = function() {
-	return $rest().get(this.url + "/_template");
+	return $rest(this.restmap).get(this.url + "/_template");
 };
 
 /**
@@ -49,7 +76,7 @@ ElasticSearch.prototype.listTemplates = function() {
  * </odoc>
  */
 ElasticSearch.prototype.setTemplate = function(aTemplateName, aTemplateMap) {
-	return $rest().put(this.url + "/_template/" + aTemplateName, aTemplateMap);
+	return $rest(this.restmap).put(this.url + "/_template/" + aTemplateName, aTemplateMap);
 };
 
 /**
@@ -59,7 +86,7 @@ ElasticSearch.prototype.setTemplate = function(aTemplateName, aTemplateMap) {
  * </odoc>
  */
 ElasticSearch.prototype.deleteTemplate = function(aTemplateName, aTemplateMap) {
-	return $rest().delete(this.url + "/_template/" + aTemplateName);
+	return $rest(this.restmap).delete(this.url + "/_template/" + aTemplateName);
 };
 
 /**
@@ -74,7 +101,7 @@ ElasticSearch.prototype.setTemplatePriRep = function(aTemplateName, aListOfIndex
 	numReplica = _$(numReplica).isNumber().default(1);
 
 	if (!isArray(aListOfIndexPatterns)) aListOfIndexPatterns = [ aListOfIndexPatterns ];
-	return $rest().put(this.url + "/_template/" + aTemplateName, { 
+	return $rest(this.restmap).put(this.url + "/_template/" + aTemplateName, { 
 		"index_patterns": aListOfIndexPatterns,
 		settings: {
 			"number_of_shards": numPrimary,
@@ -99,7 +126,8 @@ ElasticSearch.prototype.createIndex = function(aIndex, aNumberOfShards, aNumberO
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, options, this.user, this.pass);
+	//return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, options, this.user, this.pass);
+	return $rest(this.restmap).put(this.url + "/" + aIndex, options);
 };
 
 /**
@@ -113,7 +141,8 @@ ElasticSearch.prototype.deleteIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonRemove(this.url + "/" + aIndex, {}, this.user, this.pass);
+	//return ow.obj.rest.jsonRemove(this.url + "/" + aIndex, {}, this.user, this.pass);
+	return $rest(this.restmap).delete(this.url + "/" + aIndex);
 };
 
 /**
@@ -127,7 +156,8 @@ ElasticSearch.prototype.closeIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
+	//return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_close", {}, this.user, this.pass);
+	return $rest(this.restmap).post(this.url + "/" + aIndex + "/_close");
 };
 
 /**
@@ -141,7 +171,8 @@ ElasticSearch.prototype.openIndex = function(aIndex) {
 
 	if (isUnDef(aIndex)) throw "Please provide aIndex";
 
-	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
+	//return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_open", {}, this.user, this.pass);
+	return $rest(this.restmap).post(this.url + "/" + aIndex + "/_open");
 };
 
 /**
@@ -167,7 +198,8 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, ext
 	var res;
 	if (isDef(taskCallback) && isFunction(taskCallback)) {
 		extra += "&wait_for_completion=false";
-		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+		//res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+		res = $rest(this.restmap).post(this.url + "/_reindex" + extra, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions));
 		var t = 1000, task;
 		do {
 			sleep(t);
@@ -178,7 +210,8 @@ ElasticSearch.prototype.reIndex = function(anOrigIndex, aNewIndex, aTimeout, ext
 		} while (isDef(task) && t > 0);
 		return;
 	} else {
-		res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+		//res = ow.obj.rest.jsonCreate(this.url + "/_reindex" + extra, {}, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions), this.user, this.pass);
+		res = $rest(this.restmap).post(this.url + "/_reindex" + extra, merge({ source: { index: anOrigIndex }, dest: { index: aNewIndex } }, extraOptions));
 	}
 
 	return res;
@@ -197,7 +230,8 @@ ElasticSearch.prototype.forceMerge = function(aIndexExpression, maxNumSegments) 
 	maxNumSegments = _$(maxNumSegments).isNumber().default(1);
 	_$(aIndexExpression).$_("Please provide an index or index wildcard expression or _all.");
 	
-	var res = ow.obj.rest.jsonCreate(this.url + "/" + aIndexExpression + "/_forcemerge?max_num_segments=" + maxNumSegments);
+	//var res = ow.obj.rest.jsonCreate(this.url + "/" + aIndexExpression + "/_forcemerge?max_num_segments=" + maxNumSegments);
+	var res = $rest(this.restmap).post(this.url + "/" + aIndexExpression + "/_forcemerge?max_num_segments=" + maxNumSegments);
 
 	return res;
 };
@@ -238,7 +272,8 @@ ElasticSearch.prototype.getTasks = function(actionsFilter, isDetailed) {
 		});
 	}
 
-	return ow.obj.rest.jsonGet(this.url + "/_tasks" + extra, this.user, this.pass);
+	//return ow.obj.rest.jsonGet(this.url + "/_tasks" + extra, this.user, this.pass);
+	return $rest(this.restmap).get(this.url + "/_tasks" + extra);
 };
 
 /**
@@ -248,14 +283,15 @@ ElasticSearch.prototype.getTasks = function(actionsFilter, isDetailed) {
  * </odoc>
  */
 ElasticSearch.prototype.cancelTask = function(aTaskId) {
-	return $rest().post(this.url + "/_tasks/" + aTaskId + "/_cancel");
+	return $rest(this.restmap).post(this.url + "/_tasks/" + aTaskId + "/_cancel");
 };
 
 ElasticSearch.prototype.getShards = function(forQuery) {
 	ow.loadObj();
 
 	if (forQuery) {
-		var o = ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json&bytes=b", {}, this.user, this.pass);
+		//var o = ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json&bytes=b", {}, this.user, this.pass);
+		var o = $rest(this.restmap).get(this.url + "/_cat/shards?format=json&bytes=b");
 		return $from(o).select((r) => {
 			return {
 				index: r.index,
@@ -269,19 +305,21 @@ ElasticSearch.prototype.getShards = function(forQuery) {
 			};
 		});
 	} else {
-		return ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json", {}, this.user, this.pass);
+		//return ow.obj.rest.jsonGet(this.url + "/_cat/shards?format=json", {}, this.user, this.pass);
+		return $rest(this.restmap).get(this.url + "/_cat/shards?format=json");
 	}
 };
 
 ElasticSearch.prototype.getBreakerStats = function() {
-	return $rest({ login: this.user, pass: this.pass }).get(this.url + "/_nodes/stats/breaker");
+	return $rest(this.restmap).get(this.url + "/_nodes/stats/breaker");
 };
 
 ElasticSearch.prototype.getClusterHealth = function(forQuery) {
 	ow.loadObj();
 
 	if (forQuery) {
-		var o = ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+		//var o = ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+		var o = $rest(this.restmap).get(this.url + "/_cat/health?format=json");
 
 		return $from(o).select((r) => {
 			return {
@@ -302,39 +340,45 @@ ElasticSearch.prototype.getClusterHealth = function(forQuery) {
 			};
 		});		
 	} else {
-		return ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+		//return ow.obj.rest.jsonGet(this.url + "/_cat/health?format=json", {}, this.user, this.pass);
+		return $rest(this.restmap).get(this.url + "/_cat/health?format=json");
 	}
 };
 
 ElasticSearch.prototype.excludeNodeIP = function(aIP) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonSet(this.url + "/_cluster/settings", {}, { transient: { "cluster.routing.allocation.exclude._ip": aIP } }, this.user, this.pass);
+	//return ow.obj.rest.jsonSet(this.url + "/_cluster/settings", {}, { transient: { "cluster.routing.allocation.exclude._ip": aIP } }, this.user, this.pass);
+	return $rest(this.restmap).put(this.url + "/_cluster/settings", { transient: { "cluster.routing.allocation.exclude._ip": aIP } });
 };
 
 ElasticSearch.prototype.getClusterStats = function() {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cluster/stats", {}, this.user, this.pass);
+	//return ow.obj.rest.jsonGet(this.url + "/_cluster/stats", {}, this.user, this.pass);
+	return $rest(this.restmap).get(this.url + "/_cluster/stats");
 };
 
 ElasticSearch.prototype.getPendingTasks = function() {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_cluster/pending_tasks", {}, this.user, this.pass);
+	//return ow.obj.rest.jsonGet(this.url + "/_cluster/pending_tasks", {}, this.user, this.pass);
+	return $rest(this.restmap).get(this.url + "/_cluster/pending_tasks");
 };
 
 ElasticSearch.prototype.getNodeStats = function() {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats", {}, this.user, this.pass);
+	//return ow.obj.rest.jsonGet(this.url + "/_nodes/stats", {}, this.user, this.pass);
+	return $rest(this.restmap).get(this.url + "/_nodes/stats");
 };
 
 ElasticSearch.prototype.getIndices = function(forQuery) {
 	ow.loadObj();
 
 	if (forQuery) {
-		var o = ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json&bytes=b", {}, this.user, this.pass);
+		//var o = ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json&bytes=b", {}, this.user, this.pass);
+		var o = $rest(this.restmap).get(this.url + "/_cat/indices?format=json&bytes=b");
 
 		return $from(o).select((r) => {
 			return {
@@ -351,19 +395,21 @@ ElasticSearch.prototype.getIndices = function(forQuery) {
 			};
 		});
 	} else {
-		return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
+		//return ow.obj.rest.jsonGet(this.url + "/_cat/indices?format=json", {}, this.user, this.pass);
+		return $rest(this.restmap).get(this.url + "/_cat/indices?format=json");
 	}
 };
 
 ElasticSearch.prototype.getIndice = function(aIndex) {
-	return $rest().get(this.url + "/_cat/indices/" + aIndex + "?format=json");
+	return $rest(this.restmap).get(this.url + "/_cat/indices/" + aIndex + "?format=json");
 };
 
 ElasticSearch.prototype.getNodes = function(forQuery) {
 	ow.loadObj();
 
 	if (forQuery) {
-		var o = ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+		//var o = ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+		var o = $rest(this.restmap).get(this.url + "/_cat/nodes?format=json");
 
 		return $from(o).select((r) => {
 			return {
@@ -380,7 +426,8 @@ ElasticSearch.prototype.getNodes = function(forQuery) {
 			};
 		});
 	} else {
-		return ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+		//return ow.obj.rest.jsonGet(this.url + "/_cat/nodes?format=json", {}, this.user, this.pass);
+		return $rest(this.restmap).get(this.url + "/_cat/nodes?format=json");
 	}
 };
 
@@ -388,7 +435,8 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 	ow.loadObj();
 
 	if (forQuery) {
-		var o = ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+		//var o = ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+		var o = $rest(this.restmap).get(this.url + "/_cat/count?format=json");
 
 		return $from(o).select((r) => {
 			return {
@@ -398,7 +446,8 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 			};
 		});		
 	} else {
-		return ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+		//return ow.obj.rest.jsonGet(this.url + "/_cat/count?format=json", {}, this.user, this.pass);
+		return $rest(this.restmap).get(this.url + "/_cat/count?format=json");
 	}
 };
 
@@ -411,7 +460,8 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 ElasticSearch.prototype.search = function(aIndex, aSearchJSON) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search", {}, aSearchJSON);
+	//return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search", {}, aSearchJSON);
+	return $rest(this.restmap).post(this.url + "/" + aIndex + "/_search", aSearchJSON);
 };
 
 /**
@@ -429,12 +479,13 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 	if (isUnDef(aChName)) aChName = aIndex;
 
 	var parent = this;
-	return $ch(aChName).create(undefined, "elasticsearch", {
+	return $ch(aChName).create(void 0, "elasticsearch", {
 		index: aIndex,
 		idKey: aIdKey,
 		url  : parent.url,
 		user : parent.user,
-		pass : parent.pass
+		pass : parent.pass,
+		preAction: this.restmap.preAction
 	});
 };
 
@@ -498,7 +549,8 @@ ElasticSearch.prototype.createScroll = function(aIndex, aSearchJSON, aSize, aTim
 	   };
 	}
 
-	return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search?scroll=" + aTime, {}, aSearchJSON);
+	//return ow.obj.rest.jsonCreate(this.url + "/" + aIndex + "/_search?scroll=" + aTime, {}, aSearchJSON);
+	return $rest(this.restmap).post(this.url + "/" + aIndex + "/_search?scroll=" + aTime, aSearchJSON);
 };
 
 /**
@@ -514,9 +566,13 @@ ElasticSearch.prototype.nextScroll = function(aScrollMap, aTime) {
 
 	aTime = _$(aTime).isString().default("1m");
 
-	return ow.obj.rest.jsonCreate(this.url + "/_search/scroll", {}, {
+	/*return ow.obj.rest.jsonCreate(this.url + "/_search/scroll", {}, {
 	   scroll: aTime,
 	   scroll_id: aScrollMap._scroll_id
+	});*/
+	return $rest(this.restmap).create(this.url + "/_search/scroll", {
+		scroll: aTime,
+		scroll_id: aScrollMap._scroll_id
 	});
 };
 
@@ -530,7 +586,10 @@ ElasticSearch.prototype.nextScroll = function(aScrollMap, aTime) {
 ElasticSearch.prototype.deleteScroll = function(aScrollMap) {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonRemove(this.url + "/_search/scroll", {}, { scroll_id: aScrollMap._scroll_id });
+	//return ow.obj.rest.jsonRemove(this.url + "/_search/scroll", {}, { scroll_id: aScrollMap._scroll_id });
+	return $rest(this.restmap).delete(this.url + "/_search/scroll", {
+		scroll_id: aScrollMap._scroll_id
+	});
 };
 
 /**
@@ -542,7 +601,8 @@ ElasticSearch.prototype.deleteScroll = function(aScrollMap) {
 ElasticSearch.prototype.deleteAllScrolls = function() {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonRemove(this.url + "/_search/scroll/_all", {}, {});
+	//return ow.obj.rest.jsonRemove(this.url + "/_search/scroll/_all", {}, {});
+	return $rest(this.restmap).delete(this.url + "/_search/scroll/_all");
 };
 
 /**
@@ -554,7 +614,8 @@ ElasticSearch.prototype.deleteAllScrolls = function() {
 ElasticSearch.prototype.getNodesStats = function() {
 	ow.loadObj();
 
-	return ow.obj.rest.jsonGet(this.url + "/_nodes/stats/indices/search", {}, {});
+	//return ow.obj.rest.jsonGet(this.url + "/_nodes/stats/indices/search", {}, {});
+	return $rest(this.restmap).get(this.url + "/_nodes/stats/indices/search");
 };
 
 /**
