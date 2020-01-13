@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - timelive
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/TimeLive.opack'
+description: Wrapper for TimeLive timesheets API
+name: TimeLive
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20200112'
+dependencies:
+  openaf: '>=20200101'
+files:
+  - .package.yaml
+  - .odoc.db
+  - README.md
+  - timelive.js
+filesHash:
+  .odoc.db: 87558df5ce27f78097e31b9f14cba33ef59fa1c4
+  README.md: 2cfbc2bcafe117e5c6169ffe8f828718bc497982
+  timelive.js: 9ec4ae2359d6b9e65892f56c9d6fa0cb6c74589a
