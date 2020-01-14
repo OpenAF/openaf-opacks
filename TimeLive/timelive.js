@@ -50,16 +50,20 @@ TimeLive.prototype.__convertMapDate2Date = function(anArray) {
         var keys = Object.keys(v);
         for(var ii in keys) {
             // Check if it can be a date
-            if (String(v[keys[ii]]).substr(10,1) == "T" && String(v[keys[ii]]).match(/\d{4}-\d{2}-\d{2}T/)) {
+            if (String(v[keys[ii]]).substr(10,1) == "T" && String(v[keys[ii]]).match(/^\d{4}\-\d{2}\-\d{2}T/)) {
                 // Good candidate, try
                 try {
                     var n = new Date(v[keys[ii]]);
-                    if (n != "Invalid Date")
-                        v[keys[ii] + ".Date"] = n;
+                    if (isDate(n))
+                        v[keys[ii]] = n;
                     else
-                        v[keys[ii] + ".Date"] = ow.format.toDate(v[keys[ii]], "yyyy-MM-dd'T'HH:mm:ss.SX");
+                        v[keys[ii]] = ow.format.toDate(v[keys[ii]], "yyyy-MM-dd'T'HH:mm:ss.SX");
                 } catch(e1) {
-                    // forget it
+                    try {
+                        v[keys[ii]] = ow.format.toDate(v[keys[ii]], "yyyy-MM-dd'T'HH:mm:ss.SSX");
+                    } catch(e2) {
+                        // forget it
+                    }
                 }
             }
         }
@@ -140,8 +144,12 @@ TimeLive.prototype.apiGet = function(aURI, aParams) {
     if (this.debug) {
         print("API GET: " + this.url + "/api/" + aURI + "\n" + stringify(aParams));
     }
-    return $rest({ requestHeaders: this.headers })
-           .get(this.url + "/api/" + aURI, aParams);
+    var res = $rest({ requestHeaders: this.headers })
+              .get(this.url + "/api/" + aURI, aParams);
+
+    if (isArray(res)) res = this.__convertMapDate2Date(res);
+
+    return res;
 };
 
 TimeLive.prototype.apiPost = function(aURI, aParams) {
@@ -152,10 +160,10 @@ TimeLive.prototype.apiPost = function(aURI, aParams) {
            .post(this.url + "/api/" + aURI, aParams);
 };
 
-TimeLive.prototype.REFERENCE_getProjects      = function() { return this.__convertMapDate2Date(this.apiGet("Projects")); };
-TimeLive.prototype.REFERENCE_getTasks         = function() { return this.__convertMapDate2Date(this.apiGet("Tasks")); };
-TimeLive.prototype.REFERENCE_getEmployees     = function() { return this.__convertMapDate2Date(this.apiGet("Employees")); };
-TimeLive.prototype.REFERENCE_getDepartments   = function() { return this.__convertMapDate2Date(this.apiGet("departments")); };
+TimeLive.prototype.REFERENCE_getProjects      = function() { return this.apiGet("Projects"); };
+TimeLive.prototype.REFERENCE_getTasks         = function() { return this.apiGet("Tasks"); };
+TimeLive.prototype.REFERENCE_getEmployees     = function() { return this.apiGet("Employees"); };
+TimeLive.prototype.REFERENCE_getDepartments   = function() { return this.apiGet("departments"); };
 TimeLive.prototype.REFERENCE_getEmployeeTypes = function() { return this.apiGet("EmployeeTypes"); };
 TimeLive.prototype.REFERENCE_getLocations     = function() { return this.apiGet("Locations"); };
 TimeLive.prototype.REFERENCE_getProjectTypes  = function() { return this.apiGet("ProjectTypes"); };

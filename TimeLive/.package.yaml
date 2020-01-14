@@ -16,15 +16,15 @@ name: TimeLive
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200112'
+version: '20200113'
 dependencies:
   openaf: '>=20200101'
 files:
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
   - README.md
   - timelive.js
 filesHash:
-  .odoc.db: 87558df5ce27f78097e31b9f14cba33ef59fa1c4
+  .odoc.db: 8cde8ad09c0e765d19d6e09665c7d70e74eaed22
   README.md: 2cfbc2bcafe117e5c6169ffe8f828718bc497982
-  timelive.js: 9ec4ae2359d6b9e65892f56c9d6fa0cb6c74589a
+  timelive.js: 33e9c9dd504f29d9fae9aa643cb083ff24425417
