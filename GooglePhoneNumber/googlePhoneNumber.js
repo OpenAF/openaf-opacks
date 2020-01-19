@@ -102,13 +102,13 @@ function GooglePhoneNumberUpdateJars(aLibPath) {
 
 	var urls = [
 		{   name: "geocoder",
-			url: "http://repo1.maven.org/maven2/com/googlecode/libphonenumber/geocoder" },
+			url: "https://repo1.maven.org/maven2/com/googlecode/libphonenumber/geocoder" },
 		{   name: "carrier",
-		    url: "http://repo1.maven.org/maven2/com/googlecode/libphonenumber/carrier" },
+		    url: "https://repo1.maven.org/maven2/com/googlecode/libphonenumber/carrier" },
 		{   name: "libphonenumber",
-	        url:  "http://repo1.maven.org/maven2/com/googlecode/libphonenumber/libphonenumber" },
+	        url:  "https://repo1.maven.org/maven2/com/googlecode/libphonenumber/libphonenumber" },
 	    {   name: "prefixmapper",
-	        url: "http://repo1.maven.org/maven2/com/googlecode/libphonenumber/prefixmapper" }
+	        url: "https://repo1.maven.org/maven2/com/googlecode/libphonenumber/prefixmapper" }
 	];
 
 	var current = ($from(io.listFilenames(this.LIB_PATH)).ends(".jar").select(function(r) {
