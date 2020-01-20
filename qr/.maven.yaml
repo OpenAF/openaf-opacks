@@ -1,0 +1,15 @@
+artifacts:
+    - id      : com.google.zxing
+      group   : core
+      version : 3.4.0
+      template: core-{{version}}.jar
+
+    - id      : com.google.zxing
+      group   : javase
+      version : 3.4.0
+      template: javase-{{version}}.jar
+
+    - id      : com.github.jai-imageio
+      group   : jai-imageio-core
+      version : 1.4.0
+      template: jai-imageio-core-{{version}}.jar
