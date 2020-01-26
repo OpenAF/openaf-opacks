@@ -10,6 +10,19 @@ loadExternalJars(path + "/lib");
 var QR = function() {
 };
 
+// http://goqr.me/api/doc/create-qr-code
+QR.prototype.write2URL = function(aText, aW, aH) {
+   aW = _$(aW, "width").isNumber().default(350);
+   aH = _$(aH, "height").isNumber().default(350);
+
+   return "https://api.qrserver.com/v1/create-qr-code/?" + $rest().query({
+      data  : aText,
+      size  : aW + "x" + aH,
+      ecc   : "Q",
+      margin: 10
+   });
+};
+
 /**
  * <odoc>
  * <key>QR.write2File(aText, aFilePath, aWidth, aHeight, aType)</key>
