@@ -725,8 +725,10 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			aLogFunc = () => {};
 	}
 
-	var res;
+	var res, h = new ow.obj.http(), recC = new java.util.concurrent.atomic.AtomicLong();
 	function sendBulk(tdata) {
+			recC.getAndIncrement();
+			while(recC.get() > getNumberOfCores()) sleep(100, true);
 			ops.push($do((_s,_f) => {
 					var uuid = genUUID();
 					if (isDef(aLogFunc)) aLogFunc({
@@ -748,6 +750,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 					} catch(e) {
 					   _f({ e: e, uuid: uuid});
 					}
+					recC.getAndDecrement();
 			}).catch((e) => {
 					try{
 					if (isDef(aLogFunc)) aLogFunc({
@@ -756,6 +759,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 							exception: e.e
 					});
 					}catch(ee) { sprint(ee); }
+					recC.getAndDecrement();
 			}));
 	}
 
@@ -786,8 +790,10 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			sendBulk(String(data));
 			data = "";
 	}
+	
+	//$doWait($doAll(ops));
+	while(recC.get() > 0) sleep(100, true);
 	rstream.close();
-	$doWait($doAll(ops));
 
 	return cdata;
 };
