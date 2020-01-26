@@ -280,3 +280,22 @@ QR.prototype.genFTString = function(aId, onlyAudio) {
    out += "facetime" + (onlyAudio ? "-audio" : "") + ":" + aId;
    return out;
 };
+
+QR.prototype.genOTPAuth = function(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod) {
+   var out = "";
+   aDigits = _$(aDigits).isNumber().default(6);
+   aPeriod = _$(aPeriod).isNumber().default(30);
+   aAlg    = _$(aAlg).isString().default("SHA1");
+   aIssuerName = _$(aIssuerName).isString().default("na");
+   aAccountName = _$(aAccountName).isString().default("na");
+
+   out += "otpauth://totp/" + aAccountName + ":" + aIssuerName + "?" + $rest.query({
+      secret: aSecret,
+      issuer: aIssuerName,
+      algorithm: aAlg,
+      digits: aDigits,
+      period: aPeriod
+   });
+
+   return out;
+}; 
