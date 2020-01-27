@@ -336,16 +336,16 @@ TimeLive.prototype.TIMESHEET_submit = function(aAccountEmployeeTimeEntryPeriodId
     _$(aAccountEmployeeTimeEntryPeriodId, "employeeTimeEntryPeriodId").regexp(/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}/).$_();
 
     // Workaround error for own timesheet
-    aEmployeeId = _$(aEmployeeId).isNumber().default(this.accountEmployeeId);
+    // aEmployeeId = _$(aEmployeeId).isNumber().default(this.accountEmployeeId);
 
     var extra;
     if (isUnDef(aEmployeeId)) {
-        extra = "/" + aAccountEmployeeTimeEntryPeriodId;
+        extra = "/SubmitTimesheet/" + aAccountEmployeeTimeEntryPeriodId;
     } else {
-        extra = "/" + aEmployeeId + "/" + aAccountEmployeeTimeEntryPeriodId;
+        extra = "/SubmitTimesheetByEmployeeId/" + aEmployeeId + "/" + aAccountEmployeeTimeEntryPeriodId;
     }
 
-    return this.apiGet("Timesheets/SubmitTimesheetByEmployeeId" + extra);
+    return this.apiGet("Timesheets" + extra);
 };
 
 /**
