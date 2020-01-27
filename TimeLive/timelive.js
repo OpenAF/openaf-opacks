@@ -335,6 +335,9 @@ TimeLive.prototype.TIMESHEET_setEntry = function(aSingleDate, aProjectId, aProje
 TimeLive.prototype.TIMESHEET_submit = function(aAccountEmployeeTimeEntryPeriodId, aEmployeeId) {
     _$(aAccountEmployeeTimeEntryPeriodId, "employeeTimeEntryPeriodId").regexp(/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}/).$_();
 
+    // Workaround error for own timesheet
+    aEmployeeId = _$(aEmployeeId).isNumber().default(this.accountEmployeeId);
+
     var extra;
     if (isUnDef(aEmployeeId)) {
         extra = "/" + aAccountEmployeeTimeEntryPeriodId;
