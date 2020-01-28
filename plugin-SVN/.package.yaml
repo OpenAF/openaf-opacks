@@ -1,0 +1,54 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - openaf
+  - smb
+  - plugins
+  - samba
+  - windows
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/plugin-SVN.opack'
+description: OpenAF plugin to access SVN repositories.
+name: plugin-SVN
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20200128'
+dependencies:
+  openaf: '>=20190128'
+files:
+  - .maven.yaml
+  - .odoc.db
+  - .package.yaml
+  - antlr-runtime-3.4.jar
+  - compile.yaml
+  - LICENSES.txt
+  - plugin-svn.jar
+  - sequence-library-1.0.3.jar
+  - sqljet-1.1.11.jar
+  - src/openaf/plugins/SVN.class
+  - src/openaf/plugins/SVN.java
+  - svnkit-1.9.1.jar
+  - svnkit-javahl16-1.9.1.jar
+  - trilead-ssh2-1.0.0-build221.jar
+filesHash:
+  .maven.yaml: 20c33ff19fd992e48b16310c69590439907a9551
+  .odoc.db: b0695729f24ee33b401580fc3f2a328ae0192d7d
+  antlr-runtime-3.4.jar: 8f011408269a8e42b8548687e137d8eeb56df4b4
+  compile.yaml: e9278c35a1a9eb4197cd930d7188fcac49221219
+  LICENSES.txt: 63c09d6e039752fd33cef562f80b5c3d55d2c93c
+  plugin-svn.jar: d6d79db6db5d477b4a0c3f39efe4d4bcecf3a570
+  sequence-library-1.0.3.jar: 3bcf12fa805a735bb26369cd66c5933767c026de
+  sqljet-1.1.11.jar: 68c946d051fa4aa9d3f2a793c556c35fcfba0be3
+  src/openaf/plugins/SVN.class: 887bf1fb1e3cb683ebc7f9f5fc1eef6b1c2a4acd
+  src/openaf/plugins/SVN.java: 7f82dd878694a61f81d77dc2c6915ad0a77a4d42
+  svnkit-1.9.1.jar: 2b6af356de0ed3f26203a2c321a61d92f7fd8a3a
+  svnkit-javahl16-1.9.1.jar: 73269ae2c65ffc97c9732f7cd0986386d536d51d
+  trilead-ssh2-1.0.0-build221.jar: c14d6fbab5e4ac1eb355f92e91b4c2c28a17e9b9

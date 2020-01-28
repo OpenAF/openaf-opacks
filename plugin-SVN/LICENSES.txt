@@ -1,0 +1,473 @@
+svnkit-1.9.1.jar:
+  name: TMate Open Source License
+  url: 'https://svnkit.com/license.html'
+  version: 1.9.1
+  changed from original: false
+  comments: GPL-like license with a dual-licensing option for closed source usage
+  license: >-
+    SVNKit&nbsp;::&nbsp;The TMate Open Source License
+
+
+
+    The TMate Open Source License.
+
+
+
+    This license applies to all portions of TMate SVNKit library, which 
+
+    are not externally-maintained libraries (e.g. Ganymed SSH library).
+
+
+    All the source code and compiled classes in package
+    org.tigris.subversion.javahl
+
+    except SvnClient class are covered by the license in JAVAHL-LICENSE file
+
+
+    Copyright (c) 2004-2012 TMate Software. All rights reserved.
+
+
+    Redistribution and use in source and binary forms, with or without
+    modification, 
+
+    are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice, 
+          this list of conditions and the following disclaimer.
+          
+        * Redistributions in binary form must reproduce the above copyright notice, 
+          this list of conditions and the following disclaimer in the documentation 
+          and/or other materials provided with the distribution.
+          
+        * Redistributions in any form must be accompanied by information on how to 
+          obtain complete source code for the software that uses SVNKit and any 
+          accompanying software that uses the software that uses SVNKit. The source 
+          code must either be included in the distribution or be available for no 
+          more than the cost of distribution plus a nominal fee, and must be freely 
+          redistributable under reasonable conditions. For an executable file, complete 
+          source code means the source code for all modules it contains. It does not 
+          include source code for modules or files that typically accompany the major 
+          components of the operating system on which the executable file runs.
+          
+        * Redistribution in any form without redistributing source code for software 
+          that uses SVNKit is possible only when such redistribution is explictly permitted 
+          by TMate Software. Please, contact TMate Software at support@svnkit.com to 
+          get such permission.
+
+    THIS SOFTWARE IS PROVIDED BY TMATE SOFTWARE ``AS IS'' AND ANY EXPRESS OR
+    IMPLIED
+
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE 
+
+    DISCLAIMED. 
+
+
+    IN NO EVENT SHALL TMATE SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, 
+
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    NOT 
+
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+    OR 
+
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE 
+
+    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+
+    ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." :
+    "http://www.");
+
+    document.write(unescape("%3Cscript src='" + gaJsHost +
+    "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+
+
+    var pageTracker = _gat._getTracker("UA-181731-2");
+
+    pageTracker._initData();
+
+    pageTracker._trackPageview();
+svnkit-cli-1.9.1.jar:
+  name: TMate Open Source License
+  url: 'https://svnkit.com/license.html'
+  version: 1.9.1
+  changed from original: false
+  comments: GPL-like license with a dual-licensing option for closed source usage
+  license: >-
+    SVNKit&nbsp;::&nbsp;The TMate Open Source License
+
+
+
+    The TMate Open Source License.
+
+
+
+    This license applies to all portions of TMate SVNKit library, which 
+
+    are not externally-maintained libraries (e.g. Ganymed SSH library).
+
+
+    All the source code and compiled classes in package
+    org.tigris.subversion.javahl
+
+    except SvnClient class are covered by the license in JAVAHL-LICENSE file
+
+
+    Copyright (c) 2004-2012 TMate Software. All rights reserved.
+
+
+    Redistribution and use in source and binary forms, with or without
+    modification, 
+
+    are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice, 
+          this list of conditions and the following disclaimer.
+          
+        * Redistributions in binary form must reproduce the above copyright notice, 
+          this list of conditions and the following disclaimer in the documentation 
+          and/or other materials provided with the distribution.
+          
+        * Redistributions in any form must be accompanied by information on how to 
+          obtain complete source code for the software that uses SVNKit and any 
+          accompanying software that uses the software that uses SVNKit. The source 
+          code must either be included in the distribution or be available for no 
+          more than the cost of distribution plus a nominal fee, and must be freely 
+          redistributable under reasonable conditions. For an executable file, complete 
+          source code means the source code for all modules it contains. It does not 
+          include source code for modules or files that typically accompany the major 
+          components of the operating system on which the executable file runs.
+          
+        * Redistribution in any form without redistributing source code for software 
+          that uses SVNKit is possible only when such redistribution is explictly permitted 
+          by TMate Software. Please, contact TMate Software at support@svnkit.com to 
+          get such permission.
+
+    THIS SOFTWARE IS PROVIDED BY TMATE SOFTWARE ``AS IS'' AND ANY EXPRESS OR
+    IMPLIED
+
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE 
+
+    DISCLAIMED. 
+
+
+    IN NO EVENT SHALL TMATE SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, 
+
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    NOT 
+
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+    OR 
+
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE 
+
+    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+
+    ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." :
+    "http://www.");
+
+    document.write(unescape("%3Cscript src='" + gaJsHost +
+    "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+
+
+    var pageTracker = _gat._getTracker("UA-181731-2");
+
+    pageTracker._initData();
+
+    pageTracker._trackPageview();
+svnkit-javahl16-1.9.1.jar:
+  name: TMate Open Source License
+  url: 'https://svnkit.com/license.html'
+  version: 1.9.1
+  changed from original: false
+  comments: GPL-like license with a dual-licensing option for closed source usage
+  license: >-
+    SVNKit&nbsp;::&nbsp;The TMate Open Source License
+
+
+
+    The TMate Open Source License.
+
+
+
+    This license applies to all portions of TMate SVNKit library, which 
+
+    are not externally-maintained libraries (e.g. Ganymed SSH library).
+
+
+    All the source code and compiled classes in package
+    org.tigris.subversion.javahl
+
+    except SvnClient class are covered by the license in JAVAHL-LICENSE file
+
+
+    Copyright (c) 2004-2012 TMate Software. All rights reserved.
+
+
+    Redistribution and use in source and binary forms, with or without
+    modification, 
+
+    are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice, 
+          this list of conditions and the following disclaimer.
+          
+        * Redistributions in binary form must reproduce the above copyright notice, 
+          this list of conditions and the following disclaimer in the documentation 
+          and/or other materials provided with the distribution.
+          
+        * Redistributions in any form must be accompanied by information on how to 
+          obtain complete source code for the software that uses SVNKit and any 
+          accompanying software that uses the software that uses SVNKit. The source 
+          code must either be included in the distribution or be available for no 
+          more than the cost of distribution plus a nominal fee, and must be freely 
+          redistributable under reasonable conditions. For an executable file, complete 
+          source code means the source code for all modules it contains. It does not 
+          include source code for modules or files that typically accompany the major 
+          components of the operating system on which the executable file runs.
+          
+        * Redistribution in any form without redistributing source code for software 
+          that uses SVNKit is possible only when such redistribution is explictly permitted 
+          by TMate Software. Please, contact TMate Software at support@svnkit.com to 
+          get such permission.
+
+    THIS SOFTWARE IS PROVIDED BY TMATE SOFTWARE ``AS IS'' AND ANY EXPRESS OR
+    IMPLIED
+
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE 
+
+    DISCLAIMED. 
+
+
+    IN NO EVENT SHALL TMATE SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, 
+
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+    NOT 
+
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+    OR 
+
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE 
+
+    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+
+    ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." :
+    "http://www.");
+
+    document.write(unescape("%3Cscript src='" + gaJsHost +
+    "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+
+
+    var pageTracker = _gat._getTracker("UA-181731-2");
+
+    pageTracker._initData();
+
+    pageTracker._trackPageview();
+trilead-ssh2-1.0.0-build221.jar:
+  name: Trilead Library License (BSD-Like)
+  url: 'http://svn.tmatesoft.com/repos/3rdparty/com.trileads.ssh2/trunk/LICENSE.txt'
+  version: 1.0.0-build221
+  changed from original: false
+  comments: ''
+  license: ''
+sequence-library-1.0.3.jar:
+  name: Sequence Library License
+  url: 'http://www.svnkit.com/SEQUENCE-LICENSE.txt'
+  version: 1.0.3
+  changed from original: false
+  comments: ''
+  license: >-
+    Sequence Library License
+
+
+    This license applies to all portions of the Sequence library, which 
+
+    are not externally-maintained libraries (e.g. junit).
+
+    ====================================================================
+
+    Copyright (c) 2000-2013 syntevo GmbH, Freilassing, GERMANY.
+
+    All rights reserved.
+
+
+    Redistribution and use in source and binary forms, with or without
+
+    modification, are permitted provided that the following conditions are met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+        * Neither the name of syntevo GmbH nor the
+          names of its contributors may be used to endorse or promote products
+          derived from this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND
+
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED
+
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+
+    DISCLAIMED. IN NO EVENT SHALL SYNTEVO GMBH BE LIABLE FOR ANY
+
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+    THIS
+
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    ===================================================================
+sqljet-1.1.11.jar:
+  name: GNU General Public License (GPL)
+  url: 'https://sqljet.com/'
+  version: 1.1.11
+  changed from original: false
+  comments: GPL license with a dual-licensing option for closed source usage
+  license: >-
+    SQLJet&nbsp;::&nbsp;Pure Java SQLite
+      
+      
+      
+      
+
+
+
+
+      
+      
+      
+      
+             What is SQLJet
+
+             SQLJet is an independent pure Java implementation of a popular SQLite database management system.
+              SQLJet is a software library that provides API that enables Java application to
+              read and modify SQLite databases.
+
+             SQLJet does not support SQL queries; there is an API to work with the database on a lower level.
+             SQLJet Google Group.
+             SQLJet API Tutorial.
+             SQLJet Sample Application: SQLite Database Browser (click to launch).
+
+             SQLJet Major Features
+             
+               Fine-grained API to create, read and modify SQLite databases.
+               Database format is fully compatible with SQLite 3.6.
+               No native binaries are needed.
+               Current version only supports SQL in schema.
+             
+
+              Download SQLJet
+              Option 0: Download SQLJet v1.1.13:&nbsp;(version 1.1.13 changelog)
+              
+              Library jar:sqljet-1.1.13.jar
+              Library sources:sqljet-1.1.13-sources.jar
+              Library javadoc:sqljet-1.1.13-javadoc.jar
+              OSGi bundle, to use, e.g. in Eclipse:org.tmatesoft.sqljet_1.1.13.jar
+              From maven repository:http://maven.tmatesoft.com/content/repositories/releases
+    &lt;repositories&gt;
+      &lt;repository&gt;
+        &lt;id&gt;tmate&lt;/id&gt;
+        &lt;url&gt;http://maven.tmatesoft.com/content/repositories/releases&lt;/url&gt;
+      &lt;/repository&gt;
+    &lt;/repositories&gt;
+
+    ...
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.tmatesoft.sqljet&lt;/groupId&gt;
+      &lt;artifactId&gt;sqljet&lt;/artifactId&gt;
+      &lt;version&gt;1.1.13&lt;/version&gt;
+    &lt;/dependency&gt;
+              
+              Option 1: SQLJet nightly builds are available at our build server. Click "Login as Guest" if prompted to log in.
+              Option 2: Checkout from Subversion repository:
+    $ svn co http://svn.sqljet.com/repos/sqljet/branches/1.0.x/ sqljet
+
+    $ cd sqljet
+
+    $ gradle build
+
+              SQLJet is Open Source
+
+              SQLJet is Open Source and can be freely used in Open Source applications under the terms GNU General Public License (GPL). 
+              We also provide commercial licensing option for closed source applications or so called Dual Licensing. For more information
+              on licensing please contact us at support@sqljet.com.
+
+              See Also
+              
+              SQLJet Nightly Builds (Click "Login as Guest" if prompted to log in).
+              SQLJet Issues Tracker
+              SQLJet Subversion Repository
+              SQLite Home Page
+              
+          
+      
+        Copyright &copy; 2004-2019, TMate Software &nbsp;&nbsp;&nbsp;&nbsp;Privacy Policy
+        Java&trade; and all Java-based marks are a trademark or registered trademark of
+          Sun Microsystems, Inc. in the United States and other countries.
+          TMate Software and the website sqljet.com are independent of Sun Microsystems,
+          Inc. and have no relationship, formal or informal.
+          
+        SQLite&trade; is a registered trademark of Hipp, Wyrick & Company, Inc.
+          in the United States and other countries.
+          TMate Software and the website sqljet.com are independent of Hipp, Wyrick & Company, Inc. 
+          and have no relationship, formal or informal.
+          
+      
+
+
+
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." :
+    "http://www.");
+
+    document.write(unescape("%3Cscript src='" + gaJsHost +
+    "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+
+
+    try {
+
+    var pageTracker = _gat._getTracker("UA-10187081-1");
+
+    pageTracker._trackPageview();
+
+    } catch(err) {}

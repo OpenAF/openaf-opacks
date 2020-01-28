@@ -1,0 +1,29 @@
+artifacts:
+
+  - id     : svnkit-cli
+    group  : org.tmatesoft.svnkit
+    version: 1.9.1
+
+  - id     : svnkit
+    group  : org.tmatesoft.svnkit
+    version: 1.9.1
+
+  - id     : svnkit-javahl16
+    group  : org.tmatesoft.svnkit
+    version: 1.9.1
+
+  - id     : trilead-ssh2
+    group  : com.trilead
+    version: 1.0.0-build221
+
+  - id     : antlr-runtime
+    group  : org.antlr
+    version: 3.4
+
+  - id     : sequence-library
+    group  : de.regnis.q.sequence
+    version: 1.0.3
+
+  - id     : sqljet
+    group  : org.tmatesoft.sqljet
+    version: 1.1.11

@@ -36,6 +36,7 @@
   |oPackServer|Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
   |plugin-Ignite|OpenAF plugin to access Ignite functionality.|
+  |plugin-SVN|OpenAF plugin to access SVN repositories.|
   |QR|Generates and reads QR codes.|
   |Redis|Wrapper to access Redis using the java Jedis client.|
   |Robot|Wrapper of functionality that allows for the automation of keystrokes and mouse movements and clicks. |
