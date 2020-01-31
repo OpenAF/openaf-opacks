@@ -479,7 +479,7 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 	if (isUnDef(aChName)) aChName = aIndex;
 
 	var parent = this;
-	return $ch(aChName).create(void 0, "elasticsearch", {
+	return $ch(aChName).post(void 0, "elasticsearch", {
 		index: aIndex,
 		idKey: aIdKey,
 		url  : parent.url,
@@ -570,7 +570,7 @@ ElasticSearch.prototype.nextScroll = function(aScrollMap, aTime) {
 	   scroll: aTime,
 	   scroll_id: aScrollMap._scroll_id
 	});*/
-	return $rest(this.restmap).create(this.url + "/_search/scroll", {
+	return $rest(this.restmap).post(this.url + "/_search/scroll", {
 		scroll: aTime,
 		scroll_id: aScrollMap._scroll_id
 	});
@@ -638,6 +638,8 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
 		aLogFunc = () => {};
 	}
+
+	if (__threads <= 1) __threads = 2;
 
 	var __iniBulk = [];
 	for(var ii = 0; ii < __threads; ii++) {
