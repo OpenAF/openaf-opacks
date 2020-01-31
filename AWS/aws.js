@@ -7,3 +7,4 @@ loadLib("aws_ecs.js");
 loadLib("aws_lambda.js");
 loadLib("aws_rds.js");
 loadLib("aws_sqs.js");
+loadLib("aws_iam.js");
