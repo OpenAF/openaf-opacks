@@ -11,7 +11,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://openaf.io/opacks/rss.opack'
+  url: 'https://openaf.io/opacks/RSS.opack'
 description: A simple library to create and serve RSS feeds.
 name: RSS
 main: ''
