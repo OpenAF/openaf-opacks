@@ -15,7 +15,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/AWS'
+  url: ''https://openaf.io/opacks/AWS.opack'
 description: >-
   Simplified and light AWS API calls to avoid including the heavy AWS Java SDK.
   Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.
