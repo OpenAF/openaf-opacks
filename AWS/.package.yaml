@@ -15,7 +15,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: ''https://openaf.io/opacks/AWS.opack'
+  url: 'https://openaf.io/opacks/AWS.opack'
 description: >-
   Simplified and light AWS API calls to avoid including the heavy AWS Java SDK.
   Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.
@@ -27,29 +27,29 @@ version: '20200130'
 dependencies:
   OpenAF: '>=20190716'
 files:
-  - .odoc.db
-  - .package.yaml
+  - aws_iam.js
+  - aws_sqs.js
   - aws.js
+  - aws_rds.js
   - aws_cloudwatch.js
   - aws_core.js
-  - aws_dynamo.js
-  - aws_ecs.js
-  - aws_iam.js
-  - aws_lambda.js
-  - aws_rds.js
-  - aws_sqs.js
-  - utils/genTestRegions.yaml
+  - .package.yaml
   - utils/testRegions.js
+  - utils/genTestRegions.yaml
+  - aws_dynamo.js
+  - .odoc.db
+  - aws_lambda.js
+  - aws_ecs.js
 filesHash:
-  .odoc.db: 59315f0ca0f71e9bd6ed3a09f6acaa1092422ff1
+  aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
+  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   aws.js: 9986821a9d244b4ff8dbcacbd9aabeb69ae5ddab
+  aws_rds.js: 15518551361378139b152192e479ef764d741e70
   aws_cloudwatch.js: 3f04d1bbc7d54217fff6663cfa237c1f126de48d
   aws_core.js: 61c5e00dfc63ddeb499192ab2d59cd55653d15d5
-  aws_dynamo.js: 1c38f60eaaa1a44f324314022fab8b8867b6c673
-  aws_ecs.js: f245b895329c01e4e1a5e0a4fcc9bb4ac739093c
-  aws_iam.js: a1ebf5c14c5254fdd341305dea5af293758514c2
-  aws_lambda.js: e206da89b743f86cb6c79c66eefa4ce6f343283e
-  aws_rds.js: 15518551361378139b152192e479ef764d741e70
-  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
-  utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 692d6d9f763c4fb17d696c7fd814dc06801c7d08
+  utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
+  aws_dynamo.js: 1c38f60eaaa1a44f324314022fab8b8867b6c673
+  .odoc.db: 59315f0ca0f71e9bd6ed3a09f6acaa1092422ff1
+  aws_lambda.js: e206da89b743f86cb6c79c66eefa4ce6f343283e
+  aws_ecs.js: f245b895329c01e4e1a5e0a4fcc9bb4ac739093c
