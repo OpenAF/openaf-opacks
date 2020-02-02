@@ -1,0 +1,29 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - rss
+  - feed
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/rss.opack'
+description: A simple library to create and serve RSS feeds.
+name: RSS
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20200201'
+dependencies:
+  openaf: '>=20200101'
+files:
+  - rss.js
+  - .package.yaml
+  - .odoc.db
+filesHash:
+  rss.js: d9cc3bd959de3205d5f5ee5d1b47f11cfa3c6378
+  .odoc.db: 7039b782de7e9767e05e82a6e04173ca1493a40f
