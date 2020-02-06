@@ -21,7 +21,7 @@ AWS.prototype.IAM_GetUser = function(aUserName) {
     };
     url += "?" + $rest().query(params);
  
-    var res = this.getURLEncoded(url, aURI, $rest().query(params), {}, "iam", aHost);
+    var res = this.getURLEncoded(url, aURI, $rest().query(params), {}, "iam", aHost, "us-east-1");
 
     if (isMap(res)) return res; else return af.fromXML2Obj(res);
 }; 

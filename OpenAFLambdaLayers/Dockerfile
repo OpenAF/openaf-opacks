@@ -1,13 +1,18 @@
-FROM adoptopenjdk/openjdk11-openj9:alpine
+FROM adoptopenjdk/openjdk11:alpine
 
 RUN apk update\
  && apk add zip\
  && mkdir /openaf\
  && cd /openaf\
- && wget https://openaf.io/nightly/openaf.jar -q\
- && java -Xshareclasses:persistent -Xshareclasses:name=openaf -Xshareclasses:cacheDir=/openaf -jar openaf.jar --repack\
- && sleep 2\
- && java -Xshareclasses:persistent -Xshareclasses:name=openaf -Xshareclasses:cacheDir=/openaf -jar openaf.jar --install
+ && wget -O openaf.jar.orig https://openaf.io/nightly/openaf.jar -q\
+ && wget -O openaf.jar https://openaf.io/nightly/openaf.jar.repacked -q\
+ && java -jar openaf.jar --install
+
+# Update SSL certificates
+RUN apk update\
+ && apk add ca-certificates wget\
+ && update-ca-certificates\
+ && apk --no-cache add openssl wget
 
 RUN mkdir /opt/build\
  && mkdir /output

@@ -19,10 +19,11 @@ jobs:
       var h = new ow.obj.http();
       
       log("Downloading jre...");
-      var o = ow.obj.rest.jsonGet("https://api.adoptopenjdk.net/v2/latestAssets/nightly/openjdk8?openjdk_impl=openj9&os=linux&arch=x64&binary_type=jre&heap_size=normal");
-      var si = h.get(o[0].binary_link, void 0, void 0, true, void 0, true);
-      var so = io.writeFileStream("jre.tgz");
-      ioStreamCopy(so, si);
+      $rest().get2File("jre.tgz", "https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&type=jre&heap_size=normal&release=latest");
+      //var o = ow.obj.rest.jsonGet("https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&type=jre&heap_size=normal&release=latest");
+      //var si = h.get(o[0].binary_link, void 0, void 0, true, void 0, true);
+      //var so = io.writeFileStream("jre.tgz");
+      //ioStreamCopy(so, si);
 
   #---------------------
   - name: Uncompress JRE
@@ -77,7 +78,12 @@ jobs:
       log("Downloading openaf...");
       //var si = h.get("https://openaf.io/nightly/openaf.jar", void 0, void 0, false, void 0, true);
       var si = h.get("https://openaf.io/openaf.jar", void 0, void 0, false, void 0, true);
-      var so = io.writeFileStream("openaf.jar");
+      var so = io.writeFileStream("openaf.jar.orig");
+      ioStreamCopy(so, si);
+
+      //si = h.get("https://openaf.io/nightly/openaf.jar.repacked", void 0, void 0, false, void 0, true);
+      si = h.get("https://openaf.io/openaf.jar.repacked", void 0, void 0, false, void 0, true);
+      so = io.writeFileStream("openaf.jar");
       ioStreamCopy(so, si);
 
       io.rm("openaf");
@@ -90,10 +96,10 @@ jobs:
     exec: |
       ow.loadFormat();
       log("Preparing openaf...");
-      global.jvmargs = " -Xquickstart -Xtune:virtualized ";
+      global.jvmargs = " ";
       sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --repack", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix("oaf repack"));
       sh("rm openaf/openaf.jar.orig");
-      sleep(2500, true);
+      //sleep(2500, true);
       log("Done preparing openaf.");
 
   #--------------------------------
@@ -102,7 +108,7 @@ jobs:
       ow.loadFormat();
       log("Install additional opacks...");
 
-      args.OPACKS = _$(args.OPACKS).isString().default("ElasticSearch,Notifications,Kube,aws,oJob-common");
+      args.OPACKS = _$(args.OPACKS).isString().default("ElasticSearch,Notifications,Kube,aws,s3,rss,oJob-common");
       var pcks = String(args.OPACKS).split(/,/);
       if (isArray(pcks)) pcks.forEach((v) => {
          sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix(v));
