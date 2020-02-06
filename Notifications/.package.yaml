@@ -28,12 +28,16 @@ dependencies:
 files:
   - .odoc.db
   - .package.yaml
+  - .precompile
+  - msteams.js
   - notificationsPushover.yaml
   - notificationsSlack.yaml
   - pushover.js
   - slack.js
 filesHash:
   .odoc.db: a443c2152bf8346bb148c6aba60bbe786767f426
+  .precompile: 296680c7a954da9eb871b3c3ee40ff7fba58ee5d
+  msteams.js: 021db2d4a20ded2971822e6a2ed23e36df7dd460
   notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
   notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
   pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf

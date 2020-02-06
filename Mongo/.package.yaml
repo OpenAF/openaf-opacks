@@ -26,10 +26,12 @@ files:
   - .maven.yaml
   - .odoc.db
   - .package.yaml
+  - .precompile
   - lib/mongo-java-driver-3.9.1.jar
   - mongo.js
 filesHash:
   .maven.yaml: 02fa9c2e696e913571dfc57e131c8708e10c3af9
   .odoc.db: 515fe2958811ff8e7a0941e3e58149bea2b18f52
+  .precompile: 1f45b4faf8afdba6f972e72ebcd518bf9807cad1
   lib/mongo-java-driver-3.9.1.jar: d313237180bf9f2f82e12f503d9617e6b070f792
-  mongo.js: 63f6195d4d01a5d2281975050d4caea16c5b9bbf
+  mongo.js: c931fc3eebdb053a99791571cd7db0dff86aff5d

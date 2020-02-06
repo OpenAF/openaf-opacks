@@ -25,6 +25,7 @@ files:
   - .maven.yaml
   - .odoc.db
   - .package.yaml
+  - .precompile
   - minio-6.0.10-all.jar
   - README.md
   - s3.js
@@ -32,6 +33,7 @@ files:
 filesHash:
   .maven.yaml: 705e7fdc31878af9dbd958bfc151d5b252f2b15f
   .odoc.db: 77d863de7bad824166ed7b83e00a75d7e53adb2b
+  .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   minio-6.0.10-all.jar: 1ac48f28d1f6bfbbe81e20c30b174bd1fb495f2a
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   s3.js: 884bb07a32e6c2ddfdabe1e26543ca9cc01ab856

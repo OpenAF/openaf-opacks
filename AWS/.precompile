@@ -1,0 +1,9 @@
+- aws.js
+- aws_core.js
+- aws_cloudwatch.js
+- aws_dynamo.js
+- aws_ecs.js
+- aws_iam.js
+- aws_lambda.js
+- aws_rds.js
+- aws_sqs.js

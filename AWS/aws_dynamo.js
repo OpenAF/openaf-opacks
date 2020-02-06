@@ -117,7 +117,7 @@ loadLib("aws_core.js");
  
  AWS.prototype.__DYNAMO_Item_Deconvert = function(aMap) {
     var __translate = (v) => {
-       for(let ii in v) {
+       for(var ii in v) {
           switch(ii) {
           case "N": return String(v[ii]);
           case "S": return String(v[ii]);
@@ -125,13 +125,13 @@ loadLib("aws_core.js");
           case "NULL": return null;
           case "L": 
              var ar = [];
-             for(let iii in v[ii]) {
+             for(var iii in v[ii]) {
                 ar.push(__translate(v[ii][iii]));
              }
              return ar;
           case "M":
              var ar = {};
-             for(let iii in v[ii]) {
+             for(var iii in v[ii]) {
                 ar[iii] = __translate(v[ii][iii]);
              }
              return ar;
@@ -140,14 +140,14 @@ loadLib("aws_core.js");
           default:
              if (isMap(v[ii])) {
                 var ar = {};
-                for(let iii in v[ii]) {
+                for(var iii in v[ii]) {
                    ar[iii] = __translate(v[ii][iii]);
                 }
                 return ar;
              } else {
                 if (isArray(v[ii])) {
                    var ar = [];
-                   for(let ii in v[ii]) {
+                   for(var ii in v[ii]) {
                       ar.push(__translate(v[ii][iii]));
                    }
                    return ar;
@@ -161,7 +161,7 @@ loadLib("aws_core.js");
  
     if (isMap(aMap)) {
        var ar = {};
-       for(let ii in aMap) {
+       for(var ii in aMap) {
           ar[ii] = __translate(aMap[ii]);
        }
        return ar;
@@ -176,14 +176,14 @@ loadLib("aws_core.js");
        if (isNull(v)) { return { NULL: v }; }
        if (isArray(v)) {
           var ar = [];
-          for(let ii in v) {
+          for(var ii in v) {
              ar.push(__translate(v[ii]));
           }
           return { L: ar };
        }
        if (isMap(v)) {
           var ar = {};
-          for(let ii in v) {
+          for(var ii in v) {
              ar[ii] = __translate(v[ii]);
           }
           return { M: ar };
@@ -195,7 +195,7 @@ loadLib("aws_core.js");
  
     if (isMap(aMap)) {
        var ar = {};
-       for(let ii in aMap) {
+       for(var ii in aMap) {
           ar[ii] = __translate(aMap[ii]);
        }
        return ar;

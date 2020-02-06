@@ -24,6 +24,7 @@ dependencies:
 files:
   - .odoc.db
   - .package.yaml
+  - .precompile
   - automaton-1.11-8.jar
   - generex-1.0.1.jar
   - jackson-annotations-2.9.0.jar
@@ -42,6 +43,7 @@ files:
   - zjsonpatch-0.3.0.jar
 filesHash:
   .odoc.db: c9277911f82410327ca28222a0120a02b278946a
+  .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
   generex-1.0.1.jar: d8b3573e6d59f0a61dfc37f85dd568ad3bf49e83
   jackson-annotations-2.9.0.jar: 07c10d545325e3a6e72e06381afe469fd40eb701
