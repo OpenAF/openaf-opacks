@@ -27,5 +27,5 @@ files:
   - rss.js
 filesHash:
   .odoc.db: 7039b782de7e9767e05e82a6e04173ca1493a40f
-  .precompile: 3316f4ae0323f58ca08278a14f49c625f15c1080
+  .precompile: 6671ec4aa2c0e8c0716d53df3d0671bd94003636
   rss.js: d9cc3bd959de3205d5f5ee5d1b47f11cfa3c6378
