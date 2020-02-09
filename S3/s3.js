@@ -236,6 +236,18 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
 
 /**
  * <odoc>
+ * <key>S3.putObjectByURL(aURL, aLocalPath)</key>
+ * Puts the file on aLocalPath into aURL.  Optionally you can provide a meta map.
+ * Note: use "/" on the name to simulate folders.
+ * </odoc>
+ */
+S3.prototype.putObjectByURL = function(aURL, aLocalPath, aMetaMap) {
+    var o = this.decomposeURL(aURL);
+    return this.putObject(o.bucket, o.objectName, aLocalPath, aMetaMap);
+};
+
+/**
+ * <odoc>
  * <key>S3.putObjectStream(aBucket, aObjectName, aStream, aMetaMap)</key>
  * Puts the aStream into aBucket with the name aObjectName. Optionally you can provide a meta map.
  * Note: use "/" on the name to simulate folders.
@@ -250,6 +262,18 @@ S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap)
     } else {
         this.s3.putObject(aBucket, aObjectName, aStream);
     }
+};
+
+/**
+ * <odoc>
+ * <key>S3.putObjectStreamByURL(aURL, aStream, aMetaMap)</key>
+ * Puts the aStream into aURL. Optionally you can provide a meta map.
+ * Note: use "/" on the name to simulate folders.
+ * </odoc>
+ */
+S3.prototype.putObjectStreamByURL = function(aURL, aStream, aMetaMap) {
+    var o = this.decomposeURL(aURL);
+    return this.putObjectStream(o.bucket, o.objectName, aStream, aMetaMap);
 };
 
 /**
@@ -275,6 +299,17 @@ S3.prototype.getObjectStream = function(aBucket, aObjectName, offset, len) {
 
 /**
  * <odoc>
+ * <key>S3.getObjectStreamByURL(aURL, offset, len) : JavaStream</key>
+ * Returns a JavaStream to get an object from aURL. Optionally you can provide an offset and a length.
+ * </odoc>
+ */
+S3.prototype.getObjectStreamByURL = function(aURL, offset, len) {
+    var o = this.decomposeURL(aURL);
+    return this.getObjectStream(o.bucket, o.objectName, offset, len);
+};
+
+/**
+ * <odoc>
  * <key>S3.getObject(aBucket, aObjectName, aRemotePath)</key>
  * Gets aObjectName from aBucket storing the file locally in aRemotePath.
  * </odoc>
@@ -285,6 +320,31 @@ S3.prototype.getObject = function(aBucket, aObjectName, aRemotePath) {
     _$(aRemotePath).isString().$_("Please provide a remote path.");
 
     this.s3.getObject(aBucket, aObjectName, aRemotePath);
+};
+
+/**
+ * <odoc>
+ * <key>S3.decomposeURL(aURL) : Map</key>
+ * Given a S3 compatible aURL returns a map with the identified bucket and objectName.
+ * </odoc>
+ */
+S3.prototype.decomposeURL = function(aURL) {
+    var url = new java.net.URL(aURL);
+    return {
+        bucket: String(url.getHost()).replace(/([^\.]+)\..+/, "$1"),
+        objectName: String(url.getPath()).replace(/^\/+/, "")
+    };
+};
+
+/**
+ * <odoc>
+ * <key>S3.getObjectByURL(aURL, aRemotePath)</key>
+ * Gets an object from an aURL storing the file locally in aRemotePath.
+ * </odoc>
+ */
+S3.prototype.getObjectByURL = function(aURL, aRemotePath) {
+    var o = this.decomposeURL(aURL);
+    return this.getObject(o.bucket, o.objectName, aRemotePath);
 };
 
 /**
