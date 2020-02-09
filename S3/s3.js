@@ -248,20 +248,19 @@ S3.prototype.putObjectByURL = function(aURL, aLocalPath, aMetaMap) {
 
 /**
  * <odoc>
- * <key>S3.putObjectStream(aBucket, aObjectName, aStream, aMetaMap)</key>
+ * <key>S3.putObjectStream(aBucket, aObjectName, aStream, aMetaMap, aContentType)</key>
  * Puts the aStream into aBucket with the name aObjectName. Optionally you can provide a meta map.
  * Note: use "/" on the name to simulate folders.
  * </odoc>
  */
-S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap) {
+S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap, aContentType) {
+
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
-    
-    if (isDef(aMetaMap) && isMap(aMetaMap)) {
-        this.s3.putObject(aBucket, aObjectName, aStream, af.toJavaMap(aMetaMap));
-    } else {
-        this.s3.putObject(aBucket, aObjectName, aStream);
-    }
+    aContentType = _$(aContentType).default(null);
+    aMetaMap = _$(aMetaMap).isMap().default({});
+
+    this.s3.putObject(aBucket, aObjectName, aStream, aStream.available(), af.toJavaMap(aMetaMap), null, aContentType);
 };
 
 /**
@@ -271,9 +270,9 @@ S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap)
  * Note: use "/" on the name to simulate folders.
  * </odoc>
  */
-S3.prototype.putObjectStreamByURL = function(aURL, aStream, aMetaMap) {
+S3.prototype.putObjectStreamByURL = function(aURL, aStream, aMetaMap, aContentType) {
     var o = this.decomposeURL(aURL);
-    return this.putObjectStream(o.bucket, o.objectName, aStream, aMetaMap);
+    return this.putObjectStream(o.bucket, o.objectName, aStream, aMetaMap, aContentType);
 };
 
 /**
