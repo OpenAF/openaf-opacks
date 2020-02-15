@@ -23,7 +23,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200213'
+version: '20200214'
 dependencies:
   OpenAF: '>=20190716'
 files:
@@ -35,6 +35,7 @@ files:
   - aws_core.js
   - aws_dynamo.js
   - aws_ecs.js
+  - aws_events.js
   - aws_iam.js
   - aws_lambda.js
   - aws_rds.js
@@ -42,15 +43,16 @@ files:
   - utils/genTestRegions.yaml
   - utils/testRegions.js
 filesHash:
-  .odoc.db: 5f318e12f9708dd7b8f6c57f4769ec3b994c3784
+  .odoc.db: 7781f9f759f2360acfdeb55b12b9485ea4641383
   .precompile: 931dbab4e0b02acaa2891c099b621eeb0bc2c168
-  aws.js: 9986821a9d244b4ff8dbcacbd9aabeb69ae5ddab
+  aws.js: 529b4dd7fc928ee5210b9ad19cc5abc0178b6263
   aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
-  aws_core.js: 61c5e00dfc63ddeb499192ab2d59cd55653d15d5
+  aws_core.js: 2ec2d0b8ce93f4b340b1bf1679d5a3a5703819ed
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
   aws_ecs.js: f245b895329c01e4e1a5e0a4fcc9bb4ac739093c
+  aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
-  aws_lambda.js: e206da89b743f86cb6c79c66eefa4ce6f343283e
+  aws_lambda.js: c3436394c310814836d6f3c8b79b7ca2a4d7a458
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
