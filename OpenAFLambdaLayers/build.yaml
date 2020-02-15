@@ -108,11 +108,23 @@ jobs:
       ow.loadFormat();
       log("Install additional opacks...");
 
-      args.OPACKS = _$(args.OPACKS).isString().default("ElasticSearch,Notifications,Kube,aws,s3,rss,oJob-common");
+      args.OPACKS = _$(args.OPACKS).isString().default("ElasticSearch,Notifications,Kube,aws,s3,rss,oJob-common,Mongo");
       var pcks = String(args.OPACKS).split(/,/);
-      if (isArray(pcks)) pcks.forEach((v) => {
-         sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix(v));
-      });
+      if (isArray(pcks)) {
+        pcks.forEach((v) => {
+          sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix(v));
+        });
+        if (isDef(loadCompiled)) {
+          $from(io.listFiles("openaf").files)
+          .equals("isDirectory", true)
+          .select(r => {
+            if (io.fileExists(r.canonicalPath + "/.precompile")) { 
+              log("Precompile " + r.canonicalPath + "/.precompile");
+              io.readFileYAML(r.canonicalPath + "/.precompile").map(r2 => { loadCompiled(r.canonicalPath + "/" + r2, void 0, true); }); 
+            }
+          })
+        }
+      };
 
       io.rm("openaf/openaf.jar");
       io.rm("openaf-opacks.zip");
@@ -124,6 +136,10 @@ jobs:
     exec: | 
       io.rm("openaf.zip");
       sh("chmod -R a+rw openaf");
+      if (isDef(loadCompiled)) {
+        loadCompiled("lambda.js", void 0, true);
+        sh("zip -9r openaf.zip .openaf_precompiled", void 0, void 0, true);
+      }
       sh("zip -9r openaf.zip openaf", void 0, void 0, true);
       sh("zip -9r openaf.zip lambda.js", void 0, void 0, true);
       sh("zip -9r openaf.zip bootstrap", void 0, void 0, true);

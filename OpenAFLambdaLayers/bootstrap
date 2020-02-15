@@ -1,4 +1,4 @@
 #!/bin/sh
 set -euo pipefail
 
-/opt/jre/bin/java -Xquickstart -Xtune:virtualized -Djava.system.class.loader=openaf.OAFdCL -jar /opt/openaf/openaf.jar -f /opt/lambda.js
+/opt/jre/bin/java -Xshare:off -XX:+IgnoreUnrecognizedVMOptions -XX:+UseContainerSupport -XX:MaxRAMPercentage=90.0 -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -Djava.system.class.loader=openaf.OAFdCL -jar /opt/openaf/openaf.jar -f /opt/lambda.js
