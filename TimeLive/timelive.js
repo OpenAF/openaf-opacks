@@ -292,17 +292,18 @@ TimeLive.prototype.TIMESHEET_getEntriesByDateRange = function(aBeginDate, aEndDa
 // https://www.livetecs.com/timelivexhelp/1/en/topic/timelive-api-timesheet-api
 /**
  * <odoc>
- * <key>TimeLive.TIMESHEET_setEntry(aSingleDate, aProjectId, aProjectTaskId, aTotalTime) : Map</key>
+ * <key>TimeLive.TIMESHEET_setEntry(aSingleDate, aProjectId, aProjectTaskId, aTotalTime, aEmployeeId) : Map</key>
  * Tries to insert or update a timesheet entry on a specific aSingleDate (defaults to today) for aProjectId, aProjectTaskId with aTotalTime (using the format "hh:mm")
  * returning the result of the operation.
  * </odoc>
  */
-TimeLive.prototype.TIMESHEET_setEntry = function(aSingleDate, aProjectId, aProjectTaskId, aTotalTime) {
+TimeLive.prototype.TIMESHEET_setEntry = function(aSingleDate, aProjectId, aProjectTaskId, aTotalTime, aEmployeeId) {
     aSingleDate = this.__convertTextToDate(aSingleDate);
 
     _$(aProjectId, "project id").isNumber().$_();
     _$(aProjectTaskId, "project task id").isNumber().$_();
     _$(aTotalTime, "total time").isString().$_();
+    aEmployeeId = _$(aEmployeeId, "employee id").isNumber().default(this.accountEmployeeId);
 
     var extra = "";
     var res = this.TIMESHEET_getEntryDetailsByDate(aSingleDate);
@@ -314,7 +315,7 @@ TimeLive.prototype.TIMESHEET_setEntry = function(aSingleDate, aProjectId, aProje
         if (isDef(entry) && isDef(entry.AccountEmployeeTimeEntryID)) {
             extra = "/" + entry.AccountEmployeeTimeEntryID;
         }
-    }
+    } 
 
     return this.apiPost("Timesheets" + extra, {
         AccountProjectId: aProjectId,
@@ -322,7 +323,8 @@ TimeLive.prototype.TIMESHEET_setEntry = function(aSingleDate, aProjectId, aProje
         TotalTime: aTotalTime,
         Year: Number(ow.format.fromDate(aSingleDate, "yyyy")),
         Month: Number(ow.format.fromDate(aSingleDate, "MM")),
-        Day: Number(ow.format.fromDate(aSingleDate, "dd"))
+        Day: Number(ow.format.fromDate(aSingleDate, "dd")),
+        AccountEmployeeId: aEmployeeId
     });
 };
 
