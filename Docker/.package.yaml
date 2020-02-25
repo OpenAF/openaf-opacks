@@ -34,7 +34,7 @@ files:
 filesHash:
   docker.js: b526e5e629d923dd2d51332e25326f396209c79d
   .odoc.db: 68ce4c541590964f73f31b1e8fb0be5604377d5b
-  README.md: e144ecd274f242357412ec3723a138e2dcf16284
+  README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
   lib/docker-java-api-0.0.10-jar-with-dependencies.jar: 812ec56bfc5153917a1351c57959bf0e64937dd3

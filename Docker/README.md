@@ -44,3 +44,22 @@ docker.start(container.Id);
 print(docker.logs(container.Id));
 docker.remove(container.Id);
 ````
+
+### Mouting a bind volume when creating a docker container
+
+````javascript
+loadLib("docker.js");
+var docker = new Docker();
+
+var container = docker.create({
+    Image: "openaf/openaf",
+    Env: [ "OJOB=/ojob/main.yaml" ],
+    AttachStdout: true,
+    AttachStderr: true,
+    Binds: [ "/my/source/dir:/ojob" ]
+});
+
+docker.start(container.Id);
+print(docker.logs(container.Id));
+docker.remove(container.Id);
+````
