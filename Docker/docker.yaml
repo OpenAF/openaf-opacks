@@ -1,7 +1,7 @@
 # Author: Nuno Aguiar
 
 jobs:
-  ###################
+  #------------------
   - name: Docker Pull
     help: >
       Tries to pull a container. Expects:
@@ -23,7 +23,7 @@ jobs:
         d.pull(args.image);
       }
 
-  ######################
+  #---------------------
   - name: Docker Execute
     help: >
       Executes a command on a docker container. Expects:
@@ -61,3 +61,64 @@ jobs:
     from: Docker Execute
     exec: |
       args.res = jsonParse(args.res);
+
+  #------------------
+  - name: Docker oJob
+    help: >
+      Tries to execute an oJob on an openaf docker container. Expects:
+
+        ojob           (string) The complete path to the ojob file to execute
+        envs           (map)    Map with the environment variables to use
+        binds          (array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use
+        image          (string) The openaf docker image to use (defaults to openaf/openaf)
+        shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
+        shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
+        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
+    exec: |
+      // Argument checking
+      args.image          = _$(args.image, "image").default("openaf/openaf:nightly");
+      args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
+      args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
+      args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+      _$(args.ojob, "ojob").$_();
+      args.envs   = _$(args.envs, "envs").isMap().default({});
+
+      // Set oJob
+      args.envs.OJOB = args.ojob;
+
+      // Prepare envs
+      var envs = [];
+      Object.keys(args.envs).forEach(k => {
+        envs.push(k + "=" + args.envs[k]);
+      });
+
+      // Go
+      loadLib("docker.js");
+      var docker = new Docker();
+      var container = docker.create({
+          Image: args.image,
+          Env  : envs,
+          AttachStdout: true,
+          AttachStderr: true,
+          Binds: args.binds
+      });
+      docker.start(container.Id);
+
+      // Wait for it
+      if (String(args.shouldWait).toLowerCase() == "true") {
+        var state = docker.getInfo(container.Id).State;
+        if (state == "created" || state == "running") {
+           while(state != "exited") {
+              state = docker.getInfo(container.Id).State;
+              sleep(25, true); 
+           }
+        }
+
+        // Done with it
+        args.logs = docker.logs(container.Id);
+        if (String(args.shouldRemove).toLowerCase() == "true") docker.remove(container.Id);
+  
+        if (String(args.shouldShowLogs).toLowerCase() == "true") {
+          print(args.logs);
+        }
+      }
