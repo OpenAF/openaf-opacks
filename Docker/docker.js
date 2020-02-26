@@ -177,7 +177,11 @@ Docker.prototype.getContainer = function(aId) {
  * </odoc>
  */
 Docker.prototype.getInfo = function(aId) {
-   return jsonParse(String(this.getContainer(aId)));
+   var res = this.getContainer(aId);
+   if (isUnDef(res)) 
+      return void 0;
+   else
+      return jsonParse(String(res));
 };
 
 /**

@@ -107,19 +107,29 @@ jobs:
 
       // Wait for it
       if (String(args.shouldWait).toLowerCase() == "true") {
-        var state = docker.getInfo(container.Id).State;
-        if (state == "created" || state == "running") {
-           while(state != "exited") {
-              state = docker.getInfo(container.Id).State;
-              sleep(25, true); 
-           }
+        var info = docker.getInfo(container.Id);
+        if (isDef(info)) {
+          var state = info.State;
+          if (state == "created" || state == "running") {
+             while(isDef(info) && state != "exited") {
+                info = docker.getInfo(container.Id);
+                if (isDef(info)) {
+                  state = info.State;
+                  sleep(500, true); 
+                }
+             }
+          }
         }
 
         // Done with it
-        args.logs = docker.logs(container.Id);
-        if (String(args.shouldRemove).toLowerCase() == "true") docker.remove(container.Id);
-  
-        if (String(args.shouldShowLogs).toLowerCase() == "true") {
-          print(args.logs);
+        if (isDef(info)) {
+          args.logs = docker.logs(container.Id);
+          if (String(args.shouldRemove).toLowerCase() == "true") docker.remove(container.Id);
+    
+          if (String(args.shouldShowLogs).toLowerCase() == "true") {
+            print(args.logs);
+          }
+        } else {
+          throw "Container no longer found.";
         }
       }
