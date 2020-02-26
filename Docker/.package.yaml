@@ -38,4 +38,4 @@ filesHash:
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
   lib/docker-java-api-0.0.10-jar-with-dependencies.jar: 812ec56bfc5153917a1351c57959bf0e64937dd3
-  docker.yaml: 415a216ea0085ed066cbfda899eb720914a1321a
+  docker.yaml: dc3a4afacf2f28f5e11411aaaa4a65a8925adfd5
