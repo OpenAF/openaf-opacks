@@ -127,27 +127,31 @@ Docker.prototype.prune = function() {
 
 /**
  * <odoc>
- * <key>Docker.create(aObj) : Map</key>
- * Tries to create a docker container with the provided aObj.
+ * <key>Docker.create(aObj, aName) : Map</key>
+ * Tries to create a docker container (with optional aName) with the provided aObj.
  * (check https://docs.docker.com/engine/api/v1.37/#operation/ContainerCreate for more).\
  * \
  * Example: docker.create({ Cmd: "date", Image: "ubuntu", Env: [ "FOO=bar", "BAZ=quux" ], AttachStdout: true, AttachStderr: true })\
  * \
  * </odoc>
  */
-Docker.prototype.containerCreate = function(aContainer) {
-   return this.docker.containers().create(this.__buildObj(aContainer));
+Docker.prototype.containerCreate = function(aContainer, aName) {
+   if (isDef(aName) && isString(aName)) {
+      return this.docker.containers().create(aName, this.__buildObj(aContainer));
+   } else {
+      return this.docker.containers().create(this.__buildObj(aContainer));
+   }
 };
 
 /**
  * <odoc>
- * <key>Docker.containerCreate(aObj) : JavaObject</key>
- * Tries to create a docker container with the provided aObj returning the container java
+ * <key>Docker.containerCreate(aObj, aName) : JavaObject</key>
+ * Tries to create a docker container (with optional aName) with the provided aObj returning the container java
  * object.
  * </odoc>
  */
-Docker.prototype.create = function(aContainer) {
-   return jsonParse(this.containerCreate(aContainer));
+Docker.prototype.create = function(aContainer, aName) {
+   return jsonParse(this.containerCreate(aContainer, aName));
 };
 
 /**
