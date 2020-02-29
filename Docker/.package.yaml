@@ -32,7 +32,7 @@ files:
   - lib/docker-java-api-0.0.10-jar-with-dependencies.jar
   - docker.yaml
 filesHash:
-  docker.js: 0a65449e894e0355a24f6bd51de2724e69a056c0
+  docker.js: 484a902f405b9ba834dbdc02323e5ec72c6cf288
   .odoc.db: 3f10bf15f106deb7f7e43da535c784d590b39c35
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746

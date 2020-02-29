@@ -271,7 +271,7 @@ Docker.prototype.logs = function(aId) {
       for(var ii in o) {
          r += o[ii].substring(8) + "\n";
       }
-      return r; 
+      return r.substring(0, r.length-1); 
    } else {
       return void 0;
    }
