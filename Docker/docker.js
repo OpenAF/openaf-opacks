@@ -191,7 +191,9 @@ Docker.prototype.getInfo = function(aId) {
  * </odoc>
  */
 Docker.prototype.start = function(aId) {
-   this.getContainer(aId).start();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.start();
 };
 
 /**
@@ -201,7 +203,9 @@ Docker.prototype.start = function(aId) {
  * </odoc>
  */
 Docker.prototype.stop = function(aId) {
-   this.getContainer(aId).stop();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.stop();
 };
 
 /**
@@ -211,7 +215,9 @@ Docker.prototype.stop = function(aId) {
  * </odoc>
  */
 Docker.prototype.restart = function(aId) {
-   this.getContainer(aId).restart();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.restart();
 };
 
 /**
@@ -221,7 +227,9 @@ Docker.prototype.restart = function(aId) {
  * </odoc>
  */
 Docker.prototype.kill = function(aId) {
-   this.getContainer(aId).kill();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.kill();
 };
 
 /**
@@ -231,7 +239,9 @@ Docker.prototype.kill = function(aId) {
  * </odoc>
  */
 Docker.prototype.remove = function(aId) {
-   this.getContainer(aId).remove();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.remove();
 };
 
 /**
@@ -241,7 +251,9 @@ Docker.prototype.remove = function(aId) {
  * </odoc>
  */
 Docker.prototype.containerLogs = function(aId) {
-   return this.getContainer(aId).logs();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) return void 0;
+   return c.logs();
 };
 
 /**
@@ -251,12 +263,18 @@ Docker.prototype.containerLogs = function(aId) {
  * </odoc>
  */
 Docker.prototype.logs = function(aId) {
-   var o = String(this.getContainer(aId).logs()).split(/\n/);
-   var r = "";
-   for(var ii in o) {
-      r += o[ii].substring(8) + "\n";
+   var c = this.getContainer(aId);
+
+   if (isDef(c)) {
+      var o = String(c.logs()).split(/\n/);
+      var r = "";
+      for(var ii in o) {
+         r += o[ii].substring(8) + "\n";
+      }
+      return r; 
+   } else {
+      return void 0;
    }
-   return r;
 };
 
 /**

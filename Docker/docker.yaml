@@ -121,11 +121,13 @@ jobs:
                 if (isDef(info)) {
                   state = info.State;
                   if (String(args.shouldShowLogs).toLowerCase() == "true") {
-                    tmp = docker.logs(container.Id);
-                    if (tmp.length > logPos || (logPos == 0 && tmp.length > 0)) printnl(tmp.substr(logPos-1, tmp.length));
-                    logPos = tmp.length;
+                    $tb(() => { tmp = String(docker.logs(container.Id)); }).timeout(2500).exec();
+                    if (isDef(tmp) && tmp.length > 0) {
+                       if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                       logPos = tmp.length-1;
+                    } 
                   }
-                  sleep(250, true); 
+                  sleep(500, true); 
                 }
              }
           }
