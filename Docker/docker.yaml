@@ -72,6 +72,7 @@ jobs:
         binds          (array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use
         image          (string) The openaf docker image to use (defaults to openaf/openaf)
         name           (string) Optional name for the container
+        nameSuffix     (string) Boolean string to determine if an unique container name suffix should be added (defaults to "true")
         shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
         shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
         shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
@@ -96,6 +97,9 @@ jobs:
       // Go
       loadLib("docker.js");
       var docker = new Docker();
+      if (String(args.nameSuffix).toLowerCase() == "true") {
+        args.name = args.name  + "-" + String(nowUTC());
+      }
       var container = docker.create({
           Image: args.image,
           Env  : envs,
@@ -111,11 +115,17 @@ jobs:
         if (isDef(info)) {
           var state = info.State;
           if (state == "created" || state == "running") {
+             var logPos = 0, tmp = "";
              while(isDef(info) && state != "exited") {
                 info = docker.getInfo(container.Id);
                 if (isDef(info)) {
                   state = info.State;
-                  sleep(500, true); 
+                  if (String(args.shouldShowLogs).toLowerCase() == "true") {
+                    tmp = docker.logs(container.Id);
+                    if (tmp.length > logPos || (logPos == 0 && tmp.length > 0)) printnl(tmp.substr(logPos-1, tmp.length));
+                    logPos = tmp.length;
+                  }
+                  sleep(250, true); 
                 }
              }
           }
@@ -126,9 +136,9 @@ jobs:
           args.logs = docker.logs(container.Id);
           if (String(args.shouldRemove).toLowerCase() == "true") docker.remove(container.Id);
     
-          if (String(args.shouldShowLogs).toLowerCase() == "true") {
-            print(args.logs);
-          }
+          //if (String(args.shouldShowLogs).toLowerCase() == "true") {
+          //  print(args.logs);
+          //}
         } else {
           throw "Container no longer found.";
         }
