@@ -69,7 +69,7 @@ RSS.prototype.generate = function(aPubDate, aBuildDate) {
                .e("title").t(this.items[ii].title).up()
                .e("description").t(this.items[ii].description).up()
                .e("category").t(this.items[ii].category).up()
-               .e("pubDate").t(this.items[ii].pubDate).up()
+               .e("pubDate").t(this.items[ii].pubDate.toUTCString()).up()
                .e("guid").t(this.items[ii].guid).up()
                .e("link").t(this.items[ii].link).up()
                .up();
