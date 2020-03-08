@@ -11,7 +11,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://openaf.io/opacks/pastebin.opack'
+  url: 'https://openaf.io/opacks/PasteBin.opack'
 description: Wrapper around PasteBin functionality.
 name: PasteBin
 main: ''
