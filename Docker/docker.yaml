@@ -80,3 +80,21 @@ jobs:
       loadLib("docker.js");
       var docker = new Docker();
       docker.runOJob(args);
+
+  # ----------------------
+  - name: Docker container
+    help: >
+      Tries to execute a container on an docker container. Expects:
+
+        envs           (map)    Map with the environment variables to use
+        binds          (array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use
+        image          (string) The openaf docker image to use (defaults to openaf/openaf)
+        name           (string) Optional name for the container
+        nameSuffix     (string) Boolean string to determine if an unique container name suffix should be added (defaults to "true")
+        shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
+        shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
+        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
+    exec: |
+      loadLib("docker.js");
+      var docker = new Docker();
+      docker.runContainer(args);

@@ -459,3 +459,80 @@ Docker.prototype.runOJob = function(args) {
       }
    }
 };
+
+/**
+ * <odoc>
+ * <key>Docker.runContainer(args)</key>
+ * Tries to run an oJob in an openaf docker image with the provided args maps. The args map expects:\
+ * \
+ *    image          (String) The openaf image to use (defaults to openaf/openaf:nightly)\
+ *    shouldWait     (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
+ *    shouldRemove   (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
+ *    shouldShowLogs (String) A boolean string to determine if the logs of container execution should be output\
+ *    envs           (Map)    A map of environment variables for container execution\
+ *    name           (String) The container name\
+ *    nameSuffix     (String) A boolean string to determine if the container name should be suffixed with nowUTC()\
+ * \
+ * </odoc>
+ */
+Docker.prototype.runContainer = function(args) {
+   // Argument checking
+   args.image          = _$(args.image, "image").default("openaf/openaf:nightly");
+   args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
+   args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
+   args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+   args.envs   = _$(args.envs, "envs").isMap().default({});
+
+   // Prepare envs
+   var envs = [];
+   Object.keys(args.envs).forEach(k => {
+      envs.push(k + "=" + args.envs[k]);
+   });
+
+   // Go
+   var origName = String(args.name);
+   if (String(args.nameSuffix).toLowerCase() == "true") {
+      args.name = args.name  + "-" + String(nowUTC());
+   }
+   var container = this.create({
+         Image       : args.image,
+         Env         : envs,
+         AttachStdout: true,
+         AttachStderr: true,
+         Binds       : args.binds
+   }, args.name);
+   this.start(container.Id);
+
+   // Wait for it
+   if (String(args.shouldWait).toLowerCase() == "true") {
+      var info = this.getInfo(container.Id);
+      if (isDef(info)) {
+         var state = info.State;
+         if (state == "created" || state == "running") {
+            var logPos = 0, tmp = "";
+            while(isDef(info) && state != "exited") {
+               info = this.getInfo(container.Id);
+               if (isDef(info)) {
+               state = info.State;
+               if (String(args.shouldShowLogs).toLowerCase() == "true") {
+                  $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                  if (isDef(tmp) && tmp.length > 0) {
+                     if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                     logPos = tmp.length-1;
+                  } 
+               }
+               sleep(500, true); 
+               }
+            }
+         }
+      }
+
+      // Done with it
+      if (isDef(info)) {
+         args.logs = this.logs(container.Id);
+         if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
+      } else {
+         throw "Container no longer found.";
+      }
+   }
+};
