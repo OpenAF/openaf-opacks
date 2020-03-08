@@ -12,7 +12,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: 'https://openaf.io/opacks/OpenCliLambdaLayers.opack'
+  url: 'https://openaf.io/opacks/OpenAFLambdaLayers.opack'
 description: Build the lambda layers to run OpenAF lambda functions
 name: OpenAFLambdaLayers
 main: ''
