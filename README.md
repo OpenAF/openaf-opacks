@@ -42,6 +42,7 @@
   |Robot|Wrapper of functionality that allows for the automation of keystrokes and mouse movements and clicks. |
   |RSS|A simple library to create and serve RSS feeds.|
   |S3|Wrapper to access S3 compatible object storages as a client.|
+  |ScaleWay|Wrapper around ScaleWay API.| 
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
   |Terraform|OpenAF's wrapper around Terraform's functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|

@@ -1,0 +1,26 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - scaleway
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/ScaleWay.opack
+description: Wrapper around ScaleWay API
+name: ScaleWay
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20200312'
+dependencies:
+  openaf: '>=20200101'
+files:
+  - scaleway.js
+  - .package.yaml
+filesHash:
+  scaleway.js: c3ede20a775d3fe5593abc9676e802bbab777d74
