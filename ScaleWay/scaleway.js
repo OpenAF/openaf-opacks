@@ -6,15 +6,14 @@ var ScaleWay = function(aAccessKey, aAuthToken, aRegion) {
     this.headers = {
         requestHeaders: {
             "X-Auth-Token": this.authToken
-        },
-        uriQuery: true
+        }
     };
 };
 
 ScaleWay.prototype.execAPI = function(aVerb, aType, aURISuffix, aParams, aPerPage, aPage) {
     aPerPage   = _$(aPerPage, "perpage").isNumber().default(void 0);
     aPage      = _$(aPage, "page").isNumber().default(void 0);
-    aParams    = _$(aParams, "params").isString().default({});
+    aParams    = _$(aParams, "params").isMap().default({});
     aURISuffix = _$(aURISuffix, "urisuffix").isString().default("");
 
     var uri = "";
@@ -22,16 +21,15 @@ ScaleWay.prototype.execAPI = function(aVerb, aType, aURISuffix, aParams, aPerPag
     case "instance": uri = "/instance/v1/zones/" + this.region; break;
     }
 
-    var url = "http://api.scaleway.com" + uri + aURISuffix;
+    var url = "https://api.scaleway.com" + uri + aURISuffix;
     switch(aVerb) {
     case "post":
-        return $rest(this.headers).post(url, aParams, {
-            per_page: aPerPage,
-            page    : aPage
-        });
+        return $rest(this.headers).post(url, aParams);
     case "get": 
     default   :
-        return $rest(this.headers).get(url, merge({
+        return $rest(merge(this.headers, {
+            uriQuery: true
+        })).get(url, merge({
             per_page: aPerPage,
             page    : aPage
         }, aParams));
@@ -54,6 +52,8 @@ ScaleWay.prototype.SERVERS_listActions = function(aId, aPerPage, aPage) {
 
 ScaleWay.prototype.SERVERS_performAction = function(aId, aAction) {
     _$(aId, "id").isString().$_();
+    _$(aAction, "action").isString().$_();
+
     return this.execAPI("post", "instance", "/servers/" + aId + "/action", {
         action: aAction
     });

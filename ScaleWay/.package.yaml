@@ -7,20 +7,20 @@ scripts:
 keywords:
   - scaleway
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://openaf.io/opacks/ScaleWay.opack
+  url: 'https://openaf.io/opacks/ScaleWay.opack'
 description: Wrapper around ScaleWay API
 name: ScaleWay
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20200312'
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20200313'
 dependencies:
   openaf: '>=20200101'
 files:
   - scaleway.js
   - .package.yaml
 filesHash:
-  scaleway.js: c3ede20a775d3fe5593abc9676e802bbab777d74
+  scaleway.js: 89f451aeb2552dd3f7b43f6ff4c7dd3511940e6c
