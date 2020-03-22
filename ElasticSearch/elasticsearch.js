@@ -479,7 +479,7 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 	if (isUnDef(aChName)) aChName = aIndex;
 
 	var parent = this;
-	return $ch(aChName).post(void 0, "elasticsearch", {
+	return $ch(aChName).create(void 0, "elasticsearch", {
 		index: aIndex,
 		idKey: aIdKey,
 		url  : parent.url,
