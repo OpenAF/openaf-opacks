@@ -23,7 +23,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200304'
+version: '20200305'
 dependencies:
   OpenAF: '>=20190716'
 files:
@@ -46,7 +46,7 @@ files:
 filesHash:
   .odoc.db: 50cfbc0ca98521b2048514d7eae3d71ad63432ee
   .precompile: 931dbab4e0b02acaa2891c099b621eeb0bc2c168
-  aws.js: 529b4dd7fc928ee5210b9ad19cc5abc0178b6263
+  aws.js: 407c128f958d48f446d2a444fec9efdad94a33c0
   aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
   aws_core.js: 2ec2d0b8ce93f4b340b1bf1679d5a3a5703819ed
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
