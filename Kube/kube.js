@@ -14,14 +14,19 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout) {
 	loadExternalJars(getOPackPath("Kube") || ".");
 	aWSTimeout = _$(aWSTimeout).isNumber().default(5000);
 	
-	this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
-	              .withMasterUrl(this.url)
-	              .withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
-	              .withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
-				  .withTrustCerts(true)
-				  .withWebsocketTimeout(aWSTimeout)
-	              .build();
-				  //.withOauthToken("")
+	if (isUnDef(aURL)) {
+		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build();
+	} else {
+		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+		.withMasterUrl(this.url)
+		.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
+		.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
+		.withTrustCerts(true)
+		.withWebsocketTimeout(aWSTimeout)
+		.build();
+		//.withOauthToken("")
+	}
+
 	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
 };
 
