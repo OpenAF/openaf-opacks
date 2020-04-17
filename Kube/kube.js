@@ -1,10 +1,10 @@
 /**
  * <odoc>
- * <key>Kube.Kube(aURL, aUser, aPass)</key>
- * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass.
+ * <key>Kube.Kube(aURL, aUser, aPass, aWSTimeout, aToken)</key>
+ * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass or aToken.
  * </odoc>
  */
-var Kube = function (aURL, aUser, aPass, aWSTimeout) {
+var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
 	plugin("HTTP");
 	ow.loadFormat();
 	this.url = aURL; 
@@ -17,14 +17,22 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout) {
 	if (isUnDef(aURL)) {
 		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build();
 	} else {
-		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
-		.withMasterUrl(this.url)
-		.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
-		.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
-		.withTrustCerts(true)
-		.withWebsocketTimeout(aWSTimeout)
-		.build();
-		//.withOauthToken("")
+		if (isDef(aToken)) {
+			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+			.withMasterUrl(this.url)
+			.withTrustCerts(true)
+			.withWebsocketTimeout(aWSTimeout)
+			.withOauthToken(aToken)
+			.build();
+		} else {
+			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+			.withMasterUrl(this.url)
+			.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
+			.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
+			.withTrustCerts(true)
+			.withWebsocketTimeout(aWSTimeout)
+			.build();
+		}
 	}
 
 	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
