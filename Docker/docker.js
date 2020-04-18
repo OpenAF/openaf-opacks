@@ -7,18 +7,22 @@ loadExternalJars(path + "/lib");
 
 /**
  * <odoc>
- * <key>Docker.Docker(aRemote, pathToSSL)</key>
+ * <key>Docker.Docker(aRemote, auth)</key>
  * If no parameters are provided it assumes that /var/run/docker.sock exists otherwise you need to provide aRemote URL and
- * the pathToSSL certificates.
+ * the an auth class.
  * </odoc>
  */
-var Docker = function(aRemote, pathToSSL) {
+var Docker = function(aRemote, authC) {
    this.remote = aRemote;
 
    if (isUnDef(this.remote)) {
-      this.docker = new Packages.com.amihaiemil.docker.LocalDocker(new java.io.File("/var/run/docker.sock"));
+      this.docker = new Packages.com.amihaiemil.docker.UnixDocker(new java.io.File("/var/run/docker.sock"));
    } else {
-      this.docker = new Packages.com.amihaiemil.docker.RemoteDocker(aRemote, pathToSSL);
+      if (isUnDef(authC)) {
+         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote));
+      } else {
+         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote), authC);
+      }
    }
 };
 
@@ -222,6 +226,42 @@ Docker.prototype.restart = function(aId) {
 
 /**
  * <odoc>
+ * <key>Docker.waitForNotRunning(aId) : Number</key>
+ * Waits for container aId to be "not running". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForNotRunning = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("not-running");
+};
+
+/**
+ * <odoc>
+ * <key>Docker.waitForNextExit(aId) : Number</key>
+ * Waits for container aId to be "next-exit". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForNextExit = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("next-exit");
+};
+
+/**
+ * <odoc>
+ * <key>Docker.waitForRemoved(aId) : Number</key>
+ * Waits for container aId to be "removed". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForRemoved = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("removed");
+};
+
+/**
+ * <odoc>
  * <key>Docker.kill(aId)</key>
  * Tries to kill the aId corresponding container.
  * </odoc>
@@ -270,7 +310,7 @@ Docker.prototype.logs = function(aId, aPrefix) {
       var o = String(c.logs()).split(/\n/);
       var r = "";
       for(var ii in o) {
-         r += aPrefix + o[ii].substring(8) + "\n";
+         r += aPrefix + o[ii] + "\n";
       }
       return r.substring(0, r.length-1); 
    } else {
@@ -379,14 +419,31 @@ Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
  * <key>Docker.runOJob(args)</key>
  * Tries to run an oJob in an openaf docker image with the provided args maps. The args map expects:\
  * \
- *    image          (String) The openaf image to use (defaults to openaf/openaf:nightly)\
- *    shouldWait     (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
- *    shouldRemove   (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
- *    shouldShowLogs (String) A boolean string to determine if the logs of container execution should be output\
- *    envs           (Map)    A map of environment variables for container execution\
- *    ojob           (String) The full path to the ojob to execute on the container\
- *    name           (String) The container name\
- *    nameSuffix     (String) A boolean string to determine if the container name should be suffixed with nowUTC()\
+ *    image            (String)  The openaf image to use (defaults to openaf/openaf:nightly)\
+ *    shouldWait       (String)  A boolean string to determine if it should wait for the container execution end (defaults to "true")\
+ *    shouldRemove     (String)  A boolean string to determine if the container should be remove after execution end (defaults to "true")\
+ *    shouldShowLogs   (String)  A boolean string to determine if the logs of container execution should be output\
+ *    envs             (Map)     A map of environment variables for container execution\
+ *    binds            (Array)   Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
+ *    cmd              (String)  An optional command string\
+ *    hostname         (String)  An optional hostname to use\
+ *    domainname       (String)  An optional domain name to use\
+ *    user             (String)  Optional user that commands are run as inside the container\
+ *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
+ *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    volumes          (Map)     A map of volumes to use\
+ *    workingDir       (String)  The working directory for commands to run in\
+ *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
+ *    networkDisabled  (Boolean) Disable networking for the container\
+ *    macAddress       (String)  A MAC address of the container\
+ *    labels           (Map)     Optional labels\
+ *    stopSignal       (String)  Signal to stop a container as a string or unsigned integer\
+ *    stopTimeout      (Number)  Timeout to stop a container in second\
+ *    hostConfig       (Map)     The container host config (see Docker's ContainerCreate documentation)\
+ *    networkingConfig (Map)     The container networking config (see Docker's ContainerCreate documentation)\
+ *    ojob             (String)  The full path to the ojob to execute on the container\
+ *    name             (String)  The container name\
+ *    nameSuffix       (String)  A boolean string to determine if the container name should be suffixed with nowUTC()\
  * \
  * </odoc>
  */
@@ -414,38 +471,58 @@ Docker.prototype.runOJob = function(args) {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
-         Image       : args.image,
-         Env         : envs,
-         AttachStdout: true,
-         AttachStderr: true,
-         Binds       : args.binds
+         Image           : args.image,
+         Env             : envs,
+         AttachStdout    : true,
+         AttachStderr    : true,
+         Binds           : args.binds,
+         Cmd             : args.cmd,
+         Hostname        : args.hostname,
+         Domainname      : args.domainname,
+         User            : args.user,
+         Healthcheck     : args.healthcheck,
+         ExposedPorts    : args.exposedPorts,
+         Volumes         : args.volumes,
+         WorkingDir      : args.workingDir,
+         Entrypoint      : args.entrypoint,
+         NetworkDisabled : args.networkDisabled,
+         MacAddress      : args.macAddress,
+         Labels          : args.labels,
+         StopSignal      : args.stopSignal,
+         StopTimeout     : args.stopTimeout,
+         HostConfig      : args.hostConfig,
+         NetworkingConfig: args.networkingConfig
    }, args.name);
    this.start(container.Id);
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
-      var info = this.getInfo(container.Id);
-      if (isDef(info)) {
-         var state = info.State;
-         if (state == "created" || state == "running") {
-            var logPos = 0, tmp = "";
-            while(isDef(info) && state != "exited") {
-               info = this.getInfo(container.Id);
-               if (isDef(info)) {
-               state = info.State;
-               if (String(args.shouldShowLogs).toLowerCase() == "true") {
-                  $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
-                  if (isDef(tmp) && tmp.length > 0) {
-                     if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
-                     logPos = tmp.length-1;
-                  } 
-               }
-               sleep(500, true); 
+      var info;
+      if (String(args.shouldShowLogs).toLowerCase() == "true") {
+         info = this.getInfo(container.Id);
+         if (isDef(info)) {
+            var state = info.State;
+            if (state == "created" || state == "running") {
+               var logPos = 0, tmp = "";
+               while(isDef(info) && state != "exited") {
+                  info = this.getInfo(container.Id);
+                  if (isDef(info)) {
+                  state = info.State;
+                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                     if (isDef(tmp) && tmp.length > 0) {
+                        if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                        logPos = tmp.length-1;
+                     } 
+                  sleep(500, true); 
+                  }
                }
             }
          }
+      } else {
+         this.waitForNotRunning(container.Id);
+         info = this.getInfo(container.Id);
       }
-
+   
       // Done with it
       if (isDef(info)) {
          args.logs = this.logs(container.Id);
@@ -465,13 +542,30 @@ Docker.prototype.runOJob = function(args) {
  * <key>Docker.runContainer(args)</key>
  * Tries to run an oJob in an openaf docker image with the provided args maps. The args map expects:\
  * \
- *    image          (String) The openaf image to use (defaults to openaf/openaf:nightly)\
- *    shouldWait     (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
- *    shouldRemove   (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
- *    shouldShowLogs (String) A boolean string to determine if the logs of container execution should be output\
- *    envs           (Map)    A map of environment variables for container execution\
- *    name           (String) The container name\
- *    nameSuffix     (String) A boolean string to determine if the container name should be suffixed with nowUTC()\
+ *    image            (String) The openaf image to use (defaults to openaf/openaf:nightly)\
+ *    shouldWait       (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
+ *    shouldRemove     (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
+ *    shouldShowLogs   (String) A boolean string to determine if the logs of container execution should be output\
+ *    envs             (Map)    A map of environment variables for container execution\
+ *    binds            (Array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
+ *    cmd              (String) An optional command string\
+ *    hostname         (String)  An optional hostname to use\
+ *    domainname       (String)  An optional domain name to use\
+ *    user             (String)  Optional user that commands are run as inside the container\
+ *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
+ *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    volumes          (Map)     A map of volumes to use\
+ *    workingDir       (String)  The working directory for commands to run in\
+ *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
+ *    networkDisabled  (Boolean) Disable networking for the container\
+ *    macAddress       (String)  A MAC address of the container\
+ *    labels           (Map)     Optional labels\
+ *    stopSignal       (String)  Signal to stop a container as a string or unsigned integer\
+ *    stopTimeout      (Number)  Timeout to stop a container in second\
+ *    hostConfig       (Map)     The container host config (see Docker's ContainerCreate documentation)\
+ *    networkingConfig (Map)     The container networking config (see Docker's ContainerCreate documentation)\ 
+ *    name             (String) The container name\
+ *    nameSuffix       (String) A boolean string to determine if the container name should be suffixed with nowUTC()\
  * \
  * </odoc>
  */
@@ -495,36 +589,57 @@ Docker.prototype.runContainer = function(args) {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
-         Image       : args.image,
-         Env         : envs,
-         AttachStdout: true,
-         AttachStderr: true,
-         Binds       : args.binds
+         Image           : args.image,
+         Env             : envs,
+         AttachStdout    : true,
+         AttachStderr    : true,
+         Binds           : args.binds,
+         Cmd             : args.cmd,
+         Hostname        : args.hostname,
+         Domainname      : args.domainname,
+         User            : args.user,
+         Healthcheck     : args.healthcheck,
+         ExposedPorts    : args.exposedPorts,
+         Volumes         : args.volumes,
+         WorkingDir      : args.workingDir,
+         Entrypoint      : args.entrypoint,
+         NetworkDisabled : args.networkDisabled,
+         MacAddress      : args.macAddress,
+         Labels          : args.labels,
+         StopSignal      : args.stopSignal,
+         StopTimeout     : args.stopTimeout,
+         HostConfig      : args.hostConfig,
+         NetworkingConfig: args.networkingConfig         
    }, args.name);
    this.start(container.Id);
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
-      var info = this.getInfo(container.Id);
-      if (isDef(info)) {
-         var state = info.State;
-         if (state == "created" || state == "running") {
-            var logPos = 0, tmp = "";
-            while(isDef(info) && state != "exited") {
-               info = this.getInfo(container.Id);
-               if (isDef(info)) {
-               state = info.State;
-               if (String(args.shouldShowLogs).toLowerCase() == "true") {
-                  $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
-                  if (isDef(tmp) && tmp.length > 0) {
-                     if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
-                     logPos = tmp.length-1;
-                  } 
-               }
-               sleep(500, true); 
+      var info;
+
+      if (String(args.shouldShowLogs).toLowerCase() == "true") {
+         info = this.getInfo(container.Id);
+         if (isDef(info)) {
+            var state = info.State;
+            if (state == "created" || state == "running") {
+               var logPos = 0, tmp = "";
+               while(isDef(info) && state != "exited") {
+                  info = this.getInfo(container.Id);
+                  if (isDef(info)) {
+                  state = info.State;
+                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                     if (isDef(tmp) && tmp.length > 0) {
+                        if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                        logPos = tmp.length-1;
+                     } 
+                  sleep(500, true); 
+                  }
                }
             }
          }
+      } else {
+         this.waitForNotRunning(container.Id);
+         info = this.getInfo(container.Id);
       }
 
       // Done with it
