@@ -497,32 +497,27 @@ Docker.prototype.runOJob = function(args) {
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
-      var info;
-      if (String(args.shouldShowLogs).toLowerCase() == "true") {
-         info = this.getInfo(container.Id);
-         if (isDef(info)) {
-            var state = info.State;
-            if (state == "created" || state == "running") {
-               var logPos = 0, tmp = "";
-               while(isDef(info) && state != "exited") {
-                  info = this.getInfo(container.Id);
-                  if (isDef(info)) {
-                  state = info.State;
-                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
-                     if (isDef(tmp) && tmp.length > 0) {
-                        if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
-                        logPos = tmp.length-1;
-                     } 
-                  sleep(500, true); 
-                  }
+      var info = this.getInfo(container.Id);
+      if (isDef(info)) {
+         var state = info.State;
+         if (state == "created" || state == "running") {
+            var logPos = 0, tmp = "";
+            while(isDef(info) && state != "exited") {
+               info = this.getInfo(container.Id);
+               if (isDef(info)) {
+               state = info.State;
+               if (String(args.shouldShowLogs).toLowerCase() == "true") {
+                  $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                  if (isDef(tmp) && tmp.length > 0) {
+                     if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                     logPos = tmp.length-1;
+                  } 
                }
+               sleep(500, true);
             }
          }
-      } else {
-         this.waitForNextExit(container.Id);
-         info = this.getInfo(container.Id);
       }
-   
+
       // Done with it
       if (isDef(info)) {
          args.logs = this.logs(container.Id);
@@ -615,31 +610,26 @@ Docker.prototype.runContainer = function(args) {
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
-      var info;
-
-      if (String(args.shouldShowLogs).toLowerCase() == "true") {
-         info = this.getInfo(container.Id);
-         if (isDef(info)) {
-            var state = info.State;
-            if (state == "created" || state == "running") {
-               var logPos = 0, tmp = "";
-               while(isDef(info) && state != "exited") {
-                  info = this.getInfo(container.Id);
-                  if (isDef(info)) {
+      var info = this.getInfo(container.Id);
+      if (isDef(info)) {
+         var state = info.State;
+         if (state == "created" || state == "running") {
+            var logPos = 0, tmp = "";
+            while(isDef(info) && state != "exited") {
+               info = this.getInfo(container.Id);
+               if (isDef(info)) {
                   state = info.State;
+                  if (String(args.shouldShowLogs).toLowerCase() == "true") {
                      $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
                      if (isDef(tmp) && tmp.length > 0) {
                         if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
                         logPos = tmp.length-1;
                      } 
-                  sleep(500, true); 
                   }
+                  sleep(500, true); 
                }
             }
          }
-      } else {
-         this.waitForNextExit(container.Id);
-         info = this.getInfo(container.Id);
       }
 
       // Done with it
