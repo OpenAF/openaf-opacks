@@ -32,7 +32,7 @@ files:
   - docker.yaml
   - .package.yaml
 filesHash:
-  docker.js: ebd567bc3162f18140ae74058da77d5c505e602d
+  docker.js: a15617886f5b3295ccbaa2f13ffc1fdfcc95ccb4
   .odoc.db: 176227d6ae0da757c95a10ae265aa641601842c2
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88

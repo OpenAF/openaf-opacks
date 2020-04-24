@@ -502,18 +502,19 @@ Docker.prototype.runOJob = function(args) {
          var state = info.State;
          if (state == "created" || state == "running") {
             var logPos = 0, tmp = "";
-            while(isDef(info) && state != "exited") {
+            while (isDef(info) && state != "exited") {
                info = this.getInfo(container.Id);
                if (isDef(info)) {
-               state = info.State;
-               if (String(args.shouldShowLogs).toLowerCase() == "true") {
-                  $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
-                  if (isDef(tmp) && tmp.length > 0) {
-                     if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
-                     logPos = tmp.length-1;
-                  } 
+                  state = info.State;
+                  if (String(args.shouldShowLogs).toLowerCase() == "true") {
+                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                     if (isDef(tmp) && tmp.length > 0) {
+                        if ((tmp.length - 1) > logPos) printnl(tmp.substr(logPos));
+                        logPos = tmp.length - 1;
+                     }
+                  }
+                  sleep(500, true);
                }
-               sleep(500, true);
             }
          }
       }
