@@ -519,7 +519,7 @@ Docker.prototype.runOJob = function(args) {
             }
          }
       } else {
-         this.waitForNotRunning(container.Id);
+         this.waitForNextExit(container.Id);
          info = this.getInfo(container.Id);
       }
    
@@ -638,7 +638,7 @@ Docker.prototype.runContainer = function(args) {
             }
          }
       } else {
-         this.waitForNotRunning(container.Id);
+         this.waitForNextExit(container.Id);
          info = this.getInfo(container.Id);
       }
 
