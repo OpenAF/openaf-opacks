@@ -423,6 +423,7 @@ Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
  *    shouldWait       (String)  A boolean string to determine if it should wait for the container execution end (defaults to "true")\
  *    shouldRemove     (String)  A boolean string to determine if the container should be remove after execution end (defaults to "true")\
  *    shouldShowLogs   (String)  A boolean string to determine if the logs of container execution should be output\
+ *    shouldLog        (String)  A boolean string to determine if the logs of container execution should be made available on args.logs (defaults to "false")\
  *    envs             (Map)     A map of environment variables for container execution\
  *    binds            (Array)   Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
  *    cmd              (String)  An optional command string\
@@ -453,6 +454,7 @@ Docker.prototype.runOJob = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
    _$(args.ojob, "ojob").$_();
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
@@ -509,7 +511,7 @@ Docker.prototype.runOJob = function(args) {
                   if (isDef(info)) {
                      state = info.State;
                      
-                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
                      if (isDef(tmp) && tmp.length > 0) {
                         if ((tmp.length - 1) > logPos) printnl(tmp.substr(logPos));
                         logPos = tmp.length - 1;
@@ -527,7 +529,7 @@ Docker.prototype.runOJob = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         $tb(() => { args.logs = this.logs(container.Id); }).timeout(2500).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
@@ -544,6 +546,7 @@ Docker.prototype.runOJob = function(args) {
  *    shouldWait       (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
  *    shouldRemove     (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
  *    shouldShowLogs   (String) A boolean string to determine if the logs of container execution should be output\
+ *    shouldLog        (String)  A boolean string to determine if the logs of container execution should be made available on args.logs (defaults to "false")\* 
  *    envs             (Map)    A map of environment variables for container execution\
  *    binds            (Array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
  *    cmd              (String) An optional command string\
@@ -573,6 +576,7 @@ Docker.prototype.runContainer = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
    // Prepare envs
@@ -625,7 +629,7 @@ Docker.prototype.runContainer = function(args) {
                   if (isDef(info)) {
                      state = info.State;
                   
-                     $tb(() => { tmp = String(this.logs(container.Id, "[" + origName + "] ")); }).timeout(2500).exec();
+                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
                      if (isDef(tmp) && tmp.length > 0) {
                         if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
                         logPos = tmp.length-1;
@@ -643,7 +647,7 @@ Docker.prototype.runContainer = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         $tb(() => { args.logs = this.logs(container.Id); }).timeout(2500).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";

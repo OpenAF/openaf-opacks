@@ -33,7 +33,7 @@ files:
   - README.md
 filesHash:
   .odoc.db: 176227d6ae0da757c95a10ae265aa641601842c2
-  docker.js: 3d62149341b54ff8e2a89811ed52d4407c3fa867
+  docker.js: b23bdac4e7f3272c26424500f6e1527e85eb24aa
   docker.yaml: 1e419f5ffdd35bada4f7a58bdb42a7b3e3bd28cd
   lib/docker-java-api-0.0.12-jar-with-dependencies.jar: 662f8928c824131cf372dc3c51a7cdd71df4b09c
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
