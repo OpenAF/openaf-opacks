@@ -69,7 +69,7 @@ jobs:
     exec: |
       args.res = jsonParse(args.res);
 
-  #------------------
+  # -----------------
   - name: Docker oJob
     help: >
       Tries to execute an oJob on an openaf docker container. Expects:
@@ -82,11 +82,18 @@ jobs:
         nameSuffix     (string) Boolean string to determine if an unique container name suffix should be added (defaults to "true")
         shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
         shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
-        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
+        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "false")
+        showLogsOnEnd  (string) Boolean string to determine if logs should be print on end of execution (defaults to "true" if shouldShowLogs = "false")
     exec: |
+      if (isDef(args.shouldShowLogs) && args.shouldShowLogs.toLowerCase() != "true")
+        args.showLogsOnEnd = _$(args.showLogsOnEnd, "showLogsOnEnd").default("true");
+
       loadLib("docker.js");
       var docker = new Docker();
-      docker.runOJob(args);
+      var res = docker.runOJob(args);
+      if (args.showLogsOnEnd.toLowerCase() == "true") {
+        print(res.logs);
+      }
 
   # ----------------------
   - name: Docker container
@@ -102,9 +109,15 @@ jobs:
         shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
         shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
     exec: |
+      if (isDef(args.shouldShowLogs) && args.shouldShowLogs.toLowerCase() != "true")
+        args.showLogsOnEnd = _$(args.showLogsOnEnd, "showLogsOnEnd").default("true");
+        
       loadLib("docker.js");
       var docker = new Docker();
       docker.runContainer(args);
+      if (args.showLogsOnEnd.toLowerCase() == "true") {
+        print(res.logs);
+      }
 
   # -----------------------------
   - name  : oJobManager Docker Job
