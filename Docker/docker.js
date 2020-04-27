@@ -529,11 +529,17 @@ Docker.prototype.runOJob = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
       }
+
+      return {
+         id: container.Id,
+         logs: args.logs,
+         info: info
+      };
    }
 };
 
@@ -647,10 +653,16 @@ Docker.prototype.runContainer = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
       }
+
+      return {
+         id: container.Id,
+         logs: args.logs,
+         info: info
+      };
    }
 };
