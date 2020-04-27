@@ -60,7 +60,7 @@ filesHash:
   jackson-module-jaxb-annotations-2.10.3.jar: bd367b54bd7f8997a2d81c21791bf69c6ba65af0
   jakarta.activation-api-1.2.1.jar: 562a587face36ec7eff2db7f2fc95425c6602bc1
   jakarta.xml.bind-api-2.3.2.jar: 8d49996a4338670764d7ca4b85a1c4ccf7fe665d
-  kube.js: 35f6fcc881f4e5aa3f97c4f9d6594ed192b9af2f
+  kube.js: 8be4782c22199aa52b521468cb2cf70a75ab7904
   kubernetes-client-4.9.0.jar: 19d0361bb24461b127a192af4a1b2fdcac9abbb7
   kubernetes-model-4.9.0.jar: 4fb1420a2174bc274d1ed416b0f3e7349be0c5b8
   kubernetes-model-common-4.9.0.jar: 7cef44abf243c66d1efca6483f545784e3a0ca1e
