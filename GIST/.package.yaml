@@ -22,13 +22,15 @@ version: '20181016'
 dependencies:
   openaf: '>=20171126'
 files:
-  - .odoc.db
-  - .package.yaml
-  - gist.js
   - gistMain.js
+  - .package.yaml
+  - .odoc.db
   - README.md
+  - .precompile
+  - gist.js
 filesHash:
-  .odoc.db: 663db8e363f4359b814cbdd73226cc70ed82e7d7
-  gist.js: 40385f2d86365a6b9f98d359d0f25b79aa5822b5
   gistMain.js: e45ea667e0b6540ccdcaf28e10efb2d0557f0ff8
+  .odoc.db: 663db8e363f4359b814cbdd73226cc70ed82e7d7
   README.md: 2408b7ff5203042c5f38baf063f7406d7d04cd72
+  .precompile: 37e6214364bea52d981bfb7ee836650d71285c24
+  gist.js: cf889114ed9b8ee8e923df4362bd8567c2311106

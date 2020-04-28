@@ -1,10 +1,10 @@
 /**
  * <odoc>
- * <key>Kube.Kube(aURL, aUser, aPass)</key>
- * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass.
+ * <key>Kube.Kube(aURL, aUser, aPass, aWSTimeout, aToken)</key>
+ * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass or aToken.
  * </odoc>
  */
-var Kube = function (aURL, aUser, aPass, aWSTimeout) {
+var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
 	plugin("HTTP");
 	ow.loadFormat();
 	this.url = aURL; 
@@ -14,14 +14,27 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout) {
 	loadExternalJars(getOPackPath("Kube") || ".");
 	aWSTimeout = _$(aWSTimeout).isNumber().default(5000);
 	
-	this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
-	              .withMasterUrl(this.url)
-	              .withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
-	              .withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
-				  .withTrustCerts(true)
-				  .withWebsocketTimeout(aWSTimeout)
-	              .build();
-				  //.withOauthToken("eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXI0bWI3Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJhMTA5ZWM1MC0xZTVjLTExZTktYmRlMy0wYTFhZDM4ZmI2NjQiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.T71FTSAgIFNOfS0vGbFx4T-ZPwZEVZL1zmeQFN2XULY1NwDI8LqPVjqrUKC43qbEaXcSdZ7UmO2vMOx__3F__GqMqQAsxFaKZ5i_PtVNzAsjmzanhQWLPDtCVVuRxJuwo-OfmK_KxSM9TIu-03NGEzkG9H-wFDK3B1IZdNf6mNLDeyzYM-nJWzv6NVN_tJRZoGt4hhedulAV_KJZaN9UTAhFG10SfpekzWQfNYsn-xLvGBXitwloUNMzOtEnJoTGXmurHAX9f2-EZlAAyLUGadWe4EE-pCXEqyy3K2uJ912BQCbDD7Q1T58KMa2QHvP_28JHnzXB8g-ooYnle_zJ4")
+	if (isUnDef(aURL)) {
+		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build();
+	} else {
+		if (isDef(aToken)) {
+			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+			.withMasterUrl(this.url)
+			.withTrustCerts(true)
+			.withWebsocketTimeout(aWSTimeout)
+			.withOauthToken(aToken)
+			.build();
+		} else {
+			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+			.withMasterUrl(this.url)
+			.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
+			.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
+			.withTrustCerts(true)
+			.withWebsocketTimeout(aWSTimeout)
+			.build();
+		}
+	}
+
 	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
 };
 
@@ -112,15 +125,198 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
  * </odoc>
  */
 Kube.prototype.getNamespaces = function (full) {
-	var h = new HTTP();
-	if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
+	if (full) {
+		return this.__displayResult(this.client.namespaces().list().items);
+	} else {
+		var h = new HTTP();
+		if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
+	
+		var res = JSON.parse(h.exec(this.url + "/api/v1/pods").response);
 
-	var res = JSON.parse(h.exec(this.url + "/api/v1/pods").response);
-
-	if (full)
-		return res.items;
-	else
 		return Object.keys($stream(clone(res.items)).groupBy("metadata.namespace"));
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getServices(aNamespace) : Array</key>
+ * Tries to retrieve the list of services on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getServices = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).services().list().items);
+	} else {
+		return this.__displayResult(this.client.services().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getConfigMaps(aNamespace) : Array</key>
+ * Tries to retrieve the list of config maps on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getConfigMaps = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).configMaps().list().items);
+	} else {
+		return this.__displayResult(this.client.configMaps().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getEndpoints(aNamespace) : Array</key>
+ * Tries to retrieve the list of end points on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getEndpoints = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).endpoints().list().items);
+	} else {
+		return this.__displayResult(this.client.endpoints().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getNodes(aNamespace) : Array</key>
+ * Tries to retrieve the list of nodes on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getNodes = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).nodes().list().items);
+	} else {
+		return this.__displayResult(this.client.nodes().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getPods(aNamespace) : Array</key>
+ * Tries to retrieve the list of pods on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getPods = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).pods().list().items);
+	} else {
+		return this.__displayResult(this.client.pods().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getServiceAccounts(aNamespace) : Array</key>
+ * Tries to retrieve the list of service accounts on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getServiceAccounts = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).serviceAccounts().list().items);
+	} else {
+		return this.__displayResult(this.client.serviceAccounts().list().items);
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.apply(aNamespace, aObj) : Map</key>
+ * Given aObj (a java stream (in yaml or json), a string (as the filename of a yaml or json file) or an object) will try to apply
+ * it on the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.apply = function(aNamespace, aStream) {
+	_$(aNamespace, "namespace").isString().$_();
+	if (isString(aStream)) aStream = io.readFileStream(aStream);
+	if (isMap(aStream)) aStream = af.fromString2InputStream(stringify(aStream));
+	var o2 = this.client.inNamespace(aNamespace).load(aStream).apply();
+	global.o2 = o2;
+	return this.__displayResult(o2);
+};
+
+/**
+ * <odoc>
+ * <key>Kube.delete(aNamespace, aObj) : Boolean</key>
+ * Given aObj (a java stream (in yaml or json), a string (as the filename of a yaml or json file) or an object) will try to delete
+ * it of the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.delete = function(aNamespace, aStream) {
+	_$(aNamespace, "namespace").isString().$_();
+	if (isString(aStream)) aStream = io.readFileStream(aStream);
+	if (isMap(aStream)) aStream = af.fromString2InputStream(stringify(aStream));
+	return Boolean(this.client.inNamespace(aNamespace).load(aStream).delete());
+};
+
+/**
+ * <odoc>
+ * <key>Kube.get(aNamespace, aObj) : Map</key>
+ * Given aObj (a java stream (in yaml or json), a string (as the filename of a yaml or json file) or an object) will try to get
+ * it from the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.get = function(aNamespace, aStream) {
+	_$(aNamespace, "namespace").isString().$_();
+	if (isString(aStream)) aStream = io.readFileStream(aStream);
+	if (isMap(aStream)) aStream = af.fromString2InputStream(stringify(aStream));
+	var o2 = this.client.inNamespace(aNamespace).load(aStream).fromServer().get();
+	global.o2 = o2;
+	return this.__displayResult(o2);
+};
+
+Kube.prototype.__displayResult = function(aObj) {
+	var res = [];
+	ow.loadObj();
+
+	for(var obj in aObj.toArray()) {
+		var r = {};
+		var o = aObj.toArray()[obj];
+
+		var fn = (f1, p) => {
+			p = _$(p).default("");
+			var f0 = Object.keys(f1);
+
+			for(var i in f0) {
+				var f = f0[i];
+				if (f.startsWith("get") && f != "getClass" && f != "getApiVersion" && f != "get" && f != "getOrDefault") {
+					try {
+						var rr = f1[f]();
+						if (isDef(rr.entrySet)) rr = rr.entrySet().toArray(); else rr = [ rr ];
+
+						for(var ii in rr) {
+							if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
+								ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
+							} else {
+								if (!isNull(rr[ii])) {
+									fn(rr[ii], "." + f.replace(/^get/, ""));
+								}
+							}
+						}
+					} catch(e) {
+						//printErr(f);
+					}
+				}
+			}
+		};
+
+		fn(o);
+
+		/*if (o.getMetadata().getLabels() != null && !o.getMetadata().getLabels().isEmpty()) {
+			r.labels = {};
+			var o2 = o.getMetadata().getLabels().entrySet();
+			for(var e in o2.toArray()) {
+				var oo = o2.toArray()[e];
+				r.labels[String(oo.getKey())] = String(oo.getValue());
+			}
+		}*/
+
+		res.push(r);
+	}
+
+	return res;
 };
 
 /**

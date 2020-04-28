@@ -1,3 +1,5 @@
+// Author: Nuno Aguiar
+
 plugin("XML");
 ow.loadFormat();
 
@@ -69,7 +71,7 @@ RSS.prototype.generate = function(aPubDate, aBuildDate) {
                .e("title").t(this.items[ii].title).up()
                .e("description").t(this.items[ii].description).up()
                .e("category").t(this.items[ii].category).up()
-               .e("pubDate").t(this.items[ii].pubDate).up()
+               .e("pubDate").t(this.items[ii].pubDate.toUTCString()).up()
                .e("guid").t(this.items[ii].guid).up()
                .e("link").t(this.items[ii].link).up()
                .up();
@@ -104,4 +106,95 @@ RSS.prototype.serverReply = function(aServer, aRequest, aPubDate, aBuildDate) {
     _$(aRequest, "request").$_();
     
     return aServer.reply((aRequest.method == "HEAD" ? "" : this.generate(aPubDate, aBuildDate)), "text/xml; charset=UTF-8", 200);
+};
+
+/**
+ * <odoc>
+ * <key>RSS.serverReplyMD(aServer, aRequest, aPubDate, aBuildDate) : Map</key>
+ * Given a HTTPServer plugin aServer and aRequest will return the appropriate map for request handling a reply in HTML from Markdown
+ * calling the method generateMD with aPubDate and aBuildDate.\
+ * \
+ * Example:\
+ * \
+ * ow.loadServer();\
+ * var hs = ow.server.httpd.start(80);\
+ * ow.server.httpd.route(hs, {\
+ *    "/rss": function(req) {\
+ *       // ... create rss object\
+ *       return rss.serverReplyMD(hs, req);\
+ *    }\
+ * })\
+ * \
+ * </odoc>
+ */
+RSS.prototype.serverReplyMD = function(aServer, aRequest, aPubDate, aBuildDate) {
+    _$(aServer, "server").$_();
+    _$(aRequest, "request").$_();
+    
+    ow.loadTemplate();
+    return aServer.reply((aRequest.method == "HEAD" ? "" : ow.template.parseMD2HTML(this.generateMD(aPubDate, aBuildDate), true)), "text/html; charset=UTF-8", 200);
+};
+
+/**
+ * <odoc>
+ * <key>RSS.generateMD(aPubDate, aBuildDate) : String</key>
+ * Generates and returns a markdown represation of a feed xml given aPubDate and aBuildDate.
+ * </odoc>
+ */
+RSS.prototype.generateMD = function(aPubDate, aBuildDate) {
+    aPubDate = _$(aPubDate, "pubdate").isDate().default(new Date());
+    aBuildDate = _$(aBuildDate, "builddate").isDate().default(aPubDate);
+
+    var fnNotes = (aTxt) => {
+       return '<div style="font-family: -apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Oxygen-Sans,Ubuntu,Cantarell,\'Helvetica Neue\',sans-serif; text-align: right; float: right; font-size: 8pt; font-weight: 200; line-height: 110%;"><i>' + aTxt + '</i></div>';
+    }
+
+    var fnDesc = (aTxt) => {
+       return '<div style="font-family: -apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Oxygen-Sans,Ubuntu,Cantarell,\'Helvetica Neue\',sans-serif; font-weight: 200; line-height: 110%;"><i>' + aTxt + '</i></div>';
+    }
+
+    var md = "# [" + this.title + "](" + this.link + ")" + fnNotes(aPubDate) + "\n";
+    md += "\n_" + fnDesc(this.description) + "_\n\n";
+
+    for(var ii in this.items) {
+       if (isDef(this.items[ii].link) && this.items[ii].link != "")
+          md += "## [" + this.items[ii].title + "](" + this.items[ii].link + ")" + fnNotes(this.items[ii].pubDate) + "\n\n";
+       else
+          md += "## " + this.items[ii].title + " " + fnNotes(this.items[ii].pubDate) + "\n\n";
+
+       md += this.items[ii].description + "\n\n";
+    }
+
+    return md;
+};
+
+/**
+ * <odoc>
+ * <key>RSS.set4RSS(aRSS)</key>
+ * Tries to retrieve the internal fields from a aRSS string XML representation.
+ * </odoc>
+ */
+RSS.prototype.set4RSS = function(aRSS) {
+    var obj = af.fromXML2Obj(aRSS);
+
+    if (isDef(obj.RDF)) { obj.rss = obj.RDF; obj.rss.channel.item = obj.RDF.item; }
+
+    this.title = obj.rss.channel.title;
+    this.description = obj.rss.channel.description;
+    this.link = obj.rss.channel.link.join(" ").trim();
+    this.lang = obj.rss.channel.language;
+
+    this.items = [];
+    for (var ii in obj.rss.channel.item) {
+       var item = obj.rss.channel.item[ii];
+
+       this.items.push({
+          title: item.title,
+          description: item.description,
+          category: item.category,
+          pubDate: item.pubDate,
+          guid: item.guid,
+          link: item.link
+       });
+    }
 };

@@ -7,18 +7,22 @@ loadExternalJars(path + "/lib");
 
 /**
  * <odoc>
- * <key>Docker.Docker(aRemote, pathToSSL)</key>
+ * <key>Docker.Docker(aRemote, auth)</key>
  * If no parameters are provided it assumes that /var/run/docker.sock exists otherwise you need to provide aRemote URL and
- * the pathToSSL certificates.
+ * the an auth class.
  * </odoc>
  */
-var Docker = function(aRemote, pathToSSL) {
+var Docker = function(aRemote, authC) {
    this.remote = aRemote;
 
    if (isUnDef(this.remote)) {
-      this.docker = new Packages.com.amihaiemil.docker.LocalDocker(new java.io.File("/var/run/docker.sock"));
+      this.docker = new Packages.com.amihaiemil.docker.UnixDocker(new java.io.File("/var/run/docker.sock"));
    } else {
-      this.docker = new Packages.com.amihaiemil.docker.RemoteDocker(aRemote, pathToSSL);
+      if (isUnDef(authC)) {
+         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote));
+      } else {
+         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote), authC);
+      }
    }
 };
 
@@ -127,27 +131,31 @@ Docker.prototype.prune = function() {
 
 /**
  * <odoc>
- * <key>Docker.create(aObj) : Map</key>
- * Tries to create a docker container with the provided aObj.
+ * <key>Docker.create(aObj, aName) : Map</key>
+ * Tries to create a docker container (with optional aName) with the provided aObj.
  * (check https://docs.docker.com/engine/api/v1.37/#operation/ContainerCreate for more).\
  * \
  * Example: docker.create({ Cmd: "date", Image: "ubuntu", Env: [ "FOO=bar", "BAZ=quux" ], AttachStdout: true, AttachStderr: true })\
  * \
  * </odoc>
  */
-Docker.prototype.containerCreate = function(aContainer) {
-   return this.docker.containers().create(this.__buildObj(aContainer));
+Docker.prototype.containerCreate = function(aContainer, aName) {
+   if (isDef(aName) && isString(aName)) {
+      return this.docker.containers().create(aName, this.__buildObj(aContainer));
+   } else {
+      return this.docker.containers().create(this.__buildObj(aContainer));
+   }
 };
 
 /**
  * <odoc>
- * <key>Docker.containerCreate(aObj) : JavaObject</key>
- * Tries to create a docker container with the provided aObj returning the container java
+ * <key>Docker.containerCreate(aObj, aName) : JavaObject</key>
+ * Tries to create a docker container (with optional aName) with the provided aObj returning the container java
  * object.
  * </odoc>
  */
-Docker.prototype.create = function(aContainer) {
-   return jsonParse(this.containerCreate(aContainer));
+Docker.prototype.create = function(aContainer, aName) {
+   return jsonParse(this.containerCreate(aContainer, aName));
 };
 
 /**
@@ -173,7 +181,11 @@ Docker.prototype.getContainer = function(aId) {
  * </odoc>
  */
 Docker.prototype.getInfo = function(aId) {
-   return jsonParse(String(this.getContainer(aId)));
+   var res = this.getContainer(aId);
+   if (isUnDef(res)) 
+      return void 0;
+   else
+      return jsonParse(String(res));
 };
 
 /**
@@ -183,7 +195,9 @@ Docker.prototype.getInfo = function(aId) {
  * </odoc>
  */
 Docker.prototype.start = function(aId) {
-   this.getContainer(aId).start();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.start();
 };
 
 /**
@@ -193,7 +207,9 @@ Docker.prototype.start = function(aId) {
  * </odoc>
  */
 Docker.prototype.stop = function(aId) {
-   this.getContainer(aId).stop();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.stop();
 };
 
 /**
@@ -203,7 +219,45 @@ Docker.prototype.stop = function(aId) {
  * </odoc>
  */
 Docker.prototype.restart = function(aId) {
-   this.getContainer(aId).restart();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.restart();
+};
+
+/**
+ * <odoc>
+ * <key>Docker.waitForNotRunning(aId) : Number</key>
+ * Waits for container aId to be "not running". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForNotRunning = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("not-running");
+};
+
+/**
+ * <odoc>
+ * <key>Docker.waitForNextExit(aId) : Number</key>
+ * Waits for container aId to be "next-exit". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForNextExit = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("next-exit");
+};
+
+/**
+ * <odoc>
+ * <key>Docker.waitForRemoved(aId) : Number</key>
+ * Waits for container aId to be "removed". Returns the exit code.
+ * </odoc>
+ */
+Docker.prototype.waitForRemoved = function(aId) {
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   return c.waitOn("removed");
 };
 
 /**
@@ -213,7 +267,9 @@ Docker.prototype.restart = function(aId) {
  * </odoc>
  */
 Docker.prototype.kill = function(aId) {
-   this.getContainer(aId).kill();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.kill();
 };
 
 /**
@@ -223,7 +279,9 @@ Docker.prototype.kill = function(aId) {
  * </odoc>
  */
 Docker.prototype.remove = function(aId) {
-   this.getContainer(aId).remove();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) throw("Container " + aId + " not found.");
+   c.remove();
 };
 
 /**
@@ -233,22 +291,31 @@ Docker.prototype.remove = function(aId) {
  * </odoc>
  */
 Docker.prototype.containerLogs = function(aId) {
-   return this.getContainer(aId).logs();
+   var c = this.getContainer(aId);
+   if (isUnDef(c)) return void 0;
+   return c.logs();
 };
 
 /**
  * <odoc>
- * <key>Docker.logs(aId) : String</key>
+ * <key>Docker.logs(aId, aPrefix) : String</key>
  * Returns the aID corresponding container logs in string format.
  * </odoc>
  */
-Docker.prototype.logs = function(aId) {
-   var o = String(this.getContainer(aId).logs()).split(/\n/);
-   var r = "";
-   for(var ii in o) {
-      r += o[ii].substring(8) + "\n";
+Docker.prototype.logs = function(aId, aPrefix) {
+   var c = this.getContainer(aId);
+   aPrefix = _$(aPrefix, "prefix").isString().default("");
+
+   if (isDef(c)) {
+      var o = String(c.logs()).split(/\n/);
+      var r = "";
+      for(var ii in o) {
+         r += aPrefix + o[ii] + "\n";
+      }
+      return r.substring(0, r.length-1); 
+   } else {
+      return void 0;
    }
-   return r;
 };
 
 /**
@@ -345,4 +412,257 @@ Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
    args.extra.NetworkingConfig.EndpointsConfig[aNetwork] = {};
 
    return aExtra;
+};
+
+/**
+ * <odoc>
+ * <key>Docker.runOJob(args)</key>
+ * Tries to run an oJob in an openaf docker image with the provided args maps. The args map expects:\
+ * \
+ *    image            (String)  The openaf image to use (defaults to openaf/openaf:nightly)\
+ *    shouldWait       (String)  A boolean string to determine if it should wait for the container execution end (defaults to "true")\
+ *    shouldRemove     (String)  A boolean string to determine if the container should be remove after execution end (defaults to "true")\
+ *    shouldShowLogs   (String)  A boolean string to determine if the logs of container execution should be output\
+ *    shouldLog        (String)  A boolean string to determine if the logs of container execution should be made available on args.logs (defaults to "false")\
+ *    envs             (Map)     A map of environment variables for container execution\
+ *    binds            (Array)   Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
+ *    cmd              (String)  An optional command string\
+ *    hostname         (String)  An optional hostname to use\
+ *    domainname       (String)  An optional domain name to use\
+ *    user             (String)  Optional user that commands are run as inside the container\
+ *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
+ *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    volumes          (Map)     A map of volumes to use\
+ *    workingDir       (String)  The working directory for commands to run in\
+ *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
+ *    networkDisabled  (Boolean) Disable networking for the container\
+ *    macAddress       (String)  A MAC address of the container\
+ *    labels           (Map)     Optional labels\
+ *    stopSignal       (String)  Signal to stop a container as a string or unsigned integer\
+ *    stopTimeout      (Number)  Timeout to stop a container in second\
+ *    hostConfig       (Map)     The container host config (see Docker's ContainerCreate documentation)\
+ *    networkingConfig (Map)     The container networking config (see Docker's ContainerCreate documentation)\
+ *    ojob             (String)  The full path to the ojob to execute on the container\
+ *    name             (String)  The container name\
+ *    nameSuffix       (String)  A boolean string to determine if the container name should be suffixed with nowUTC()\
+ * \
+ * </odoc>
+ */
+Docker.prototype.runOJob = function(args) {
+   // Argument checking
+   args.image          = _$(args.image, "image").default("openaf/openaf:nightly");
+   args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
+   args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
+   args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   _$(args.ojob, "ojob").$_();
+   args.envs   = _$(args.envs, "envs").isMap().default({});
+
+   // Set oJob
+   args.envs.OJOB = args.ojob;
+
+   // Prepare envs
+   var envs = [];
+   Object.keys(args.envs).forEach(k => {
+      envs.push(k + "=" + args.envs[k]);
+   });
+
+   // Go
+   var origName = String(args.name);
+   if (String(args.nameSuffix).toLowerCase() == "true") {
+      args.name = args.name  + "-" + String(nowUTC());
+   }
+   var container = this.create({
+         Image           : args.image,
+         Env             : envs,
+         AttachStdout    : true,
+         AttachStderr    : true,
+         Binds           : args.binds,
+         Cmd             : args.cmd,
+         Hostname        : args.hostname,
+         Domainname      : args.domainname,
+         User            : args.user,
+         Healthcheck     : args.healthcheck,
+         ExposedPorts    : args.exposedPorts,
+         Volumes         : args.volumes,
+         WorkingDir      : args.workingDir,
+         Entrypoint      : args.entrypoint,
+         NetworkDisabled : args.networkDisabled,
+         MacAddress      : args.macAddress,
+         Labels          : args.labels,
+         StopSignal      : args.stopSignal,
+         StopTimeout     : args.stopTimeout,
+         HostConfig      : args.hostConfig,
+         NetworkingConfig: args.networkingConfig
+   }, args.name);
+   this.start(container.Id);
+
+   // Wait for it
+   if (String(args.shouldWait).toLowerCase() == "true") {
+      var info;
+      if (String(args.shouldShowLogs).toLowerCase() == "true") {
+         info = this.getInfo(container.Id);
+         if (isDef(info)) {
+            var state = info.State;
+            if (state == "created" || state == "running") {
+               var logPos = 0, tmp = "";
+               while (isDef(info) && state != "exited") {
+                  info = this.getInfo(container.Id);
+                  if (isDef(info)) {
+                     state = info.State;
+                     
+                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
+                     if (isDef(tmp) && tmp.length > 0) {
+                        if ((tmp.length - 1) > logPos) printnl(tmp.substr(logPos));
+                        logPos = tmp.length - 1;
+                     }
+                     
+                     sleep(500, true);
+                  }
+               }
+            }
+         }
+      } else {
+         this.waitForNotRunning(container.Id);
+         info = this.getInfo(container.Id);
+      }
+
+      // Done with it
+      if (isDef(info)) {
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
+      } else {
+         throw "Container no longer found.";
+      }
+
+      return {
+         id: container.Id,
+         logs: args.logs,
+         info: info
+      };
+   }
+};
+
+/**
+ * <odoc>
+ * <key>Docker.runContainer(args)</key>
+ * Tries to run an oJob in an openaf docker image with the provided args maps. The args map expects:\
+ * \
+ *    image            (String) The openaf image to use (defaults to openaf/openaf:nightly)\
+ *    shouldWait       (String) A boolean string to determine if it should wait for the container execution end (defaults to "true")\
+ *    shouldRemove     (String) A boolean string to determine if the container should be remove after execution end (defaults to "true")\
+ *    shouldShowLogs   (String) A boolean string to determine if the logs of container execution should be output\
+ *    shouldLog        (String)  A boolean string to determine if the logs of container execution should be made available on args.logs (defaults to "false")\* 
+ *    envs             (Map)    A map of environment variables for container execution\
+ *    binds            (Array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use\
+ *    cmd              (String) An optional command string\
+ *    hostname         (String)  An optional hostname to use\
+ *    domainname       (String)  An optional domain name to use\
+ *    user             (String)  Optional user that commands are run as inside the container\
+ *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
+ *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    volumes          (Map)     A map of volumes to use\
+ *    workingDir       (String)  The working directory for commands to run in\
+ *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
+ *    networkDisabled  (Boolean) Disable networking for the container\
+ *    macAddress       (String)  A MAC address of the container\
+ *    labels           (Map)     Optional labels\
+ *    stopSignal       (String)  Signal to stop a container as a string or unsigned integer\
+ *    stopTimeout      (Number)  Timeout to stop a container in second\
+ *    hostConfig       (Map)     The container host config (see Docker's ContainerCreate documentation)\
+ *    networkingConfig (Map)     The container networking config (see Docker's ContainerCreate documentation)\ 
+ *    name             (String) The container name\
+ *    nameSuffix       (String) A boolean string to determine if the container name should be suffixed with nowUTC()\
+ * \
+ * </odoc>
+ */
+Docker.prototype.runContainer = function(args) {
+   // Argument checking
+   args.image          = _$(args.image, "image").default("openaf/openaf:nightly");
+   args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
+   args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
+   args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   args.envs   = _$(args.envs, "envs").isMap().default({});
+
+   // Prepare envs
+   var envs = [];
+   Object.keys(args.envs).forEach(k => {
+      envs.push(k + "=" + args.envs[k]);
+   });
+
+   // Go
+   var origName = String(args.name);
+   if (String(args.nameSuffix).toLowerCase() == "true") {
+      args.name = args.name  + "-" + String(nowUTC());
+   }
+   var container = this.create({
+         Image           : args.image,
+         Env             : envs,
+         AttachStdout    : true,
+         AttachStderr    : true,
+         Binds           : args.binds,
+         Cmd             : args.cmd,
+         Hostname        : args.hostname,
+         Domainname      : args.domainname,
+         User            : args.user,
+         Healthcheck     : args.healthcheck,
+         ExposedPorts    : args.exposedPorts,
+         Volumes         : args.volumes,
+         WorkingDir      : args.workingDir,
+         Entrypoint      : args.entrypoint,
+         NetworkDisabled : args.networkDisabled,
+         MacAddress      : args.macAddress,
+         Labels          : args.labels,
+         StopSignal      : args.stopSignal,
+         StopTimeout     : args.stopTimeout,
+         HostConfig      : args.hostConfig,
+         NetworkingConfig: args.networkingConfig         
+   }, args.name);
+   this.start(container.Id);
+
+   // Wait for it
+   if (String(args.shouldWait).toLowerCase() == "true") {
+      var info;
+      if (String(args.shouldShowLogs).toLowerCase() == "true") {
+         info = this.getInfo(container.Id);
+         if (isDef(info)) {
+            var state = info.State;
+            if (state == "created" || state == "running") {
+               var logPos = 0, tmp = "";
+               while(isDef(info) && state != "exited") {
+                  info = this.getInfo(container.Id);
+                  if (isDef(info)) {
+                     state = info.State;
+                  
+                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
+                     if (isDef(tmp) && tmp.length > 0) {
+                        if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
+                        logPos = tmp.length-1;
+                     } 
+                     
+                     sleep(500, true); 
+                  }
+               }
+            }
+         }
+      } else {
+         this.waitForNotRunning(container.Id);
+         info = this.getInfo(container.Id);
+      }
+
+      // Done with it
+      if (isDef(info)) {
+         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
+      } else {
+         throw "Container no longer found.";
+      }
+
+      return {
+         id: container.Id,
+         logs: args.logs,
+         info: info
+      };
+   }
 };

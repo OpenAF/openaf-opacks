@@ -22,21 +22,23 @@ version: '20200125'
 dependencies:
   openaf: '>=20200101'
 files:
-  - .maven.yaml
-  - .odoc.db
   - .package.yaml
-  - lib/core-3.4.0.jar
+  - tests/tests.yaml
+  - tests/tests.js
+  - .odoc.db
   - lib/jai-imageio-core-1.4.0.jar
+  - lib/core-3.4.0.jar
   - lib/javase-3.4.0.jar
   - qr.js
-  - tests/tests.js
-  - tests/tests.yaml
+  - .precompile
+  - .maven.yaml
 filesHash:
-  .maven.yaml: 6f8d0871142e3f2e12237c18f758d952a26c9f25
+  tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
+  tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af
   .odoc.db: f2e608a7d717ae2525e1e8129eb4d314b70d5ea7
-  lib/core-3.4.0.jar: 5264296c46634347890ec9250bc65f14b7362bf8
   lib/jai-imageio-core-1.4.0.jar: fb6d79b929556362a241b2f65a04e538062f0077
+  lib/core-3.4.0.jar: 5264296c46634347890ec9250bc65f14b7362bf8
   lib/javase-3.4.0.jar: 8be20100f28515037a31cc0bbe557501c0538147
   qr.js: 777e939e6e3c877b251d61c3ac9b2dcfc248a821
-  tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af
-  tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
+  .precompile: 87d0b8c5672656702f3a8a3230f916cbbede5086
+  .maven.yaml: 6f8d0871142e3f2e12237c18f758d952a26c9f25

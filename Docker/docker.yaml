@@ -1,7 +1,14 @@
 # Author: Nuno Aguiar
 
+ojob:
+  opacks:
+    oJob-common: 20200410
+
+include:
+  - oJobManager.yaml
+
 jobs:
-  ###################
+  #------------------
   - name: Docker Pull
     help: >
       Tries to pull a container. Expects:
@@ -23,7 +30,7 @@ jobs:
         d.pull(args.image);
       }
 
-  ######################
+  #---------------------
   - name: Docker Execute
     help: >
       Executes a command on a docker container. Expects:
@@ -61,3 +68,68 @@ jobs:
     from: Docker Execute
     exec: |
       args.res = jsonParse(args.res);
+
+  # -----------------
+  - name: Docker oJob
+    help: >
+      Tries to execute an oJob on an openaf docker container. Expects:
+
+        ojob           (string) The complete path to the ojob file to execute
+        envs           (map)    Map with the environment variables to use
+        binds          (array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use
+        image          (string) The openaf docker image to use (defaults to openaf/openaf)
+        name           (string) Optional name for the container
+        nameSuffix     (string) Boolean string to determine if an unique container name suffix should be added (defaults to "true")
+        shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
+        shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
+        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "false")
+        showLogsOnEnd  (string) Boolean string to determine if logs should be print on end of execution (defaults to "true" if shouldShowLogs = "false")
+    exec: |
+      if (isDef(args.shouldShowLogs) && args.shouldShowLogs.toLowerCase() != "true")
+        args.showLogsOnEnd = _$(args.showLogsOnEnd, "showLogsOnEnd").default("true");
+
+      loadLib("docker.js");
+      var docker = new Docker();
+      var res = docker.runOJob(args);
+      if (args.showLogsOnEnd.toLowerCase() == "true") {
+        print(res.logs);
+      }
+
+  # ----------------------
+  - name: Docker container
+    help: >
+      Tries to execute a container on an docker container. Expects:
+
+        envs           (map)    Map with the environment variables to use
+        binds          (array)  Array of strings in the form "localPath:dockerPath" or "volumeName:dockerPath" to use
+        image          (string) The openaf docker image to use (defaults to openaf/openaf)
+        name           (string) Optional name for the container
+        nameSuffix     (string) Boolean string to determine if an unique container name suffix should be added (defaults to "true")
+        shouldWait     (string) Boolean string to determine if it should wait for the end of the execution (defaults to "true")
+        shouldRemove   (string) Boolean string to determine if it should remove the container on the end of the execution if shouldWait = "true" (default to "true")
+        shouldShowLogs (string) Boolean string to determine if it should print logs on the end of execution if shouldWait = "true" (default to "true")
+    exec: |
+      if (isDef(args.shouldShowLogs) && args.shouldShowLogs.toLowerCase() != "true")
+        args.showLogsOnEnd = _$(args.showLogsOnEnd, "showLogsOnEnd").default("true");
+        
+      loadLib("docker.js");
+      var docker = new Docker();
+      docker.runContainer(args);
+      if (args.showLogsOnEnd.toLowerCase() == "true") {
+        print(res.logs);
+      }
+
+  # -----------------------------
+  - name  : oJobManager Docker Job
+    help  : >
+      Wrapper around the oPack Docker job "Docker oJob" to execute an ojob with docker using oJobManager functionality.
+    deps  :
+      - oJobManager Init
+    from  :
+      - oJobManager Job Start
+    to    :
+      - Docker oJob
+      - oJobManager Job End
+    catch : |
+      oJobRunJob("oJobDirector Error", { e: exception });
+      throw exception;

@@ -136,6 +136,7 @@ jobs:
     exec: | 
       io.rm("openaf.zip");
       sh("chmod -R a+rw openaf");
+      sh("chmod 755 bootstrap");
       if (isDef(loadCompiled)) {
         loadCompiled("lambda.js", void 0, true);
         sh("zip -9r openaf.zip .openaf_precompiled", void 0, void 0, true);

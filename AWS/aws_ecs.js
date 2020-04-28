@@ -73,4 +73,3 @@ AWS.prototype.ECS_ListTaskDefinitions = function(aRegion, params) {
        return af.fromXML2Obj(res);
     }
  };
- 

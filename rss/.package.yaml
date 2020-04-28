@@ -17,15 +17,15 @@ name: RSS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200201'
+version: '20200309'
 dependencies:
   openaf: '>=20200101'
 files:
-  - .odoc.db
-  - .package.yaml
-  - .precompile
   - rss.js
+  - .package.yaml
+  - .odoc.db
+  - .precompile
 filesHash:
-  .odoc.db: 7039b782de7e9767e05e82a6e04173ca1493a40f
+  rss.js: b6ccf4de037a792fab1b8b2365a867dcb96789cb
+  .odoc.db: d453774b01e9a5f5616051f03f05088a466f9995
   .precompile: 8d74a2f741f47e49e312eb8b257a1c933cd2a810
-  rss.js: d9cc3bd959de3205d5f5ee5d1b47f11cfa3c6378
