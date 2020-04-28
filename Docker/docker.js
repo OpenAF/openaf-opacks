@@ -469,7 +469,7 @@ Docker.prototype.runOJob = function(args) {
 
    // Go
    var origName = String(args.name);
-   if (String(args.nameSuffix).toLowerCase() == "true") {
+   if (isDef(args.nameSuffix) && String(args.nameSuffix).toLowerCase() == "true") {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
@@ -593,7 +593,7 @@ Docker.prototype.runContainer = function(args) {
 
    // Go
    var origName = String(args.name);
-   if (String(args.nameSuffix).toLowerCase() == "true") {
+   if (isDef(args.nameSuffix) && String(args.nameSuffix).toLowerCase() == "true") {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
