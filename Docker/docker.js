@@ -454,7 +454,7 @@ Docker.prototype.runOJob = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
-   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("true");
    _$(args.ojob, "ojob").$_();
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
@@ -582,7 +582,7 @@ Docker.prototype.runContainer = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
-   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("true");
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
    // Prepare envs

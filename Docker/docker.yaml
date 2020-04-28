@@ -114,7 +114,7 @@ jobs:
         
       loadLib("docker.js");
       var docker = new Docker();
-      docker.runContainer(args);
+      var res = docker.runContainer(args);
       if (isDef(args.showLogsOnEnd) && args.showLogsOnEnd.toLowerCase() == "true") {
         print(res.logs);
       }

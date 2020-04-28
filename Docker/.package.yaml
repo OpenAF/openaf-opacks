@@ -32,10 +32,10 @@ files:
   - .package.yaml
   - README.md
 filesHash:
-  docker.yaml: 3c145c574a88d92ea343b873a136714fd9de1487
+  docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
   lib/docker-java-api-0.0.12-jar-with-dependencies.jar: 662f8928c824131cf372dc3c51a7cdd71df4b09c
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   .odoc.db: 176227d6ae0da757c95a10ae265aa641601842c2
-  docker.js: 541ded89778f53468a47232ba2cb695fa0a29904
+  docker.js: bd59a96c34f4fcdfd2e360628d352b43079a38f9
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
