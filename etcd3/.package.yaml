@@ -17,9 +17,9 @@ name: etcd3
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20191119'
+version: '20200427'
 dependencies:
-  openaf: '>=20190801'
+  openaf: '>=20200101'
 files:
   - .package.yaml
   - animal-sniffer-annotations-1.18.jar
@@ -64,7 +64,7 @@ filesHash:
   checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
   error_prone_annotations-2.3.2.jar: d1a0c5032570e0f64be6b4d9c90cdeb103129029
   etcd-java-0.0.13.jar: 53f5261862d365d271b99628d23443348d73009f
-  etcd3.js: fa57f77b9c2f6432603b79b37e98d12663a623e3
+  etcd3.js: be594e613de193eb0d76feedad80e96dc5be221b
   failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
   grpc-api-1.24.1.jar: 7bbdb6041e82a741804378160a90a4f41cac696b
   grpc-context-1.24.1.jar: 77485a74c2553ae0efeefd8917d4b09ccecb0465
