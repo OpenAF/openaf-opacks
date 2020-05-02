@@ -22,31 +22,31 @@ name: Robot
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190902'
+version: '20200501'
 dependencies:
   openaf: '>=20190801'
 files:
-  - .odoc.db
+  - robot_win32.js
   - .package.yaml
-  - examples/macGetPublicIP.yaml
-  - examples/winCopyClipboard.yaml
-  - examples/winExample.yaml
-  - examples/winKeepAlive.yaml
-  - oJobRobot.yaml
+  - vks/pt_PT.json
+  - vks/en_US.json
+  - .odoc.db
   - README.md
   - robot.js
-  - robot_win32.js
-  - vks/en_US.json
-  - vks/pt_PT.json
+  - examples/winKeepAlive.yaml
+  - examples/macGetPublicIP.yaml
+  - examples/winExample.yaml
+  - examples/winCopyClipboard.yaml
+  - oJobRobot.yaml
 filesHash:
-  .odoc.db: 22fc3c8ec8007d0f5c29f8c88c68f2c54d0f4f20
-  examples/macGetPublicIP.yaml: c66e3d1b157948615048ad23c17fe28fc81367ee
-  examples/winCopyClipboard.yaml: bd740294b2b9ca5bdd5def503802a3cf489a040f
-  examples/winExample.yaml: d13e81c7df2710fdb9ec151baa31debf7f92e4a9
-  examples/winKeepAlive.yaml: 99f730b3dbe9613e09f3bb0566d68e2ffad9ac1f
-  oJobRobot.yaml: 826e961cd89eb81596f8f174cf94626dbf52429a
+  robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
+  vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e
+  vks/en_US.json: db1bf55439ce1ae5a02cfa6091db52414bb1a38d
+  .odoc.db: ff701400394c3427d12d12a31509ee9ebb9d1089
   README.md: 655c961bc575f6d06c02d700ec8d8f550950c9e0
   robot.js: 4d586f05abac923c3538f80250f615914e8fcb5f
-  robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
-  vks/en_US.json: db1bf55439ce1ae5a02cfa6091db52414bb1a38d
-  vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e
+  examples/winKeepAlive.yaml: 99f730b3dbe9613e09f3bb0566d68e2ffad9ac1f
+  examples/macGetPublicIP.yaml: c66e3d1b157948615048ad23c17fe28fc81367ee
+  examples/winExample.yaml: d13e81c7df2710fdb9ec151baa31debf7f92e4a9
+  examples/winCopyClipboard.yaml: bd740294b2b9ca5bdd5def503802a3cf489a040f
+  oJobRobot.yaml: 826e961cd89eb81596f8f174cf94626dbf52429a
