@@ -216,7 +216,7 @@ ow.ch.__types.etcd3 = {
         if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
         if (isDef(this.__channels[aName].stamp)) aV = merge(aV, this.__channels[aName].stamp);
         try {
-            var res = this.__channels[aName].kvClient.put(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, "")), Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aV, void 0, ""))).sync();
+            var res = this.__channels[aName].kvClient.put(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(sortMapKeys(aK), void 0, "")), Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aV, void 0, ""))).sync();
             if (isDef(res) && res.hasPrevKv()) {
                 return jsonParse(o.getPrevKv().getValue());
             } else {
@@ -261,7 +261,7 @@ ow.ch.__types.etcd3 = {
     get          : function(aName, aK) {
         if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
         try {
-            var res = this.__channels[aName].kvClient.get(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, ""))).sync();
+            var res = this.__channels[aName].kvClient.get(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(sortMapKeys(aK), void 0, ""))).sync();
             if (isDef(res) && res.getKvsCount() > 0)
                 return jsonParse(af.fromBytes2String(res.getKvs(0).getValue().toByteArray()));
             else
@@ -287,7 +287,7 @@ ow.ch.__types.etcd3 = {
     unset        : function(aName, aK, aTimestamp) {
         if (isDef(this.__channels[aName].keyStamp)) aK = merge(aK, this.__channels[aName].keyStamp);
         try {
-            this.__channels[aName].kvClient.delete(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(aK, void 0, ""))).sync();
+            this.__channels[aName].kvClient.delete(Packages.com.google.protobuf.ByteString.copyFromUtf8(stringify(sortMapKeys(aK), void 0, ""))).sync();
         } catch(e) {
             if (isDef(this.__channels[aName].throwExceptions) && !this.__channels[aName].throwExceptions) {
                 return void 0;

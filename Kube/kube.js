@@ -126,7 +126,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
  */
 Kube.prototype.getNamespaces = function (full) {
 	if (full) {
-		return this.__displayResult(k.client.namespaces().list().items);
+		return this.__displayResult(this.client.namespaces().list().items);
 	} else {
 		var h = new HTTP();
 		if (isDef(this.user)) h.login(this.user, this.pass, undefined, this.url);
@@ -145,9 +145,9 @@ Kube.prototype.getNamespaces = function (full) {
  */
 Kube.prototype.getServices = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).services().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).services().list().items);
 	} else {
-		return this.__displayResult(k.client.services().list().items);
+		return this.__displayResult(this.client.services().list().items);
 	}
 };
 
@@ -159,9 +159,9 @@ Kube.prototype.getServices = function(aNamespace) {
  */
 Kube.prototype.getConfigMaps = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).configMaps().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).configMaps().list().items);
 	} else {
-		return this.__displayResult(k.client.configMaps().list().items);
+		return this.__displayResult(this.client.configMaps().list().items);
 	}
 };
 
@@ -173,9 +173,9 @@ Kube.prototype.getConfigMaps = function(aNamespace) {
  */
 Kube.prototype.getEndpoints = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).endpoints().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).endpoints().list().items);
 	} else {
-		return this.__displayResult(k.client.endpoints().list().items);
+		return this.__displayResult(this.client.endpoints().list().items);
 	}
 };
 
@@ -187,9 +187,9 @@ Kube.prototype.getEndpoints = function(aNamespace) {
  */
 Kube.prototype.getNodes = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).nodes().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).nodes().list().items);
 	} else {
-		return this.__displayResult(k.client.nodes().list().items);
+		return this.__displayResult(this.client.nodes().list().items);
 	}
 };
 
@@ -201,9 +201,9 @@ Kube.prototype.getNodes = function(aNamespace) {
  */
 Kube.prototype.getPods = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).pods().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).pods().list().items);
 	} else {
-		return this.__displayResult(k.client.pods().list().items);
+		return this.__displayResult(this.client.pods().list().items);
 	}
 };
 
@@ -215,9 +215,9 @@ Kube.prototype.getPods = function(aNamespace) {
  */
 Kube.prototype.getServiceAccounts = function(aNamespace) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(k.client.inNamespace(aNamespace).serviceAccounts().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).serviceAccounts().list().items);
 	} else {
-		return this.__displayResult(k.client.serviceAccounts().list().items);
+		return this.__displayResult(this.client.serviceAccounts().list().items);
 	}
 };
 

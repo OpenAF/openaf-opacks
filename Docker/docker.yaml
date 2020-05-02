@@ -91,7 +91,7 @@ jobs:
       loadLib("docker.js");
       var docker = new Docker();
       var res = docker.runOJob(args);
-      if (args.showLogsOnEnd.toLowerCase() == "true") {
+      if (isDef(args.showLogsOnEnd) && args.showLogsOnEnd.toLowerCase() == "true") {
         print(res.logs);
       }
 
@@ -114,8 +114,8 @@ jobs:
         
       loadLib("docker.js");
       var docker = new Docker();
-      docker.runContainer(args);
-      if (args.showLogsOnEnd.toLowerCase() == "true") {
+      var res = docker.runContainer(args);
+      if (isDef(args.showLogsOnEnd) && args.showLogsOnEnd.toLowerCase() == "true") {
         print(res.logs);
       }
 

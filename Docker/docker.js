@@ -307,7 +307,7 @@ Docker.prototype.logs = function(aId, aPrefix) {
    aPrefix = _$(aPrefix, "prefix").isString().default("");
 
    if (isDef(c)) {
-      var o = String(c.logs()).split(/\n/);
+      var o = String(c.logs().fetch()).split(/\n/);
       var r = "";
       for(var ii in o) {
          r += aPrefix + o[ii] + "\n";
@@ -454,7 +454,7 @@ Docker.prototype.runOJob = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
-   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("true");
    _$(args.ojob, "ojob").$_();
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
@@ -469,7 +469,7 @@ Docker.prototype.runOJob = function(args) {
 
    // Go
    var origName = String(args.name);
-   if (String(args.nameSuffix).toLowerCase() == "true") {
+   if (isDef(args.nameSuffix) && String(args.nameSuffix).toLowerCase() == "true") {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
@@ -529,7 +529,7 @@ Docker.prototype.runOJob = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
@@ -582,7 +582,7 @@ Docker.prototype.runContainer = function(args) {
    args.shouldWait     = _$(args.shouldWait, "shouldWait").default("true");
    args.shouldRemove   = _$(args.shouldRemove, "shouldRemove").default("true");
    args.shouldShowLogs = _$(args.shouldShowLogs, "shouldShowLogs").default("true");
-   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("false");
+   args.shouldLog      = _$(args.shouldLog, "shouldLog").default("true");
    args.envs   = _$(args.envs, "envs").isMap().default({});
 
    // Prepare envs
@@ -593,7 +593,7 @@ Docker.prototype.runContainer = function(args) {
 
    // Go
    var origName = String(args.name);
-   if (String(args.nameSuffix).toLowerCase() == "true") {
+   if (isDef(args.nameSuffix) && String(args.nameSuffix).toLowerCase() == "true") {
       args.name = args.name  + "-" + String(nowUTC());
    }
    var container = this.create({
@@ -653,7 +653,7 @@ Docker.prototype.runContainer = function(args) {
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    $tb(() => { try { args.logs = this.containerLogs(container.Id).fetch(); } catch(e) { sprintErr(e); } }).timeout(5000).exec();
+         if (String(args.shouldLog).toLowerCase() == "true")    try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
