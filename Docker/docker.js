@@ -82,6 +82,30 @@ Docker.prototype.getDiskUsage = function() {
 
 /**
  * <odoc>
+ * <key>Docker.getVersion() : Map</key>
+ * Returns a map with docker version information.
+ * </odoc>
+ */
+Docker.prototype.getVersion = function() {
+   return jsonParse(this.docker.version());
+};
+
+/**
+ * <odoc>
+ * <key>Docker.inspect(aId) : Map</key>
+ * Returns an inspect map for the aID corresponding container.
+ * </odoc>
+ */
+Docker.prototype.inspect = function(aId) {
+   var res = this.getContainer(aId);
+   if (isUnDef(res)) 
+      return void 0;
+   else
+      return jsonParse(String(res.inspect()));
+};
+
+/**
+ * <odoc>
  * <key>Docker.getImages() : Array</key>
  * Returns an array with the current list of images in docker.
  * </odoc>
