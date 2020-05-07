@@ -299,6 +299,111 @@ Kube.prototype.getObject = function(aNamespace, aKind, aName) {
 	}))).fromServer().get());
 };
 
+/**
+ * <odoc>
+ * <key>Kube.getTemplate(aTemplateName, aMap) : Map</key>
+ * Retrieves an existing aTemplateName (check list in Kube.templates) applying aMap to fill out the template.
+ * </odoc>
+ */
+Kube.prototype.getTemplate = function(aTemplateName, aObjs) {
+	var t = this.templates[aTemplateName];
+
+	return jsonParse(templify(stringify(t), aObjs));
+};
+
+Kube.prototype.templates = {
+	job: {
+		kind: "Job",
+		metadata: {
+			name: "{{name}}",
+			namespace: "{{namespace}}"
+		},
+		spec: {
+			template: {
+				spec: {
+					containers: [
+						{
+							name: "{{name}}",
+							image: "{{image}}"
+						}
+					],
+					restartPolicy: "Never",
+					imagePullSecrets: {
+						name: "regcred"
+					}
+				}
+			},
+			backoffLimit: 4
+		}
+	},
+	deployment: {
+		kind: "Deployment",
+		metadata: {
+			labels: {
+				app: "{{app}}"
+			},
+			name: "{{name}}",
+			namespace: "{{namespace}}"
+		},
+		spec: {
+			progressDeadlineSeconds: 600,
+			replicas: 1,
+			revisionHistoryLimit: 10,
+			selector: {
+				matchLabels: {
+					app: "{{app}}"
+				}
+			},
+			template: {
+				metadata: {
+					labels: {
+						app: "{{app}}"
+					}
+				},
+				spec: {
+					containers: [
+						{
+							image: "{{image}}",
+							imagePullPolicy: "Always",
+							name: "{{name}}"
+						}
+					],
+					imagePullSecrets: [
+						"regcred"
+					],
+					dnsPolicy: "ClusterFirst",
+					restartPolicy: "Always"
+				}
+			}
+		}
+	},
+	serviceAccount: {
+		kind: "ServiceAccount",
+		metadata: {
+			name: "{{name}}",
+			namespace: "{{namespace}}"
+		}
+	},
+	clusterAdminRole: {
+		kind: "ClusterRoleBinding",
+		metadata: {
+			name: "{{roleName}}"
+		},
+		roleRef: {
+			apiGroup: "rbac.authorization.k8s.io",
+			kind: "ClusterRole",
+			name: "cluster-admin"
+		},
+		subjects: [
+			{
+				kind: "ServiceAccount",
+				name: "{{account}}",
+				namespace: "{{namespace}}"
+			}
+		]
+	}
+};
+
 Kube.prototype.__displayResult = function(aObj) {
 	var res = [];
 	ow.loadObj();
