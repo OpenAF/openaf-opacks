@@ -209,6 +209,20 @@ Kube.prototype.getPods = function(aNamespace) {
 
 /**
  * <odoc>
+ * <key>Kube.getJobs(aNamespace) : Array</key>
+ * Tries to retrieve the list of jobs on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getJobs = function(aNamespace) {
+	if (isDef(aNamespace)) {
+			return this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items);
+	} else {
+			return this.__displayResult(this.client.batch().jobs().list().items);
+	}
+};
+
+/**
+ * <odoc>
  * <key>Kube.getServiceAccounts(aNamespace) : Array</key>
  * Tries to retrieve the list of service accounts on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -263,8 +277,26 @@ Kube.prototype.get = function(aNamespace, aStream) {
 	if (isString(aStream)) aStream = io.readFileStream(aStream);
 	if (isMap(aStream)) aStream = af.fromString2InputStream(stringify(aStream));
 	var o2 = this.client.inNamespace(aNamespace).load(aStream).fromServer().get();
-	global.o2 = o2;
 	return this.__displayResult(o2);
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getObject(aNamespace, aKind, aName) : Map</key>
+ * Given an object aKind and aName will try to retrieve the current object definition.
+ * </odoc>
+ */
+Kube.prototype.getObject = function(aNamespace, aKind, aName) {
+	_$(aNamespace, "namespace").isString().$_();
+	_$(aKind, "kind").isString().$_();
+    _$(aName, "name").isString().$_();
+
+	return this.__displayResult(this.client.inNamespace(aNamespace).load(af.fromString2InputStream(stringify({
+		kind: aKind,
+		metadata: {
+			name: aName
+		}
+	}))).fromServer().get());
 };
 
 Kube.prototype.__displayResult = function(aObj) {
