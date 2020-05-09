@@ -1,0 +1,53 @@
+todo:
+- Update Docsify
+- Update PrismJS
+
+jobs:
+# =====================
+- name: Update Docsify
+  from: Identify files
+  each: Download files
+  args:
+    DIR  : docsify
+    URL  : https://unpkg.com/docsify@latest/lib/
+    extra:
+      "plugins/docsify-copy-code.min.js": https://unpkg.com/docsify-copy-code@latest/dist/docsify-copy-code.min.js
+  exec: |
+    args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
+
+# ====================
+- name: Update PrismJS
+  from: Identify files
+  each: Download files
+  args:
+    DIR: prismjs
+    URL: https://unpkg.com/prismjs@latest/components/
+  exec: |
+    args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
+
+# --------------------
+- name: Identify files
+  exec: |
+    args._list = $from( listFilesRecursive(args.DIR) )
+                 .equals("isFile", true)
+                 .select(r => r.filepath.replace(new RegExp("^" + args.DIR + "/"), ""));
+
+# ---------------------
+- name : Download files
+  catch: |
+    logErr(stringify(exception));
+  exec : |
+    var url;
+
+    if (isDef(args.extra) && isDef(args.extra[args.f]))
+      url = args.extra[args.f];
+    else
+      url = args.URL + args.f
+
+    try {
+      $rest().get2File(args.DIR + "/" + args.f, url);
+      log("Downloaded " + args.DIR + "/" + args.f + " <- " + url + "...");
+      if (io.fileInfo(args.DIR + "/" + args.f).size == 0) logWarn("Zero sized file "+ args.DIR + "/" + args.f);
+    } catch(e) {
+      logErr(url + " | " + stringify(e));
+    }

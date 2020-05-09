@@ -12,6 +12,7 @@
   |Confluence|Wrapper for the Confluence REST API|
   |CopyFiles|Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.|
   |Docker|A wrapper to access the amihaiemil/docker-java-api api to access a docker client.|
+  |Docksify|Wrapper to quickly build and server Docsify markdown documentation.|
   |DRProxy|DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs communication. It allows the interception of pre-proxy and post-proxy requests for any debug need.|
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
   |EncryptText|Encrypts a password by asking the user and not displaying on the shell session.|

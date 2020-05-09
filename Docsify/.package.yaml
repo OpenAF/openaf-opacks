@@ -1,0 +1,103 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - docsify
+  - markdown
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Docsify.opack
+description: Wrapper to quickly build and server Docsify markdown documentation.
+name: Docsify
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20200508'
+dependencies:
+  openaf: '>=20200508'
+files:
+  - prismjs/prism-perl.min.js
+  - prismjs/prism-r.min.js
+  - prismjs/prism-python.min.js
+  - prismjs/prism-java.min.js
+  - prismjs/prism-json.min.js
+  - prismjs/prism-css.min.js
+  - prismjs/prism-plsql.min.js
+  - prismjs/prism-yaml.min.js
+  - prismjs/prism-typescript.min.js
+  - prismjs/prism-sql.min.js
+  - prismjs/prism-properties.min.js
+  - prismjs/prism-handlebars.min.js
+  - prismjs/prism-powershell.min.js
+  - prismjs/prism-markdown.min.js
+  - prismjs/prism-nginx.min.js
+  - prismjs/prism-velocity.min.js
+  - prismjs/prism-regex.min.js
+  - prismjs/prism-javastacktrace.min.js
+  - prismjs/prism-go.min.js
+  - prismjs/prism-bash.min.js
+  - prismjs/prism-docker.min.js
+  - docsify.js
+  - README.md
+  - index.hbs
+  - main.js
+  - docsify/plugins/search.min.js
+  - docsify/plugins/front-matter.min.js
+  - docsify/plugins/ga.min.js
+  - docsify/plugins/zoom-image.min.js
+  - docsify/plugins/external-script.min.js
+  - docsify/plugins/docsify-copy-code.min.js
+  - docsify/plugins/emoji.min.js
+  - docsify/docsify.min.js
+  - docsify/themes/vue.css
+  - docsify/themes/pure.css
+  - docsify/themes/dark.css
+  - docsify/themes/dolphin.css
+  - docsify/themes/buble.css
+  - update.yaml
+  - .package.yaml
+filesHash:
+  prismjs/prism-perl.min.js: 178cbf74ea55de7e567d3fa7b5fca17424b8b7cb
+  prismjs/prism-r.min.js: 45ec2fd077bf82b3e6a36838974bb01fd0d89af4
+  prismjs/prism-python.min.js: f0cf6c0d95b72ff008d0cad0d9f732bcd7097e96
+  prismjs/prism-java.min.js: 29c01a6dd25db5433bc47d000a2458c4d3b8332e
+  prismjs/prism-json.min.js: af35f8c32b94773b7cb35da36e7aa59acc74eff5
+  prismjs/prism-css.min.js: 8a2a0d5850bf6d3a116232abf74bdbccfbdeb85a
+  prismjs/prism-plsql.min.js: be31f697fd96edacf010667b128d815081f7171f
+  prismjs/prism-yaml.min.js: 787f4563c5509f8ac5d684f449e5ccb4755a803d
+  prismjs/prism-typescript.min.js: 80d2e5ad1bff934183d4faefcbb565bf63634a6c
+  prismjs/prism-sql.min.js: ef2b2612f1499b257adcef7e42b0ffefed2165f3
+  prismjs/prism-properties.min.js: d94dd8f95b847a9a3d71bcda316088c302ba4bac
+  prismjs/prism-handlebars.min.js: dfe9015dd62f3bd52270effee7ed96d860af0074
+  prismjs/prism-powershell.min.js: c08ff0a69f31dd52a0486152ce43d25188ab16b7
+  prismjs/prism-markdown.min.js: 22df3ac8b8512087b32b5d14ede94536292d6790
+  prismjs/prism-nginx.min.js: c44c40545f70de9ed00a76f60b865f15e7181fb0
+  prismjs/prism-velocity.min.js: 006f83e82fbe1df020926696496fa309b0282dad
+  prismjs/prism-regex.min.js: 75d027f3b829bbe76c50f0e5da3f1907796bdb10
+  prismjs/prism-javastacktrace.min.js: 87d64a1f6790dcc25a92b4013e7568e4a2696579
+  prismjs/prism-go.min.js: efae459898adea2bc09e9cfce9cadbb38f551aab
+  prismjs/prism-bash.min.js: 50fcda01ff1ce3d603e9787474245b5d4fd1c558
+  prismjs/prism-docker.min.js: df27aa8f6f405b063071d981c2e4d5f67726f1c6
+  docsify.js: 2adff89f3a2bbe349fc36f36d00c4a9311716355
+  README.md: 6e83979faa2b6dd0f825dccadf67a1b8341be5d8
+  index.hbs: b7f9a1d37365ab2456a79c71b54fa5b63461180c
+  main.js: d81a4e00d8f81e808d94ff370b05709f5c7e2775
+  docsify/plugins/search.min.js: 649a0f830fc9a0e1e05733e6797bfefa2130588d
+  docsify/plugins/front-matter.min.js: de5658cf96bba25545fc61e0a87a8e40d3a3e322
+  docsify/plugins/ga.min.js: 9dcc4899550386d92379fdb268560ee6c7145113
+  docsify/plugins/zoom-image.min.js: ac7b4da834638b428792cb8f6b43ced56a75ab01
+  docsify/plugins/external-script.min.js: 0e830e50a7b56195cb399a943c0bb6ed3efdeef9
+  docsify/plugins/docsify-copy-code.min.js: 95625314703c162fb761ecd4bad61c02df672330
+  docsify/plugins/emoji.min.js: 6f4f96af2660a45fdb37c8cebdd79773b37551c5
+  docsify/docsify.min.js: 6f875b06cad91d815ee5134526813d65577dd819
+  docsify/themes/vue.css: d7499850d86bc570cced65ccbdaccc9631b4f7a1
+  docsify/themes/pure.css: 68adaad126d147c972ce836334da7d485ee0f625
+  docsify/themes/dark.css: e32af4ab14ef0685c1a34cc37047d48e474eab5b
+  docsify/themes/dolphin.css: dbbc757f49e36511275598f5753a1da865d3bfaa
+  docsify/themes/buble.css: 3003e1a77f9eaa0f0134c6e0b756e0c4b85d42f5
+  update.yaml: e5e4056253d336e71093458b46bb88b3bf8f9808
