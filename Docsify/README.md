@@ -20,7 +20,7 @@ You can quickly test with this oPack documentation (the one you are reading). Us
 loadLib("docsify.js");
 
 var hs = ow.server.httpd.start(8080);
-ow.server.httpd.routes(hs, { "/" : function(r, aHs) {
+ow.server.httpd.route(hs, { "/" : function(r, aHs) {
     return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r));
 }});
 
@@ -65,7 +65,7 @@ http://127.0.0.1:8080/docs?t=pure
 On the options map just for the _theme_ key:
 
 ````javascript
-ow.server.httpd.routes(hs, { "/" : function(r, aHs) {
+ow.server.httpd.route(hs, { "/" : function(r, aHs) {
     return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
         theme: "dark"
     }));
@@ -91,10 +91,10 @@ You can add more on the docsify/plugins folder. From this list "Docsify Copy Cod
 To configure your own list of plugins just add it to the _plugins_ array on the options map:
 
 ````javascript
-ow.server.httpd.routes(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+ow.server.httpd.route(hs, { "/" : function(r, aHs) {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r, {
         plugins: [ "docsify-copy-code", "zoom-image" ]
-    }));
+    });
 }});
 ````
 
@@ -103,7 +103,7 @@ _NOTE: Use the filename part as the reference to add to the plugins array._
 For plugins that need specific options you can use the _options_ key but keep in mind that it's a string representing a JSON. So do use the _stringify_ function as in the example below:
 
 ````javascript
-ow.server.httpd.routes(hs, { "/" : function(r, aHs) {
+ow.server.httpd.route(hs, { "/" : function(r, aHs) {
     return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
         plugins: [ "docsify-copy-code", "zoom-image", "search" ],
         options: stringify({
@@ -115,6 +115,37 @@ ow.server.httpd.routes(hs, { "/" : function(r, aHs) {
 }});
 ````
 
+## How to generate a static version
+
+It's possible to use the OpenAF's ability to include all css and javascript on a single HTML file so this oPack extends that functionality to also include all the markdown content that would otherwise retrived from a web server.
+
+To generate a single HTML file with everything just execute:
+
+````javascript
+loadLib("docsify.js");
+
+var docsify = new Docsify();
+io.writeFileString("README.html", docsify.genStaticVersion({
+    "/README.md": "README.md"
+}));
+````
+
+You can also include multiple markdown files, inline markdown and the docsify options as described for _replyDocsify_: 
+
+````javascript
+loadLib("docsify.js");
+
+var docsify = new Docsify();
+io.writeFileString("README.html", docsify.genStaticVersion({
+    "/README.md" : "# Test\n[Link to README](read_me.md)", 
+    "/read_me.md": "README.md" 
+}, {
+    theme: "dark"
+}));
+````
+
+**NOTE: Sub-folder markdown (e.g. "/my/markdown/folder/file.md"), on the key side, is not directly supported on the generation of static versions. You can work around this by replacing "/" with "_" on the key (e.g. "/my_markdown_folder_file.md").**
+
 ## How to update
 
-There is an oJob "update.yaml" to help on updating the existing content from the UnPKG CDN. Please run it directly on the oPack folder.
+There is an oJob "utils/update.yaml" to help on updating the existing content from the UnPKG CDN. Please run it directly on the oPack folder but be carefull that new versions might break existing functionality (specially the generation of static versions).
