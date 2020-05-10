@@ -61,7 +61,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
     var cont = stringify(aMapMDs, void 0, "");
     var res  = af.fromString2Bytes(io.readFileString(this.pth + "/docsify/docsify.min.js")
                .replace("var F={};function L", "var F=" + cont + ";function L")
-               .replace("var s=new XMLHttpRequest,r=F[a]", "var s=new XMLHttpRequest,r=F[a.substring(a.lastIndexOf(\"/\"))]")
+               .replace("var s=new XMLHttpRequest,r=F[a]", "var s=new XMLHttpRequest,r=F[a.substring(window.location.href.indexOf(\"#\")-7)]")
                );
 
     output = output.replace("\"/_d/docsify.min.js", "\"docsify.js");

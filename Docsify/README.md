@@ -137,14 +137,12 @@ loadLib("docsify.js");
 
 var docsify = new Docsify();
 io.writeFileString("README.html", docsify.genStaticVersion({
-    "/README.md" : "# Test\n[Link to README](read_me.md)", 
-    "/read_me.md": "README.md" 
+    "/README.md" : "# Test\n[Link to README](read/me.md)", 
+    "/read/me.md": "README.md" 
 }, {
     theme: "dark"
 }));
 ````
-
-**NOTE: Sub-folder markdown (e.g. "/my/markdown/folder/file.md"), on the key side, is not directly supported on the generation of static versions. You can work around this by replacing "/" with "_" on the key (e.g. "/my_markdown_folder_file.md").**
 
 ## How to update
 
