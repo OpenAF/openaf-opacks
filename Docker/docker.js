@@ -535,7 +535,7 @@ Docker.prototype.runOJob = function(args) {
                   if (isDef(info)) {
                      state = info.State;
                      
-                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
+                     try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) };
                      if (isDef(tmp) && tmp.length > 0) {
                         if ((tmp.length - 1) > logPos) printnl(tmp.substr(logPos));
                         logPos = tmp.length - 1;
@@ -546,10 +546,9 @@ Docker.prototype.runOJob = function(args) {
                }
             }
          }
-      } else {
-         this.waitForNotRunning(container.Id);
-         info = this.getInfo(container.Id);
-      }
+      } 
+      this.waitForNotRunning(container.Id);
+      info = this.getInfo(container.Id);
 
       // Done with it
       if (isDef(info)) {
@@ -659,7 +658,7 @@ Docker.prototype.runContainer = function(args) {
                   if (isDef(info)) {
                      state = info.State;
                   
-                     $tb(() => { try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e) } }).timeout(2500).exec();
+                     try { tmp = String(this.logs(container.Id, "[" + origName + "] ")); } catch(e) { sprintErr(e); }
                      if (isDef(tmp) && tmp.length > 0) {
                         if ((tmp.length-1) > logPos) printnl(tmp.substr(logPos));
                         logPos = tmp.length-1;
@@ -670,10 +669,9 @@ Docker.prototype.runContainer = function(args) {
                }
             }
          }
-      } else {
-         this.waitForNotRunning(container.Id);
-         info = this.getInfo(container.Id);
-      }
+      } 
+      this.waitForNotRunning(container.Id);
+      info = this.getInfo(container.Id);
 
       // Done with it
       if (isDef(info)) {
