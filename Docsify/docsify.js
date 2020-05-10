@@ -55,6 +55,15 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
                     content: String(aMapMDs[k])
                 };
             }
+
+            // Process images
+            var o = aMapMDs[k].content, ar = null;
+            do {
+                ar = o.match(/(\!\[[^\]]+\]\()(\w+\.\w+)/); 
+                if (ar != null && io.fileExists(ar[2])) 
+                    o = o.substring(0, ar["index"]) + ar[1] + ow.template.html.inlineSrc(ar[2]) + " " + o.substring(ar["index"] + ar[0].length);
+            } while(ar != null);
+            aMapMDs[k].content = o;
         }
     }
 

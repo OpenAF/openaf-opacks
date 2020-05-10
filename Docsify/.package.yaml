@@ -83,7 +83,7 @@ filesHash:
   prismjs/prism-go.min.js: efae459898adea2bc09e9cfce9cadbb38f551aab
   prismjs/prism-bash.min.js: 50fcda01ff1ce3d603e9787474245b5d4fd1c558
   prismjs/prism-docker.min.js: df27aa8f6f405b063071d981c2e4d5f67726f1c6
-  docsify.js: e58d3ee0ffb1575d060201b8106c555cf0fe1239
+  docsify.js: 98a53debef9c2fa45d6bfc906db86cd5748c502a
   utils/update.yaml: e5e4056253d336e71093458b46bb88b3bf8f9808
   .odoc.db: c48dc339c47af251e7240e4624add9aa4c43b0dc
   README.md: b328961a80e089440a818b41f0491bfac16d97de
