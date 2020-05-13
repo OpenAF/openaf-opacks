@@ -115,6 +115,40 @@ ow.server.httpd.route(hs, { "/" : function(r, aHs) {
 }});
 ````
 
+### Adding more syntax-highlight languages
+
+Docsify uses [PrismJS](https://prismjs.com/) for it's language syntax-highlight rendering. By default PrismJS includes support for:
+
+* Markup
+* CSS
+* CLike
+* Javascript
+
+By default the docsify opack will also add:
+
+* YAML
+* Markdown
+* Docker
+* JSON
+* SQL
+* Python
+* Bash
+
+But you can customize to add or remove any of these. You can see the full list under the prismjs folder on the oPack source. If some language is missing you can go right ahead and add it there.
+
+When invoking the docksify opack functions (replyDocsify and genStaticVersion) you can add on the options _langs_ entry your list of supported languages keeping in mind that you don't want to load to much or too little. For example:
+
+````javascript
+ow.server.httpd.route(hs, { "/" : function(r, aHs) {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+        plugins: [ "docsify-copy-code", "zoom-image", "search" ],
+        options: stringify({
+            langs: [ "r", "java", "javastacktrace", "plsql", "sql", "velocity", "regex" ]
+        })
+    }));
+}});
+````
+
 ## How to generate a static version
 
 It's possible to use the OpenAF's ability to include all css and javascript on a single HTML file so this oPack extends that functionality to also include all the markdown content that would otherwise retrived from a web server.

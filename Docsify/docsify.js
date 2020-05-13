@@ -16,7 +16,7 @@ var Docsify = function() {
  * \
  *    title   (String) \
  *    theme   (String) Defaults to vue\
- *    langs   (Array)  Defaults to yaml and markdown\
+ *    langs   (Array)  Defaults to yaml, markdown, docker, json, sql, python and bash\
  *    plugins (Array)  Defaults to docsify-copy-code\
  * \
  * Example of aMapMDs:\
@@ -40,7 +40,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
             name: "",
             repo: ""
         }),
-        langs  : [ "yaml", "markdown" ],
+        langs  : [ "yaml", "markdown", "docker", "json", "sql", "python", "bash" ],
         plugins: [ "docsify-copy-code" ]
     }, options));
 
@@ -90,7 +90,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
  * \
  *    title   (String) \
  *    theme   (String) (can be set using ?t= on the request)\
- *    langs   (Array)  Defaults to yaml and markdown\
+ *    langs   (Array)  Defaults to yaml, markdown, docker, json, sql, python and bash\
  *    plugins (Array)  Defaults to docsify-copy-code\
  * \
  * </odoc>
@@ -124,7 +124,7 @@ ow.server.httpd.replyDocsify = function(aHs, docRoot, aURI, aRequest, options) {
                 name: "",
                 repo: ""
             }),
-            langs  : [ "yaml", "markdown" ],
+            langs  : [ "yaml", "markdown", "docker", "json", "sql", "python", "bash" ],
             plugins: [ "docsify-copy-code" ]
         }, options));
         return ow.server.httpd.reply(cont, 200, "text/html");
