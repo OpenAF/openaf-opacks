@@ -24,6 +24,8 @@ var Docker = function(aRemote, authC) {
          this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote), authC);
       }
    }
+
+   this._useCmdForLogs = false;
 };
 
 Docker.prototype.__buildObj = function(aObj) {
@@ -521,10 +523,17 @@ Docker.prototype.runOJob = function(args) {
    }, args.name);
    this.start(container.Id);
 
+   if(isDef(useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
+
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
       var info;
       if (String(args.shouldShowLogs).toLowerCase() == "true") {
+	if (this._useCmdForLogs) {
+	 $sh("docker logs -f " + container.Id)
+	 .prefix(origName)
+	 .get(0);
+	} else {
          info = this.getInfo(container.Id);
          if (isDef(info)) {
             var state = info.State;
@@ -546,13 +555,20 @@ Docker.prototype.runOJob = function(args) {
                }
             }
          }
+	}
       } 
       this.waitForNotRunning(container.Id);
       info = this.getInfo(container.Id);
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
+         if (String(args.shouldLog).toLowerCase() == "true")    {
+	    if (this._useCmdForLogs) {
+		args.logs = $sh("docker logs " + container.Id).get(0).stdout;
+	    } else {
+            	try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
+            }
+	 }
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
@@ -644,10 +660,17 @@ Docker.prototype.runContainer = function(args) {
    }, args.name);
    this.start(container.Id);
 
+   if(isDef(useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
+
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
       var info;
       if (String(args.shouldShowLogs).toLowerCase() == "true") {
+        if (this._useCmdForLogs) {
+         $sh("docker logs -f " + container.Id)
+         .prefix("origName")
+	 .get(0);
+	} else {
          info = this.getInfo(container.Id);
          if (isDef(info)) {
             var state = info.State;
@@ -669,13 +692,20 @@ Docker.prototype.runContainer = function(args) {
                }
             }
          }
+        }
       } 
       this.waitForNotRunning(container.Id);
       info = this.getInfo(container.Id);
 
       // Done with it
       if (isDef(info)) {
-         if (String(args.shouldLog).toLowerCase() == "true")    try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
+         if (String(args.shouldLog).toLowerCase() == "true") {
+	    if (this._useCmdForLogs) {
+		args.logs = $sh("docker logs " + container.Id).get(0).stdout;
+	    } else {
+	    	try { args.logs = String(this.containerLogs(container.Id).fetch()); } catch(e) { sprintErr(e); };
+	    }
+	 }
          if (String(args.shouldRemove).toLowerCase() == "true") this.remove(container.Id);
       } else {
          throw "Container no longer found.";
