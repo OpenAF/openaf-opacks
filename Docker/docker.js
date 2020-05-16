@@ -523,7 +523,7 @@ Docker.prototype.runOJob = function(args) {
    }, args.name);
    this.start(container.Id);
 
-   if(isDef(useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
+   if(isDef(args.useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
@@ -660,7 +660,7 @@ Docker.prototype.runContainer = function(args) {
    }, args.name);
    this.start(container.Id);
 
-   if(isDef(useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
+   if(isDef(args.useCmdForLogs)) this._useCmdForLogs = args.useCmdForLogs;
 
    // Wait for it
    if (String(args.shouldWait).toLowerCase() == "true") {
