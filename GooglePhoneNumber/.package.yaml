@@ -13,8 +13,6 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  backurl: >-
-    https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GooglePhoneNumber
   url: 'https://openaf.io/opacks/GooglePhoneNumber.opack'
 description: >-
   Provides a wrapper to use the google phone number library
