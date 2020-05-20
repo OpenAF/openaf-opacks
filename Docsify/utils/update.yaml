@@ -1,6 +1,10 @@
 todo:
 - Update Docsify
 - Update PrismJS
+- Update Mermaid
+
+ojob:
+  async: true
 
 jobs:
 # =====================
@@ -24,6 +28,17 @@ jobs:
     URL: https://unpkg.com/prismjs@latest/components/
   exec: |
     args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
+
+# ====================
+- name: Update Mermaid
+  from: Identify files
+  each: Download files
+  args:
+    DIR: mermaid
+    URL: https://unpkg.com/mermaid@latest/dist/
+  exec: |
+    args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
+
 
 # --------------------
 - name: Identify files

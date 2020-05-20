@@ -18,5 +18,32 @@
   {{#each langs}}
   <script src="{{../uri}}_p/prism-{{this}}.min.js"></script>
   {{/each}}
+  {{#if mermaid}}
+  <script src="{{uri}}_m/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({{{mermaidOptions}}});
+
+    window.$docsify.markdown = { 
+      renderer: { 
+        code: function(code, lang) { 
+          if (lang==="mermaid") {
+            var style = "";
+            if (code.startsWith("style=")) {
+              style = code.substring(0, code.indexOf("\n"));
+              code = code.substring(code.indexOf("\n"));
+            }
+            return '<div class="mermaid"' + style + '>' + code + "</div>";
+          } 
+          return this.origin.code.apply(this, arguments); 
+        } 
+      } 
+    }
+  </script>
+  <style>
+    div.mermaid {
+        font-family: 'trebuchet ms', verdana, arial;
+    }
+  </style>
+  {{/if}}
 </body>
 </html>

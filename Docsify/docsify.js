@@ -14,10 +14,11 @@ var Docsify = function() {
  * Tries to generate a static "all-in" version with docsify over aMapMDs (where the key is "/filename.md" and value is
  * the markdown string or a markdown file path). Aditionally you can add docsify options:\
  * \
- *    title   (String) \
- *    theme   (String) Defaults to vue\
- *    langs   (Array)  Defaults to yaml, markdown, docker, json, sql, python and bash\
- *    plugins (Array)  Defaults to docsify-copy-code\
+ *    title   (String)  \  
+ *    theme   (String)  Defaults to vue\
+ *    langs   (Array)   Defaults to yaml, markdown, docker, json, sql, python and bash\
+ *    plugins (Array)   Defaults to docsify-copy-code\
+ *    mermaid (Boolean) Defaults to false\
  * \
  * Example of aMapMDs:\
  * \
@@ -41,7 +42,11 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
             repo: ""
         }),
         langs  : [ "yaml", "markdown", "docker", "json", "sql", "python", "bash" ],
-        plugins: [ "docsify-copy-code" ]
+        plugins: [ "docsify-copy-code" ],
+        mermaid: false,
+        mermaidOptions: stringify({
+            startOnLoad: true
+        })
     }, options));
 
     for(var k in aMapMDs) {
@@ -74,6 +79,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
                );
 
     output = output.replace("\"/_d/docsify.min.js", "\"docsify.js");
+    output = output.replace("\"/_m/mermaid.min.js", "\"" + this.pth + "/mermaid/mermaid.min.js");
     output = output.replace(/\"\/\_p\//g, "\"" + this.pth + "prismjs/");
     output = output.replace(/\"\/\_d\//g, "\"" + this.pth + "docsify/");
     output = output.replace("\"docsify.js", "\"data:application/javascript; charset=utf-8;base64," + af.fromBytes2String(af.toBase64Bytes(res)));
@@ -92,6 +98,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
  *    theme   (String) (can be set using ?t= on the request)\
  *    langs   (Array)  Defaults to yaml, markdown, docker, json, sql, python and bash\
  *    plugins (Array)  Defaults to docsify-copy-code\
+ *    mermaid (Boolean) Defaults to false\
  * \
  * </odoc>
  */
@@ -116,6 +123,10 @@ ow.server.httpd.replyDocsify = function(aHs, docRoot, aURI, aRequest, options) {
             return ow.server.httpd.replyFile(aHs, pth + "prismjs", aURI + "_p", aRequest.uri);
         }
 
+        if (aRequest.uri.startsWith(aURI + "_m")) {
+            return ow.server.httpd.replyFile(aHs, pth + "mermaid", aURI + "_m", aRequest.uri);
+        }
+
         var cont = templify(io.readFileString(pth + "index.hbs"), merge({
             uri    : aURI,
             title  : "",
@@ -125,7 +136,11 @@ ow.server.httpd.replyDocsify = function(aHs, docRoot, aURI, aRequest, options) {
                 repo: ""
             }),
             langs  : [ "yaml", "markdown", "docker", "json", "sql", "python", "bash" ],
-            plugins: [ "docsify-copy-code" ]
+            plugins: [ "docsify-copy-code" ],
+            mermaid: false,
+            mermaidOptions: stringify({
+                startOnLoad: true
+            })
         }, options));
         return ow.server.httpd.reply(cont, 200, "text/html");
     }

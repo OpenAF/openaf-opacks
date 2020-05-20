@@ -17,7 +17,7 @@ name: Docsify
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200512'
+version: '20200519'
 dependencies:
   openaf: '>=20200508'
 files:
@@ -38,6 +38,7 @@ files:
   - docsify/themes/vue.css
   - docsify.js
   - index.hbs
+  - mermaid/mermaid.min.js
   - prismjs/prism-bash.min.js
   - prismjs/prism-css.min.js
   - prismjs/prism-docker.min.js
@@ -62,22 +63,23 @@ files:
   - README.md
   - utils/update.yaml
 filesHash:
-  .odoc.db: 7130e6de51e902ea44ecaa366a37bd95dc55cb68
+  .odoc.db: 9846ac6855a89eaa0b5e20993e0cc237d423237b
   docsify/docsify.min.js: 6f875b06cad91d815ee5134526813d65577dd819
   docsify/plugins/docsify-copy-code.min.js: 95625314703c162fb761ecd4bad61c02df672330
   docsify/plugins/emoji.min.js: 6f4f96af2660a45fdb37c8cebdd79773b37551c5
   docsify/plugins/external-script.min.js: 0e830e50a7b56195cb399a943c0bb6ed3efdeef9
   docsify/plugins/front-matter.min.js: de5658cf96bba25545fc61e0a87a8e40d3a3e322
   docsify/plugins/ga.min.js: 9dcc4899550386d92379fdb268560ee6c7145113
-  docsify/plugins/search.min.js: a774e813318d36fe7662400bda50d7115b50b6bd
+  docsify/plugins/search.min.js: 649a0f830fc9a0e1e05733e6797bfefa2130588d
   docsify/plugins/zoom-image.min.js: ac7b4da834638b428792cb8f6b43ced56a75ab01
   docsify/themes/buble.css: 3003e1a77f9eaa0f0134c6e0b756e0c4b85d42f5
   docsify/themes/dark.css: e32af4ab14ef0685c1a34cc37047d48e474eab5b
   docsify/themes/dolphin.css: dbbc757f49e36511275598f5753a1da865d3bfaa
   docsify/themes/pure.css: 68adaad126d147c972ce836334da7d485ee0f625
   docsify/themes/vue.css: d7499850d86bc570cced65ccbdaccc9631b4f7a1
-  docsify.js: d44791cc05d1a4f26ef65ee2d91d63e6818abb2a
-  index.hbs: b7f9a1d37365ab2456a79c71b54fa5b63461180c
+  docsify.js: 48f7f32af2a20af9205248ea96400edc7643a58e
+  index.hbs: 624fe3ea663bf16b6440eb4debb4092b1c9a3529
+  mermaid/mermaid.min.js: 8dd833c84d8bc0c4b0e6ac8c6a9d3bb6bb08a9b2
   prismjs/prism-bash.min.js: 50fcda01ff1ce3d603e9787474245b5d4fd1c558
   prismjs/prism-css.min.js: 8a2a0d5850bf6d3a116232abf74bdbccfbdeb85a
   prismjs/prism-docker.min.js: df27aa8f6f405b063071d981c2e4d5f67726f1c6
@@ -99,5 +101,5 @@ filesHash:
   prismjs/prism-typescript.min.js: 80d2e5ad1bff934183d4faefcbb565bf63634a6c
   prismjs/prism-velocity.min.js: 006f83e82fbe1df020926696496fa309b0282dad
   prismjs/prism-yaml.min.js: 787f4563c5509f8ac5d684f449e5ccb4755a803d
-  README.md: 70b049a35e801412e362633c610dc4c1ebc56b94
-  utils/update.yaml: e5e4056253d336e71093458b46bb88b3bf8f9808
+  README.md: a741176ad1caf054db3936c2d2514b16fa4f70ff
+  utils/update.yaml: 7cfa34196d641a37f118263c56bbd7eae6d56ce5
