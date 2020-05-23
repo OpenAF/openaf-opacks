@@ -21,7 +21,7 @@ name: GooglePhoneNumber
 main: main.js
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200118'
+version: '20200522'
 dependencies:
   openaf: '>=20170301'
 files:
