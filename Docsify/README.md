@@ -66,10 +66,9 @@ On the options map just for the _theme_ key:
 
 ````javascript
 ow.server.httpd.route(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r, {
         theme: "dark"
     }));
-}});
 ````
 
 _NOTE: This will disabled changing the theme through the query string._
@@ -104,15 +103,14 @@ For plugins that need specific options you can use the _options_ key but keep in
 
 ````javascript
 ow.server.httpd.route(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r, {
         plugins: [ "docsify-copy-code", "zoom-image", "search" ],
         options: stringify({
             search: {
                 namespace: "test"
             }
         })
-    }));
-}});
+    });
 ````
 
 ### Adding more syntax-highlight languages
@@ -140,12 +138,12 @@ When invoking the docksify opack functions (replyDocsify and genStaticVersion) y
 
 ````javascript
 ow.server.httpd.route(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r, {
         plugins: [ "docsify-copy-code", "zoom-image", "search" ],
         options: stringify({
             langs: [ "r", "java", "javastacktrace", "plsql", "sql", "velocity", "regex" ]
         })
-    }));
+    });
 }});
 ````
 
@@ -157,7 +155,7 @@ To use it just add the mermaid boolean option set to true:
 
 ````javascript
 ow.server.httpd.route(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r, {
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r, {
         plugins: [ "docsify-copy-code", "zoom-image", "search" ],
         options: stringify({
             langs: [ "r", "java", "javastacktrace", "plsql", "sql", "velocity", "regex" ]

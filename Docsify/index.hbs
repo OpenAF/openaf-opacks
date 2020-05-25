@@ -45,5 +45,29 @@
     }
   </style>
   {{/if}}
+  {{#if liveupdate}}
+  <script>
+    var ws;
+    function fnConnect() {
+      ws = new WebSocket("ws://" + location.host + "/ws");
+      ws.onopen = function(e) { };
+
+      ws.onmessage = function(event) {
+        console.log("[message websockets] data=" + event.data);
+        if (event.data == "reload") location.reload();
+      };
+
+      ws.onclose = function(event) {
+        fnConnect();
+      };
+
+      ws.onerror = function(error) {
+        console.log("[error websockets] " + error.message);
+      };
+    }
+
+    fnConnect();
+  </script>
+  {{/if}}
 </body>
 </html>

@@ -8,6 +8,36 @@ var Docsify = function() {
     this.pth += "/";
 };
 
+Docsify.prototype.startLiveServer = function(aPort, aHost, aPath, aMap) {
+    var ws = [], state = -1;
+    var hs = ow.server.httpd.start(aPort, aHost, void 0, void 0, void 0, {
+        onOpen     : _ws => { ws.push(_ws); }, 
+        onClose    : (_ws, code, reason, hIBR) => { ws = deleteFromArray(ws, ws.indexOf(_ws)); },
+        onMessage  : (_ws, aMsg) => { }, 
+        onPong     : (_ws, aPong) => { }, 
+        onException: (_ws, e) => { /*sprintErr("exception: " + e);*/ }
+    }, 60000 * 60);
+    hs.addWS("/ws");
+    ow.server.httpd.route(hs, { 
+        "/" : function(r, aHs) { 
+            return ow.server.httpd.replyDocsify(aHs, aPath, "/", r, merge(aMap, { liveupdate: true }));
+        } 
+    });
+
+    ow.server.daemon(500, () => {
+        var tstate = 0;
+        listFilesRecursive(aPath).map(r => { tstate += r.lastModified });
+        if (tstate != state) {
+            if (state < 0) {
+                state = tstate;
+            } else {
+                state = tstate;
+                ws.map(r => r.send("reload"));
+            }
+        }
+    });
+};
+
 /**
  * <odoc>
  * <key>Docsify.genStaticVersion(aMapMDs, options) : String</key>
