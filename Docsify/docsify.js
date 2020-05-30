@@ -75,7 +75,7 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
         plugins: [ "docsify-copy-code" ],
         mermaid: false,
         mermaidOptions: stringify({
-            startOnLoad: true
+            startOnLoad: false
         })
     }, options));
 
@@ -169,7 +169,7 @@ ow.server.httpd.replyDocsify = function(aHs, docRoot, aURI, aRequest, options) {
             plugins: [ "docsify-copy-code" ],
             mermaid: false,
             mermaidOptions: stringify({
-                startOnLoad: true
+                startOnLoad: false
             })
         }, options));
         return ow.server.httpd.reply(cont, 200, "text/html");

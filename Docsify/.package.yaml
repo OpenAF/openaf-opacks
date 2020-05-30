@@ -50,6 +50,7 @@ files:
   - .odoc.db
   - README.md
   - index.hbs
+  - liveHttpd.yaml
   - mermaid/mermaid.min.js
   - docsify/plugins/search.min.js
   - docsify/plugins/front-matter.min.js
@@ -88,11 +89,12 @@ filesHash:
   prismjs/prism-go.min.js: efae459898adea2bc09e9cfce9cadbb38f551aab
   prismjs/prism-bash.min.js: 50fcda01ff1ce3d603e9787474245b5d4fd1c558
   prismjs/prism-docker.min.js: da39a3ee5e6b4b0d3255bfef95601890afd80709
-  docsify.js: 2414c9d6b0c7b1a0a26e6778ac7d635c08700ea1
+  docsify.js: fae0b2f3621d64260dd59291526dd3d787ee81ae
   utils/update.yaml: 7cfa34196d641a37f118263c56bbd7eae6d56ce5
   .odoc.db: 9846ac6855a89eaa0b5e20993e0cc237d423237b
   README.md: fb4963aa19f408f711a7eb007b36c79483f0271a
-  index.hbs: a3803050341defd4dc17cc27d65ab8e2dbf4bc52
+  index.hbs: d7b7b29e3fc057a9524e4ac91fac4b98b2a4fdf1
+  liveHttpd.yaml: 85365f9af373ed26336812804e068871ae69538a
   mermaid/mermaid.min.js: 8dd833c84d8bc0c4b0e6ac8c6a9d3bb6bb08a9b2
   docsify/plugins/search.min.js: 649a0f830fc9a0e1e05733e6797bfefa2130588d
   docsify/plugins/front-matter.min.js: de5658cf96bba25545fc61e0a87a8e40d3a3e322

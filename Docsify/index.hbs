@@ -8,9 +8,6 @@
 </head>
 <body>
   <div id="app"></div>
-  <script>
-    window.$docsify = {{{options}}}
-  </script>
   <script src="{{uri}}_d/docsify.min.js"></script>
   {{#each plugins}}
   <script src="{{../uri}}_d/plugins/{{this}}.min.js"></script>
@@ -21,29 +18,36 @@
   {{#if mermaid}}
   <script src="{{uri}}_m/mermaid.min.js"></script>
   <script>
+    var num = 0;
     mermaid.initialize({{{mermaidOptions}}});
-
-    window.$docsify.markdown = { 
+    var _m = {{{options}}}
+    _m.markdown = { 
       renderer: { 
-        code: function(code, lang) { 
+        code: function(code1, lang) { 
           if (lang==="mermaid") {
             var style = "";
-            if (code.startsWith("style=")) {
-              style = code.substring(0, code.indexOf("\n"));
-              code = code.substring(code.indexOf("\n"));
+            if (code1.startsWith("style=")) {
+              style = code1.substring(0, code1.indexOf("\n"));
+              code1 = code1.substring(code1.indexOf("\n"));
             }
-            return '<div class="mermaid"' + style + '>' + code + "</div>";
+            //return "<div class=\"mermaid\"" + style + ">" + code1 + "</div>";
+            return "<div class=\"mermaid\"" + style + ">" + mermaid.render('mermaid-svg-' + num++, code1) + "</div>";
           } 
           return this.origin.code.apply(this, arguments); 
         } 
       } 
     }
+    window.$docsify = _m; 
   </script>
   <style>
     div.mermaid {
         font-family: 'trebuchet ms', verdana, arial;
     }
   </style>
+  {{else}}
+  <script>
+    window.$docsify = {{{options}}}
+  </script> 
   {{/if}}
   {{#if liveupdate}}
   <script>
