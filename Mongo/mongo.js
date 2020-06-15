@@ -14,6 +14,7 @@ ow.ch.__types.mongo = {
     },
     __toTypeConvert: function(aMap) {
         traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$oid"])) o[k] = new Packages.org.bson.types.ObjectId(v["$oid"]); });
+        return aMap;
     },
     create       : function(aName, shouldCompress, options) {
         if (isUnDef(options)) options = {};
