@@ -153,7 +153,7 @@ ow.ch.__types.mongo = {
             this.__c[aName].replaceOne(Packages.org.bson.Document(this.__toTypeConvert(ak)), new Packages.org.bson.Document(this.__toTypeConvert(av)));
         }
 
-	return ak;
+	    return ak;
     },
     setAll       : function(aName, anArrayOfKeys, anArrayOfMapData, aTimestamp) {
         // Could implement in a faster way
