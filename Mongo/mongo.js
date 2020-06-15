@@ -12,6 +12,9 @@ ow.ch.__types.mongo = {
         traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$date"])) o[k] = new Date(v["$date"]) });
         return aMap;
     },
+    __toTypeConvert: function(aMap) {
+        traverse(aMap, (k, v, p, o) => { if(isObject(v) && isDef(v["$oid"])) o[k] = new Packages.org.bson.types.ObjectId(v["$oid"]); });
+    },
     create       : function(aName, shouldCompress, options) {
         if (isUnDef(options)) options = {};
         if (isUnDef(options.database))   options.database = "default";
@@ -48,7 +51,7 @@ ow.ch.__types.mongo = {
 
         var r = this.__c[aName].find(new Packages.org.bson.Document(full));
         if (r.first() == null) {
-            return undefined;
+            return void 0;
         } else {
             var res = [];
             var i = r.iterator();
@@ -80,7 +83,7 @@ ow.ch.__types.mongo = {
 
         var r = this.__c[aName].find(new Packages.org.bson.Document(full));
         if (r.first() == null) {
-            return undefined;
+            return void 0;
         } else {
             var res = [];
             var i = r.iterator();
@@ -145,7 +148,8 @@ ow.ch.__types.mongo = {
         try {
             this.__c[aName].insertOne(new Packages.org.bson.Document(av));
         } catch(e) {
-            this.__c[aName].replaceOne(Packages.org.bson.BsonDocument.parse(stringify(ak)), new Packages.org.bson.Document(av));
+            //this.__c[aName].replaceOne(Packages.org.bson.BsonDocument.parse(stringify(this.__toTypeConvert(ak))), new Packages.org.bson.Document(av));
+            this.__c[aName].replaceOne(Packages.org.bson.Document(this.__toTypeConvert(ak)), new Packages.org.bson.Document(this.__toTypeConvert(av)));
         }
 
 	return ak;
@@ -157,16 +161,16 @@ ow.ch.__types.mongo = {
         }
     },
     get          : function(aName, aKey) {
-        if (isUnDef(aKey)) return undefined;
+        if (isUnDef(aKey)) return void 0;
 
         if (isDef(this.__o[aName].key) && isUnDef(aKey._id)) {
             aKey._id = aKey[this.__o[aName].key];
             delete aKey[this.__o[aName].key];
          }
 
-        var r = this.__c[aName].find(new Packages.org.bson.Document(aKey)).first();
+        var r = this.__c[aName].find(new Packages.org.bson.Document(this.__toTypeConvert(aKey))).first();
         if (r == null) {
-            return undefined;
+            return void 0;
         } else {
             var res = jsonParse(r.toJson());
 
@@ -192,9 +196,9 @@ ow.ch.__types.mongo = {
         return res[0]._id;
     },
     unset        : function(aName, aKey) {
-        if (isUnDef(aKey)) return undefined;
+        if (isUnDef(aKey)) return void 0;
         
-        return this.__c[aName].deleteOne(new Packages.org.bson.Document(aKey)).getDeletedCount();
+        return this.__c[aName].deleteOne(new Packages.org.bson.Document(this.__toTypeConvert(aKey))).getDeletedCount();
     }
 };
 
