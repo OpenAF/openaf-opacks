@@ -22,19 +22,19 @@ version: '20200630'
 dependencies:
   OpenAF: '>=20190401'
 files:
-  - .maven.yaml
-  - .odoc.db
-  - .package.yaml
-  - .precompile
   - minio-7.0.2-all.jar
-  - README.md
+  - .package.yaml
+  - .odoc.db
   - s3.js
+  - README.md
   - s3.yaml
+  - .precompile
+  - .maven.yaml
 filesHash:
-  .maven.yaml: bea72f1aaf39a6d917f51504e95f6187b4357580
-  .odoc.db: 299b7feba82d9457555ddaa491224d00ab696b51
-  .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   minio-7.0.2-all.jar: af77e5eb80ae69d4709e706bf392fc64901c328c
+  .odoc.db: 299b7feba82d9457555ddaa491224d00ab696b51
+  s3.js: f81619943f768155f6df0accc731d945a0ea67ce
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3.js: b4b4ef9501039873df8a9a9ee0ad9522e3151917
   s3.yaml: 10c83fb629fbe2860e304316c44ab8ed617f078c
+  .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
+  .maven.yaml: bea72f1aaf39a6d917f51504e95f6187b4357580

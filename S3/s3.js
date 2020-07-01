@@ -230,7 +230,15 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
         this.putObjectStream(aBucket, aObjectName, is, aMetaMap);
         is.close();
     } else {
-        this.s3.putObject(aBucket, aObjectName, aLocalPath);
+        this.s3.putObject(aBucket, aObjectName, aLocalPath, __calcPutObjectOptions(aLocalPath));
+    }
+};
+
+S3.prototype.__calcPutObjectOptions = function(aLocalPath) {
+    if (isDef(aLocalPath) && io.fileExists(aLocalPath)) {
+        return Packages.io.minio.PutObjectOptions(io.fileInfo(aLocalPath).size, -1);
+    } else {
+        return void 0;
     }
 };
 
@@ -254,7 +262,6 @@ S3.prototype.putObjectByURL = function(aURL, aLocalPath, aMetaMap) {
  * </odoc>
  */
 S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap, aContentType) {
-
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
     aContentType = _$(aContentType).default(null);
