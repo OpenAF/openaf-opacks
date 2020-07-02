@@ -230,7 +230,7 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
         this.putObjectStream(aBucket, aObjectName, is, aMetaMap);
         is.close();
     } else {
-        this.s3.putObject(aBucket, aObjectName, aLocalPath, __calcPutObjectOptions(aLocalPath));
+        this.s3.putObject(aBucket, aObjectName, aLocalPath, this.__calcPutObjectOptions(aLocalPath));
     }
 };
 
