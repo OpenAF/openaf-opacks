@@ -47,6 +47,18 @@ Redis.prototype.size = function() {
 
 /**
  * <odoc>
+ * <key>Redis.keys(aPattern) : Array</key>"
+ * Returns an array of keys for the provided aPattern (e.g. "*akey", "akey*", "akey").
+ * </odoc>
+ */
+Redis.prototype.keys = function(aPattern) {
+    _$(aPattern).isString().$_();
+
+    return af.fromJavaArray(this.jedis.keys(aPattern).toArray());
+};
+
+/**
+ * <odoc>
  * <key>Redis.getCurrentDBId() : Number</key>
  * Returns the current Redis database id.
  * </odoc>
@@ -350,4 +362,14 @@ Redis.prototype.sortedSets_toArray = function(aKeyName) {
         });
     }
     return ar;
+};
+
+ow.obj.pool.REDIS = function(aHost, aPort, aDBId) {
+    var p = this.create();
+    p.setFactory(
+       () => { return new Redis(aHost, aPort, aDBId); },
+       (a) => { a.close(); },
+       (a) => { if (a.ping() != "PONG") throw "No pong from redis"; }
+    );
+    return p;
 };
