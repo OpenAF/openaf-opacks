@@ -364,6 +364,7 @@ Redis.prototype.sortedSets_toArray = function(aKeyName) {
     return ar;
 };
 
+ow.loadObj();
 ow.obj.pool.REDIS = function(aHost, aPort, aDBId) {
     var p = this.create();
     p.setFactory(

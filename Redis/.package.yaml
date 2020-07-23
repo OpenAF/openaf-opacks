@@ -18,7 +18,7 @@ name: Redis
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190709'
+version: '20200722'
 dependencies:
   openaf: '>=20200101'
 files:
@@ -33,4 +33,4 @@ filesHash:
   .odoc.db: 757c9a43571194fd25c5c57a828fa77328eef74b
   .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   jedis-3.3.0.jar: 2ab3fdd2340ce84aa67765a8b8f5af05c45e06fd
-  redis.js: e0755b92e7e1b599d17ef018c8933b9bb37f99bd
+  redis.js: 97a333f469074559100cc9790147f4ae79e44a9b
