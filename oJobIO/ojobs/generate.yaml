@@ -1,0 +1,78 @@
+init:
+  tmpl: |
+    # Author: {{author}}
+
+    todo:
+    {{#each jobs}}
+    - {{name}}
+    {{/each}} 
+
+    ojob:
+      {{#if async}}async       : true{{else}}sequential  : true{{/if}}
+      opacks      :
+      - openaf: 20200523
+      catch       : logErr(exception);
+      logToConsole: true   # to change when finished
+   
+    jobs:
+    # ----------
+    - name: Help
+      help: 
+        text   : Does stuff. 
+        expects: 
+        - name: something
+          desc: To do stuff
+
+    {{#each jobs}}
+    # ------{{sep}}
+    - name: {{name}}
+      exec: |
+        _$(args.something, "something").$_();
+
+        ow.oJob.output(args, args);
+
+    {{/each}}
+
+todo:
+- Generate Job
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false
+
+jobs:
+# ----------
+- name: Help
+  help: |
+    text   : Generates an oJob.io job template to jump start the creation of a new job.
+    expects:
+    - name: jobs
+      desc: Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
+    - name: author
+      desc: The author to add on the comments
+    - name: async
+      desc: If the job is sequential or async (e.g. "true")
+
+# ------------------
+- name: Generate Job
+  exec: |
+    args.jobs   = _$(args.jobs, "jobs").default("Sample job");
+    args.author = _$(args.author, "author").default("Anonymous");
+    args.async  = _$(args.async, "async").default(void 0);
+
+    args.jobs = args.jobs.split(",");
+    args.jobs = args.jobs.map(j => {
+       return {
+         name: j.trim(),
+         sep : repeat(j.trim().length, "-")
+       }
+    });
+
+    print(templify(args.init.tmpl, { 
+      author: args.author,
+      jobs  : args.jobs,
+      async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false)
+    }));

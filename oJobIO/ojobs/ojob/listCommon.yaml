@@ -1,0 +1,50 @@
+# Author: Nuno Aguiar
+
+todo:
+- List jobs
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  - oJob-common
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : List all job names from oJob-common package 
+    #expects: 
+    #- name: something
+    #  desc: To do stuff
+
+# ----------------
+- name: List jobs
+  exec: |
+    var lst = $from( io.listFiles( getOPackPath("oJob-common") ).files )
+              .starts("filename", "oJob")
+              .ends("filename", ".yaml")
+              .sort("filename")
+              .select(r => r);
+
+    lst = lst.map(f => ({
+       include: f.filename,
+       job    : io.readFileYAML(f.canonicalPath).jobs
+    }));
+
+    args.jobs = []; 
+    lst = lst.map(r => { 
+       if (isDef(r.job)) r.job.map(rr => {
+          args.jobs.push({
+             include: r.include,
+             job    : rr.name
+          });
+       });
+    }); 
+
+    args.__format = _$(args.__format).default("table");
+
+    ow.oJob.output(args.jobs, args);
+

@@ -1,0 +1,11 @@
+// Author: Nuno Aguiar
+
+todo:
+- Hello
+
+jobs:
+- name: Hello
+  exec: print('Hello')
+
+ojob:
+  sequential: true

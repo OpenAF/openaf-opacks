@@ -1,0 +1,35 @@
+# Author: Nuno Aguiar
+
+todo:
+- Echo 
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Echo all arguments provided
+
+# ----------
+- name: Echo 
+  exec: |
+    var cp = clone(args);
+    
+    delete cp.init;
+    delete cp.__id;
+    delete cp.objId;
+    delete cp.execid;
+
+    var isPM = false; 
+    if (args.__format == "pm") isPM = true;
+
+    if (isPM) delete args.__format;
+    ow.oJob.output(cp, args);
+    if (isPM) ow.oJob.output(cp, merge({ __format: "pm" }, args));
+

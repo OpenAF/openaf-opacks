@@ -1,0 +1,86 @@
+# Author: Nuno Aguiar
+
+todo:
+- Pipe
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200610
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help:
+    text   : |
+      Pipe oJobs in a sequence. Expects number arguments with the order of the jobs and [number].[argument] for each job specific argument. Example:
+      
+        0=myJob1 1=myJob2 2=myJob3 1.a=2 1.b=2 2.XX=abc
+
+# ---------------
+- name: Get parts
+  exec: |
+    var oo = Object.keys(args);
+    global.pipe = [];
+
+    $from(oo)
+    .notEquals("init")
+    .notEquals("__id")
+    .notEquals("objId")
+    .notEquals("execid")
+    .sort()
+    .select(r => {
+      if (isNumber(r)) {
+        global.pipe.push({ j: args[r], a: {} });
+      } else {
+        var s = r.match(/^(\d+)\.(.+)/);
+        if (isArray(s) && s.length > 2) {
+          if ( $from(global.pipe).equals("j", args[ s[1] ]).none() ) {
+            var aa = {}; aa[s[2]] = args[r];
+            global.pipe.push({ j: s[1], a: aa });
+          } else {
+            $from(global.pipe)
+            .equals("j", args[ s[1] ])
+            .at(0)
+            .a[ s[2] ] = args[ r ];
+          }
+        }
+      }
+    });
+
+# ----------
+- name: Pipe
+  from:
+  - Get parts
+  exec: |
+    if (isDef(args.generate)) {
+      var res = { todo: [], jobs: [] }, c = 0;
+      global.pipe.map(r => {
+        if (Object.keys(r.a).indexOf("*") >= 0)     r.a = r.a["*"];
+        if (Object.keys(r.a).indexOf("*path") >= 0) r.a = "$path(__pm._list, \"" + r.a["*path"] + "\")";
+        if (!isString(r.a)) r.a = merge(r.a, { __format: "pm" });
+
+        res.todo.push("Job " + c);
+        res.jobs.push({
+          name: "Job " + c,
+          type: "jobs",
+          typeArgs: { file: r.j },
+          args: r.a 
+        });
+        c++;
+      });
+      print(af.toYAML(res));
+    } else {
+      global.pipe.map(r => {
+        var exec = false;
+        if (Object.keys(r.a).indexOf("*path") >= 0)      { r.a = $path(__pm._list, r.a["*path"]); exec = true; } 
+        if (!exec && Object.keys(r.a).indexOf("*") >= 0) { r.a = af.eval(r.a["*"]); exec = true; }
+        if (!exec) r.a = merge(r.a, { __format: "pm" });
+        
+        oJobRunFile(r.j, r.a, now());
+      });
+ 
+      ow.oJob.output(__pm, args);   
+    } 

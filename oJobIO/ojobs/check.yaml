@@ -1,0 +1,113 @@
+# Author: Nuno Aguiar
+
+todo:
+- Check
+- Show stats
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Given an oJob file tries to syntax compile all OpenAF code parts for syntax errors that might be hard to debug/find when running oJob.
+    expects: 
+    - name: job
+      desc: The YAML/JSON oJob file to check. 
+
+# ------------------
+- name: Check syntax
+  exec: |
+    _$(args.code).isString().$_();
+    _$(args.name).isString().$_();
+
+    vars = _$(args.vars).default("args");
+    log(" checking '"+ args.name + "'...");
+    var cx, nlines = args.code.split("\n").length;
+    try {
+      global.stats.checks++;
+      global.stats.lines += nlines;
+
+      cx = Packages.openaf.AFCmdBase.jse.enterContext();
+      cx.compileString("var " + vars + ";" + args.code, args.name, 1, null);
+      Packages.openaf.AFCmdBase.jse.exitContext();
+    } catch(e) {
+      global.stats.errors++;
+      if (nlines < 3) {
+        var l = 1;
+        args.code.split("\n").map(l => logErr(e.fileName + " | " + l++ + ": " + l));
+      } else {
+        var ls = args.code.split("\n");
+        if (e.lineNumber > 1) logErr(e.fileName + " | " + (e.lineNumber-1) + ": " + ls[e.lineNumber-2]);
+        logErr(e.fileName + " | " + e.lineNumber + ": " + ls[e.lineNumber-1]);
+        if (e.lineNumber < nlines) logErr(e.fileName + " | " + (e.lineNumber+1) + ": " + ls[e.lineNumber]);
+      }
+      logErr(e.fileName + " | Line " + e.lineNumber + " | " + e.message);
+      Packages.openaf.AFCmdBase.jse.exitContext();
+    }
+
+# ----------------
+- name: Show stats
+  exec: |
+    global.stats.averageLinesPerPart = Math.floor(global.stats.lines / global.stats.checks);
+ 
+    ow.oJob.output(global.stats, args);
+
+# -----------
+- name: Check
+  each:
+  - Check syntax
+  exec: |
+    _$(args.job, "job").$_();
+    global.stats = { checks: 0, lines: 0, errors: 0, hasHelpJob: false };
+ 
+    if (io.fileExists(args.job)) {
+      var j;
+      if (args.job.match(/\.ya?ml$/)) j = io.readFileYAML(args.job);
+      if (args.job.match(/\.json$/))  j = io.readFileJSON(args.job);
+
+      // For ojob
+      log("Checking ojob...");
+      if (isDef(j.ojob)) {
+        if (isDef(j.ojob.catch))   each({ name: "ojob.catch", code: j.ojob.catch, vars: "args,job,id,deps,exception"});
+        if (isDef(j.ojob.metrics) && isDef(j.ojob.metrics.add)) {
+          Object.keys(j.ojob.metrics.add).map(r => {
+            each({ name: "ojob.metrics.add.r", code: j.ojob.metrics.add[r], vars: "" }); 
+          });
+        }  
+        if (isDef(j.ojob.checkStall) && isDef(j.ojob.checkStall.checkFunc)) 
+          each({ name: "ojob.checkStall.checkFunc", code: j.ojob.checkStall.checkFunc, vars: "args,job,id,deps,exception"});
+      }
+    
+      // For each job 
+      log("Checking ojob's jobs..."); 
+      var hasHelp = false;
+
+      if (isDef(j.jobs)) {
+         j.jobs.map(r => {
+           if (r.name.toLowerCase() == "help") hasHelp = true;
+
+           if (isDef(r.exec))  each({ code: r.exec,  name: "jobs."+r.name         , vars: "args,job,id,deps" + (isDef(r.each) ? ",each" : "") });
+           if (isDef(r.catch)) each({ code: r.catch, name: "jobs."+r.name+".catch", vars: "args,job,id,deps,exception"});
+           if (isDef(r.typeArgs) && isDef(r.typeArgs.stopWhen)) each({ code: r.typeArgs.stopWhen, name: "jobs."+r.name+".typeArgs.stopWhen", vars: "" });
+
+           // Deps
+           if (isDef(r.deps)) {
+             r.deps.map(rr => {
+               if (isDef(rr.onSuccess)) each({ code: rr.onSuccess, name: "jobs."+r.name+".deps."+rr.name+".onSuccess", vars: "args,job,id" });
+               if (isDef(rr.onFail))    each({ code: rr.onFail,    name: "jobs."+r.name+".deps."+rr.name+".onFail",    vars: "args,job,id" });
+             }); 
+           }
+         });
+
+         if (!hasHelp) logWarn("No help job found..."); else global.stats.hasHelpJob = true;
+      }
+      global.stats.job = args.job;
+    } else {
+      throw "File not found '" + args.job + "'";
+    } 

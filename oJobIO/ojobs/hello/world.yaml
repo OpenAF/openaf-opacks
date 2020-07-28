@@ -1,0 +1,8 @@
+# Author: Nuno Aguiar
+
+todo:
+- Hello World
+
+jobs:
+- name: Hello World
+  exec: ow.oJob.output("Hello world!", args); 

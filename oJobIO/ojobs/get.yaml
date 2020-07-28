@@ -1,0 +1,35 @@
+# Author: Nuno Aguiar
+
+todo:
+- Download
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Downloads the corresponding job from the provided location/url.
+    expects: 
+    - name: job
+      desc: The job location or url (e.g. ojob.io/get) 
+
+# --------------
+- name: Download
+  exec: |
+    _$(args.job, "job").$_();
+    if (!(args.job.toLowerCase().match(/^https?:\/\//))) {
+      var newjob = "https://" + args.job;
+
+      ow.loadFormat();
+      var host = (new java.net.URL(newjob).getHost());
+      if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job;
+      args.job = newjob;
+    }
+
+    print($rest({ uriQuery: true }).get(args.job, { raw: 1 }));

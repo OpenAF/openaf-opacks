@@ -1,0 +1,98 @@
+init:
+  l:
+
+ojob:
+  logToConsole: false
+  sequential: true
+
+todo:
+- List
+
+jobs:
+- name: List
+  exec: |
+    
+    var lst, localLst; 
+    var hd = String(java.lang.System.getProperty("user.home")).replace(/\\/g, "/") + "/.{{url}}";
+    io.mkdir(hd);
+    if (io.fileExists(hd + "/ojobs")) {
+        var lst = $from(listFilesRecursive(hd + "/ojobs"))
+                  .ends("filename", "yaml")
+                  .orEnds("filename", "json")
+                  .notStarts("filename", "_")
+                  .select(r => r.filepath.replace(hd + "/ojobs", "/local"));
+        localLst = lst; 
+        args.init.l = args.init.l.concat(lst);
+    }
+
+    if (isDef(args.search) || isDef(args.list)) {
+      if (isDef(args.list)) {
+         ow.oJob.output(args.init.l, args);
+         return;
+      }
+
+      lst = $from(args.init.l)
+      .contains(args.search)
+      .sort()
+      .select();
+
+      ow.oJob.output(lst, args);
+    } else {
+      plugin("Console");
+      var o = args.init.l.map(r => r.replace(/^{{proto}}:\/\/{{url}}\//g, "").replace(/\.ya?ml$/, "").replace(/\.json$/, ""));
+
+      var con = new Console();
+      con.getConsoleReader().setExpandEvents(false);
+      con.getConsoleReader().setHistoryEnabled(true);
+      var hist = new Packages.jline.console.history.FileHistory(new java.io.File(hd + "/.history"));
+      con.getConsoleReader().setHistory(hist);
+      con.getConsoleReader().addCompleter(new Packages.jline.console.completer.StringsCompleter(o));
+
+      print(ansiColor("BOLD", "── {{name}} " + repeat(con.getConsoleReader().getTerminal().getWidth() - (4 + {{lname}}), "─")) + "\n" + ansiColor("ITALIC", "Start completing the URI and/or hit TAB to auto-complete to select the ojob to execute (you can hit Ctrl-C at any time to abort):") + "\n");
+      var cmd, ct = 0;
+      while (o.indexOf(cmd) < 0 && ct < 2) { cmd = con.readLinePrompt(">> {{url}}/").trim(); ct++ }
+      hist.flush();
+
+      if (cmd != "") {
+        var oj;
+        if (!cmd.startsWith("/local/")) 
+           oj = $rest().get("{{proto}}://{{url}}/" + cmd);
+        else {
+           if (localLst.indexOf(cmd + ".yaml") >= 0) cmd += ".yaml";
+           if (localLst.indexOf(cmd + ".yml") >= 0) cmd += ".yml";
+           if (localLst.indexOf(cmd + ".json") >= 0) cmd += ".json";
+
+           if (cmd.match(/\.ya?ml$/))
+              oj = io.readFileYAML(hd + cmd.replace(/^\/local\//, "/ojobs/"));
+           else
+              oj = io.readFileJSON(hd + cmd.replace(/^\/local\//, "/ojobs/"));
+        }
+           
+        var hcmd = [];
+  
+        var h = $from(oj.jobs).equals("name", "Help").at(0);
+        if (isDef(h) && isDef(h.help) && isDef(h.help.text)) {
+           print("\n" + ansiColor("BOLD", "Job description:\n") + ansiColor("ITALIC", "\"" + h.help.text + "\""));
+        }
+        if (isDef(h) && isDef(h.help) && isDef(h.help.expects)) {
+           print("\n" + ansiColor("ITALIC", "Please fill out the job arguments (no value entered is equivalent to not providing the argument):") );
+           h.help.expects.map(r => {
+              print("\n  \"" + r.desc + "\"");
+              var tmp = String(con.readLinePrompt("  (" + ansiColor("BOLD", r.name) + "): "));
+              if (tmp != "") {
+                 args[r.name] = tmp;
+                 hcmd.push(r.name + "=" + tmp);
+              }
+           });
+        }
+ 
+        print("");
+        print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+        print(ansiColor("BOLD", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")));
+        print("");
+
+        var res = oJobRun(oj, args, now());
+
+        if (isDef(res)) ow.oJob.output(res, args);
+      }
+    }

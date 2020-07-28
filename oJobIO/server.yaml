@@ -1,0 +1,72 @@
+# Author: Nuno Aguiar
+
+init:
+  port: &PORT 8080
+  uri : &URI  "/"
+  dir : &DIR  "output"
+  pid : &PID  server.pid
+
+ojob:
+  daemon    : true
+  sequential: true
+  opacks    :
+  - oJob-common
+  unique    :
+    pidFile     : *PID
+    killPrevious: false
+  logToFile :
+    logFolder            : server.logs
+    HKhowLongAgoInMinutes: 10080
+    setLogOff            : true
+
+include:
+- oJobHTTPd.yaml
+
+todo:
+- name: HTTP Start Server
+  args: 
+    #host   : 127.0.0.1
+    port   : *PORT
+    mapLibs: true
+
+- name: HTTP Service
+  args: 
+    #host   : 127.0.0.1
+    port   : *PORT
+    uri    : *URI
+    execURI: |
+      var res = "", d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
+      try {
+         if (request.uri == "/" || request.uri == "/.json") request.uri = "/index.json";
+         var r = d + request.uri;
+         if (!io.getCanonicalPath(r).startsWith(d)) throw "outside directory";
+         
+         // https://ojob.io/hello/world (.yaml / .md / .json)
+         var tr = r, res = {};
+         if (!r.endsWith(".yaml") && !r.endsWith(".json") && !r.endsWith(".md") && !r.endsWith(".html")) tr += ".json";
+         if (tr.endsWith(".json") && !io.fileExists(tr) && io.fileExists(r.replace(/\.json$/, "") + ".yaml")) tr = r.replace(/\.json$/, "") + ".yaml";  
+
+         if (!io.fileExists(tr)) return server.reply("Not found", mime, 404, {});
+
+         if (isDef(request.params.raw) && Boolean(request.params.raw)) {
+            // Raw
+            res = io.readFileString(tr);
+         } else {
+            // Minified
+            if (tr.endsWith(".yaml")) {
+               res = io.readFileYAML(tr);
+            }
+
+            if (tr.endsWith(".json")) {
+               res = io.readFileJSON(tr);
+            }
+
+            if (tr.endsWith(".html")) {
+               res = io.readFileString(tr);
+            }
+         }
+         tlog("{{header.remote-addr}} | {{uri}} - {{target}}", merge(request, { target: tr } ));
+      } catch(e) {
+         logErr("Error: " + e);
+      }
+      return ow.server.httpd.reply(res); 

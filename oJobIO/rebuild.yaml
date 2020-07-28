@@ -1,0 +1,88 @@
+# Author: Nuno Aguiar
+init:
+  name  : oJob.io
+  url   : ojob.io
+  proto : https
+  lname : 7
+
+todo:
+- Prepare output
+- Copy content
+- Get oJob-commons
+- Finish output
+
+ojob:
+  async       : true
+  argsFromEnvs: true
+
+jobs:
+# --------------------
+- name: Prepare output
+  exec: |
+    io.rm("_output");
+    io.mkdir("_output");
+
+# -------------------
+- name: Set variables
+  exec: |
+    args.init.name  = _$(args.NAME).default(args.init.name);
+    args.init.url   = _$(args.URL).default(args.init.url);
+    args.init.proto = _$(args.PROTO).default(args.init.proto);
+    args.init.lname = args.init.name.length;
+    global.args.init.name  = args.init.name;
+    global.args.init.url   = args.init.url;
+    global.args.init.proto = args.init.proto;
+    global.args.init.lname = args.init.lname;
+
+# -------------------
+- name: Finish output
+  from:
+  - Set variables
+  deps:
+  - Get oJob-commons
+  - Copy content
+  exec: |
+    args.output = _$(args.output, "output").default("output");
+
+    var l = [];
+
+    listFilesRecursive("_output").map(r => {
+       if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
+          if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "");
+          if (r.filename != ".package.yaml" && !r.filename.startsWith("_")) {
+            l.push( global.args.init.proto + "://" + global.args.init.url + r.filepath.replace(/^_output\//, "/") );
+          }
+       }
+    });
+    var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init));
+    _tmpl.init.l = l;
+    io.writeFileJSON("_output/index.json", _tmpl);
+  
+    io.rm(args.output);
+    io.mv("_output", args.output);
+
+# ----------------------
+- name: Get oJob-commons
+  deps: Prepare output
+  exec: |
+    plugin("GIT");
+    var git = new GIT();
+    git.clone("https://github.com/openaf/oJob-common.git", "_output/common");
+    io.rm("_output/common/.git");
+
+# ------------------
+- name: Copy content
+  from:
+  - Set variables
+  deps: Prepare output
+  exec: |
+    yprint(args.init);
+    listFilesRecursive("ojobs").map(r => {
+       if (r.isFile) {
+         log("Copying " + r.filepath + "...");
+         io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"));
+       } else {
+         log("Creating folder " + r.filepath + "...");
+         io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"));
+       }
+    });

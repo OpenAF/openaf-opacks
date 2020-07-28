@@ -1,0 +1,66 @@
+# Author            : Nuno Aguiar
+
+init:
+  # The port where the rest services will be available
+  port  : &PORT   8787
+  # Where the pid file will be located
+  piddir: &PIDDIR service.pid
+
+ojob:
+  daemon: true
+  opacks:
+  - oJob-common
+  unique:
+    pidFile     : *PIDDIR
+    killPrevious: false
+  catch : |
+    sprintErr(exception);
+
+include:
+  - oJobRest.yaml
+
+todo:
+- name: REST Start Server
+  args: |
+    ({ port: _$((isDef(getEnv("PORT")) ? getEnv("PORT") : args.port), "port").default(global.args.init.port) })
+- name: Prepare Healthz
+- name: Prepare default
+
+jobs:
+# ----------
+- name: Help
+  help:
+    text   : | 
+      Launches a simple service to execute a job with the provided arguments where __ojob is the job to execute.
+      Example: 'curl -XPOST http://my.service:8787 -H "Content-Type: application/json" -d "{ \"__ojob\": \"ojob.io/hello/world\" }"'
+    expects:
+    - name: port
+      desc: The port on which to launch the service (defaults to 8787)
+
+# ---------------------
+- name: Prepare Healthz
+  to  : REST Healthz
+  args:
+    uri: /healthz
+  exec: |
+    args.port = _$((isDef(getEnv("PORT")) ? getEnv("PORT") : args.port), "port").default(global.args.init.port);
+
+# ---------------------
+- name: Prepare default
+  to  : REST Service
+  args:
+    uri       : /
+    execGET   : "return { a: 1 }"
+    execPOST  : |
+      if (isUnDef(data.__ojob)) return {};
+      log("Running '" + stringify(data, void 0, "") + "'...");
+      __pm = {};
+      oJobRunFile(data.__ojob, merge(data, { __format: "pm" }), now());
+      if (isDef(__pm._map)) return __pm._map;
+      if (isDef(__pm._list)) return __pm._list;
+      if (isDef(__pm.result)) return { result: __pm.result };
+      return __pm;
+    execPUT   : "return { }"
+    execDELETE: "return { }"
+  exec: |
+    args.port = _$((isDef(getEnv("PORT")) ? getEnv("PORT") : args.port), "port").default(global.args.init.port);

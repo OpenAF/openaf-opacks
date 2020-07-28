@@ -1,0 +1,28 @@
+# Author: Nuno Aguiar
+
+todo:
+- List envs 
+
+ojob:
+  sequential  : true
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : List the current list of enviroment variables.
+
+# ---------------
+- name: List envs
+  exec: |
+    args.sorted = _$(args.sorted).default("false");
+    args.envs = getEnvs();
+ 
+    if (args.sorted.toUpperCase() != "FALSE") args.envs = sortMapKeys(args.envs);
+
+    ow.oJob.output(args.envs, args);
+
