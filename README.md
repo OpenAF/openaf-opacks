@@ -5,18 +5,18 @@
   | Name   | Description   |
   |--------|---------------|
   |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, weather and a test service.|
-  |AWS|A ligthweigth and small set of AWS API calls to enhance functionality without having to include heavier AWS SDK dependencies when possible.|
+  |AWS|Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
-  |Compromise|Integrates the [NPL Compromise lib](https://github.com/nlp-compromise/compromise) into a opack.|
+  |Compromise|Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
   |Confluence|Wrapper for the Confluence REST API|
   |CopyFiles|Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.|
   |Docker|A wrapper to access the amihaiemil/docker-java-api api to access a docker client.|
-  |Docksify|Wrapper to quickly build and server Docsify markdown documentation.|
+  |Docsify|Wrapper to quickly build and server Docsify markdown documentation.|
   |DRProxy|DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs communication. It allows the interception of pre-proxy and post-proxy requests for any debug need.|
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
   |EncryptText|Encrypts a password by asking the user and not displaying on the shell session.|
-  |etcd3| Wrapper to access etcd3 functionality as a client.|
+  |etcd3|Wrapper to access etcd3 functionality as a client|
   |GenData|Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.|
   |GIST|Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
   |GoogleCompiler|Google Closure Compiler, reducing size of Javascript files and makes them more efficient helping your application to load faster and reducing your bandwidth needs and provides warning for illegal JavaScript and warnings for potentially dangerous operations, helping you to produce JavaScript that is less buggy and easier to maintain.|
@@ -34,19 +34,22 @@
   |MSBot|Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |Notifications|Provides libraries to use notifications services. Currently pushover.js.|
   |oDoc2MD|Generating markdown documentation based on existing oDoc databases.|
+  |oJobIO|Service to provide easy-to-access oJobs for daily routines.|
   |oPackServer|Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
+  |OpenAFLambdaLayers|Build the lambda layers to run OpenAF lambda functions|
+  |PasteBin|Wrapper around PasteBin functionality.|
+  |plugin-Ignite|OpenAF plugin to wrap Ignite functionality.|
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
-  |plugin-Ignite|OpenAF plugin to access Ignite functionality.|
   |plugin-SVN|OpenAF plugin to access SVN repositories.|
-  |QR|Generates and reads QR codes.|
+  |QR|Generates and reads QR codes|
   |Redis|Wrapper to access Redis using the java Jedis client.|
-  |Robot|Wrapper of functionality that allows for the automation of keystrokes and mouse movements and clicks. |
+  |Robot|Wrapper of functionality that allows for the automation of keystrokes and mouse movements and clicks.|
   |RSS|A simple library to create and serve RSS feeds.|
   |S3|Wrapper to access S3 compatible object storages as a client.|
-  |ScaleWay|Wrapper around ScaleWay API.| 
+  |ScaleWay|Wrapper around ScaleWay API|
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
-  |Terraform|OpenAF's wrapper around Terraform's functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
+  |Terraform|OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
   |TimeLive|Wrapper for TimeLive timesheets API|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
   |UnixPAM|Provides UNIX PAM based authentication|
