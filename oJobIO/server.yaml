@@ -1,7 +1,7 @@
 # Author: Nuno Aguiar
 
 init:
-  port: &PORT 8080
+  port: &PORT 8088
   uri : &URI  "/"
   dir : &DIR  "output"
   pid : &PID  server.pid
@@ -14,10 +14,10 @@ ojob:
   unique    :
     pidFile     : *PID
     killPrevious: false
-  logToFile :
-    logFolder            : server.logs
-    HKhowLongAgoInMinutes: 10080
-    setLogOff            : true
+  #logToFile :
+  #  logFolder            : server.logs
+  #  HKhowLongAgoInMinutes: 10080
+  #  setLogOff            : true
 
 include:
 - oJobHTTPd.yaml
@@ -25,13 +25,13 @@ include:
 todo:
 - name: HTTP Start Server
   args: 
-    #host   : 127.0.0.1
+    host   : 0.0.0.0
     port   : *PORT
     mapLibs: true
 
 - name: HTTP Service
   args: 
-    #host   : 127.0.0.1
+    host   : 0.0.0.0
     port   : *PORT
     uri    : *URI
     execURI: |

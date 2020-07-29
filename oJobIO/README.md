@@ -6,6 +6,7 @@ Generic service to provide easy-to-access oJobs for daily routines.
 
 ````bash
 docker build --no-cache --build-arg NAME=oJob.mydomain --build-arg PROTO=http --build-arg URL=oJob.mydomain -t ojobdomain .
+docker run -d -p 8088:8088 --rm ojobdomain 
 ````
 
 Build arguments:
@@ -21,7 +22,7 @@ Build arguments:
 To access you just need to execute: 
 
 ````bash
-ojob ojob.mydomain
+ojob http://ojob.mydomain:8088
 ````
 
 Then you can start writing a category or name and/or hit tab for auto-complete for the available jobs under that site.
@@ -38,7 +39,7 @@ OJOB_AUTHORIZEDDOMAINS=ojob.io,ojob.mydomain
 
 #### Hello world:
 ````bash
-ojob ojob.mydomain/hello/world
+ojob http://ojob.mydomain:8088/hello/world
 ````
 
 ## How to control the output

@@ -87,7 +87,7 @@ jobs:
         }
  
         print("");
-        print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+        print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
         print(ansiColor("BOLD", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")));
         print("");
 
