@@ -38,10 +38,10 @@ files:
   - ojobs/hello/index.yaml
   - rebuild.yaml
 filesHash:
-  rebuild.hbs: 17a6508cd9f72c56b4032f9b222b44030d05c196
-  server.yaml: db493e4600498de31b28fe3888f243431648a56d
+  rebuild.hbs: 7fda6a4d9ca6f81fadcb0b6ddd88e26e8abf4419
+  server.yaml: f23da29625e14939c09fce85c79f4ed6ff752131
   Dockerfile: 9e2cf40c777ae0e6a405afa55d335dc0fdd4b6ee
-  README.md: 308594b19067e502634f54874f829f0a38a64641
+  README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   ojobs/echo.yaml: f0040d39d7e4002133d989f189ec35a8c9716db2
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
   ojobs/get.yaml: c40eb8264941bd11978d7b9884f7f3d105c71f25
@@ -51,4 +51,4 @@ filesHash:
   ojobs/generate.yaml: a03e1f870c7d9b70b315d6db97e0ed8917f6c3d0
   ojobs/hello/world.yaml: 141e62983331a4aa7ed30179af793e1a3a21fdba
   ojobs/hello/index.yaml: 5a66dbe810076f7ff2cd4ee3aaeaf6da961ecdcb
-  rebuild.yaml: 98336e395be31ac8915e86f1f8bc2690c7c949cc
+  rebuild.yaml: 13b0069c08895b624108752c9db74529fc08a88d
