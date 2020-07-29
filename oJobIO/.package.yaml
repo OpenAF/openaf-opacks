@@ -36,6 +36,7 @@ files:
   - ojobs/generate.yaml
   - ojobs/hello/world.yaml
   - ojobs/hello/index.yaml
+  - setupOJobIO.yaml
   - rebuild.yaml
 filesHash:
   rebuild.hbs: 7fda6a4d9ca6f81fadcb0b6ddd88e26e8abf4419
@@ -51,4 +52,5 @@ filesHash:
   ojobs/generate.yaml: a03e1f870c7d9b70b315d6db97e0ed8917f6c3d0
   ojobs/hello/world.yaml: 141e62983331a4aa7ed30179af793e1a3a21fdba
   ojobs/hello/index.yaml: 5a66dbe810076f7ff2cd4ee3aaeaf6da961ecdcb
+  setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699
   rebuild.yaml: 13b0069c08895b624108752c9db74529fc08a88d
