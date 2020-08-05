@@ -17,17 +17,17 @@ name: ElasticSearch
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200321'
+version: '20200804'
 dependencies:
-  openaf: '>=20191001'
+  openaf: '>=20200524'
 files:
-  - ElasticSearch.yaml
-  - elasticsearch.js
-  - .package.yaml
   - .odoc.db
+  - .package.yaml
   - .precompile
+  - elasticsearch.js
+  - ElasticSearch.yaml
 filesHash:
-  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
-  elasticsearch.js: 301dc72e0425810176f52d3cafa9afedcb55d54b
   .odoc.db: d345abb569d305c212f7c378e2386b24af86f665
   .precompile: 65efea614ff4d1a11ea14ddea08713710e04296e
+  elasticsearch.js: 7d167d51aaa03d257086ab83092f93f8a2a7082e
+  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7

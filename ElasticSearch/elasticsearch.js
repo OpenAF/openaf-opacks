@@ -727,74 +727,66 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			aLogFunc = () => {};
 	}
 
-	var res, h = new ow.obj.http(), recC = new java.util.concurrent.atomic.AtomicLong();
-	function sendBulk(tdata) {
-			recC.getAndIncrement();
-			while(recC.get() > getNumberOfCores()) sleep(100, true);
-			ops.push($do((_s,_f) => {
-					var uuid = genUUID();
-					if (isDef(aLogFunc)) aLogFunc({
-							op: "start",
-							uuid: uuid,
-							size: tdata.length
-					});
-					try {
-					   var h = new ow.obj.http();
-					   if (isDef(parent.user)) h.login(parent.user, parent.pass);
-					   res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
-					   if (jsonParse(res.response).errors) throw "Errors on bulk operation";
-					   if (isDef(aLogFunc)) aLogFunc({
-							op: "done",
-							uuid: uuid,
-							size: tdata.length,
-							result: jsonParse(res.response)
-					   });
-					} catch(e) {
-					   _f({ e: e, uuid: uuid});
-					}
-					recC.getAndDecrement();
-			}).catch((e) => {
-					try{
-					if (isDef(aLogFunc)) aLogFunc({
-							op: "error",
-							uuid: e.uuid,
-							exception: e.e
-					});
-					}catch(ee) { sprint(ee); }
-					recC.getAndDecrement();
-			}));
+	var res, h = new ow.obj.http();
+	function sendBulk(tdata) {		
+		var uuid = genUUID();
+		try {
+			if (isDef(aLogFunc)) aLogFunc({
+					op: "start",
+					uuid: uuid,
+					size: tdata.length
+			});
+			var h = new ow.obj.http();
+			if (isDef(parent.user)) h.login(parent.user, parent.pass);
+			res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
+			if (jsonParse(res.response).errors) throw "Errors on bulk operation";
+			if (isDef(aLogFunc)) aLogFunc({
+				op: "done",
+				uuid: uuid,
+				size: tdata.length,
+				result: jsonParse(res.response)
+			});
+		} catch(e) {
+			try{
+			if (isDef(aLogFunc)) aLogFunc({
+					op: "error",
+					uuid: e.uuid,
+					exception: String(e),
+					response: res
+			});
+			}catch(ee) { sprint(ee); }
+		}
 	}
 
-	var ops = [];
-	ioStreamReadLines(rstream, (line) => {
-		var j = jsonParse(line);
-		var tmp = stringify({
+	$doA2B(each => {
+		ioStreamReadLines(rstream, (line) => {
+			var j = jsonParse(line);
+			var tmp = stringify({
 				index: {
-						_index: aIndex(j),
-						_type : idKey,
-						_id   : aFnId(j)
+					_index: aIndex(j),
+					_type : idKey,
+					_id   : aFnId(j)
 				}
-		}, void 0, "") + "\n";
-		if (isDef(aTransformFn)) {
+			}, void 0, "") + "\n";
+			if (isDef(aTransformFn)) {
 				tmp += stringify(aTransformFn(jsonParse(line)), void 0, "") + "\n";
-		} else {
+			} else {
 				tmp += line + "\n";
-		}
-		if (data.length + tmp.length >= batchSize) {
-				sendBulk(String(data));
-				data = "";
-		}
-		data += tmp;
-		cdata++;
-	});
-
-	if (data != "") {
-			sendBulk(String(data));
+			}
+			if (data.length + tmp.length >= batchSize) {
+					each(String(data));
+					data = "";
+			}
+			data += tmp;
+			cdata++;
+		}, "\n", false);
+		
+		if (data != "") {
+			each(String(data));
 			data = "";
-	}
-	
-	//$doWait($doAll(ops));
-	while(recC.get() > 0) sleep(100, true);
+		}
+	}, sendBulk);
+
 	rstream.close();
 
 	return cdata;
