@@ -60,11 +60,3 @@
         return void 0;
     };
 })();
-/*
-var apiYFinance = function apiYFinance() {
-    this.url = "https://query1.finance.yahoo.com";
-};
-
-apiYFinance.prototype.getTicketData = function(aTicker) {
-    return $rest().get(this.url + "/v8/finance/chart/" + aTicker);
-};*/
