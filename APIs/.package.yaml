@@ -27,18 +27,20 @@ repository:
   url: 'https://openaf.io/opacks/APIs.opack'
 description: >-
   A collection of public REST APIs for currency check, country info, numbers &
-  dates trivia, GeoIP, weather and a test service.
+  dates trivia, GeoIP, finance, weather and a test service.
 name: APIs
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20191017'
+version: '20200806'
 dependencies:
-  openaf: '>=20180424'
+  openaf: '>=20200401'
 files:
-  - .odoc.db
   - .package.yaml
+  - .odoc.db
+  - apiYFinance.js
   - apis.js
 filesHash:
-  .odoc.db: 3b177e360bbcfee2000216c5bc31657a7e37dcdc
+  .odoc.db: c5163c8aaf12d889454f954ed3d8e070a1d5f895
+  apiYFinance.js: 3493789933772b829ac5f5ad149a75ae35edc8bd
   apis.js: 69f9e7d54fc9cf7864cd9f7a7263736769a5ce4e
