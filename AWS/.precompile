@@ -7,3 +7,7 @@
 - aws_lambda.js
 - aws_rds.js
 - aws_sqs.js
+- aws_cost.js
+- aws_organizations.js
+- aws_events.js
+- aws_ec2.js

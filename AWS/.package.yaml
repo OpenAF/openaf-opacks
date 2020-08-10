@@ -23,7 +23,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200305'
+version: '20200809'
 dependencies:
   OpenAF: '>=20190716'
 files:
@@ -33,29 +33,33 @@ files:
   - aws.js
   - aws_cloudwatch.js
   - aws_core.js
+  - aws_cost.js
   - aws_dynamo.js
   - aws_ec2.js
   - aws_ecs.js
   - aws_events.js
   - aws_iam.js
   - aws_lambda.js
+  - aws_organizations.js
   - aws_rds.js
   - aws_sqs.js
   - utils/genTestRegions.yaml
   - utils/testRegions.js
 filesHash:
-  .odoc.db: 50cfbc0ca98521b2048514d7eae3d71ad63432ee
-  .precompile: 931dbab4e0b02acaa2891c099b621eeb0bc2c168
-  aws.js: 407c128f958d48f446d2a444fec9efdad94a33c0
+  .odoc.db: 4960880b11d5934b0dc2fb2cbccda8d35b1de6f2
+  .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
+  aws.js: d39eff3254e87fbb98d7257c1f0900fb7dfe43c7
   aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
   aws_core.js: 2ec2d0b8ce93f4b340b1bf1679d5a3a5703819ed
+  aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_lambda.js: c3436394c310814836d6f3c8b79b7ca2a4d7a458
+  aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  utils/testRegions.js: 692d6d9f763c4fb17d696c7fd814dc06801c7d08
+  utils/testRegions.js: b20c173bddb0ca2960e64ff4ce172fc6a75a5cca
