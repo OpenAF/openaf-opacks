@@ -1,0 +1,80 @@
+jobs:
+    # --------------------------
+    - name: oJobIO configuration
+      exec: |
+        _$(args.__store, "store").isString().$_();
+        _$(args.__params, "params").isArray().$_();
+        args.__set = _$(args.__set, "set").isString().default(void 0);
+        args.__options = _$(args.__options, "options").isMap().default({});
+    
+        global.ojobIOConfigPath = java.lang.System.getProperty("user.home") + "/.ojob.io";
+        io.mkdir(global.ojobIOConfigPath);
+    
+        global.ojobIOStorePath = global.ojobIOConfigPath + "/." + args.__store;
+    
+        if (io.fileExists(global.ojobIOStorePath)) {
+            try {
+                args.__config = io.readFileYAML(global.ojobIOStorePath);
+            } catch(e) {
+                logErr("While reading '" + global.ojobIOStorePath + "': " + String(e));
+                args.__config = { default: {} };
+            }
+            
+            if (isUnDef(args.__config.default)) args.__config = { default: args.__config };
+        } else {
+            args.__config = { default: {} };
+        }
+    
+        if (args.__options.askSet && isUnDef(args.__set)) {
+            plugin("Console");
+            var con = new Console();
+    
+            if (isUnDef(args.__options.askSetDesc)) args.__options.askSetDesc = "Which set of configurations you want to use (e.g. 'default'): ";
+            args.__set = con.readLinePrompt(args.__options.askSetDesc);
+            if (args.__set == "") args.__set = "default";
+        } else {
+            args.__set = _$(args.__set).default("default");
+        }
+    
+        if (isUnDef(args.__config[args.__set])) args.__config[args.__set] = {};
+    
+        for(var pi in args.__params) {
+            var param = args.__params[pi];
+    
+            if (isMap(param) && isDef(param.name) && isUnDef(args[param.name])) {
+                if (isUnDef(args.__config[args.__set][param.name])) {
+                    plugin("Console");
+                    var con = new Console();
+    
+                    if (isUnDef(param.type)) param.type = "normal";
+                    if (isUnDef(param.desc)) param.desc = param.name;
+    
+                    var fn = mask => {
+                        var res = con.readLinePrompt(param.desc + ": ", mask);
+                        if (res == "") res = param.default;
+                        return res;
+                    }
+    
+                    var res;
+                    switch(param.type) {
+                    case "password": res = af.encrypt(fn("*")); break;
+                    case "encrypt" : res = af.encrypt(fn());    break;
+                    default        : res = fn()
+                    }
+    
+                    args.__config[args.__set][param.name] = res;
+                }
+    
+                args[param.name] = args.__config[args.__set][param.name];
+            } else {
+                args.__config[args.__set][param.name] = args[param.name];
+            }
+        }
+    
+        try {
+            io.writeFileYAML(global.ojobIOStorePath, args.__config);
+        } catch(e) {
+            logErr("While writing '" + global.ojobIOStorePath + "': " + String(e));
+        }
+    
+        delete args.__config;

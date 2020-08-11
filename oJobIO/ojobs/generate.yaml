@@ -3,6 +3,9 @@ init:
     # Author: {{author}}
 
     todo:
+    {{#if params}}
+    - Init
+    {{/if}}
     {{#each jobs}}
     - {{name}}
     {{/each}} 
@@ -13,7 +16,12 @@ init:
       - openaf: 20200523
       catch       : logErr(exception);
       logToConsole: true   # to change when finished
-   
+    {{#if params}}
+
+    include:
+    - ojob.io/_common
+    {{/if}}      
+
     jobs:
     # ----------
     - name: Help
@@ -23,11 +31,27 @@ init:
         - name: something
           desc: To do stuff
 
+    {{#if params}}
+    # ----------
+    - name: Init
+      from: oJobIO configuration
+      args:
+        __store  : something
+        #__options:
+        #  askSet: true
+        __params :
+        - name   : something
+          type   : encrypt
+          default: stuff
+      exec: |
+        global.something = args.something;
+
+    {{/if}}
     {{#each jobs}}
     # ------{{sep}}
     - name: {{name}}
       exec: |
-        _$(args.something, "something").$_();
+        _$(args.something, "something").{{#if ../params}}default(global.something){{else}}$_(){{/if}};
 
         ow.oJob.output(args, args);
 
@@ -46,7 +70,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: |
+  help: 
     text   : Generates an oJob.io job template to jump start the creation of a new job.
     expects:
     - name: jobs
@@ -74,5 +98,6 @@ jobs:
     print(templify(args.init.tmpl, { 
       author: args.author,
       jobs  : args.jobs,
-      async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false)
+      async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false),
+      params: (isDef(args.params) && args.params.toLowerCase() == "true" ? true : false)
     }));

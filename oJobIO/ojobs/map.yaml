@@ -1,0 +1,44 @@
+# Author: Nuno Aguiar
+
+todo:
+- Map
+
+ojob:
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Selects only specific fields/keys from an incoming _list or _map
+    expects: 
+    - name: fields
+      desc: Comma separated list of fields/keys
+
+# ---------
+- name: Map
+  exec: |
+    args.fields = _$(args.fields, "fields").default("");
+    ow.loadObj();
+
+    var flds = args.fields.split(",");
+    if (isDef(__pm._list)) {
+       var nl = __pm._list.map(m => {
+          var nm = {};
+          flds.map(f => ow.obj.setPath(nm, f, ow.obj.getPath(m, f)) )
+          return nm;
+       });
+       __pm._list = nl;
+       ow.oJob.output(nl, args); 
+    } else {
+       if (isDef(__pm._map)) {
+          var nm = {};
+          flds.map(f => ow.obj.setPath(nm, f, ow.obj.getPath(args._map, f)) );
+          __pm._map = nm;
+          ow.oJob.output(nm, args);
+       }
+    }
+
