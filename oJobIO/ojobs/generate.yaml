@@ -3,7 +3,7 @@ init:
     # Author: {{author}}
 
     todo:
-    {{#if params}}
+    {{#if config}}
     - Init
     {{/if}}
     {{#each jobs}}
@@ -16,7 +16,7 @@ init:
       - openaf: 20200523
       catch       : logErr(exception);
       logToConsole: true   # to change when finished
-    {{#if params}}
+    {{#if config}}
 
     include:
     - ojob.io/_common
@@ -31,7 +31,7 @@ init:
         - name: something
           desc: To do stuff
 
-    {{#if params}}
+    {{#if config}}
     # ----------
     - name: Init
       from: oJobIO configuration
@@ -39,7 +39,7 @@ init:
         __store  : something
         #__options:
         #  askSet: true
-        __params :
+        __config :
         - name   : something
           type   : encrypt
           default: stuff
@@ -51,7 +51,7 @@ init:
     # ------{{sep}}
     - name: {{name}}
       exec: |
-        _$(args.something, "something").{{#if ../params}}default(global.something){{else}}$_(){{/if}};
+        _$(args.something, "something").{{#if ../config}}default(global.something){{else}}$_(){{/if}};
 
         ow.oJob.output(args, args);
 
@@ -99,5 +99,5 @@ jobs:
       author: args.author,
       jobs  : args.jobs,
       async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false),
-      params: (isDef(args.params) && args.params.toLowerCase() == "true" ? true : false)
+      config: (isDef(args.config) && args.config.toLowerCase() == "true" ? true : false)
     }));
