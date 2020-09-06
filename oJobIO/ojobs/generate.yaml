@@ -11,7 +11,7 @@ init:
     {{/each}} 
 
     ojob:
-      {{#if async}}async       : true{{else}}sequential  : true{{/if}}
+      {{#if async}}async       : true{{/if}}
       opacks      :
       - openaf: 20200523
       catch       : logErr(exception);
