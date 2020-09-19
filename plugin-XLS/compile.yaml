@@ -77,5 +77,5 @@ jobs:
     args:
       - outputDir: *OUTPUT_DIR
     exec: | 
-      saveHelp(args.outputDir, { "XLS": args.outputDir + "/src/openaf/plugins/XLS.java",
-                                 "DOC": args.outputDir + "/src/openaf/plugins/DOC.java" })
+      saveHelp(args.outputDir, { "xls": args.outputDir + "/src/openaf/plugins/XLS.java",
+                                 "doc": args.outputDir + "/src/openaf/plugins/DOC.java" })
