@@ -1,0 +1,64 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - xls
+  - doc
+  - plugins
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/plugin-XLS.opack'
+description: OpenAF plugin to create and modify XLS and DOC files.
+name: plugin-XLS
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20200918'
+dependencies:
+  openaf: '>=20200918'
+files:
+  - poi-ooxml-schemas-4.1.2.jar
+  - plugin-xls.jar
+  - poi-ooxml-4.1.2.jar
+  - xmlbeans-3.1.0.jar
+  - .package.yaml
+  - tests/autoTestAll.XLS.js
+  - tests/autoTestAll.XLS.yaml
+  - poi-excelant-4.1.2.jar
+  - .odoc.db
+  - poi-scratchpad-4.1.2.jar
+  - poi-4.1.2.jar
+  - compile.yaml
+  - .maven.yaml
+  - LICENSES.txt
+  - src/openaf/plugins/XLS.class
+  - src/openaf/plugins/DOC.class
+  - src/openaf/plugins/XLS$TableType.class
+  - src/openaf/plugins/DOC.java
+  - src/openaf/plugins/XLS$1NullOutputStream.class
+  - src/openaf/plugins/XLS.java
+filesHash:
+  poi-ooxml-schemas-4.1.2.jar: 550cc22a598c0b0a51d1f55f8371e83c1229802d
+  plugin-xls.jar: e1cf217c70cc84440cd0d08ae9e110183314a466
+  poi-ooxml-4.1.2.jar: 87d9a22aa9a7dd26e80c360e709f7ee02e32ab3b
+  xmlbeans-3.1.0.jar: 6dac1f897dfb3e3f17fc79b18a3353b2e51c464e
+  tests/autoTestAll.XLS.js: d187ea75619f7615f9ca411c51cdb216b663a487
+  tests/autoTestAll.XLS.yaml: b69b32c9842ad2ba62ea397eb9a33c1312b0721d
+  poi-excelant-4.1.2.jar: e650e49e8374af6e64886e7b7a7c2d8add383ab1
+  .odoc.db: e6b1036c42ce491972aa3aff5fc922223fd2112d
+  poi-scratchpad-4.1.2.jar: 1be379e91d3d3fb0cd11425451acdbfb0d2264e7
+  poi-4.1.2.jar: 964bf41cf68bce08e4ef6b2279b559fdf8d454f4
+  compile.yaml: 9f1987a2add64aaabe167f21d470ecd14fd86dd0
+  .maven.yaml: b6688d93d3762d0227bf67c0b3ba5bb08d1deb9e
+  LICENSES.txt: 588b668e9987a6752730ca51c473270b73535d7d
+  src/openaf/plugins/XLS.class: f3d37c2bcc5cd3c2a9725354b0358d0f16386097
+  src/openaf/plugins/DOC.class: 7710623b74f3fd18e34236b82961001800dd9f1f
+  src/openaf/plugins/XLS$TableType.class: aea138b372a238471df32fe2c6ab929052b9847b
+  src/openaf/plugins/DOC.java: b9bb4c6491c759727a52d3c7403d9a9d76a13bf8
+  src/openaf/plugins/XLS$1NullOutputStream.class: 7dcfd87fba1e3e209fb3d026adbbc1c3cc61a531
+  src/openaf/plugins/XLS.java: 4d165f4d1ec74d9db266f271fa431d61cf410626
