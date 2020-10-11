@@ -1,0 +1,85 @@
+# Author: Nuno Aguiar
+init:
+    tmpl: |
+      # {{name}}
+  
+      ## Usage
+  
+      ````bash
+      ojob {{name}} {{#each expects}}{{name}}={{example}} {{/each}}
+      ````
+  
+      ## Description
+  
+      {{text}}
+  
+      ## Expects
+  
+      | Name | Description |
+      |------|-------------|
+      {{#each expects}}
+      | {{name}} | {{desc}} |
+      {{/each}}
+  
+      {{{more}}}
+  
+todo:
+- Generate doc
+  
+ojob:
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+  
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Generates a markdown output for an oJob. If a markdown file (.md) with the same name of the original oJob file (.yaml or .json) being processed exists it will append that markdown content on the generated one.
+    expects: 
+    - name   : job
+      desc   : The file path to the ojob file.
+      example: abc.yaml
+    - name   : name
+      desc   : Optionally force the name of the ojob (defaults to the job argument).
+      example: ojob.io/abc
+    - name   : mdfile
+      desc   : Specifies the extra markdown file to append to the generated markdown (defaults to the job argument replacing the extension by ".md")
+      example: abc_extra.md
+    - name   : output
+      desc   : If defined the output will be stored on the provided filepath.
+      example: abc.md
+  
+# ------------------
+- name: Generate doc
+  exec: |
+    _$(args.job, "job").$_();
+  
+    var j;
+    if (args.job.match(/\.ya?ml$/)) j = io.readFileYAML(args.job);
+    if (args.job.match(/\.json$/))   j = io.readFileJSON(args.job);
+
+    if (isUnDef(j) || isUnDef(j.jobs)) {
+      logWarn("No jobs found in '" + args.job + "'...");
+      return false;
+    }
+
+    var jf = $from(j.jobs).equals("name", "Help");
+    var data = {};
+    if (jf.any()) {
+        data = jf.at(0).help;
+    }
+
+    data.name = _$(args.name).default(args.job);
+    var mdFile = _$(args.mdfile).default(args.job.replace(/(\.ya?ml$|\.json)/, ".md"));
+    if (io.fileExists(mdFile)) {
+        data.more = io.readFileString(mdFile);
+    }
+  
+    var out = templify(args.init.tmpl, data);
+    if (isDef(args.output)) {
+        io.writeFileString(args.output, out);
+    } else {
+        print(out);
+    }

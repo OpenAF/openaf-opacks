@@ -15,8 +15,9 @@ jobs:
   help: 
     text   : Selects only specific fields/keys from an incoming _list or _map
     expects: 
-    - name: fields
-      desc: Comma separated list of fields/keys
+    - name   : fields
+      desc   : Comma separated list of fields/keys
+      example: "a.b1,a.b2"
 
 # ---------
 - name: Map

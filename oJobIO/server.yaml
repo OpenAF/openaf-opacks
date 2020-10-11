@@ -35,7 +35,7 @@ todo:
     port   : *PORT
     uri    : *URI
     execURI: |
-      var res = "", d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
+      var res = "", md = false, d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
       try {
          if (request.uri == "/" || request.uri == "/.json") request.uri = "/index.json";
          var r = d + request.uri;
@@ -64,9 +64,20 @@ todo:
             if (tr.endsWith(".html")) {
                res = io.readFileString(tr);
             }
+
+            if (tr.endsWith(".md")) {
+               md = true;
+               res = io.readFileString(tr);
+            }
          }
          tlog("{{header.remote-addr}} | {{uri}} - {{target}}", merge(request, { target: tr } ));
       } catch(e) {
          logErr("Error: " + e);
       }
-      return ow.server.httpd.reply(res); 
+      
+      if (md) {
+         ow.loadTemplate();
+         return ow.server.httpd.reply(String( ow.template.parseMD2HTML(res, true) ), 200, "text/html; charset=utf-8", {});
+      } else {
+         return ow.server.httpd.reply(res); 
+      }

@@ -33,16 +33,52 @@ jobs:
     args.init.name  = _$(args.NAME, "NAME").default(args.init.name);
     args.init.url   = _$(args.URL, "URL").default(args.init.url);
     args.init.lname = args.init.name.length;
-    var l = [];
+    var l = [], lp = [];
      
     listFilesRecursive("_output").map(r => {
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
+          var orig = r.filepath;
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "");
           if (r.filename != ".package.yaml" && !r.filename.startsWith("_")) {
             l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") );
+            lp.push(orig);
           }
        }
     });
+
+    var mdindex = "# " + args.init.url + "\n";
+    //parallel4Array(lp, f => {
+    lp.sort().map(f => {
+       if (io.fileInfo(f).isDirectory) {
+         mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n";
+         return true;
+       }
+
+       var j;
+       try {
+         if (f.match(/\.ya?ml$/)) j = io.readFileYAML(f);
+         if (f.match(/\.json$/))  j = io.readFileJSON(f);
+       } catch(e) {
+         logErr("Problem reading file '" + f + "': " + String(e));
+       }
+
+       
+       if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any()) {
+        log("Generating markdown for " + f + "...");
+        oJobRunFile("ojobs/doc.yaml", {
+          job   : f,
+          name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
+          mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
+          output: f.replace(/(\.ya?ml|\.json)$/, ".md")
+        }, nowUTC(), void 0, true);
+ 
+        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, "").replace(new RegExp("^" + args.init.url), "");
+        mdindex += "  * [" + mentry + "](" + mentry + ".md)\n";
+       }
+       return 1;
+    });
+
+    io.writeFileString("_output/index.md", mdindex);
     
     var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init));
     _tmpl.init.l = l;
