@@ -76,13 +76,13 @@ jobs:
       var h = new ow.obj.http();
 
       log("Downloading openaf...");
-      //var si = h.get("https://openaf.io/nightly/openaf.jar", void 0, void 0, false, void 0, true);
-      var si = h.get("https://openaf.io/openaf.jar", void 0, void 0, false, void 0, true);
+      var si = h.get("https://openaf.io/nightly/openaf.jar", void 0, void 0, false, void 0, true);
+      //var si = h.get("https://openaf.io/openaf.jar", void 0, void 0, false, void 0, true);
       var so = io.writeFileStream("openaf.jar.orig");
       ioStreamCopy(so, si);
 
-      //si = h.get("https://openaf.io/nightly/openaf.jar.repacked", void 0, void 0, false, void 0, true);
-      si = h.get("https://openaf.io/openaf.jar.repacked", void 0, void 0, false, void 0, true);
+      si = h.get("https://openaf.io/nightly/openaf.jar.repacked", void 0, void 0, false, void 0, true);
+      //si = h.get("https://openaf.io/openaf.jar.repacked", void 0, void 0, false, void 0, true);
       so = io.writeFileStream("openaf.jar");
       ioStreamCopy(so, si);
 
