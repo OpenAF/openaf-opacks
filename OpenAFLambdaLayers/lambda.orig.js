@@ -10,7 +10,7 @@ function __exec(aIn) {
 
    __pmIn = aIn;
    if (type == "ojob") {
-      $ch("oJob::log").destroy(); $ch("oJob::todo").destroy();  $ch("oJob::jobs").destroy(); $ch("oJob::oJob").destroy();
+      $ch("oJob::log").destroy(); $ch("oJob::todo").destroy();  $ch("oJob::jobs").destroy(); $ch("oJob::oJob").destroy(); $ch("oJob::locks").destroy(); ow.oJob = void 0;
       oJobRunFile(filename, __pmIn);
    } else {
       load(filename);

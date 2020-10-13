@@ -16,8 +16,9 @@ jobs:
   help: 
     text   : Downloads the corresponding job from the provided location/url.
     expects: 
-    - name: job
-      desc: The job location or url (e.g. ojob.io/get) 
+    - name   : job
+      desc   : The job location or url (e.g. ojob.io/get) 
+      example: abc.yaml
 
 # --------------
 - name: Download

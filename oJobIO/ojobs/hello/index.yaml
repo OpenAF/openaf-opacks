@@ -4,8 +4,10 @@ todo:
 - Hello
 
 jobs:
+- name: Help
+  help: 
+    text: Simply prints Hello
+
 - name: Hello
   exec: print('Hello')
 
-ojob:
-  sequential: true

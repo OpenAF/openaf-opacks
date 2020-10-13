@@ -1,0 +1,25 @@
+artifacts:
+
+    - id     : poi
+      group  : org.apache.poi
+      version: 4.1.2
+  
+    - id     : poi-excelant
+      group  : org.apache.poi
+      version: 4.1.2
+  
+    - id     : poi-ooxml
+      group  : org.apache.poi
+      version: 4.1.2
+    
+    - id     : poi-ooxml-schemas
+      group  : org.apache.poi
+      version: 4.1.2
+
+    - id     : poi-scratchpad
+      group  : org.apache.poi
+      version: 4.1.2
+
+    - id     : xmlbeans
+      group  : org.apache.xmlbeans
+      version: 3.1.0
