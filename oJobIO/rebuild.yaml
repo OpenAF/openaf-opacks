@@ -58,6 +58,10 @@ jobs:
        try {
          if (f.match(/\.ya?ml$/)) j = io.readFileYAML(f);
          if (f.match(/\.json$/))  j = io.readFileJSON(f);
+         if (isUnDef(j)) {
+           f += "/index.yaml"
+           j = io.readFileYAML(f);
+         }
        } catch(e) {
          logErr("Problem reading file '" + f + "': " + String(e));
        }
@@ -72,7 +76,7 @@ jobs:
           output: f.replace(/(\.ya?ml|\.json)$/, ".md")
         }, nowUTC(), void 0, true);
  
-        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, "").replace(new RegExp("^" + args.init.url), "");
+        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "");
         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n";
        }
        return 1;

@@ -18,7 +18,7 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200910'
+version: '20201017'
 dependencies:
   openaf: '>=20200523'
 files:
@@ -59,4 +59,4 @@ filesHash:
   ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
   ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
   setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699
-  rebuild.yaml: 4d538f8cd596758a7367f969e9e34e131252dc05
+  rebuild.yaml: ac18646cd7de035eb81b155d5fd90c883ed25a01
