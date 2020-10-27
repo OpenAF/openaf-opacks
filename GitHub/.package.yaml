@@ -1,0 +1,27 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- github
+- git
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/GitHub.opack
+description: GitHub partially API wrapper
+name: GitHub
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20201027'
+dependencies:
+  openaf: '>=20100801'
+files:
+- github.js
+- .package.yaml
+filesHash:
+  github.js: a9f2fcabf6ea732ff9256c868b01e0f425ae2b9b

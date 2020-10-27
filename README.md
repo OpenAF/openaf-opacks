@@ -4,7 +4,7 @@
   
   | Name   | Description   |
   |--------|---------------|
-  |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, weather and a test service.|
+  |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, finance, weather and a test service.|
   |AWS|Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
@@ -19,6 +19,7 @@
   |etcd3|Wrapper to access etcd3 functionality as a client|
   |GenData|Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.|
   |GIST|Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
+  |GitHub|GitHub partially API wrapper|
   |GoogleCompiler|Google Closure Compiler, reducing size of Javascript files and makes them more efficient helping your application to load faster and reducing your bandwidth needs and provides warning for illegal JavaScript and warnings for potentially dangerous operations, helping you to produce JavaScript that is less buggy and easier to maintain.|
   |GooglePhoneNumber|Provides a wrapper to use the google phone number library (https://github.com/googlei18n/libphonenumber/).|
   |IMEICheck|Enables the checking of IMEIs for checksum validity and tries also to determine the equipment brand from a public database|
