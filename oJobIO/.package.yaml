@@ -18,7 +18,7 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200905'
+version: '20201017'
 dependencies:
   openaf: '>=20200523'
 files:
@@ -33,6 +33,7 @@ files:
   - ojobs/envs.yaml
   - ojobs/pipe.yaml
   - ojobs/_common.yaml
+  - ojobs/doc.yaml
   - ojobs/check.yaml
   - ojobs/generate.yaml
   - ojobs/map.yaml
@@ -42,19 +43,20 @@ files:
   - rebuild.yaml
 filesHash:
   rebuild.hbs: 7fda6a4d9ca6f81fadcb0b6ddd88e26e8abf4419
-  server.yaml: f23da29625e14939c09fce85c79f4ed6ff752131
-  Dockerfile: 9e2cf40c777ae0e6a405afa55d335dc0fdd4b6ee
+  server.yaml: 44f3a607785f8054f5ffdaf9409826adbfc6b8ec
+  Dockerfile: dd58ea9dafeb77c1b9fea9075c93d690cf75a738
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   ojobs/echo.yaml: f0040d39d7e4002133d989f189ec35a8c9716db2
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
-  ojobs/get.yaml: c40eb8264941bd11978d7b9884f7f3d105c71f25
+  ojobs/get.yaml: 4ffb32e1448890728216c5f68ee6fc50eac6a4c1
   ojobs/envs.yaml: 7b2a34193cc10765c656e03a71bf4ebfa768c069
   ojobs/pipe.yaml: 36daeae006fbbced697aac9f37cf159dec0b8cf4
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
-  ojobs/check.yaml: a1139e21761d16b1de0c2e52b02426fe475faf29
-  ojobs/generate.yaml: 89f2c85adca21f4e5105aeb19e8431c90cd861ea
-  ojobs/map.yaml: e3b46b3e8ad8ef6850837b5303833787aa45499e
-  ojobs/hello/world.yaml: 141e62983331a4aa7ed30179af793e1a3a21fdba
-  ojobs/hello/index.yaml: 5a66dbe810076f7ff2cd4ee3aaeaf6da961ecdcb
+  ojobs/doc.yaml: 749b523da04e49f1f985c4a98f4fb27ccd71ef92
+  ojobs/check.yaml: f395c66bef5acc47baf337060b35961666c6a0dd
+  ojobs/generate.yaml: 0582e533128ef5a9847a7b6d899f98b1cfaec1bb
+  ojobs/map.yaml: 6004f4c068c18fd128da20a0ac009cdca0fdfc9a
+  ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
+  ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
   setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699
-  rebuild.yaml: 13b0069c08895b624108752c9db74529fc08a88d
+  rebuild.yaml: ac18646cd7de035eb81b155d5fd90c883ed25a01

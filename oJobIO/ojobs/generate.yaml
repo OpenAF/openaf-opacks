@@ -28,8 +28,9 @@ init:
       help: 
         text   : Does stuff. 
         expects: 
-        - name: something
-          desc: To do stuff
+        - name   : something
+          desc   : To do stuff
+          example: aValueExample
 
     {{#if config}}
     # ----------
@@ -73,12 +74,15 @@ jobs:
   help: 
     text   : Generates an oJob.io job template to jump start the creation of a new job.
     expects:
-    - name: jobs
-      desc: Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
-    - name: author
-      desc: The author to add on the comments
-    - name: async
-      desc: If the job is sequential or async (e.g. "true")
+    - name   : jobs
+      desc   : Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
+      example: Stuff\\ to\\ do,Other\\ jobs
+    - name   : author
+      desc   : The author to add on the comments
+      example: Anonymous
+    - name   : async
+      desc   : If the job is sequential or async (e.g. "true")
+      example: "false"
 
 # ------------------
 - name: Generate Job
