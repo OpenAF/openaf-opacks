@@ -3,13 +3,13 @@
      * <odoc>
      * <key>GenData.funcs.genUSAddress(aGenData, aAddressList) : String</key>
      * Tries to generate random door number addresses from a provided GenData::AddressList list (if not provided it will try to load,
-     * as clientAddresses, the list lists/clients/list_addresses.yaml).
+     * as clientAddresses, the list lists/clients/list_addresses.db).
      * </odoc>
      */
     exports.genUSAddress = function(aGenData, aAddressList) {
         if (isUnDef(aAddressList)) {
             aAddressList = "GenData::AddressList";
-            aGenData.loadIfNotExists("GenData::AddressList", aGenData.getPath() + "/lists/clients/list_addresses.yaml");
+            aGenData.loadIfNotExists("GenData::AddressList", aGenData.getPath() + "/lists/clients/list_addresses.db");
         }
 
         var st = aGenData.getFromList(aAddressList); 

@@ -344,7 +344,7 @@ GenData.prototype.existsList = function(aName) {
 /**
  * <odoc>
  * <key>GenData.loadList(aName, aFile, noSync) : GenData</key>
- * Tries to load all values of an array JSON or YAML aFile into a list named aName for this GenData object instance.
+ * Tries to load all values of an array JSON or YAML or a MVS db aFile into a list named aName for this GenData object instance.
  * </odoc>
  */
 GenData.prototype.loadList = function(aName, aFile) {
@@ -354,10 +354,18 @@ GenData.prototype.loadList = function(aName, aFile) {
     if (!(io.fileExists(aFile)) && io.fileExists(this.getPath()+"/" + aFile)) {
         aFile =  this.getPath() + "/" + aFile;
     }
-    if (aFile.endsWith("yaml") || aFile.endsWith("yml")) {
+    if (aFile.endsWith(".yaml") || aFile.endsWith(".yml")) {
         list = io.readFileYAML(aFile);
     } else {
-        list = io.readFile(aFile);
+        if (aFile.endsWith(".json")) {
+            list = io.readFileJSON(aFile);
+        } else {
+            if (aFile.endsWith(".db")) {
+                $ch(aFile).create(1, "mvs", { file: aFile, compress: true, compact: true });
+                list = $ch(aFile).getAll();
+                $ch(aFile).destroy();
+            }
+        }
     }
 
     this.setList(aName, list);  
