@@ -1,15 +1,17 @@
 var classPath;
 
 if (__expr.match(/--update/)) {
-	plugin("HTTP");
+        throw "Not supported temporarially.";
+
+	/*plugin("HTTP");
         plugin("ZIP");
         log("Downloading Google Closure Compiler from Google...");
-	var down = new HTTP("http://dl.google.com/closure-compiler/compiler-latest.zip", "GET", "", {}, true, 5000);
+	var down = new HTTP("https://dl.google.com/closure-compiler/compiler-latest.zip", "GET", "", {}, true, 5000);
         var zip = new ZIP();
         zip.load(down.responseBytes());
         af.writeFileBytes(getOPackPath("GoogleCompiler") + "/compiler.jar", zip.getFile("compiler.jar")); 
         zip.close();
-        log("Done downloading.");
+        log("Done downloading.");*/
 }
 
 if (typeof classPath === 'undefined') {

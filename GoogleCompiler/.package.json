@@ -26,7 +26,7 @@
   "main": "main.js",
   "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
-  "version": "20200721",
+  "version": "20201116",
   "dependencies": {},
   "files": [
     ".package.json",

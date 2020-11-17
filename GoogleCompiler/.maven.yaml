@@ -1,0 +1,5 @@
+artifacts:
+
+    - id     : closure-compiler
+      group  : com.google.javascript
+      version: v20201102
