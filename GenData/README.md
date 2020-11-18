@@ -22,7 +22,7 @@ Using the provided list of names and the generator of sample phone numbers, exec
 
 ````javascript
 genData()
-.loadList("names", "lists/clients/list_names.yaml")
+.loadList("names", "lists/clients/list_names.db")
 .generate((g, f) => { 
     return { 
         name  : g.getFromList("names").name,
