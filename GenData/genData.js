@@ -125,6 +125,26 @@ GenData.prototype.generate = function(aFunc, numberOfSamples) {
 
 /**
  * <odoc>
+ * <key>GenData.generateFn(aFunction) : Function</key>
+ * Returns a function that generates a sample record by calling aFunction with the parameters: GenData (this object), auxiliaryFunctions (union of all functions under the funcs folder). The
+ * return of aFunction will be consider the generated object and added to the generate channel.
+ * </odoc>
+ */
+GenData.prototype.generateFn = function(aFunc) {
+    return () => {
+        var rec = {};
+        rec = aFunc(this, this.extraFuncs);
+        if (isObject(rec)) {
+            rec.___i = nowNano();
+            return rec;
+        } else {
+            throw "not an object: '" + rec + "'";
+        }
+    };
+};
+
+/**
+ * <odoc>
  * <key>GenData.generateFromList(aListName, aFunction) : GenData</key>
  * For each object in an existing list aListName calls aFunction with the parameters: GenData (this object), auxiliaryFunctions (union of all functions under the funcs folder) and
  * an object from aListName. The return of aFunction will be consider the generated object and added to the generate channel. 
