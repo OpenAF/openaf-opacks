@@ -13,7 +13,7 @@
     /**
      * <odoc>
      * <key>GenData.funcs.genPhone(aGenData, aCountry, aType, addOperator, addCountryCode) : Object</key>
-     * Using the lists/telecom/list_phonePatterns.yaml (loaded as genData::phonePatterns list) will try to generate a random
+     * Using the lists/telecom/list_phonePatterns.db (loaded as genData::phonePatterns list) will try to generate a random
      * weighted phone number for the specific aCountry. aType can be "fixed", "mobile", "tollFree", "premium", "voip", "voicemail", "sharedCost", "personal". If aType
      * is not provided the following weights will be used: fixed 10%, mobile 40%, tollFree 30%, premium 15% and personal 5%.
      * Optionally if addCountryCode = true the country code will be returned, if addCountryCode = true the operator if not 
@@ -21,8 +21,8 @@
      * </odoc>
      */
     exports.genPhone = function(aGenData, aCountry, aType, addOperator, addCountryCode) {
-        aGenData.loadIfNotExists("genData::phonePatterns", aGenData.getPath() + "/lists/telecom/list_phonePatterns.yaml");
-        aGenData.loadIfNotExists("genData::phonePrefixes", aGenData.getPath() + "/lists/telecom/list_phonePrefixes.yaml");
+        aGenData.loadIfNotExists("genData::phonePatterns", aGenData.getPath() + "/lists/telecom/list_phonePatterns.db");
+        aGenData.loadIfNotExists("genData::phonePrefixes", aGenData.getPath() + "/lists/telecom/list_phonePrefixes.db");
 
         if (isUnDef(aType)) {
             aType = aGenData.oneOf([ 
@@ -57,11 +57,11 @@
     /**
      * <odoc>
      * <key>GenData.funcs.genIMSI(aGenData, aCountry, anOperator) : String</key>
-     * Given anOperator from aCountry (two-letter) will generate a possible IMSI based on the lists/telecom/list_phoneOperators.yaml.
+     * Given anOperator from aCountry (two-letter) will generate a possible IMSI based on the lists/telecom/list_phoneOperators.db.
      * </odoc>
      */
     exports.genIMSI = function(aGenData, aCountry, anOperator) {
-        aGenData.loadIfNotExists("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_phoneOperators.yaml");
+        aGenData.loadIfNotExists("genData::phoneOperators", aGenData.getPath() + "/lists/telecom/list_phoneOperators.db");
 
         var opr;
         if (isDef(anOperator)) 
@@ -82,11 +82,11 @@
      * </odoc>
      */
     exports.genIMEI = function(aGenData, aModel) {
-        aGenData.loadIfNotExists("genData::phoneTACs", aGenData.getPath()+ "/lists/telecom/list_phoneTACs.yaml");
+        aGenData.loadIfNotExists("genData::phoneTACs", aGenData.getPath()+ "/lists/telecom/list_phoneTACs.db");
 
         var opr;
         if (isDef(aModel)) {
-            opr = $path(aGenData.getList("genData::phoneTACs"), "[?name=='" + aModel + "']");
+            opr = $path(aGenData.getList("genData::phoneTACs"), "[?name=='" + aModel.m + "']");
             opr = aGenData.oneOf(opr);
         } else {
             opr = aGenData.getFromList("genData::phoneTACs");
@@ -109,7 +109,7 @@
      * </odoc>
      */
     exports.genICCID = function(aGenData, anOperator) {
-        aGenData.loadIfNotExists("genData::operatorsIIN", aGenData.getPath() + "/lists/telecom/list_iin.yaml");
+        aGenData.loadIfNotExists("genData::operatorsIIN", aGenData.getPath() + "/lists/telecom/list_iin.db");
 
         var getLuhn = function(aValue) {
             aValue = String(aValue);
@@ -133,7 +133,7 @@
         //var countryCode = "1"; // 3 digits as defined in E.164
         //var issuer = "1234"; // 4 digits
         var issuer;
-        if (isDef(opr) && isDef(opr.simIssuer))
+        if (isDef(opr) && opr != null && isDef(opr.simIssuer))
             issuer = String(aGenData.oneOf(opr.simIssuer));
         else
             issuer = "8911234";

@@ -1,0 +1,51 @@
+# Author: Nuno Aguiar
+
+todo:
+- name: Convert YAML to MVS
+  args: |
+    $from(listFilesRecursive("../lists"))
+    .equals("isFile", true)
+    .ends("filename", ".yaml")
+    .select(r => ({
+      yaml: r.canonicalPath
+    }))
+
+ojob:
+  opacks      :
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: true   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Converts an existing yaml file into a mvs database.
+    expects: 
+    - name   : yaml
+      desc   : The original yaml file (array of maps)
+      example: list_something.yaml
+    - name   : mvs
+      desc   : The target mvs file
+      example: list_something.db
+
+# -------------------------
+- name: Convert YAML to MVS
+  exec: |
+    args.yaml = _$(args.yaml, "yaml").$_();
+    args.mvs  = _$(args.mvs, "mvs").default(args.yaml.replace(/\.yaml$/, ".db"));
+
+    log("Reading data from '" + args.yaml + "'...");
+    var data = io.readFileYAML(args.yaml);
+
+    log("Preparing the #" + data.length + " records...");
+    data.map((r, i) => r.id = i);
+
+    io.rm(args.mvs);
+
+    log("Saving data to mvs db '" + args.mvs + "'...");
+    $ch(args.mvs).create(1, "mvs", { file: args.mvs, compress: true, compact: true }); 
+    $ch(args.mvs).setAll(["id"], data);
+    $ch(args.mvs).destroy();
+
+    log("Done.");

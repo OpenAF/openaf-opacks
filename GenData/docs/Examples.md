@@ -6,7 +6,7 @@ Generating sample numbers, IMSI, SIM ICCID and IMEIs using a provided list of ra
 
 ````javascript
 genData()
-.loadList("names", "lists/clients/list_names.yaml")
+.loadList("names", "lists/clients/list_names.db")
 .generate((g, f) => { 
     return { 
         name  : g.getFromList("names").name, 

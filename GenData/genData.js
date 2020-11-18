@@ -125,6 +125,26 @@ GenData.prototype.generate = function(aFunc, numberOfSamples) {
 
 /**
  * <odoc>
+ * <key>GenData.generateFn(aFunction) : Function</key>
+ * Returns a function that generates a sample record by calling aFunction with the parameters: GenData (this object), auxiliaryFunctions (union of all functions under the funcs folder). The
+ * return of aFunction will be consider the generated object and added to the generate channel.
+ * </odoc>
+ */
+GenData.prototype.generateFn = function(aFunc) {
+    return () => {
+        var rec = {};
+        rec = aFunc(this, this.extraFuncs);
+        if (isObject(rec)) {
+            rec.___i = nowNano();
+            return rec;
+        } else {
+            throw "not an object: '" + rec + "'";
+        }
+    };
+};
+
+/**
+ * <odoc>
  * <key>GenData.generateFromList(aListName, aFunction) : GenData</key>
  * For each object in an existing list aListName calls aFunction with the parameters: GenData (this object), auxiliaryFunctions (union of all functions under the funcs folder) and
  * an object from aListName. The return of aFunction will be consider the generated object and added to the generate channel. 
@@ -344,7 +364,7 @@ GenData.prototype.existsList = function(aName) {
 /**
  * <odoc>
  * <key>GenData.loadList(aName, aFile, noSync) : GenData</key>
- * Tries to load all values of an array JSON or YAML aFile into a list named aName for this GenData object instance.
+ * Tries to load all values of an array JSON or YAML or a MVS db aFile into a list named aName for this GenData object instance.
  * </odoc>
  */
 GenData.prototype.loadList = function(aName, aFile) {
@@ -354,10 +374,18 @@ GenData.prototype.loadList = function(aName, aFile) {
     if (!(io.fileExists(aFile)) && io.fileExists(this.getPath()+"/" + aFile)) {
         aFile =  this.getPath() + "/" + aFile;
     }
-    if (aFile.endsWith("yaml") || aFile.endsWith("yml")) {
+    if (aFile.endsWith(".yaml") || aFile.endsWith(".yml")) {
         list = io.readFileYAML(aFile);
     } else {
-        list = io.readFile(aFile);
+        if (aFile.endsWith(".json")) {
+            list = io.readFileJSON(aFile);
+        } else {
+            if (aFile.endsWith(".db")) {
+                $ch(aFile).create(1, "mvs", { file: aFile, compress: true, compact: true });
+                list = $ch(aFile).getAll();
+                $ch(aFile).destroy();
+            }
+        }
     }
 
     this.setList(aName, list);  
