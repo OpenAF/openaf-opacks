@@ -86,7 +86,7 @@
 
         var opr;
         if (isDef(aModel)) {
-            opr = $path(aGenData.getList("genData::phoneTACs"), "[?name=='" + aModel + "']");
+            opr = $path(aGenData.getList("genData::phoneTACs"), "[?name=='" + aModel.m + "']");
             opr = aGenData.oneOf(opr);
         } else {
             opr = aGenData.getFromList("genData::phoneTACs");
@@ -133,7 +133,7 @@
         //var countryCode = "1"; // 3 digits as defined in E.164
         //var issuer = "1234"; // 4 digits
         var issuer;
-        if (isDef(opr) && isDef(opr.simIssuer))
+        if (isDef(opr) && opr != null && isDef(opr.simIssuer))
             issuer = String(aGenData.oneOf(opr.simIssuer));
         else
             issuer = "8911234";
