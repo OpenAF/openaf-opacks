@@ -18,45 +18,45 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20201017'
+version: '20201130'
 dependencies:
   openaf: '>=20200523'
 files:
-  - rebuild.hbs
-  - server.yaml
-  - Dockerfile
   - .package.yaml
-  - README.md
+  - Dockerfile
+  - ojobs/check.yaml
+  - ojobs/doc.yaml
   - ojobs/echo.yaml
-  - ojobs/index.html
-  - ojobs/get.yaml
   - ojobs/envs.yaml
+  - ojobs/generate.yaml
+  - ojobs/get.yaml
+  - ojobs/hello/index.yaml
+  - ojobs/hello/world.yaml
+  - ojobs/index.html
+  - ojobs/map.yaml
   - ojobs/pipe.yaml
   - ojobs/_common.yaml
-  - ojobs/doc.yaml
-  - ojobs/check.yaml
-  - ojobs/generate.yaml
-  - ojobs/map.yaml
-  - ojobs/hello/world.yaml
-  - ojobs/hello/index.yaml
-  - setupOJobIO.yaml
+  - README.md
+  - rebuild.hbs
   - rebuild.yaml
+  - server.yaml
+  - setupOJobIO.yaml
 filesHash:
-  rebuild.hbs: 7fda6a4d9ca6f81fadcb0b6ddd88e26e8abf4419
-  server.yaml: 44f3a607785f8054f5ffdaf9409826adbfc6b8ec
   Dockerfile: dd58ea9dafeb77c1b9fea9075c93d690cf75a738
-  README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
+  ojobs/check.yaml: f395c66bef5acc47baf337060b35961666c6a0dd
+  ojobs/doc.yaml: 749b523da04e49f1f985c4a98f4fb27ccd71ef92
   ojobs/echo.yaml: f0040d39d7e4002133d989f189ec35a8c9716db2
-  ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
-  ojobs/get.yaml: 4ffb32e1448890728216c5f68ee6fc50eac6a4c1
   ojobs/envs.yaml: 7b2a34193cc10765c656e03a71bf4ebfa768c069
+  ojobs/generate.yaml: 0582e533128ef5a9847a7b6d899f98b1cfaec1bb
+  ojobs/get.yaml: 4ffb32e1448890728216c5f68ee6fc50eac6a4c1
+  ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
+  ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
+  ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
+  ojobs/map.yaml: 6004f4c068c18fd128da20a0ac009cdca0fdfc9a
   ojobs/pipe.yaml: 36daeae006fbbced697aac9f37cf159dec0b8cf4
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
-  ojobs/doc.yaml: 749b523da04e49f1f985c4a98f4fb27ccd71ef92
-  ojobs/check.yaml: f395c66bef5acc47baf337060b35961666c6a0dd
-  ojobs/generate.yaml: 0582e533128ef5a9847a7b6d899f98b1cfaec1bb
-  ojobs/map.yaml: 6004f4c068c18fd128da20a0ac009cdca0fdfc9a
-  ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
-  ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
-  setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699
+  README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
+  rebuild.hbs: c73c41e36ddc8ec419e2b1f294460bc08d86b37d
   rebuild.yaml: ac18646cd7de035eb81b155d5fd90c883ed25a01
+  server.yaml: 44f3a607785f8054f5ffdaf9409826adbfc6b8ec
+  setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699

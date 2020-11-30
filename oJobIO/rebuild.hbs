@@ -13,14 +13,14 @@ jobs:
   exec: |
     
     var lst, localLst; 
-    var hd = String(java.lang.System.getProperty("user.home")).replace(/\\/g, "/") + "/.{{url}}";
+    var hd = String(java.lang.System.getProperty("user.home")).replace(/\\/g, "/") + "/.{{url}}".replace(/\:+/g, "_");
     io.mkdir(hd);
     if (io.fileExists(hd + "/ojobs")) {
         var lst = $from(listFilesRecursive(hd + "/ojobs"))
                   .ends("filename", "yaml")
                   .orEnds("filename", "json")
                   .notStarts("filename", "_")
-                  .select(r => r.filepath.replace(hd + "/ojobs", "/local"));
+                  .select(r => r.filepath.replace(hd + "/ojobs", "local"));
         localLst = lst; 
         args.init.l = args.init.l.concat(lst);
     }
@@ -55,7 +55,7 @@ jobs:
 
       if (cmd != "") {
         var oj;
-        if (!cmd.startsWith("/local/")) 
+        if (!cmd.startsWith("local/")) 
            oj = $rest().get("{{proto}}://{{url}}/" + cmd);
         else {
            if (localLst.indexOf(cmd + ".yaml") >= 0) cmd += ".yaml";
@@ -63,9 +63,9 @@ jobs:
            if (localLst.indexOf(cmd + ".json") >= 0) cmd += ".json";
 
            if (cmd.match(/\.ya?ml$/))
-              oj = io.readFileYAML(hd + cmd.replace(/^\/local\//, "/ojobs/"));
+              oj = io.readFileYAML(hd + cmd.replace(/^local\//, "/ojobs/"));
            else
-              oj = io.readFileJSON(hd + cmd.replace(/^\/local\//, "/ojobs/"));
+              oj = io.readFileJSON(hd + cmd.replace(/^local\//, "/ojobs/"));
         }
            
         var hcmd = [];
