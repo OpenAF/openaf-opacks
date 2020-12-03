@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.lang.String;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -171,7 +171,7 @@ public class XLS extends ScriptableObject {
 		if (c == CellType.BOOLEAN) return "BOOLEAN";
 		if (c == CellType.ERROR) return "ERROR";
 		if (c == CellType.FORMULA) return "FORMULA";
-		if (c == CellType.NUMERIC) if (HSSFDateUtil.isCellDateFormatted(cell)) return "DATE"; else return "NUMERIC";
+		if (c == CellType.NUMERIC) if (DateUtil.isCellDateFormatted(cell)) return "DATE"; else return "NUMERIC";
 		if (c == CellType.STRING) return "STRING";
 
 		return null;
@@ -531,7 +531,7 @@ public class XLS extends ScriptableObject {
 		if (value != null && value.getClass().getName().equals("org.mozilla.javascript.NativeDate")) {
 			type = CellType.NUMERIC;
 			
-			value = HSSFDateUtil.getExcelDate((Date) ((Context) AFCmdBase.jse.getNotSafeContext()).jsToJava(value, Date.class));
+			value = DateUtil.getExcelDate((Date) ((Context) AFCmdBase.jse.getNotSafeContext()).jsToJava(value, Date.class));
 			isDate = true;
 		}
 		
@@ -668,7 +668,7 @@ public class XLS extends ScriptableObject {
 	@JSFunction
 	public static String toDate(double d) {
 		Calendar cal = new GregorianCalendar();
-		cal.setTime(HSSFDateUtil.getJavaDate(d));
+		cal.setTime(DateUtil.getJavaDate(d));
 		
 		StringBuffer data = new StringBuffer();
 		
@@ -707,7 +707,7 @@ public class XLS extends ScriptableObject {
 		else if (type == CellType.NUMERIC) {
 			double d = cell.getNumericCellValue();
 
-			if (HSSFDateUtil.isCellDateFormatted(cell)) {
+			if (DateUtil.isCellDateFormatted(cell)) {
 				data = toDate(d);
 			} else {
 				data = d;
@@ -726,7 +726,7 @@ public class XLS extends ScriptableObject {
 				else if (ctf == CellType.NUMERIC) {
 					double dd = cell.getNumericCellValue();
 	
-					if (HSSFDateUtil.isCellDateFormatted(cell)) {
+					if (DateUtil.isCellDateFormatted(cell)) {
 						data = toDate(dd);
 					} else {
 						data = dd;
@@ -762,7 +762,7 @@ public class XLS extends ScriptableObject {
 		    else if (ct == CellType.NUMERIC) { 
 				double d = cellValue.getNumberValue();
 
-				if (HSSFDateUtil.isCellDateFormatted(cell)) {
+				if (DateUtil.isCellDateFormatted(cell)) {
 					cellS.put("val", cellS, toDate(d));
 				} else {
 					cellS.put("val", cellS, new Double(d)); 
