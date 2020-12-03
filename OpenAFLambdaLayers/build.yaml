@@ -167,3 +167,4 @@ jobs:
       io.cp("openaf.zip", "/output/openaf.zip");
       io.cp("openaf-opacks.zip", "/output/openaf-opacks.zip");
       io.cp("minijvm.zip", "/output/minijvm.zip");
+      io.cp("Dockerfile.lambda", "/output/Dockerfile");

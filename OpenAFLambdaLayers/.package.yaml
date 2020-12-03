@@ -18,21 +18,23 @@ name: OpenAFLambdaLayers
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200918'
+version: '20201202'
 dependencies:
-  openaf: '>=20200801'
+  openaf: '>=20201111'
 files:
-  - lambda.js
-  - bootstrap
-  - Dockerfile
   - .package.yaml
-  - README.md
-  - lambda.orig.js
+  - bootstrap
   - build.yaml
+  - Dockerfile
+  - Dockerfile.lambda
+  - lambda.js
+  - lambda.orig.js
+  - README.md
 filesHash:
-  lambda.js: 8c639548aba68236bc7367fc884d8c0257fd6e17
   bootstrap: dc69f91161a826e2f0e72c9efd9e5bd3df53db4b
-  Dockerfile: 3a2824222aa02cb9ff231f49593e239bfbbc1504
-  README.md: d51480762258ee25749c6bfa1438f4dd48e2d06f
+  build.yaml: 1d6bf80c69ad7758402e9d317a6a8a8d70f4aae9
+  Dockerfile: 681066b4437f2c8694b1f6ab3d3e2b40b4d1a894
+  Dockerfile.lambda: 2f6a28939717461d84279d59329b45bc70f9ca4c
+  lambda.js: 8c639548aba68236bc7367fc884d8c0257fd6e17
   lambda.orig.js: a2a99cc63203fca5b882d97999b7f576aa523931
-  build.yaml: 24914d7357ca8a8e816231420b2edf8c864361ff
+  README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474

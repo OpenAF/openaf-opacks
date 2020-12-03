@@ -1,0 +1,19 @@
+FROM amazon/aws-lambda-provided
+
+COPY minijvm.zip /opt/minijvm.zip
+COPY openaf-opacks.zip /opt/openaf-opacks.zip
+COPY openaf.zip /opt/openaf.zip
+
+RUN cd /opt\
+ && yum -y install unzip\
+ && unzip -o minijvm.zip\
+ && unzip -o openaf-opacks.zip\
+ && unzip -o openaf.zip\
+ && rm minijvm.zip\
+ && rm openaf-opacks.zip\
+ && rm openaf.zip\
+ && ln -s /opt/bootstrap /var/runtime/bootstrap\
+ && yum -y remove unzip\
+ && yum -y autoremove
+ 
+#COPY main.js /var/task/main.js

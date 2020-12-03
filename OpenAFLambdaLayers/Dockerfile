@@ -20,6 +20,7 @@ RUN mkdir /opt/build\
 COPY bootstrap /opt/bootstrap
 COPY build.yaml /opt/build.yaml
 COPY lambda.js /opt/lambda.js
+COPY Dockerfile.lambda /opt/Dockerfile.lambda
 
 WORKDIR /opt
 ENTRYPOINT [ "/openaf/ojob", "/opt/build.yaml" ]

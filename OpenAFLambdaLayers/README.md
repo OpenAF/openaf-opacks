@@ -100,3 +100,9 @@ getEnv("AWS_REGION");
 getEnv("AWS_LAMBDA_LOG_STREAM_NAME");
 getEnv("AWS_LAMBDA_FUNCTION_NAME");
 ````
+
+## How to create an OpenAF AWS Lambda container
+
+1. Use the output _Dockerfile_ and zip files to build the base container.
+2. Extend the Dockerfile image by copying your code and artifacts to /var/task on the _Dockerfile_
+3. Add, on the CMD override, the main handler (e.g. main.js or main.yaml or alike).
