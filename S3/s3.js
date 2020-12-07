@@ -225,10 +225,10 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
 
     if (isDef(aMetaMap) && isMap(aMetaMap)) {
         var is = io.readFileStream(aLocalPath);
-        this.putObjectStream(aBucket, aObjectName, is, aMetaMap);
+        this.putObjectStream(Packages.io.minio.PutObjectArgs.builder().bucket(aBucket).object(aObjectName).stream(is, -1, 10485760).userMetadata(aMetaMap));
         is.close();
     } else {
-        this.s3.putObject(aBucket, aObjectName, aLocalPath);
+        this.s3.uploadObject(Packages.io.minio.UploadObjectArgs.builder().bucket(aBucket).object(aObjectName).filename(aLocalPath).build());
     }
 };
 
@@ -367,7 +367,7 @@ S3.prototype.removeObject = function(aBucket, aObjectName) {
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
 
-    this.s3.removeObject(aBucket, aObjectName);
+    this.s3.removeObject(Packages.io.minio.RemoveObjectArgs.builder().bucket(aBucket).object(aObjectName).build());
 };
 
 /**

@@ -1,0 +1,76 @@
+init:
+  url       : http://minio.ncasa
+  accessKey : minio
+  secretKey : minio123
+  region    : 
+  testBucket: openaf-test
+
+include:
+- oJobTest.yaml
+
+ojob:
+  async : false
+  opacks:
+  - oJob-common
+  - openaf: 20200523
+  catch       : logErr(exception);
+  logToConsole: true 
+
+todo:
+- S3 Init
+- Results
+
+- S3::Create, list and remove bucket
+- S3::Upload, list, download and delete an object
+
+jobs:
+# -------------
+- name: Results
+  from: oJob Test Results
+  type: shutdown
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED: {{pass}}/{{count}}", args.results);
+    tprint("Tests FAILED: {{fail}}/{{count}}", args.results);
+    if (args.results.fail > 0) printErr("There are failed tests");
+    io.writeFileString("s3-test.md", ow.test.toMarkdown());
+    io.writeFileJSON("s3-test.json", args.results);
+
+# -------------
+- name: S3 Init
+  exec: |
+    loadLib("s3.js");
+    global.s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+
+# ---------------------------------------
+- name: S3::Create, list and remove bucket
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      global.s3.makeBucket(args.init.testBucket);
+
+      ow.test.assert(global.s3.bucketExists(args.init.testBucket), true, "Problem with creating bucket.");
+
+      var ar = global.s3.listBuckets();
+      ow.test.assert($from(ar).equals("name", args.init.testBucket).count(), 1, "Problem with listing buckets.");
+
+      global.s3.removeBucket(args.init.testBucket);
+      ar = global.s3.listBuckets();
+      ow.test.assert($from(ar).equals("name", args.init.testBucket).count(), 0, "Problem with removing buckets.");
+
+# -----------------------------------------------------
+- name: S3::Upload, list, download and delete an object
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      global.s3.makeBucket(args.init.testBucket); 
+
+      global.s3.putObject(args.init.testBucket, "anExample.md", "README.md");
+      var ar = global.s3.listObjects(args.init.testBucket);
+      ow.test.assert($from(ar).equals("filename", "anExample.md").count(), 1, "Problem with putting object.");
+      global.s3.removeObject(args.init.testBucket, "anExample.md");
+
+      global.s3.removeBucket(args.init.testBucket);  
