@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
+
+import javax.print.DocFlavor.STRING;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -237,14 +240,150 @@ public class XLS extends ScriptableObject {
 		return wbook;
 	}
 
+	/**
+	 * <odoc>
+	 * <key>XLS.getClassIndexedColors(aName) : IndexedColors</key>
+	 * Returns the Apache Java POI IndexedColors object used internally.
+	 * </odoc>
+	 */
 	@JSFunction
 	public Object getClassIndexedColors(String name) {
 		return (Object) org.apache.poi.ss.usermodel.IndexedColors.valueOf(name);
 	}
 
+	/**
+	 * <odoc>
+	 * <key>XLS.getClassBorderStyle(aName) : BorderStyle</key>
+	 * Returns the Apache Java POI BorderStyle object used internally.
+	 * </odoc>
+	 */
 	@JSFunction
 	public Object getClassBorderStyle(String name) {
 		return (Object) org.apache.poi.ss.usermodel.BorderStyle.valueOf(name);
+	}
+
+	/**
+	 * <odoc>
+	 * <key>XLS.getClassVerticalAlignment(aName) : VerticalAlignment</key>
+	 * Returns the Apache Java POI VerticalAlignment object used internally.
+	 * </odoc>
+	 */
+	@JSFunction
+	public Object getClassVerticalAlignment(String name) {
+		return (Object) org.apache.poi.ss.usermodel.VerticalAlignment.valueOf(name);
+	}
+
+	/**
+	 * <odoc>
+	 * <key>XLS.getClassHorizontalAlignment(aName) : HorizontalAlignment</key>
+	 * Returns the Apache Java POI HorizontalAlignment object used internally.
+	 * </odoc>
+	 */
+	@JSFunction
+	public Object getClassHorizontalAlignment(String name) {
+		return (Object) org.apache.poi.ss.usermodel.HorizontalAlignment.valueOf(name);
+	}
+
+	/**
+	 * <odoc>
+	 * <key>XLS.getBorderStyle(aName) : BorderStyle</key>
+	 * Returns the Apache Java POI BorderStyle object used internally.
+	 * </odoc>
+	 */
+	@JSFunction
+	public Object getBorderStyle(String aBorderStyle) {
+		switch(aBorderStyle) {
+		case "dash_dot": return org.apache.poi.ss.usermodel.BorderStyle.DASH_DOT; 
+		case "dash_dot_dot": return org.apache.poi.ss.usermodel.BorderStyle.DASH_DOT_DOT; 
+		case "dashed": return org.apache.poi.ss.usermodel.BorderStyle.DASHED; 
+		case "dotted": return org.apache.poi.ss.usermodel.BorderStyle.DOTTED; 
+		case "double": return org.apache.poi.ss.usermodel.BorderStyle.DOUBLE; 
+		case "hair": return org.apache.poi.ss.usermodel.BorderStyle.HAIR; 
+		case "medium": return org.apache.poi.ss.usermodel.BorderStyle.MEDIUM; 
+		case "medium_dash_dot": return org.apache.poi.ss.usermodel.BorderStyle.MEDIUM_DASH_DOT; 
+		case "medium_dash_dot_dot": return org.apache.poi.ss.usermodel.BorderStyle.MEDIUM_DASH_DOT_DOT; 
+		case "medium_dashed": return org.apache.poi.ss.usermodel.BorderStyle.MEDIUM_DASHED; 
+		case "none": return org.apache.poi.ss.usermodel.BorderStyle.NONE; 
+		case "slanted_dash_dot": return org.apache.poi.ss.usermodel.BorderStyle.SLANTED_DASH_DOT; 
+		case "thick": return org.apache.poi.ss.usermodel.BorderStyle.THICK; 
+		case "thin": return org.apache.poi.ss.usermodel.BorderStyle.THIN; 
+		}
+		
+		return null;
+	}
+
+	/**
+	 * <odoc>
+	 * <key>XLS.getCellRangeAddress(aSheet, aRange) : CellRangeAddress</key>
+	 * Returns the Apache Java POI CellRangeAddress object used internally.
+	 * </odoc>
+	 */
+	@JSFunction
+	public Object getCellRangeAddress(Object sheet, String aRange) {
+		return org.apache.poi.ss.util.CellRangeAddress.valueOf(aRange);
+	}
+
+	/**
+	 * <odoc>
+	 * <key>XLS.getIndexedColors(aColorName) : IndexedColors</key>
+	 * Returns the Apache Java POI IndexedColors object used internally.
+	 * </odoc>
+	 */
+	@JSFunction
+	public short getIndexedColors(String aColorName) {
+		org.apache.poi.ss.usermodel.IndexedColors c = null;
+		switch(aColorName) {
+		case "aqua": c = org.apache.poi.ss.usermodel.IndexedColors.AQUA; break;
+		case "auto": c = org.apache.poi.ss.usermodel.IndexedColors.AUTOMATIC; break;
+		case "black": c = org.apache.poi.ss.usermodel.IndexedColors.BLACK; break;
+		case "blue": c = org.apache.poi.ss.usermodel.IndexedColors.BLUE; break;
+		case "blue_grey": c = org.apache.poi.ss.usermodel.IndexedColors.BLUE_GREY; break;
+		case "bright_green": c = org.apache.poi.ss.usermodel.IndexedColors.BRIGHT_GREEN; break;
+		case "brown": c = org.apache.poi.ss.usermodel.IndexedColors.BROWN; break;
+		case "coral": c = org.apache.poi.ss.usermodel.IndexedColors.CORAL; break;
+		case "cornflower_blue": c = org.apache.poi.ss.usermodel.IndexedColors.CORNFLOWER_BLUE; break;
+		case "dark_blue": c = org.apache.poi.ss.usermodel.IndexedColors.DARK_BLUE; break;
+		case "dark_green": c = org.apache.poi.ss.usermodel.IndexedColors.DARK_GREEN; break;
+		case "dark_red": c = org.apache.poi.ss.usermodel.IndexedColors.DARK_RED; break;
+		case "dark_teal": c = org.apache.poi.ss.usermodel.IndexedColors.DARK_TEAL; break;
+		case "dark_yellow": c = org.apache.poi.ss.usermodel.IndexedColors.DARK_YELLOW; break;
+		case "gold": c = org.apache.poi.ss.usermodel.IndexedColors.GOLD; break;
+		case "green": c = org.apache.poi.ss.usermodel.IndexedColors.GREEN; break;
+		case "grey25": c = org.apache.poi.ss.usermodel.IndexedColors.GREY_25_PERCENT; break;
+		case "grey40": c = org.apache.poi.ss.usermodel.IndexedColors.GREY_40_PERCENT; break;
+		case "grey50": c = org.apache.poi.ss.usermodel.IndexedColors.GREY_50_PERCENT; break;
+		case "grey80": c = org.apache.poi.ss.usermodel.IndexedColors.GREY_80_PERCENT; break;
+		case "indigo": c = org.apache.poi.ss.usermodel.IndexedColors.INDIGO; break;
+		case "lavender": c = org.apache.poi.ss.usermodel.IndexedColors.LAVENDER; break;
+		case "lemon_chiffon": c = org.apache.poi.ss.usermodel.IndexedColors.LEMON_CHIFFON; break;
+		case "light_blue": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_BLUE; break;
+		case "light_cornflower_blue": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_CORNFLOWER_BLUE; break;
+		case "light_green": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_GREEN; break;
+		case "light_orange": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_ORANGE; break;
+		case "light_turquoise": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_TURQUOISE; break;
+		case "light_yellow": c = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_YELLOW; break;
+		case "lime": c = org.apache.poi.ss.usermodel.IndexedColors.LIME; break;
+		case "maroon": c = org.apache.poi.ss.usermodel.IndexedColors.MAROON; break;
+		case "olive_green": c = org.apache.poi.ss.usermodel.IndexedColors.OLIVE_GREEN; break;
+		case "orange": c = org.apache.poi.ss.usermodel.IndexedColors.ORANGE; break;
+		case "orchid": c = org.apache.poi.ss.usermodel.IndexedColors.ORCHID; break;
+		case "pale_blue": c = org.apache.poi.ss.usermodel.IndexedColors.PALE_BLUE; break;
+		case "pink": c = org.apache.poi.ss.usermodel.IndexedColors.PINK; break;
+		case "plum": c = org.apache.poi.ss.usermodel.IndexedColors.PLUM; break;
+		case "red": c = org.apache.poi.ss.usermodel.IndexedColors.RED; break;
+		case "rose": c = org.apache.poi.ss.usermodel.IndexedColors.ROSE; break;
+		case "royal_blue": c = org.apache.poi.ss.usermodel.IndexedColors.ROYAL_BLUE; break;
+		case "sea_green": c = org.apache.poi.ss.usermodel.IndexedColors.SEA_GREEN; break;
+		case "sky_blue": c = org.apache.poi.ss.usermodel.IndexedColors.SKY_BLUE; break;
+		case "tan": c = org.apache.poi.ss.usermodel.IndexedColors.TAN; break;
+		case "teal": c = org.apache.poi.ss.usermodel.IndexedColors.TEAL; break;
+		case "turquoise": c = org.apache.poi.ss.usermodel.IndexedColors.TURQUOISE; break;
+		case "violet": c = org.apache.poi.ss.usermodel.IndexedColors.VIOLET; break;
+		case "white": c = org.apache.poi.ss.usermodel.IndexedColors.WHITE; break;
+		case "yellow": c = org.apache.poi.ss.usermodel.IndexedColors.YELLOW; break;
+		}
+		
+		if (c != null) return c.getIndex(); else return -1;
 	}
 
 	/**
