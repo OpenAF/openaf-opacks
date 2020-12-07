@@ -237,6 +237,16 @@ public class XLS extends ScriptableObject {
 		return wbook;
 	}
 
+	@JSFunction
+	public Object getClassIndexedColors(String name) {
+		return (Object) org.apache.poi.ss.usermodel.IndexedColors.valueOf(name);
+	}
+
+	@JSFunction
+	public Object getClassBorderStyle(String name) {
+		return (Object) org.apache.poi.ss.usermodel.BorderStyle.valueOf(name);
+	}
+
 	/**
 	 * <odoc>
 	 * <key>XLS.getSheet(aSheetRef) : Object</key>
