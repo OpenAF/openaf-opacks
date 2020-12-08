@@ -22,8 +22,6 @@ version: '20201207'
 dependencies:
   OpenAF: '>=20201111'
 files:
-  - s3-test.md
-  - s3-test.json
   - .package.yaml
   - s3-test.yaml
   - .odoc.db
@@ -34,12 +32,10 @@ files:
   - .precompile
   - .maven.yaml
 filesHash:
-  s3-test.md: db36b0a5449d7227551ff99356e56bb8c27a01c1
-  s3-test.json: cebe0fe91572d175b2e6f7bd00352a06fd14a9a1
-  s3-test.yaml: ee98e352c4443123ce3f96d5d3e6e6e01bf8c90f
+  s3-test.yaml: 4b95c5ca37ecd974bc7c21923bc0dc0499fd822a
   .odoc.db: 299b7feba82d9457555ddaa491224d00ab696b51
   minio-8.0.3-all.jar: 3b2ee9239fc0f066c734949b5ab9d06ccd53fec6
-  s3.js: 2869ece77f1ea24ffd5a653b812916cdea26517d
+  s3.js: 57c319ece3adf97dae93530829df0da94456f1a3
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   s3.yaml: 10c83fb629fbe2860e304316c44ab8ed617f078c
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca

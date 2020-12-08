@@ -1,5 +1,5 @@
 init:
-  url       : http://minio.ncasa
+  url       : http://minio
   accessKey : minio
   secretKey : minio123
   region    : 

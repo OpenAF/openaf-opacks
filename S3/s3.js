@@ -19,7 +19,11 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion) {
         else
             this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret)).region(aRegion).build();
     } else {
-        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).build();
+        if (aURL.indexOf(".amazonaws.com") > 0) {
+            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentialsProvider(new Packages.io.minio.credentials.IamAwsProvider(null, null)).build();
+        } else {
+            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).build();
+        }
     }
 };
 
