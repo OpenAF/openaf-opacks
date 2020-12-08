@@ -18,9 +18,9 @@ name: S3
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200701'
+version: '20201207'
 dependencies:
-  OpenAF: '>=20190401'
+  OpenAF: '>=20201111'
 files:
   - s3-test.md
   - s3-test.json
