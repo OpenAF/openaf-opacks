@@ -119,7 +119,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull) {
             filename: String(item.objectName()), 
             filepath: String(item.objectName()),
             canonicalPath: String(item.objectName()),
-            lastModified: Number(new Date(item.lastModified().toString()).getTime()),
+            lastModified: (item.objectName().endsWith("/") ? void 0 : Number(new Date(item.lastModified().toString()).getTime())),
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
