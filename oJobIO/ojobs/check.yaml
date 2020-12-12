@@ -29,27 +29,31 @@ jobs:
 
     vars = _$(args.vars).default("args");
     log(" checking '"+ args.name + "'...");
-    var cx, nlines = args.code.split("\n").length;
-    try {
-      global.stats.checks++;
-      global.stats.lines += nlines;
+    if (isDef(args.lang) && args.lang != "js") {
+      logWarn(" job '" + args.name + "' language is '" + args.lang + "'. Ignoring.");
+    } else {
+      var cx, nlines = args.code.split("\n").length;
+      try {
+        global.stats.checks++;
+        global.stats.lines += nlines;
 
-      cx = Packages.openaf.AFCmdBase.jse.enterContext();
-      cx.compileString("var " + vars + ";" + args.code, args.name, 1, null);
-      Packages.openaf.AFCmdBase.jse.exitContext();
-    } catch(e) {
-      global.stats.errors++;
-      if (nlines < 3) {
-        var l = 1;
-        args.code.split("\n").map(l => logErr(e.fileName + " | " + l++ + ": " + l));
-      } else {
-        var ls = args.code.split("\n");
-        if (e.lineNumber > 1) logErr(e.fileName + " | " + (e.lineNumber-1) + ": " + ls[e.lineNumber-2]);
-        logErr(e.fileName + " | " + e.lineNumber + ": " + ls[e.lineNumber-1]);
-        if (e.lineNumber < nlines) logErr(e.fileName + " | " + (e.lineNumber+1) + ": " + ls[e.lineNumber]);
+        cx = Packages.openaf.AFCmdBase.jse.enterContext();
+        cx.compileString("var " + vars + ";" + args.code, args.name, 1, null);
+        Packages.openaf.AFCmdBase.jse.exitContext();
+      } catch(e) {
+        global.stats.errors++;
+        if (nlines < 3) {
+          var l = 1;
+          args.code.split("\n").map(l => logErr(e.fileName + " | " + l++ + ": " + l));
+        } else {
+          var ls = args.code.split("\n");
+          if (e.lineNumber > 1) logErr(e.fileName + " | " + (e.lineNumber-1) + ": " + ls[e.lineNumber-2]);
+          logErr(e.fileName + " | " + e.lineNumber + ": " + ls[e.lineNumber-1]);
+          if (e.lineNumber < nlines) logErr(e.fileName + " | " + (e.lineNumber+1) + ": " + ls[e.lineNumber]);
+        }
+        logErr(e.fileName + " | Line " + e.lineNumber + " | " + e.message);
+        Packages.openaf.AFCmdBase.jse.exitContext();
       }
-      logErr(e.fileName + " | Line " + e.lineNumber + " | " + e.message);
-      Packages.openaf.AFCmdBase.jse.exitContext();
     }
 
 # ----------------
@@ -93,7 +97,7 @@ jobs:
          j.jobs.map(r => {
            if (r.name.toLowerCase() == "help") hasHelp = true;
 
-           if (isDef(r.exec))  each({ code: r.exec,  name: "jobs."+r.name         , vars: "args,job,id,deps" + (isDef(r.each) ? ",each" : "") });
+          if (isDef(r.exec))  each({ code: r.exec,  name: "jobs."+r.name         , vars: "args,job,id,deps" + (isDef(r.each) ? ",each" : ""), lang: r.lang });
            if (isDef(r.catch)) each({ code: r.catch, name: "jobs."+r.name+".catch", vars: "args,job,id,deps,exception"});
            if (isDef(r.typeArgs) && isDef(r.typeArgs.stopWhen)) each({ code: r.typeArgs.stopWhen, name: "jobs."+r.name+".typeArgs.stopWhen", vars: "" });
 
