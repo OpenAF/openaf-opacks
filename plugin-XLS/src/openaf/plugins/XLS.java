@@ -314,12 +314,12 @@ public class XLS extends ScriptableObject {
 
 	/**
 	 * <odoc>
-	 * <key>XLS.getCellRangeAddress(aSheet, aRange) : CellRangeAddress</key>
+	 * <key>XLS.getCellRangeAddress(aRange) : CellRangeAddress</key>
 	 * Returns the Apache Java POI CellRangeAddress object used internally.
 	 * </odoc>
 	 */
 	@JSFunction
-	public Object getCellRangeAddress(Object sheet, String aRange) {
+	public Object getCellRangeAddress(String aRange) {
 		return org.apache.poi.ss.util.CellRangeAddress.valueOf(aRange);
 	}
 
