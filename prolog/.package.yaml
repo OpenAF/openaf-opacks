@@ -8,24 +8,24 @@ keywords:
   - prolog
   - logic
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  url: https://openaf.io/opacks/prolog.opack
+  url: 'https://openaf.io/opacks/prolog.opack'
 description: Wrapper for the projob library to add prolog functionality.
 name: Prolog
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
 version: '20201221'
 dependencies:
   openaf: '>=20201111'
 files:
   - projog-core-0.4.0-SNAPSHOT.jar
   - prolog.js
-  - .maven.yaml
   - .package.yaml
+  - .maven.yaml
 filesHash:
   projog-core-0.4.0-SNAPSHOT.jar: afd494d9077215ad350b0f7de09193fe19b808dd
-  prolog.js: a59ac82af8e4c24d180e5a5c0ec334903d4f5967
+  prolog.js: e35e819a1f4eaf68b95890753a87ba8ff59237a5
   .maven.yaml: 622bb3fb264f8b224f47b83b792fb93728be866f

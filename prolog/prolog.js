@@ -1,6 +1,6 @@
 // Author: Nuno Aguiar
 
-loadExternalJars(getOPackPath("prolog") || ".");
+loadExternalJars(getOPackPath("Prolog") || ".");
 
 /**
  * <odoc>
