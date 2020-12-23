@@ -19,7 +19,6 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/inBrowser'
   url: 'https://openaf.io/opacks/inBrowser.opack'
 description: >-
   Provides a mini browser editor intended to use from openaf-console to edit
