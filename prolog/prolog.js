@@ -103,18 +103,73 @@ Prolog.prototype.query = function(aQuery, aTerms, aLimit) {
    return this.__parseresult(q, aTerms, aLimit);
 };
 
+/**
+ * <odoc>
+ * <key>Prolog.q(aQuery, aMapOrArray, aKey, aPrefix, otherGoals, aTerms, aLimit) : Object</key>
+ * Performs aQuery over the current knowledge if none is provided through aMapOrArray and/or otherGoals. If new knowledge
+ * is provided it will clean existing knowledge and consult new one based on aMapOrArray and otherGoals (will prefix aMapOrArray).
+ * If aMapOrArray is provided a map aKey should be provided with an optional aPrefix (defaults to "m_"). A query limiting aTerms map and/or
+ * aLimit number of results can also be provided. 
+ * </odoc>
+ */
+Prolog.prototype.q = function(aQuery, aMapOrArray, aKey, aPrefix, otherGoals, aTerms, aLimit) {
+   _$(aQuery, "aQuery").isString().$_();
+   otherGoals = _$(otherGoals, "otherGoals").isString().default("");
+
+   if (isArray(aMapOrArray) || isMap(aMapOrArray) || otherGoals.length > 0) {
+      this.pl = new Packages.org.projog.api.Projog();
+
+      if (otherGoals.length > 0) {
+         if (!otherGoals.trim().endsWith(".")) otherGoals += ".";
+         this.consult(otherGoals);
+      }
+   
+      if (isArray(aMapOrArray)) this.consultMapArray(aPrefix, aMapOrArray, aKey);
+      if (isMap(aMapOrArray))   this.consultMap(aPrefix, aMapOrArray, aKey);
+   }
+
+   return this.query(aQuery, aTerms, aLimit);
+};
+
+/**
+ * <odoc>
+ * <key>Prolog.consultMapArray(aPrefix, anArray, aKey)</key>
+ * Given anArray will use Prolog.fromMapArray2Prolog to add the corresponding facts converted from the map array given aPrefix and aKey.
+ * </odoc>
+ */
 Prolog.prototype.consultMapArray = function(aPrefix, anArray, aKey) {
    this.consult(this.fromMapArray2Prolog(aPrefix, anArray, aKey));
 };
 
+/**
+ * <odoc>
+ * <key>Prolog.consultMap(aPrefix, aMap, aKey)</key>
+ * Given aMap will use Prolog.fromMap2Prolog to add the corresponding facts converted from the map given aPrefix and aKey.
+ * </odoc>
+ */
 Prolog.prototype.consultMap= function(aPrefix, aMap, aKey) {
    this.consult(this.fromMap2Prolog(aPrefix, aMap, aKey));
 };
 
+/**
+ * <odoc>
+ * <key>Prolog.fromMapArray2Prolog(aPrefix, anArray, aKey) : String</key>
+ * Given anArray of maps will execute, for each, entry the Prolog.fromMap2Prolog function and return the cummulative
+ * facts given also aPrefix and aKey.
+ * </odoc>
+ */
 Prolog.prototype.fromMapArray2Prolog = function(aPrefix, anArray, aKey) {
    return anArray.map(v => this.fromMap2Prolog(aPrefix, v, aKey)).join("");
 };
 
+/**
+ * <odoc>
+ * <key>Prolog.fromMap2Prolog(aPrefix, aMap, aKey) : String</key>
+ * Given aMap will flatten it (using ow.obj.flatten) and generate prolog facts given the map's aKey as first argument
+ * and the value as the second argument. The relation name will be prefixed with aPrefix (defaults to 'm_') (the prefix
+ * needs to start with a lower case).
+ * </odoc>
+ */
 Prolog.prototype.fromMap2Prolog = function(aPrefix, aMap, aKey) {
    _$(aMap, "aMap").isMap().$_();
    _$(aKey, "aKey").isString().$_();
