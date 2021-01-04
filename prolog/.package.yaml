@@ -17,15 +17,15 @@ name: Prolog
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20201222'
+version: '20210103'
 dependencies:
   openaf: '>=20201111'
 files:
+  - .maven.yaml
+  - .package.yaml
   - projog-core-0.4.0-SNAPSHOT.jar
   - prolog.js
-  - .package.yaml
-  - .maven.yaml
 filesHash:
-  projog-core-0.4.0-SNAPSHOT.jar: afd494d9077215ad350b0f7de09193fe19b808dd
-  prolog.js: e3644fe6705e90ac6f1ea936c09097346a9a476d
   .maven.yaml: 622bb3fb264f8b224f47b83b792fb93728be866f
+  projog-core-0.4.0-SNAPSHOT.jar: afd494d9077215ad350b0f7de09193fe19b808dd
+  prolog.js: d3ffce0a2be409f32a2cfde0ceda079cb50d50f0

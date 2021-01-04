@@ -83,6 +83,16 @@ Prolog.prototype.__parseresult = function(aQ, aT, aL) {
       var r = {};
       ks.forEach(k => {
          r[k] = r1.getTerm(k);
+         if (r[k].getType() == "LIST") {
+            var r2 = [], r0 = r[k];
+            while(r0.getNumberOfArguments() > 0) {
+               r2.push(r0.getArgument(0));
+               r0 = r0.getArgument(1);
+            }
+            r[k] = r2;
+         } else {
+            r[k] = String(r[k]);
+         }
       }); 
       res.push(r);
    }
