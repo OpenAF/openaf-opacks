@@ -1,0 +1,11 @@
+ojob:
+  langs:
+  - lang  : prolog
+    langFn: |
+      loadLib("prolog.js");
+
+      global.p = global.p || new Prolog();
+      _$(args.knowledge, "knowledge").$_();
+      _$(args.knowledgeKey, "knowledgeKey").isString().$_();
+
+      args.result = p.q(code, args.knowledge, args.knowledgeKey, "kl_", global.knowledge);
