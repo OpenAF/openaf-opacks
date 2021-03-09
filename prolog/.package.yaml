@@ -1,0 +1,35 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+  - prolog
+  - logic
+bugs:
+  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+repository:
+  type: http
+  url: 'https://openaf.io/opacks/prolog.opack'
+description: Wrapper for the projob library to add prolog functionality.
+name: Prolog
+main: ''
+mainJob: ''
+license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+version: '20210105'
+dependencies:
+  openaf: '>=20201111'
+files:
+  - projog-core-0.4.0-SNAPSHOT.jar
+  - prolog.js
+  - .package.yaml
+  - README.md
+  - prolog.yaml
+  - .maven.yaml
+filesHash:
+  projog-core-0.4.0-SNAPSHOT.jar: afd494d9077215ad350b0f7de09193fe19b808dd
+  prolog.js: d3ffce0a2be409f32a2cfde0ceda079cb50d50f0
+  README.md: 11fa0d1f43baa377d79c76a1176e7e4bdbf09894
+  prolog.yaml: ff4214def94e85120e4da52f7ea8046bd963f552
+  .maven.yaml: 622bb3fb264f8b224f47b83b792fb93728be866f

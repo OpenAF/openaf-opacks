@@ -1,0 +1,5 @@
+artifacts:
+  - id      : org.projog
+    group   : projog-core
+    version : 0.4.0-SNAPSHOT
+    template: projog-core-{{version}}.jar

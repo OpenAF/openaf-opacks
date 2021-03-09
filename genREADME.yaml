@@ -70,4 +70,4 @@ jobs:
         |{{name}}|{{description}}|\n\
         {{/each}}\n\
         \
-      ", { opacks: $ch("outputs").getAll() }));
+      ", { opacks: $from($ch("outputs").getAll()).sort("name").select() }));
