@@ -24,6 +24,7 @@ dependencies:
 files:
   - .package.yaml
   - Dockerfile
+  - imgs/openaf.png
   - ojobs/check.yaml
   - ojobs/doc.yaml
   - ojobs/echo.yaml
@@ -42,9 +43,10 @@ files:
   - server.yaml
   - setupOJobIO.yaml
 filesHash:
-  Dockerfile: dd58ea9dafeb77c1b9fea9075c93d690cf75a738
+  Dockerfile: 4a726bc4ac51720f0552a2ded7d0847dba895743
+  imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
   ojobs/check.yaml: 9bb7136a6cdd3b422368d9155f3dc7c41677105f
-  ojobs/doc.yaml: 749b523da04e49f1f985c4a98f4fb27ccd71ef92
+  ojobs/doc.yaml: 67f31908f71fcc8eb17daef375cde81c2dff4765
   ojobs/echo.yaml: f0040d39d7e4002133d989f189ec35a8c9716db2
   ojobs/envs.yaml: 7b2a34193cc10765c656e03a71bf4ebfa768c069
   ojobs/generate.yaml: 0582e533128ef5a9847a7b6d899f98b1cfaec1bb
@@ -57,6 +59,6 @@ filesHash:
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   rebuild.hbs: c73c41e36ddc8ec419e2b1f294460bc08d86b37d
-  rebuild.yaml: 9c1ad7bd27a26b33334e4725f6542a1637ee4068
-  server.yaml: 808acb1a6bef634a2b40fa37b4828fb23f86004a
+  rebuild.yaml: e0ed04c46db2c39fbbfb0b6b6b97fbe7f8b5e594
+  server.yaml: 208aedc081db38001b1742a7838ea84bf3af6e9f
   setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699

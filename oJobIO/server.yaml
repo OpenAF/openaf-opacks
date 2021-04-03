@@ -37,6 +37,8 @@ todo:
     execURI: |
       var res = "", md = false, d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
       try {
+         if (request.uri == "/logo.png") return ow.server.httpd.replyFile(server, d + "/logo.png", "/logo.png", request.uri);
+
          if (request.uri == "/" || request.uri == "/.json") {
             if (request.header["user-agent"] != "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)") {
                return ow.server.httpd.replyRedirect(server, "/index.md", {});

@@ -5,6 +5,7 @@ COPY rebuild.hbs /openaf/rebuild.hbs
 COPY server.yaml /openaf/main.yaml
 #COPY setupOJobIO.yaml /openaf/setupOJobIO.yaml
 
+COPY imgs  /openaf/imgs
 COPY ojobs /openaf/ojobs
 
 ARG NAME

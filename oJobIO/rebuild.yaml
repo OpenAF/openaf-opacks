@@ -46,7 +46,7 @@ jobs:
        }
     });
 
-    var mdindex = "# " + args.init.url + "\n";
+    var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n";
     //parallel4Array(lp, f => {
     lp.sort().map(f => {
        if (io.fileInfo(f).isDirectory) {
@@ -87,6 +87,7 @@ jobs:
     var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init));
     _tmpl.init.l = l;
     io.writeFileJSON("_output/index.json", _tmpl);
+    io.cp("imgs/openaf.png", "_output/logo.png");
   
     io.rm(args.output);
     io.mv("_output", args.output);

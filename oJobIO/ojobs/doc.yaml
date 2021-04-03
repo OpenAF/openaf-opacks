@@ -1,7 +1,7 @@
 # Author: Nuno Aguiar
 init:
     tmpl: |
-      # {{name}}
+      # {{name}} <a href="/"><img src='/logo.png' align='right'/></a>
   
       ## Usage
   
