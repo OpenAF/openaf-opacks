@@ -76,7 +76,7 @@ jobs:
           output: f.replace(/(\.ya?ml|\.json)$/, ".md")
         }, nowUTC(), void 0, true);
  
-        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "");
+        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "");
         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n";
        }
        return 1;

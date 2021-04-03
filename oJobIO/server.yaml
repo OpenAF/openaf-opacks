@@ -8,7 +8,7 @@ init:
 
 ojob:
   daemon    : true
-  sequential: true
+  #sequential: true
   opacks    :
   - oJob-common
   unique    :
@@ -37,10 +37,17 @@ todo:
     execURI: |
       var res = "", md = false, d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
       try {
-         if (request.uri == "/" || request.uri == "/.json") request.uri = "/index.json";
+         if (request.uri == "/" || request.uri == "/.json") {
+            if (request.header["user-agent"] != "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)") {
+               return ow.server.httpd.replyRedirect(server, "/index.md", {});
+            } else {
+               request.uri = "/index.json";
+            }
+         }
          var r = d + request.uri;
          if (!io.getCanonicalPath(r).startsWith(d)) throw "outside directory";
          
+
          // https://ojob.io/hello/world (.yaml / .md / .json)
          var tr = r, res = {};
          if (!r.endsWith(".yaml") && !r.endsWith(".json") && !r.endsWith(".md") && !r.endsWith(".html")) tr += ".json";
