@@ -35,7 +35,10 @@ jobs:
     args.init.lname = args.init.name.length;
     var l = [], lp = [];
      
-    listFilesRecursive("_output").map(r => {
+    $from(listFilesRecursive("_output"))
+    .attach("dir", r => (r.isFile ? r.filepath.substr(0, r.filepath.lastIndexOf("/")) : r.filepath))
+    .sort("dir", "-isDirectory", "filename")
+    .select().map(r => {
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
           var orig = r.filepath;
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "");
@@ -43,12 +46,14 @@ jobs:
             l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") );
             lp.push(orig);
           }
+       } else {
+          if (r.isDirectory && r.filename != "common" && !r.filename.startsWith("_")) lp.push(r.filepath);
        }
     });
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n";
     //parallel4Array(lp, f => {
-    lp.sort().map(f => {
+    lp.map(f => {
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n";
          return true;
@@ -66,7 +71,6 @@ jobs:
          logErr("Problem reading file '" + f + "': " + String(e));
        }
 
-       
        if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any()) {
         log("Generating markdown for " + f + "...");
         oJobRunFile("ojobs/doc.yaml", {
