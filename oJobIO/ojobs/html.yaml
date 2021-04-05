@@ -1,0 +1,37 @@
+# Author: Nuno Aguiar
+
+todo:
+- Generate html
+
+ojob:
+  opacks      :
+  - openaf: 20210404
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Tries to open a browser with the context map/array HTML representation
+    #expects: 
+    #- name   : something
+    #  desc   : To do stuff
+    #  example: aValueExample
+
+# -------------------
+- name: Generate html
+  exec: |
+    ow.loadTemplate();
+    var c = ow.template.html.parseMap( (isMap(__pm._map) ? __pm._map : (isArray(__pm._list) ? __pm._list : __pm)), true);
+    var html = "<html><style>" + c.css + "</style><body>" + c.out + "</body></html>"; 
+
+    var tmpf = io.createTempFile("ojobio_", ".html");
+    io.writeFileString(tmpf, html);
+
+    var res = openInBrowser("file:///" + tmpf.replace(/\\/g, "/"));
+    if (res) {
+       sleep(2500, true);
+    } else {
+       print(html);
+    }
