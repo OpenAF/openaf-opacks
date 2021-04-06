@@ -1,0 +1,46 @@
+# Author: Nuno Aguiar
+todo:
+- Download help
+
+ojob:
+  opacks      :
+  - openaf: 20210404
+  catch       : logErr(exception);
+  logToConsole: false   # to change when finished
+
+jobs:
+# ----------
+- name: Help
+  help: 
+    text   : Downloads and returns corresponding job help.
+    expects: 
+    - name   : job
+      desc   : The job location or url (e.g. ojob.io/get) 
+      example: abc.yaml
+
+# -------------------
+- name: Download help
+  exec: |
+    _$(args.job, "job").$_();
+    if (!(args.job.toLowerCase().match(/^https?:\/\//))) {
+      var newjob = "https://" + args.job;
+
+      ow.loadFormat();
+      var host = (new java.net.URL(newjob).getHost());
+      if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job;
+      args.job = newjob;
+    }
+
+    var oo = $rest({ uriQuery: true }).get(args.job);
+    if (isMap(oo) && isArray(oo.jobs)) {
+      args.out = $from(oo.jobs)
+                 .equals("name", "Help")
+                 .at(0);
+      if (isMap(args.out) && isDef(args.out.help)) args.out = args.out.help;
+      if (isDef(args.out.text) && isArray(args.out.expects)) {
+        args.out.text = [ { help: args.out.text} ];
+        //delete args.out.text;
+      }
+    }
+
+    ow.oJob.output(args.out, args);

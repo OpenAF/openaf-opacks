@@ -33,6 +33,7 @@ files:
   - ojobs/get.yaml
   - ojobs/hello/index.yaml
   - ojobs/hello/world.yaml
+  - ojobs/help.yaml
   - ojobs/html.yaml
   - ojobs/index.html
   - ojobs/map.yaml
@@ -54,6 +55,7 @@ filesHash:
   ojobs/get.yaml: 4ffb32e1448890728216c5f68ee6fc50eac6a4c1
   ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
   ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
+  ojobs/help.yaml: 93f1e61806d81ab32b655ab45df8b65f66853072
   ojobs/html.yaml: a9a568f4a7da90b8d5c9f305312e962048480da0
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
   ojobs/map.yaml: 6004f4c068c18fd128da20a0ac009cdca0fdfc9a
