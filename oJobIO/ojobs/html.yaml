@@ -23,7 +23,12 @@ jobs:
 - name: Generate html
   exec: |
     ow.loadTemplate();
-    var c = ow.template.html.parseMap( (isMap(__pm._map) ? __pm._map : (isArray(__pm._list) ? __pm._list : __pm)), true);
+    var c = {};
+    if (isDef(__pm)) {
+      sprint( Object.keys(__pm) );
+      if (isDef(__pm._map))  c = ow.template.html.parseMap(__pm._map, true);
+      if (isDef(__pm._list)) c = ow.template.html.parseMap(__pm._list, true);
+    }
     var html = "<html><style>" + c.css + "</style><body>" + c.out + "</body></html>"; 
 
     var tmpf = io.createTempFile("ojobio_", ".html");
