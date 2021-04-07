@@ -1,6 +1,13 @@
 init:
   tmpl: |
     # Author: {{author}}
+    init:
+      help: &HELP
+        text   : Does stuff. 
+        expects: 
+        - name   : something
+          desc   : To do stuff
+          example: aValueExample
 
     todo:
     {{#if config}}
@@ -11,26 +18,19 @@ init:
     {{/each}} 
 
     ojob:
-      {{#if async}}async       : true{{/if}}
       opacks      :
-      - openaf: 20200523
-      catch       : logErr(exception);
+      - openaf: 20210404
+      catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception); return false;"
       logToConsole: true   # to change when finished
-    {{#if config}}
-
+      {{#if async}}async       : true
+      {{/if}}{{#if config}}
     include:
-    - ojob.io/_common
-    {{/if}}      
+    - ojob.io/_common{{/if}}      
 
     jobs:
     # ----------
     - name: Help
-      help: 
-        text   : Does stuff. 
-        expects: 
-        - name   : something
-          desc   : To do stuff
-          example: aValueExample
+      help: *HELP
 
     {{#if config}}
     # ----------
@@ -45,17 +45,13 @@ init:
           type   : encrypt
           default: stuff
       exec: |
-        global.something = args.something;
-
-    {{/if}}
-    {{#each jobs}}
+        global.something = args.something;{{/if}}{{#each jobs}}
     # ------{{sep}}
     - name: {{name}}
       exec: |
         _$(args.something, "something").{{#if ../config}}default(global.something){{else}}$_(){{/if}};
 
         ow.oJob.output(args, args);
-
     {{/each}}
 
 todo:
@@ -90,6 +86,7 @@ jobs:
     args.jobs   = _$(args.jobs, "jobs").default("Sample job");
     args.author = _$(args.author, "author").default("Anonymous");
     args.async  = _$(args.async, "async").default(void 0);
+    args.file   = _$(args.file, "file").default(void 0);
 
     args.jobs = args.jobs.split(",");
     args.jobs = args.jobs.map(j => {
@@ -99,9 +96,14 @@ jobs:
        }
     });
 
-    print(templify(args.init.tmpl, { 
+    var res = templify(args.init.tmpl, { 
       author: args.author,
       jobs  : args.jobs,
       async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false),
       config: (isDef(args.config) && args.config.toLowerCase() == "true" ? true : false)
-    }));
+    });
+    
+    if (isDef(args.file)) 
+      io.writeFileString(args.file, res);
+    else
+      printnl(res);
