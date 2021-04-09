@@ -451,6 +451,19 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 	}
 };
 
+ElasticSearch.prototype.getAllocation = function(useBytes) {
+	return $rest(this.restmap).get(this.url + "/_cat_allocation?format=json" + (useBytes ? "&bytes=b" : ""));
+};
+
+ElasticSearch.prototype.getSettings = function() {
+	return $rest(this.restmap).get(this.url + "/_cluster/settings?include_defaults=true&flat_settings=true");
+};
+
+ElasticSearch.prototype.getIndexSettings = function(aIndex) {
+	_$(aIndex, "aIndex").isString().$_();
+	return $rest(this.restmap).get(this.url + "/" + aIndex + "_settings");
+};
+
 /**
  * <odoc>
  * <key>ElasticSearch.search(aIndex, aSearchJSON) : aResultJSON</key>
