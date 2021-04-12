@@ -15,12 +15,35 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    this.secretKey = aSecretKey;
    this.stoken    = aSessionToken;
 
-   if (isUnDef(this.accessKey) && getEnv("AWS_ACCESS_KEY_ID") != "null") this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
-   if (isUnDef(this.secretKey) && getEnv("AWS_SECRET_ACCESS_KEY") != "null") this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
-   if (isUnDef(this.stoken) && getEnv("AWS_SESSION_TOKEN") != "null") this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
+   if (isUnDef(this.accessKey) && isDef(getEnv("AWS_ACCESS_KEY_ID"))) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
+   if (isUnDef(this.secretKey) && isDef(getEnv("AWS_SECRET_ACCESS_KEY"))) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
+   if (isUnDef(this.stoken) && isDef(getEnv("AWS_SESSION_TOKEN"))) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
+
+   if (isUnDef(this.accessKey) && isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
+      var o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+      this.accessKey = o.AccessKeyId;
+      this.secretKey = o.SecretAccessKey;
+      this.stoken    = o.Token;
+   }
 
    this.region = aRegion || getEnv("AWS_DEFAULT_REGION");
 };
+
+/*AWS.prototype.getS3 = function() {
+   var go = false;
+   try {
+      loadLib("s3.js");
+      go = true;
+   } catch(e) {
+      throw "Please install the S3 oPack: opack install S3";
+   }
+
+   if (go) {
+      if (isDef(S3)) {
+         return new S3("https://s3.amazonaws.com", this.accessKey, this.secretKey, this.region);
+      }
+   }
+};*/
 
 /**
  * <odoc>
