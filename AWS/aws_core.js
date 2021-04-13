@@ -19,8 +19,13 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    if (isUnDef(this.secretKey) && isDef(getEnv("AWS_SECRET_ACCESS_KEY"))) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
    if (isUnDef(this.stoken) && isDef(getEnv("AWS_SESSION_TOKEN"))) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
-   if (isUnDef(this.accessKey) && isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
-      var o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+   if (isUnDef(this.accessKey)) {
+      var o;
+      if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
+         o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+      } else {
+         o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+      }
       this.accessKey = o.AccessKeyId;
       this.secretKey = o.SecretAccessKey;
       this.stoken    = o.Token;
