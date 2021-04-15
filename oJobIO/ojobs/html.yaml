@@ -5,7 +5,7 @@ todo:
 
 ojob:
   opacks      :
-  - openaf: 20210404
+  - openaf: 20210412
   catch       : logErr(exception);
   logToConsole: false   # to change when finished
 
@@ -25,7 +25,6 @@ jobs:
     ow.loadTemplate();
     var c = {};
     if (isDef(__pm)) {
-      sprint( Object.keys(__pm) );
       if (isDef(__pm._map))  c = ow.template.html.parseMap(__pm._map, true);
       if (isDef(__pm._list)) c = ow.template.html.parseMap(__pm._list, true);
     }
