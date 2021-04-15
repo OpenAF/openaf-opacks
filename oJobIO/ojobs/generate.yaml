@@ -19,7 +19,7 @@ init:
 
     ojob:
       opacks      :
-      - openaf: 20210404
+      - openaf: 20210412
       catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception); return false;"
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
