@@ -237,6 +237,20 @@ Kube.prototype.getServiceAccounts = function(aNamespace) {
 
 /**
  * <odoc>
+ * <key>Kube.getServiceAccount(aNamespace, aServiceAccount) : Map</key>
+ * Tries to retrieve the aServiceAccount on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getServiceAccount = function(aNamespace, aServiceAccount) {
+	if (isDef(aNamespace)) {
+		return this.__dR(this.client.inNamespace(aNamespace).serviceAccounts().withName(aServiceAccount));
+	} else {
+		return this.__dR(this.client.serviceAccounts().withName(aServiceAccount));
+	}
+}
+
+/**
+ * <odoc>
  * <key>Kube.apply(aNamespace, aObj) : Map</key>
  * Given aObj (a java stream (in yaml or json), a string (as the filename of a yaml or json file) or an object) will try to apply
  * it on the provided aNamespace.
@@ -402,6 +416,47 @@ Kube.prototype.templates = {
 			}
 		]
 	}
+};
+
+Kube.prototype.__dR = function(aObj) {
+	ow.loadObj();
+
+	var r = {};
+	var fn = (f1, p) => {
+		p = _$(p).default("");
+		if (isNull(f1)) return;
+		var f0 = Object.keys(f1);
+
+		for (var i in f0) {
+			var f = f0[i]; var exc = ["getAdditionalProperties", "getClass", "getOrDefault", "get", "getRemainingItemCount", "getContinue"];
+			if (f.startsWith("get") && exc.indexOf(f) < 0) {
+				try {
+					var rr = f1[f]();
+					if (!isNull(rr) && isDef(rr.entrySet)) rr = rr.entrySet().toArray(); else rr = [rr];
+
+					for (var ii in rr) {
+						if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
+							ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
+						} else {
+							if (!isNull(rr[ii])) {
+								fn(rr[ii], "." + f.replace(/^get/, ""));
+							}
+						}
+					}
+				} catch (e) {
+					//printErr("error " + f + " | " + e);
+				}
+			}
+			if (f == "getAdditionalProperties") {
+				r = merge(r, af.fromJavaMap(f1.getAdditionalProperties()));
+			}
+		}
+	};
+
+	fn(aObj.get());
+	fn(aObj.list());
+
+	return r;
 };
 
 Kube.prototype.__displayResult = function(aObj) {
