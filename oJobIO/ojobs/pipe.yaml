@@ -33,16 +33,20 @@ jobs:
     .sort()
     .select(r => {
       if (isNumber(r)) {
-        global.pipe.push({ j: args[r], a: {} });
+        if ($from(global.pipe).equals("n", r).none()) {
+          global.pipe.push({ j: args[r], n: r, a: {} });
+        } else {
+          $from(global.pipe).equals("n", r).at(0).j = args[r];
+        }
       } else {
         var s = r.match(/^(\d+)\.(.+)/);
         if (isArray(s) && s.length > 2) {
-          if ( $from(global.pipe).equals("j", args[ s[1] ]).none() ) {
+          if ( $from(global.pipe).equals("n", s[1]).none() ) {
             var aa = {}; aa[s[2]] = args[r];
-            global.pipe.push({ j: s[1], a: aa });
+            global.pipe.push({ j: args[s[1]], n: s[1], a: aa });
           } else {
             $from(global.pipe)
-            .equals("j", args[ s[1] ])
+            .equals("n", s[1])
             .at(0)
             .a[ s[2] ] = args[ r ];
           }
@@ -73,12 +77,15 @@ jobs:
       });
       print(af.toYAML(res));
     } else {
-      global.pipe.map(r => {
+      $from(global.pipe).sort("n").select(r => {
         var exec = false;
+        if (isUnDef(r.a)) r.a = {};
+        if (isUnDef(r.a["__format"])) r.a["__format"] = "pm";
+        
         if (Object.keys(r.a).indexOf("*path") >= 0)      { r.a = $path(__pm._list, r.a["*path"]); exec = true; } 
         if (!exec && Object.keys(r.a).indexOf("*") >= 0) { r.a = af.eval(r.a["*"]); exec = true; }
-        if (!exec) r.a = merge(r.a, { __format: "pm" });
-        
+        if (!exec) r.a["__format"] = "pm";
+
         oJobRunFile(r.j, r.a, now());
       });
  
