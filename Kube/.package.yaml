@@ -11,7 +11,7 @@ bugs:
   url: 'https://github.com/OpenAF/openaf-opacks/issues'
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Kube'
+  backurl: ''
   url: 'https://openaf.io/opacks/Kube.opack'
 description: Kubernetes REST API access wrapper
 name: Kube
