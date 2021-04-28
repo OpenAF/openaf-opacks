@@ -140,29 +140,55 @@ AWS.prototype.LAMBDA_DeleteLayerVersion = function(aRegion, aLayerName, aVersion
 
 /**
  * <odoc>
- * <key>AWS.LAMBDA_CreateWithLayers(aRegion, aFunctionName, aArrayOfLayers, aRole, aRuntime) : Map</key>
- * Tries to create a lambda aFunctionName in aRegion with aArrayOfLayers using aRole and aRuntime.
+ * <key>AWS.LAMBDA_CreateWithLayers(aRegion, aFunctionName, aArrayOfLayers, aRole, aRuntime, aContent, aFile, aHandler) : Map</key>
+ * Tries to create a lambda aFunctionName in aRegion with aArrayOfLayers using aRole and aRuntime. Optionally you can specify aContent (zip object or string),
+ * a default file (if aContent is a string) and aHandler.
  * </odoc>
  */
-AWS.prototype.LAMBDA_CreateWithLayers = function(aRegion, aFunctionName, aArrayOfLayers, aRole, aRuntime) {
+AWS.prototype.LAMBDA_CreateWithLayers = function(aRegion, aFunctionName, aArrayOfLayers, aRole, aRuntime, aContent, aFile, aHandler) {
    aRegion = _$(aRegion, "region").isString().default(this.region);
    _$(aFunctionName, "function name").isString().$_();
-   _$(aArrayOfLayers, "array of layers").isArray().$_();
+   aArrayOfLayers = _$(aArrayOfLayers, "array of layers").isArray().default([]);
    aRuntime = _$(aRuntime, "runtime").isString().default("provided");
+   aContent = _$(aContent, "content").isObject().default(__);
+   aFile    = _$(aFile, "file").isString().default("main.js");
+   aHandler = _$(aHandler, "handler").isString().default("main.js");
 
-   plugin("ZIP");
-   var zip = new ZIP();
-   zip.putFile("main.js", af.fromString2Bytes("__pm.result = 0;\n"));
+   if (isUnDef(aContent) || isString(aContent)) {
+      plugin("ZIP");
+      var zip = new ZIP();
+      var code = (isString(aContent) ? aContent : "__pm.result = 0;\n");
+      zip.putFile(aFile, code);
+      aContent = zip;
+   }
+
    var res = this.post("lambda", aRegion, "/2015-03-31/functions", "", {
       FunctionName: aFunctionName,
       Layers: aArrayOfLayers,
       Code: {
-         ZipFile: af.fromBytes2String(af.toBase64Bytes(zip.generate({ compressionLevel: 9})))
+         ZipFile: af.fromBytes2String(af.toBase64Bytes(aContent.generate({ compressionLevel: 9})))
       },
       Runtime: aRuntime,
       Role: aRole,
-      Handler: "main.js"
+      Handler: aHandler
    }, {}, void 0, "application/json");
 
+   if (!isString(aContent)) aContent.close();
+
    return res;
+};
+
+/**
+ * <odoc>
+ * <key>AWS.LAMBDA_CreatePython(aRegion, aFunctionName, aRole, aPythonCode) : Map</key>
+ * Tries to create a lambda aFunctionName in aRegion with the provided aPythonCode as index.py.
+ * </odoc>
+ */
+AWS.prototype.LAMBDA_CreatePython = function(aRegion, aFunctionName, aRole, aPythonCode) {
+   _$(aPythonCode, "aPythonCode").isString().$_();
+
+   plugin("ZIP");
+   var zip = new ZIP();
+   zip.putFile("index.py", aPythonCode);
+   return this.LAMBDA_CreateWithLayers(aRegion, aFunctionName, [], aRole, "python3.8", zip, "index.py", "index.lambda_handler");
 };

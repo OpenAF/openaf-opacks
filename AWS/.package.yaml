@@ -23,7 +23,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210412'
+version: '20210427'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -46,7 +46,7 @@ files:
   - utils/genTestRegions.yaml
   - utils/testRegions.js
 filesHash:
-  .odoc.db: 4960880b11d5934b0dc2fb2cbccda8d35b1de6f2
+  .odoc.db: 379b3975af6c4b9929baca95458ceffc875ca954
   .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
   aws.js: d39eff3254e87fbb98d7257c1f0900fb7dfe43c7
   aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
@@ -57,7 +57,7 @@ filesHash:
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
-  aws_lambda.js: c3436394c310814836d6f3c8b79b7ca2a4d7a458
+  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
