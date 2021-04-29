@@ -460,19 +460,20 @@ Kube.prototype.__dR = function(aObj) {
 };
 
 Kube.prototype.__displayResult = function(aObj) {
-	var res = [];
+	var res = [], arr = aObj.toArray();
 	ow.loadObj();
 
-	for(var obj in aObj.toArray()) {
+	for(var obj in arr) {
+            try {
 		var r = {};
-		var o = aObj.toArray()[obj];
+		var o = arr[obj];
 
 		var fn = (f1, p) => {
 			p = _$(p).default("");
-			var f0 = Object.keys(f1);
+			var f0 = Object.keys(f1); 
 
 			for(var i in f0) {
-				var f = f0[i];
+				var f = f0[i]; 
 				if (f.startsWith("get") && f != "getClass" && f != "getApiVersion" && f != "get" && f != "getOrDefault") {
 					try {
 						var rr = f1[f]();
@@ -506,6 +507,8 @@ Kube.prototype.__displayResult = function(aObj) {
 		}*/
 
 		res.push(r);
+            } catch(e1) {
+            }
 	}
 
 	return res;
@@ -529,5 +532,15 @@ Kube.prototype.getNames = function (aNamespace, full) {
 		return $from(res.items).equals("metadata.namespace", aNamespace).select(function (rr) {
 			return rr.metadata.name;
 		});
+	}
+};
+
+Kube.prototype.getEvents = function(aNamespace) {
+        aNamespace = _$(aNamespace, "namespace").default(__);
+
+	if (isDef(aNamespace)) {
+		return this.__displayResult( this.client.v1().events().inNamespace(aNamespace).list().getItems().stream() );
+	} else {
+		return this.__displayResult( this.client.v1().events().inAnyNamespace().list().getItems().stream() );
 	}
 };
