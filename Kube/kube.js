@@ -147,11 +147,11 @@ Kube.prototype.getNamespaces = function (full) {
  * Tries to retrieve the list of services on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getServices = function(aNamespace) {
+Kube.prototype.getServices = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).services().list().items);
 	} else {
-		return this.__displayResult(this.client.services().list().items);
+		return (full ? this.__dR(this.client.services()) : this.__displayResult(this.client.services().list().items));
 	}
 };
 
@@ -161,11 +161,11 @@ Kube.prototype.getServices = function(aNamespace) {
  * Tries to retrieve the list of config maps on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getConfigMaps = function(aNamespace) {
+Kube.prototype.getConfigMaps = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).configMaps().list().items);
 	} else {
-		return this.__displayResult(this.client.configMaps().list().items);
+		return (full ? this.__dR(this.client.configMaps()) : this.__displayResult(this.client.configMaps().list().items));
 	}
 };
 
@@ -175,11 +175,11 @@ Kube.prototype.getConfigMaps = function(aNamespace) {
  * Tries to retrieve the list of end points on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getEndpoints = function(aNamespace) {
+Kube.prototype.getEndpoints = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).endpoints().list().items);
 	} else {
-		return this.__displayResult(this.client.endpoints().list().items);
+		return (full ? this.__dR(this.client.endpoints()) : this.__displayResult(this.client.endpoints().list().items));
 	}
 };
 
@@ -189,11 +189,11 @@ Kube.prototype.getEndpoints = function(aNamespace) {
  * Tries to retrieve the list of nodes on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getNodes = function(aNamespace) {
+Kube.prototype.getNodes = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).nodes().list().items);
 	} else {
-		return this.__displayResult(this.client.nodes().list().items);
+		return (full ? this.__dR(this.client.nodes()) : this.__displayResult(this.client.nodes().list().items));
 	}
 };
 
@@ -203,11 +203,11 @@ Kube.prototype.getNodes = function(aNamespace) {
  * Tries to retrieve the list of pods on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getPods = function(aNamespace) {
+Kube.prototype.getPods = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).pods().list().items);
 	} else {
-		return this.__displayResult(this.client.pods().list().items);
+		return (full ? this.__dR(this.client.pods()) : this.__displayResult(this.client.pods().list().items));
 	}
 };
 
@@ -217,11 +217,11 @@ Kube.prototype.getPods = function(aNamespace) {
  * Tries to retrieve the list of jobs on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getJobs = function(aNamespace) {
+Kube.prototype.getJobs = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-			return this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items);
+		return this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items);
 	} else {
-			return this.__displayResult(this.client.batch().jobs().list().items);
+		return (full ? this.__dR(this.client.batch().jobs()) : this.__displayResult(this.client.batch().jobs().list().items));
 	}
 };
 
@@ -231,11 +231,11 @@ Kube.prototype.getJobs = function(aNamespace) {
  * Tries to retrieve the list of service accounts on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
  */
-Kube.prototype.getServiceAccounts = function(aNamespace) {
+Kube.prototype.getServiceAccounts = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).serviceAccounts().list().items);
 	} else {
-		return this.__displayResult(this.client.serviceAccounts().list().items);
+		return (full ? this.__dR(this.client.serviceAccounts()) : this.__displayResult(this.client.serviceAccounts().list().items));
 	}
 };
 
