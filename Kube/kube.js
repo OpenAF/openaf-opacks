@@ -38,6 +38,10 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
 	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
 };
 
+Kube.prototype.close = function() {
+  	this.client.close();
+};
+
 /**
  * <odoc>
  * <key>Kube.exec(aNamespace, aPodName, aCommand, aTimeout, doSH) : String</key>
@@ -539,8 +543,14 @@ Kube.prototype.getEvents = function(aNamespace) {
         aNamespace = _$(aNamespace, "namespace").default(__);
 
 	if (isDef(aNamespace)) {
-		return this.__displayResult( this.client.v1().events().inNamespace(aNamespace).list().getItems().stream() );
+		var s = this.client.v1().events().inNamespace(aNamespace).list().getItems().stream();
+                var r = this.__displayResult(s);
+                s.close();
+         	return r;
 	} else {
-		return this.__displayResult( this.client.v1().events().inAnyNamespace().list().getItems().stream() );
+		var s = this.client.v1().events().inAnyNamespace().list().getItems().stream();
+		var r = this.__displayResult(s);
+      		s.close();
+		return r;
 	}
 };

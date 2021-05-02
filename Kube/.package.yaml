@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210428'
+version: '20210429'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -69,7 +69,7 @@ filesHash:
   kubernetes-model-common-5.3.1.jar: 0873373f955c2b532ac3bd52db756e68e3851030
   kubernetes-model-batch-5.3.1.jar: 18fd7b86db6662953badba43bba0c4da44b09ccb
   zjsonpatch-0.3.0.jar: d3ebf0f291297649b4c8dc3ecc81d2eddedc100d
-  kube.js: da82dceeba8c524a055c511f9a33f35f2561234d
+  kube.js: bca044c27b5b85487c14bbbf1f244732bb59d7fe
   slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
   kubernetes-model-metrics-5.3.1.jar: fd63c29fc8c195044b25c96d4eee9408da4116a6
   kubernetes-model-apiextensions-5.3.1.jar: 6b45425f96585115b1df72071c7d20184ecfcd7c
