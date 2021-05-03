@@ -253,6 +253,29 @@ Kube.prototype.getServiceAccount = function(aNamespace, aServiceAccount) {
 	}
 }
 
+Kube.prototype.getObj = function(aNamespace, anArrayOfObjs) {
+	var o = this.client;
+	if (isDef(aNamespace)) {
+		o = o.inNamespace(aNamespace);
+	} else {
+		o = o.inAnyNamespace();
+	}
+	anArrayOfObjs.forEach(r => o = o[r]());
+	return this.__dR(o);
+}
+
+Kube.prototype.getDeployments = function(aNamespace) {
+	return this.getObj(aNamespace, ["apps", "deployments"]);
+}
+
+Kube.prototype.getStatefulSets = function(aNamespace) {
+	return this.getObj(aNamespace, ["apps", "statefulSets"]);
+}
+
+Kube.prototype.getStatefulSets = function(aNamespace) {
+	return this.getObj(aNamespace, ["apps", "replicaSets"]);
+}
+
 /**
  * <odoc>
  * <key>Kube.apply(aNamespace, aObj) : Map</key>
@@ -450,15 +473,15 @@ Kube.prototype.__dR = function(aObj) {
 				} catch (e) {
 					//printErr("error " + f + " | " + e);
 				}
-			}
-			if (f == "getAdditionalProperties") {
+			} else if (f == "getAdditionalProperties") {
 				r = merge(r, af.fromJavaMap(f1.getAdditionalProperties()));
 			}
 		}
 	};
 
-	fn(aObj.get());
-	fn(aObj.list());
+	try { fn(aObj.get())  } catch(e) {}
+	try { fn(aObj.list()) } catch(e) {}
+	try { fn(aObj) } catch(e) {}
 
 	return r;
 };
