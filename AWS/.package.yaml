@@ -5,50 +5,50 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - aws
-  - lambda
-  - sqs
-  - rds
-  - ecs
-  - dynamo
+- aws
+- lambda
+- sqs
+- rds
+- ecs
+- dynamo
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/AWS.opack'
-description: >-
-  Simplified and light AWS API calls to avoid including the heavy AWS Java SDK.
-  Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.
+  url: https://openaf.io/opacks/AWS.opack
+description: Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.
 name: AWS
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210427'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210502'
 dependencies:
   OpenAF: '>=20210412'
 files:
-  - .odoc.db
-  - .package.yaml
-  - .precompile
-  - aws.js
-  - aws_cloudwatch.js
-  - aws_core.js
-  - aws_cost.js
-  - aws_dynamo.js
-  - aws_ec2.js
-  - aws_ecs.js
-  - aws_events.js
-  - aws_iam.js
-  - aws_lambda.js
-  - aws_organizations.js
-  - aws_rds.js
-  - aws_sqs.js
-  - utils/genTestRegions.yaml
-  - utils/testRegions.js
+- .odoc.db
+- .package.yaml
+- .precompile
+- aws.js
+- aws_athena.js
+- aws_cloudwatch.js
+- aws_core.js
+- aws_cost.js
+- aws_dynamo.js
+- aws_ec2.js
+- aws_ecs.js
+- aws_events.js
+- aws_iam.js
+- aws_lambda.js
+- aws_organizations.js
+- aws_rds.js
+- aws_sqs.js
+- utils/genTestRegions.yaml
+- utils/testRegions.js
 filesHash:
-  .odoc.db: 379b3975af6c4b9929baca95458ceffc875ca954
+  .odoc.db: 14d0ad7d78ab82b55db0fc1117fa51cb3c69c56f
   .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
-  aws.js: d39eff3254e87fbb98d7257c1f0900fb7dfe43c7
+  aws.js: f10c9a5ee1a2ca77e01576a0f68dcbf12d6c9b11
+  aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
   aws_core.js: 410989353b4a06b4355fefb760eb4fa12f9bff43
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
