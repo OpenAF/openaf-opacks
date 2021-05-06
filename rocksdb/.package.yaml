@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- rocksdb
+- rocks
+- channels
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/rocksdb
+description: OpenAF channels wrapper for RocksDB
+name: rocksdb
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210505'
+dependencies:
+  openaf: '>=20210412'
+files:
+- .package.yaml
+- rocksdb.js
+- rocksdbjni-6.19.3.jar
+filesHash:
+  rocksdb.js: 272e9a362aff7880bfc628276fd99b6b88b3f5d9
+  rocksdbjni-6.19.3.jar: 54bb5df7d522a90b94f647b40d216e285f052a54

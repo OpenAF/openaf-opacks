@@ -58,4 +58,4 @@
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |Notifications|Provides libraries to use notifications services. Currently pushover.js.|
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
-  
+  |rocksdb|OpenAF channels wrapper for RocksDB|
