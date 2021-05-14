@@ -11,6 +11,13 @@ keywords:
 - rds
 - ecs
 - dynamo
+- cloudwatch
+- cost
+- ec2
+- events
+- iam
+- organizations
+- sqs
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
@@ -21,7 +28,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210502'
+version: '20210513'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -45,11 +52,11 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 14d0ad7d78ab82b55db0fc1117fa51cb3c69c56f
+  .odoc.db: 75d5cc3504b91587c59a8022f59263ac420b3883
   .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
   aws.js: f10c9a5ee1a2ca77e01576a0f68dcbf12d6c9b11
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_cloudwatch.js: fe0cb600a2b450f67abf095056c423c88d42ad08
+  aws_cloudwatch.js: 28350e1608340be23a4a14096a0bf03b304743e5
   aws_core.js: 410989353b4a06b4355fefb760eb4fa12f9bff43
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf

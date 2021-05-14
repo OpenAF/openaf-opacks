@@ -32,7 +32,60 @@ AWS.prototype.CLOUDWATCH_LOGS_DescribeLogGroups = function(aRegion, aLimit, aPre
       return af.fromXML2Obj(res.error.response);
     else
       return af.fromXML2Obj(res);
- }; 
+}; 
+
+/**
+ * <odoc>
+ * <key>AWS.CLOUDWATCH_GetMetricStatistics(aRegion, aNamespace, aMetricName, aDimensions, aStatistics, aExtendedStatistics, aStartTime, aEndTime, aPeriod, aUnit) : Map</key>
+ * Get the CloudWatch metric using the following parameters:\
+ * \
+ *    aRegion            : the corresponding AWS region 
+ *    aNamespace         : the metric namespace (e.g. "AWS/EC2")\
+ *    aMetricName        : the metric to gather (e.g. "CPUUtilization")\ 
+ *    aDimensions        : a map of dimensions (e.g. { Name: "InstanceId", Value: "i-123456"})\
+ *    aStatistics        : array (e.g. "Maximum")\
+ *    aExtendedStatistics: array of extended statistics (e.g. "p90")\ 
+ *    aStartTime         : a start time\
+ *    aEndTime           : a end time\
+ *    aPeriod            : in seconds\
+ *    Unit               : [Seconds | Microseconds | Milliseconds | Bytes | Kilobytes | Megabytes | Gigabytes | Terabytes | Bits | Kilobits | Megabits | Gigabits | Terabits | Percent | Count | Bytes/Second | Kilobytes/Second | Megabytes/Second | Gigabytes/Second | Terabytes/Second | Bits/Second | Kilobits/Second | Megabits/Second | Gigabits/Second | Terabits/Second | Count/Second | None]\
+ * \
+ * </odoc>
+ */
+AWS.prototype.CLOUDWATCH_GetMetricStatistics = function(aRegion, aNamespace, aMetricName, aDimensions, aStatistics, aExtendedStatistics, aStartTime, aEndTime, aPeriod, aUnit) {
+   aRegion = _$(aRegion, "region").isString().default(this.region);
+   aNamespace = _$(aNamespace, "namespace").isString().default("");
+   aMetricName = _$(aMetricName, "metricname").isString().$_();
+   aPeriod = _$(aPeriod, "period").isNumber().$_();
+   aDimensions = _$(aDimensions, "dimensions").isArray().default(__);
+   aStatistics = _$(aStatistics, "statistics").isArray().default(__);
+   aExtendedStatistics = _$(aExtendedStatistics, "extendedstatistics").isArray().default(__);
+   aStartTime = _$(aStartTime, "StartTime").isDate().$_();
+   aEndTime = _$(aEndTime, "EndTime").isDate().$_();
+   aUnit = _$(aUnit, "unit").isString().default(__);
+
+   var aURL = "https://monitoring." + aRegion + ".amazonaws.com/";
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   var data = merge(this.flattenMap2Params({ Statistics: aStatistics }), merge(this.flattenMap2Params({ ExtendedStatistics: aExtendedStatistics }), merge(this.convertArray2Attrs("Dimensions.member", aDimensions), {
+      Action    : "GetMetricStatistics",
+      Version   : "2010-08-01",
+      Namespace : aNamespace,
+      EndTime   : aEndTime.toISOString(),
+      MetricName: aMetricName,
+      Period    : aPeriod,
+      StartTime : aStartTime.toISOString(),
+      Unit      : aUnit
+   }))); 
+   var res = this.postURLEncoded(aURL, aURI, "", data, "monitoring", aHost, aRegion);
+
+   if (isMap(res))
+      return af.fromXML2Obj(res.error);
+   else
+      return af.fromXML2Obj(res).GetMetricStatisticsResponse;
+};
 
  /**
   * <odoc>
