@@ -76,13 +76,13 @@ AWS.prototype.CLOUDWATCH_GetMetricStatistics = function(aRegion, aNamespace, aMe
       EndTime   : aEndTime.toISOString(),
       MetricName: aMetricName,
       Period    : aPeriod,
-      StartTime : aStartTime.toISOString(),
-      Unit      : aUnit
+      StartTime : aStartTime.toISOString()
    }))); 
+   data.Unit = aUnit;
    var res = this.postURLEncoded(aURL, aURI, "", data, "monitoring", aHost, aRegion);
 
    if (isMap(res))
-      return af.fromXML2Obj(res.error);
+      return af.fromXML2Obj(res.error.response);
    else
       return af.fromXML2Obj(res).GetMetricStatisticsResponse;
 };
