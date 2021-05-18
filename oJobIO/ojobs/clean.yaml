@@ -1,0 +1,37 @@
+# Author: Nuno Aguiar
+init:
+  help: &HELP
+    text   : Cleans the received context input (__pm)
+    expects: 
+    - name   : list
+      desc   : If list=true it will delete just the __pm._list component.
+      example: "true"
+    - name   : map
+      desc   : If map=true it will delete just the __pm._map component.
+
+todo:
+- Clean
+
+ojob:
+  opacks      :
+  - openaf: 20210515
+  catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception);"
+  logToConsole: false   # to change when finished
+        
+
+jobs:
+# ----------
+- name: Help
+  help: *HELP
+
+
+# -----------
+- name: Clean
+  exec: |
+    args.list = toBoolean(_$(args.list, "list").default("false"));
+    args.map  = toBoolean(_$(args.map, "map").default("false"));
+
+    if (args.list) delete __pm._list;
+    if (args.map)  delete __pm._map;
+
+    ow.oJob.output(args, args);
