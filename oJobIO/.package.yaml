@@ -5,45 +5,45 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - oJob.io
-  - oJobio
-  - oJob
+- oJob.io
+- oJobio
+- oJob
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/oDoc2MD.opack'
+  url: https://openaf.io/opacks/oDoc2MD.opack
 description: Service to provide easy-to-access oJobs for daily routines.
 name: oJobIO
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210426'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210517'
 dependencies:
-  openaf: '>=20210412'
+  openaf: '>=20210515'
 files:
-  - .package.yaml
-  - Dockerfile
-  - imgs/openaf.png
-  - ojobs/check.yaml
-  - ojobs/doc.yaml
-  - ojobs/echo.yaml
-  - ojobs/envs.yaml
-  - ojobs/generate.yaml
-  - ojobs/get.yaml
-  - ojobs/hello/index.yaml
-  - ojobs/hello/world.yaml
-  - ojobs/help.yaml
-  - ojobs/html.yaml
-  - ojobs/index.html
-  - ojobs/map.yaml
-  - ojobs/pipe.yaml
-  - ojobs/_common.yaml
-  - README.md
-  - rebuild.hbs
-  - rebuild.yaml
-  - server.yaml
-  - setupOJobIO.yaml
+- .package.yaml
+- Dockerfile
+- imgs/openaf.png
+- ojobs/check.yaml
+- ojobs/doc.yaml
+- ojobs/echo.yaml
+- ojobs/envs.yaml
+- ojobs/generate.yaml
+- ojobs/get.yaml
+- ojobs/hello/index.yaml
+- ojobs/hello/world.yaml
+- ojobs/help.yaml
+- ojobs/html.yaml
+- ojobs/index.html
+- ojobs/map.yaml
+- ojobs/pipe.yaml
+- ojobs/_common.yaml
+- README.md
+- rebuild.hbs
+- rebuild.yaml
+- server.yaml
+- setupOJobIO.yaml
 filesHash:
   Dockerfile: 4a726bc4ac51720f0552a2ded7d0847dba895743
   imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
@@ -58,7 +58,7 @@ filesHash:
   ojobs/help.yaml: 93f1e61806d81ab32b655ab45df8b65f66853072
   ojobs/html.yaml: a73e92157ae1cbd3545d750c78833c17410db985
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
-  ojobs/map.yaml: 6004f4c068c18fd128da20a0ac009cdca0fdfc9a
+  ojobs/map.yaml: deb33a36f808ff82877791c86386510063928cac
   ojobs/pipe.yaml: bd70590faea40753b0334a2f882cbfd75b6ea878
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19

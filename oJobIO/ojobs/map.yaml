@@ -37,7 +37,7 @@ jobs:
     } else {
        if (isDef(__pm._map)) {
           var nm = {};
-          flds.map(f => ow.obj.setPath(nm, f, ow.obj.getPath(args._map, f)) );
+          flds.map(f => ow.obj.setPath(nm, f, ow.obj.getPath(__pm._map, f)) );
           __pm._map = nm;
           ow.oJob.output(nm, args);
        }
