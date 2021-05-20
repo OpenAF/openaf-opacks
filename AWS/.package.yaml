@@ -28,45 +28,45 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210514'
+version: '20210520'
 dependencies:
-  OpenAF: '>=20210412'
+  OpenAF: '>=20210515'
 files:
-- .odoc.db
-- .package.yaml
-- .precompile
+- aws_iam.js
+- aws_sqs.js
 - aws.js
-- aws_athena.js
+- aws_rds.js
 - aws_cloudwatch.js
 - aws_core.js
-- aws_cost.js
+- .package.yaml
+- aws_organizations.js
+- utils/testRegions.js
+- utils/genTestRegions.yaml
 - aws_dynamo.js
+- .odoc.db
+- aws_lambda.js
+- aws_events.js
 - aws_ec2.js
 - aws_ecs.js
-- aws_events.js
-- aws_iam.js
-- aws_lambda.js
-- aws_organizations.js
-- aws_rds.js
-- aws_sqs.js
-- utils/genTestRegions.yaml
-- utils/testRegions.js
+- .precompile
+- aws_cost.js
+- aws_athena.js
 filesHash:
-  .odoc.db: 75d5cc3504b91587c59a8022f59263ac420b3883
-  .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
+  aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
+  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   aws.js: f10c9a5ee1a2ca77e01576a0f68dcbf12d6c9b11
-  aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_cloudwatch.js: bb9a601599619e049e32f5fc8d13e2fb7002dd60
-  aws_core.js: 410989353b4a06b4355fefb760eb4fa12f9bff43
-  aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
+  aws_rds.js: 15518551361378139b152192e479ef764d741e70
+  aws_cloudwatch.js: 74d44f16e8f39d0b21bcc0253a316114f981ae42
+  aws_core.js: 9d03716818fa09fafae9c2a5cc5e55e4fe4fdfa0
+  aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
+  utils/testRegions.js: b20c173bddb0ca2960e64ff4ce172fc6a75a5cca
+  utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
+  .odoc.db: 977db8feccf3ca34ddb1aa831fee7a0040ae5e22
+  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
+  aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
-  aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
-  aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
-  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
-  aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
-  aws_rds.js: 15518551361378139b152192e479ef764d741e70
-  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
-  utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  utils/testRegions.js: b20c173bddb0ca2960e64ff4ce172fc6a75a5cca
+  .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
+  aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
+  aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f

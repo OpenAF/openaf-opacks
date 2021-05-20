@@ -15,6 +15,20 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    this.secretKey = aSecretKey;
    this.stoken    = aSessionToken;
 
+   this.connect(aAccessKey, aSecretKey, aSessionToken, aRegion);
+};
+
+/**
+ * <odoc>
+ * <key>AWS.connect(aAccessKey, aSecretKey, aSessionToken, aRegion)</key>
+ * Resets existing credentials if needed. Usually helpful when using session tokens.
+ * </odoc>
+ */
+AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
+   this.accessKey = _$(aAccessKey).default(this._aAccessKey);
+   this.secretKey = _$(aSecretKey).default(this._aSecretKey);
+   this.stoken    = _$(aSessionToken).default(this.aSessionToken);
+
    if (isUnDef(this.accessKey) && isDef(getEnv("AWS_ACCESS_KEY_ID"))) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
    if (isUnDef(this.secretKey) && isDef(getEnv("AWS_SECRET_ACCESS_KEY"))) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
    if (isUnDef(this.stoken) && isDef(getEnv("AWS_SESSION_TOKEN"))) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
