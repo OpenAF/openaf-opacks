@@ -1,6 +1,6 @@
 poi-4.1.2.jar:
-  name: 'Apache License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: Apache License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 4.1.2
   changed from original: false
   comments: ''
@@ -207,8 +207,8 @@ poi-4.1.2.jar:
        See the License for the specific language governing permissions and
        limitations under the License.
 poi-excelant-4.1.2.jar:
-  name: 'Apache License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: Apache License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 4.1.2
   changed from original: false
   comments: ''
@@ -415,8 +415,8 @@ poi-excelant-4.1.2.jar:
        See the License for the specific language governing permissions and
        limitations under the License.
 poi-ooxml-4.1.2.jar:
-  name: 'Apache License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: Apache License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 4.1.2
   changed from original: false
   comments: ''
@@ -623,8 +623,8 @@ poi-ooxml-4.1.2.jar:
        See the License for the specific language governing permissions and
        limitations under the License.
 poi-ooxml-schemas-4.1.2.jar:
-  name: 'Apache License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: Apache License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 4.1.2
   changed from original: false
   comments: ''
@@ -831,8 +831,8 @@ poi-ooxml-schemas-4.1.2.jar:
        See the License for the specific language governing permissions and
        limitations under the License.
 poi-scratchpad-4.1.2.jar:
-  name: 'Apache License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: Apache License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 4.1.2
   changed from original: false
   comments: ''
@@ -1039,8 +1039,8 @@ poi-scratchpad-4.1.2.jar:
        See the License for the specific language governing permissions and
        limitations under the License.
 xmlbeans-3.1.0.jar:
-  name: 'The Apache Software License, Version 2.0'
-  url: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  name: The Apache Software License, Version 2.0
+  url: http://www.apache.org/licenses/LICENSE-2.0.txt
   version: 3.1.0
   changed from original: false
   comments: ''

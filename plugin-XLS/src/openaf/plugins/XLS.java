@@ -323,6 +323,16 @@ public class XLS extends ScriptableObject {
 		return org.apache.poi.ss.util.CellRangeAddress.valueOf(aRange);
 	}
 
+	@JSFunction
+	public Object getEnumIndexedColors(String name) {
+		return org.apache.poi.ss.usermodel.IndexedColors.valueOf(name);
+	}
+
+	@JSFunction
+	public Object getEnumFillPatternType(String name) {
+		return org.apache.poi.ss.usermodel.FillPatternType.valueOf(name);
+	}
+
 	/**
 	 * <odoc>
 	 * <key>XLS.getIndexedColors(aColorName) : IndexedColors</key>
