@@ -5,42 +5,38 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - s3
-  - client
-  - object
+- s3
+- client
+- object
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/S3.opack'
+  url: https://openaf.io/opacks/S3.opack
 description: Wrapper to access S3 compatible object storages as a client.
 name: S3
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210412'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210620'
 dependencies:
   OpenAF: '>=20210412'
 files:
-  - .maven.yaml
-  - .odoc.db
-  - .package.yaml
-  - .precompile
-  - minio-8.2.0-all.jar
-  - README.md
-  - s3-test.json
-  - s3-test.md
-  - s3-test.yaml
-  - s3.js
-  - s3.yaml
+- .package.yaml
+- .maven.yaml
+- .precompile
+- README.md
+- minio-8.2.2-all.jar
+- s3.js
+- s3.yaml
+- .odoc.db
+- s3-test.yaml
 filesHash:
-  .maven.yaml: c70a3af4655a295c9681683ef3590e279e7bb3e4
-  .odoc.db: 299b7feba82d9457555ddaa491224d00ab696b51
+  .maven.yaml: dc1b063584de84fed3801c1d14747c47a576ec46
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
-  minio-8.2.0-all.jar: 966af28e18487352550e0eb3a08fbb82ac20dadb
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3-test.json: 935cd1d7688986b0b6af2d7f8bc20975b85771fe
-  s3-test.md: c7b2cc4bca7ff427b748052f71d4e65f093a477b
-  s3-test.yaml: 4b95c5ca37ecd974bc7c21923bc0dc0499fd822a
+  minio-8.2.2-all.jar: 98b73f9ab4dc80a25c4e185bb8f64b9e26537f0d
   s3.js: 161ef6dba6b4f2674639d29105097c6d57e3cbd0
   s3.yaml: 10c83fb629fbe2860e304316c44ab8ed617f078c
+  .odoc.db: 299b7feba82d9457555ddaa491224d00ab696b51
+  s3-test.yaml: e7774dac38b5d8d262b833d629d5797560753ae3

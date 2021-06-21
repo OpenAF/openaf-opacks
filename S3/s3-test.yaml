@@ -1,5 +1,5 @@
 init:
-  url       : http://minio
+  url       : https://play.minio.io:9000
   accessKey : minio
   secretKey : minio123
   region    : 
