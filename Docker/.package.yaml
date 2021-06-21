@@ -5,37 +5,35 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - docker
-  - containers
+- docker
+- containers
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/Docker.opack'
-description: >-
-  A wrapper to access the amihaiemil/docker-java-api api to access a docker
-  client.
+  url: https://openaf.io/opacks/Docker.opack
+description: A wrapper to access the amihaiemil/docker-java-api api to access a docker client.
 name: Docker
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200509'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210620'
 dependencies:
-  openaf: '>=20200502'
+  openaf: '>=20210515'
 files:
-  - docker.js
-  - .package.yaml
-  - .odoc.db
-  - README.md
-  - lib/javax.json-api-1.1.4.jar
-  - lib/javax.json-1.1.4.jar
-  - lib/docker-java-api-0.0.12-jar-with-dependencies.jar
-  - docker.yaml
+- .odoc.db
+- .package.yaml
+- docker.js
+- docker.yaml
+- lib/docker-java-api-0.0.13-jar-with-dependencies.jar
+- lib/javax.json-1.1.4.jar
+- lib/javax.json-api-1.1.4.jar
+- README.md
 filesHash:
-  docker.js: fbbc4c50fa42a548b3194213c72a12ad3a69436a
   .odoc.db: 176227d6ae0da757c95a10ae265aa641601842c2
-  README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
-  lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
-  lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
-  lib/docker-java-api-0.0.12-jar-with-dependencies.jar: 662f8928c824131cf372dc3c51a7cdd71df4b09c
+  docker.js: 3de41593b6780da43e73b87532a0e887d7276e51
   docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
+  lib/docker-java-api-0.0.13-jar-with-dependencies.jar: 927ca6d1d30be5472acf1e8e53eaddbb71e99162
+  lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
+  lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
+  README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
