@@ -1,6 +1,6 @@
 (function() {
     var path = io.fileInfo(getOPackPath("UnixPAM") || ".").canonicalPath;
-    af.externalAddClasspath("file:" + path + "/lib/libpam4j-1.8.jar");
+    af.externalAddClasspath("file:" + path + "/lib/libpam4j-1.11.jar");
 
     /**
      * <odoc>
