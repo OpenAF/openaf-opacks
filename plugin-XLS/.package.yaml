@@ -18,47 +18,39 @@ name: plugin-XLS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210529'
+version: '20210627'
 dependencies:
   openaf: '>=20200918'
 files:
-- .maven.yaml
-- .odoc.db
-- .package.yaml
-- compile.yaml
-- LICENSES.txt
-- plugin-xls.jar
-- poi-4.1.2.jar
-- poi-excelant-4.1.2.jar
-- poi-ooxml-4.1.2.jar
 - poi-ooxml-schemas-4.1.2.jar
-- poi-scratchpad-4.1.2.jar
-- src/openaf/plugins/DOC.class
-- src/openaf/plugins/DOC.java
-- src/openaf/plugins/XLS$1NullOutputStream.class
-- src/openaf/plugins/XLS$TableType.class
-- src/openaf/plugins/XLS.class
-- src/openaf/plugins/XLS.java
+- plugin-xls.jar
+- poi-ooxml-4.1.2.jar
+- xmlbeans-3.1.0.jar
+- .package.yaml
 - tests/autoTestAll.XLS.js
 - tests/autoTestAll.XLS.yaml
-- xmlbeans-3.1.0.jar
+- poi-excelant-4.1.2.jar
+- .odoc.db
+- poi-scratchpad-4.1.2.jar
+- poi-4.1.2.jar
+- compile.yaml
+- .maven.yaml
+- LICENSES.txt
+- src/openaf/plugins/DOC.java
+- src/openaf/plugins/XLS.java
 filesHash:
-  .maven.yaml: b6688d93d3762d0227bf67c0b3ba5bb08d1deb9e
-  .odoc.db: aac3ed013f8261f03e187c746157c9ef85f9443d
-  compile.yaml: 1978dd14bb544b487e31166aa70b4fc7ab161927
-  LICENSES.txt: 3e50b67db577d9662d9d9b4d9f2f72448ff0cbfc
-  plugin-xls.jar: 7e5fdd64bfbca0bfdd639d765fec032aa5d5a3a2
-  poi-4.1.2.jar: 964bf41cf68bce08e4ef6b2279b559fdf8d454f4
-  poi-excelant-4.1.2.jar: e650e49e8374af6e64886e7b7a7c2d8add383ab1
-  poi-ooxml-4.1.2.jar: 87d9a22aa9a7dd26e80c360e709f7ee02e32ab3b
   poi-ooxml-schemas-4.1.2.jar: 550cc22a598c0b0a51d1f55f8371e83c1229802d
-  poi-scratchpad-4.1.2.jar: 1be379e91d3d3fb0cd11425451acdbfb0d2264e7
-  src/openaf/plugins/DOC.class: eaf2fb1aef6bc612957fc3dd89b501f3ef99d0b5
-  src/openaf/plugins/DOC.java: b9bb4c6491c759727a52d3c7403d9a9d76a13bf8
-  src/openaf/plugins/XLS$1NullOutputStream.class: 2b1dc3fae433a9c4ee6d10c2614de9a50045e3fd
-  src/openaf/plugins/XLS$TableType.class: 3a25dbb13041e861060c0ce05b5b3b62e800fb9d
-  src/openaf/plugins/XLS.class: 1c4f352b5d3d1cee7eeae460d2709d95cb84e6bc
-  src/openaf/plugins/XLS.java: af052827b6175122debc17076337d18c6886410a
+  plugin-xls.jar: 0b73a30855063c043faf6eed81f0a57e970b2b71
+  poi-ooxml-4.1.2.jar: 87d9a22aa9a7dd26e80c360e709f7ee02e32ab3b
+  xmlbeans-3.1.0.jar: 6dac1f897dfb3e3f17fc79b18a3353b2e51c464e
   tests/autoTestAll.XLS.js: d187ea75619f7615f9ca411c51cdb216b663a487
   tests/autoTestAll.XLS.yaml: b69b32c9842ad2ba62ea397eb9a33c1312b0721d
-  xmlbeans-3.1.0.jar: 6dac1f897dfb3e3f17fc79b18a3353b2e51c464e
+  poi-excelant-4.1.2.jar: e650e49e8374af6e64886e7b7a7c2d8add383ab1
+  .odoc.db: c94f6d51ab9758d8a7fa3ece16ed845f8c731214
+  poi-scratchpad-4.1.2.jar: 1be379e91d3d3fb0cd11425451acdbfb0d2264e7
+  poi-4.1.2.jar: 964bf41cf68bce08e4ef6b2279b559fdf8d454f4
+  compile.yaml: cb732d0c15a1e385372bc5b50de206e5ea56fd1a
+  .maven.yaml: b6688d93d3762d0227bf67c0b3ba5bb08d1deb9e
+  LICENSES.txt: 3e50b67db577d9662d9d9b4d9f2f72448ff0cbfc
+  src/openaf/plugins/DOC.java: b9bb4c6491c759727a52d3c7403d9a9d76a13bf8
+  src/openaf/plugins/XLS.java: af052827b6175122debc17076337d18c6886410a

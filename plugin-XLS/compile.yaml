@@ -10,22 +10,41 @@ todo:
   - Compile XLS plugin
   - Prepare XLS jar
   - Prepare help
+  - Clean up end
 
 jobs:
-  ################
-  - name: Clean up
+  # ----------------------
+  - name: Clean up classes
     args:
-      - outputDir: *OUTPUT_DIR
+      outputDir: *OUTPUT_DIR
+    exec: |
+      var classes = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.class')].filepath");
+      classes.forEach((afile) => {
+        io.rm(afile);
+      });
+
+  # -------------------
+  - name: Clean up jars
+    args:
+      outputDir: *OUTPUT_DIR
     exec: |
       var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
       classpath.forEach((afile) => {
         io.rm(afile);
       });
-      
-      var classes = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.class')].filepath");
-      classes.forEach((afile) => {
-        io.rm(afile);
-      });
+
+  ################
+  - name: Clean up
+    to  :
+    - Clean up classes
+    - Clean up jars
+
+  # ------------------
+  - name: Clean up end
+    deps:
+    - Prepare XLS jar
+    to  :
+    - Clean up classes
 
   #####################
   - name: Download jars
