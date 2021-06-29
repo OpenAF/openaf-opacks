@@ -662,7 +662,7 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 		aLogFunc({
 			op: "init",
 			threadId: res.__index,
-			totalThread: __iniBulk[ii].hits.total
+			totalThread: isDef(__iniBulk[ii].hits.total) ? __iniBulk[ii].hits.total : __
 		});
 	}
 	
@@ -677,7 +677,7 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 			});
 			while(res.hits.hits.length > 0) {
 				res.hits.hits.forEach((v) => {
-					aOutputFunc(v._source);
+					aOutputFunc(v._source, v);
 				});
 				res = parent.nextScroll(res);
 			}
