@@ -17,23 +17,27 @@ name: Docker
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210620'
+version: '20210718'
 dependencies:
   openaf: '>=20210515'
 files:
-- .odoc.db
-- .package.yaml
-- docker.js
-- docker.yaml
+- config/config.yml
+- dockerRegistry.js
 - lib/docker-java-api-0.0.13-jar-with-dependencies.jar
 - lib/javax.json-1.1.4.jar
 - lib/javax.json-api-1.1.4.jar
 - README.md
+- .odoc.db
+- docker.js
+- docker.yaml
+- .package.yaml
 filesHash:
-  .odoc.db: 176227d6ae0da757c95a10ae265aa641601842c2
-  docker.js: 3de41593b6780da43e73b87532a0e887d7276e51
-  docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
+  config/config.yml: 8baeb8b732b24800cb8051ec39f1b5f41ffeba0b
+  dockerRegistry.js: d987a740e0e32d37d215cfbbfbdd9d0bbf3b2a50
   lib/docker-java-api-0.0.13-jar-with-dependencies.jar: 927ca6d1d30be5472acf1e8e53eaddbb71e99162
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
+  .odoc.db: 7c2ff9114a32d6d01f29e8ffd24f8e5dcdd20efc
+  docker.js: 519ad2fa02955d8b4c8d5607251f266d4ed9bc24
+  docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e

@@ -457,7 +457,7 @@ Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
  *    domainname       (String)  An optional domain name to use\
  *    user             (String)  Optional user that commands are run as inside the container\
  *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
- *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    exposedPorts     (Map)     A map of { "&lt;port&gt;/&lt;tcp|udp|sctp&gt;": {} }\
  *    volumes          (Map)     A map of volumes to use\
  *    workingDir       (String)  The working directory for commands to run in\
  *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
@@ -599,7 +599,7 @@ Docker.prototype.runOJob = function(args) {
  *    domainname       (String)  An optional domain name to use\
  *    user             (String)  Optional user that commands are run as inside the container\
  *    healthcheck      (Map)     A map with { Test: ["cmd1", "cmd2", ...], Interval: 123, Timeout: 123, Retries: 3, StartPeriod: 123 }\
- *    exposedPorts     (Map)     A map of { "<port>/<tcp|udp|sctp>": {} }\
+ *    exposedPorts     (Map)     A map of { "&lt;port&gt;/&lt;tcp|udp|sctp&gt;": {} }\
  *    volumes          (Map)     A map of volumes to use\
  *    workingDir       (String)  The working directory for commands to run in\
  *    entrypoint       (String)  The entry point for the container as a string or an array of strings\
