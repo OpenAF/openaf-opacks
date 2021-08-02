@@ -450,7 +450,7 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
     ow.loadObj();
     loadLodash();
 
-    var rlst = ow.obj.fromArray2Obj(this.listObjects(aBucket, aPrefix), "filename", __, true);
+    var rlst = ow.obj.fromArray2Obj(this.listObjects(aBucket, aPrefix, __, true), "filename");
     var slst = ow.obj.fromArray2Obj($from(listFilesRecursive(aLocalPath)).equals("isFile", true).select(), "canonicalPath");
 
     var realLocalPath = String((new java.io.File(aLocalPath)).getCanonicalPath()).replace(/\\/g, "/") + "/";
