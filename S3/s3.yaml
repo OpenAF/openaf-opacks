@@ -10,10 +10,10 @@ jobs:
         secret     (String)   The secret key to the S3 service
         region     (String)   The S3 region
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket).$_("Please provide a S3 bucket name");
+      _$(args.accessKey).$_("Please provide the S3 access key");
+      _$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -30,10 +30,10 @@ jobs:
         secret     (String)   The secret key to the S3 service
         region     (String)   The S3 region
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket).$_("Please provide a S3 bucket name");
+      _$(args.accessKey).$_("Please provide the S3 access key");
+      _$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -53,10 +53,12 @@ jobs:
         localPath  (String)   The local path file to send to the bucket
         meta       (Map)      The meta object to add to the object
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket).$_("Please provide a S3 bucket name");
+      _$(args.accessKey).$_("Please provide the S3 access key");
+      _$(args.secret).$_("Please provide the S3 access secret");
+      _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
+      _$(args.localPath, "localPath").$_("Please provide a local path file to send to the bucket");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -73,16 +75,18 @@ jobs:
         secret     (String)   The secret key to the S3 service
         region     (String)   The S3 region
         objectName (String)   The S3 object name to use
-        remotePath (String)   The local path to store the object
+        localPath  (String)   The local path to store the object
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
+      _$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
+      _$(args.secret, "secret").$_("Please provide the S3 access secret");
+      _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
+      _$(args.localPath, "localPath").$_("Please provide a local path to store the retrieved object");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.getObject(args.bucket, args.objectName, args.remotePath);
+      s3.getObject(args.bucket, args.objectName, args.localPath);
 
   #-----------------------
   - name: S3 Remove object
@@ -96,10 +100,10 @@ jobs:
         region     (String)   The S3 region
         objectName (String)   The S3 object name to remove
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket).$_("Please provide a S3 bucket name");
+      _$(args.accessKey).$_("Please provide the S3 access key");
+      _$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -121,10 +125,10 @@ jobs:
         meta         (Map)      Change the S3 target object metadata
         copyOptions  (Map)      Optionally specify matchETag (string), matchETagNone (string), modified, unmodified
     exec: |
-      _$(url).$_("Please provide a S3 endpoint url");
-      _$(bucket).$_("Please provide a S3 bucket name");
-      _$(accessKey).$_("Please provide the S3 access key");
-      _$(secret).$_("Please provide the S3 access secret");
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket).$_("Please provide a S3 bucket name");
+      _$(args.accessKey).$_("Please provide the S3 access key");
+      _$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
