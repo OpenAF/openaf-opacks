@@ -121,7 +121,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
             var _stat = this.s3.statObject(Packages.io.minio.StatObjectArgs.builder().bucket(aBucket).object(String(item.objectName())).build());
             stat.contentType = _stat.contentType();
         }
-        var isDir = item.isDir() || (String(item.objectName()).endsWith("/") && (item.objectSize() == 0));
+        var isDir = item.isDir() || (String(item.objectName()).endsWith("/"));
         res.push({
             isDirectory: isDir,
             isFile: !isDir,
