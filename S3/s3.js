@@ -125,6 +125,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
         res.push({
             isDirectory: isDir,
             isFile: !isDir,
+            isLatest: item.isLatest(),
             filename: String(item.objectName()), 
             filepath: String(item.objectName()),
             canonicalPath: String(item.objectName()),
@@ -132,6 +133,9 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
+            owner: String(item.owner().displayName()),
+            version: String(item.versionId()),
+            metadata: af.fromJavaMap(item.userMetadata()),
             contentType: (isUnDef(stat.contentType) ? void 0 : String(stat.contentType))
         });
     }
@@ -379,6 +383,63 @@ S3.prototype.getObjectURL = function(aBucket, aObjectName) {
 
     return String(this.s3.getObjectUrl(aBucket, aObjectName));
 };
+
+/**
+ * <odoc>
+ * <key>S3.removeObjectsByPrefix(aBucket, aPrefix, aLimitPerCall) : Array</key>
+ * Tries to remove all objects recursively on aBucket with the provided aPrefix. Optionally aLimitPerCall (e.g. AWS S3 is limited to 1000)
+ * can be provided (-1 for no limit). Returns an array of errors.
+ * </odoc>
+ */
+S3.prototype.removeObjectsByPrefix = function(aBucket, aPrefix, aLimitPerCall) {
+    _$(aBucket).isString().$_("Please provide a bucket name.");
+    _$(aPrefix).isString().$_("Please provide a prefix.");
+
+    var lst = this.listObjects(aBucket, aPrefix, false, true);
+    return this.removeObjects(aBucket, lst.map(r => r.canonicalPath), aLimitPerCall);
+};
+
+/**
+ * <odoc>
+ * <key>S3.removeObjects(aBucket, aListObjectNames, aLimitPerCall) : Array</key>
+ * Tries to remove aListObjectNames (an array of strings or an array of maps with a "name" and a "version") on aBucket 
+ * Optionally aLimitPerCall (e.g. AWS S3 is limited to 1000) can be provided (-1 for no limit). Returns an array of errors.
+ * </odoc>
+ */
+S3.prototype.removeObjects = function(aBucket, aListObjectNames, aLimitPerCall) {
+    _$(aBucket, "aBucket").isString().$_("Please provide a bucket name.");
+    _$(aListObjectNames, "aListObjectNames").isArray().$_("Please provide an array of object names");
+    aLimitPerCall = _$(aLimitPerCall, "aLimitePerCall").isNumber().default(-1);
+
+    if (aLimitPerCall > 0) {
+        var res = [];
+        splitArray(aListObjectNames, aListObjectNames.length / aLimitPerCall).forEach(subArr => {
+            res = res.concat(this.removeObjects(aBucket, subArr, -1));
+        });
+        return res;
+    }
+
+    var ll = new java.util.LinkedList();
+    aListObjectNames.forEach(obj => {
+        if (isString(obj)) {
+            ll.add(new Packages.io.minio.messages.DeleteObject(obj));
+        }
+        if (isMap(obj)) {
+            ll.add(new Packages.io.minio.messages.DeleteObject(obj.name, obj.version));
+        }
+    });
+
+    var res = this.s3.removeObjects(Packages.io.minio.RemoveObjectsArgs.builder().bucket(aBucket).objects(ll).build());
+
+    var errors = [];
+    var ii = res.iterator();
+
+    while(ii.hasNext()) {
+        errors.push(ii.next());
+    }
+
+    return errors;
+}
 
 /**
  * <odoc>
