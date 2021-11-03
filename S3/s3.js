@@ -133,7 +133,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
-            owner: String(item.owner().displayName()),
+            owner: isNull(item.owner()) ? __ : String(item.owner().displayName()),
             version: String(item.versionId()),
             metadata: af.fromJavaMap(item.userMetadata()),
             contentType: (isUnDef(stat.contentType) ? void 0 : String(stat.contentType))

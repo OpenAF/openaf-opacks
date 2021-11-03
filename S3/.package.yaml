@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20211030'
+version: '20211102'
 dependencies:
   OpenAF: '>=20210515'
 files:
@@ -37,6 +37,6 @@ filesHash:
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
   .maven.yaml: dc1b063584de84fed3801c1d14747c47a576ec46
-  s3.yaml: 3f79775ed76efc7b1813dcb8d8671a347f198a35
+  s3.yaml: d6d485334a3f5bac4c2c8c11544c2d0c7f842c62
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3.js: de5cc3ba506b492e6805a5090b85e9e4b755c8b0
+  s3.js: da6d71145279d86512d7bee4486e774449898721

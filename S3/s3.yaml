@@ -18,7 +18,35 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.makeBucket(args.bucket, args.region);
-  
+
+  # -------------
+  - name: S3 List
+    help: >
+      Retrieves the list of objects in a S3 Bucket. Expects:
+
+        url           (String)  The S3 endpoint URL
+        bucket        (String)  The S3 bucket name
+        accessKey     (String)  The access key to the S3 service
+        secret        (String)  The secret key to the S3 service
+        region        (String)  The S3 region
+        objectPrefix  (String)  The object prefix
+        needFull      (Boolean) If the list needs to include the contentType
+        needRecursive (Boolean) If the list should recursive
+
+      If successfull the list will be output to args.list
+    exec: |
+      _$(args.url).$_("Please provide a S3 endpoint url");
+      _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
+      _$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
+      _$(args.secret, "secret").$_("Please provide the S3 access secret");
+      args.objectPrefix  = _$(args.objectPrefix, "objectPrefix").default(__);
+      args.needFull      = toBoolean(_$(args.needFull, "needFull").default("false"));
+      args.needRecursive = toBoolean(_$(args.needRecursive, "needRecursive").default("false"));
+
+      loadLib("s3.js");
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
+      args.list = s3.listObjects(args.bucket, args.objectPrefix, args.needFull, args.needRecursive);
+
   #-----------------------
   - name: S3 Remove bucket
     help: >
