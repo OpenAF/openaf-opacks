@@ -37,6 +37,6 @@ filesHash:
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
   .maven.yaml: dc1b063584de84fed3801c1d14747c47a576ec46
-  s3.yaml: 920f9d6fb305e5b3ee54674518a6871b4a7d6b55
+  s3.yaml: 3671ba825964b6373d5ac09fff1e93094ea1e8a5
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   s3.js: da6d71145279d86512d7bee4486e774449898721

@@ -62,9 +62,9 @@ jobs:
       var listmetric = "ListObjects" + (args.needRecursive ? "Recursive" : "")
       t = now()
       args.list = s3.listObjects(args.bucket, args.objectPrefix, args.needFull, args.needRecursive);
-      _met["time" + listmetric] = _$(_met["time" + listmetric]).isNumber().default(0) + (now() - t)
-      _met["ops" + listmetric]  = _$(_met["count" + listmetric]).isNumber().default(0) + 1
-      if (isArray(args.list)) _met["resultCount" + listmetric] = _$(_met["resultCount" + listmetric]).isNumber().default(0) + args.list.length
+      _met[listmetric + "Time"] = _$(_met[listmetric + "Time"]).isNumber().default(0) + (now() - t)
+      _met[listmetric + "Ops"]  = _$(_met[listmetric + "Ops"]).isNumber().default(0) + 1
+      if (isArray(args.list)) _met[listmetric + "ResultCount"] = _$(_met[listmetric + "ResultCount"]).isNumber().default(0) + args.list.length
 
       if (isDef(args.metric)) {
         _met.id          = args.metric
