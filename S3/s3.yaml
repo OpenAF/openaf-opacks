@@ -32,6 +32,7 @@ jobs:
         objectPrefix  (String)  The object prefix
         needFull      (Boolean) If the list needs to include the contentType
         needRecursive (Boolean) If the list should recursive
+        metric        (String)  Identify the oJob metric to use (only for openaf version > 20211103)
 
       If successfull the list will be output to args.list
     exec: |
@@ -42,11 +43,35 @@ jobs:
       args.objectPrefix  = _$(args.objectPrefix, "objectPrefix").default(__);
       args.needFull      = toBoolean(_$(args.needFull, "needFull").default("false"));
       args.needRecursive = toBoolean(_$(args.needRecursive, "needRecursive").default("false"));
+      args.metric        = _$(args.metric).isString().default(__)
+
+      var _met = {}
+      if (isDef(args.metric)) _met = _$(ow.oJob.getMetric(args.metric)).isMap().default({})
 
       loadLib("s3.js");
-      var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      args.list = s3.listObjects(args.bucket, args.objectPrefix, args.needFull, args.needRecursive);
 
+      var t = now()
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
+      _met.connTime = now() - t
+
+      if (isDef(args.metric)) {
+        ow.loadNet()
+        _met.socketLatency = ow.net.testURLLatency(args.url)
+      }
+
+      var listmetric = "ListObjects" + (args.needRecursive ? "Recursive" : "")
+      t = now()
+      args.list = s3.listObjects(args.bucket, args.objectPrefix, args.needFull, args.needRecursive);
+      _met["time" + listmetric] = _$(_met["time" + listmetric]).isNumber().default(0) + (now() - t)
+      _met["ops" + listmetric]  = _$(_met["count" + listmetric]).isNumber().default(0) + 1
+      if (isArray(args.list)) _met["resultCount" + listmetric] = _$(_met["resultCount" + listmetric]).isNumber().default(0) + args.list.length
+
+      if (isDef(args.metric)) {
+        _met.id          = args.metric
+        _met.type        = "s3"
+        ow.oJob.setMetric(args.metric, _met)
+      }
+      
   #-----------------------
   - name: S3 Remove bucket
     help: >
