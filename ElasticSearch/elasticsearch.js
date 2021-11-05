@@ -637,16 +637,17 @@ ElasticSearch.prototype.getNodesStats = function() {
  * Given aIndex will bulk export all documents using the aOutputFunc and calling providing each document as a parameter. Optionally if aMap.aLogFunc is
  * provided it will be called with a map containing op (e.g. init, start, error and done), the threadId and totalThread created. The parameter aMap.aBatchSize
  * allows to define a different number of documents sent per bulk call in each thread (defaults to 100). The parameter aMap.aNumThreads allows to specify the 
- * number of threads that will be used (defaults to the number of cores detected).
+ * number of threads that will be used (defaults to the number of cores detected). The parameter aMap.search allows the specification of a search query map.
  * </odoc>
  */
 ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 	aMap = _$(aMap).isMap().default({});
-	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads;
+	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads, search = aMap.search;
 	
 	var __batchSize = _$(batchSize).isNumber("BatchSize needs to be a number.").default(100);
 	var __threads   = _$(numThreads).isNumber("Threads needs to be a number.").default(getNumberOfCores());
 	var __index     = _$(aIndex).isString("Index needs to be a string.").$_("Please provide an index pattern aIndex=something*");
+	var __search    = _$(search).isMap("Search needs to be a map.").default(__);
 	var func        = _$(aOutputFunc).isFunction("OutputFunc needs to be a function.").$_("Please provide aOutputFunc");
 	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
 		aLogFunc = () => {};
@@ -656,7 +657,7 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 
 	var __iniBulk = [];
 	for(var ii = 0; ii < __threads; ii++) {
-        var res = this.createScroll(__index, void 0, __batchSize, void 0, ii, __threads);
+        var res = this.createScroll(__index, __search, __batchSize, void 0, ii, __threads);
         res.__index = ii + 1;
 		__iniBulk.push(res);
 		aLogFunc({
@@ -814,7 +815,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
  */
 ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	aMap = _$(aMap).isMap().default({});
-	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads;
+	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads, search = aMap.search;
 
 	if (isUnDef(aLogFunc)) {
 		aLogFunc = (r) => {
@@ -832,7 +833,8 @@ ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	}, {
 		logFunc: aLogFunc, 
 		batchSize: batchSize, 
-		numThreads: numThreads
+		numThreads: numThreads,
+		search: search
 	});
 
 	wstream.close();
