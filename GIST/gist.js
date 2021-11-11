@@ -15,7 +15,7 @@ ow.ch.__types.gist = {
     },
     forEach      : function(aName, aFunction, x) {
         var keys = this.getKeys(aName);
-        for(let o in keys) {
+        for(var o in keys) {
             aFunction(keys[o], this.get(aName, keys[o]));
         }
     },
