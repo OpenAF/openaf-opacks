@@ -663,7 +663,7 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 		aLogFunc({
 			op: "init",
 			threadId: res.__index,
-			totalThread: isDef(__iniBulk[ii].hits.total) ? __iniBulk[ii].hits.total : __
+			totalThread: isDef(__iniBulk[ii].hits) && isDef(__iniBulk[ii].hits.total) ? __iniBulk[ii].hits.total : __
 		});
 	}
 	
