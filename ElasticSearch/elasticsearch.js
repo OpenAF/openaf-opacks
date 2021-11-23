@@ -733,7 +733,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 
 	batchSize = _$(batchSize).isNumber().default(9 * 1024 * 1024);
 	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
-	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(j)); });
+	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(sortMapKeys(j), __, "")); });
 	idKey = _$(idKey).default("id");
 	_$(aTransformFn).isFunction();
 
@@ -808,7 +808,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 
 /**
  * <odoc>
- * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aLogFunc, aBatchSize, aNumThreads)</key>
+ * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aMap)</key>
  * Given the provided aIndex uses ElasticSearch.exportIndex to generate a NDJSON on aFilename. Additionally you can provide aMap.logFunc, aMap.batchSize and
  *  aMap.numThreads. See help for ElasticSearch.exportIndex for more.
  * </odoc>
