@@ -130,6 +130,62 @@ ElasticSearch.prototype.createIndex = function(aIndex, aNumberOfShards, aNumberO
 	return $rest(this.restmap).put(this.url + "/" + aIndex, options);
 };
 
+ElasticSearch.prototype.alias = function() {
+	var _ops = [];
+
+	var _o = {
+		list: () => {
+			return $rest(this.restmap).get(this.url + "/_aliases")
+		},
+		get: (anAlias) => {
+			return _o.list()[anAlias]
+		},
+		exec: () => {
+			return $rest(this.restmap).post(this.url + "/_aliases", { actions: _ops })
+		},
+		add: (anAlias, anIndex, isReadOnly, extraOptions) => {
+			var r = {
+				add: {
+					index: !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __,
+					alias  : !isArray(anAlias) ? anAlias : __,
+					aliases: isArray(anAlias) ? anAlias : __,
+					is_write_index: !isReadOnly ? true : false
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		},
+		removeIndex: (anIndex, extraOptions) => {
+			var r
+			r = {
+				remove_index: {
+					index  : !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		},
+		remove: (anAlias, anIndex, shouldDelete, extraOptions) => {
+			var r = {
+				remove: {
+					index  : !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __,
+					alias  : !isArray(anAlias) ? anAlias : __,
+					aliases: isArray(anAlias) ? anAlias : __
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		}
+	}
+	return _o
+}
+
 /**
  * <odoc>
  * <key>ElasticSearch.deleteIndex(aIndex) : Map</key>
@@ -451,8 +507,8 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 	}
 };
 
-ElasticSearch.prototype.getAllocation = function(useBytes) {
-	return $rest(this.restmap).get(this.url + "/_cat_allocation?format=json" + (useBytes ? "&bytes=b" : ""));
+ElasticSearch.prototype.getAllocation = function(anIndex, useBytes) {
+	return $rest(this.restmap).get(this.url + "/_cat/allocation?format=json" + (useBytes ? "&bytes=b" : ""));
 };
 
 ElasticSearch.prototype.getSettings = function() {
