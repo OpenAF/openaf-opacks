@@ -797,7 +797,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			aLogFunc = () => {};
 	}
 
-	var res, h = new ow.obj.http();
+	var res;
 	function sendBulk(tdata) {		
 		var uuid = genUUID();
 		try {
@@ -809,12 +809,15 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			var h = new ow.obj.http();
 			if (isDef(parent.user)) h.login(parent.user, parent.pass);
 			res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
-			if (jsonParse(res.response).errors) throw "Errors on bulk operation";
+			if (isString(res.response)) {
+				var _em = jsonParse(res.response, true)
+				if (isMap(_em) && isDef(_em.errors) && _em.errors == true) throw "Errors on bulk operation";
+			}
 			if (isDef(aLogFunc)) aLogFunc({
 				op: "done",
 				uuid: uuid,
 				size: tdata.length,
-				result: jsonParse(res.response)
+				result: jsonParse(res.response, true)
 			});
 		} catch(e) {
 			try{
