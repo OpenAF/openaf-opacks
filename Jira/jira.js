@@ -209,6 +209,25 @@ JIRA.prototype.getIssue = function(aIssueId) {
         { cookie: this.session });
 };
 
+
+/**
+ * <odoc>
+ * <key>JIRA.getExternalIssuesOfIssue(aIssueId) : Map</key>
+ * Returns the External references for a JIRA issue in a map.
+ * </odoc>
+ */
+JIRA.prototype.getExternalIssuesOfIssue = function(aIssueId) {
+    return ow.obj.rest.jsonGet(this.url + "/rest/api/latest/issue/" + aIssueId+ "/remotelink",
+        {},
+        void 0,
+        void 0,
+        void 0,
+        { cookie: this.session });
+};
+
+
+
+
 /**
  * <odoc>
  * <key>JIRA.browseIssue(aIssueId)</key>
