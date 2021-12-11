@@ -1,38 +1,38 @@
-author: Nuno Aguiar
+author: Nuno Aguiar, Miguel Fernandes
 scripts:
   preerase: ''
   posterase: ''
   preinstall: ''
   postinstall: ''
 keywords:
-  - jira
+- jira
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/Jira.opack'
+  url: https://openaf.io/opacks/Jira.opack
 description: Wrapper for the JIRA REST API
 name: Jira
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20190614
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: 20211210
 dependencies:
   openaf: '>=20180601'
 files:
-  - .odoc.db
-  - .package.yaml
-  - jira.js
-  - jira.yaml
-  - README.md
-  - templates/subTaskCreate.yaml
-  - templates/taskCreate.yaml
-  - templates/taskDone.yaml
+- jira.yaml
+- templates/taskDone.yaml
+- templates/taskCreate.yaml
+- templates/subTaskCreate.yaml
+- .package.yaml
+- README.md
+- jira.js
+- .odoc.db
 filesHash:
-  .odoc.db: 6b8717366d7d7e424e6256671f0524634c45a50b
-  jira.js: 502cbd2b2226e6212d38084421b836d7788eebce
   jira.yaml: 6bc16bda81544b6fed9947fa552bf2ec4bf46da1
-  README.md: 537ba48f3f24cf9b15984008ffa28ed960f9f0ec
-  templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
-  templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
   templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38
+  templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
+  templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
+  README.md: 537ba48f3f24cf9b15984008ffa28ed960f9f0ec
+  jira.js: 0f27bf7e31c864248f4daaf749100cc6f35579ed
+  .odoc.db: 8887754139201114f0da808026bf54c61b6db527
