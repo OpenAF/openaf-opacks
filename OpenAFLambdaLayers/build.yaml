@@ -3,7 +3,7 @@
 
 ojob:
   argsFromEnvs: true
-  async       : true
+  #async       : true
 
 todo:
   - Get jvm
@@ -21,10 +21,6 @@ jobs:
       log("Downloading jre...");
       var arch = _$(args.arch, "arch").default("x64") // or aarch64
       $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/11/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
-      //var o = ow.obj.rest.jsonGet("https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&type=jre&heap_size=normal&release=latest");
-      //var si = h.get(o[0].binary_link, __, __, true, __, true);
-      //var so = io.writeFileStream("jre.tgz");
-      //ioStreamCopy(so, si);
 
   #---------------------
   - name: Uncompress JRE
