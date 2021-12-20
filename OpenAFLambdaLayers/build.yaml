@@ -19,9 +19,10 @@ jobs:
       var h = new ow.obj.http();
       
       log("Downloading jre...");
-      $rest().get2File("jre.tgz", "https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&type=jre&heap_size=normal&release=latest");
+      var arch = _$(args.arch, "arch").default("x64") // or aarch64
+      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/11/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
       //var o = ow.obj.rest.jsonGet("https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&type=jre&heap_size=normal&release=latest");
-      //var si = h.get(o[0].binary_link, void 0, void 0, true, void 0, true);
+      //var si = h.get(o[0].binary_link, __, __, true, __, true);
       //var so = io.writeFileStream("jre.tgz");
       //ioStreamCopy(so, si);
 
@@ -31,8 +32,8 @@ jobs:
       ow.loadFormat();
       log("Uncompressing...");
       io.rm("jre");
-      sh("tar xzf jre.tgz", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("untar jre"));
-      sh("mv jdk*jre jre", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("mv jre"));
+      sh("tar xzf jre.tgz", __, __, false, __, __, ow.format.streamSHPrefix("untar jre"));
+      sh("mv jdk*jre jre", __, __, false, __, __, ow.format.streamSHPrefix("mv jre"));
       io.rm("jre.tgz");
  
   #------------------------------
@@ -51,7 +52,7 @@ jobs:
       ow.loadFormat();
       log("Repack JRE...");
       io.rm("minijvm.zip");
-      sh("zip -9r minijvm.zip jre", void 0, void 0, false, void 0, void 0, ow.format.streamSHPrefix("unzip jre"));
+      sh("zip -9r minijvm.zip jre", __, __, false, __, __, ow.format.streamSHPrefix("unzip jre"));
       //io.rm("jre");
       log("Built minijvm.zip.");
 
@@ -77,13 +78,13 @@ jobs:
       var h = new ow.obj.http();
 
       log("Downloading openaf...");
-      var si = h.get("https://openaf.io/nightly/openaf.jar", void 0, void 0, false, void 0, true);
-      //var si = h.get("https://openaf.io/openaf.jar", void 0, void 0, false, void 0, true);
+      var si = h.get("https://openaf.io/nightly/openaf.jar", __, __, false, __, true);
+      //var si = h.get("https://openaf.io/openaf.jar", __, __, false, __, true);
       var so = io.writeFileStream("openaf.jar.orig");
       ioStreamCopy(so, si);
 
-      si = h.get("https://openaf.io/nightly/openaf.jar.repacked", void 0, void 0, false, void 0, true);
-      //si = h.get("https://openaf.io/openaf.jar.repacked", void 0, void 0, false, void 0, true);
+      si = h.get("https://openaf.io/nightly/openaf.jar.repacked", __, __, false, __, true);
+      //si = h.get("https://openaf.io/openaf.jar.repacked", __, __, false, __, true);
       so = io.writeFileStream("openaf.jar");
       ioStreamCopy(so, si);
 
@@ -98,7 +99,7 @@ jobs:
       ow.loadFormat();
       log("Preparing openaf...");
       global.jvmargs = " ";
-      sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --repack", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix("oaf repack"));
+      sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --repack", __, __, true, __, __, ow.format.streamSHPrefix("oaf repack"));
       sh("rm openaf/openaf.jar.orig");
       //sleep(2500, true);
       log("Done preparing openaf.");
@@ -113,7 +114,7 @@ jobs:
       var pcks = String(args.OPACKS).split(/,/);
       if (isArray(pcks)) {
         pcks.forEach((v) => {
-          sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", void 0, void 0, true, void 0, void 0, ow.format.streamSHPrefix(v));
+          sh("jre/bin/java " + global.jvmargs + " -jar openaf/openaf.jar --opack -e \"install " + v + "\"", __, __, true, __, __, ow.format.streamSHPrefix(v));
         });
         if (isDef(loadCompiled)) {
           $from(io.listFiles("openaf").files)
@@ -121,16 +122,20 @@ jobs:
           .select(r => {
             if (io.fileExists(r.canonicalPath + "/.precompile")) { 
               log("Precompile " + r.canonicalPath + "/.precompile");
-              io.readFileYAML(r.canonicalPath + "/.precompile").map(r2 => { loadCompiled(r.canonicalPath + "/" + r2, void 0, true); }); 
+              io.readFileYAML(r.canonicalPath + "/.precompile").map(r2 => { loadCompiled(r.canonicalPath + "/" + r2, __, true); }); 
             }
           })
         }
-      };
+      }
+
+      $sh("jre/bin/java " + global.jvmargs + " -Djava.system.class.loader=openaf.OAFdCL -jar openaf/openaf.jar --ojob -e ojob.io/opack/compileOPacks")
+      .prefix("compileOPacks")
+      .get()
 
       io.rm("openaf/openaf.jar");
       io.rm("openaf-opacks.zip");
       sh("chmod -R a+rw openaf");
-      sh("zip -9r openaf-opacks.zip openaf", void 0, void 0, true);
+      sh("zip -9r openaf-opacks.zip openaf", __, __, true);
 
   #--------------------
   - name: Repack openaf
@@ -139,12 +144,12 @@ jobs:
       sh("chmod -R a+rw openaf");
       sh("chmod 755 bootstrap");
       if (isDef(loadCompiled)) {
-        loadCompiled("lambda.js", void 0, true);
-        sh("zip -9r openaf.zip .openaf_precompiled", void 0, void 0, true);
+        loadCompiled("lambda.js", __, true);
+        sh("zip -9r openaf.zip .openaf_precompiled", __, __, true);
       }
-      sh("zip -9r openaf.zip openaf", void 0, void 0, true);
-      sh("zip -9r openaf.zip lambda.js", void 0, void 0, true);
-      sh("zip -9r openaf.zip bootstrap", void 0, void 0, true);
+      sh("zip -9r openaf.zip openaf", __, __, true);
+      sh("zip -9r openaf.zip lambda.js", __, __, true);
+      sh("zip -9r openaf.zip bootstrap", __, __, true);
       log("Built openaf.zip.");
       //io.rm("openaf/openaf.jar");
 
