@@ -5,31 +5,30 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - reverse
-  - proxy
+- reverse
+- proxy
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/DRProxy'
-  url: 'https://openaf.io/opacks/DRProxy.opack'
-description: >-
-  DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs
-  communication. It allows the interception of pre-proxy and post-proxy requests
-  for any debug need.
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/DRProxy
+  url: https://openaf.io/opacks/DRProxy.opack
+description: DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs communication. It allows the interception of pre-proxy and post-proxy requests for any debug need.
 name: DRProxy
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20180114'
 dependencies:
   OpenAF: '>=20180114'
 files:
-  - drproxy.js
-  - .package.yaml
-  - .odoc.db
-  - README.md
+- .precompile
+- .package.yaml
+- README.md
+- drproxy.js
+- .odoc.db
 filesHash:
+  .precompile: d3c6980a666d0a9184f9f8e4594e3c0c8297b17d
+  README.md: cd86592bb2eab20b0203ffc920e9b634c06f5c31
   drproxy.js: 75dd837bcd77e41d60bd00a0bf447aebdd8d4c54
   .odoc.db: 808e2380a9a1dbc55ebf1ba1838775a5fb0f4102
-  README.md: cd86592bb2eab20b0203ffc920e9b634c06f5c31

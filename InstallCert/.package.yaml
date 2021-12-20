@@ -5,32 +5,34 @@ scripts:
   preerase: ''
   preinstall: ''
 keywords:
-  - ssl
-  - installcert
-  - keytool
-  - https
+- ssl
+- installcert
+- keytool
+- https
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/InstallCert'
-  url: 'https://openaf.io/opacks/InstallCert.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/InstallCert
+  url: https://openaf.io/opacks/InstallCert.opack
 description: Easy local installation of SSL certificates.
 name: InstallCert
 main: InstallCert.js
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20171029'
 dependencies:
   OpenAF: '>=20170601'
 files:
-  - .package.yaml
-  - InstallCert.js
-  - lib/InstallCert.class
-  - lib/InstallCert$SavingTrustManager.class
-  - src/InstallCert.java
+- .precompile
+- lib/InstallCert.class
+- lib/InstallCert$SavingTrustManager.class
+- .package.yaml
+- InstallCert.js
+- src/InstallCert.java
 filesHash:
-  InstallCert.js: cbbfb69b915edf41bdf897c3cceaa1761e876acd
+  .precompile: b5c68e8b86437dac53afa939bd94eadbfa83b1a8
   lib/InstallCert.class: 8cb550436fffa51b2a5ccc99083428b39d498c4c
   lib/InstallCert$SavingTrustManager.class: 29e86e17db020084290974bf6e4b170a96e64698
+  InstallCert.js: cbbfb69b915edf41bdf897c3cceaa1761e876acd
   src/InstallCert.java: d8771d979c110e7765bec059e46addde2b633349

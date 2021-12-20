@@ -6,28 +6,30 @@ scripts:
   preinstall: ''
 keywords: []
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/XChart'
-  url: 'https://openaf.io/opacks/XChart.opack'
-description: >-
-  Provides a wrapper to use the XChart java charts library. Allows the creation
-  of png (or others) images of charts and html/css inline images of charts.
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/XChart
+  url: https://openaf.io/opacks/XChart.opack
+description: Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.
 name: XChart
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20170322'
 dependencies: {}
 files:
-  - .package.yaml
-  - lib/xchart-3.5.0.jar
-  - README.md
-  - test/test.html
-  - xchart.js
+- .precompile
+- xchart.js
+- lib/xchart-3.5.0.jar
+- lib/LICENSE
+- test/test.html
+- .package.yaml
+- README.md
 filesHash:
-  lib/xchart-3.5.0.jar: eafda298e7c2ef757089838debd7e10cf2573442
-  README.md: d3be56de158415aa82440b10826be28c4f7a3ea0
-  test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
+  .precompile: 385bd4e4b141d74d6074c035ba192d8acadf2c24
   xchart.js: 2edc516fa89aca4812bc3d4f88ecc8cefc242bac
+  lib/xchart-3.5.0.jar: eafda298e7c2ef757089838debd7e10cf2573442
+  lib/LICENSE: 3809b4e8be6b906334959cac98d49bb09e6ba93f
+  test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
+  README.md: d3be56de158415aa82440b10826be28c4f7a3ea0

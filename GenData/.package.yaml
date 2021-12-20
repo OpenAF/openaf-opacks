@@ -5,129 +5,128 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - generate
-  - dummy
-  - data
+- generate
+- dummy
+- data
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/GenData.opack'
-description: >-
-  Helps in the quick generation of dummy data with already provided lists,
-  custom lists, already provided functions (including telecom functions) and
-  lists.
+  url: https://openaf.io/opacks/GenData.opack
+description: Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.
 name: GenData
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20201117'
 dependencies:
   openaf: '>=20200801'
 files:
-  - genData.js
-  - lists/clients/list_clients.db
-  - lists/clients/list_emaildomains.db
-  - lists/clients/list_companies.yaml
-  - lists/clients/list_companies.db
-  - lists/clients/list_emails.db
-  - lists/clients/list_addresses.db
-  - lists/clients/list_names.yaml
-  - lists/clients/list_clients.yaml
-  - lists/clients/list_emaildomains.yaml
-  - lists/clients/list_addresses.yaml
-  - lists/clients/list_names.db
-  - lists/clients/list_emails.yaml
-  - lists/products/list_products_computer_peripherals.yaml
-  - lists/products/list_products_electronics.yaml
-  - lists/products/list_products_sweets.db
-  - lists/products/list_products_retail.db
-  - lists/products/list_products_sweets.yaml
-  - lists/products/list_products_mobile_phone_store.db
-  - lists/products/list_products_electronics.db
-  - lists/products/list_products_electrical.yaml
-  - lists/products/list_products_retail.yaml
-  - lists/products/list_products_computer_peripherals.db
-  - lists/products/list_products_mobile_phone_store.yaml
-  - lists/products/list_food.yaml
-  - lists/products/list_food.db
-  - lists/products/list_products_electrical.db
-  - lists/other/list_things.db
-  - lists/other/list_things.yaml
-  - lists/telecom/list_phoneOperators.yaml
-  - lists/telecom/list_phonePatterns.yaml
-  - lists/telecom/list_phoneTACs.db
-  - lists/telecom/list_phoneOperators.db
-  - lists/telecom/list_phonePatterns.db
-  - lists/telecom/list_iin.db
-  - lists/telecom/list_phoneTACs.yaml
-  - lists/telecom/list_phonePrefixes.db
-  - lists/telecom/list_iin.yaml
-  - lists/telecom/list_phonePrefixes.yaml
-  - .package.yaml
-  - utils/genHelp.js
-  - utils/telecom/getPhonePatterns.js
-  - utils/yaml2mvs.yaml
-  - .odoc.db
-  - docs/Examples.md
-  - libs/update.js
-  - libs/generex-1.0.2.jar
-  - libs/automaton-1.11-8.jar
-  - README.md
-  - funcs/baseFuncs.js
-  - funcs/telecomFuncs.js
-  - funcs/clientFuncs.js
-  - funcs/baseGens.js
+- lists/clients/list_clients.yaml
+- lists/clients/list_names.yaml
+- lists/clients/list_emaildomains.db
+- lists/clients/list_names.db
+- lists/clients/list_emails.yaml
+- lists/clients/list_addresses.db
+- lists/clients/list_emails.db
+- lists/clients/list_emaildomains.yaml
+- lists/clients/list_companies.db
+- lists/clients/list_clients.db
+- lists/clients/list_companies.yaml
+- lists/clients/list_addresses.yaml
+- lists/telecom/list_iin.yaml
+- lists/telecom/list_phonePatterns.yaml
+- lists/telecom/list_phoneOperators.db
+- lists/telecom/list_phoneTACs.yaml
+- lists/telecom/list_phoneTACs.db
+- lists/telecom/list_phonePrefixes.yaml
+- lists/telecom/list_iin.db
+- lists/telecom/list_phoneOperators.yaml
+- lists/telecom/list_phonePatterns.db
+- lists/telecom/list_phonePrefixes.db
+- lists/products/list_food.yaml
+- lists/products/list_products_computer_peripherals.yaml
+- lists/products/list_products_electrical.db
+- lists/products/list_products_computer_peripherals.db
+- lists/products/list_products_sweets.yaml
+- lists/products/list_products_electronics.yaml
+- lists/products/list_products_electrical.yaml
+- lists/products/list_products_mobile_phone_store.db
+- lists/products/list_food.db
+- lists/products/list_products_retail.yaml
+- lists/products/list_products_mobile_phone_store.yaml
+- lists/products/list_products_sweets.db
+- lists/products/list_products_retail.db
+- lists/products/list_products_electronics.db
+- lists/other/list_things.yaml
+- lists/other/list_things.db
+- funcs/baseFuncs.js
+- funcs/telecomFuncs.js
+- funcs/clientFuncs.js
+- funcs/baseGens.js
+- .precompile
+- libs/automaton-1.11-8.jar
+- libs/update.js
+- libs/generex-1.0.2.jar
+- .package.yaml
+- genData.js
+- README.md
+- utils/telecom/getPhonePatterns.js
+- utils/yaml2mvs.yaml
+- utils/genHelp.js
+- docs/Examples.md
+- .odoc.db
 filesHash:
-  genData.js: 74ce26584b71dafde8282a4c56a7dc74e17da190
-  lists/clients/list_clients.db: d10e8367ea70cfe704c5861f89c08253f6f88bee
-  lists/clients/list_emaildomains.db: fcc7fb6f4e7421ddff30e74f4cc1eff4fdb17ec2
-  lists/clients/list_companies.yaml: f92b8a48acbea50fa4c88a8c30b435da0e2583b1
-  lists/clients/list_companies.db: f47664971b22c3229dad2d667c8bfdf202c848d2
-  lists/clients/list_emails.db: d48b2142ad8389c1bf46c0cceabb55d2009e7a11
-  lists/clients/list_addresses.db: f060e05a9ac7e0b7db92547c904959fbb870f87d
-  lists/clients/list_names.yaml: 6c688567212138b28d85e839771b1b533d63cde0
   lists/clients/list_clients.yaml: ffb4652ce2884ccf21b8ba5a1aa76e6f9086a3a1
-  lists/clients/list_emaildomains.yaml: ca9c48a559ce3c41366f3ce83ef2cc01eee7638a
-  lists/clients/list_addresses.yaml: 8b80d62a8ce1a12dbc9822ca58dbcc793029ba59
+  lists/clients/list_names.yaml: 6c688567212138b28d85e839771b1b533d63cde0
+  lists/clients/list_emaildomains.db: fcc7fb6f4e7421ddff30e74f4cc1eff4fdb17ec2
   lists/clients/list_names.db: 65c0b20fcef9c18cc7eb0747027ce259d5effea1
   lists/clients/list_emails.yaml: 24723fc932bf8452ace8113bbdedc15b5cd23c16
+  lists/clients/list_addresses.db: f060e05a9ac7e0b7db92547c904959fbb870f87d
+  lists/clients/list_emails.db: d48b2142ad8389c1bf46c0cceabb55d2009e7a11
+  lists/clients/list_emaildomains.yaml: ca9c48a559ce3c41366f3ce83ef2cc01eee7638a
+  lists/clients/list_companies.db: f47664971b22c3229dad2d667c8bfdf202c848d2
+  lists/clients/list_clients.db: d10e8367ea70cfe704c5861f89c08253f6f88bee
+  lists/clients/list_companies.yaml: f92b8a48acbea50fa4c88a8c30b435da0e2583b1
+  lists/clients/list_addresses.yaml: 8b80d62a8ce1a12dbc9822ca58dbcc793029ba59
+  lists/telecom/list_iin.yaml: 74b517959cf40a2f775e7374e7c31dd393e486e1
+  lists/telecom/list_phonePatterns.yaml: d95bb6201f595fbed4f98608c0766e4af5feedb6
+  lists/telecom/list_phoneOperators.db: b3e71c008060aa063a89e550678101906c4c085c
+  lists/telecom/list_phoneTACs.yaml: 6007724d703f1291c12450e2274f3f327742d7a1
+  lists/telecom/list_phoneTACs.db: 1b644dc7b470657fe38e362f116c0dc9057ef07d
+  lists/telecom/list_phonePrefixes.yaml: bd3202695fd55ec6c342785c2811b5ae55a75118
+  lists/telecom/list_iin.db: 8053026b3365de933e7fa91d5b42d4a92bbc25a2
+  lists/telecom/list_phoneOperators.yaml: aeaf8e6bab379867902548f55b1d56f2a73072ce
+  lists/telecom/list_phonePatterns.db: b1a663cdd531c9586f2d935504ecc8ecba931681
+  lists/telecom/list_phonePrefixes.db: fe6e6011f8298a17dcfe690532ec610b9a7b63cd
+  lists/products/list_food.yaml: 85c0aa4e65d1369dc33e8e9769c8860693cc84bb
   lists/products/list_products_computer_peripherals.yaml: 2357fcf7f6866bdcedfb6925c897a46ba92765e1
+  lists/products/list_products_electrical.db: 84e21cf5b828fdf70ccbc556a665856304e6b70e
+  lists/products/list_products_computer_peripherals.db: c25812c22e6e31db2c7185f335d5c773ef0465cd
+  lists/products/list_products_sweets.yaml: e55158069d89b73b0992fb946e94d1b0bb9f86ab
   lists/products/list_products_electronics.yaml: ac23311d9817c5c45904b138e086afb1a4a53d08
+  lists/products/list_products_electrical.yaml: 121e6d901583c932c8682a821e014d079c280a17
+  lists/products/list_products_mobile_phone_store.db: f63c42cee26013fac9deabd6403ad5489b0764fe
+  lists/products/list_food.db: 1ae48ca58c98cd060e3e97406e7d3fce6fd75612
+  lists/products/list_products_retail.yaml: af39602f8eb536ea33a2f8786a8f88d62f84b0df
+  lists/products/list_products_mobile_phone_store.yaml: 4ef001bbee00c52ddf16f056cf22bd1ff75dce11
   lists/products/list_products_sweets.db: 747318142e85b7405a7afcd33df935bd2a1fd74a
   lists/products/list_products_retail.db: 8f5a9074d41fe250b84b108a964ee01bb95fd06d
-  lists/products/list_products_sweets.yaml: e55158069d89b73b0992fb946e94d1b0bb9f86ab
-  lists/products/list_products_mobile_phone_store.db: f63c42cee26013fac9deabd6403ad5489b0764fe
   lists/products/list_products_electronics.db: d76cd6ea3a6d8bd153ea4eb6c50a383fb386f1e4
-  lists/products/list_products_electrical.yaml: 121e6d901583c932c8682a821e014d079c280a17
-  lists/products/list_products_retail.yaml: af39602f8eb536ea33a2f8786a8f88d62f84b0df
-  lists/products/list_products_computer_peripherals.db: c25812c22e6e31db2c7185f335d5c773ef0465cd
-  lists/products/list_products_mobile_phone_store.yaml: 4ef001bbee00c52ddf16f056cf22bd1ff75dce11
-  lists/products/list_food.yaml: 85c0aa4e65d1369dc33e8e9769c8860693cc84bb
-  lists/products/list_food.db: 1ae48ca58c98cd060e3e97406e7d3fce6fd75612
-  lists/products/list_products_electrical.db: 84e21cf5b828fdf70ccbc556a665856304e6b70e
-  lists/other/list_things.db: 00d89493d86e03937caf1ad68b467be4a97037cc
   lists/other/list_things.yaml: a9fe74a38bac34f908480a9d9ba48e7e4f2b430a
-  lists/telecom/list_phoneOperators.yaml: aeaf8e6bab379867902548f55b1d56f2a73072ce
-  lists/telecom/list_phonePatterns.yaml: d95bb6201f595fbed4f98608c0766e4af5feedb6
-  lists/telecom/list_phoneTACs.db: 1b644dc7b470657fe38e362f116c0dc9057ef07d
-  lists/telecom/list_phoneOperators.db: b3e71c008060aa063a89e550678101906c4c085c
-  lists/telecom/list_phonePatterns.db: b1a663cdd531c9586f2d935504ecc8ecba931681
-  lists/telecom/list_iin.db: 8053026b3365de933e7fa91d5b42d4a92bbc25a2
-  lists/telecom/list_phoneTACs.yaml: 6007724d703f1291c12450e2274f3f327742d7a1
-  lists/telecom/list_phonePrefixes.db: fe6e6011f8298a17dcfe690532ec610b9a7b63cd
-  lists/telecom/list_iin.yaml: 74b517959cf40a2f775e7374e7c31dd393e486e1
-  lists/telecom/list_phonePrefixes.yaml: bd3202695fd55ec6c342785c2811b5ae55a75118
-  utils/genHelp.js: 0b164ab05cc50456ceed72d715736b55fd0ddba2
-  utils/telecom/getPhonePatterns.js: fc03e02f68c8878313701934119da905994e9f5f
-  utils/yaml2mvs.yaml: 93e2764203a92de4331f96d98e0e89c35fbd79b1
-  .odoc.db: f95ae5f2493b30e1b85527c3432f8838f9bc6f21
-  docs/Examples.md: 9a03a896e2abb764b05f7af437122b3b439984f3
-  libs/update.js: a0ed4cbd814352784cdbdde05deea39a9b49c0eb
-  libs/generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
-  libs/automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
-  README.md: 8562dfcf5f6c280528f5a5db81317c62f680081d
+  lists/other/list_things.db: 00d89493d86e03937caf1ad68b467be4a97037cc
   funcs/baseFuncs.js: a4d348275eb7f769a0ca22dde5223547cc525f76
   funcs/telecomFuncs.js: 6a54cb0b3238c19939501b12279597d2f3b7e49b
   funcs/clientFuncs.js: b779a895d4a49fafafe995d29872269478d5b0f8
   funcs/baseGens.js: f27ac5ed60e146304cce6ddf78f54542ba241bd9
+  .precompile: 9e07ce425349dfd0036610b26fa0eb3313fc54cb
+  libs/automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
+  libs/update.js: a0ed4cbd814352784cdbdde05deea39a9b49c0eb
+  libs/generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
+  genData.js: 74ce26584b71dafde8282a4c56a7dc74e17da190
+  README.md: 8562dfcf5f6c280528f5a5db81317c62f680081d
+  utils/telecom/getPhonePatterns.js: fc03e02f68c8878313701934119da905994e9f5f
+  utils/yaml2mvs.yaml: 93e2764203a92de4331f96d98e0e89c35fbd79b1
+  utils/genHelp.js: 0b164ab05cc50456ceed72d715736b55fd0ddba2
+  docs/Examples.md: 9a03a896e2abb764b05f7af437122b3b439984f3
+  .odoc.db: f95ae5f2493b30e1b85527c3432f8838f9bc6f21

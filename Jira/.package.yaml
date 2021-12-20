@@ -21,6 +21,7 @@ dependencies:
   openaf: '>=20180601'
 files:
 - jira.yaml
+- .precompile
 - templates/taskDone.yaml
 - templates/taskCreate.yaml
 - templates/subTaskCreate.yaml
@@ -30,6 +31,7 @@ files:
 - .odoc.db
 filesHash:
   jira.yaml: 6bc16bda81544b6fed9947fa552bf2ec4bf46da1
+  .precompile: 12e814ce8a61ba32b276df688984540cbf675ead
   templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38
   templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
   templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c

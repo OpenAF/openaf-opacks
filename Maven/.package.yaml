@@ -5,26 +5,28 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - maven
-  - maven2
+- maven
+- maven2
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Maven'
-  url: 'https://openaf.io/opacks/Maven.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Maven
+  url: https://openaf.io/opacks/Maven.opack
 description: A Maven2 repositories access wrapper to get or update existing artifacts/jars.
 name: Maven
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20181018'
 dependencies:
   OpenAF: '>=20180601'
 files:
-  - .odoc.db
-  - maven.js
-  - .package.yaml
+- .precompile
+- maven.js
+- .package.yaml
+- .odoc.db
 filesHash:
-  .odoc.db: 0c49b03bd63346873f57803b2ba4a9bf204aa828
-  maven.js: a7d593e1c6394f36e87a850938bd42f44c6d7a3f
+  .precompile: 4a18627431df72418344ca16b0e89267483a5d92
+  maven.js: a6b99123cfeda491d4a8406b93a9c0aac6c94e7b
+  .odoc.db: 0a99ac83d31fcdb75693dd525233261288c37dc5

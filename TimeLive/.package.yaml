@@ -5,26 +5,28 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - timelive
+- timelive
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/TimeLive.opack'
+  url: https://openaf.io/opacks/TimeLive.opack
 description: Wrapper for TimeLive timesheets API
 name: TimeLive
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20200220'
 dependencies:
   openaf: '>=20200101'
 files:
-  - .odoc.db
-  - .package.yaml
-  - README.md
-  - timelive.js
+- .precompile
+- .package.yaml
+- README.md
+- timelive.js
+- .odoc.db
 filesHash:
-  .odoc.db: 8cde8ad09c0e765d19d6e09665c7d70e74eaed22
+  .precompile: 3a1a8fd90a7cab7b770cf7dc433c790632364874
   README.md: 2cfbc2bcafe117e5c6169ffe8f828718bc497982
   timelive.js: 7895748ba8ffd25568da4d93fb501993039dce7e
+  .odoc.db: 8cde8ad09c0e765d19d6e09665c7d70e74eaed22

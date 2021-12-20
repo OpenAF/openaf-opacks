@@ -32,43 +32,43 @@ version: '20210802'
 dependencies:
   OpenAF: '>=20210515'
 files:
-- aws_pi.js
-- .package.yaml
-- aws_ecs.js
-- aws_rds.js
-- aws_sqs.js
-- aws_organizations.js
-- aws_core.js
+- .precompile
 - aws_cloudwatch.js
+- aws_rds.js
+- aws_ec2.js
+- .package.yaml
+- aws_core.js
+- aws_events.js
+- aws_pi.js
+- aws_sqs.js
+- aws_dynamo.js
+- aws_ecs.js
+- aws_lambda.js
 - utils/testRegions.js
 - utils/genTestRegions.yaml
-- aws_ec2.js
-- aws_events.js
-- .precompile
-- aws_dynamo.js
-- .odoc.db
-- aws_lambda.js
-- aws.js
+- aws_organizations.js
+- aws_iam.js
 - aws_cost.js
 - aws_athena.js
-- aws_iam.js
+- .odoc.db
+- aws.js
 filesHash:
-  aws_pi.js: 4dfe2ca9661fc42a9072452005953344c1ee61b2
-  aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
-  aws_rds.js: 15518551361378139b152192e479ef764d741e70
-  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
-  aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
-  aws_core.js: 9d03716818fa09fafae9c2a5cc5e55e4fe4fdfa0
+  .precompile: 21583d38710fe15a116cdff840d3f9fef6d9b617
   aws_cloudwatch.js: 74d44f16e8f39d0b21bcc0253a316114f981ae42
+  aws_rds.js: 15518551361378139b152192e479ef764d741e70
+  aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
+  aws_core.js: 9d03716818fa09fafae9c2a5cc5e55e4fe4fdfa0
+  aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
+  aws_pi.js: 4dfe2ca9661fc42a9072452005953344c1ee61b2
+  aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
+  aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
+  aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
+  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
   utils/testRegions.js: b20c173bddb0ca2960e64ff4ce172fc6a75a5cca
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
-  aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
-  .precompile: 66fe014714ec94ffb45964be5bc2d6ac509da321
-  aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
-  .odoc.db: 59ef58e22fe247f41bc89acc5aebac88783e295c
-  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
-  aws.js: e2a745fa41accff2c7aa656adeb19092a470ff3c
+  aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
+  aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
+  .odoc.db: 59ef58e22fe247f41bc89acc5aebac88783e295c
+  aws.js: e2a745fa41accff2c7aa656adeb19092a470ff3c

@@ -5,16 +5,16 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - Serialize Java Object
-  - Unserialize Java Object
-  - serialize
-  - unserialize
+- Serialize Java Object
+- Unserialize Java Object
+- serialize
+- unserialize
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
   backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/SerializedObjects
-  url: 'https://openaf.io/opacks/SerializedObjects.opack'
+  url: https://openaf.io/opacks/SerializedObjects.opack
 description: Package to Serialize and Unserialize Java Objects
 name: SerializedObjects
 main: ''
@@ -24,7 +24,9 @@ version: '20180706'
 dependencies:
   openaf: '>=20180706'
 files:
-  - .package.yaml
-  - SerializedObjects.js
+- .precompile
+- SerializedObjects.js
+- .package.yaml
 filesHash:
-  SerializedObjects.js: 8595779762e70642c0ee82be6ebc8bd93d131a4d
+  .precompile: 460966577550d5e91e2a4ebcc366b9bf389aa91d
+  SerializedObjects.js: 2dc7bac10d0ffe3a1c112bffe6fc11b75be1ca47

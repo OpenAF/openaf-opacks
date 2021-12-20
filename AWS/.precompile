@@ -11,3 +11,5 @@
 - aws_organizations.js
 - aws_events.js
 - aws_ec2.js
+- aws_athena.js
+- aws_pi.js

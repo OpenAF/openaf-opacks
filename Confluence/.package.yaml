@@ -5,22 +5,24 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - confluence
+- confluence
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/Confluence.opack'
+  url: https://openaf.io/opacks/Confluence.opack
 description: Wrapper for the Confluence REST API
 name: Confluence
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20181113'
 dependencies:
   openaf: '>=20181113'
 files:
-  - .package.yaml
-  - confluence.js
+- .precompile
+- .package.yaml
+- confluence.js
 filesHash:
+  .precompile: 4bbd73b384c173136acae7b62333eb59e149bf86
   confluence.js: eb303ea2020ec6daef321a785e5e72f9c731744c

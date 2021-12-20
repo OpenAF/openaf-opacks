@@ -45,6 +45,7 @@ files:
 - prismjs/prism-properties.min.js
 - prismjs/prism-css.min.js
 - prismjs/prism-javastacktrace.min.js
+- .precompile
 - docsify.js
 - .package.yaml
 - mermaid/mermaid.min.js
@@ -90,6 +91,7 @@ filesHash:
   prismjs/prism-properties.min.js: b9006f745797fd1f1d6b417e535ca746c3a31ed8
   prismjs/prism-css.min.js: 46566648755622f627c36609caa683b7ee3e995a
   prismjs/prism-javastacktrace.min.js: cbbf4e9b63261e809068c5fae2e49212728b5ef1
+  .precompile: c31c80b263e1224bf48f1099e88bc898579cceea
   docsify.js: fae0b2f3621d64260dd59291526dd3d787ee81ae
   mermaid/mermaid.min.js: 06beb645b38a0d6c0cbe719b98ceaf24ef276257
   README.md: 945074de174c1b0e00d56932eeb3866a3cfb3a0e
