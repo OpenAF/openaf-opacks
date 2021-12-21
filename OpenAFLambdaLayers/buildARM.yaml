@@ -1,0 +1,73 @@
+# Author: Nuno Aguiar
+#
+
+ojob:
+  argsFromEnvs: true
+  #async       : true
+
+todo:
+- Get jvm
+- Build minijvm layer
+- Move layers to output
+
+jobs:
+  #-------------------
+  - name: Download JRE
+    exec: |
+      ow.loadObj(); ow.loadFormat();
+      var h = new ow.obj.http();
+
+      log("Downloading jre...");
+      var arch = _$(args.arch, "arch").default("aarch64") // or aarch64
+      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/11/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
+
+  #---------------------
+  - name: Uncompress JRE
+    exec: |
+      ow.loadFormat();
+      log("Uncompressing...");
+      io.rm("jre");
+      sh("tar xzf jre.tgz", __, __, false, __, __, ow.format.streamSHPrefix("untar jre"));
+      sh("mv jdk*jre jre", __, __, false, __, __, ow.format.streamSHPrefix("mv jre"));
+      io.rm("jre.tgz");
+
+  #------------------------------
+  - name: Remove unneed JRE parts
+    exec: |
+      log("Removing unneeded parts...");
+      $sh("rm -rf jre/man")
+      .sh("rm -rf jre/lib/ext/nashorn.jar")
+      .sh("rm -rf jre/lib/images")
+      .sh("rm -rf jre/legal")
+      .exec(0);
+
+  #-----------------
+  - name: Repack JRE
+    exec: |
+      ow.loadFormat();
+      log("Repack JRE...");
+      io.rm("minijvmARM.zip");
+      sh("zip -9r minijvmARM.zip jre", __, __, false, __, __, ow.format.streamSHPrefix("unzip jre"));
+      log("Built minijvmARM.zip.");
+
+
+  #--------------
+  - name: Get jvm
+    to  :
+      - Download JRE
+      - Uncompress JRE
+      - Remove unneed JRE parts
+
+  #--------------------------
+  - name: Build minijvm layer
+    deps:
+      - Get jvm
+    to  :
+      - Repack JRE
+
+  #----------------------------
+  - name: Move layers to output
+    deps:
+    - Build minijvm layer
+    exec: |
+      io.cp("minijvmARM.zip", "/output/minijvmARM.zip");
