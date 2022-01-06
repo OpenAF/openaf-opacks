@@ -28,7 +28,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210802'
+version: '20220105'
 dependencies:
   OpenAF: '>=20210515'
 files:
@@ -63,7 +63,7 @@ filesHash:
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
-  aws_lambda.js: b8c1792e7002483a9e9ef764ceea82bda7d8d16b
+  aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   utils/testRegions.js: b20c173bddb0ca2960e64ff4ce172fc6a75a5cca
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
