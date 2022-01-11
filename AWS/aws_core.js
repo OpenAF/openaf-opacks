@@ -104,7 +104,7 @@ AWS.prototype.getVirtualMFASessionToken = function(aRegion, mfaDeviceARN, aToken
 
 /**
  * <odoc>
- * <key>AWS.convertArray2Attrs(aParameter, anArray) : Map</key>
+ * <key>AWS.convertArray2Attrs(aParameter, anArray, withoutId) : Map</key>
  * Given anArray will convert it to a flatten AWS map for the provided aParameter. Example:\
  * \
  * aws.convertArray2Attrs("test", [ { a: 11, b: true }, { a: 22, b: false } ]);\
@@ -114,15 +114,17 @@ AWS.prototype.getVirtualMFASessionToken = function(aRegion, mfaDeviceARN, aToken
  * // }\
  * </odoc>
  */
-AWS.prototype.convertArray2Attrs = function(aParameter, anArray) {
+AWS.prototype.convertArray2Attrs = function(aParameter, anArray, withoutId) {
+   withoutId = _$(withoutId, "withoutId").isBoolean().default(false)
+
    var res = {};
    for(var ii in anArray) {
-      res[aParameter + "." + (Number(ii) + 1) + ".Id"] = ii;
+      if (!withoutId) res[aParameter + "." + (Number(ii) + 1) + ".Id"] = ii;
       for(var jj in anArray[ii]) {
          if (isArray(anArray[ii][jj])) {
-            res = merge(res, this.convertArray2Attrs(aParameter + "."+ (Number(ii) + 1) + "." + jj, anArray[ii][jj]));
+            res = merge(res, this.convertArray2Attrs(aParameter + "." + (!withoutId ? "" : "member.") + (Number(ii) + 1) + "." + jj, anArray[ii][jj], withoutId));
          } else {
-            res[aParameter + "."+ (Number(ii) + 1) + "." + jj] = anArray[ii][jj];
+            res[aParameter + "." + (!withoutId ? "" : "member.") + (Number(ii) + 1) + "." + jj] = anArray[ii][jj];
          }
       }
    }
