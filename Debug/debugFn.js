@@ -9,7 +9,7 @@ function _debug(aCode, args, returnCode) {
   
   args = _$(args, "args").isMap().default({})
   args.lineColor = _$(args.lineColor, "lineColor").isString().default("FG(220)")
-  args.textColor = _$(args.textColor, "textColor").isString().default("BG(230)")
+  args.textColor = _$(args.textColor, "textColor").isString().default("BG(230),BLACK")
   args.lineError = _$(args.lineError, "lineError").isString().default("FG(220)")
   args.textError = _$(args.textError, "textError").isString().default("BG(196),FG(255),BOLD")
   args.theme     = _$(args.theme, "theme").isString().default("closedCurvedRect")
