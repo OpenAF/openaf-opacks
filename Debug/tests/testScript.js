@@ -1,4 +1,4 @@
-if (getEnv("OAF_DEBUG") == "true") load("debug.js")
+if (isDef(getOPackPath("Debug")) && getEnv("OAF_DEBUG") == "true") loadLib("debug.js"); else _debug = s=>s
 
 //@ Declaring array
 var ar = [ 0, 1, 2, 3, 4, 5 ]

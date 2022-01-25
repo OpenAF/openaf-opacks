@@ -22,11 +22,15 @@ dependencies:
 files:
 - tests/testScript.js
 - tests/testOJob.yaml
-- debug.yaml
-- debug.js
+- tests/testScriptFn.js
 - .package.yaml
+- debug.yaml
+- debugFn.js
+- debug.js
 filesHash:
-  tests/testScript.js: 39d70e8515edd943c40b2796e1ebb3b9c9199208
+  tests/testScript.js: 20d0970b4e2b0fe8060451ec17a1c834e56b245d
   tests/testOJob.yaml: a7ab825e0bdc79e0e7736d6104fdcb50851ab57d
-  debug.yaml: 0f97c0ade55d7e46154f56e92857be42aea2723b
-  debug.js: e22a1a585e78bb5894db526798c4eccbd3dba4d0
+  tests/testScriptFn.js: b4e97ea08280514319c058f817e8087e54efde22
+  debug.yaml: aaef522b21fcd564f031d20d542e3b20123bfc14
+  debugFn.js: 7c00cfc34680f180416437687363e445ffb946b1
+  debug.js: 30063fb7f320506cbfa73d869a8d1c7c1c0605bc
