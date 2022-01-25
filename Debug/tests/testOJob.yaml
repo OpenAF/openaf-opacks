@@ -1,0 +1,29 @@
+jobs:
+# ----------------
+- name: Sample job
+  exec: |
+    //@ Declaring array
+    var ar = [ 0, 1, 2, 3, 4, 5 ]
+
+    //@ Start cycle
+    var ii = 0;
+    while(ii < ar.length) {
+      print("II = " + ii)
+      ii++
+      //# ii == 3
+    }
+    //@ End cycle
+    //? ii
+
+    //?s args
+    //?y args
+    //? IDontExist
+
+    //@ It's all okay... relax...
+
+todo:
+- ojob job debug
+- Sample job
+
+include: 
+- debug.yaml

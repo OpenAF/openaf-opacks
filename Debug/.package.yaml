@@ -1,0 +1,32 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- debug
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Debug.opack
+description: Debug wrapper functionality to transform comments into active debugging
+name: Debug
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220124'
+dependencies:
+  OpenAF: '>=20220124'
+files:
+- tests/testScript.js
+- tests/testOJob.yaml
+- debug.yaml
+- debug.js
+- .package.yaml
+filesHash:
+  tests/testScript.js: 39d70e8515edd943c40b2796e1ebb3b9c9199208
+  tests/testOJob.yaml: a7ab825e0bdc79e0e7736d6104fdcb50851ab57d
+  debug.yaml: 0f97c0ade55d7e46154f56e92857be42aea2723b
+  debug.js: e22a1a585e78bb5894db526798c4eccbd3dba4d0
