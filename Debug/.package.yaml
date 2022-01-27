@@ -40,7 +40,7 @@ filesHash:
   tests/testOJob.yaml: a7ab825e0bdc79e0e7736d6104fdcb50851ab57d
   tests/testScriptFn.js: b4e97ea08280514319c058f817e8087e54efde22
   tests/testScript3.js: fe13b03cd912b164036b1bcad56519e68dcb3342
-  debug.yaml: d69c1c8532de0b442532214fbe57a26cd9619f57
+  debug.yaml: 6ecfcdbcc821b14d8dfb372c1fdfdd281a4bff46
   debugFn.js: 2a8f2d999de68b292bcc39fbb8f9732cc7a40992
   README.md: bbd92d2513f10870f2df25b7b65c31691133b51d
   debug.js: 7653310132d7b82733575bf587fe93050efece4b

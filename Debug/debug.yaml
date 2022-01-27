@@ -44,7 +44,7 @@ jobs:
     args.textColor = _$(args.textColor, "textColor").isString().default("BG(230),BLACK")
     args.lineError = _$(args.lineError, "lineError").isString().default("FG(220)")
     args.textError = _$(args.textError, "textError").isString().default("BG(196),FG(255),BOLD")
-    args.theme     = _$(args.theme, "theme").isString().default("doubleLine")
+    args.theme     = _$(args.theme, "theme").isString().default("doubleLineBothSides")
     args.emoticons = _$(args.emoticons, "emoticons").isBoolean().default(true)
     args.signs     = _$(args.signs, "signs").isMap().default({
       checkpoint: 0x1F37A,
