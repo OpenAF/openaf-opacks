@@ -11,4 +11,5 @@
   }
   
   exports.load = function(aScript) { load(aScript) }
+  exports.require = function(aScript, force) { return require(aScript, force) }
 })();
