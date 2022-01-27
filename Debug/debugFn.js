@@ -3,6 +3,7 @@
 var OAF_DEBUG_ARGS
 
 function _debug(aCode, args, returnCode) {
+  if (isDef(getEnv("OAF_DEBUG_ARGS"))) OAF_DEBUG_ARGS = jsonParse(getEnv("OAF_DEBUG_ARGS"), true)
   if (isMap(OAF_DEBUG_ARGS) && isUnDef(args)) args = OAF_DEBUG_ARGS
   
   returnCode = _$(returnCode, "returnCode").isBoolean().default(false)
@@ -12,7 +13,7 @@ function _debug(aCode, args, returnCode) {
   args.textColor = _$(args.textColor, "textColor").isString().default("BG(230),BLACK")
   args.lineError = _$(args.lineError, "lineError").isString().default("FG(220)")
   args.textError = _$(args.textError, "textError").isString().default("BG(196),FG(255),BOLD")
-  args.theme     = _$(args.theme, "theme").isString().default("closedCurvedRect")
+  args.theme     = _$(args.theme, "theme").isString().default("doubleLine")
   args.emoticons = _$(args.emoticons, "emoticons").isBoolean().default(true)
   args.signs     = _$(args.signs, "signs").isMap().default({
     checkpoint: 0x1F37A,
@@ -39,14 +40,14 @@ function _debug(aCode, args, returnCode) {
   var _m = (s, c) => {
     var _s = ";try{"
     if (isDef(c)) _s += "if(" + c + ") {"
-    var _t = (args.includeTime ? "(new Date()).toISOString() +\" | \" + " : "")
+    var _t = (args.includeTime ? "(new Date()).toISOString() +\" |\" + " : "")
     _s += "cprint(ow.format.withSideLine(" + _t + s + ", __, \"" + args.lineColor + "\", \"" + args.textColor + "\", ow.format.withSideLineThemes()." + args.theme + ")) "
     if (isDef(c)) _s += "}"
     _s += "}catch(__e_debug){cprint(ow.format.withSideLine(" + _t + "' " + sign.error + " ' + String(__e_debug), __, \"" + args.lineError + "\", \"" + args.textError + "\", ow.format.withSideLineThemes()." + args.theme + "))};"
     return _s
   }
 
-  var sign
+  var sign = {}
   if (args.emoticons) {
     sign = args.signs
     if (isNumber(sign.checkpoint)) sign.checkpoint = ow.format.string.unicode(sign.checkpoint)

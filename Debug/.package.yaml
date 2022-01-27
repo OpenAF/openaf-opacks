@@ -21,16 +21,24 @@ dependencies:
   OpenAF: '>=20220124'
 files:
 - tests/testScript.js
+- tests/testScript1.js
+- tests/testScript2.js
 - tests/testOJob.yaml
 - tests/testScriptFn.js
+- tests/testScript3.js
 - .package.yaml
 - debug.yaml
 - debugFn.js
+- README.md
 - debug.js
 filesHash:
-  tests/testScript.js: 20d0970b4e2b0fe8060451ec17a1c834e56b245d
+  tests/testScript.js: c5245bd60ba8867d9ca795d3e5d48537d29fafcc
+  tests/testScript1.js: 1e8641a4db30d3216a73d2c41ce571914b6782a5
+  tests/testScript2.js: 473ca4553256bd5c9f61fe5c49796f9f517d6e02
   tests/testOJob.yaml: a7ab825e0bdc79e0e7736d6104fdcb50851ab57d
   tests/testScriptFn.js: b4e97ea08280514319c058f817e8087e54efde22
-  debug.yaml: aaef522b21fcd564f031d20d542e3b20123bfc14
-  debugFn.js: ec53cbb22de4209de04d95e1c045cf89a09312b9
-  debug.js: 30063fb7f320506cbfa73d869a8d1c7c1c0605bc
+  tests/testScript3.js: fe13b03cd912b164036b1bcad56519e68dcb3342
+  debug.yaml: d69c1c8532de0b442532214fbe57a26cd9619f57
+  debugFn.js: a3296ed2a21624367b0840b7d3f230c4726bdb88
+  README.md: bbd92d2513f10870f2df25b7b65c31691133b51d
+  debug.js: 8ff39bf037d2d7bcc9dca874583702e770eea76e

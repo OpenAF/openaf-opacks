@@ -1,5 +1,3 @@
-if (isDef(getOPackPath("Debug")) && getEnv("OAF_DEBUG") == "true") loadLib("debug.js"); else _debug = s=>s
-
 //@ Declaring array
 var ar = [ 0, 1, 2, 3, 4, 5 ]
 
@@ -8,7 +6,7 @@ var ii = 0;
 while(ii < ar.length) {
 print("II = " + ii)
 ii++
-//# ii == 3
+//# ii % 2 == 0
 }
 //@ End cycle
 //? ii

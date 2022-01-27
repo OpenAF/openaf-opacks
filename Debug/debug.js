@@ -1,10 +1,14 @@
 // Author: Nuno Aguiar
+(function() {
 
-var __scriptfile, _debug
-if (isDef(__scriptfile) && isUnDef(_debug)) { 
   loadLib("debugFn.js")
-  _debug(__scriptfile)
-  exit(0) 
-} else {
-  loadLib("debugFn.js")
-}
+  if (isFunction(__loadPreParser) && !__closed && isDef(_debug) && isUnDef(global.__debugLoadPreParser)) {
+    global.__debugLoadPreParser = __loadPreParser.toString()
+    __loadPreParser = function(code) {
+      var _fn = eval(global.__debugLoadPreParser)
+      return _fn(_debug(code, __, true))
+    }
+  }
+  
+  exports.load = function(aScript) { load(aScript) }
+})();
