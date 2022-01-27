@@ -14,14 +14,14 @@ function _debug(aCode, args, returnCode) {
   args.lineError = _$(args.lineError, "lineError").isString().default("FG(220)")
   args.textError = _$(args.textError, "textError").isString().default("BG(196),FG(255),BOLD")
   args.theme     = _$(args.theme, "theme").isString().default("doubleLineBothSides")
-  args.emoticons = _$(args.emoticons, "emoticons").isBoolean().default(true)
+  args.emoticons = _$(args.emoticons, "emoticons").toBoolean().isBoolean().default(true)
   args.signs     = _$(args.signs, "signs").isMap().default({
     checkpoint: 0x1F37A,
     assert    : 0x1F44D,
     print     : 0x1F50E,
     error     : 0x1F621
   })
-  args.includeTime = _$(args.includeTime, "includeTime").isBoolean().default(false)
+  args.includeTime = _$(args.includeTime, "includeTime").toBoolean().isBoolean().default(false)
   
   // Determine if code is a file or actual code
   var code
@@ -40,10 +40,10 @@ function _debug(aCode, args, returnCode) {
   var _m = (s, c) => {
     var _s = ";try{"
     if (isDef(c)) _s += "if(" + c + ") {"
-    var _t = (args.includeTime ? "(new Date()).toISOString() +\" |\" + " : "")
+    var _t = (args.includeTime ? "(new Date()).toISOString() +\" | \" + " : "")
     _s += "cprint(ow.format.withSideLine(" + _t + s + ", __, \"" + args.lineColor + "\", \"" + args.textColor + "\", ow.format.withSideLineThemes()." + args.theme + ")) "
     if (isDef(c)) _s += "}"
-    _s += "}catch(__e_debug){cprint(ow.format.withSideLine(" + _t + "' " + sign.error + " ' + String(__e_debug), __, \"" + args.lineError + "\", \"" + args.textError + "\", ow.format.withSideLineThemes()." + args.theme + "))};"
+    _s += "}catch(__e_debug){cprint(ow.format.withSideLine(" + _t + "'" + sign.error + " ' + String(__e_debug), __, \"" + args.lineError + "\", \"" + args.textError + "\", ow.format.withSideLineThemes()." + args.theme + "))};"
     return _s
   }
 
@@ -67,35 +67,35 @@ function _debug(aCode, args, returnCode) {
     l = line.trim().match(/\/\/\@ (.+)$/)
     if (isArray(l)) {
       var s = l[1]
-      line = line.replace(/\/\/\@ (.+)$/, _m("\" " + sign.checkpoint + " " + s.replace(/\"/g, "\\\"") + "\""))
+      line = line.replace(/\/\/\@ (.+)$/, _m("\"" + sign.checkpoint + " " + s.replace(/\"/g, "\\\"") + "\""))
     }
 
     // assert equivalent
     l = line.trim().match(/\/\/\# (.+)$/)
     if (isArray(l)) {
       var s = l[1]
-      line = line.replace(/\/\/\# (.+)$/, _m("\" " + sign.assert + " " + s + "\"", s))
+      line = line.replace(/\/\/\# (.+)$/, _m("\"" + sign.assert + " " + s + "\"", s))
     }
 
     // print equivalent
     l = line.trim().match(/\/\/\? (.+)$/)
     if (isArray(l)) {
       var s = l[1]
-      line = line.replace(/\/\/\? (.+)$/, _m("\" "+ sign.print + " " + s + " = \" + stringify(" + s + ") + \"\""))
+      line = line.replace(/\/\/\? (.+)$/, _m("\""+ sign.print + " " + s + " = \" + stringify(" + s + ") + \"\""))
     }
 
     // slon print equivalent
     l = line.trim().match(/\/\/\?s (.+)$/)
     if (isArray(l)) {
       var s = l[1]
-      line = line.replace(/\/\/\?s (.+)$/, _m("\" " + sign.print + " " + s + " = \" + af.toSLON(" + s + ") + \"\""))
+      line = line.replace(/\/\/\?s (.+)$/, _m("\"" + sign.print + " " + s + " = \" + af.toSLON(" + s + ") + \"\""))
     }
 
     // yaml print equivalent
     l = line.trim().match(/\/\/\?y (.+)$/)
     if (isArray(l)) {
       var s = l[1]
-      line = line.replace(/\/\/\?y (.+)$/, _m("\" " + sign.print + " " + s + " = \\n\" + af.toYAML(" + s + ") + \"\""))
+      line = line.replace(/\/\/\?y (.+)$/, _m("\"" + sign.print + " " + s + " = \\n\" + af.toYAML(" + s + ") + \"\""))
     }
 
     return line
