@@ -1,5 +1,4 @@
 // Author: Nuno Aguiar
-
 var OAF_DEBUG_ARGS
 
 function _debug(aCode, args, returnCode) {
@@ -19,10 +18,13 @@ function _debug(aCode, args, returnCode) {
     checkpoint: 0x1F37A,
     assert    : 0x1F44D,
     print     : 0x1F50E,
-    error     : 0x1F621
+    error     : 0x1F621,
+    time      : "🕒"
   })
   args.includeTime = _$(args.includeTime, "includeTime").toBoolean().isBoolean().default(false)
   
+  if (!isMap(global._debugData)) global._debugData = { p: { } }
+
   // Determine if code is a file or actual code
   var code
   if (aCode.indexOf("\n") >= 0) {
@@ -59,6 +61,7 @@ function _debug(aCode, args, returnCode) {
   sign.assert     = _$(sign.assert).default("#")
   sign.print      = _$(sign.print).default("?")
   sign.error      = _$(sign.error).default("!")
+  sign.time       = _$(sign.time).default(":")
 
   code = code.split("\n").map(line => {
     var l
@@ -68,6 +71,20 @@ function _debug(aCode, args, returnCode) {
     if (isArray(l)) {
       var s = l[1]
       line = line.replace(/\/\/\@ (.+)$/, _m("\"" + sign.checkpoint + " " + s.replace(/\"/g, "\\\"") + "\""))
+    }
+
+    // profile end equivalent
+    l = line.trim().match(/\/\/\] (.+)$/)
+    if (isArray(l)) {
+      var s = l[1]
+      line = line.replace(/\/\/\] (.+)$/, _m("\"" + sign.time + " " + s + ": \" + ow.format.elapsedTime4ms(now() - global._debugData['" + s + "'])"))
+    }
+
+    // profile begin equivalent
+    l = line.trim().match(/\/\/\[ (.+)$/)
+    if (isArray(l)) {
+      var s = l[1]
+      line = line.replace(/\/\/\[ (.+)$/, ";global._debugData['" + s + "']=now();")
     }
 
     // assert equivalent

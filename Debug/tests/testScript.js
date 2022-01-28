@@ -1,17 +1,20 @@
 //@ Declaring array
-var ar = [ 0, 1, 2, 3, 4, 5 ]
+var ar = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
 
 //@ Start cycle
 var ii = 0;
+//[ cycle total time
 while(ii < ar.length) {
-print("II = " + ii)
-ii++
-//# ii % 2 == 0
+    print("II = " + ii)
+    //# ii % 4 == 0
+    ii++
 }
-//@ End cycle
+//] cycle total time
 //? ii
+//@ End cycle
 
 //@ Check arguments
+//? __expr
 var params = processExpr()
 
 //?s iDontExist
