@@ -49,7 +49,6 @@ files:
 - slf4j-api-1.7.32.jar
 - perfmark-api-0.23.0.jar
 - netty-codec-http2-4.1.72.Final.jar
-- docker-compose.yml
 - netty-transport-classes-epoll-4.1.72.Final.jar
 - netty-transport-4.1.72.Final.jar
 - grpc-protobuf-lite-1.44.0.jar
@@ -91,7 +90,6 @@ filesHash:
   slf4j-api-1.7.32.jar: cdcff33940d9f2de763bc41ea05a0be5941176c3
   perfmark-api-0.23.0.jar: 0b813b7539fae6550541da8caafd6add86d4e22f
   netty-codec-http2-4.1.72.Final.jar: 4b269e666fbace27d2c1efa57703e99b09655822
-  docker-compose.yml: 0f6db2b04ecdb7097482c3ba06c17f91628fc3d8
   netty-transport-classes-epoll-4.1.72.Final.jar: 490c922f85c8f6a5b39bdeec1f6629d58d48eaff
   netty-transport-4.1.72.Final.jar: 99138b436a584879355aca8fe3c64b46227d5d79
   grpc-protobuf-lite-1.44.0.jar: 99bd18a0d30535ca47948359016e2ad1df92247c
