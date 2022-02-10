@@ -1,5 +1,5 @@
 = README
-:source-highlighter: highlightjs
+:source-highlighter: highlight.js
 
 This oPack provides support for asciidoc in OpenAF. It adds the Asciidoc to the current scope as well as an ow.server.httpd.replyAsciidoc function.
 
