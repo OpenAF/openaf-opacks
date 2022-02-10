@@ -1,0 +1,29 @@
+= README
+:source-highlighter: highlightjs
+
+This oPack provides support for asciidoc in OpenAF. It adds the Asciidoc to the current scope as well as an ow.server.httpd.replyAsciidoc function.
+
+Using it for direct conversion:
+
+[source,javascript]
+----
+loadLib("asciidoctor.js")
+
+print( asciidoctor.convert('Hello *world_*!', { standalone: true }) )
+----
+
+Using in an internal OpenAF web server:
+
+[source,javascript]
+----
+loadLib("asciidoctor.js")
+
+var hs = ow.server.httpd.start(17878)
+ow.server.httpd.route(hs, ow.server.httpd.mapRoutesWithLibs(hs, { 
+    "/": function(r, aHs) { 
+        return ow.server.httpd.replyAsciidoc(aHs, ".", "/", r.uri) 
+    } 
+}))
+----
+
+Please check more about asciidoc syntax in https://powerman.name/doc/asciidoc.

@@ -1,0 +1,33 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- Asciidoc
+- adoc
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Asciidoc.opack
+description: Provides a wrapper around asciidoctor.js enabling conversion to HTML
+name: Asciidoc
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '202102099'
+dependencies:
+  openaf: '>=20211229'
+files:
+- .package.yaml
+- README.adoc
+- asciidoc.js
+- lib/asciidoctor.css
+- lib/asciidoctor.min.js
+filesHash:
+  README.adoc: 3e885e9f0220e4cbd341ad6a1c2447d252699e64
+  asciidoc.js: 97542f031e729b17d6585794f8bf698853cc4a24
+  lib/asciidoctor.css: 720f4b4c8c7b89b92d6327ae1359c1943f8ad288
+  lib/asciidoctor.min.js: c659cbfa6ed0082fc6429cb2cce7a2e1c9434b6b
