@@ -5,31 +5,31 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - PAM
-  - Unix
-  - Authentication
+- PAM
+- Unix
+- Authentication
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/UnixPAM'
-  url: 'https://openaf.io/opacks/UnixPAM.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/UnixPAM
+  url: https://openaf.io/opacks/UnixPAM.opack
 description: Provides UNIX PAM based authentication
 name: UnixPAM
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: 20171202
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: 20210620
 dependencies:
-  OpenAF: '>=20171101'
+  OpenAF: '>=20210515'
 files:
-  - .package.yaml
-  - PAM.js
-  - .odoc.db
-  - lib/libpam4j-1.8.jar
-  - lib/LICENSE.txt
+- .odoc.db
+- .package.yaml
+- lib/libpam4j-1.11.jar
+- lib/LICENSE.txt
+- PAM.js
 filesHash:
-  PAM.js: 097ef66f5fdf1ce92289d38985996fe17eb73e05
   .odoc.db: 6576227860754f5cd436dfe8091249179a63c191
-  lib/libpam4j-1.8.jar: 548d4a1177adad8242fe03a6930c335669d669ad
-  lib/LICENSE.txt: 19057a2d3dd40c14624779e63524fa36e86575e2
+  lib/libpam4j-1.11.jar: 82cfca73e813c165c83b5d6b1d16808cb5291fe7
+  lib/LICENSE.txt: 2b9dd84b5e5cdebab569b69a9a45d0281affb014
+  PAM.js: fe566f2d5de6b60c7fdaedf285d7dc24e26ea2dc

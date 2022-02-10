@@ -99,7 +99,7 @@ AWS.prototype.LAMBDA_ListLayerVersions = function(aRegion, aLayerName, aRuntime,
 
 /**
  * <odoc>
- * <key>AWS.LAMBDA_PublishLayerVersion(aRegion, aLayerName, aDescription, aLicenseInfo, aContent, aListRuntimes) : Map</key>
+ * <key>AWS.LAMBDA_PublishLayerVersion(aRegion, aLayerName, aDescription, aLicenseInfo, aContent, aListRuntimes, aListArchs) : Map</key>
  * Tries to publish a new lambda layer version on aRegion for aLayerName with aDescription and aLicenseInfo for, optionally, aListRuntimes array.
  * aContent is a map with either ZipFile (base64 contents) or S3Bucket, S3Key and S3ObjectVersion entries. Example:\
  * \
@@ -107,13 +107,14 @@ AWS.prototype.LAMBDA_ListLayerVersions = function(aRegion, aLayerName, aRuntime,
  * \
  * </odoc>
  */
-AWS.prototype.LAMBDA_PublishLayerVersion = function(aRegion, aLayerName, aDescription, aLicenseInfo, aContent, aListRuntimes) {
+AWS.prototype.LAMBDA_PublishLayerVersion = function(aRegion, aLayerName, aDescription, aLicenseInfo, aContent, aListRuntimes, aListArchs) {
    aRegion = _$(aRegion, "region").isString().default(this.region);
    aListRuntimes = _$(aListRuntimes, "runtimes").isArray().default(void 0);
    _$(aLayerName, "layer name").isString().$_();
 
    var res = this.post("lambda", aRegion, "/2018-10-31/layers/" + aLayerName + "/versions", "", {
       CompatibleRuntimes: aListRuntimes,
+      CompatibleArchitectures: aListArchs,
       Content: aContent,
       Description: aDescription,
       LicenseInfo: aLicenseInfo

@@ -5,44 +5,46 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - openaf
-  - smb
-  - plugins
-  - samba
-  - windows
+- openaf
+- smb
+- plugins
+- samba
+- windows
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/plugin-SMB.opack'
+  url: https://openaf.io/opacks/plugin-SMB.opack
 description: OpenAF plugin to access samba/window shares.
 name: plugin-SMB
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20190311'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210620'
 dependencies:
-  openaf: '>=20190216'
+  openaf: '>=20210515'
 files:
-  - .maven.yaml
-  - .odoc.db
-  - .package.yaml
-  - bcprov-jdk15on-1.58.jar
-  - compile.yaml
-  - jcifs-ng-2.1.1.jar
-  - plugin-smb.jar
-  - src/openaf/plugins/SMB.class
-  - src/openaf/plugins/SMB.java
-  - tests/autoTestSMB.js
-  - tests/autoTestSMB.yaml
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- bcprov-jdk15on-1.68.jar
+- compile.yaml
+- jcifs-ng-2.1.6.jar
+- LICENSES.txt
+- plugin-smb.jar
+- src/openaf/plugins/SMB.class
+- src/openaf/plugins/SMB.java
+- tests/autoTestSMB.js
+- tests/autoTestSMB.yaml
 filesHash:
-  .maven.yaml: 477770ff7f926ecfc654b4615aaa97514e45a149
-  .odoc.db: a9e61914843860edd5f57b0f4b2d7b307e3d9f6b
-  bcprov-jdk15on-1.58.jar: 2c9aa1c4e3372b447ba5daabade4adf2a2264b12
-  compile.yaml: d5be5348eff807f6a34bebee3ebf8f879e5611bc
-  jcifs-ng-2.1.1.jar: badfd9e401b2cb8001866faa661c7ab1f54607ee
-  plugin-smb.jar: 4a78a96b97a10eeae54a1d545814e4434394fb14
-  src/openaf/plugins/SMB.class: 193236148a049f2cdb538b267c6518839e2b3534
+  .maven.yaml: 0e559a3cfdaaf27bb659708b072672073434cb4d
+  .odoc.db: d6fd6847f238914ae75d7130abac7aaab356773d
+  bcprov-jdk15on-1.68.jar: 46a080368d38b428d237a59458f9bc915222894d
+  compile.yaml: 65950cd663e8840ab5a7329a74e1e862281c9e67
+  jcifs-ng-2.1.6.jar: a53e090ba20751d29a18cab49c0a65a13d9be5ff
+  LICENSES.txt: b7ccfc865a1fe7ca9e2495fff17efa62b0b3776e
+  plugin-smb.jar: 789ab5864968d1711b6b959906a26b33768d23ea
+  src/openaf/plugins/SMB.class: b44ab359a9a2929668269c7a9e72566da961fa95
   src/openaf/plugins/SMB.java: 2830c601409b9058dbe70f7d077359fa9496cc3d
   tests/autoTestSMB.js: bfeb9b25141899d25b2e6dad15ab7e4a9b7b1fff
   tests/autoTestSMB.yaml: f53ae337e3d4d2c9a5af03348523c1544d2bdc0c

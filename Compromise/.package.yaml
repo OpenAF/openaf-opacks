@@ -5,31 +5,30 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - Natural Language Processing
-  - Language
-  - npl
-  - Compromise
+- Natural Language Processing
+- Language
+- npl
+- Compromise
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compromise'
-  url: 'https://openaf.io/opacks/Compromise.opack'
-description: >-
-  Integrates the NPL Compromise lib
-  (https://github.com/nlp-compromise/compromise) into a opack.
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compromise
+  url: https://openaf.io/opacks/Compromise.opack
+description: Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.
 name: Compromise
 main: main.js
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20170429'
 dependencies:
   openaf: '>=20170401'
 files:
-  - .package.yaml
-  - compromise.js
-  - main.js
+- .precompile
+- main.js
+- .package.yaml
+- compromise.js
 filesHash:
-  .package.yaml: 3013f537a8e7aa12444ed319a04e3de816c403de
-  compromise.js: 4369b00388ee993ad632fa506f5a67f1c8931a17
+  .precompile: 5e2756018d274b90e0601a53f00be70cfcdd85ac
   main.js: 72ef7e68ea04014281ca8d0a875e5728395a6cbc
+  compromise.js: 4369b00388ee993ad632fa506f5a67f1c8931a17

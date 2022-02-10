@@ -1,13 +1,16 @@
 init:
   tmpl: |
     # Author: {{author}}
+    help: &HELP
+      text   : Does stuff. 
+      expects: 
+      - name     : something
+        desc     : To do stuff
+        example  : aValueExample
+        mandatory: true
+    
     init:
-      help: &HELP
-        text   : Does stuff. 
-        expects: 
-        - name   : something
-          desc   : To do stuff
-          example: aValueExample
+      help: *HELP
 
     todo:
     {{#if config}}
@@ -20,7 +23,7 @@ init:
     ojob:
       opacks      :
       - openaf: 20210515
-      catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception); return false;"
+      catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception);"
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
       {{/if}}{{#if config}}
@@ -58,7 +61,6 @@ todo:
 - Generate Job
 
 ojob:
-  sequential  : true
   opacks      :
   - openaf: 20200523
   catch       : logErr(exception);

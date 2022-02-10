@@ -6,6 +6,7 @@ loadLib("aws_dynamo.js");
 loadLib("aws_ecs.js");
 loadLib("aws_lambda.js");
 loadLib("aws_rds.js");
+loadLib("aws_pi.js");
 loadLib("aws_sqs.js");
 loadLib("aws_iam.js");
 loadLib("aws_events.js");

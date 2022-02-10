@@ -5,29 +5,29 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - ElasticSearch
+- ElasticSearch
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ElasticSearch'
-  url: 'https://openaf.io/opacks/ElasticSearch.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ElasticSearch
+  url: https://openaf.io/opacks/ElasticSearch.opack
 description: Provides ElasticSearch functionality for OpenAF scripts.
 name: ElasticSearch
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210408'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20211209'
 dependencies:
-  openaf: '>=20200524'
+  openaf: '>=20210721'
 files:
-  - .odoc.db
-  - .package.yaml
-  - .precompile
-  - elasticsearch.js
-  - ElasticSearch.yaml
+- .precompile
+- .package.yaml
+- ElasticSearch.yaml
+- elasticsearch.js
+- .odoc.db
 filesHash:
-  .odoc.db: d345abb569d305c212f7c378e2386b24af86f665
   .precompile: 65efea614ff4d1a11ea14ddea08713710e04296e
-  elasticsearch.js: f2d26db8cc58a8603e2ef4307d4262b1970431e3
   ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
+  elasticsearch.js: ef7006f482d76605374946d633edf9a09d231a15
+  .odoc.db: 9a0d3a8e99dc20b3fec7e049c3d66f223b63f03d

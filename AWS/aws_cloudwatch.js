@@ -58,7 +58,7 @@ AWS.prototype.CLOUDWATCH_LOGS_DescribeLogGroups = function(aRegion, aLimit, aPre
    var aHost = String(url.getHost());
    var aURI = String(url.getPath());
 
-   var res = this.postURLEncoded(aURL, aURI, "", merge(this.convertArray2Attrs("MetricData.member", aMetricDat), {
+   var res = this.postURLEncoded(aURL, aURI, "", merge(this.convertArray2Attrs("MetricData", aMetricDat, true), {
       Action   : "PutMetricData",
       Version  : "2010-08-01",
       Namespace: aNamespace

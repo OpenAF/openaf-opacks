@@ -5,40 +5,46 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - openaf
-  - ignite
-  - plugins
+- openaf
+- ignite
+- plugins
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/plugin-Ignite.opack'
+  url: https://openaf.io/opacks/plugin-Ignite.opack
 description: OpenAF plugin to wrap Ignite functionality.
 name: plugin-Ignite
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200409'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210620'
 dependencies:
-  openaf: '>=20200301'
+  openaf: '>=20210515'
 files:
-  - ignite-core-2.8.0.jar
-  - .package.yaml
-  - src/openaf/plugins/Ignite.java
-  - compile.yaml
-  - .maven.yaml
-  - plugin-ignite.jar
-  - cache-api-1.0.0.jar
-  - .odoc.db
-  - ignite-shmem-1.0.0.jar
-  - LICENSES.txt
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- cache-api-1.0.0.jar
+- compile.yaml
+- ignite-core-2.10.0.jar
+- ignite-shmem-1.0.0.jar
+- LICENSES.txt
+- plugin-ignite.jar
+- src/openaf/plugins/Ignite$1.class
+- src/openaf/plugins/Ignite$2.class
+- src/openaf/plugins/Ignite.class
+- src/openaf/plugins/Ignite.java
 filesHash:
-  ignite-core-2.8.0.jar: 6ed923c2d0f99cd8c6c981f475b9ace3e75eac61
-  src/openaf/plugins/Ignite.java: 29f68c4c15d529abd8531dcbc5437ea1e0e8db1e
-  compile.yaml: 718e102e5edbf8036384b12dc72c1ee578761178
-  .maven.yaml: 3e1908d41ffe5704e520afdcdfb8a22d7100057f
-  plugin-ignite.jar: 02b67f3e43d34c9fde57a0bfa82f0146d06ae93f
+  .maven.yaml: 217ffe03f4ec0438f56dd6705c65835e1cfedee7
+  .odoc.db: 3ea19586a852b8e3c847b6cce1d07fbdd35f08df
   cache-api-1.0.0.jar: 2b57384801243f387f1a2e7ab8066ac79c2a91d3
-  .odoc.db: b1daa652a4352373c0db88bb977edd72c227cccb
+  compile.yaml: 8106ec1fb849b830e67608c158ed7f27228021fe
+  ignite-core-2.10.0.jar: 011e4f6a1c782434746cd14de80139e6cca694fc
   ignite-shmem-1.0.0.jar: 1874ee7f7fa2c7f4bc0c458f5dd1e3a3876418e9
-  LICENSES.txt: 593c5ce751cd70e19c55ce4f17c984b37807780a
+  LICENSES.txt: 588520b86595f1b847398acce8f5bae715008320
+  plugin-ignite.jar: 769a4235259c184e8fd2685e7033222d92654384
+  src/openaf/plugins/Ignite$1.class: 791040f341ab4ae4cc57c569a00fb070a541c5f8
+  src/openaf/plugins/Ignite$2.class: 98a0232612da0a3e34ae6adee05f4a2cecfeb013
+  src/openaf/plugins/Ignite.class: c3d7500be60e3552e5ba026f8c524ecd48436786
+  src/openaf/plugins/Ignite.java: 29f68c4c15d529abd8531dcbc5437ea1e0e8db1e

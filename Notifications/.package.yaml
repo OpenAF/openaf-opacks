@@ -7,38 +7,38 @@ scripts:
   preerase: ''
   preinstall: ''
 keywords:
-  - notifications
-  - push
-  - pushover
-  - slack
+- notifications
+- push
+- pushover
+- slack
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Notifications'
-  url: 'https://openaf.io/opacks/Notifications.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Notifications
+  url: https://openaf.io/opacks/Notifications.opack
 description: Provides libraries to use notifications services. Currently pushover.js.
 name: Notifications
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20180605'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20210711'
 dependencies:
-  openaf: '>=20170701'
+  openaf: '>=20210515'
 files:
-  - .odoc.db
-  - .package.yaml
-  - .precompile
-  - msteams.js
-  - notificationsPushover.yaml
-  - notificationsSlack.yaml
-  - pushover.js
-  - slack.js
+- .odoc.db
+- pushover.js
+- .precompile
+- notificationsSlack.yaml
+- notificationsPushover.yaml
+- slack.js
+- msteams.js
+- .package.yaml
 filesHash:
-  .odoc.db: a443c2152bf8346bb148c6aba60bbe786767f426
-  .precompile: 296680c7a954da9eb871b3c3ee40ff7fba58ee5d
-  msteams.js: 021db2d4a20ded2971822e6a2ed23e36df7dd460
-  notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
-  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
+  .odoc.db: bccc183a8df3aebb9a9d894604dda29bdc23416c
   pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf
-  slack.js: 77c363a85d379cf52cb2ab716e0a582f04494a84
+  .precompile: 296680c7a954da9eb871b3c3ee40ff7fba58ee5d
+  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
+  notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
+  slack.js: 92dbc7f3934e7da1e40c3643d06a89e38b01a9c1
+  msteams.js: c1b24936bbd2898a6d59dea3dcdd644e44213d39

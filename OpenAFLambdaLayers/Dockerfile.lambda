@@ -1,4 +1,4 @@
-FROM amazon/aws-lambda-provided
+FROM amazon/aws-lambda-provided AS builder
 
 COPY minijvm.zip /opt/minijvm.zip
 COPY openaf-opacks.zip /opt/openaf-opacks.zip
@@ -17,3 +17,6 @@ RUN cd /opt\
  && yum -y autoremove
  
 #COPY main.js /var/task/main.js
+FROM amazon/aws-lambda-provided
+COPY --from=builder /opt /opt
+RUN ln -s /opt/bootstrap /var/runtime/bootstrap

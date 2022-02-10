@@ -23,11 +23,12 @@
   "version": "20150917",
   "dependencies": {},
   "files": [
-    ".package.json",
-    "inprogress.js"
+    ".precompile",
+    "inprogress.js",
+    ".package.json"
   ],
   "filesHash": {
-    ".package.json": "6faa56bf8f69f339a290d2fd712ab649198b7779",
+    ".precompile": "5a8e0e40b9189c32fcc6783df3c4041f34ada64d",
     "inprogress.js": "b8ffb19a50f26993d27bf79a6c31d7cd626213ef"
   }
 }

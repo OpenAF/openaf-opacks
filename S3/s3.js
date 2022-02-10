@@ -1,11 +1,11 @@
 /**
  * <odoc>
- * <key>S3.S3(aURL, aAccessKey, aSecret, aRegion)</key>
+ * <key>S3.S3(aURL, aAccessKey, aSecret, aRegion, useVersion1)</key>
  * Given aURL (e.g. https://s3.amazonaws.com) and, optionally aAccessKey, aSecret and aRegion,
- * creates a S3 compatible client access object.
+ * creates a S3 compatible client access object. If useVersion1=true it will use API version 1 where possible.
  * </odoc>
  */
-var S3 = function(aURL, aAccessKey, aSecret, aRegion) {
+var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1) {
     if (isUnDef(getOPackPath("S3")))
         loadExternalJars(".");
     else
@@ -25,6 +25,8 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion) {
             this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).build();
         }
     }
+
+    this.useVersion1 = useVersion1;
 };
 
 /**
@@ -89,21 +91,28 @@ S3.prototype.listBuckets = function() {
 
 /**
  * <odoc>
- * <key>S3.listObjects(aBucket, aPrefix, needFull) : Array</key>
+ * <key>S3.listObjects(aBucket, aPrefix, needFull, needRecursive) : Array</key>
  * Returns a list of objects (equivalent to io.listFiles) in aBucket. Optionally you can 
  * provide aPrefix (e.g "myDir/") to simulate listing a folder. If needFull = true the contentType
- * and createdTime will be retrieved which results in slower results.
+ * will be retrieved which results in slower results. If needRecursive = true all "object paths" will
+ * be traversed. Please use useVersion1 on the S3 object creation if you need to force it.
  * </odoc>
  */
-S3.prototype.listObjects = function(aBucket, aPrefix, needFull) {
+S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
     _$(aBucket).isString().$_("Please provide a bucket name.");
     var lsts, res = [];
 
+    var lstsArgs;
     if (isDef(aPrefix) && isString(aPrefix)) 
-        lsts = this.s3.listObjects(Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).prefix(aPrefix).build());
+        lstsArgs = Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).prefix(aPrefix);
     else
-        lsts = this.s3.listObjects(Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).build());
-        
+        lstsArgs = Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket);
+    
+    if (this.useVersion1)   lstsArgs = lstsArgs.useApiVersion1(true);
+    if (needRecursive)      lstsArgs = lstsArgs.recursive(true);
+
+    lsts = this.s3.listObjects(lstsArgs.build());
+
     var itr = lsts.iterator();
     while (itr.hasNext()) { 
         var item = itr.next().get();
@@ -112,10 +121,11 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull) {
             var _stat = this.s3.statObject(Packages.io.minio.StatObjectArgs.builder().bucket(aBucket).object(String(item.objectName())).build());
             stat.contentType = _stat.contentType();
         }
-        var isDir = item.isDir() || (String(item.objectName()).endsWith("/") && (item.objectSize() == 0));
+        var isDir = item.isDir() || (String(item.objectName()).endsWith("/"));
         res.push({
             isDirectory: isDir,
             isFile: !isDir,
+            isLatest: item.isLatest(),
             filename: String(item.objectName()), 
             filepath: String(item.objectName()),
             canonicalPath: String(item.objectName()),
@@ -123,6 +133,9 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull) {
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
+            owner: isNull(item.owner()) ? __ : String(item.owner().displayName()),
+            version: String(item.versionId()),
+            metadata: af.fromJavaMap(item.userMetadata()),
             contentType: (isUnDef(stat.contentType) ? void 0 : String(stat.contentType))
         });
     }
@@ -373,6 +386,63 @@ S3.prototype.getObjectURL = function(aBucket, aObjectName) {
 
 /**
  * <odoc>
+ * <key>S3.removeObjectsByPrefix(aBucket, aPrefix, aLimitPerCall) : Array</key>
+ * Tries to remove all objects recursively on aBucket with the provided aPrefix. Optionally aLimitPerCall (e.g. AWS S3 is limited to 1000)
+ * can be provided (-1 for no limit). Returns an array of errors.
+ * </odoc>
+ */
+S3.prototype.removeObjectsByPrefix = function(aBucket, aPrefix, aLimitPerCall) {
+    _$(aBucket).isString().$_("Please provide a bucket name.");
+    _$(aPrefix).isString().$_("Please provide a prefix.");
+
+    var lst = this.listObjects(aBucket, aPrefix, false, true);
+    return this.removeObjects(aBucket, lst.map(r => r.canonicalPath), aLimitPerCall);
+};
+
+/**
+ * <odoc>
+ * <key>S3.removeObjects(aBucket, aListObjectNames, aLimitPerCall) : Array</key>
+ * Tries to remove aListObjectNames (an array of strings or an array of maps with a "name" and a "version") on aBucket 
+ * Optionally aLimitPerCall (e.g. AWS S3 is limited to 1000) can be provided (-1 for no limit). Returns an array of errors.
+ * </odoc>
+ */
+S3.prototype.removeObjects = function(aBucket, aListObjectNames, aLimitPerCall) {
+    _$(aBucket, "aBucket").isString().$_("Please provide a bucket name.");
+    _$(aListObjectNames, "aListObjectNames").isArray().$_("Please provide an array of object names");
+    aLimitPerCall = _$(aLimitPerCall, "aLimitePerCall").isNumber().default(-1);
+
+    if (aLimitPerCall > 0) {
+        var res = [];
+        splitArray(aListObjectNames, aListObjectNames.length / aLimitPerCall).forEach(subArr => {
+            res = res.concat(this.removeObjects(aBucket, subArr, -1));
+        });
+        return res;
+    }
+
+    var ll = new java.util.LinkedList();
+    aListObjectNames.forEach(obj => {
+        if (isString(obj)) {
+            ll.add(new Packages.io.minio.messages.DeleteObject(obj));
+        }
+        if (isMap(obj)) {
+            ll.add(new Packages.io.minio.messages.DeleteObject(obj.name, obj.version));
+        }
+    });
+
+    var res = this.s3.removeObjects(Packages.io.minio.RemoveObjectsArgs.builder().bucket(aBucket).objects(ll).build());
+
+    var errors = [];
+    var ii = res.iterator();
+
+    while(ii.hasNext()) {
+        errors.push(ii.next());
+    }
+
+    return errors;
+}
+
+/**
+ * <odoc>
  * <key>S3.removeObject(aBucket, aObjectName)</key>
  * Removes aObjectName from aBucket.
  * </odoc>
@@ -441,7 +511,7 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
     ow.loadObj();
     loadLodash();
 
-    var rlst = ow.obj.fromArray2Obj(this.listObjects(aBucket, aPrefix), "filename");
+    var rlst = ow.obj.fromArray2Obj(this.listObjects(aBucket, aPrefix, __, true), "filename");
     var slst = ow.obj.fromArray2Obj($from(listFilesRecursive(aLocalPath)).equals("isFile", true).select(), "canonicalPath");
 
     var realLocalPath = String((new java.io.File(aLocalPath)).getCanonicalPath()).replace(/\\/g, "/") + "/";
@@ -528,7 +598,7 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
 
 /**
  * <odoc>
- * <key>S3.deleteFolderActions(aBucket, aPrefix) : Array</key>
+ * <key>S3.deleteFolderActions(aBucket, aPrefix, beRecursive) : Array</key>
  * Given aBucket and a "folder" aPrefix returns an array of actions to remove all objects under that "folder". Use S3.execActions
  * to execute the returned actions.
  * </odoc>
@@ -540,7 +610,7 @@ S3.prototype.deleteFolderActions = function(aBucket, aPrefix) {
     if (!(aPrefix.endsWith("/")) && aPrefix.length > 0) aPrefix += "/";
 
     var actions = [];
-    var lst = this.listObjects(aBucket, aPrefix);
+    var lst = this.listObjects(aBucket, aPrefix, __, beRecursive);
     for(var vi in lst) {
         var v = lst[vi];
         actions.push({
@@ -569,7 +639,7 @@ S3.prototype.renameFolderActions = function(aBucket, aPrefix, aTargetBucket, aTa
     if (!(aTargetPrefix.endsWith("/")) && aTargetPrefix.length > 0) aTargetPrefix += "/";
 
     var copyActions = [], delActions = [];
-    var lst = this.listObjects(aBucket, aPrefix);
+    var lst = this.listObjects(aBucket, aPrefix, __, true);
     for(var vi in lst) {
         var v = lst[vi];
         copyActions.push({

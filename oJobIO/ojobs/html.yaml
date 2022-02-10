@@ -14,20 +14,24 @@ jobs:
 - name: Help
   help: 
     text   : Tries to open a browser with the context map/array HTML representation
-    #expects: 
-    #- name   : something
-    #  desc   : To do stuff
-    #  example: aValueExample
+    expects: 
+    - name   : convertURLs
+      desc   : Tries to convert urls into hyperlinks if not convertURLs=true (default convertURLs=true) 
+      example: "true"
 
 # -------------------
 - name: Generate html
   exec: |
+    args.convertURLs = toBoolean(_$(args.convertURLs, "convertURLs").default("true"));
+
     ow.loadTemplate();
     var c = {};
     if (isDef(__pm)) {
       if (isDef(__pm._map))  c = ow.template.html.parseMap(__pm._map, true);
       if (isDef(__pm._list)) c = ow.template.html.parseMap(__pm._list, true);
     }
+    
+    if (args.convertURLs) c.out = c.out.replace(new RegExp("((http|https|ftp)://[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*))", "gi"), "<a href=\"$1\">$1</a>");
     var html = "<html><style>" + c.css + "</style><body>" + c.out + "</body></html>"; 
 
     var tmpf = io.createTempFile("ojobio_", ".html");

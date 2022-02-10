@@ -1,0 +1,1 @@
+oaf -c "require('debug.js').load('testScript.js')"

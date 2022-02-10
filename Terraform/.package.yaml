@@ -5,32 +5,32 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - terraform
-  - tf
-  - hcl
+- terraform
+- tf
+- hcl
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/Terraform.opack'
-description: >-
-  OpenAF's wrapper around Terraform's functionality (e.g. converts HCL/TF to
-  JSON and JSON to HCL/TF)
+  url: https://openaf.io/opacks/Terraform.opack
+description: OpenAF's wrapper around Terraform's functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)
 name: Terraform
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20190612'
 dependencies:
   OpenAF: '>=20190401'
 files:
-  - .odoc.db
-  - .package.yaml
-  - hcl.js
-  - src/hcl.peg
-  - terraform.js
+- .precompile
+- .package.yaml
+- hcl.js
+- src/hcl.peg
+- terraform.js
+- .odoc.db
 filesHash:
-  .odoc.db: 295bc1d3e733d4a942d8beb633319c790e0588cc
+  .precompile: da588afc4e62a756bbee5a4b4b086c2d989efea6
   hcl.js: 9e5698715d29ff573f957b3ec43c4008f16f8a5c
   src/hcl.peg: d7f4d617bbc5165fb154a3707ae335f346b4f833
   terraform.js: 851c25065008912d0a3e30fb4383c79c4ab0d3f7
+  .odoc.db: 295bc1d3e733d4a942d8beb633319c790e0588cc

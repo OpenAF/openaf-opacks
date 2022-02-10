@@ -5,29 +5,32 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - TAR
-  - Compress
+- TAR
+- Compress
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compress'
-  url: 'https://openaf.io/opacks/Compress.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Compress
+  url: https://openaf.io/opacks/Compress.opack
 description: Provides encapsulation for the Apache Compress library.
 name: Compress
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20170802'
 dependencies:
   openaf: '>=20170601'
 files:
-  - .odoc.db
-  - .package.yaml
-  - TAR.js
-  - test/TAR.yaml
+- .precompile
+- test/TAR.yaml
+- .package.yaml
+- TAR/.odoc.db
+- TAR.js
+- .odoc.db
 filesHash:
-  .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb
-  .package.yaml: f34a5f15e61e24f03f85067eaed5c2f0305bf32f
-  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
+  .precompile: 2ea6e078793f791e44a84d6dab4ffd75f71f8010
   test/TAR.yaml: f905dbcffc89eebe48f25a3fd4d8604086caff28
+  TAR/.odoc.db: fa830a86e046eb1044c859a59f07a92e8e6de1f4
+  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
+  .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb

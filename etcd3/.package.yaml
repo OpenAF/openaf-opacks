@@ -5,93 +5,101 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - etcd
-  - etcd3
+- etcd
+- etcd3
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/etcd3.opack'
+  url: https://openaf.io/opacks/etcd3.opack
 description: Wrapper to access etcd3 functionality as a client
 name: etcd3
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200723'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220204'
 dependencies:
-  openaf: '>=20200101'
+  openaf: '>=20210515'
 files:
-  - annotations-4.1.1.4.jar
-  - netty-codec-4.1.48.Final.jar
-  - grpc-core-1.30.1.jar
-  - netty-transport-native-epoll-4.1.48.Final-linux-x86_64.jar
-  - gson-2.8.6.jar
-  - perfmark-api-0.19.0.jar
-  - netty-handler-proxy-4.1.48.Final.jar
-  - slf4j-api-1.7.30.jar
-  - netty-codec-http2-4.1.48.Final.jar
-  - grpc-protobuf-lite-1.30.1.jar
-  - etcd-java-0.0.16.jar
-  - animal-sniffer-annotations-1.18.jar
-  - grpc-protobuf-1.30.1.jar
-  - etcd3.js
-  - .package.yaml
-  - protobuf-java-3.12.0.jar
-  - netty-codec-http-4.1.48.Final.jar
-  - failureaccess-1.0.1.jar
-  - checker-qual-2.11.1.jar
-  - netty-common-4.1.48.Final.jar
-  - netty-tcnative-boringssl-static-2.0.30.Final.jar
-  - error_prone_annotations-2.3.4.jar
-  - netty-transport-4.1.48.Final.jar
-  - guava-29.0-jre.jar
-  - netty-codec-socks-4.1.48.Final.jar
-  - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-  - grpc-context-1.30.1.jar
-  - netty-handler-4.1.48.Final.jar
-  - grpc-stub-1.30.1.jar
-  - netty-transport-native-unix-common-4.1.48.Final.jar
-  - grpc-netty-1.30.1.jar
-  - grpc-api-1.30.1.jar
-  - netty-resolver-4.1.48.Final.jar
-  - j2objc-annotations-1.3.jar
-  - proto-google-common-protos-1.17.0.jar
-  - jsr305-3.0.2.jar
-  - netty-buffer-4.1.48.Final.jar
+- gson-2.8.9.jar
+- netty-codec-socks-4.1.72.Final.jar
+- netty-resolver-4.1.72.Final.jar
+- guava-31.0.1-jre.jar
+- .precompile
+- j2objc-annotations-1.3.jar
+- netty-handler-4.1.72.Final.jar
+- checker-qual-3.12.0.jar
+- jsr305-3.0.2.jar
+- grpc-stub-1.44.0.jar
+- listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+- netty-transport-native-unix-common-4.1.72.Final.jar
+- .maven.yaml
+- netty-codec-http-4.1.72.Final.jar
+- annotations-4.1.1.4.jar
+- .package.yaml
+- netty-tcnative-boringssl-static-2.0.46.Final.jar
+- grpc-api-1.44.0.jar
+- grpc-context-1.44.0.jar
+- proto-google-common-protos-2.0.1.jar
+- protobuf-java-3.19.3.jar
+- grpc-protobuf-1.44.0.jar
+- netty-transport-native-epoll-4.1.72.Final-linux-x86_64.jar
+- etcd3.js
+- netty-tcnative-classes-2.0.46.Final.jar
+- slf4j-api-1.7.32.jar
+- perfmark-api-0.23.0.jar
+- netty-codec-http2-4.1.72.Final.jar
+- netty-transport-classes-epoll-4.1.72.Final.jar
+- netty-transport-4.1.72.Final.jar
+- grpc-protobuf-lite-1.44.0.jar
+- grpc-netty-1.44.0.jar
+- netty-buffer-4.1.72.Final.jar
+- grpc-core-1.44.0.jar
+- error_prone_annotations-2.9.0.jar
+- failureaccess-1.0.1.jar
+- animal-sniffer-annotations-1.19.jar
+- netty-handler-proxy-4.1.72.Final.jar
+- netty-common-4.1.72.Final.jar
+- etcd-java-0.0.19.jar
+- netty-codec-4.1.72.Final.jar
 filesHash:
-  annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
-  netty-codec-4.1.48.Final.jar: 3142078325d745228da9d6d1f6f9931c63aaba16
-  grpc-core-1.30.1.jar: 6cb5984063c42ace968b118228dcf904192752f8
-  netty-transport-native-epoll-4.1.48.Final-linux-x86_64.jar: 2b25233dda8b986297076a7d62552c1ec2f41ed8
-  gson-2.8.6.jar: 9180733b7df8542621dc12e21e87557e8c99b8cb
-  perfmark-api-0.19.0.jar: 2bfc352777fa6e27ad1e11d11ea55651ba93236b
-  netty-handler-proxy-4.1.48.Final.jar: 79910203db6a542189c9aaa9ec187bf5ee16248a
-  slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
-  netty-codec-http2-4.1.48.Final.jar: f7a0e40d0eea9a60c05f705a128473f08a3de1dc
-  grpc-protobuf-lite-1.30.1.jar: f8c6fe4c4291ecce534525749892e1b3dc3c6c0a
-  etcd-java-0.0.16.jar: 39369581d15a57aa9a9bed66127878f0a21c54ac
-  animal-sniffer-annotations-1.18.jar: f7aa683ea79dc6681ee9fb95756c999acbb62f5d
-  grpc-protobuf-1.30.1.jar: 2f838d43f79eb3f99d59806a5e2d909c0699d86d
-  etcd3.js: be594e613de193eb0d76feedad80e96dc5be221b
-  protobuf-java-3.12.0.jar: 77295c02922228635d9bf64bd8793c2a70f6cceb
-  netty-codec-http-4.1.48.Final.jar: 8b18499a51367d291efd1f200a4e865370d38738
-  failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
-  checker-qual-2.11.1.jar: 8c43bf8f99b841d23aadda6044329dad9b63c185
-  netty-common-4.1.48.Final.jar: ec27d04fd5e7b65ac171cd64734f9e4f1fc2a286
-  netty-tcnative-boringssl-static-2.0.30.Final.jar: c55df10afab2aa2fa932656ec7625d5dfd9c0fbb
-  error_prone_annotations-2.3.4.jar: dac170e4594de319655ffb62f41cbd6dbb5e601e
-  netty-transport-4.1.48.Final.jar: d285e8d9af5be1fc146b91a1b0d211e7a6a7e7d4
-  guava-29.0-jre.jar: 801142b4c3d0f0770dd29abea50906cacfddd447
-  netty-codec-socks-4.1.48.Final.jar: 42b55c9ca8672ebb7160cadf3c70ffc11638f021
-  listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  grpc-context-1.30.1.jar: 4c6497ff0c70c39d89aa6cca6b9d1e77e313fff4
-  netty-handler-4.1.48.Final.jar: d459919c87dc1a2bf400b39053761ecc11c2e436
-  grpc-stub-1.30.1.jar: dfb5b389ee7fc45ed9ba51436c7d9e8cebb60c07
-  netty-transport-native-unix-common-4.1.48.Final.jar: fb0a76d5d201b59ec2b3721c66eda737b3176f30
-  grpc-netty-1.30.1.jar: c993091591e2eda9e338acc5700e586d9e805e14
-  grpc-api-1.30.1.jar: a43d96f2c166baf9ea2e0d5b2827dcade6b4d17b
-  netty-resolver-4.1.48.Final.jar: 612ad2acc848ce46496095683eea621094763b80
+  gson-2.8.9.jar: 8a432c1d6825781e21a02db2e2c33c5fde2833b9
+  netty-codec-socks-4.1.72.Final.jar: d3bc427b6e2dc4bb6dc9d18d1cc47f8530970a8b
+  netty-resolver-4.1.72.Final.jar: 4ff458458ea32ed1156086820b624a815fcbf2c0
+  guava-31.0.1-jre.jar: 119ea2b2bc205b138974d351777b20f02b92704b
+  .precompile: f469636ceae98d4c1e551ff89b87b2939a48e2a6
   j2objc-annotations-1.3.jar: ba035118bc8bac37d7eff77700720999acd9986d
-  proto-google-common-protos-1.17.0.jar: 40471bf2045151c17da555889b5550fcfd5224a8
+  netty-handler-4.1.72.Final.jar: 9feee089fee606c64be90c0332db9aef1f7d8e46
+  checker-qual-3.12.0.jar: d5692f0526415fcc6de94bb5bfbd3afd9dd3b3e5
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
-  netty-buffer-4.1.48.Final.jar: 7fd3ebb659c628e0158c9c2c971f4d0734d7f4f0
+  grpc-stub-1.44.0.jar: 5ee58904e9be31aca2682340c8f05f2bc51ccb6c
+  listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
+  netty-transport-native-unix-common-4.1.72.Final.jar: cedc023ffdcb68543b22a1ebc7960a160589aa09
+  .maven.yaml: 3ae3616a63a4ab3b1334a3be133dc73cabb0055b
+  netty-codec-http-4.1.72.Final.jar: a8f062d67303a5e4b2bc2ad48fb4fd8c99108e45
+  annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
+  netty-tcnative-boringssl-static-2.0.46.Final.jar: 5aaf1b7bf74dfe4ae8458c308b616e05f98403f3
+  grpc-api-1.44.0.jar: 0c1e6c5359d1501affbfee4926d1e4c584619570
+  grpc-context-1.44.0.jar: 343f88cb505db0976f1632df5edd17105cc4b74a
+  proto-google-common-protos-2.0.1.jar: 20827628ea2b9f69ae22987b2aedb0050e9c470d
+  protobuf-java-3.19.3.jar: 4b57f1b1b9e281231c3fcfc039ce3021e29ff570
+  grpc-protobuf-1.44.0.jar: aa739c79bd405f4d0a78735d82e6de847c7eec0b
+  netty-transport-native-epoll-4.1.72.Final-linux-x86_64.jar: b3eef308278d874e208388164b9eabcd1e1e6963
+  etcd3.js: be594e613de193eb0d76feedad80e96dc5be221b
+  netty-tcnative-classes-2.0.46.Final.jar: 9937a832d9c19861822d345b48ced388b645aa5f
+  slf4j-api-1.7.32.jar: cdcff33940d9f2de763bc41ea05a0be5941176c3
+  perfmark-api-0.23.0.jar: 0b813b7539fae6550541da8caafd6add86d4e22f
+  netty-codec-http2-4.1.72.Final.jar: 4b269e666fbace27d2c1efa57703e99b09655822
+  netty-transport-classes-epoll-4.1.72.Final.jar: 490c922f85c8f6a5b39bdeec1f6629d58d48eaff
+  netty-transport-4.1.72.Final.jar: 99138b436a584879355aca8fe3c64b46227d5d79
+  grpc-protobuf-lite-1.44.0.jar: 99bd18a0d30535ca47948359016e2ad1df92247c
+  grpc-netty-1.44.0.jar: d72c64d1efa954b2ce836e30f673183af10ac767
+  netty-buffer-4.1.72.Final.jar: f306eec3f79541f9b8af9c471a0d5b63b7996272
+  grpc-core-1.44.0.jar: b68d6638bee520200b8121bec5427722f2e0ec04
+  error_prone_annotations-2.9.0.jar: 74fe3b8b4f3fc84dc940d0ca4c4b270dbc902764
+  failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
+  animal-sniffer-annotations-1.19.jar: 1536e1a8fd552dc05f12b5f0827fbb2ee3d5a89b
+  netty-handler-proxy-4.1.72.Final.jar: 90de0fe610454d4296052ae36acb8a6a1d0333f1
+  netty-common-4.1.72.Final.jar: a55bac9c3af5f59828207b551a96ac19bbfc341e
+  etcd-java-0.0.19.jar: 5c5e929532df7ffe4b614989ac9377c7fd12311c
+  netty-codec-4.1.72.Final.jar: 613c4019d687db4e9a5532564e442f83c4474ed7

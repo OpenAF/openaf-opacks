@@ -1,0 +1,46 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- debug
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Debug.opack
+description: Debug wrapper functionality to transform comments into active debugging
+name: Debug
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220127'
+dependencies:
+  OpenAF: '>=20220127'
+files:
+- tests/testScript.js
+- tests/testScript1.js
+- tests/testScript2.js
+- tests/testRequire.js
+- tests/testOJob.yaml
+- tests/testScriptFn.js
+- tests/testScript3.js
+- .package.yaml
+- debug.yaml
+- debugFn.js
+- README.md
+- debug.js
+filesHash:
+  tests/testScript.js: 3e9286144a9e9cc85f79aa2d3124c5338025405f
+  tests/testScript1.js: 1e8641a4db30d3216a73d2c41ce571914b6782a5
+  tests/testScript2.js: 473ca4553256bd5c9f61fe5c49796f9f517d6e02
+  tests/testRequire.js: 98496ae0fd0bdc5a993e1883846283ef26e40e7c
+  tests/testOJob.yaml: a7ab825e0bdc79e0e7736d6104fdcb50851ab57d
+  tests/testScriptFn.js: b4e97ea08280514319c058f817e8087e54efde22
+  tests/testScript3.js: fe13b03cd912b164036b1bcad56519e68dcb3342
+  debug.yaml: d3b8a3be266057902930d99ca4e36860b4d8d369
+  debugFn.js: f1322d6ed7938a222c3cd875f340619e93ef5974
+  README.md: bbd92d2513f10870f2df25b7b65c31691133b51d
+  debug.js: 7653310132d7b82733575bf587fe93050efece4b

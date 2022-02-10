@@ -21,7 +21,7 @@ loadLib("docsify.js");
 
 var hs = ow.server.httpd.start(8080);
 ow.server.httpd.route(hs, { "/" : function(r, aHs) {
-    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify", "/", r));
+    return ow.server.httpd.replyDocsify(aHs, getOPackPath("Docsify"), "/", r);
 }});
 
 log("READY");

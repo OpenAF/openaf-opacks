@@ -5,27 +5,29 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - skype
-  - slack
-  - MS Bot Framework
-  - Bot
+- skype
+- slack
+- MS Bot Framework
+- Bot
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/MSBot'
-  url: 'https://openaf.io/opacks/MSBot.opack'
-description: >-
-  Provides a wrapper to access the MS Bot Framework to allow for skype, slack
-  and others interaction.
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/MSBot
+  url: https://openaf.io/opacks/MSBot.opack
+description: Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.
 name: MSBot
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20180503'
-dependencies: null
+dependencies:
+  packa: '>=20100101'
+  packb: <20120101
 files:
-  - .package.yaml
-  - MSBot.js
+- .precompile
+- .package.yaml
+- MSBot.js
 filesHash:
+  .precompile: e197229b05ddf5ccd71996bb511958c1c292dddb
   MSBot.js: aab3106e92ea6087908e6ed1f21f8b5376f019ac

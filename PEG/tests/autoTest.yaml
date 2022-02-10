@@ -1,0 +1,100 @@
+todo:
+- Results
+- Init
+
+- Test simple grammar
+- Test arithmetics grammar
+- Test json grammar
+- Test actions plugin
+
+include:
+- oJobTest.yaml
+
+ojob:
+  async : false
+  opacks:
+  - oJob-common
+  - openaf: 20210515
+  catch       : logErr(exception);
+  logToConsole: true 
+
+jobs:
+# -------------
+- name: Results
+  from: oJob Test Results
+  type: shutdown
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED: {{pass}}/{{count}}", args.results);
+    tprint("Tests FAILED: {{fail}}/{{count}}", args.results);
+    if (args.results.fail > 0) printErr("There are failed tests");
+    io.writeFileString("peg-test.md", ow.test.toMarkdown());
+    io.writeFileJSON("peg-test.json", args.results);
+
+# ----------
+- name: Init
+  exec: |
+    loadLib("peg.js");
+
+# -------------------------
+- name: Test simple grammar
+  deps: Init
+  to  : oJob Test
+  args: 
+    func: |
+      var p = new PEG();
+      p.setGrammar("start = ('a' / 'b')+");
+
+      ow.test.assert(isArray(p.parse("abba")), true, "Problem parsing simple grammar (1)");
+      var res = false;
+      try {
+        p.parse("abcd");
+      } catch(e) {
+        res = true;
+      }
+      ow.test.assert(res, true, "Problem parsing simple grammar (2)");
+
+# ------------------------------
+- name: Test arithmetics grammar
+  deps: Init
+  to  : oJob Test
+  args:
+    func: |
+      var p = new PEG();
+      p.loadGrammar("arithmetics");
+
+      ow.test.assert(p.parse("2+2"), 4, "Problem with the arithmetics grammar");
+
+# -----------------------
+- name: Test json grammar
+  deps: Init
+  to  : oJob Test
+  args:
+    func: |
+      var p = new PEG();
+      p.loadGrammar("json");
+
+      var t = { n: 1, s: "s", b: true };
+      ow.test.assert(p.parse(stringify(t)), t, "Problem with json grammar");
+
+# -------------------------
+- name: Test actions plugin
+  deps: Init
+  to  : oJob Test
+  args: 
+    func: |
+      var p = new PEG();
+
+      global._scheme = "";
+      p.addPlugin("ActionsPlugin", {
+        scheme: t => {
+          global._scheme = String(t);
+          return t;
+        } 
+      });
+
+      p.loadGrammar("ietf/rfc3986-uri.pegjs");
+      p.parse("https://openaf.io");
+
+      ow.test.assert(_scheme, "https", "Problem with actions plugin");

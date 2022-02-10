@@ -5,42 +5,42 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - apis
-  - weather
-  - geoip
-  - ip
-  - currency
-  - countries
-  - country
-  - trivia
-  - jokes
-  - fake
-  - data
-  - dns
-  - google
-  - cloudflare
+- apis
+- weather
+- geoip
+- ip
+- currency
+- countries
+- country
+- trivia
+- jokes
+- fake
+- data
+- dns
+- google
+- cloudflare
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs'
-  url: 'https://openaf.io/opacks/APIs.opack'
-description: >-
-  A collection of public REST APIs for currency check, country info, numbers &
-  dates trivia, GeoIP, finance, weather and a test service.
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/APIs
+  url: https://openaf.io/opacks/APIs.opack
+description: A collection of public REST APIs for currency check, country info, numbers & dates trivia, GeoIP, finance, weather and a test service.
 name: APIs
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20200806'
 dependencies:
   openaf: '>=20200401'
 files:
-  - .package.yaml
-  - .odoc.db
-  - apiYFinance.js
-  - apis.js
+- .precompile
+- .package.yaml
+- apiYFinance.js
+- apis.js
+- .odoc.db
 filesHash:
-  .odoc.db: c5163c8aaf12d889454f954ed3d8e070a1d5f895
+  .precompile: d1cd5d57e3a52a9d6e1aa6d4486e9d9dfa733639
   apiYFinance.js: 300dcc9493f4fc6a85199319424d30358607b1e0
   apis.js: 69f9e7d54fc9cf7864cd9f7a7263736769a5ce4e
+  .odoc.db: c5163c8aaf12d889454f954ed3d8e070a1d5f895

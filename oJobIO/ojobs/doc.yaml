@@ -65,10 +65,16 @@ jobs:
       return false;
     }
 
-    var jf = $from(j.jobs).equals("name", "Help");
     var data = {};
-    if (jf.any()) {
-        data = jf.at(0).help;
+    if (isUnDef(j.help)) {
+      // Old version < 20211229
+      var jf = $from(j.jobs).equals("name", "Help");
+      if (jf.any()) {
+          data = jf.at(0).help;
+      }
+    } else {
+      // New version
+      data = j.help
     }
 
     data.name = _$(args.name).default(args.job);

@@ -130,6 +130,62 @@ ElasticSearch.prototype.createIndex = function(aIndex, aNumberOfShards, aNumberO
 	return $rest(this.restmap).put(this.url + "/" + aIndex, options);
 };
 
+ElasticSearch.prototype.alias = function() {
+	var _ops = [];
+
+	var _o = {
+		list: () => {
+			return $rest(this.restmap).get(this.url + "/_aliases")
+		},
+		get: (anAlias) => {
+			return _o.list()[anAlias]
+		},
+		exec: () => {
+			return $rest(this.restmap).post(this.url + "/_aliases", { actions: _ops })
+		},
+		add: (anAlias, anIndex, isReadOnly, extraOptions) => {
+			var r = {
+				add: {
+					index: !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __,
+					alias  : !isArray(anAlias) ? anAlias : __,
+					aliases: isArray(anAlias) ? anAlias : __,
+					is_write_index: !isReadOnly ? true : false
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		},
+		removeIndex: (anIndex, extraOptions) => {
+			var r
+			r = {
+				remove_index: {
+					index  : !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		},
+		remove: (anAlias, anIndex, shouldDelete, extraOptions) => {
+			var r = {
+				remove: {
+					index  : !isArray(anIndex) ? anIndex : __,
+					indices: isArray(anIndex) ? anIndex : __,
+					alias  : !isArray(anAlias) ? anAlias : __,
+					aliases: isArray(anAlias) ? anAlias : __
+				}
+			}
+			r = merge(r, extraOptions)
+			_ops.push(r)
+			return _o
+		}
+	}
+	return _o
+}
+
 /**
  * <odoc>
  * <key>ElasticSearch.deleteIndex(aIndex) : Map</key>
@@ -451,8 +507,8 @@ ElasticSearch.prototype.getCounts = function(forQuery) {
 	}
 };
 
-ElasticSearch.prototype.getAllocation = function(useBytes) {
-	return $rest(this.restmap).get(this.url + "/_cat_allocation?format=json" + (useBytes ? "&bytes=b" : ""));
+ElasticSearch.prototype.getAllocation = function(anIndex, useBytes) {
+	return $rest(this.restmap).get(this.url + "/_cat/allocation?format=json" + (useBytes ? "&bytes=b" : ""));
 };
 
 ElasticSearch.prototype.getSettings = function() {
@@ -637,16 +693,17 @@ ElasticSearch.prototype.getNodesStats = function() {
  * Given aIndex will bulk export all documents using the aOutputFunc and calling providing each document as a parameter. Optionally if aMap.aLogFunc is
  * provided it will be called with a map containing op (e.g. init, start, error and done), the threadId and totalThread created. The parameter aMap.aBatchSize
  * allows to define a different number of documents sent per bulk call in each thread (defaults to 100). The parameter aMap.aNumThreads allows to specify the 
- * number of threads that will be used (defaults to the number of cores detected).
+ * number of threads that will be used (defaults to the number of cores detected). The parameter aMap.search allows the specification of a search query map.
  * </odoc>
  */
 ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 	aMap = _$(aMap).isMap().default({});
-	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads;
+	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads, search = aMap.search;
 	
 	var __batchSize = _$(batchSize).isNumber("BatchSize needs to be a number.").default(100);
 	var __threads   = _$(numThreads).isNumber("Threads needs to be a number.").default(getNumberOfCores());
 	var __index     = _$(aIndex).isString("Index needs to be a string.").$_("Please provide an index pattern aIndex=something*");
+	var __search    = _$(search).isMap("Search needs to be a map.").default(__);
 	var func        = _$(aOutputFunc).isFunction("OutputFunc needs to be a function.").$_("Please provide aOutputFunc");
 	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
 		aLogFunc = () => {};
@@ -656,13 +713,13 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 
 	var __iniBulk = [];
 	for(var ii = 0; ii < __threads; ii++) {
-        var res = this.createScroll(__index, void 0, __batchSize, void 0, ii, __threads);
+        var res = this.createScroll(__index, __search, __batchSize, void 0, ii, __threads);
         res.__index = ii + 1;
 		__iniBulk.push(res);
 		aLogFunc({
 			op: "init",
 			threadId: res.__index,
-			totalThread: __iniBulk[ii].hits.total
+			totalThread: isDef(__iniBulk[ii].hits) && isDef(__iniBulk[ii].hits.total) ? __iniBulk[ii].hits.total : __
 		});
 	}
 	
@@ -677,7 +734,7 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
 			});
 			while(res.hits.hits.length > 0) {
 				res.hits.hits.forEach((v) => {
-					aOutputFunc(v._source);
+					aOutputFunc(v._source, v);
 				});
 				res = parent.nextScroll(res);
 			}
@@ -732,7 +789,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 
 	batchSize = _$(batchSize).isNumber().default(9 * 1024 * 1024);
 	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
-	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(j)); });
+	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(sortMapKeys(j), __, "")); });
 	idKey = _$(idKey).default("id");
 	_$(aTransformFn).isFunction();
 
@@ -740,7 +797,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			aLogFunc = () => {};
 	}
 
-	var res, h = new ow.obj.http();
+	var res;
 	function sendBulk(tdata) {		
 		var uuid = genUUID();
 		try {
@@ -752,12 +809,15 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			var h = new ow.obj.http();
 			if (isDef(parent.user)) h.login(parent.user, parent.pass);
 			res = h.exec(parent.url + "/_bulk", "POST", tdata, { "Content-Type": "application/json" });
-			if (jsonParse(res.response).errors) throw "Errors on bulk operation";
+			if (isString(res.response)) {
+				var _em = jsonParse(res.response, true)
+				if (isMap(_em) && isDef(_em.errors) && _em.errors == true) throw "Errors on bulk operation";
+			}
 			if (isDef(aLogFunc)) aLogFunc({
 				op: "done",
 				uuid: uuid,
 				size: tdata.length,
-				result: jsonParse(res.response)
+				result: jsonParse(res.response, true)
 			});
 		} catch(e) {
 			try{
@@ -807,14 +867,14 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 
 /**
  * <odoc>
- * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aLogFunc, aBatchSize, aNumThreads)</key>
+ * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aMap)</key>
  * Given the provided aIndex uses ElasticSearch.exportIndex to generate a NDJSON on aFilename. Additionally you can provide aMap.logFunc, aMap.batchSize and
  *  aMap.numThreads. See help for ElasticSearch.exportIndex for more.
  * </odoc>
  */
 ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	aMap = _$(aMap).isMap().default({});
-	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads;
+	var aLogFunc = aMap.logFunc, batchSize = aMap.batchSize, numThreads = aMap.numThreads, search = aMap.search;
 
 	if (isUnDef(aLogFunc)) {
 		aLogFunc = (r) => {
@@ -832,7 +892,8 @@ ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	}, {
 		logFunc: aLogFunc, 
 		batchSize: batchSize, 
-		numThreads: numThreads
+		numThreads: numThreads,
+		search: search
 	});
 
 	wstream.close();
