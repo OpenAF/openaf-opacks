@@ -171,6 +171,104 @@ Kube.prototype.getConfigMaps = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getSecrets(aNamespace) : Array</key>
+ * Tries to retrieve the list of secrets on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getSecrets = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).secrets().list().items);
+	} else {
+		return (full ? this.__dR(this.client.secrets()) : this.__displayResult(this.client.secrets().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getDeployments(aNamespace) : Array</key>
+ * Tries to retrieve the list of deployments on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getDeployments = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).apps().deployments().list().items);
+	} else {
+		return (full ? this.__dR(this.client.apps().deployments()) : this.__displayResult(this.client.apps().deployments().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getDaemonSets(aNamespace) : Array</key>
+ * Tries to retrieve the list of daemon sets on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getDaemonSets = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).apps().daemonSets().list().items);
+	} else {
+		return (full ? this.__dR(this.client.apps().daemonSets()) : this.__displayResult(this.client.apps().daemonSets().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getReplicaSets(aNamespace) : Array</key>
+ * Tries to retrieve the list of daemon sets on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getReplicaSets = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).apps().replicaSets().list().items);
+	} else {
+		return (full ? this.__dR(this.client.apps().replicaSets()) : this.__displayResult(this.client.apps().replicaSets().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getStatefulSets(aNamespace) : Array</key>
+ * Tries to retrieve the list of stateful sets on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getStatefulSets = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).apps().statefulSets().list().items);
+	} else {
+		return (full ? this.__dR(this.client.apps().statefulSets()) : this.__displayResult(this.client.apps().statefulSets().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getPersistentVolumes(aNamespace) : Array</key>
+ * Tries to retrieve the list of persistent volumes on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getPersistentVolumes = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumes().list().items)
+	} else {
+		return (full ? this.__dR(this.client.persistentVolumes()) : this.__displayResult(this.client.persistentVolumes().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getPersistentVolumeClaims(aNamespace) : Array</key>
+ * Tries to retrieve the list of persistent volume claims on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getPersistentVolumeClaims = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).persistentvolumeClaims().list().items)
+	} else {
+		return (full ? this.__dR(this.client.persistentvolumeClaims()) : this.__displayResult(this.client.persistentvolumeClaims().list().items))
+	}
+}
+
+/**
+ * <odoc>
  * <key>Kube.getEndpoints(aNamespace) : Array</key>
  * Tries to retrieve the list of end points on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -222,6 +320,20 @@ Kube.prototype.getJobs = function(aNamespace, full) {
 		return this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items);
 	} else {
 		return (full ? this.__dR(this.client.batch().jobs()) : this.__displayResult(this.client.batch().jobs().list().items));
+	}
+};
+
+/**
+ * <odoc>
+ * <key>Kube.getCronJobs(aNamespace) : Array</key>
+ * Tries to retrieve the list of cron jobs on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getCronJobs = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.batch().cronjobs().inNamespace(aNamespace).list().items);
+	} else {
+		return (full ? this.__dR(this.client.batch().cronjobs()) : this.__displayResult(this.client.batch().cronjobs().list().items));
 	}
 };
 

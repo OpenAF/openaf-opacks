@@ -5,100 +5,100 @@ scripts:
   preerase: ''
   preinstall: ''
 keywords:
-  - Kubernetes
-  - Kube
+- Kubernetes
+- Kube
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
   backurl: ''
-  url: 'https://openaf.io/opacks/Kube.opack'
+  url: https://openaf.io/opacks/Kube.opack
 description: Kubernetes REST API access wrapper
 name: Kube
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20210430'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220210'
 dependencies:
   OpenAF: '>=20210412'
 files:
-  - .maven.yaml
-  - .odoc.db
-  - .package.yaml
-  - .precompile
-  - automaton-1.11-8.jar
-  - generex-1.0.2.jar
-  - jackson-annotations-2.11.2.jar
-  - jackson-core-2.11.2.jar
-  - jackson-databind-2.11.2.jar
-  - jackson-dataformat-yaml-2.11.2.jar
-  - jackson-datatype-jsr310-2.11.2.jar
-  - jakarta.activation-api-1.2.1.jar
-  - jakarta.xml.bind-api-2.3.2.jar
-  - kube.js
-  - kubernetes-client-5.3.1.jar
-  - kubernetes-model-admissionregistration-5.3.1.jar
-  - kubernetes-model-apiextensions-5.3.1.jar
-  - kubernetes-model-apps-5.3.1.jar
-  - kubernetes-model-autoscaling-5.3.1.jar
-  - kubernetes-model-batch-5.3.1.jar
-  - kubernetes-model-certificates-5.3.1.jar
-  - kubernetes-model-common-5.3.1.jar
-  - kubernetes-model-coordination-5.3.1.jar
-  - kubernetes-model-core-5.3.1.jar
-  - kubernetes-model-discovery-5.3.1.jar
-  - kubernetes-model-events-5.3.1.jar
-  - kubernetes-model-extensions-5.3.1.jar
-  - kubernetes-model-metrics-5.3.1.jar
-  - kubernetes-model-networking-5.3.1.jar
-  - kubernetes-model-node-5.3.1.jar
-  - kubernetes-model-policy-5.3.1.jar
-  - kubernetes-model-rbac-5.3.1.jar
-  - kubernetes-model-scheduling-5.3.1.jar
-  - kubernetes-model-storageclass-5.3.1.jar
-  - logging-interceptor-3.12.12.jar
-  - okhttp-3.12.12.jar
-  - okio-1.15.0.jar
-  - slf4j-api-1.7.30.jar
-  - snakeyaml-1.26.jar
-  - zjsonpatch-0.3.0.jar
+- okhttp-3.12.12.jar
+- .precompile
+- jakarta.activation-api-1.2.1.jar
+- snakeyaml-1.26.jar
+- jackson-dataformat-yaml-2.11.2.jar
+- kubernetes-model-autoscaling-5.3.1.jar
+- kubernetes-model-admissionregistration-5.3.1.jar
+- okio-1.15.0.jar
+- kubernetes-model-apps-5.3.1.jar
+- kube.js
+- kubernetes-model-common-5.3.1.jar
+- kubernetes-model-rbac-5.3.1.jar
+- .maven.yaml
+- .package.yaml
+- kubernetes-model-discovery-5.3.1.jar
+- kubernetes-model-extensions-5.3.1.jar
+- kubernetes-model-core-5.3.1.jar
+- jackson-annotations-2.11.2.jar
+- kubernetes-model-node-5.3.1.jar
+- automaton-1.11-8.jar
+- kubernetes-client-5.3.1.jar
+- kubernetes-model-storageclass-5.3.1.jar
+- kubernetes-model-policy-5.3.1.jar
+- kubernetes-model-batch-5.3.1.jar
+- kubernetes-model-coordination-5.3.1.jar
+- slf4j-api-1.7.30.jar
+- jakarta.xml.bind-api-2.3.2.jar
+- kubernetes-model-scheduling-5.3.1.jar
+- generex-1.0.2.jar
+- zjsonpatch-0.3.0.jar
+- kubernetes-model-events-5.3.1.jar
+- logging-interceptor-3.12.12.jar
+- jackson-databind-2.11.2.jar
+- kubernetes-model-networking-5.3.1.jar
+- jackson-core-2.11.2.jar
+- kubernetes-model-apiextensions-5.3.1.jar
+- kubernetes-model-certificates-5.3.1.jar
+- kubernetes-model-metrics-5.3.1.jar
+- .odoc.db
+- jackson-datatype-jsr310-2.11.2.jar
 filesHash:
-  .maven.yaml: 9b5f98b6394bd39acc934b8247574d23bb112087
-  .odoc.db: c34e9b7ea3f70830e23669e8468b3570397aaea0
-  .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
-  automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
-  generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
-  jackson-annotations-2.11.2.jar: 0e0a7f61fce3e3eac38a079c11831868269de2ea
-  jackson-core-2.11.2.jar: bc022ab0f0c83c07f9c52c5ab9a6a4932b15cc35
-  jackson-databind-2.11.2.jar: ee08bbd8975dde844307fe8309dfcd5ec7ee129d
-  jackson-dataformat-yaml-2.11.2.jar: 71af2529ab5ea33f7b9d13d4f421688c4491e5dc
-  jackson-datatype-jsr310-2.11.2.jar: e6235e5eb3cf3edd2a95cd0dc96bc48aeb309e8a
-  jakarta.activation-api-1.2.1.jar: 562a587face36ec7eff2db7f2fc95425c6602bc1
-  jakarta.xml.bind-api-2.3.2.jar: 8d49996a4338670764d7ca4b85a1c4ccf7fe665d
-  kube.js: 23a957f1febef6104a2e05c44c48698c525d0c35
-  kubernetes-client-5.3.1.jar: e6a96753e63522e6a794a47340d882ff9b4edff9
-  kubernetes-model-admissionregistration-5.3.1.jar: a2d32b6a3c3102d51e8e424145ac6f68f0dcd4fb
-  kubernetes-model-apiextensions-5.3.1.jar: 6b45425f96585115b1df72071c7d20184ecfcd7c
-  kubernetes-model-apps-5.3.1.jar: 3376792449a8898dbcd7105d24e9432403eafda6
-  kubernetes-model-autoscaling-5.3.1.jar: 3b2f5332fde5e59a4460b67bc907ea61dae6e326
-  kubernetes-model-batch-5.3.1.jar: 18fd7b86db6662953badba43bba0c4da44b09ccb
-  kubernetes-model-certificates-5.3.1.jar: ba713c1facac7a402fd4c249dce348ab7bf3bfc6
-  kubernetes-model-common-5.3.1.jar: 0873373f955c2b532ac3bd52db756e68e3851030
-  kubernetes-model-coordination-5.3.1.jar: cbf7fbc5210412732dbb8290b2257f5b0db745d5
-  kubernetes-model-core-5.3.1.jar: 08054029a8a1b601cfd716b650e58992c8d382f5
-  kubernetes-model-discovery-5.3.1.jar: 1d69799a2e84a2db46a47c73619d87034fe9071c
-  kubernetes-model-events-5.3.1.jar: 6b8b7ca782bbdd4a7e3b0f0b10d07636d07f1755
-  kubernetes-model-extensions-5.3.1.jar: 33b11a2e9c6834227d73a48e0263c3ba2482b7ad
-  kubernetes-model-metrics-5.3.1.jar: fd63c29fc8c195044b25c96d4eee9408da4116a6
-  kubernetes-model-networking-5.3.1.jar: a91d4e941c4d1909168c77b3c9b331cde376b6ea
-  kubernetes-model-node-5.3.1.jar: cb0da2e02fa163b28e21bb429689a540efae10b6
-  kubernetes-model-policy-5.3.1.jar: 68e49ecc663f6869cc15f987abfb2d3a99639fd8
-  kubernetes-model-rbac-5.3.1.jar: 617ab8115309f51f37ee8988a74649f3abfed479
-  kubernetes-model-scheduling-5.3.1.jar: 938971ba59aa611e6edf9d5c48b89e7bdfb74821
-  kubernetes-model-storageclass-5.3.1.jar: 2cc4929a067a43355107dcd1b0118dda4dbc86a5
-  logging-interceptor-3.12.12.jar: d952189f6abb148ff72aab246aa8c28cf99b469f
   okhttp-3.12.12.jar: d3e1ce1d2b3119adf270b2d00d947beb03fe3321
-  okio-1.15.0.jar: bc28b5a964c8f5721eb58ee3f3c47a9bcbf4f4d8
-  slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
+  .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
+  jakarta.activation-api-1.2.1.jar: 562a587face36ec7eff2db7f2fc95425c6602bc1
   snakeyaml-1.26.jar: a78a8747147d2c5807683e76ec2b633e95c14fe9
+  jackson-dataformat-yaml-2.11.2.jar: 71af2529ab5ea33f7b9d13d4f421688c4491e5dc
+  kubernetes-model-autoscaling-5.3.1.jar: 3b2f5332fde5e59a4460b67bc907ea61dae6e326
+  kubernetes-model-admissionregistration-5.3.1.jar: a2d32b6a3c3102d51e8e424145ac6f68f0dcd4fb
+  okio-1.15.0.jar: bc28b5a964c8f5721eb58ee3f3c47a9bcbf4f4d8
+  kubernetes-model-apps-5.3.1.jar: 3376792449a8898dbcd7105d24e9432403eafda6
+  kube.js: 62fe89544890828a59a685adb62c4eb15a718fc2
+  kubernetes-model-common-5.3.1.jar: 0873373f955c2b532ac3bd52db756e68e3851030
+  kubernetes-model-rbac-5.3.1.jar: 617ab8115309f51f37ee8988a74649f3abfed479
+  .maven.yaml: 9b5f98b6394bd39acc934b8247574d23bb112087
+  kubernetes-model-discovery-5.3.1.jar: 1d69799a2e84a2db46a47c73619d87034fe9071c
+  kubernetes-model-extensions-5.3.1.jar: 33b11a2e9c6834227d73a48e0263c3ba2482b7ad
+  kubernetes-model-core-5.3.1.jar: 08054029a8a1b601cfd716b650e58992c8d382f5
+  jackson-annotations-2.11.2.jar: 0e0a7f61fce3e3eac38a079c11831868269de2ea
+  kubernetes-model-node-5.3.1.jar: cb0da2e02fa163b28e21bb429689a540efae10b6
+  automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
+  kubernetes-client-5.3.1.jar: e6a96753e63522e6a794a47340d882ff9b4edff9
+  kubernetes-model-storageclass-5.3.1.jar: 2cc4929a067a43355107dcd1b0118dda4dbc86a5
+  kubernetes-model-policy-5.3.1.jar: 68e49ecc663f6869cc15f987abfb2d3a99639fd8
+  kubernetes-model-batch-5.3.1.jar: 18fd7b86db6662953badba43bba0c4da44b09ccb
+  kubernetes-model-coordination-5.3.1.jar: cbf7fbc5210412732dbb8290b2257f5b0db745d5
+  slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
+  jakarta.xml.bind-api-2.3.2.jar: 8d49996a4338670764d7ca4b85a1c4ccf7fe665d
+  kubernetes-model-scheduling-5.3.1.jar: 938971ba59aa611e6edf9d5c48b89e7bdfb74821
+  generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
   zjsonpatch-0.3.0.jar: d3ebf0f291297649b4c8dc3ecc81d2eddedc100d
+  kubernetes-model-events-5.3.1.jar: 6b8b7ca782bbdd4a7e3b0f0b10d07636d07f1755
+  logging-interceptor-3.12.12.jar: d952189f6abb148ff72aab246aa8c28cf99b469f
+  jackson-databind-2.11.2.jar: ee08bbd8975dde844307fe8309dfcd5ec7ee129d
+  kubernetes-model-networking-5.3.1.jar: a91d4e941c4d1909168c77b3c9b331cde376b6ea
+  jackson-core-2.11.2.jar: bc022ab0f0c83c07f9c52c5ab9a6a4932b15cc35
+  kubernetes-model-apiextensions-5.3.1.jar: 6b45425f96585115b1df72071c7d20184ecfcd7c
+  kubernetes-model-certificates-5.3.1.jar: ba713c1facac7a402fd4c249dce348ab7bf3bfc6
+  kubernetes-model-metrics-5.3.1.jar: fd63c29fc8c195044b25c96d4eee9408da4116a6
+  .odoc.db: c34e9b7ea3f70830e23669e8468b3570397aaea0
+  jackson-datatype-jsr310-2.11.2.jar: e6235e5eb3cf3edd2a95cd0dc96bc48aeb309e8a
