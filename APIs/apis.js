@@ -168,6 +168,209 @@
 
     /**
      * <odoc>
+     * <key>apis.OpenMeteo</key>
+     * From: https://open-meteo.com
+     * </odoc>
+     */
+    var _OpenMeteo_translateWeatherCode = aWC => {
+        aWC = _$(aWC, "aWC").toNumber().isNumber().default(__)
+        switch(aWC) {
+        case 0         : return "Clear sky"
+        case 1, 2, 3   : return "Mainly clear, partly cloudy, and overcast"
+        case 45, 48    : return "Fog and depositing rime fog"
+        case 51, 53, 55: return "Drizzle: Light, moderate, and dense intensity"
+        case 56, 57    : return	"Freezing Drizzle: Light and dense intensity"
+        case 61, 63, 65: return "Rain: Slight, moderate and heavy intensity"
+        case 66, 67    : return "Freezing Rain: Light and heavy intensity"
+        case 71, 73, 75: return "Snow fall: Slight, moderate, and heavy intensity"
+        case 77        : return	"Snow grains"
+        case 80, 81, 82: return "Rain showers: Slight, moderate, and violent"
+        case 85, 86    : return	"Snow showers slight and heavy"
+        case 95        : return "Thunderstorm: Slight or moderate"
+        case 96, 99    : return "Thunderstorm with slight and heavy hail"
+        default        : return aWC
+        }
+    }
+    exports.OpenMeteo = {
+        getHourlyForecast: (aLat, aLon) => {
+            aLat = _$(aLat, "aLat").isNumber().default(__)
+            aLon = _$(aLon, "aLon").isNumber().default(__)
+
+            if (isUnDef(aLat) || isUnDef(aLog)) {
+                ow.loadNet()
+                var myPos = ow.net.getPublicIP()
+                aLat = myPos.latitude
+                aLon = myPos.longitude
+            }
+
+            var res = $rest().get("https://api.open-meteo.com/v1/forecast?latitude="+aLat+"&longitude="+aLon+"&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,pressure_msl,precipitation,weathercode,snow_depth,freezinglevel_height,shortwave_radiation,direct_radiation,diffuse_radiation,evapotranspiration")
+
+            if (isDef(res) && isDef(res.hourly) && isArray(res.hourly.weathercode))
+                res.hourly.weathercode = res.hourly.weathercode.map(_OpenMeteo_translateWeatherCode)
+
+            return res
+        },
+        getDailyForecast: (aLat, aLon, aTZ) => {
+            aLat = _$(aLat, "aLat").isNumber().default(__)
+            aLon = _$(aLon, "aLon").isNumber().default(__)
+            aTZ  = _$(aTZ, "aTZ").isString().default("UTC")
+
+            if (isUnDef(aLat) || isUnDef(aLog)) {
+                ow.loadNet()
+                var myPos = ow.net.getPublicIP()
+                aLat = myPos.latitude
+                aLon = myPos.longitude
+            }
+
+            var res = $rest().get("https://api.open-meteo.com/v1/forecast?latitude="+aLat+"&longitude="+aLon+"&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,precipitation_sum,precipitation_hours,windspeed_10m_max,windgusts_10m_max,winddirection_10m_dominant&timezone="+aTZ)
+            
+            if (isDef(res) && isDef(res.daily) && isArray(res.daily.weathercode))
+                res.daily.weathercode = res.daily.weathercode.map(_OpenMeteo_translateWeatherCode)
+
+            return res
+        },
+        getSunRiseSetByLatLon: (aLat, aLon, aPeriod, aTZ) => {
+            aLat = _$(aLat, "aLat").isNumber().default(__)
+            aLon = _$(aLon, "aLon").isNumber().default(__)
+            aTZ  = _$(aTZ, "aTZ").isString().default("UTC")
+            aPeriod = _$(aPeriod, "aPeriod").oneOf(["sunset","sunrise"]).default("sunset,sunrise")
+
+            if (isUnDef(aLat) || isUnDef(aLog)) {
+                ow.loadNet()
+                var myPos = ow.net.getPublicIP()
+                aLat = myPos.latitude
+                aLon = myPos.longitude
+            }
+
+            var res = $rest().get("https://api.open-meteo.com/v1/forecast?latitude="+aLat+"&longitude="+aLon+"&current_weather=true&timezone="+aTZ+"&daily="+aPeriod) 
+
+            if (isDef(res.current_weather) && isNumber(res.current_weather.weathercode))
+               res.weatherDesc = _OpenMeteo_translateWeatherCode(res.current_weather.weathercode)
+
+            return res
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.LatLon</key>
+     * From: https://nominatim.org/release-docs/develop/api/Search/
+     * </odoc>
+     */
+    exports.LatLon = {
+        getLatLon: (aQuery, retRaw) => {
+            aQuery = _$(aQuery, "aQuery").isString().$_()
+            retRaw = _$(retRaw, "retRaw").isBoolean().default(false)
+
+            var res = $rest({uriQuery: true}).get("https://nominatim.openstreetmap.org/search", { 
+                q: aQuery,
+                format: "jsonv2" 
+            })
+
+            if (retRaw) {
+                return res
+            } else {
+                return { lat: res[0].lat, lon: res[0].lon }
+            }
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.SunRiseSet</key>
+     * From: https://sunrise-sunset.org
+     * </odoc>
+     */
+    exports.SunRiseSet = {
+        getByLatLog: (aDat, aLat, aLon) => {
+            aLat = _$(aLat, "aLat").isNumber().default(__)
+            aLon = _$(aLon, "aLon").isNumber().default(__)
+            aDat = _$(aDat, "aDat").isString().default("today")
+
+            if (isUnDef(aLat) || isUnDef(aLog)) {
+                ow.loadNet()
+                var myPos = ow.net.getPublicIP()
+                aLat = myPos.latitude
+                aLon = myPos.longitude
+            }
+
+            var res = $rest({uriQuery: true}).get("https://api.sunrise-sunset.org/json", {
+                lat      : aLat,
+                lng      : aLon,
+                date     : aDat,
+                formatted: 0
+            })
+
+            return res.results
+        }
+    }
+    /**
+     * <odoc>
+     * <key>apis.EvilInsult</key>
+     * From: https://evilinsult.com/api/#generate-insult-get
+     * </odoc>
+     */
+    exports.EvilInsult = {
+        get: function() {
+            return $rest().get("https://evilinsult.com/generate_insult.php?lang=en&type=json").insult
+        }
+    }
+    /**
+     * <odoc>
+     * <key>apis.Loripsum</key>
+     * From: https://loripsum.net
+     * </odoc>
+     */
+    exports.Loripsum = {
+        get: function(aNum, aSize) {
+            aNum  = _$(aNum, "aNum").isNumber().default(__)
+            aSize = _$(aSize, "aSize").oneOf(["short", "medium", "long", "verylong"]).default("short")
+
+            var res = "/plaintext"
+            if (isDef(aNum)) res += "/" + aNum
+            if (isDef(aSize)) res += "/" + aSize
+
+            return $rest().get("https://loripsum.net/api" + res)
+        }
+    }
+    /**
+     * <odoc>
+     * <key>apis.RandomData</key>
+     * From: https://random-data-api.com/documentation
+     * </odoc>
+     */
+    exports.RandomData = { 
+        get: function(aResource, aSize) {
+            aResource = _$(aResource, "aResource").isString().default("stripe")
+            aSize     = _$(aSize, "aSize").isNumber().default(__)
+
+            return $rest().get("https://random-data-api.com/api/" + aResource + "/random_" + aResource + (isNumber(aSize) ? "?size=" + aSize : ""))
+        }
+    }
+    /**
+     * <odoc>
+     * <key>apis.Metaphorpsum</key>
+     * From: http://metaphorpsum.com
+     * </odoc>
+     */
+    exports.Metaphorpsum = {
+        get: function(aNumParagraphs, aNumSentences) {
+            aNumParagraphs = _$(aNumParagraphs, "aNumParagraphs").isNumber().default(1)
+            aNumSentences  = _$(aNumSentences, "aNumSentences").isNumber().default(1)
+
+            var res = {}
+
+            if (isDef(aNumSentences))  res = aNumSentences
+            if (isDef(aNumParagraphs)) 
+                res = "/paragraphs/" + aNumParagraphs + "/" + res
+            else
+                res = "/sentences/" + res
+
+            return $rest().get("http://metaphorpsum.com" + res)
+        }
+    }
+    /**
+     * <odoc>
      * <key>apis.ChuckNorrisJokes</key>
      * From: https://api.chucknorris.io
      * Auth: none
