@@ -1,14 +1,4 @@
 artifacts:
-
-    - id     : kubernetes-client
-      group  : io.fabric8
-      version: 5.1.1
-  
-    - id     : kubernetes-model
-      group  : io.fabric8
-      version: 5.1.1
-    
-    - id     : generex
-      group  : com.github.mifmif
-      version: 1.0.2
-  
+- id     : kubernetes-client
+  group  : io.fabric8
+  version: 5.12.1

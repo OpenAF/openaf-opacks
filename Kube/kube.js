@@ -58,13 +58,22 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 	var cmd = newJavaArray(java.lang.String, pre.length);
 	for(var ii in pre) { cmd[ii] = new java.lang.String(pre[ii]); }
 
+	var error, gI = genUUID()
+	aw = $await(gI)
 	var watch = this.client.pods()
 				.inNamespace(aNamespace)
 				.withName(aPod)
 				.writingOutput(stream)
 				.writingError(stream)
-				.exec(cmd);
-	watch.waitUntilReady();
+				.usingListener({
+					onOpen   : () =>     { },
+					onFailure: (t,fR) => { error = t; aw.notify() },
+					onClose  : (i,s) =>  { aw.notify() } 
+				})
+				.exec(cmd)
+	aw.wait(aTimeout)
+	if (isDef(error)) throw error
+	//watch.waitUntilReady();
 
 	stream.flush();
 	var res = stream.toString();
@@ -261,9 +270,9 @@ Kube.prototype.getPersistentVolumes = function(aNamespace, full) {
  */
 Kube.prototype.getPersistentVolumeClaims = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).persistentvolumeClaims().list().items)
+		return this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumeClaims().list().items)
 	} else {
-		return (full ? this.__dR(this.client.persistentvolumeClaims()) : this.__displayResult(this.client.persistentvolumeClaims().list().items))
+		return (full ? this.__dR(this.client.persistentVolumeClaims()) : this.__displayResult(this.client.persistentVolumeClaims().list().items))
 	}
 }
 
