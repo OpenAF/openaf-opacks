@@ -520,6 +520,7 @@
      * <key>apis.UINames</key>
      * From: https://github.com/thm/uinames
      * Auth: none
+     * </odoc>
      */
     exports.UINames = {
         getBasicInfo: (anAmount, aGender, aRegion) => {
@@ -538,4 +539,155 @@
             });
         },
     };
+
+    /**
+     * <odoc>
+     * <key>apis.Binance</key>
+     * From: https://api2.binance.com/api/v3/ticker/24hr
+     * Auth: none
+     * 
+     * 24 hours crypto finance ticket
+     * </odoc>
+     */
+    exports.Binance = {
+        get: () => {
+            return $rest().get("https://api2.binance.com/api/v3/ticker/24hr")
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.BoredActivity</key>
+     * From: https://www.boredapi.com/api/activity
+     * Auth: none
+     * 
+     * Provides activity suggestions
+     * </odoc>
+     */
+    exports.BoredActivity = {
+        getJson: () => {
+            return $rest().get("https://www.boredapi.com/api/activity")
+        },
+        get: () => {
+            return $rest().get("https://www.boredapi.com/api/activity").activity
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apias.CocktailDB</key>
+     * From: https://www.thecocktaildb.com/api/json/v1/1/search.php?s=margarita
+     * Auth: none
+     * 
+     * Provide cocktail information
+     * </odoc>
+     */
+    exports.CocktailDB = {
+        get: aDrink => {
+            _$(aDrink, "aDrink").isString().$_()
+
+            return $rest({ uriQuery: true }).get("https://www.thecocktaildb.com/api/json/v1/1/search.php", { s: aDrink })
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.Currency2</key>
+     * From: https://api.coinbase.com/v2/currencies
+     *       https://api.coingecko.com/api/v3/exchange_rates
+     * Auth: none
+     * 
+     * Retrives a list of currency values
+     * </odoc>
+     */
+    exports.Currency2 = {
+        get: () => {
+            return $rest().get("https://api.coinbase.com/v2/currencies")
+        },
+        getCrypto: () => {
+            return $rest().get("https://api.coingecko.com/api/v3/exchange_rates")
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.Bitcoin</key>
+     * From: https://api.coindesk.com/v1/bpi/currentprice.json
+     * Auth: none
+     * 
+     * Retrives the current bitcoin price
+     * </odoc>
+     */
+    exports.Bitcoin = {
+        get: () => {
+            return $rest().get("https://api.coindesk.com/v1/bpi/currentprice.json")
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.iTunesSearch</key>
+     * From: https://itunes.apple.com/search
+     * Auth: none
+     * 
+     * Retrieves itunes search information
+     * </odoc>
+     */
+    exports.iTunesSearch = {
+        get: aTerm => {
+            _$(aTerm).isString().$_()
+            return $rest({ uriQuery: true }).get("https://itunes.apple.com/search", { term: aTerm })
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.Joke</key>
+     * From: https://v2.jokeapi.dev/joke/Any
+     * Auth: none
+     * 
+     * Retrieves jokes
+     * </odoc>
+     */
+    exports.Joke = {
+        getJson: () => {
+            return $rest().get("https://v2.jokeapi.dev/joke/Any")
+        },
+        get: () => {
+            return $rest().get("https://v2.jokeapi.dev/joke/Any").joke
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.PublicHolidays</key>
+     * From: https://date.nager.at/api/v2/publicholidays
+     * Auth: None
+     * 
+     * Retrives a list of public holidays
+     * </odoc>
+     */
+    exports.PublicHolidays = {
+        get: (aCountry, aYear) => {
+            ow.loadFormat()
+            aYear = _$(aYear, "aYear").isNumber().default(ow.format.fromDate(new Date(), "yyyy"))
+
+            return $rest().get("https://date.nager.at/api/v2/publicholidays/" + aYear + "/" + aCountry.toUpperCase())
+        }
+    }
+
+    /**
+     * <odoc>
+     * <key>apis.PublicAPIs</key>
+     * From: https://api.publicapis.org/entries
+     * Auth: None
+     * 
+     * Retrieves a list of public APIs
+     * </odoc>
+     */
+    expects.PublicAPIs = {
+        get: () => {
+            return $rest().get("https://api.publicapis.org/entries")
+        }
+    }
 })();
