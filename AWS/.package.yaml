@@ -28,9 +28,9 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220110'
+version: '20220118'
 dependencies:
-  OpenAF: '>=20210515'
+  OpenAF: '>=20211229'
 files:
 - .precompile
 - aws_cloudwatch.js
@@ -40,6 +40,7 @@ files:
 - aws_core.js
 - aws_events.js
 - aws_pi.js
+- aws_ecr.js
 - aws_sqs.js
 - aws_dynamo.js
 - aws_ecs.js
@@ -60,6 +61,7 @@ filesHash:
   aws_core.js: f8b505114f33dd00f03b22405d1c1571063a29f4
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_pi.js: 4dfe2ca9661fc42a9072452005953344c1ee61b2
+  aws_ecr.js: 7efb01affc6aa72f5963243bcf03d189a691703d
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   aws_dynamo.js: c96be8e1a041ef473db494d68aa8dc739b2831bf
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
@@ -70,5 +72,5 @@ filesHash:
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  .odoc.db: a8b198ea10b1f04c73f55894820a8debae2d4cd7
-  aws.js: e2a745fa41accff2c7aa656adeb19092a470ff3c
+  .odoc.db: 337580f55cd6aa14b3f0d0c28861b9455e198ecf
+  aws.js: f08eb5be964889a67020b5173ad0fae2ae523169
