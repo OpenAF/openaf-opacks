@@ -669,6 +669,7 @@
      */
     exports.PublicHolidays = {
         get: (aCountry, aYear) => {
+            _$(aCountry, "aCountry").isString().$_()
             ow.loadFormat()
             aYear = _$(aYear, "aYear").isNumber().default(ow.format.fromDate(new Date(), "yyyy"))
 
@@ -685,7 +686,7 @@
      * Retrieves a list of public APIs
      * </odoc>
      */
-    expects.PublicAPIs = {
+    exports.PublicAPIs = {
         get: () => {
             return $rest().get("https://api.publicapis.org/entries")
         }
