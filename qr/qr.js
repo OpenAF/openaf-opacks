@@ -282,18 +282,36 @@ QR.prototype.genCalString = function(aName, aBeginDate, aEndDate, aLocation, aDe
    return out;
 };
 
+/**
+ * <odoc>
+ * <key>QR.genYTString(aVideoId) : String</key>
+ * Produces the QR text to share a YouTube video
+ * </odoc>
+ */
 QR.prototype.genYTString = function(aVideoId) {
    var out = "";
    out += "youtube://" + aVideoId;
    return out;
 };
 
+/**
+ * <odoc>
+ * <key>QR.genFTString(aId, onlyAudio) : String</key>
+ * Produces the QR test to share a FaceTime call to aId optionally onlyAudio (true/false)
+ * </odoc>
+ */
 QR.prototype.genFTString = function(aId, onlyAudio) {
    var out = "";
    out += "facetime" + (onlyAudio ? "-audio" : "") + ":" + aId;
    return out;
 };
 
+/**
+ * <odoc>
+ * <key>QR.genOTPAuth(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod) : String</key>
+ * Produces the QR test to share an OTP (One-Time-Password) for aAccountName, aIssuerName, aSecret, aAlg (e.g. SHA1), aDigits and aPeriod.
+ * </odoc>
+ */
 QR.prototype.genOTPAuth = function(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod) {
    var out = "";
    aDigits = _$(aDigits).isNumber().default(6);

@@ -5,40 +5,40 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - qr
-  - qrcode
-  - barcode
+- qr
+- qrcode
+- barcode
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/QR.opack'
+  url: https://openaf.io/opacks/QR.opack
 description: Generates and reads QR codes
 name: QR
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
-version: '20200125'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220301'
 dependencies:
   openaf: '>=20200101'
 files:
-  - .package.yaml
-  - tests/tests.yaml
-  - tests/tests.js
-  - .odoc.db
-  - lib/jai-imageio-core-1.4.0.jar
-  - lib/core-3.4.0.jar
-  - lib/javase-3.4.0.jar
-  - qr.js
-  - .precompile
-  - .maven.yaml
+- .precompile
+- tests/tests.js
+- tests/tests.yaml
+- .maven.yaml
+- lib/javase-3.4.0.jar
+- lib/jai-imageio-core-1.4.0.jar
+- lib/core-3.4.0.jar
+- .package.yaml
+- qr.js
+- .odoc.db
 filesHash:
-  tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
+  .precompile: 87d0b8c5672656702f3a8a3230f916cbbede5086
   tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af
-  .odoc.db: f2e608a7d717ae2525e1e8129eb4d314b70d5ea7
+  tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
+  .maven.yaml: 6f8d0871142e3f2e12237c18f758d952a26c9f25
+  lib/javase-3.4.0.jar: 8be20100f28515037a31cc0bbe557501c0538147
   lib/jai-imageio-core-1.4.0.jar: fb6d79b929556362a241b2f65a04e538062f0077
   lib/core-3.4.0.jar: 5264296c46634347890ec9250bc65f14b7362bf8
-  lib/javase-3.4.0.jar: 8be20100f28515037a31cc0bbe557501c0538147
-  qr.js: 777e939e6e3c877b251d61c3ac9b2dcfc248a821
-  .precompile: 87d0b8c5672656702f3a8a3230f916cbbede5086
-  .maven.yaml: 6f8d0871142e3f2e12237c18f758d952a26c9f25
+  qr.js: 79931628007963980262f8f2e8e77a6fd62f0c82
+  .odoc.db: ff36ff6713ef41ea3d53d9c7cb35add0cce164d2
