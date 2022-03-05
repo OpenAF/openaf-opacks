@@ -770,12 +770,14 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
  * map with op (e.g. start, error and done), uuid with unique identification of each thread used and size with the data size being handle by each thread. The optional
  * parameter aMap.batchSize can also be provided so that each bulk import thread uses a different maximum size from the default 10MB. If the optional parameter aMap.transformFn 
  * is provided that function will be executed for each document and the returned transformed documented will be the one used on the import.
+ * For recent ElasticSearch versions that no longer support the _type field you can set aMap.noType = true.
  * </odoc>
  */
 ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 	ow.loadObj();
 	aMap = _$(aMap).isMap().default({});
 	var aFnId = aMap.aFnId, idKey = aMap.idKey, aTransformFn = aMap.transformFn, aLogFunc = aMap.logFunc, batchSize = aMap.batchSize;
+	var noType = _$(aMap.noType, "noType").isBoolean().default(false)
 
 	if (isUnDef(aLogFunc)) {
 		aLogFunc = (r) => {
@@ -790,7 +792,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 	batchSize = _$(batchSize).isNumber().default(9 * 1024 * 1024);
 	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
 	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(sortMapKeys(j), __, "")); });
-	idKey = _$(idKey).default("id");
+	if (!noType) idKey = _$(idKey).default("id");
 	_$(aTransformFn).isFunction();
 
 	if (isUnDef(aLogFunc) || !isFunction(aLogFunc)) {
