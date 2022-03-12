@@ -44,7 +44,7 @@ jobs:
 - name: Prepare file list
   exec: |
     io.rm(global.dir + "/.git");
-    global.lst = listFilesRecursive(global.dir);
+    global.lst = $from(listFilesRecursive(global.dir)).notContains("filepath", "/.").select();
 
 # --------------------
 - name: Create folders
@@ -52,7 +52,7 @@ jobs:
   - Create folder
   exec: |
     log("Creating folders...");
-    global.lst.map(r => (r.isDirectory ? each(r) : void 0));
+    global.lst.forEach(r => (r.isDirectory ? each(r) : __));
     log("Folders created.");
 
 # -------------------
@@ -70,7 +70,7 @@ jobs:
   - Copy file
   exec: |
     log("Moving files...");
-    global.lst.map(r => (r.isFile ? each(r) : void 0));
+    global.lst.forEach(r => (r.isFile ? each(r) : __));
     log("Files moved.");
 
 # ----------------

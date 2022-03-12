@@ -28,7 +28,7 @@ jobs:
   - Get oJob-commons
   - Copy content
   exec: |
-    args.output = _$(args.output, "output").default("output");
+    args.output     = _$(args.output, "output").default("output");
     args.init.proto = _$(args.PROTO, "PROTO").default(args.init.proto);
     args.init.name  = _$(args.NAME, "NAME").default(args.init.name);
     args.init.url   = _$(args.URL, "URL").default(args.init.url);
@@ -36,9 +36,10 @@ jobs:
     var l = [], lp = [];
      
     $from(listFilesRecursive("_output"))
+    .notStarts("filename", ".")
     .attach("dir", r => (r.isFile ? r.filepath.substr(0, r.filepath.lastIndexOf("/")) : r.filepath))
     .sort("dir", "-isDirectory", "filename")
-    .select().map(r => {
+    .select(r => {
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
           var orig = r.filepath;
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "");
@@ -53,7 +54,7 @@ jobs:
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n";
     //parallel4Array(lp, f => {
-    lp.map(f => {
+    lp.forEach(f => {
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n";
          return true;
@@ -109,7 +110,7 @@ jobs:
 - name: Copy content
   deps: Prepare output
   exec: |
-    listFilesRecursive("ojobs").map(r => {
+    listFilesRecursive("ojobs").forEach(r => {
        if (r.isFile) {
          log("Copying " + r.filepath + "...");
          io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"));

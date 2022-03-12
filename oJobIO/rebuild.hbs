@@ -77,7 +77,7 @@ jobs:
         }
         if (isDef(h) && isDef(h.help) && isDef(h.help.expects)) {
            print("\n" + ansiColor("ITALIC", "Please fill out the job arguments (no value entered is equivalent to not providing the argument):") );
-           h.help.expects.map(r => {
+           h.help.expects.forEach(r => {
               print("\n  \"" + r.desc + "\"");
               var tmp = String(con.readLinePrompt("  (" + ansiColor("BOLD", r.name) + "): "));
               if (tmp != "") {
