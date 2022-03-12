@@ -1,44 +1,48 @@
 include:
-   - oJobTest.yaml
+- oJobTest.yaml
+
+ojob:
+  opacks:
+  - oJob-common
 
 jobs:
-   # XLS tests
-   # --------------
-   - name: XLS::Init
-     exec: |
-       args.tests = require("autoTestAll.XLS.js");
+# XLS tests
+# --------------
+- name: XLS::Init
+  exec: |
+    args.tests = require("autoTestAll.XLS.js")
 
-   - name: XLS::Simple XLS creation
-     from: XLS::Init
-     to  : oJob Test
-     exec: args.func = args.tests.testXLSSimple;
+- name: XLS::Simple XLS creation
+  from: XLS::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testXLSSimple
 
-   - name: XLS::XLS Loading
-     from: XLS::Init
-     to  : oJob Test
-     deps: 
-        - XLS::Simple XLS creation
-     exec: args.func = args.tests.testXLSLoad;
+- name: XLS::XLS Loading
+  from: XLS::Init
+  to  : oJob Test
+  deps: 
+  - XLS::Simple XLS creation
+  exec: args.func = args.tests.testXLSLoad
 
-   - name: XLS::XLS Simple Create
-     from: XLS::Init
-     to  : oJob Test
-     deps: 
-        - XLS::Simple XLS creation
-     exec: args.func = args.tests.testSimpleCreateTable;
+- name: XLS::XLS Simple Create
+  from: XLS::Init
+  to  : oJob Test
+  deps: 
+  - XLS::Simple XLS creation
+  exec: args.func = args.tests.testSimpleCreateTable
 
-   - name: XLS::XLS Simple Load
-     from: XLS::Init
-     to  : oJob Test
-     deps: 
-        - XLS::Simple XLS creation
-     exec: args.func = args.tests.testSimpleLoadTable;
+- name: XLS::XLS Simple Load
+  from: XLS::Init
+  to  : oJob Test
+  deps:  
+  - XLS::Simple XLS creation
+  exec: args.func = args.tests.testSimpleLoadTable
 
 todo:
-   # XLS tests
-   # ------------
-   - XLS::Init
-   - XLS::Simple XLS creation
-   - XLS::XLS Loading
-   - XLS::XLS Simple Create
-   - XLS::XLS Simple Load
+# XLS tests
+# ------------
+- XLS::Init
+- XLS::Simple XLS creation
+- XLS::XLS Loading
+- XLS::XLS Simple Create
+- XLS::XLS Simple Load

@@ -5,12 +5,12 @@ ojob:
   async: true
 
 todo:
-  - Clean up
-  - Download jars
-  - Compile XLS plugin
-  - Prepare XLS jar
-  - Prepare help
-  - Clean up end
+#- Clean up
+#- Download jars
+- Compile XLS plugin
+- Prepare XLS jar
+- Prepare help
+- Clean up end
 
 jobs:
   # ----------------------
@@ -60,8 +60,8 @@ jobs:
 
   ##########################
   - name: Compile XLS plugin
-    deps:
-      - Download jars
+    #deps:
+    #  - Download jars
     args:
       - outputDir: *OUTPUT_DIR
     exec: |

@@ -169,7 +169,7 @@ public class XLS extends ScriptableObject {
 	 */
 	protected static String translateType(Cell cell) {
 		@SuppressWarnings("deprecation")
-		CellType c = cell.getCellTypeEnum();
+		CellType c = cell.getCellType();
 		if (c == CellType.BLANK) return "BLANK";
 		if (c == CellType.BOOLEAN) return "BOOLEAN";
 		if (c == CellType.ERROR) return "ERROR";
@@ -861,7 +861,7 @@ public class XLS extends ScriptableObject {
 		Cell cell = (Cell) cel;
 		
 		@SuppressWarnings("deprecation")
-		CellType type = cell.getCellTypeEnum();
+		CellType type = cell.getCellType();
 		if (type == CellType.BOOLEAN) data = cell.getBooleanCellValue();
 		else if (type == CellType.NUMERIC) {
 			double d = cell.getNumericCellValue();
@@ -880,7 +880,7 @@ public class XLS extends ScriptableObject {
 			}
 			if (isFormulaEvaluated) {
 				@SuppressWarnings("deprecation")
-				CellType ctf = cell.getCachedFormulaResultTypeEnum();
+				CellType ctf = cell.getCachedFormulaResultType();
 				if (ctf == CellType.BOOLEAN) data = cell.getBooleanCellValue();
 				else if (ctf == CellType.NUMERIC) {
 					double dd = cell.getNumericCellValue();
@@ -913,10 +913,10 @@ public class XLS extends ScriptableObject {
 		//cellS.put("col", cellS, y);
 		cellS.put("type", cellS, translateType(cell));
 		
-		if (evaluateFormulas && cell.getCellTypeEnum() == CellType.FORMULA) {
+		if (evaluateFormulas && cell.getCellType() == CellType.FORMULA) {
 			CellValue cellValue = evaluator.evaluate(cell);
 			
-			CellType ct = cellValue.getCellTypeEnum();
+			CellType ct = cellValue.getCellType();
 		    if (ct == CellType.BOOLEAN) cellS.put("val", cellS, new Boolean(cellValue.getBooleanValue())); 
 		    else if (ct == CellType.NUMERIC) { 
 				double d = cellValue.getNumberValue();
@@ -1173,7 +1173,7 @@ public class XLS extends ScriptableObject {
 				cell = cellIterator.next();
 				
 				if (cell.getColumnIndex() >= (ignoreCol-1)) {				
-					if (cell.getCellTypeEnum() != CellType.BLANK) {
+					if (cell.getCellType() != CellType.BLANK) {
 						keys.add(getCellValueRaw(cell, true, true).toString());
 					} else {
 						shouldContinue = false;

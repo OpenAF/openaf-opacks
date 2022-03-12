@@ -1,0 +1,30 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  opacks:
+  - oJob-common
+
+jobs:
+# DOC tests
+# --------------
+- name: DOC::Init
+  exec: |
+    args.tests = require("autoTestAll.DOC.js")
+
+- name: DOC::Simple
+  from: DOC::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDOCSimple
+
+- name: DOC::Custom Headings
+  from: DOC::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testCustomHeadings
+
+todo:
+# DOC tests
+# ------------
+- DOC::Init
+- DOC::Simple
+- DOC::Custom Headings

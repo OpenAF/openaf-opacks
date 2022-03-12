@@ -34,6 +34,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHpsMeasure;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPrGeneral;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
@@ -317,32 +318,32 @@ public class DOC extends ScriptableObject {
         ctStyle.setQFormat(onoffnull);
     
         // style defines a heading of the given level
-        CTPPr ppr = CTPPr.Factory.newInstance();
+        CTPPrGeneral ppr = CTPPrGeneral.Factory.newInstance();
         ppr.setOutlineLvl(indentNumber);
         ctStyle.setPPr(ppr);
-    
+        
         XWPFStyle style = new XWPFStyle(ctStyle);
-    
+        
         CTHpsMeasure size = CTHpsMeasure.Factory.newInstance();
         size.setVal(new BigInteger(String.valueOf(pointSize)));
         CTHpsMeasure size2 = CTHpsMeasure.Factory.newInstance();
         size2.setVal(new BigInteger("24"));
-    
+        
         CTFonts fonts = CTFonts.Factory.newInstance();
         fonts.setAscii(font);
     
         CTRPr rpr = CTRPr.Factory.newInstance();
-        rpr.setRFonts(fonts);
-        rpr.setSz(size);
-        rpr.setSzCs(size2);
-        if (isItalic) rpr.setI(onoffnull);
-        if (isBold) rpr.setB(onoffnull);
+        rpr.setRFontsArray(new CTFonts[] { fonts });
+        rpr.setSzArray(new CTHpsMeasure[] { size });
+        rpr.setSzCsArray(new CTHpsMeasure[] { size2 });
+        if (isItalic) rpr.setIArray(new CTOnOff[] { onoffnull });
+        if (isBold) rpr.setBArray(new CTOnOff[] { onoffnull });
     
         CTColor color=CTColor.Factory.newInstance();
         color.setVal(hexColor);
-        rpr.setColor(color);
+        rpr.setColorArray(new CTColor[] { color });
         style.getCTStyle().setRPr(rpr);
-    
+        
         style.setType(STStyleType.PARAGRAPH);
         ((XWPFStyles) styles).addStyle(style);
     }
