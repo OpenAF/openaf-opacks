@@ -1,7 +1,20 @@
+help: 
+  text   : Generates an oJob.io job template to jump start the creation of a new job.
+  expects:
+  - name   : jobs
+    desc   : Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
+    example: Stuff\\ to\\ do,Other\\ jobs
+  - name   : author
+    desc   : The author to add on the comments
+    example: Anonymous
+  - name   : async
+    desc   : If the job is sequential or async (e.g. "true")
+    example: "false"
+
 init:
   tmpl: |
     # Author: {{author}}
-    help: &HELP
+    help:
       text   : Does stuff. 
       expects: 
       - name     : something
@@ -9,9 +22,6 @@ init:
         example  : aValueExample
         mandatory: true
     
-    init:
-      help: *HELP
-
     todo:
     {{#if config}}
     - Init
@@ -22,8 +32,8 @@ init:
 
     ojob:
       opacks      :
-      - openaf: 20210515
-      catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception);"
+      - openaf: 20211229
+      catch       : logErr(exception)
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
       {{/if}}{{#if config}}
@@ -31,15 +41,11 @@ init:
     - ojob.io/_common{{/if}}      
 
     jobs:
-    # ----------
-    - name: Help
-      help: *HELP
-
-    {{#if config}}
+    {{~#if config}}
     # ----------
     - name: Init
       from: oJobIO configuration
-      args:
+      args~
         __store  : something
         #__options:
         #  askSet: true
@@ -49,12 +55,13 @@ init:
           default: stuff
       exec: |
         global.something = args.something;{{/if}}{{#each jobs}}
-    # ------{{sep}}
-    - name: {{name}}
-      exec: |
-        _$(args.something, "something").{{#if ../config}}default(global.something){{else}}$_(){{/if}};
-
-        ow.oJob.output(args, args);
+    # -------{{sep}}
+    - name : {{name}}
+      check:
+        in:
+          something: isString{{#if ../config}}.default(global.something){{/if}}
+      exec : |
+        ow.oJob.output(args, args)
     {{/each}}
 
 todo:
@@ -67,21 +74,6 @@ ojob:
   logToConsole: false
 
 jobs:
-# ----------
-- name: Help
-  help: 
-    text   : Generates an oJob.io job template to jump start the creation of a new job.
-    expects:
-    - name   : jobs
-      desc   : Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
-      example: Stuff\\ to\\ do,Other\\ jobs
-    - name   : author
-      desc   : The author to add on the comments
-      example: Anonymous
-    - name   : async
-      desc   : If the job is sequential or async (e.g. "true")
-      example: "false"
-
 # ------------------
 - name: Generate Job
   exec: |

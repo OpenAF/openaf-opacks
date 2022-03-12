@@ -70,7 +70,8 @@ jobs:
            
         var hcmd = [];
   
-        var h = $from(oj.jobs).equals("name", "Help").at(0);
+        var h = $from(oj.jobs).equals("name", "Help").at(0)
+        if (isUnDef(h) && isDef(oj.help)) h = oj
         if (isDef(h) && isDef(h.help) && isDef(h.help.text)) {
            print("\n" + ansiColor("BOLD", "Job description:\n") + ansiColor("ITALIC", "\"" + h.help.text + "\""));
         }

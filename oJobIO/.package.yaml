@@ -12,15 +12,15 @@ bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: https://openaf.io/opacks/oDoc2MD.opack
+  url: https://openaf.io/opacks/oJobIO.opack
 description: Service to provide easy-to-access oJobs for daily routines.
 name: oJobIO
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220112'
+version: '20220311'
 dependencies:
-  openaf: '>=20210515'
+  openaf: '>=20211229'
 files:
 - .package.yaml
 - ojobs/help.yaml
@@ -54,19 +54,19 @@ filesHash:
   ojobs/html.yaml: bb7ca7c8de989dfe918611cc0e7e79e1992b5216
   ojobs/map.yaml: deb33a36f808ff82877791c86386510063928cac
   ojobs/envs.yaml: 7b2a34193cc10765c656e03a71bf4ebfa768c069
-  ojobs/generate.yaml: 9848cc2cf8a2dedf35a6180579420c691250d323
+  ojobs/generate.yaml: 13d4d1ace85f5e262eb05f7a49e253b1f3f3a42d
   ojobs/clean.yaml: 9962774faad9838a872957963a8ae8bee91d5ea4
   ojobs/echo.yaml: f0040d39d7e4002133d989f189ec35a8c9716db2
   ojobs/check.yaml: 9bb7136a6cdd3b422368d9155f3dc7c41677105f
   ojobs/hash.yaml: 9a0dd0b9338c6024b538e42079833359ef2a9d5b
   ojobs/doc.yaml: f9be4fe35df53545d4e0cb40651668e574054776
-  ojobs/hello/index.yaml: 30de348ce16f6aece4c8574e192cb0736e224d7a
-  ojobs/hello/world.yaml: b570175f6d48306ebc933f690312402b6de9b6bb
+  ojobs/hello/index.yaml: a0a072fa94b82221ad68d4d15f9ec7b62b07aeb9
+  ojobs/hello/world.yaml: 195f769e2463141d028bb033e7236c51847cb67b
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
   Dockerfile: 4a726bc4ac51720f0552a2ded7d0847dba895743
   server.yaml: 208aedc081db38001b1742a7838ea84bf3af6e9f
   rebuild.yaml: b24d4dbc883562231be97273acf1de4480ca73e1
-  rebuild.hbs: c73c41e36ddc8ec419e2b1f294460bc08d86b37d
+  rebuild.hbs: a1e8ed1d0774914c1be94a8794113c979bae4be4
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   setupOJobIO.yaml: 7505d1ec95e4ddc568cd1d5656ab3f25a2e57699
   imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572

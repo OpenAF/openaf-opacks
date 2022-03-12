@@ -1,4 +1,6 @@
 # Author: Nuno Aguiar
+help: 
+  text: Simply prints Hello world.
 
 todo:
 - Hello World
@@ -6,7 +8,3 @@ todo:
 jobs:
 - name: Hello World
   exec: ow.oJob.output("Hello world!", args); 
-
-- name: Help
-  help: 
-    text: Simply prints Hello world.
