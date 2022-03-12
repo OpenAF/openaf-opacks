@@ -67,13 +67,13 @@ Prolog.prototype.assert = function(aFact, onStart) {
    if (onStart) cmd = "asserta"; else cmd = "assertz";
 
    aFact = cmd + "(" + aFact.trim().replace(/\.$/, "") + ").";
-   return this.__parseresult(this.pl.query(aFact));
+   return this.__parseresult(this.pl.executeQuery(aFact));
 };
 
 Prolog.prototype.__parseresult = function(aQ, aT, aL) {
    aL = _$(aL, "aLimit").isNumber().default(-1);
 
-   var r1 = aQ.getResult(), res = [];
+   var r1 = aQ, res = [];
    var ks = af.fromJavaArray(r1.getVariableIds().toArray());
 
    if (isDef(aT) && isMap(aT)) { Object.keys(aT).forEach(k => r1.setTerm(k, new org.projog.core.term.Atom(aT[k]))) }
@@ -108,7 +108,7 @@ Prolog.prototype.__parseresult = function(aQ, aT, aL) {
  */
 Prolog.prototype.query = function(aQuery, aTerms, aLimit) {
    if (!aQuery.endsWith(".")) aQuery += ".";
-   var q = this.pl.query(aQuery);
+   var q = this.pl.executeQuery(aQuery);
 
    return this.__parseresult(q, aTerms, aLimit);
 };
