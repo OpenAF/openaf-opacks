@@ -1,6 +1,6 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-   
+
     <groupId>openaf</groupId>
     <artifactId>openaf-opacks</artifactId>
     <version>20210101</version>
@@ -8,45 +8,40 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.javascript</groupId>
-            <artifactId>closure-compiler</artifactId>
-            <version>v20201102</version>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit-cli</artifactId>
+            <version>1.9.1</version>
         </dependency>
         <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-            <version>5.1.1</version>
-        </dependency>       
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit</artifactId>
+            <version>1.9.1</version>
+        </dependency>
         <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-model</artifactId>
-            <version>5.1.1</version>
-        </dependency>            
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit-javahl16</artifactId>
+            <version>1.9.1</version>
+        </dependency>
         <dependency>
-            <groupId>com.github.mifmif</groupId>
-            <artifactId>generex</artifactId>
-            <version>1.0.2</version>
-        </dependency>            
+            <groupId>com.trilead</groupId>
+            <artifactId>trilead-ssh2</artifactId>
+            <version>1.0.0-build221</version>
+        </dependency>
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>3.9.1</version>
-        </dependency>    
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>3.4</version>
+        </dependency>
         <dependency>
-            <groupId>org.apache.ignite</groupId>
-            <artifactId>ignite-core</artifactId>
-            <version>2.10.0</version>
-        </dependency>   
+            <groupId>de.regnis.q.sequence</groupId>
+            <artifactId>sequence-library</artifactId>
+            <version>1.0.3</version>
+        </dependency>
         <dependency>
-            <groupId>org.gridgain</groupId>
-            <artifactId>ignite-shmem</artifactId>
-            <version>1.0.0</version>
-        </dependency>            
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>            
+            <groupId>org.tmatesoft.sqljet</groupId>
+            <artifactId>sqljet</artifactId>
+            <version>1.1.11</version>
+        </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
@@ -58,119 +53,59 @@
             <version>2.1.6</version>
         </dependency>
         <dependency>
-            <groupId>org.tmatesoft.svnkit</groupId>
-            <artifactId>svnkit-cli</artifactId>
-            <version>1.9.1</version>
-        </dependency>     
-        <dependency>
-            <groupId>org.tmatesoft.svnkit</groupId>
-            <artifactId>svnkit</artifactId>
-            <version>1.9.1</version>
-        </dependency>         
-        <dependency>
-            <groupId>org.tmatesoft.svnkit</groupId>
-            <artifactId>svnkit-javahl16</artifactId>
-            <version>1.9.1</version>
+            <groupId>com.github.virtuald</groupId>
+            <artifactId>curvesapi</artifactId>
+            <version>1.07</version>
         </dependency>
         <dependency>
-            <groupId>com.trilead</groupId>
-            <artifactId>trilead-ssh2</artifactId>
-            <version>1.0.0-build221</version>
-        </dependency>         
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-            <version>3.4</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>SparseBitSet</artifactId>
+            <version>1.2</version>
         </dependency>
-        <dependency>
-            <groupId>de.regnis.q.sequence</groupId>
-            <artifactId>sequence-library</artifactId>
-            <version>1.0.3</version>
-        </dependency>       
-        <dependency>
-            <groupId>org.tmatesoft.sqljet</groupId>
-            <artifactId>sqljet</artifactId>
-            <version>1.1.11</version>
-        </dependency>      
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.2</version>
-        </dependency>     
+            <version>5.2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-excelant</artifactId>
-            <version>4.1.2</version>
-        </dependency>               
+            <version>5.2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
-        </dependency>            
+            <version>5.2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml-schemas</artifactId>
-            <version>4.1.2</version>
-        </dependency>       
+            <artifactId>poi-ooxml-full</artifactId>
+            <version>5.2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
-            <version>4.1.2</version>
-        </dependency>        
+            <version>5.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.17.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.17.2</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
-            <version>3.1.0</version>
-        </dependency>       
-        <dependency>
-            <groupId>projog-core</groupId>
-            <artifactId>org.projob</artifactId>
-            <version>3.1.0</version>
+            <version>5.0.3</version>
         </dependency>
-        <dependency>
-            <groupId>core</groupId>
-            <artifactId>com.google.zxing</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javase</groupId>
-            <artifactId>com.google.zxing</artifactId>
-            <version>3.4.0</version>
-        </dependency>         
-        <dependency>
-            <groupId>jai-imageio-core</groupId>
-            <artifactId>com.github.jai-imageio</artifactId>
-            <version>1.4.0</version>
-        </dependency> 
-        <dependency>
-            <groupId>jedis</groupId>
-            <artifactId>redis.clients.jedis</artifactId>
-            <version>3.3.0</version>
-        </dependency>      
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>8.2.2</version>
-        </dependency>     
         <dependency>
             <groupId>org.knowm.xchart</groupId>
             <artifactId>xchart</artifactId>
-            <version>3.5.0</version>
-        </dependency>  
-        <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>libpam4j</artifactId>
-            <version>1.11</version>
-        </dependency>   
-        <dependency>
-            <groupId>org.rocksdb</groupId>
-            <artifactId>rocksdbjni</artifactId>
-            <version>6.19.3</version>
-        </dependency>          
-        <dependency>
-            <groupId>com.github.jai-imageio</groupId>
-            <artifactId>jai-imageio-core</artifactId>
-            <version>1.4.0</version>
+            <version>3.8.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -181,192 +116,51 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.4.0</version>
-        </dependency> 
-        <dependency>
-            <groupId>net.sf.ucanaccess</groupId>
-            <artifactId>ucanaccess</artifactId>
-            <version>4.0.2</version>
-        </dependency>    
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>com.healthmarketscience.jackcess</groupId>
-            <artifactId>jackcess</artifactId>
-            <version>2.1.8</version>
-        </dependency>    
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>   
-        <dependency>
-            <groupId>com.github.mifmif</groupId>
-            <artifactId>generex</artifactId>
-            <version>1.0.2</version>
-        </dependency>        
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.11.2</version>
+            <groupId>com.github.jai-imageio</groupId>
+            <artifactId>jai-imageio-core</artifactId>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.11.2</version>
+            <groupId>org.projog</groupId>
+            <artifactId>projog-core</artifactId>
+            <version>0.4.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.11.2</version>
-        </dependency>            
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.11.2</version>
-        </dependency>           
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.11.2</version>
-        </dependency>   
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.12.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>logging-interceptor</artifactId>
-            <version>3.12.12</version>
-        </dependency>     
         <dependency>
             <groupId>io.fabric8</groupId>
-            <artifactId>zjsonpatch</artifactId>
-            <version>0.3.0</version>
-        </dependency>    
+            <artifactId>kubernetes-client</artifactId>
+            <version>5.12.1</version>
+        </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
-        </dependency>    
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.3.3</version>
+        </dependency>
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.26</version>
-        </dependency>        
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-core</artifactId>
+            <version>2.10.0</version>
+        </dependency>
         <dependency>
-            <groupId>com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
-            <version>1.15.0</version>
-        </dependency>        
+            <groupId>org.gridgain</groupId>
+            <artifactId>ignite-shmem</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.2</version>
-        </dependency>   
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-            <version>1.2.1</version>
-        </dependency>  
+            <groupId>com.google.javascript</groupId>
+            <artifactId>closure-compiler</artifactId>
+            <version>v20201102</version>
+        </dependency>
         <dependency>
-            <groupId>dk.brics.automaton</groupId>
-            <artifactId>automaton</artifactId>
-            <version>1.11-8</version>
-        </dependency>        
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>libphonenumber</artifactId>
-            <version>8.12.23</version>
-        </dependency> 
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>geocoder</artifactId>
-            <version>2.159</version>
-        </dependency>  
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>carrier</artifactId>
-            <version>1.149</version>
-        </dependency>    
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>prefixmapper</artifactId>
-            <version>2.159</version>
-        </dependency>     
-        <dependency>
-            <groupId>com.google.protobuf.nano</groupId>
-            <artifactId>protobuf-javanano</artifactId>
-            <version>3.0.0-alpha-7</version>
-        </dependency>  
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-epoll</artifactId>
-            <version>4.1.51.Final</version>
-            <classifier>linux-x86_64</classifier>
-         </dependency>
-         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-tcnative-boringssl-static</artifactId>
-            <version>2.0.31.Final</version>
-         </dependency>
-         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>1.33.1</version>
-         </dependency>
-         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-protobuf</artifactId>
-            <version>1.33.1</version>
-         </dependency>
-         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
-            <version>1.33.1</version>
-         </dependency>
-         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-         </dependency>
-         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>30.0-jre</version>
-         </dependency>
-         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>29.0-jre</version>
-         </dependency>
-         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>annotations-api</artifactId>
-            <version>6.0.53</version>
-         </dependency>  
-         <dependency>
-            <groupId>com.amihaiemil.web</groupId>
-            <artifactId>docker-java-api</artifactId>
-            <version>0.0.12</version>
-        </dependency> 
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-            <version>1.1.4</version>
-        </dependency>  
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json</artifactId>
-            <version>1.1.4</version>
-        </dependency>  
-		<dependency>
-		    <groupId>com.github.jnr</groupId>
-		    <artifactId>jnr-unixsocket</artifactId>
-		    <version>0.18</version>
-		</dependency>                                                
+            <groupId>com.ibm.etcd</groupId>
+            <artifactId>etcd-java</artifactId>
+            <version>0.0.19</version>
+        </dependency>
     </dependencies>
-</project>  
+</project>
