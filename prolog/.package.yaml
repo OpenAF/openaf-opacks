@@ -28,6 +28,7 @@ files:
 - README.md
 - prolog.js
 - prolog.yaml
+- .odoc.db
 filesHash:
   projog-core-0.5.0.jar: ad3053c0f4c22ba4b4c7cb9181f4b38e137ef96b
   .precompile: 61adf0138f2b4c4f5a6f4ce1116d1a439e4c9aff
@@ -35,3 +36,4 @@ filesHash:
   README.md: 11fa0d1f43baa377d79c76a1176e7e4bdbf09894
   prolog.js: 972cb4d381f5810408f436d189fe2bb6aae1f7d3
   prolog.yaml: ff4214def94e85120e4da52f7ea8046bd963f552
+  .odoc.db: a216883b46f9c6dd79cba2528c49a876f9d2b2e1
