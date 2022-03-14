@@ -30,7 +30,7 @@ name: APIs
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220226'
+version: '20220313'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -42,5 +42,5 @@ files:
 filesHash:
   .precompile: d1cd5d57e3a52a9d6e1aa6d4486e9d9dfa733639
   apiYFinance.js: 300dcc9493f4fc6a85199319424d30358607b1e0
-  apis.js: eef0aeb0373678480cd6525668c545c93b8091fd
+  apis.js: dcc5d1c4fdddd19781008e3f8b64558751e08928
   .odoc.db: fd36c6849222bcd2e30fb52a588e340798ecd943

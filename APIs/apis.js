@@ -43,7 +43,7 @@
     /**
      * <odoc>
      * <key>apis.Countries</key>
-     * From: https://restcountries.eu
+     * From: https://restcountries.com
      * Auth: none
      * 
      * From: https://sunrise-sunset.org/api
@@ -52,19 +52,19 @@
      */
     exports.Countries = {
         getAllCountries: function() {
-            return ow.obj.rest.jsonGet("https://restcountries.eu/rest/v2/all");
+            return $rest().get("https://restcountries.com/v3.1/all");
         },
         getCountry: function(aCountry) {
-            return ow.obj.rest.jsonGet("https://restcountries.eu/rest/v2/name/" + aCountry);
+            return $rest().get("https://restcountries.com/v3.1/name/" + aCountry);
         },
         getCountryByCode: function(aCode) {
-            return ow.obj.rest.jsonGet("https://restcountries.eu/rest/v2/alpha?codes=" + aCode);
+            return $rest().get("https://restcountries.com/v3.1/alpha?codes=" + aCode);
         },
         getCountryByCurrency: function(aCurrency) {
-            return ow.obj.rest.jsonGet("https://restcountries.eu/rest/v2/currency/" + aCurrency);
+            return $rest().get("https://restcountries.com/v3.1/currency/" + aCurrency);
         },
         getCountryByCallingCode: function(aCode) {
-            return ow.obj.rest.jsonGet("https://restcountries.eu/rest/v2/callingcode/" + aCode);
+            return $rest().get("https://restcountries.com/v2/callingcode/" + aCode);
         },
         getSunriseSunsetByLatLog: function(aLat, aLog, aDate) {
             if (isUnDef(aDate)) aDate = "today"; else aDate = ow.format.fromDate(aDate, "yyyy-MM-dd");
