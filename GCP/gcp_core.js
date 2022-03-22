@@ -3,7 +3,7 @@ var GCP = function(aFileOrToken) {
 
     if (isUnDef(aFileOrToken)) {
         var res = $rest().get("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token")
-        this._token      = res.access_token
+        aFileOrToken     = res.access_token
         this._expires_in = now() + (res.expires_in * 1000)
         this.authMethod  = "metadata"
     }
