@@ -1,0 +1,31 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- Keyword1
+- keyword2
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/GCP.opack
+description: Simplified and light GCP API calls to avoid including the GCP Java SDK (work in progress)
+name: GCP
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220321'
+dependencies:
+  OpenAF: '>=20211229'
+files:
+- gcp_iam.js
+- gcp.js
+- gcp_core.js
+- .package.yaml
+filesHash:
+  gcp_iam.js: 8175ae3905e95ec70b72ef70f5ebbae93d8bac40
+  gcp.js: c66300d540b30a5bd52f5d9ef7ed708092593938
+  gcp_core.js: bb45c78e0968cde38453df918575d33c30c18f08
