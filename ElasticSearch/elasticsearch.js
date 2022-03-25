@@ -854,7 +854,7 @@ ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
 			}
 			data += tmp;
 			cdata++;
-		}, "\n", false);
+		}, "\n");
 		
 		if (data != "") {
 			each(String(data));
@@ -890,7 +890,7 @@ ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
 	this.exportIndex(aIndex, function(v) {
 		var s = (isDef(v._source) ? v._source : v);
 		var m = stringify(s, void 0, "") + "\n";
-		ioStreamWrite(wstream, m, m.length, false);
+		ioStreamWrite(wstream, m, m.length);
 	}, {
 		logFunc: aLogFunc, 
 		batchSize: batchSize, 
