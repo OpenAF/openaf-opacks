@@ -265,15 +265,17 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
    var params = _$(aParams).isString().default(""), payload = "";
    aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
 
-   if (aContentType == "application/x-www-form-urlencoded") 
+   if (!aContentType.endsWith("charset=utf-8")) aContentType = aContentType + "; charset=utf-8"
+
+   if (aContentType.startsWith("application/x-www-form-urlencoded"))
       payload = ow.obj.rest.writeQuery(aArgs);
    else
       payload = stringify(aArgs, void 0, "");
    var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, aContentType);
 
-   return $rest({ 
-      urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
-      requestHeaders: extra   
+   return $rest({
+      urlEncode: (aContentType.startsWith("application/x-www-form-urlencoded")),
+      requestHeaders: extra
    }).post(aURL, aArgs);
 };
 

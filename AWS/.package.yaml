@@ -10,6 +10,7 @@ keywords:
 - sqs
 - rds
 - ecs
+- ecr
 - dynamo
 - cloudwatch
 - cost
@@ -28,7 +29,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220118'
+version: '20220403'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -58,7 +59,7 @@ filesHash:
   aws_cloudwatch.js: 582fc6453bdd7e75572f68ad86d82a164d143694
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
-  aws_core.js: f8b505114f33dd00f03b22405d1c1571063a29f4
+  aws_core.js: ac7123b889c7036b48c481b2ddb9a3afd4dc8401
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_pi.js: 4dfe2ca9661fc42a9072452005953344c1ee61b2
   aws_ecr.js: 7efb01affc6aa72f5963243bcf03d189a691703d
