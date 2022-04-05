@@ -12,8 +12,8 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
 	this.user = aUser;
 	this.pass = aPassword;
 	this.restmap = {
-		login: this.user,
-		pass : this.pass
+		login: Packages.openaf.AFCmdBase.afc.dIP(this.user),
+		pass : Packages.openaf.AFCmdBase.afc.dIP(this.pass)
 	};
 };
 
@@ -26,8 +26,8 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
  */
 ElasticSearch.prototype.setRESTMap = function(aMap) {
 	this.restmap = merge(aMap, {
-		login: this.user,
-		pass : this.pass
+		login: Packages.openaf.AFCmdBase.afc.dIP(this.user),
+		pass : Packages.openaf.AFCmdBase.afc.dIP(this.pass)
 	});
 };
 
