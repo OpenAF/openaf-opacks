@@ -17,27 +17,63 @@ name: Docker
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210718'
+version: '20220419'
 dependencies:
-  openaf: '>=20210515'
+  openaf: '>=20211229'
 files:
-- docker.yaml
-- .precompile
-- docker.js
-- lib/javax.json-1.1.4.jar
-- lib/docker-java-api-0.0.13-jar-with-dependencies.jar
-- lib/javax.json-api-1.1.4.jar
-- .package.yaml
-- README.md
-- dockerRegistry.js
 - .odoc.db
+- docker.yaml
+- README.md
+- docker.js
+- .package.yaml
+- lib/asm-tree-5.0.3.jar
+- lib/httpclient-4.5.5.jar
+- lib/jnr-constants-0.9.8.jar
+- lib/jnr-ffi-2.1.4.jar
+- lib/httpcore-4.4.9.jar
+- lib/commons-codec-1.10.jar
+- lib/jnr-enxio-0.16.jar
+- lib/javax.json-api-1.1.4.jar
+- lib/asm-analysis-5.0.3.jar
+- lib/.maven.yaml
+- lib/commons-logging-1.2.jar
+- lib/jnr-x86asm-1.0.2.jar
+- lib/javax.json-1.1.4.jar
+- lib/asm-util-5.0.3.jar
+- lib/asm-5.0.3.jar
+- lib/docker-java-api-0.0.13.jar
+- lib/jnr-unixsocket-0.18.jar
+- lib/jnr-posix-3.0.35.jar
+- lib/jffi-1.2.15-native.jar
+- lib/jffi-1.2.15.jar
+- lib/asm-commons-5.0.3.jar
+- dockerRegistry.js
+- .precompile
 filesHash:
-  docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
-  .precompile: 50f1497451674055d9bcb80190944413f7cede6f
-  docker.js: 519ad2fa02955d8b4c8d5607251f266d4ed9bc24
-  lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
-  lib/docker-java-api-0.0.13-jar-with-dependencies.jar: 927ca6d1d30be5472acf1e8e53eaddbb71e99162
-  lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
-  README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
-  dockerRegistry.js: d987a740e0e32d37d215cfbbfbdd9d0bbf3b2a50
   .odoc.db: 7c2ff9114a32d6d01f29e8ffd24f8e5dcdd20efc
+  docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
+  README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
+  docker.js: 519ad2fa02955d8b4c8d5607251f266d4ed9bc24
+  lib/asm-tree-5.0.3.jar: 287749b48ba7162fb67c93a026d690b29f410bed
+  lib/httpclient-4.5.5.jar: 1603dfd56ebcd583ccdf337b6c3984ac55d89e58
+  lib/jnr-constants-0.9.8.jar: 478036404879bd582be79e9a7939f3a161601c8b
+  lib/jnr-ffi-2.1.4.jar: 0a63bbd4af5cee55d820ef40dc5347d45765b788
+  lib/httpcore-4.4.9.jar: a86ce739e5a7175b4b234c290a00a5fdb80957a0
+  lib/commons-codec-1.10.jar: 4b95f4897fa13f2cd904aee711aeafc0c5295cd8
+  lib/jnr-enxio-0.16.jar: ae38d71e2c224e3ea0f9528ed026c4e5a9f2b851
+  lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
+  lib/asm-analysis-5.0.3.jar: c7126aded0e8e13fed5f913559a0dd7b770a10f3
+  lib/.maven.yaml: c44ba1e0b8ecb79581305ab8344fae4b2f0da8b5
+  lib/commons-logging-1.2.jar: 4bfc12adfe4842bf07b657f0369c4cb522955686
+  lib/jnr-x86asm-1.0.2.jar: 006936bbd6c5b235665d87bd450f5e13b52d4b48
+  lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88
+  lib/asm-util-5.0.3.jar: 1512e5571325854b05fb1efce1db75fcced54389
+  lib/asm-5.0.3.jar: dcc2193db20e19e1feca8b1240dbbc4e190824fa
+  lib/docker-java-api-0.0.13.jar: 8ccec02617c99476e3c755810052402c6088a5d4
+  lib/jnr-unixsocket-0.18.jar: d79a27db9eea25e2025d5278b66ad589b75a8263
+  lib/jnr-posix-3.0.35.jar: ffba08928bec368c494180c1573a10f1f57cd031
+  lib/jffi-1.2.15-native.jar: 053f344e9e60e16f648dc66ce7cb8b1e7499b2a9
+  lib/jffi-1.2.15.jar: f480f0234dd8f053da2421e60574cfbd9d85e1f5
+  lib/asm-commons-5.0.3.jar: a7111830132c7f87d08fe48cb0ca07630f8cb91c
+  dockerRegistry.js: d987a740e0e32d37d215cfbbfbdd9d0bbf3b2a50
+  .precompile: 50f1497451674055d9bcb80190944413f7cede6f

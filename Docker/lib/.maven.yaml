@@ -1,0 +1,5 @@
+artifacts:
+- group: com.amihaiemil.web
+  id: docker-java-api
+  version: 0.0.13
+
