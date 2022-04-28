@@ -774,10 +774,36 @@ ElasticSearch.prototype.exportIndex = function(aIndex, aOutputFunc, aMap) {
  * </odoc>
  */
 ElasticSearch.prototype.importFile2Index = function(aFnIndex, aFilename, aMap) {
-	this.importStream2Index(aFnIndex, io.readFileStream(aFilename), aMap)
+	var is = io.readFileStream(aFilename)
+	try {
+		this.importStream2Index(aFnIndex, is, aMap)
+	} catch(e) {
+		throw e
+	} finally {
+		is.close()
+	}
 }
+/**
+ * <odoc>
+ * <key>ElasticSearch.importFileGzip2Index(aFnIndex, aFilename, aMap)</key>
+ * Given aFilename (in NDJSON.gz format) it will try to bulk import each document line into the returned indexed by the aFnIndex function that receives the document
+ * as a parameter. aFnIndex can also be a string. Optionally you can provided aMap.fnId function to calculate the id field from each map which can also be specified in aMap.idKey.
+ * aMap.fnIndex defaults to sha1 from the stringify version of each document and aMap.idKey defaults to "id". The function aMap.logFunc, if provided, will be executed receiving a 
+ * map with op (e.g. start, error and done), uuid with unique identification of each thread used and size with the data size being handle by each thread. The optional
+ * parameter aMap.batchSize can also be provided so that each bulk import thread uses a different maximum size from the default 10MB. If the optional parameter aMap.transformFn 
+ * is provided that function will be executed for each document and the returned transformed documented will be the one used on the import.
+ * For recent ElasticSearch versions that no longer support the _type field you can set aMap.noType = true.
+ * </odoc>
+ */
 ElasticSearch.prototype.importFileGzip2Index = function(aFnIndex, aFilename, aMap) {
-	this.importStream2Index(aFnIndex, io.readFileGzipStream(aFilename), aMap)
+	var is = io.readFileGzipStream(aFilename)
+	try {
+		this.importStream2Index(aFnIndex, is, aMap)
+	} catch(e) {
+		throw e
+	} finally {
+		is.close()
+	}
 }
 
 /**
@@ -893,10 +919,31 @@ ElasticSearch.prototype.importStream2Index = function(aFnIndex, rstream, aMap) {
  * </odoc>
  */
 ElasticSearch.prototype.exportIndex2File = function(aIndex, aFilename, aMap) {
-	this.exportIndex2Stream(aIndex, io.writeFileStream(aFilename), aMap)
+	var os = io.writeFileStream(aFilename)
+	try {
+		this.exportIndex2Stream(aIndex, os, aMap)
+	} catch(e) {
+		throw e
+	} finally {
+		os.close()
+	}
 };
+/**
+ * <odoc>
+ * <key>ElasticSearch.exportIndex2File(aIndex, aFilename, aMap)</key>
+ * Given the provided aIndex uses ElasticSearch.exportIndex to generate a NDJSON.gz on aFilename. Additionally you can provide aMap.logFunc, aMap.batchSize and
+ *  aMap.numThreads. See help for ElasticSearch.exportIndex for more.
+ * </odoc>
+ */
 ElasticSearch.prototype.exportIndex2FileGzip = function(aIndex, aFilename, aMap) {
-	this.exportIndex2Stream(aIndex, io.writeFileGzipStream(aFilename), aMap)
+	var os = io.writeFileGzipStream(aFilename)
+	try {
+		this.exportIndex2Stream(aIndex, os, aMap)
+	} catch(e) {
+		throw e
+	} finally {
+		os.close()
+	}
 };
 
 /**
