@@ -6,6 +6,8 @@
   |--------|---------------|
   |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, finance, weather and a test service.|
   |AWS|Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
+  |Asciidoc|Provides a wrapper around asciidoctor.js enabling conversion to HTML|
+  |BouncyCastle|Extra Java BouncyCastle crypto algorithms.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
   |Compromise|Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
@@ -17,6 +19,7 @@
   |Docsify|Wrapper to quickly build and server Docsify markdown documentation.|
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
   |EncryptText|Encrypts a password by asking the user and not displaying on the shell session.|
+  |GCP|Simplified and light GCP API calls to avoid including the GCP Java SDK (work in progress)|
   |GIST|Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
   |GenData|Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.|
   |GitHub|GitHub partially API wrapper|
