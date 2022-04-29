@@ -1,3 +1,87 @@
+var $kube = function(aMap) {
+	aMap = _$(aMap, "aMap").isMap().default({})
+
+	var _r = {
+		ns   : aNS => {
+			_r._ns = aNS
+		},
+		execTimeout: aTimeout => {
+			_r._to = aTimeout
+		},
+		getNS: () => {
+			var res = _r._k.getNamespaces(true)
+			_r._k.close()
+			return res
+		},
+		get  : (aKind, aName, aNS) => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.getObject(aNS, aKind, aName)
+			_r._k.close()
+			return res
+		},
+		apply: (aStream, aNS) => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.apply(aNS, aStream)
+			_r._k.close()
+			return res
+		},
+		delete: (aStream, aNS) => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.delete(aNS, aStream)
+			_r._k.close()
+			return res
+		},
+		exec : (aPodName, aCmd, aTimeout, doSH) => {
+			aTimeout = _$(aTimeout, "timeout").isNumber().default(_r._to)
+			var res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH)
+			_r._k.close()
+			return res
+		},
+		events: aNS => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.getEvents(aNS)
+			_r._k.close()
+			return res
+		}
+	};
+
+	[ { ab: "STS",    fn: "getStatefulSets" },
+	  { ab: "SVC",    fn: "getServices"    },
+	  { ab: "SA",     fn: "getServiceAccounts" },
+	  { ab: "Secrets",fn: "getSecrets"     },
+	  { ab: "RS",     fn: "getReplicaSets" },
+	  { ab: "PVC",    fn: "getPersistentVolumeClaims" },
+	  { ab: "PV",     fn: "getPersistentVolumes" },
+	  { ab: "NO",     fn: "getNodes"       },
+	  { ab: "PO",     fn: "getPods"        },
+	  { ab: "CM",     fn: "getConfigMaps"  },
+	  { ab: "Jobs",   fn: "getJobs"        },
+	  { ab: "DS",     fn: "getDaemonSets"  },
+	  { ab: "CJ",     fn: "getCronJobs"    },
+	  { ab: "Deploy", fn: "getDeployments" },
+	  { ab: "EP",     fn: "getEndpoints"   } ].forEach(m => {
+		_r["get" + m.ab] = aNS => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k[m.fn](aNS)
+			_r._k.close()
+			return res
+		}
+		_r["getF" + m.ab] = aNS => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k[m.fn](aNS, true)
+			_r._k.close()
+			return res
+		}
+		_r[m.fn] = _r["get" + m.ab]
+		_r[m.fn + "Full"] = _r["getF" + m.ab]
+	})
+
+	_r._k = new Kube(aMap.url, aMap.user, aMap.pass, aMap.wstimeout, aMap.token)
+	_r._ns = "default"
+
+	return _r
+}
+
 /**
  * <odoc>
  * <key>Kube.Kube(aURL, aUser, aPass, aWSTimeout, aToken)</key>
@@ -11,7 +95,9 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
 	this.user = aUser;
 	this.pass = aPass;
 	
-	loadExternalJars(getOPackPath("Kube") || ".");
+	loadExternalJars(getOPackPath("Kube") || ".")
+	if (isDef(getOPackPath("BouncyCastle"))) loadExternalJars(getOPackPath("BouncyCastle"))
+
 	aWSTimeout = _$(aWSTimeout).isNumber().default(5000);
 	
 	if (isUnDef(aURL)) {
@@ -158,7 +244,7 @@ Kube.prototype.getNamespaces = function (full) {
  */
 Kube.prototype.getServices = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).services().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).services()) : this.__displayResult(this.client.inNamespace(aNamespace).services().list().items));
 	} else {
 		return (full ? this.__dR(this.client.services()) : this.__displayResult(this.client.services().list().items));
 	}
@@ -172,7 +258,7 @@ Kube.prototype.getServices = function(aNamespace, full) {
  */
 Kube.prototype.getConfigMaps = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).configMaps().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).configMaps()) : this.__displayResult(this.client.inNamespace(aNamespace).configMaps().list().items));
 	} else {
 		return (full ? this.__dR(this.client.configMaps()) : this.__displayResult(this.client.configMaps().list().items));
 	}
@@ -186,7 +272,7 @@ Kube.prototype.getConfigMaps = function(aNamespace, full) {
  */
 Kube.prototype.getSecrets = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).secrets().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).secrets()) : this.__displayResult(this.client.inNamespace(aNamespace).secrets().list().items));
 	} else {
 		return (full ? this.__dR(this.client.secrets()) : this.__displayResult(this.client.secrets().list().items));
 	}
@@ -200,7 +286,7 @@ Kube.prototype.getSecrets = function(aNamespace, full) {
  */
 Kube.prototype.getDeployments = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).apps().deployments().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).apps().deployments()) : this.__displayResult(this.client.inNamespace(aNamespace).apps().deployments().list().items));
 	} else {
 		return (full ? this.__dR(this.client.apps().deployments()) : this.__displayResult(this.client.apps().deployments().list().items));
 	}
@@ -214,7 +300,7 @@ Kube.prototype.getDeployments = function(aNamespace, full) {
  */
 Kube.prototype.getDaemonSets = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).apps().daemonSets().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).apps().daemonSets()) : this.__displayResult(this.client.inNamespace(aNamespace).apps().daemonSets().list().items));
 	} else {
 		return (full ? this.__dR(this.client.apps().daemonSets()) : this.__displayResult(this.client.apps().daemonSets().list().items));
 	}
@@ -228,7 +314,7 @@ Kube.prototype.getDaemonSets = function(aNamespace, full) {
  */
 Kube.prototype.getReplicaSets = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).apps().replicaSets().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).apps().replicaSets()) : this.__displayResult(this.client.inNamespace(aNamespace).apps().replicaSets().list().items));
 	} else {
 		return (full ? this.__dR(this.client.apps().replicaSets()) : this.__displayResult(this.client.apps().replicaSets().list().items));
 	}
@@ -242,7 +328,7 @@ Kube.prototype.getReplicaSets = function(aNamespace, full) {
  */
 Kube.prototype.getStatefulSets = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).apps().statefulSets().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).apps().statefulSets()) : this.__displayResult(this.client.inNamespace(aNamespace).apps().statefulSets().list().items));
 	} else {
 		return (full ? this.__dR(this.client.apps().statefulSets()) : this.__displayResult(this.client.apps().statefulSets().list().items));
 	}
@@ -256,7 +342,7 @@ Kube.prototype.getStatefulSets = function(aNamespace, full) {
  */
 Kube.prototype.getPersistentVolumes = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumes().list().items)
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).persistentVolumes()) : this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumes().list().items))
 	} else {
 		return (full ? this.__dR(this.client.persistentVolumes()) : this.__displayResult(this.client.persistentVolumes().list().items))
 	}
@@ -270,7 +356,7 @@ Kube.prototype.getPersistentVolumes = function(aNamespace, full) {
  */
 Kube.prototype.getPersistentVolumeClaims = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumeClaims().list().items)
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).persistentVolumeClaims()) : this.__displayResult(this.client.inNamespace(aNamespace).persistentVolumeClaims().list().items))
 	} else {
 		return (full ? this.__dR(this.client.persistentVolumeClaims()) : this.__displayResult(this.client.persistentVolumeClaims().list().items))
 	}
@@ -284,7 +370,7 @@ Kube.prototype.getPersistentVolumeClaims = function(aNamespace, full) {
  */
 Kube.prototype.getEndpoints = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).endpoints().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).endpoints()) : this.__displayResult(this.client.inNamespace(aNamespace).endpoints().list().items));
 	} else {
 		return (full ? this.__dR(this.client.endpoints()) : this.__displayResult(this.client.endpoints().list().items));
 	}
@@ -298,7 +384,7 @@ Kube.prototype.getEndpoints = function(aNamespace, full) {
  */
 Kube.prototype.getNodes = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).nodes().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).nodes()) : this.__displayResult(this.client.inNamespace(aNamespace).nodes().list().items));
 	} else {
 		return (full ? this.__dR(this.client.nodes()) : this.__displayResult(this.client.nodes().list().items));
 	}
@@ -312,7 +398,7 @@ Kube.prototype.getNodes = function(aNamespace, full) {
  */
 Kube.prototype.getPods = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).pods().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).pods()) : this.__displayResult(this.client.inNamespace(aNamespace).pods().list().items));
 	} else {
 		return (full ? this.__dR(this.client.pods()) : this.__displayResult(this.client.pods().list().items));
 	}
@@ -326,7 +412,7 @@ Kube.prototype.getPods = function(aNamespace, full) {
  */
 Kube.prototype.getJobs = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).batch().jobs()) : this.__displayResult(this.client.inNamespace(aNamespace).batch().jobs().list().items));
 	} else {
 		return (full ? this.__dR(this.client.batch().jobs()) : this.__displayResult(this.client.batch().jobs().list().items));
 	}
@@ -340,7 +426,7 @@ Kube.prototype.getJobs = function(aNamespace, full) {
  */
 Kube.prototype.getCronJobs = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.batch().cronjobs().inNamespace(aNamespace).list().items);
+		return (full ? this.__dR(this.client.batch().cronjobs().inNamespace(aNamespace)) : this.__displayResult(this.client.batch().cronjobs().inNamespace(aNamespace).list().items));
 	} else {
 		return (full ? this.__dR(this.client.batch().cronjobs()) : this.__displayResult(this.client.batch().cronjobs().list().items));
 	}
@@ -354,7 +440,7 @@ Kube.prototype.getCronJobs = function(aNamespace, full) {
  */
 Kube.prototype.getServiceAccounts = function(aNamespace, full) {
 	if (isDef(aNamespace)) {
-		return this.__displayResult(this.client.inNamespace(aNamespace).serviceAccounts().list().items);
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).serviceAccounts()) : this.__displayResult(this.client.inNamespace(aNamespace).serviceAccounts().list().items));
 	} else {
 		return (full ? this.__dR(this.client.serviceAccounts()) : this.__displayResult(this.client.serviceAccounts().list().items));
 	}
