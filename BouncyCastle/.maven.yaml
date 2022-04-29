@@ -1,0 +1,4 @@
+artifacts:
+- id     : bcpkix-jdk15on
+  group  : org.bouncycastle
+  version: "1.70"
