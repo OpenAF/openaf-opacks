@@ -4,9 +4,12 @@ var $kube = function(aMap) {
 	var _r = {
 		ns   : aNS => {
 			_r._ns = aNS
+			return _r
+
 		},
 		execTimeout: aTimeout => {
 			_r._to = aTimeout
+			return _r
 		},
 		getNS: () => {
 			var res = _r._k.getNamespaces(true)
