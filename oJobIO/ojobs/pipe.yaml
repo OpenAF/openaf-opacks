@@ -1,4 +1,9 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : |
+    Pipe oJobs in a sequence. Expects number arguments with the order of the jobs and [number].[argument] for each job specific argument. Example:
+    
+      0=myJob1 1=myJob2 2=myJob3 1.a=2 1.b=2 2.XX=abc
 
 todo:
 - Pipe
@@ -13,11 +18,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help:
-    text   : |
-      Pipe oJobs in a sequence. Expects number arguments with the order of the jobs and [number].[argument] for each job specific argument. Example:
-      
-        0=myJob1 1=myJob2 2=myJob3 1.a=2 1.b=2 2.XX=abc
+  help: *HELP
 
 # ---------------
 - name: Get parts

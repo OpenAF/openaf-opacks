@@ -1,4 +1,11 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : Downloads and returns corresponding job help.
+  expects: 
+  - name   : job
+    desc   : The job location or url (e.g. ojob.io/get) 
+    example: abc.yaml
+
 todo:
 - Download help
 
@@ -11,12 +18,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : Downloads and returns corresponding job help.
-    expects: 
-    - name   : job
-      desc   : The job location or url (e.g. ojob.io/get) 
-      example: abc.yaml
+  help: *HELP
 
 # -------------------
 - name: Download help

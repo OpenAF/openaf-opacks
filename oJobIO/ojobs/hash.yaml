@@ -1,44 +1,62 @@
 # Author: Nuno Aguiar
-init:
-  help: &HELP
-    text   : Generates a hash integrity file
-    expects: 
-    - name   : url
-      desc   : A oJobIO URL server for which to generate a hash integrity file
-      example: https://ojob.io
-    - name   : file
-      desc   : Saving the result into a JSON file
-      example: integrity.json
+help: &HELP
+  text   : Generates a hash integrity file
+  expects: 
+  - name     : url
+    desc     : A oJobIO URL server for which to generate a hash integrity file
+    example  : https://ojob.io
+    mandatory: true
+  - name     : file
+    desc     : Saving the result into a JSON file
+    example  : integrity.json
+    mandatory: false
 
 todo:
-- Generate hash
+- Generate hash list
 
 ojob:
   opacks      :
-  - openaf: 20210515
-  catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception);"
+  - openaf: 20211229
+  catch       : logErr(exception)
   logToConsole: true   # to change when finished
-        
+  channels    :
+    create:
+    - name: hashes
 
 jobs:
 # ----------
 - name: Help
   help: *HELP
 
+# -------------------------
+- name : Generate hash list
+  each : Generate hash
+  check:
+    in:
+      url : isString
+      file: isString.default(__)
+  exec : |
+    log("Retrieve list of jobs from URL...")
+    var urls = $rest().get(args.url).init.l
+    log("Found #" + urls.length + " urls.")
 
-# -------------------
-- name: Generate hash
-  exec: |
-    _$(args.url, "url").$_();
+    urls.forEach(url => each({ url: url }))
+    
+    ow.loadObj()
+    var hashes = {}
+    $from($ch("hashes").getAll())
+    .sort("url")
+    .select(v => hashes[v.url] = v.hash)
 
-    var urls = $rest().get(args.url).init.l;
-    var hashes = {};
-    urls.forEach(url => {
-      url = url.replace(/\.yaml$/, "");
-      log("Checking " + url + "...");
-      hashes[url] = "sha256-" + sha256($rest().get2Stream(url));
-    });
+    if (isDef(args.file)) io.writeFileJSON(args.file, hashes)
+    ow.oJob.output(hashes, args)
 
-    if (isDef(args.file)) io.writeFileJSON(args.file, hashes);
-
-    ow.oJob.output(hashes, args);
+# --------------------
+- name : Generate hash
+  check:
+    in:
+      url: isString
+  exec : |
+    var url = args.url.replace(/\.yaml$/, "");
+    log("Checking " + url + "...");
+    $ch("hashes").set({ url: url }, { url: url, hash: "sha256-" + sha256($rest().get2Stream(url)) })

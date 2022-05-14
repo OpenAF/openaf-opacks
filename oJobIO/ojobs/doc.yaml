@@ -1,4 +1,20 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : Generates a markdown output for an oJob. If a markdown file (.md) with the same name of the original oJob file (.yaml or .json) being processed exists it will append that markdown content on the generated one.
+  expects: 
+  - name   : job
+    desc   : The file path to the ojob file.
+    example: abc.yaml
+  - name   : name
+    desc   : Optionally force the name of the ojob (defaults to the job argument).
+    example: ojob.io/abc
+  - name   : mdfile
+    desc   : Specifies the extra markdown file to append to the generated markdown (defaults to the job argument replacing the extension by ".md")
+    example: abc_extra.md
+  - name   : output
+    desc   : If defined the output will be stored on the provided filepath.
+    example: abc.md
+
 init:
     tmpl: |
       # {{name}} <a href="/"><img src='/logo.png' align='right'/></a>
@@ -35,21 +51,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : Generates a markdown output for an oJob. If a markdown file (.md) with the same name of the original oJob file (.yaml or .json) being processed exists it will append that markdown content on the generated one.
-    expects: 
-    - name   : job
-      desc   : The file path to the ojob file.
-      example: abc.yaml
-    - name   : name
-      desc   : Optionally force the name of the ojob (defaults to the job argument).
-      example: ojob.io/abc
-    - name   : mdfile
-      desc   : Specifies the extra markdown file to append to the generated markdown (defaults to the job argument replacing the extension by ".md")
-      example: abc_extra.md
-    - name   : output
-      desc   : If defined the output will be stored on the provided filepath.
-      example: abc.md
+  help: &HELP
   
 # ------------------
 - name: Generate doc

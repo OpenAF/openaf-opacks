@@ -1,4 +1,4 @@
-help: 
+help: &HELP
   text   : Generates an oJob.io job template to jump start the creation of a new job.
   expects:
   - name   : jobs
@@ -74,6 +74,10 @@ ojob:
   logToConsole: false
 
 jobs:
+# ----------
+- name: Help
+  help: *HELP
+
 # ------------------
 - name: Generate Job
   exec: |

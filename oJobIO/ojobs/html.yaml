@@ -1,4 +1,10 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : Tries to open a browser with the context map/array HTML representation
+  expects: 
+  - name   : convertURLs
+    desc   : Tries to convert urls into hyperlinks if not convertURLs=true (default convertURLs=true) 
+    example: "true"
 
 todo:
 - Generate html
@@ -12,12 +18,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : Tries to open a browser with the context map/array HTML representation
-    expects: 
-    - name   : convertURLs
-      desc   : Tries to convert urls into hyperlinks if not convertURLs=true (default convertURLs=true) 
-      example: "true"
+  help: *HELP
 
 # -------------------
 - name: Generate html

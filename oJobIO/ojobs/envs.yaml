@@ -1,4 +1,6 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : List the current list of enviroment variables.
 
 todo:
 - List envs 
@@ -13,8 +15,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : List the current list of enviroment variables.
+  help: *HELP
 
 # ---------------
 - name: List envs

@@ -1,0 +1,30 @@
+# Author: Nuno Aguiar
+help:
+  text   : Lists all oJobs on a given URL
+  expects: 
+  - name     : url
+    desc     : The ojob.io URL
+    example  : ojob.io
+    mandatory: true
+
+todo:
+- List jobs
+
+ojob:
+  opacks      :
+  - openaf: 20211229
+  catch       : logErr(exception)
+  logToConsole: true   # to change when finished
+        
+
+jobs:
+# ----------------
+- name : List jobs
+  check:
+    in:
+      url: isString
+  exec : |
+    if (!args.url.toLowerCase().match(/^https?:\/\//)) args.url = "https://" + args.url
+    var lst = $rest().get(args.url).init.l
+
+    ow.oJob.output(lst.sort(), args)

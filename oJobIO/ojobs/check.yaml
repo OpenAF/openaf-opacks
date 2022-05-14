@@ -1,4 +1,10 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : Given an oJob file tries to syntax compile all OpenAF code parts for syntax errors that might be hard to debug/find when running oJob.
+  expects: 
+  - name   : job
+    desc   : The YAML/JSON oJob file to check. 
+    example: abc.yaml
 
 todo:
 - Check
@@ -7,19 +13,14 @@ todo:
 ojob:
   sequential  : true
   opacks      :
-  - openaf: 20200523
-  catch       : logErr(exception);
+  - openaf: 20211229
+  catch       : logErr(exception)
   logToConsole: false   # to change when finished
 
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : Given an oJob file tries to syntax compile all OpenAF code parts for syntax errors that might be hard to debug/find when running oJob.
-    expects: 
-    - name   : job
-      desc   : The YAML/JSON oJob file to check. 
-      example: abc.yaml
+  help: *HELP
 
 # ------------------
 - name: Check syntax

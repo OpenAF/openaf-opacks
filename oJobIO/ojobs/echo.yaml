@@ -1,4 +1,6 @@
 # Author: Nuno Aguiar
+help: &HELP
+  text   : Echo all arguments provided
 
 todo:
 - Echo 
@@ -13,8 +15,7 @@ ojob:
 jobs:
 # ----------
 - name: Help
-  help: 
-    text   : Echo all arguments provided
+  help: *HELP
 
 # ----------
 - name: Echo 
