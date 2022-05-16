@@ -42,6 +42,33 @@
 
     /**
      * <odoc>
+     * <key>apis.WolframAlpha.get(aQuery, aAppId) : Array</key>
+     * Performs aQuery on WolframAlpha using aAppId (https://developer.wolframalpha.com/portal/myapps/) and returns
+     * the query results.
+     * </odoc>
+     */
+    exports.WolframAlpha = {
+        get: function(aQuery, aAppId) {
+            aQuery = _$(aQuery, "aQuery").isString().$_()
+            aAppId = _$(aAppId, "aAppId").isString().$_()
+
+            var res = af.fromXML2Obj( 
+                         $rest({ urlEncode: true })
+                         .post("http://api.wolframalpha.com/v2/query", { 
+                            input: aQuery, 
+                            appid: aAppId 
+                         }) 
+                      )
+            
+            if (isDef(res) && isDef(res.queryresult))
+                return res.queryresult.pod
+            else
+                return res
+        }
+    }
+
+    /**
+     * <odoc>
      * <key>apis.Countries</key>
      * From: https://restcountries.com
      * Auth: none
