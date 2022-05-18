@@ -6,6 +6,7 @@
   |--------|---------------|
   |APIs|A collection of public REST APIs for currency check, country info, numbers &amp; dates trivia, GeoIP, finance, weather and a test service.|
   |AWS|Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
+  |AsciiMo|Wrapper around AsciiMo/Figlet to produce ascii based banners.|
   |Asciidoc|Provides a wrapper around asciidoctor.js enabling conversion to HTML|
   |BouncyCastle|Extra Java BouncyCastle crypto algorithms.|
   |CmdUtils|Common object library for command utilities|
