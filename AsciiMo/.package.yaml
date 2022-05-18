@@ -1,0 +1,34 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- asciimo
+- Figlet
+- flf
+- ascii
+- banner
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/AsciiMo.opack
+description: Wrapper around AsciiMo/Figlet to produce ascii based banners.
+name: AsciiMo
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220517'
+dependencies:
+  OpenAF: '>=20211229'
+files:
+- fonts.zip
+- lib_asciimo.js
+- asciimo.js
+- .package.yaml
+filesHash:
+  fonts.zip: 87e973897580f7535e61d6d0a667e770e7a4f7f8
+  lib_asciimo.js: 536dc8517129c6e4ecc3e61066fb280b8b9b6470
+  asciimo.js: c8ffbcab32180f8d20fc1e758dab08933f33bd1c
