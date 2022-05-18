@@ -49,6 +49,14 @@ var $kube = function(aMap) {
 	};
 
 	[ { ab: "STS",    fn: "getStatefulSets" },
+	  { ab: "ClusterRoles", fn: "getClusterRoles" },
+	  { ab: "ClusterRoleBindings", fn: "getClusterRoleBindings" },
+	  { ab: "Roles",  fn: "getRoles"       },
+	  { ab: "RoleBindings", fn: "getRoleBindings" },
+	  { ab: "ING",    fn: "getIngresses"   },
+	  { ab: "NetworkPolicies", fn: "getNetworkPolicies" },
+	  { ab: "Quota",  fn: "getResourceQuotas" },
+	  { ab: "StorageClasses", fn: "getStorageClasses" },
 	  { ab: "SVC",    fn: "getServices"    },
 	  { ab: "SA",     fn: "getServiceAccounts" },
 	  { ab: "Secrets",fn: "getSecrets"     },
@@ -252,6 +260,118 @@ Kube.prototype.getServices = function(aNamespace, full) {
 		return (full ? this.__dR(this.client.services()) : this.__displayResult(this.client.services().list().items));
 	}
 };
+
+/**
+ * <odoc>
+ * <key>Kube.getClusterRoles(aNamespace) : Array</key>
+ * Tries to retrieve the list of cluster roles on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getClusterRoles = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).rbac().clusterRoles()) : this.__displayResult(this.client.inNamespace(aNamespace).rbac().clusterRoles().list().items))
+	} else {
+		return (full ? this.__dR(this.client.rbac().clusterRoles()) : this.__displayResult(this.client.rbac().clusterRoles().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getClusterRoleBindings(aNamespace) : Array</key>
+ * Tries to retrieve the list of cluster role bindings on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getClusterRoleBindings = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).rbac().clusterRoleBindings()) : this.__displayResult(this.client.inNamespace(aNamespace).rbac().clusterRoleBindings().list().items))
+	} else {
+		return (full ? this.__dR(this.client.rbac().clusterRoleBindings()) : this.__displayResult(this.client.rbac().clusterRoleBindings().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getRoles(aNamespace) : Array</key>
+ * Tries to retrieve the list of roles on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+ Kube.prototype.getRoles = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).rbac().roles()) : this.__displayResult(this.client.inNamespace(aNamespace).rbac().roles().list().items))
+	} else {
+		return (full ? this.__dR(this.client.rbac().roles()) : this.__displayResult(this.client.rbac().roles().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getRoleBindings(aNamespace) : Array</key>
+ * Tries to retrieve the list of role bindings on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getRoleBindings = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).rbac().roleBindings()) : this.__displayResult(this.client.inNamespace(aNamespace).rbac().roleBindings().list().items))
+	} else {
+		return (full ? this.__dR(this.client.rbac().roleBindings()) : this.__displayResult(this.client.rbac().roleBindings().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getIngresses(aNamespace) : Array</key>
+ * Tries to retrieve the list of ingresses on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getIngresses = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).network().ingresses()) : this.__displayResult(this.client.inNamespace(aNamespace).network().ingresses().list().items))
+	} else {
+		return (full ? this.__dR(this.client.network().ingresses()) : this.__displayResult(this.client.network().ingresses().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getNetworkPolicies(aNamespace) : Array</key>
+ * Tries to retrieve the list of network policies on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getNetworkPolicies = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).network().networkPolicies()) : this.__displayResult(this.client.inNamespace(aNamespace).network().networkPolicies().list().items))
+	} else {
+		return (full ? this.__dR(this.client.network().networkPolicies()) : this.__displayResult(this.client.network().networkPolicies().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getResourceQuotas(aNamespace) : Array</key>
+ * Tries to retrieve the list of resource quotas on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getResourceQuotas = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).resourceQuotas()) : this.__displayResult(this.client.inNamespace(aNamespace).resourceQuotas().list().items))
+	} else {
+		return (full ? this.__dR(this.client.resourceQuotas()) : this.__displayResult(this.client.resourceQuotas().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getStorageClasses(aNamespace) : Array</key>
+ * Tries to retrieve the list of storage classes on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getStorageClasses = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).storageClasses()) : this.__displayResult(this.client.inNamespace(aNamespace).storageClasses().list().items))
+	} else {
+		return (full ? this.__dR(this.client.storageClasses()) : this.__displayResult(this.client.storageClasses().list().items))
+	}
+}
 
 /**
  * <odoc>
