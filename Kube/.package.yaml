@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220508'
+version: '20220602'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -75,7 +75,7 @@ filesHash:
   kubernetes-model-storageclass-5.12.2.jar: a229853ab4def33c9fe0565cffdc3742f9ea84af
   kubernetes-model-scheduling-5.12.2.jar: 86a8f293ef09260f7f326fb23728f2689e9d4f5d
   kubernetes-model-policy-5.12.2.jar: 55e9257217b47125de0ec0228bc57e6c80a7fc91
-  kube.js: 5d7b470e52e76c98550152ecd9acc36335315b3b
+  kube.js: 2bd892c6456d55c0a30217c999fc0407a44b3c04
   kubernetes-model-metrics-5.12.2.jar: 0cf3716d8c479db77b6fd535e92be448f40cbfb9
   kubernetes-model-batch-5.12.2.jar: f90cd7d539664b914b817ec59c3b008756928b4c
   .maven.yaml: 54c086281838daa8764144ec7bf5beaa6b951d97

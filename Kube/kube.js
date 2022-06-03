@@ -34,9 +34,9 @@ var $kube = function(aMap) {
 			_r._k.close()
 			return res
 		},
-		exec : (aPodName, aCmd, aTimeout, doSH) => {
+		exec : (aPodName, aCmd, aTimeout, doSH, aContainer) => {
 			aTimeout = _$(aTimeout, "timeout").isNumber().default(_r._to)
-			var res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH)
+			var res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
 			_r._k.close()
 			return res
 		},
@@ -141,12 +141,12 @@ Kube.prototype.close = function() {
 
 /**
  * <odoc>
- * <key>Kube.exec(aNamespace, aPodName, aCommand, aTimeout, doSH) : String</key>
+ * <key>Kube.exec(aNamespace, aPodName, aCommand, aTimeout, doSH, aContainer) : String</key>
  * Tries to executed aCommand on aPodName of aNamespace. If defined, it will wait for the defined aTimeout and/or execute the aCommand on a /bin/sh if doSH = true.
  * aCommand can be either a string or an array. Do note that it might be necessary to URL encode some parts of commands.
  * </odoc>
  */
-Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
+Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH, aContainer) {
 	var stream = new java.io.ByteArrayOutputStream();
 
 	var pre = (doSH) ? ["/bin/sh", "-c"] : [];
@@ -162,6 +162,10 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH) {
 				.withName(aPod)
 				.writingOutput(stream)
 				.writingError(stream)
+
+	if (isDef(aContainer)) watch = watch.inContainer(aContainer)
+
+		watch = watch
 				.usingListener({
 					onOpen   : () =>     { },
 					onFailure: (t,fR) => { error = t; aw.notify() },
