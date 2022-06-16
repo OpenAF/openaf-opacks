@@ -411,9 +411,9 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
     __channels: {},
     create       : function(aName, shouldCompress, options) {
        options = _$(options).default({});
-       _$(options.accessKey).$_("Please provide an accessKey.");
-       _$(options.secretKey).$_("Please provide a secretKey.");
-       _$(options.tableName).$_("Please provde a table name.");
+       options.accessKey = _$(options.accessKey).default(__) //$_("Please provide an accessKey.");
+       options.secretKey = _$(options.secretKey).default(__) //$_("Please provide a secretKey.");
+       _$(options.tableName).$_("Please provide a table name.");
        options.region = _$(options.region).default(getEnv("AWS_DEFAULT_REGION"));
  
        ow.loadObj();
