@@ -343,7 +343,14 @@ S3.prototype.getObject = function(aBucket, aObjectName, aRemotePath) {
     _$(aObjectName).isString().$_("Please provide an object name.");
     _$(aRemotePath).isString().$_("Please provide a remote path.");
 
-    this.s3.downloadObject(Packages.io.minio.DownloadObjectArgs.builder().bucket(aBucket).object(aObjectName).filename(aRemotePath).build());
+    aRemotePath = aRemotePath.replace(/\\+/g, "/")
+    var dir = aRemotePath.substr(0, aRemotePath.lastIndexOf("/"))
+    if (dir.length > 0 && !io.fileExists(dir)) {
+        io.mkdir(dir)
+    }
+
+    if (aRemotePath.lastIndexOf("/") != aRemotePath.length - 1)
+        this.s3.downloadObject(Packages.io.minio.DownloadObjectArgs.builder().bucket(aBucket).object(aObjectName).overwrite(true).filename(aRemotePath).build());
 };
 
 /**
