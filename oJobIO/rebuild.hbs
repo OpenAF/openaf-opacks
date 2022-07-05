@@ -1,5 +1,5 @@
 init:
-  l:
+  l: []
 
 ojob:
   logToConsole: false
@@ -12,17 +12,26 @@ jobs:
 - name: List
   exec: |
     
-    var lst, localLst; 
+    var lst, localLst = []
     var hd = String(java.lang.System.getProperty("user.home")).replace(/\\/g, "/") + "/.{{url}}".replace(/\:+/g, "_");
     io.mkdir(hd);
     if (io.fileExists(hd + "/ojobs")) {
-        var lst = $from(listFilesRecursive(hd + "/ojobs"))
-                  .ends("filename", "yaml")
-                  .orEnds("filename", "json")
-                  .notStarts("filename", "_")
-                  .select(r => r.filepath.replace(hd + "/ojobs", "local"));
-        localLst = lst; 
-        args.init.l = args.init.l.concat(lst);
+      var lst = $from(listFilesRecursive(hd + "/ojobs"))
+               .ends("filename", "yaml")
+               .orEnds("filename", "json")
+               .notStarts("filename", "_")
+               .select(r => r.filepath.replace(hd + "/ojobs", "_local"))
+      localLst = localLst.concat(lst) 
+      args.init.l = args.init.l.concat(lst)
+    }
+    if (isDef(__flags) && isDef(__flags.OJOB_LOCALPATH)) {
+      var lst = $from(listFilesRecursive(__flags.OJOB_LOCALPATH))
+                .ends("filename", "yaml")
+                .orEnds("filename", "json")
+                .notStarts("filename", "_")
+                .select(r => r.filepath.replace(__flags.OJOB_LOCALPATH, "_global"))
+      localLst = localLst.concat(lst)
+      args.init.l = args.init.l.concat(lst)
     }
 
     if (isDef(args.search) || isDef(args.list)) {
@@ -55,17 +64,27 @@ jobs:
 
       if (cmd != "") {
         var oj;
-        if (!cmd.startsWith("local/")) 
+        if (!cmd.startsWith("_local/") && !cmd.startsWith("_global/")) 
            oj = $rest().get("{{proto}}://{{url}}/" + cmd);
         else {
            if (localLst.indexOf(cmd + ".yaml") >= 0) cmd += ".yaml";
            if (localLst.indexOf(cmd + ".yml") >= 0) cmd += ".yml";
            if (localLst.indexOf(cmd + ".json") >= 0) cmd += ".json";
 
-           if (cmd.match(/\.ya?ml$/))
-              oj = io.readFileYAML(hd + cmd.replace(/^local\//, "/ojobs/"));
-           else
-              oj = io.readFileJSON(hd + cmd.replace(/^local\//, "/ojobs/"));
+           if (cmd.startsWith("_local/")) {
+               if (cmd.match(/\.ya?ml$/))
+                  oj = io.readFileYAML(hd + cmd.replace(/^_local\//, "/ojobs/"));
+               else
+                  oj = io.readFileJSON(hd + cmd.replace(/^_local\//, "/ojobs/"));
+           }
+           
+           if (cmd.startsWith("_global/")) {
+               if (cmd.match(/\.ya?ml$/))
+                  oj = io.readFileYAML(__flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/"));
+               else
+                  oj = io.readFileJSON(__flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/"));
+           }
+
         }
            
         var hcmd = [];
@@ -88,7 +107,15 @@ jobs:
         }
  
         print("");
-        print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+        if (cmd.startsWith("_local/")) {
+          print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + hd + cmd.replace(/^_local\//, "/ojobs/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
+        } else {
+          if (cmd.startsWith("_global/")) {
+            print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + __flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
+          } else {
+            print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+          }
+        }
         print(ansiColor("BOLD", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")));
         print("");
 

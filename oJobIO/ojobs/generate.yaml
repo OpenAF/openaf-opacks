@@ -1,15 +1,22 @@
-help: &HELP
+help:
   text   : Generates an oJob.io job template to jump start the creation of a new job.
   expects:
-  - name   : jobs
-    desc   : Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
-    example: Stuff\\ to\\ do,Other\\ jobs
-  - name   : author
-    desc   : The author to add on the comments
-    example: Anonymous
-  - name   : async
-    desc   : If the job is sequential or async (e.g. "true")
-    example: "false"
+  - name     : jobs
+    desc     : Comma separated list of jobs (e.g. "Stuff\\ to\\ do,Other\\ jobs") 
+    example  : Stuff\\ to\\ do,Other\\ jobs
+    mandatory: false
+  - name     : args
+    desc     : Comma separated list of arguments (e.g. "abc,xyz")
+    example  : abc,xyz
+    mandatory: false
+  - name     : author
+    desc     : The author to add on the comments
+    example  : Anonymous
+    mandatory: false
+  - name     : async
+    desc     : If the job is sequential or async (e.g. "true")
+    example  : "false"
+    mandatory: false
 
 init:
   tmpl: |
@@ -17,11 +24,13 @@ init:
     help:
       text   : Does stuff. 
       expects: 
-      - name     : something
-        desc     : To do stuff
+      {{#each args}}
+      - name     : {{name}}
+        desc     : To do {{name}}
         example  : aValueExample
-        mandatory: true
-    
+        mandatory: false
+      {{/each}}
+
     todo:
     {{#if config}}
     - Init
@@ -33,7 +42,7 @@ init:
     ojob:
       opacks      :
       - openaf: 20211229
-      catch       : logErr(exception)
+      catch       : if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
       {{/if}}{{#if config}}
@@ -45,7 +54,7 @@ init:
     # ----------
     - name: Init
       from: oJobIO configuration
-      args~
+      args:
         __store  : something
         #__options:
         #  askSet: true
@@ -59,7 +68,9 @@ init:
     - name : {{name}}
       check:
         in:
-          something: isString{{#if ../config}}.default(global.something){{/if}}
+          {{#each ../args}}
+          {{name}}: isString{{#if ../config}}.default(global.{{name}}){{else}}.default(__){{/if}}
+          {{/each}}
       exec : |
         ow.oJob.output(args, args)
     {{/each}}
@@ -74,19 +85,16 @@ ojob:
   logToConsole: false
 
 jobs:
-# ----------
-- name: Help
-  help: *HELP
-
 # ------------------
-- name: Generate Job
-  exec: |
-    args.jobs   = _$(args.jobs, "jobs").default("Sample job");
-    args.author = _$(args.author, "author").default("Anonymous");
-    args.async  = _$(args.async, "async").default(void 0);
-    args.file   = _$(args.file, "file").default(void 0);
+- name : Generate Job
+  exec : |
+    args.jobs   = _$(args.jobs, "jobs").default("Sample job")
+    args.author = _$(args.author, "author").default("Anonymous")
+    args.async  = _$(args.async, "async").default(void 0)
+    args.file   = _$(args.file, "file").default(void 0)
+    args.args   = _$(args.args, "args").default("something")
 
-    args.jobs = args.jobs.split(",");
+    args.jobs = args.jobs.split(",")
     args.jobs = args.jobs.map(j => {
        return {
          name: j.trim(),
@@ -94,14 +102,22 @@ jobs:
        }
     });
 
+    args.args = args.args.split(",")
+    args.args = args.args.map(j => {
+      return {
+        name: j.trim()
+      }
+    })
+
     var res = templify(args.init.tmpl, { 
       author: args.author,
       jobs  : args.jobs,
+      args  : args.args,
       async : (isDef(args.async) && args.async.toLowerCase() == "true" ? true : false),
       config: (isDef(args.config) && args.config.toLowerCase() == "true" ? true : false)
     });
     
     if (isDef(args.file)) 
-      io.writeFileString(args.file, res);
+      io.writeFileString(args.file, res)
     else
-      printnl(res);
+      printnl(res)

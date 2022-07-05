@@ -18,7 +18,7 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220514'
+version: '20220704'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -51,7 +51,7 @@ filesHash:
   Dockerfile: baaad6ffb83adc10b96836e4895b751c02faa24b
   rebuild.yaml: 9ddf5e4060ac5f04e3b505a2f4d90a438c52a2ef
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
-  rebuild.hbs: c78f529a407a65af0e7c33b1b87c394ab697613b
+  rebuild.hbs: 43daa6ce9ae912dfd75f9deb7f55976804c27fcc
   imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
   ojobs/list.yaml: 60dd60aa986524c8fdca1baef6669bdc3b46bc08
   ojobs/clean.yaml: 29b1b7776b2349e2df42e265318be80eb5eef43a
@@ -61,7 +61,7 @@ filesHash:
   ojobs/hello/world.yaml: 195f769e2463141d028bb033e7236c51847cb67b
   ojobs/doc.yaml: 0d0c5d7873e0f9989877a64dd164f82e3c786b64
   ojobs/help.yaml: 9100f900a4abb3ae2abedbc077f37ed3bbf8f771
-  ojobs/generate.yaml: 7737f66c5e9409bfa303d20d54dcdce102a7a330
+  ojobs/generate.yaml: 2d3177965336b6c3585856ffab0c0bb2fdb77c67
   ojobs/echo.yaml: e082de2ae8260a8a9da2c873e91f8aab76d62cd8
   ojobs/envs.yaml: 1d261affa726f53d3f09db1ca2588da2eb94d753
   ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
