@@ -8,7 +8,7 @@
  * taken from environment variables or provided directly.
  * </odoc>
  */
-var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
+ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    ow.loadFormat();
    ow.loadObj();
    this.accessKey = aAccessKey;
@@ -38,7 +38,21 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
       if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
          o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
       } else {
-         o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+         if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
+            o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+         } else {
+            if (isDef(ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials")) {
+               o = {}
+               io.readFileString(ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials")
+               .split("\n")
+               .filter(r => r.trim().match(/^aws_(access_|secret_)/))
+               .forEach(r => { 
+                  var ar = r.split("=").map(s => s.trim()); 
+                  if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
+                  if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
+               })
+            }
+         }
       }
       this.accessKey = o.AccessKeyId;
       this.secretKey = o.SecretAccessKey;
