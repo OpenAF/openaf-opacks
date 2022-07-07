@@ -44,7 +44,7 @@ ow.ch.__types.rocksdb = {
 			if (this.options[aName].compact) this.db[aName].compactRange();
 		}
 		this.db[aName].close();
-                this.db[aName].dispose();
+        //this.db[aName].dispose();
 	},
 	size         : function(aName) {
 		var ii = this.db[aName].newIterator();
@@ -54,7 +54,7 @@ ow.ch.__types.rocksdb = {
 			c++;
 			ii.next();
 		}
-		ii.dispose();
+		ii.close();
 		return c;
 	},
 	forEach      : function(aName, aFunction) {
@@ -63,7 +63,7 @@ ow.ch.__types.rocksdb = {
 		while(ii.isValid()) {
 			aFunction(jsonParse(af.fromBytes2String(ii.key()), true), jsonParse(af.fromBytes2String(ii.value()), true));
 		}
-		ii.dispose();
+		ii.close();
 	},
 	getAll      : function(aName, full) {
 		var vs = __;
@@ -76,7 +76,7 @@ ow.ch.__types.rocksdb = {
 				vs.push(jsonParse(af.fromBytes2String(ii.value()), true));
 				ii.next();
 			}
-			ii.dispose();
+			ii.close();
 		} else {
 			if (isArray(full)) {
 				full = full.map(k => af.fromString2Bytes(stringify(sortMapKeys(k), __, "")));
@@ -95,7 +95,7 @@ ow.ch.__types.rocksdb = {
 			ks.push(jsonParse(af.fromBytes2String(ii.key()), true));
 			ii.next();
 		}
-		ii.dispose();
+		ii.close();
 		return ks;
 	},
 	getSortedKeys: function(aName, full) {
@@ -121,20 +121,20 @@ ow.ch.__types.rocksdb = {
                 });
                 var wo = new org.rocksdb.WriteOptions();
 	 	this.db[aName].write(wo, b);
-		wo.dispose();
-		b.dispose();
+		wo.close();
+		b.close();
 	},
 	unsetAll       : function(aName, aKs, aVs, aTimestamp) {
 		ow.loadObj();
 		var b = new org.rocksdb.WriteBatch();
 		aVs.forEach(v => {
 			var k = ow.obj.filterKeys(aKs, v);
-			b.remove(af.fromString2Bytes(stringify(sortMapKeys(k), __, ""))); 
+			b.delete(af.fromString2Bytes(stringify(sortMapKeys(k), __, ""))); 
 		});
 		var wo = new org.rocksdb.WriteOptions();
 		this.db[aName].write(wo, b);
-		wo.dispose();
-		b.dispose();
+		wo.close();
+		b.close();
 	},		
 	get          : function(aName, aK) {
 		return jsonParse(af.fromBytes2String(this.db[aName].get(af.fromString2Bytes(stringify(sortMapKeys(aK), void 0, "")))), true);	
@@ -145,7 +145,7 @@ ow.ch.__types.rocksdb = {
 
 		ii.seekToLast();
 		if (ii.isValid()) r = jsonParse(af.fromBytes2String(ii.key()), true);
-		ii.dispose();
+		ii.close();
 		return r;
 	},
 	shift        : function(aName) {
@@ -154,7 +154,7 @@ ow.ch.__types.rocksdb = {
 
 		ii.seekToFirst();
 		if (ii.isValid()) r = jsonParse(af.fromBytes2String(ii.key()), true);
-		ii.dispose();
+		ii.close();
 		return r;
 	},
 	unset        : function(aName, aK, aTimestamp) {

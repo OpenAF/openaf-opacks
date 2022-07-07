@@ -18,15 +18,15 @@ name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210505'
+version: '20210706'
 dependencies:
   openaf: '>=20210412'
 files:
-- .precompile
 - rocksdb.js
 - .package.yaml
-- rocksdbjni-6.19.3.jar
+- .precompile
+- rocksdbjni-7.3.1.jar
 filesHash:
+  rocksdb.js: e0dbf0d30debbb008abd3e77c14b013bc2714efa
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
-  rocksdb.js: 272e9a362aff7880bfc628276fd99b6b88b3f5d9
-  rocksdbjni-6.19.3.jar: 54bb5df7d522a90b94f647b40d216e285f052a54
+  rocksdbjni-7.3.1.jar: 278f6e46876398b60c1dcaa7588cafd1690f7b56
