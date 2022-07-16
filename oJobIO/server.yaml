@@ -35,15 +35,17 @@ todo:
     port   : *PORT
     uri    : *URI
     execURI: |
+      if (!io.fileExists(args.init.dir)) io.mkdir(args.init.dir)
+
       var res = "", md = false, d = io.fileInfo(args.init.dir).canonicalPath, mime = "application/javascript";
       try {
          if (request.uri == "/logo.png") return ow.server.httpd.replyFile(server, d + "/logo.png", "/logo.png", request.uri);
 
-         if (request.uri == "/" || request.uri == "/.json") {
+         if (request.uri.endsWith("/") || request.uri == "/.json") {
             if (request.header["user-agent"] != "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)") {
                return ow.server.httpd.replyRedirect(server, "/index.md", {});
             } else {
-               request.uri = "/index.json";
+               request.uri = "/index";
             }
          }
          var r = d + request.uri;
@@ -51,13 +53,16 @@ todo:
          
 
          // https://ojob.io/hello/world (.yaml / .md / .json)
-         var tr = r, res = {};
-         if (!r.endsWith(".yaml") && !r.endsWith(".json") && !r.endsWith(".md") && !r.endsWith(".html")) tr += ".json";
-         if (tr.endsWith(".json") && !io.fileExists(tr) && io.fileExists(r.replace(/\.json$/, "") + ".yaml")) tr = r.replace(/\.json$/, "") + ".yaml";  
+         var tr = r, res = {}, trans = false, hasExt = r.endsWith(".yaml") || r.endsWith(".json") || r.endsWith(".md") || r.endsWith(".html") || r.endsWith(".sh") || r.endsWith(".bat")
+         if (!hasExt) tr += ".json";
+         if (tr.endsWith(".json") && !io.fileExists(tr) && io.fileExists(r.replace(/\.json$/, "") + ".yaml")) {
+            tr = r.replace(/\.json$/, "") + ".yaml"
+            trans = true
+         }
 
-         if (!io.fileExists(tr)) return server.reply("Not found", mime, 404, {});
+         if (!io.fileExists(tr)) return ow.server.httpd.reply("Not found", 404, mime, {});
 
-         if (isDef(request.params.raw) && Boolean(request.params.raw)) {
+         if (!tr.endsWith(".md") && ((hasExt && !trans) || isDef(request.params.raw) && Boolean(request.params.raw))) {
             // Raw
             res = io.readFileString(tr);
          } else {
