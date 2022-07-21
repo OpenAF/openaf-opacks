@@ -1,0 +1,37 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- socks
+- proxy
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/SocksServer.opack
+description: Provides a wrapper around a Java SocksServer implementation
+name: SocksServer
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20220720'
+dependencies:
+  openaf: '>=20211229'
+files:
+- java-socks-proxy-server-2.0.0.jar
+- .odoc.db
+- .package.yaml
+- .maven.yaml
+- lombok-1.18.24.jar
+- socksServer.js
+- LICENSES.txt
+filesHash:
+  java-socks-proxy-server-2.0.0.jar: 7161069601c88843dc8ddf84c1bf7cdefe9ea045
+  .odoc.db: 87871adb9af3a9143d7e7a4d25294ae030f2776f
+  .maven.yaml: 628d6c8a0ad5a2cc9664ca80f9e2233a919a84cb
+  lombok-1.18.24.jar: 13a394eed5c4f9efb2a6d956e2086f1d81e857d9
+  socksServer.js: bc9d3555e3f2a6b033fd438bec7322816f4db034
+  LICENSES.txt: adef8f697505f8376e6597fc422cf0880aff8044

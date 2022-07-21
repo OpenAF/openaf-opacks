@@ -1,0 +1,7 @@
+artifacts:
+- id      : lombok
+  group   : org.projectlombok
+  version : 1.18.24
+- id      : java-socks-proxy-server
+  group   : com.github.bbottema
+  version : 2.0.0
