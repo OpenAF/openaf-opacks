@@ -17,7 +17,7 @@ name: Docker
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220419'
+version: '20220724'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -27,9 +27,9 @@ files:
 - docker.js
 - .package.yaml
 - lib/asm-tree-5.0.3.jar
-- lib/httpclient-4.5.5.jar
 - lib/jnr-constants-0.9.8.jar
 - lib/jnr-ffi-2.1.4.jar
+- lib/httpclient-4.5.13.jar
 - lib/httpcore-4.4.9.jar
 - lib/commons-codec-1.10.jar
 - lib/jnr-enxio-0.16.jar
@@ -50,14 +50,14 @@ files:
 - dockerRegistry.js
 - .precompile
 filesHash:
-  .odoc.db: 7c2ff9114a32d6d01f29e8ffd24f8e5dcdd20efc
+  .odoc.db: b8de65b1daa008214b8d1025f53cb66268fcecdb
   docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
-  docker.js: 519ad2fa02955d8b4c8d5607251f266d4ed9bc24
+  docker.js: c7aa54380d5a1bf1adaf7e459040217b07c572a8
   lib/asm-tree-5.0.3.jar: 287749b48ba7162fb67c93a026d690b29f410bed
-  lib/httpclient-4.5.5.jar: 1603dfd56ebcd583ccdf337b6c3984ac55d89e58
   lib/jnr-constants-0.9.8.jar: 478036404879bd582be79e9a7939f3a161601c8b
   lib/jnr-ffi-2.1.4.jar: 0a63bbd4af5cee55d820ef40dc5347d45765b788
+  lib/httpclient-4.5.13.jar: e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada
   lib/httpcore-4.4.9.jar: a86ce739e5a7175b4b234c290a00a5fdb80957a0
   lib/commons-codec-1.10.jar: 4b95f4897fa13f2cd904aee711aeafc0c5295cd8
   lib/jnr-enxio-0.16.jar: ae38d71e2c224e3ea0f9528ed026c4e5a9f2b851

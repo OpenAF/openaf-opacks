@@ -54,6 +54,39 @@ Docker.prototype.getContainers = function() {
 
 /**
  * <odoc>
+ * <key>Docker.getNetworks() : Array</key>
+ * Returns an array of maps with each available networks info.
+ * </odoc>
+ */
+Docker.prototype.getNetworks = function() {
+   var r = []
+   var o = this.docker.networks().iterator()
+   while(o.hasNext()) {
+      r.push(jsonParse(o.next().toString()))
+   }
+
+   return r
+}
+
+/**
+ * <odoc>
+ * <key>Docker.getVolumes() : Array</key>
+ * Returns an array of maps with each available networks info.
+ * </odoc>
+ */
+ Docker.prototype.getVolumes = function() {
+   var r = []
+   var o = this.docker.volumes().iterator()
+   while(o.hasNext()) {
+      r.push(jsonParse(o.next().toString()))
+   }
+
+   return r
+}
+
+
+/**
+ * <odoc>
  * <key>Docker.getObj() : JavaObject</key>
  * Returns the internal Docker java object in use.
  * </odoc>
