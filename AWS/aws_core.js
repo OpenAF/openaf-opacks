@@ -41,16 +41,19 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
          if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
             o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
          } else {
-            if (isDef(ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials")) {
+            var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
+            if (isDef(_cf)) {
                o = {}
-               io.readFileString(ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials")
-               .split("\n")
-               .filter(r => r.trim().match(/^aws_(access_|secret_)/))
-               .forEach(r => { 
-                  var ar = r.split("=").map(s => s.trim()); 
-                  if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
-                  if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
-               })
+               if (io.fileExists(_cf)) {
+                  io.readFileString(_cf)
+                  .split("\n")
+                  .filter(r => r.trim().match(/^aws_(access_|secret_)/))
+                  .forEach(r => { 
+                     var ar = r.split("=").map(s => s.trim()); 
+                     if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
+                     if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
+                  })
+               }
             }
          }
       }
