@@ -24,7 +24,7 @@ while(1) {
   var h = new ow.obj.http(), __error, __requestId = "";
   try {
      var res = h.get("http://" + getEnv("AWS_LAMBDA_RUNTIME_API") + "/2018-06-01/runtime/invocation/next");
-     __requestId = h.responseHeaders()["Lambda-Runtime-Aws-Request-Id"];
+     __requestId = h.responseHeaders()["lambda-runtime-aws-request-id"];
      __exec(jsonParse(res.response));
   } catch(e) {
      __error = e;
