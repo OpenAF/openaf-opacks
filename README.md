@@ -35,6 +35,7 @@
   |MSBot|Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |Maven|A Maven2 repositories access wrapper to get or update existing artifacts/jars.|
   |Mongo|An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
+  |Morse|Simple morse code translator|
   |Notifications|Provides libraries to use notifications services. Currently pushover.js.|
   |OpenAFLambdaLayers|Build the lambda layers to run OpenAF lambda functions|
   |PEG|Wrapper around the Peggy javascript library allowing the parsing of grammars.|
@@ -48,6 +49,7 @@
   |SQLDeveloperUtils|Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
   |ScaleWay|Wrapper around ScaleWay API|
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
+  |SocksServer|Provides a wrapper around a Java SocksServer implementation|
   |Terraform|OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
   |TimeLive|Wrapper for TimeLive timesheets API|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
