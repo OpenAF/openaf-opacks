@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220602'
+version: '20220915'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -36,7 +36,6 @@ files:
 - kubernetes-model-coordination-5.12.2.jar
 - automaton-1.11-8.jar
 - kubernetes-model-rbac-5.12.2.jar
-- snakeyaml-1.28.jar
 - kubernetes-model-apps-5.12.2.jar
 - .package.yaml
 - kubernetes-model-storageclass-5.12.2.jar
@@ -48,6 +47,7 @@ files:
 - .maven.yaml
 - .precompile
 - kubernetes-model-certificates-5.12.2.jar
+- snakeyaml-1.32.jar
 - kubernetes-model-apiextensions-5.12.2.jar
 - kubernetes-model-admissionregistration-5.12.2.jar
 - kubernetes-model-discovery-5.12.2.jar
@@ -70,7 +70,6 @@ filesHash:
   kubernetes-model-coordination-5.12.2.jar: 42e16157174ed0beee02b5d4f1635dd3c0f1cbd6
   automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
   kubernetes-model-rbac-5.12.2.jar: 2e7d70c71db0a155d4a91a617831725279e26fab
-  snakeyaml-1.28.jar: 7cae037c3014350c923776548e71c9feb7a69259
   kubernetes-model-apps-5.12.2.jar: 72f9432ec8e229ef0d052b47d70f58dbb497996a
   kubernetes-model-storageclass-5.12.2.jar: a229853ab4def33c9fe0565cffdc3742f9ea84af
   kubernetes-model-scheduling-5.12.2.jar: 86a8f293ef09260f7f326fb23728f2689e9d4f5d
@@ -81,6 +80,7 @@ filesHash:
   .maven.yaml: 54c086281838daa8764144ec7bf5beaa6b951d97
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   kubernetes-model-certificates-5.12.2.jar: ca8e28f03eb62637fa63b1c4a10089ffae3ce951
+  snakeyaml-1.32.jar: e80612549feb5c9191c498de628c1aa80693cf0b
   kubernetes-model-apiextensions-5.12.2.jar: 958ce2890bf54a018769eac759af794866db86c2
   kubernetes-model-admissionregistration-5.12.2.jar: 190365794a86498c08d16d94389a3ceb780782a9
   kubernetes-model-discovery-5.12.2.jar: dcad9af62368d6d98d5d5c6b43c36e81411155b2
