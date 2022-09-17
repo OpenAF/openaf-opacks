@@ -19,31 +19,31 @@ name: GooglePhoneNumber
 main: main.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220216'
+version: '20220916'
 dependencies:
   openaf: '>=20210515'
 files:
-- .precompile
-- main.js
-- lib/libphonenumber-8.12.43.jar
-- lib/carrier-1.169.jar
-- lib/protobuf-javanano-3.0.0-alpha-7.jar
-- lib/prefixmapper-2.179.jar
-- lib/geocoder-2.179.jar
-- lib/LICENSE
 - .package.yaml
-- googlePhoneNumber.js
+- lib/geocoder-2.191.jar
+- lib/prefixmapper-2.191.jar
+- lib/libphonenumber-8.12.55.jar
+- lib/carrier-1.181.jar
+- lib/LICENSE
+- lib/protobuf-javanano-3.0.0-alpha-7.jar
+- main.js
+- .precompile
 - googlePhoneNumber.yaml
 - updateGooglePhoneNumber.yaml
+- googlePhoneNumber.js
 filesHash:
-  .precompile: 3f9b1bb8aa12e89a9f5a7528f8f27976e4d1fca4
-  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
-  lib/libphonenumber-8.12.43.jar: f5f72822da2b19a183a357e327922398671847ac
-  lib/carrier-1.169.jar: 1f40599b11f05e145f5f92966f5d2d16afd83f7c
-  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
-  lib/prefixmapper-2.179.jar: 1ef34eec157cf531f9c2eb8b8fe1eaab8ac2b3d0
-  lib/geocoder-2.179.jar: 87ea5036fb67d67d306ce3b54fff96c84c676ec4
+  lib/geocoder-2.191.jar: fd3b89670b6393a557e51df1536a08f6105139ab
+  lib/prefixmapper-2.191.jar: 2bae6820b81ef4937936df928ca9e345c450058d
+  lib/libphonenumber-8.12.55.jar: 85dad10f51accc8569cad0eeed61bbfabf7da73c
+  lib/carrier-1.181.jar: 6d2b56917ff64ce538fdbb1e6656a0e4c8e7cd7f
   lib/LICENSE: a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33
-  googlePhoneNumber.js: 0cfd02acaf50f7a16999ac200366c9a52d258a41
+  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
+  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
+  .precompile: 3f9b1bb8aa12e89a9f5a7528f8f27976e4d1fca4
   googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
   updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
+  googlePhoneNumber.js: 0cfd02acaf50f7a16999ac200366c9a52d258a41
