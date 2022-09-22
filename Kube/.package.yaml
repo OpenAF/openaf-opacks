@@ -18,73 +18,73 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220915'
+version: '20220921'
 dependencies:
   OpenAF: '>=20210412'
 files:
+- kubernetes-model-certificates-5.12.3.jar
 - jackson-dataformat-yaml-2.13.1.jar
+- kubernetes-model-common-5.12.3.jar
 - jackson-datatype-jsr310-2.13.1.jar
-- kubernetes-model-node-5.12.2.jar
 - .odoc.db
-- kubernetes-model-core-5.12.2.jar
+- kubernetes-model-apps-5.12.3.jar
 - generex-1.0.2.jar
-- kubernetes-model-autoscaling-5.12.2.jar
-- kubernetes-model-common-5.12.2.jar
-- kubernetes-client-5.12.2.jar
+- kubernetes-model-storageclass-5.12.3.jar
 - zjsonpatch-0.3.0.jar
-- kubernetes-model-events-5.12.2.jar
-- kubernetes-model-coordination-5.12.2.jar
+- kubernetes-model-events-5.12.3.jar
+- kubernetes-model-node-5.12.3.jar
+- kubernetes-model-autoscaling-5.12.3.jar
 - automaton-1.11-8.jar
-- kubernetes-model-rbac-5.12.2.jar
-- kubernetes-model-apps-5.12.2.jar
+- kubernetes-model-flowcontrol-5.12.3.jar
+- kubernetes-model-apiextensions-5.12.3.jar
+- kubernetes-model-discovery-5.12.3.jar
+- kubernetes-model-admissionregistration-5.12.3.jar
 - .package.yaml
-- kubernetes-model-storageclass-5.12.2.jar
-- kubernetes-model-scheduling-5.12.2.jar
-- kubernetes-model-policy-5.12.2.jar
+- kubernetes-model-policy-5.12.3.jar
+- kubernetes-model-batch-5.12.3.jar
 - kube.js
-- kubernetes-model-metrics-5.12.2.jar
-- kubernetes-model-batch-5.12.2.jar
 - .maven.yaml
+- kubernetes-model-networking-5.12.3.jar
 - .precompile
-- kubernetes-model-certificates-5.12.2.jar
+- kubernetes-model-metrics-5.12.3.jar
+- kubernetes-model-coordination-5.12.3.jar
 - snakeyaml-1.32.jar
-- kubernetes-model-apiextensions-5.12.2.jar
-- kubernetes-model-admissionregistration-5.12.2.jar
-- kubernetes-model-discovery-5.12.2.jar
-- kubernetes-model-extensions-5.12.2.jar
-- kubernetes-model-networking-5.12.2.jar
-- kubernetes-model-flowcontrol-5.12.2.jar
+- kubernetes-model-core-5.12.3.jar
+- kubernetes-model-scheduling-5.12.3.jar
+- kubernetes-model-extensions-5.12.3.jar
+- kubernetes-model-rbac-5.12.3.jar
+- kubernetes-client-5.12.3.jar
 - logging-interceptor-3.12.12.jar
 filesHash:
+  kubernetes-model-certificates-5.12.3.jar: 0da00d9a1dd4c50cb04c77de0b885bb832d95c6d
   jackson-dataformat-yaml-2.13.1.jar: fa89741b057f4f2094e2f115e6cf898626989fe2
+  kubernetes-model-common-5.12.3.jar: 750af03fe4bf65d134c7b3ef54f96fe38ef6bda7
   jackson-datatype-jsr310-2.13.1.jar: 1ece5a87b59701328215e0083448b4d451857cbd
-  kubernetes-model-node-5.12.2.jar: fc125faf118c046be0475582adfb7e7f63ba3e67
   .odoc.db: 230e2717b4b3b7d0926dba293f90e2a10d7e635f
-  kubernetes-model-core-5.12.2.jar: d225c44eeb51c660f1016a9edb0e9511544d1d8d
+  kubernetes-model-apps-5.12.3.jar: 947a89299b68cfdd7b18f2f95d42b0d105092947
   generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
-  kubernetes-model-autoscaling-5.12.2.jar: c1a7aa6a8e91c0eb656e421182cba873b7e509c3
-  kubernetes-model-common-5.12.2.jar: 676bfbf1aaffb7780e1b24b116914ae735103223
-  kubernetes-client-5.12.2.jar: 00a201987fce34a54896d0b16a34efb1eaf15333
+  kubernetes-model-storageclass-5.12.3.jar: 0d5a2bc8976d08639027afdd22643145c3bb5a37
   zjsonpatch-0.3.0.jar: d3ebf0f291297649b4c8dc3ecc81d2eddedc100d
-  kubernetes-model-events-5.12.2.jar: f5b6f4bbac51cfa778f59961ef3242dae7f401b2
-  kubernetes-model-coordination-5.12.2.jar: 42e16157174ed0beee02b5d4f1635dd3c0f1cbd6
+  kubernetes-model-events-5.12.3.jar: ff24d7d535a71707b8bcedc0ea7e51881bc3c71d
+  kubernetes-model-node-5.12.3.jar: fc56906d8c98c776346ec6fb77a24b2f9cdbf247
+  kubernetes-model-autoscaling-5.12.3.jar: 19342e7ddb8d187f8184792c12123f8d04bfebf8
   automaton-1.11-8.jar: 6ebfa65eb431ff4b715a23be7a750cbc4cc96d0f
-  kubernetes-model-rbac-5.12.2.jar: 2e7d70c71db0a155d4a91a617831725279e26fab
-  kubernetes-model-apps-5.12.2.jar: 72f9432ec8e229ef0d052b47d70f58dbb497996a
-  kubernetes-model-storageclass-5.12.2.jar: a229853ab4def33c9fe0565cffdc3742f9ea84af
-  kubernetes-model-scheduling-5.12.2.jar: 86a8f293ef09260f7f326fb23728f2689e9d4f5d
-  kubernetes-model-policy-5.12.2.jar: 55e9257217b47125de0ec0228bc57e6c80a7fc91
+  kubernetes-model-flowcontrol-5.12.3.jar: 73ef752d9e6b603b20b7521ee5926c86afb3c1b9
+  kubernetes-model-apiextensions-5.12.3.jar: 7e962d34b55f17850d3339992f061df8efaefdb0
+  kubernetes-model-discovery-5.12.3.jar: ef19257e7ae1de176e3f3b798bb262e78b59a205
+  kubernetes-model-admissionregistration-5.12.3.jar: 5e58814c0076e19620965dd0e7ceabaefcb3fa19
+  kubernetes-model-policy-5.12.3.jar: 225b23ac8f93154953ec8a557e98e72e8604aa73
+  kubernetes-model-batch-5.12.3.jar: 8cdd4b789c02439e452d0e10a5c9cc94799bfc93
   kube.js: 2bd892c6456d55c0a30217c999fc0407a44b3c04
-  kubernetes-model-metrics-5.12.2.jar: 0cf3716d8c479db77b6fd535e92be448f40cbfb9
-  kubernetes-model-batch-5.12.2.jar: f90cd7d539664b914b817ec59c3b008756928b4c
-  .maven.yaml: 54c086281838daa8764144ec7bf5beaa6b951d97
+  .maven.yaml: 01995127bb53c12222a85e3df222b059281ca158
+  kubernetes-model-networking-5.12.3.jar: f3cf5a996bf318d148e7ca741af6bf87956102c0
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
-  kubernetes-model-certificates-5.12.2.jar: ca8e28f03eb62637fa63b1c4a10089ffae3ce951
+  kubernetes-model-metrics-5.12.3.jar: 1f4a539a41bfde732a290736ae9bf8e8cb775223
+  kubernetes-model-coordination-5.12.3.jar: dd0622562004c71dfddb187db0ae8b7e9640da24
   snakeyaml-1.32.jar: e80612549feb5c9191c498de628c1aa80693cf0b
-  kubernetes-model-apiextensions-5.12.2.jar: 958ce2890bf54a018769eac759af794866db86c2
-  kubernetes-model-admissionregistration-5.12.2.jar: 190365794a86498c08d16d94389a3ceb780782a9
-  kubernetes-model-discovery-5.12.2.jar: dcad9af62368d6d98d5d5c6b43c36e81411155b2
-  kubernetes-model-extensions-5.12.2.jar: 4581e2fe50d8a2f9f872d1d9267ad802e091f4dc
-  kubernetes-model-networking-5.12.2.jar: 6a9fa09853a6531e4cfc9414407bf7e3ca2036e3
-  kubernetes-model-flowcontrol-5.12.2.jar: bec45279f80fb969e9898380014113416f65a136
+  kubernetes-model-core-5.12.3.jar: cdf3f8044feb2af20f53d026bf9e7e9cb5d3263d
+  kubernetes-model-scheduling-5.12.3.jar: b25a7a8903398e89c18bba604701b4dbc6683047
+  kubernetes-model-extensions-5.12.3.jar: b2877c9b7466cd0bc4b1d01bf7a2eb39e271cb3d
+  kubernetes-model-rbac-5.12.3.jar: 89bebfd456b9cca9e95bec4c86ecdf3ccff7a036
+  kubernetes-client-5.12.3.jar: 60358bd5d4f1d83dcea633eeb02ea550571228e5
   logging-interceptor-3.12.12.jar: d952189f6abb148ff72aab246aa8c28cf99b469f
