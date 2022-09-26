@@ -170,8 +170,8 @@ loadLib("aws_core.js");
  
  AWS.prototype.__DYNAMO_Item_Convert = function(aMap) {
     var __translate = (v) => {
-       if (isString(v)) { return { S: String(v) }; }
        if (isNumber(v)) { return { N: String(v) }; }
+       if (isString(v)) { return { S: String(v) }; }
        if (isBoolean(v)) { return { BOOL: v }; }
        if (isNull(v)) { return { NULL: v }; }
        if (isArray(v)) {
