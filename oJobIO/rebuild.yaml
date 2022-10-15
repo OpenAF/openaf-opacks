@@ -19,8 +19,8 @@ jobs:
 # --------------------
 - name: Prepare output
   exec: |
-    io.rm("_output");
-    io.mkdir("_output");
+    io.rm("_output")
+    io.mkdir("_output")
 
 # -------------------
 - name: Finish output
@@ -28,12 +28,12 @@ jobs:
   - Get oJob-commons
   - Copy content
   exec: |
-    args.output     = _$(args.output, "output").default("output");
-    args.init.proto = _$(args.PROTO, "PROTO").default(args.init.proto);
-    args.init.name  = _$(args.NAME, "NAME").default(args.init.name);
-    args.init.url   = _$(args.URL, "URL").default(args.init.url);
-    args.init.lname = args.init.name.length;
-    var l = [], lp = [];
+    args.output     = _$(args.output, "output").default("output")
+    args.init.proto = _$(args.PROTO, "PROTO").default(args.init.proto)
+    args.init.name  = _$(args.NAME, "NAME").default(args.init.name)
+    args.init.url   = _$(args.URL, "URL").default(args.init.url)
+    args.init.lname = args.init.name.length
+    var l = [], lp = []
      
     $from(listFilesRecursive("_output"))
     .notStarts("filename", ".")
@@ -41,70 +41,81 @@ jobs:
     .sort("dir", "-isDirectory", "filename")
     .select(r => {
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
-          var orig = r.filepath;
-          if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "");
+          var orig = r.filepath
+          if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "")
           if (r.filename != ".package.yaml" && !r.filename.startsWith("_")) {
-            l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") );
-            lp.push(orig);
+            l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") )
+            lp.push(orig)
           }
        } else {
-          if (r.isDirectory && r.filename != "common" && !r.filename.startsWith("_")) lp.push(r.filepath);
+          if (r.isDirectory && r.filename != "common" && !r.filename.startsWith("_")) lp.push(r.filepath)
        }
-    });
+    })
 
-    var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n";
-    //parallel4Array(lp, f => {
+    var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n"
+    var htmlmdindex = mdindex
+    var cuuid = $atomic()
     lp.forEach(f => {
        if (io.fileInfo(f).isDirectory) {
-         mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n";
-         return true;
+         mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
+         htmlmdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
+         return true
        }
 
-       var j;
+       var j
        try {
-         if (f.match(/\.ya?ml$/)) j = io.readFileYAML(f);
-         if (f.match(/\.json$/))  j = io.readFileJSON(f);
+         if (f.match(/\.ya?ml$/)) j = io.readFileYAML(f)
+         if (f.match(/\.json$/))  j = io.readFileJSON(f)
          if (isUnDef(j)) {
            f += "/index.yaml"
-           j = io.readFileYAML(f);
+           j = io.readFileYAML(f)
          }
        } catch(e) {
-         logErr("Problem reading file '" + f + "': " + String(e));
+         logErr("Problem reading file '" + f + "': " + String(e))
        }
 
-       if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any()) {
-        log("Generating markdown for " + f + "...");
+       if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any() || isDef(j.help)) {
+        log("Generating markdown for " + f + "...")
         oJobRunFile("ojobs/doc.yaml", {
           job   : f,
           name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
           mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-          output: f.replace(/(\.ya?ml|\.json)$/, ".md")
-        }, nowUTC(), void 0, true);
+          output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
+          html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
+        }, cuuid.inc(), { shareArgs: false }, true)
  
-        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "");
-        mdindex += "  * [" + mentry + "](" + mentry + ".md)\n";
+        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
+        mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
+        htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
        }
-       return 1;
-    });
+       return 1
+    })
 
-    io.writeFileString("_output/index.md", mdindex);
+    io.writeFileString("_output/index.md", mdindex)
+    io.writeFileString("_output/index.html", ow.template.parseMD2HTML(htmlmdindex, true))
     
-    var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init));
-    _tmpl.init.l = l;
-    io.writeFileJSON("_output/index.json", _tmpl);
-    io.cp("imgs/openaf.png", "_output/logo.png");
+    var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init))
+    _tmpl.init.l = l
+    io.writeFileJSON("_output/index.json", _tmpl)
+    io.cp("imgs/openaf.png", "_output/logo.png")
   
-    io.rm(args.output);
-    io.mv("_output", args.output);
+    io.rm(args.output)
+    io.mv("_output", args.output)
+
+    $sh("sudo apk add zip")
+    .pwd("/openaf/output")
+    .sh("/openaf/ojob hash.yaml url=. file=_integrity.json")
+    .sh("zip -9r _output.zip *")
+    .exec()
 
 # ----------------------
 - name: Get oJob-commons
   deps: Prepare output
   exec: |
-    plugin("GIT");
-    var git = new GIT();
-    git.clone("https://github.com/openaf/oJob-common.git", "_output/common");
-    io.rm("_output/common/.git");
+    plugin("GIT")
+    var git = new GIT()
+    git.clone("https://github.com/openaf/oJob-common.git", "_output/common")
+    io.rm("_output/common/.git")
 
 # ------------------
 - name: Copy content
@@ -112,10 +123,10 @@ jobs:
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
        if (r.isFile) {
-         log("Copying " + r.filepath + "...");
-         io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"));
+         log("Copying " + r.filepath + "...")
+         io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"))
        } else {
-         log("Creating folder " + r.filepath + "...");
-         io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"));
+         log("Creating folder " + r.filepath + "...")
+         io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
        }
-    });
+    })

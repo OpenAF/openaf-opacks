@@ -1,4 +1,4 @@
-FROM openaf/openaf-ojobc:nightly
+FROM openaf/ojobc:nightly
 
 EXPOSE 8088
 

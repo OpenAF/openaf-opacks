@@ -1,5 +1,5 @@
 # Author: Nuno Aguiar
-help: &HELP
+help: 
   text   : Generates a markdown output for an oJob. If a markdown file (.md) with the same name of the original oJob file (.yaml or .json) being processed exists it will append that markdown content on the generated one.
   expects: 
   - name   : job
@@ -14,6 +14,9 @@ help: &HELP
   - name   : output
     desc   : If defined the output will be stored on the provided filepath.
     example: abc.md
+  - name   : html
+    desc   : If defined the output will be stored additionally, in html, on the provided filepath.
+    example: abc.html
 
 init:
     tmpl: |
@@ -44,15 +47,11 @@ todo:
   
 ojob:
   opacks      :
-  - openaf: 20200523
+  - openaf: 20220822
   catch       : logErr(exception);
   logToConsole: false   # to change when finished
   
 jobs:
-# ----------
-- name: Help
-  help: &HELP
-  
 # ------------------
 - name: Generate doc
   exec: |
@@ -60,7 +59,7 @@ jobs:
   
     var j;
     if (args.job.match(/\.ya?ml$/)) j = io.readFileYAML(args.job);
-    if (args.job.match(/\.json$/))   j = io.readFileJSON(args.job);
+    if (args.job.match(/\.json$/))  j = io.readFileJSON(args.job);
 
     if (isUnDef(j) || isUnDef(j.jobs)) {
       logWarn("No jobs found in '" + args.job + "'...");
@@ -87,7 +86,13 @@ jobs:
   
     var out = templify(args.init.tmpl, data);
     if (isDef(args.output)) {
-        io.writeFileString(args.output, out);
+      log("Writing to '" + args.output + "'...") 
+      io.writeFileString(args.output, out);
     } else {
-        print(out);
+      print(out);
+    }
+
+    if (isDef(args.html)) {
+      log("Writing to '" + args.html + "'...")
+      io.writeFileString(args.html, ow.template.parseMD2HTML(out.replace(mdFile, mdFile.replace(/\.md$/, ".html")), true))
     }

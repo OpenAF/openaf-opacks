@@ -48,8 +48,8 @@ files:
 - setupOJobIO.yaml
 - server.yaml
 filesHash:
-  Dockerfile: baaad6ffb83adc10b96836e4895b751c02faa24b
-  rebuild.yaml: 9ddf5e4060ac5f04e3b505a2f4d90a438c52a2ef
+  Dockerfile: 025f104d53af0225fd64ddff2c270dd6eeabaff9
+  rebuild.yaml: 08d1599e80e790cbca5f14a89aaad17a7335ac9a
   README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   rebuild.hbs: 43daa6ce9ae912dfd75f9deb7f55976804c27fcc
   imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
@@ -59,7 +59,7 @@ filesHash:
   ojobs/html.yaml: acddc4878f22fd826263211d1cf01c9683bdd056
   ojobs/hello/index.yaml: a0a072fa94b82221ad68d4d15f9ec7b62b07aeb9
   ojobs/hello/world.yaml: 195f769e2463141d028bb033e7236c51847cb67b
-  ojobs/doc.yaml: 0d0c5d7873e0f9989877a64dd164f82e3c786b64
+  ojobs/doc.yaml: 8e56eb6c9aad0aa37b2604a9f1dd13cfbcbcceb1
   ojobs/help.yaml: 9100f900a4abb3ae2abedbc077f37ed3bbf8f771
   ojobs/generate.yaml: bb6473ba074b51e14e3033f4bf9f1d4998a72534
   ojobs/echo.yaml: e082de2ae8260a8a9da2c873e91f8aab76d62cd8
@@ -68,7 +68,7 @@ filesHash:
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
   ojobs/check.yaml: aa4085a88d4dcadff1a6f2bdd0408d4d6f5f9947
   ojobs/get.yaml: 0acc9a912af5593deab66ad197bd61ed58bd71f5
-  ojobs/hash.yaml: 78b0125becd71e84203e4ef76198823d8c1b5e50
+  ojobs/hash.yaml: 9f2cd97d996af0973a56ebdb3b8a0e7ee31913b8
   ojobs/pipe.yaml: 5e8b7771bf439d28373abe0b422a58637d03b6a2
-  setupOJobIO.yaml: 6978d6ae56b6cb471fa23b4238d4fbbf286020b8
-  server.yaml: 7aa49d4ab58fef375fd7d88f4c3d504b0c6e443a
+  setupOJobIO.yaml: ebe6bd3640929068f414643b6cd37040aea8ea55
+  server.yaml: d830d18791ab3c5606f8c5997a24504b64734051

@@ -1,9 +1,9 @@
 # Author: Nuno Aguiar
-help: &HELP
+help: 
   text   : Generates a hash integrity file
   expects: 
   - name     : url
-    desc     : A oJobIO URL server for which to generate a hash integrity file
+    desc     : A oJobIO URL server (or local path) for which to generate a hash integrity file
     example  : https://ojob.io
     mandatory: true
   - name     : file
@@ -16,7 +16,7 @@ todo:
 
 ojob:
   opacks      :
-  - openaf: 20211229
+  - openaf: 20220822
   catch       : logErr(exception)
   logToConsole: true   # to change when finished
   channels    :
@@ -24,10 +24,6 @@ ojob:
     - name: hashes
 
 jobs:
-# ----------
-- name: Help
-  help: *HELP
-
 # -------------------------
 - name : Generate hash list
   each : Generate hash
@@ -37,7 +33,16 @@ jobs:
       file: isString.default(__)
   exec : |
     log("Retrieve list of jobs from URL...")
-    var urls = $rest().get(args.url).init.l
+    
+    var urls
+    if (args.url.toLowerCase().match(/^https?\:\/\//)) {
+      global.isLocal = false
+      urls = $rest().get(args.url).init.l
+    } else {
+      global.isLocal = true
+      urls = listFilesRecursive(args.url).map(r => r.canonicalPath)
+    }
+    
     log("Found #" + urls.length + " urls.")
 
     urls.forEach(url => each({ url: url }))
@@ -57,6 +62,15 @@ jobs:
     in:
       url: isString
   exec : |
-    var url = args.url.replace(/\.yaml$/, "");
-    log("Checking " + url + "...");
-    $ch("hashes").set({ url: url }, { url: url, hash: "sha256-" + sha256($rest().get2Stream(url)) })
+    var url
+    if (global.isLocal) {
+      url = args.url
+    } else {
+      url = args.url.replace(/\.yaml$/, "")
+    }
+    log("Checking " + url + "...")
+    if (global.isLocal) {
+      $ch("hashes").set({ url: url }, { url: url, hash: "sha384-" + sha384(io.readFileStream(url)) })
+    } else {
+      $ch("hashes").set({ url: url }, { url: url, hash: "sha384-" + sha384($rest().get2Stream(url)) })
+    }

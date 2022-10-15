@@ -93,5 +93,5 @@ todo:
          ow.loadTemplate();
          return ow.server.httpd.reply(String( ow.template.parseMD2HTML(res, true) ), 200, "text/html; charset=utf-8", {});
       } else {
-         return ow.server.httpd.reply(res); 
+         return ow.server.httpd.reply(res, 200, ow.server.httpd.getMimeType(tr), {}); 
       }

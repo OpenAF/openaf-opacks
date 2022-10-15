@@ -9,75 +9,64 @@ todo:
 ojob:
   sequential  : true
   opacks      :
-  - openaf: 20200523
-  catch       : logErr(exception);
+  - openaf: 20220822
+  catch       : logErr(exception)
   logToConsole: true   # to change when finished
 
 jobs:
-# ----------
-- name: Help
-  help: 
-    text   : Does stuff. 
-    expects: 
-    - name: something
-      desc: To do stuff
-
 # -----------------------
 - name: GIT Clone oJob.io
   exec: |
-    var tmp = io.createTempFile("ojobio", "");
-    io.mkdir(tmp + ".dir");
-    global.dir = tmp + ".dir";
+    global.dir = io.createTempDir("ojobio", "")
 
-    log("Creating a temporary folder '" + global.dir + "'...");
-    io.mkdir(global.dir);
+    log("Creating a temporary folder '" + global.dir + "'...")
 
     plugin("GIT")
-    var git = new GIT();
-    log("Cloning ojob.io...");
-    git.clone("https://github.com/openaf/oJob.io", global.dir);
-    log("Clone done.");
+    var git = new GIT()
+    log("Cloning ojob.io...")
+    git.clone("https://github.com/openaf/oJob.io", global.dir)
+    log("Clone done.")
 
-    ow.oJob.output(args, args);
+    ow.oJob.output(args, args)
 
 # -----------------------
 - name: Prepare file list
   exec: |
-    io.rm(global.dir + "/.git");
-    global.lst = $from(listFilesRecursive(global.dir)).notContains("filepath", "/.").select();
+    io.rm(global.dir + "/.git")
+    global.lst = $from(listFilesRecursive(global.dir)).notContains("filepath", "/.").select()
 
 # --------------------
 - name: Create folders
   each: 
   - Create folder
   exec: |
-    log("Creating folders...");
-    global.lst.forEach(r => (r.isDirectory ? each(r) : __));
-    log("Folders created.");
+    log("Creating folders...")
+    global.lst.forEach(r => (r.isDirectory ? each(r) : __))
+    log("Folders created.")
 
 # -------------------
 - name : Create folder
   catch: |
-    sprintErr(exception);
+    sprintErr(exception)
   exec : |
-    var d = "ojobs/" + args.filepath.replace(global.dir + "/", "");
-    log("Creating directory '" + d + "'...");
-    io.mkdir(d);
+    var d = "ojobs/" + args.filepath.replace(global.dir + "/", "")
+    log("Creating directory '" + d + "'...")
+    io.mkdir(d)
 
 # ----------------
 - name: Move files
   each: 
   - Copy file
   exec: |
-    log("Moving files...");
-    global.lst.forEach(r => (r.isFile ? each(r) : __));
-    log("Files moved.");
+    log("Moving files...")
+    global.lst.forEach(r => (r.isFile ? each(r) : __))
+    log("Files moved.")
 
 # ----------------
 - name : Copy file
   catch: |
-    sprintErr(exception);
+    sprintErr(exception)
   exec : |
-    var f = "ojobs/" + args.filepath.replace(global.dir + "/", "");
-    log("Copy file '" + f + "'...");
-    io.mv(args.canonicalPath, f);
+    var f = "ojobs/" + args.filepath.replace(global.dir + "/", "")
+    log("Copy file '" + f + "'...")
+    io.mv(args.canonicalPath, f)
