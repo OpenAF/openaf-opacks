@@ -12,8 +12,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket).$_("Please provide a S3 bucket name");
-      _$(args.accessKey).$_("Please provide the S3 access key");
-      _$(args.secret).$_("Please provide the S3 access secret");
+      //_$(args.accessKey).$_("Please provide the S3 access key");
+      //_$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -38,8 +38,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
-      _$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
-      _$(args.secret, "secret").$_("Please provide the S3 access secret");
+      //_$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
+      //_$(args.secret, "secret").$_("Please provide the S3 access secret");
       args.objectPrefix  = _$(args.objectPrefix, "objectPrefix").default(__);
       args.needFull      = toBoolean(_$(args.needFull, "needFull").default("false"));
       args.needRecursive = toBoolean(_$(args.needRecursive, "needRecursive").default("false"));
@@ -85,8 +85,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket).$_("Please provide a S3 bucket name");
-      _$(args.accessKey).$_("Please provide the S3 access key");
-      _$(args.secret).$_("Please provide the S3 access secret");
+      //_$(args.accessKey).$_("Please provide the S3 access key");
+      //_$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -108,8 +108,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket).$_("Please provide a S3 bucket name");
-      _$(args.accessKey).$_("Please provide the S3 access key");
-      _$(args.secret).$_("Please provide the S3 access secret");
+      //_$(args.accessKey).$_("Please provide the S3 access key");
+      //_$(args.secret).$_("Please provide the S3 access secret");
       _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
       _$(args.localPath, "localPath").$_("Please provide a local path file to send to the bucket");
       
@@ -132,8 +132,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
-      _$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
-      _$(args.secret, "secret").$_("Please provide the S3 access secret");
+      //_$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
+      //_$(args.secret, "secret").$_("Please provide the S3 access secret");
       _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
       _$(args.localPath, "localPath").$_("Please provide a local path to store the retrieved object");
       
@@ -155,8 +155,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket).$_("Please provide a S3 bucket name");
-      _$(args.accessKey).$_("Please provide the S3 access key");
-      _$(args.secret).$_("Please provide the S3 access secret");
+      //_$(args.accessKey).$_("Please provide the S3 access key");
+      //_$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
@@ -180,8 +180,8 @@ jobs:
     exec: |
       _$(args.url).$_("Please provide a S3 endpoint url");
       _$(args.bucket).$_("Please provide a S3 bucket name");
-      _$(args.accessKey).$_("Please provide the S3 access key");
-      _$(args.secret).$_("Please provide the S3 access secret");
+      //_$(args.accessKey).$_("Please provide the S3 access key");
+      //_$(args.secret).$_("Please provide the S3 access secret");
       
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
