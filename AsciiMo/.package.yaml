@@ -20,15 +20,17 @@ name: AsciiMo
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220517'
+version: '20221024'
 dependencies:
   OpenAF: '>=20211229'
 files:
+- .package.yaml
 - fonts.zip
+- SOURCES
 - lib_asciimo.js
 - asciimo.js
-- .package.yaml
 filesHash:
-  fonts.zip: 87e973897580f7535e61d6d0a667e770e7a4f7f8
+  fonts.zip: 58054e315597b41ad1719f16f585991c636bc990
+  SOURCES: 3e0917f36ef2f114ad7ed0ed755fae9d30dece55
   lib_asciimo.js: 536dc8517129c6e4ecc3e61066fb280b8b9b6470
   asciimo.js: c8ffbcab32180f8d20fc1e758dab08933f33bd1c
