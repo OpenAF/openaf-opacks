@@ -29,7 +29,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220925'
+version: '20221024'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -55,14 +55,14 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 337580f55cd6aa14b3f0d0c28861b9455e198ecf
+  .odoc.db: d4d98baf331a392d3fdaf2dddc0a9ab2fd62e2aa
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws.js: f08eb5be964889a67020b5173ad0fae2ae523169
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
-  aws_ecr.js: 7efb01affc6aa72f5963243bcf03d189a691703d
+  aws_ecr.js: ea5683ea7ac5cd71e1ad0487631e802f43844137
   aws_dynamo.js: a1c02a89f0af3a3693fadc8e2a1bd28a1d06a4ae
   aws_sqs.js: 355362490d8d1375b00687256a07314c2762e600
   aws_rds.js: 15518551361378139b152192e479ef764d741e70

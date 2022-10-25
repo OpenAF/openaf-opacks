@@ -5,7 +5,7 @@ loadLib("aws_core.js");
 
 /**
  * <odoc>
- * <key>AWS.ECR_ListImages(aRegion, aRepoName, params) : Map</key>
+ * <key>AWS.ECR_ListImages(aRegion, aRepoName, params) : Array</key>
  * List all images and tabs for aRepoName on aRegion. Optionally you can provide extra params.
  * \
  * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_ListImages.html\
@@ -22,12 +22,52 @@ AWS.prototype.ECR_ListImages = function(aRegion, aRepoName, params) {
     var url = new java.net.URL(aURL)
     var aHost = String(url.getHost())
     var aURI = String(url.getPath())
- 
+
     params.repositoryName = aRepoName
 
-    return this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
+    var _res = this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
        "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.ListImages"
-    }, void 0, "application/x-amz-json-1.1");
+    }, __, "application/x-amz-json-1.1")
+
+    var res
+    if (isDef(_res) && isDef(_res.nextToken)) {
+       res = _res.imageIds.concat(this.ECR_ListImages(aRegion, merge(params, { nextToken: _res.nextToken })))
+    } else {
+       res = _res
+    }
+    return (isDef(res.imageIds) ? res.imageIds : res)
+}
+
+/**
+ * <odoc>
+ * <key>AWS.ECR_DescribeRepositories(aRegion, params) : Array</key>
+ * List all repositories on aRegion. Optionally you can provide extra params.\
+ * \
+ * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_DescribeRepositories.html\
+ * \
+ * </odoc>
+ */
+AWS.prototype.ECR_DescribeRepositories = function(aRegion, params) {
+    var aURL
+    aRegion = _$(aRegion).isString().default(this.region)
+    params    = _$(params).isMap().default({})
+
+    aURL = "https://ecr." + aRegion + ".amazonaws.com/"
+    var url = new java.net.URL(aURL)
+    var aHost = String(url.getHost())
+    var aURI = String(url.getPath())
+
+    var _res = this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
+       "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.DescribeRepositories"
+    }, __, "application/x-amz-json-1.1")
+
+    var res
+    if (isDef(_res) && isDef(_res.nextToken)) {
+       res = _res.repositories.concat(this.ECR_DescribeRepositories(aRegion, merge(params, { nextToken: _res.nextToken })))
+    } else {
+       res = _res
+    }
+    return (isDef(res.repositories) ? res.repositories : res)
 }
 
 /**
