@@ -4,10 +4,6 @@
 loadLib("aws_core.js");
 
 /**
- * SQS =========================
- */
-
-/**
  * <odoc>
  * <key>AWS.SQS_Send(aQueueEndPoint, aRegion, aMessageBody, aMessageGroupId, aMessageDeduplicationId) : Object</key>
  * Tries to send aMessageBody with aMessageGroupId and aMessageDeduplicationId to aQueueEndPoint on a specific aRegion. Returns
@@ -52,13 +48,17 @@ AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGrou
  
  /**
   * <odoc>
-  * <key>AWS.SQS_Receive(aQueueEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds) : Object</key>
+  * <key>AWS.SQS_Receive(aQueueEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds, maxMessages, aAttrList) : Object</key>
   * Tries to send receive a message from the aQueueEndPoint on region aRegion given aVisibilityTimeout in seconds. If a message is not immediatelly available it will wait
   * for aWaitTimeSeconds. On FIFO queues, after receiving the message you should delete it after successfully processing it within the visibility timeout period.
+  * Optionally you can provide an array of message attributes to retrieve or just "All" and a maxMessages to retrieve (defaults to 1)
   * </odoc>
   */
- AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds) {
+ AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds, maxMessage, aAttrList) {
     aRegion = _$(aRegion).isString().default(this.region);
+    aMaxMessage = _$(aMaxMessage, "aMaxMessage").isNumber().default(__)
+    aAttrList = _$(aAttrList, "aAttrList").default([])
+
     var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");
     var url = new java.net.URL(aURL);
     var aURI = String(url.getPath());
@@ -69,7 +69,9 @@ AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGrou
        QueueUrl: aURL,
        Version: "2012-11-05",
        VisibilityTimeout: aVisibilityTimeout,
-       WaitTimeSeconds: aWaitTimeSeconds
+       WaitTimeSeconds: aWaitTimeSeconds,
+       MaxNumberOfMessages: maxMessage,
+       AttributeName: aAttrList
     }, "sqs", aHost, aRegion);
     
     if (isString(res)) res = af.fromXML2Obj(res);
