@@ -533,6 +533,30 @@ Kube.prototype.getPods = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getNodesMetrics() : Array</key>
+ * Tries to retrieve metrics for all nodes on the current k8s cluster
+ * </odoc>
+ */
+Kube.prototype.getNodesMetrics = function() {
+	return this.__dR(this.client.top().nodes().metrics().getItems())
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getPodsMetrics(aNamespace) : Array</key>
+ * Tries to retrieve metrics for all pods optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getPodsMetrics = function(aNamespace) {
+	if (isDef(aNamespace)) {
+		return this.__dR(this.client.top().pods().inNamespace(aNamespace).metrics().getItems())
+	} else {
+		return this.__dR(this.client.top().pods().metrics().getItems())
+	}
+}
+
+/**
+ * <odoc>
  * <key>Kube.getJobs(aNamespace) : Array</key>
  * Tries to retrieve the list of jobs on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -766,18 +790,26 @@ Kube.prototype.__dR = function(aObj) {
 		var f0 = Object.keys(f1);
 
 		for (var i in f0) {
-			var f = f0[i]; var exc = ["getAdditionalProperties", "getClass", "getOrDefault", "get", "getRemainingItemCount", "getContinue"];
+			var f = f0[i]; var exc = ["getAdditionalProperties", "getClass", "getOrDefault", "get", "getRemainingItemCount", "getContinue", "getModule", "getUnits", "getFinalizers", "getOwnerReferences", "getManagedFields"];
 			if (f.startsWith("get") && exc.indexOf(f) < 0) {
 				try {
 					var rr = f1[f]();
-					if (!isNull(rr) && isDef(rr.entrySet)) rr = rr.entrySet().toArray(); else rr = [rr];
+					if (!isNull(rr) && isDef(rr.entrySet)) {
+						rr = rr.entrySet().toArray()
+					} else {
+						if (!isNull(rr) && isDef(rr.toArray) && !(rr instanceof java.util.ImmutableCollections)) {
+							rr = af.fromJavaArray(rr.toArray())
+						} else {
+							rr = [rr]
+						}
+					}
 
 					for (var ii in rr) {
 						if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
 							ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
 						} else {
 							if (!isNull(rr[ii])) {
-								fn(rr[ii], "." + f.replace(/^get/, ""));
+								fn(rr[ii], p + "." + f.replace(/^get/, "") + "[" + ii + "]");
 							}
 						}
 					}
@@ -791,8 +823,19 @@ Kube.prototype.__dR = function(aObj) {
 		}
 	};
 
-	fn(aObj.get());
-	fn(aObj.list());
+	try { if (isDef(aObj.get))  fn(aObj.get())  } catch(e) {}
+	try { if (isDef(aObj.list)) fn(aObj.list()) } catch(e) {}
+	if (aObj instanceof java.util.List) {
+		var res = []
+		for (idx in aObj) {
+			r = {}
+			fn(aObj[idx])
+			res.push(r)
+		}
+		return res
+	} else {
+		if (Object.keys(r).length == 0) fn(aObj)
+	}
 
 	return r;
 };
@@ -802,51 +845,55 @@ Kube.prototype.__displayResult = function(aObj) {
 	ow.loadObj();
 
 	for(var obj in arr) {
-            try {
-		var r = {};
-		var o = arr[obj];
+        try {
+			var r = {};
+			var o = arr[obj];
 
-		var fn = (f1, p) => {
-			p = _$(p).default("");
+			var fn = (f1, p) => {
+				p = _$(p).default("");
+				var f0 = Object.keys(f1); 
 			var f0 = Object.keys(f1); 
+				var f0 = Object.keys(f1); 
 
-			for(var i in f0) {
+				for(var i in f0) {
+					var f = f0[i]; 
 				var f = f0[i]; 
-				if (f.startsWith("get") && f != "getClass" && f != "getApiVersion" && f != "get" && f != "getOrDefault") {
-					try {
-						var rr = f1[f]();
-						if (isDef(rr.entrySet)) rr = rr.entrySet().toArray(); else rr = [ rr ];
+					var f = f0[i]; 
+					if (f.startsWith("get") && f != "getClass" && f != "getApiVersion" && f != "get" && f != "getOrDefault") {
+						try {
+							var rr = f1[f]();
+							if (isDef(rr.entrySet)) rr = rr.entrySet().toArray(); else rr = [ rr ];
 
-						for(var ii in rr) {
-							if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
-								ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
-							} else {
-								if (!isNull(rr[ii])) {
-									fn(rr[ii], "." + f.replace(/^get/, ""));
+							for(var ii in rr) {
+								if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
+									ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
+								} else {
+									if (!isNull(rr[ii])) {
+										fn(rr[ii], "." + f.replace(/^get/, ""));
+									}
 								}
 							}
+						} catch(e) {
+							//printErr(f);
 						}
-					} catch(e) {
-						//printErr(f);
 					}
 				}
-			}
-		};
+			};
 
-		fn(o);
+			fn(o);
 
-		/*if (o.getMetadata().getLabels() != null && !o.getMetadata().getLabels().isEmpty()) {
-			r.labels = {};
-			var o2 = o.getMetadata().getLabels().entrySet();
-			for(var e in o2.toArray()) {
-				var oo = o2.toArray()[e];
-				r.labels[String(oo.getKey())] = String(oo.getValue());
-			}
-		}*/
+			/*if (o.getMetadata().getLabels() != null && !o.getMetadata().getLabels().isEmpty()) {
+				r.labels = {};
+				var o2 = o.getMetadata().getLabels().entrySet();
+				for(var e in o2.toArray()) {
+					var oo = o2.toArray()[e];
+					r.labels[String(oo.getKey())] = String(oo.getValue());
+				}
+			}*/
 
-		res.push(r);
-            } catch(e1) {
-            }
+			res.push(r);
+		} catch(e1) {
+		}
 	}
 
 	return res;

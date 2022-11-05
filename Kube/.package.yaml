@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220921'
+version: '20221004'
 dependencies:
   OpenAF: '>=20210412'
 files:
@@ -60,7 +60,7 @@ filesHash:
   jackson-dataformat-yaml-2.13.1.jar: fa89741b057f4f2094e2f115e6cf898626989fe2
   kubernetes-model-common-5.12.3.jar: 750af03fe4bf65d134c7b3ef54f96fe38ef6bda7
   jackson-datatype-jsr310-2.13.1.jar: 1ece5a87b59701328215e0083448b4d451857cbd
-  .odoc.db: 230e2717b4b3b7d0926dba293f90e2a10d7e635f
+  .odoc.db: 3254a725f28b346ea77e51486893f857f158e0a6
   kubernetes-model-apps-5.12.3.jar: 947a89299b68cfdd7b18f2f95d42b0d105092947
   generex-1.0.2.jar: b378f873b4e8d7616c3d920e2132cb1c87679600
   kubernetes-model-storageclass-5.12.3.jar: 0d5a2bc8976d08639027afdd22643145c3bb5a37
@@ -75,7 +75,7 @@ filesHash:
   kubernetes-model-admissionregistration-5.12.3.jar: 5e58814c0076e19620965dd0e7ceabaefcb3fa19
   kubernetes-model-policy-5.12.3.jar: 225b23ac8f93154953ec8a557e98e72e8604aa73
   kubernetes-model-batch-5.12.3.jar: 8cdd4b789c02439e452d0e10a5c9cc94799bfc93
-  kube.js: 2bd892c6456d55c0a30217c999fc0407a44b3c04
+  kube.js: c249f5b57ff0d4f242635ebcf6b4fbda5d5ebaa0
   .maven.yaml: 01995127bb53c12222a85e3df222b059281ca158
   kubernetes-model-networking-5.12.3.jar: f3cf5a996bf318d148e7ca741af6bf87956102c0
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
