@@ -622,7 +622,7 @@ Kube.prototype.apply = function(aNamespace, aStream) {
 	_$(aNamespace, "namespace").isString().$_();
 	if (isString(aStream)) aStream = io.readFileStream(aStream);
 	if (isMap(aStream)) aStream = af.fromString2InputStream(stringify(aStream));
-	var o2 = this.client.inNamespace(aNamespace).load(aStream).apply();
+	var o2 = this.client.inNamespace(aNamespace).load(aStream).createOrReplace()
 	global.o2 = o2;
 	return this.__displayResult(o2);
 };
