@@ -295,6 +295,38 @@ Kube.prototype.getClusterRoleBindings = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getConfig() : Map</key>
+ * Retrieves the current client configuration
+ * </odoc>
+ */
+Kube.prototype.getConfig = function() {
+	return this.__dR(this.client.configuration)
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getContext() : String</key>
+ * Returns the current configured context
+ * </odoc>
+ */
+Kube.prototype.getContext = function() {
+	return this.__dR(this.client.configuration.getCurrentContext())
+}
+
+/**
+ * <odoc>
+ * <key>Kube.setContext(aContext)</key>
+ * Reconfigures the client to use the provided aContext
+ * </odoc>
+ */
+Kube.prototype.setContext = function(aContext) {
+	_$(aContext, "aContext").isString().$_()
+	this.config = (new Packages.io.fabric8.kubernetes.client.Config.autoConfigure(aContext))
+	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
+}
+
+/**
+ * <odoc>
  * <key>Kube.getRoles(aNamespace) : Array</key>
  * Tries to retrieve the list of roles on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
