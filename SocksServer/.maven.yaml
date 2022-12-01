@@ -5,4 +5,4 @@ artifacts:
 # based on github.com/nmaguiar/
 #- id      : java-socks-proxy-server
 #  group   : com.github.bbottema
-#  version : 2.0.0
+#  version : 2.0.1
