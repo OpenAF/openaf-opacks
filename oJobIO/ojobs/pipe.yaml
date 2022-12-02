@@ -1,5 +1,5 @@
 # Author: Nuno Aguiar
-help: &HELP
+help:
   text   : |
     Pipe oJobs in a sequence. Expects number arguments with the order of the jobs and [number].[argument] for each job specific argument. Example:
     
@@ -16,10 +16,6 @@ ojob:
   logToConsole: false   # to change when finished
 
 jobs:
-# ----------
-- name: Help
-  help: *HELP
-
 # ---------------
 - name: Get parts
   exec: |
@@ -81,19 +77,28 @@ jobs:
       });
       print(af.toYAML(res));
     } else {
-      $from(global.pipe).sort("n").select(r => {
-        var exec = false
-        if (isUnDef(r.a)) r.a = {}
-        if (isUnDef(r.a.__format)) r.a.__format = "pm"
 
-        if (Object.keys(r.a).indexOf("*path") >= 0)      { r.a = $path(__pm._list, r.a["*path"]); exec = true; } 
-        if (!exec && Object.keys(r.a).indexOf("*") >= 0) { r.a = af.eval(r.a["*"]); exec = true; }
-        if (!exec) r.a.__format = "pm"
+      var _rpt = isDef(args.__interval)
 
-        ow.oJob.runFile(r.j, r.a, now(), true, (isDef(__flags.OJOB_SHAREARGS) ? { shareArgs: false } : __))
-        if (isUnDef(__flags.OJOB_SHAREARGS)) $set("res", {})
-        //oJobRunFile(r.j, r.a, now())
-      });
+      do {
+        $from(global.pipe).sort("n").select(r => {
+          var exec = false
+          if (isUnDef(r.a)) r.a = {}
+          if (isUnDef(r.a.__format)) r.a.__format = "pm"
+
+          if (Object.keys(r.a).indexOf("*path") >= 0)      { r.a = $path(__pm._list, r.a["*path"]); exec = true; } 
+          if (!exec && Object.keys(r.a).indexOf("*") >= 0) { r.a = af.eval(r.a["*"]); exec = true; }
+          if (!exec) r.a.__format = "pm"
+
+          ow.oJob.runFile(r.j, r.a, now(), true, (isDef(__flags.OJOB_SHAREARGS) ? { shareArgs: false } : __))
+          if (isUnDef(__flags.OJOB_SHAREARGS)) $set("res", {})
+          //oJobRunFile(r.j, r.a, now())
+        })
+
+        if (_rpt) sleep(args.__interval, true)
+        __pm = {}
+      } while (_rpt)
  
-      ow.oJob.output(__pm, args);   
+      ow.oJob.output(__pm, args)
     } 
+

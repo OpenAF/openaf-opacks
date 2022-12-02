@@ -18,57 +18,57 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20221001'
+version: '20221201'
 dependencies:
   openaf: '>=20211229'
 files:
-- Dockerfile
-- rebuild.yaml
-- README.md
-- .package.yaml
 - rebuild.hbs
-- imgs/openaf.png
-- ojobs/list.yaml
-- ojobs/clean.yaml
-- ojobs/map.yaml
-- ojobs/html.yaml
-- ojobs/hello/index.yaml
-- ojobs/hello/world.yaml
-- ojobs/doc.yaml
-- ojobs/help.yaml
-- ojobs/generate.yaml
-- ojobs/echo.yaml
-- ojobs/envs.yaml
-- ojobs/_common.yaml
-- ojobs/index.html
-- ojobs/check.yaml
-- ojobs/get.yaml
-- ojobs/hash.yaml
-- ojobs/pipe.yaml
-- setupOJobIO.yaml
 - server.yaml
+- imgs/openaf.png
+- Dockerfile
+- .package.yaml
+- README.md
+- ojobs/echo.yaml
+- ojobs/index.html
+- ojobs/get.yaml
+- ojobs/envs.yaml
+- ojobs/pipe.yaml
+- ojobs/_common.yaml
+- ojobs/hash.yaml
+- ojobs/doc.yaml
+- ojobs/list.yaml
+- ojobs/check.yaml
+- ojobs/generate.yaml
+- ojobs/map.yaml
+- ojobs/hello/world.yaml
+- ojobs/hello/index.yaml
+- ojobs/clean.yaml
+- ojobs/html.yaml
+- ojobs/help.yaml
+- setupOJobIO.yaml
+- rebuild.yaml
 filesHash:
-  Dockerfile: 025f104d53af0225fd64ddff2c270dd6eeabaff9
-  rebuild.yaml: 08d1599e80e790cbca5f14a89aaad17a7335ac9a
-  README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
   rebuild.hbs: 43daa6ce9ae912dfd75f9deb7f55976804c27fcc
-  imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
-  ojobs/list.yaml: 60dd60aa986524c8fdca1baef6669bdc3b46bc08
-  ojobs/clean.yaml: 29b1b7776b2349e2df42e265318be80eb5eef43a
-  ojobs/map.yaml: 6b3963f2be74011ceeb9f00aa4de55f928d63962
-  ojobs/html.yaml: acddc4878f22fd826263211d1cf01c9683bdd056
-  ojobs/hello/index.yaml: a0a072fa94b82221ad68d4d15f9ec7b62b07aeb9
-  ojobs/hello/world.yaml: 195f769e2463141d028bb033e7236c51847cb67b
-  ojobs/doc.yaml: 8e56eb6c9aad0aa37b2604a9f1dd13cfbcbcceb1
-  ojobs/help.yaml: 9100f900a4abb3ae2abedbc077f37ed3bbf8f771
-  ojobs/generate.yaml: bb6473ba074b51e14e3033f4bf9f1d4998a72534
-  ojobs/echo.yaml: e082de2ae8260a8a9da2c873e91f8aab76d62cd8
-  ojobs/envs.yaml: 1d261affa726f53d3f09db1ca2588da2eb94d753
-  ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
-  ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
-  ojobs/check.yaml: aa4085a88d4dcadff1a6f2bdd0408d4d6f5f9947
-  ojobs/get.yaml: 0acc9a912af5593deab66ad197bd61ed58bd71f5
-  ojobs/hash.yaml: 9f2cd97d996af0973a56ebdb3b8a0e7ee31913b8
-  ojobs/pipe.yaml: 5e8b7771bf439d28373abe0b422a58637d03b6a2
-  setupOJobIO.yaml: ebe6bd3640929068f414643b6cd37040aea8ea55
   server.yaml: d830d18791ab3c5606f8c5997a24504b64734051
+  imgs/openaf.png: 0e556b3dc3e0b1e4e17b0e1ae6e2668a0f630572
+  Dockerfile: 505807118c1efe1fc10809dae33f050a84387e57
+  README.md: 5bd14bb0d8656ec7d45297682340e72334246e19
+  ojobs/echo.yaml: e082de2ae8260a8a9da2c873e91f8aab76d62cd8
+  ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
+  ojobs/get.yaml: 0acc9a912af5593deab66ad197bd61ed58bd71f5
+  ojobs/envs.yaml: 1d261affa726f53d3f09db1ca2588da2eb94d753
+  ojobs/pipe.yaml: 6759feb0639ba45aa0908a90738df787a8c2ae2c
+  ojobs/_common.yaml: b25319d3faf84a20f1337d606b8043f0b371905b
+  ojobs/hash.yaml: 9f2cd97d996af0973a56ebdb3b8a0e7ee31913b8
+  ojobs/doc.yaml: 8e56eb6c9aad0aa37b2604a9f1dd13cfbcbcceb1
+  ojobs/list.yaml: 60dd60aa986524c8fdca1baef6669bdc3b46bc08
+  ojobs/check.yaml: aa4085a88d4dcadff1a6f2bdd0408d4d6f5f9947
+  ojobs/generate.yaml: bb6473ba074b51e14e3033f4bf9f1d4998a72534
+  ojobs/map.yaml: 6b3963f2be74011ceeb9f00aa4de55f928d63962
+  ojobs/hello/world.yaml: 195f769e2463141d028bb033e7236c51847cb67b
+  ojobs/hello/index.yaml: a0a072fa94b82221ad68d4d15f9ec7b62b07aeb9
+  ojobs/clean.yaml: 29b1b7776b2349e2df42e265318be80eb5eef43a
+  ojobs/html.yaml: acddc4878f22fd826263211d1cf01c9683bdd056
+  ojobs/help.yaml: 9100f900a4abb3ae2abedbc077f37ed3bbf8f771
+  setupOJobIO.yaml: ebe6bd3640929068f414643b6cd37040aea8ea55
+  rebuild.yaml: 08d1599e80e790cbca5f14a89aaad17a7335ac9a
