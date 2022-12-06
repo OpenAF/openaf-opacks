@@ -93,7 +93,7 @@ SocksServer.prototype.getNetFilter = function(ipFilters) {
  * </odoc>
  */
 SocksServer.prototype.getLocalNetFilter = function() {
-    var ipFilters = [ "10.0.0.0/24", "172.16.0.0/20", "192.168.0.0/16", "fc00::/7" ]
+    var ipFilters = [ "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fc00::/7" ]
 
     return this.getNetFilter(ipFilters)
 }
