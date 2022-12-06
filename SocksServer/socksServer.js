@@ -69,10 +69,10 @@ SocksServer.prototype.getNetFilter = function(ipFilters) {
                 if (ip.indexOf("/") > 0) {
                     var _p = ip.split("/")
                     var t = java.net.InetAddress.getByName(_p[0]).getAddress()
-                    var l = (java.net.InetAddress.getByName(_p[0]).getHostAddress().indexOf(":") >= 0 ? 128 : 32)
+                    //var l = (java.net.InetAddress.getByName(_p[0]).getHostAddress().indexOf(":") >= 0 ? 128 : 32)
     
                     var _r = true
-                    for(var i = 0; i < (l - _p[1]) / 8; i++) {
+                    for(var i = 0; i < (_p[1] / 8); i++) {
                         if (t[i] != d[i]) _r = false
                     }
                     if (_r) go = true
