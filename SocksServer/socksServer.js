@@ -61,22 +61,18 @@ SocksServer.prototype.getLogCallback = function(verboseLog, detailLog, includeSt
 SocksServer.prototype.getNetFilter = function(ipFilters) {
     ipFilters = _$(ipFilters, "ipFilters").isArray().default([])
 
+    // TODO: cache filters
     return function(data) {
         var _cmp = (aSource, filters) => {
             var go = false
-            var d = aSource.getAddress()
+            var d = aSource.getAddress().map(r => ow.format.toBinary(Number(r & 255), 8)).join("")
             filters.forEach(ip => {
                 if (ip.indexOf("/") > 0) {
                     var _p = ip.split("/")
-                    var t = java.net.InetAddress.getByName(_p[0]).getAddress()
+                    var t = java.net.InetAddress.getByName(_p[0]).getAddress().map(r => ow.format.toBinary(Number(r & 255), 8)).join("")
                     //var l = (java.net.InetAddress.getByName(_p[0]).getHostAddress().indexOf(":") >= 0 ? 128 : 32)
     
-                    var _r = true
-                    for(var i = 0; i < (_p[1] / 8); i++) {
-                        if (t[i] != d[i]) _r = false
-                    }
-                    if (_r) go = true
-                    _p.push(go)
+                    if (d.substring(0, _p[1]) == t.substring(0, _p[1])) go = true
                 }
             })
             return !go
