@@ -1,10 +1,12 @@
 # Author: Nuno Aguiar
-help: &HELP
-  text   : Downloads the corresponding job from the provided location/url.
+help:
+  text   : Downloads the corresponding job from the provided location/url and optionally the corresponding dependencies
   expects: 
   - name   : job
     desc   : The job location or url (e.g. ojob.io/get) 
     example: abc.yaml
+  - name   : airgap
+    desc   : If airgap=true the retrieved ojobs will also include dependencies (e.g. ojobs and opacks) and output will be to files.
 
 todo:
 - Download
@@ -12,26 +14,80 @@ todo:
 ojob:
   sequential  : true
   opacks      :
-  - openaf: 20200523
+  - openaf: 20220822
   catch       : logErr(exception);
   logToConsole: false   # to change when finished
 
 jobs:
-# ----------
-- name: Help
-  help: *HELP
-
 # --------------
-- name: Download
-  exec: |
-    _$(args.job, "job").$_();
+- name : Get job
+  check:
+    in:
+      job: isString
+  exec : |
     if (!(args.job.toLowerCase().match(/^https?:\/\//))) {
-      var newjob = "https://" + args.job;
+      var newjob = "https://" + args.job
 
-      ow.loadFormat();
-      var host = (new java.net.URL(newjob).getHost());
-      if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job;
-      args.job = newjob;
+      ow.loadFormat()
+      var host = (new java.net.URL(newjob).getHost())
+      if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job
+      args.job = newjob
     }
+    return $rest().get(args.job + (args.job.endsWith(".yaml") ? "" : ".yaml"))
 
-    print($rest({ uriQuery: true }).get(args.job, { raw: 1 }));
+# ---------------
+- name : Download
+  check:
+    in:
+      job   : isString
+      airgap: toBoolean.isBoolean.default(false)
+  exec : |
+    if (args.airgap) {
+      var fnT = _t => (_t + (_t.endsWith(".yaml") ? "" : ".yaml")).replace(/^https?:\/\//i, "").replace(/\//g, "_")
+      var fnW = (target, raw) => { print("Writing " + target + "..."); io.writeFileString(target, raw) }
+      var fn = _j => {
+        var raw = $job("Get job", { job: _j })
+        var data = ( raw.trim().indexOf("{") == 0 ) ? jsonParse(raw) : af.fromYAML(raw)
+
+        // Include and jobsInclude
+        if (isArray(data.include)) data.include.forEach(j => {
+          fn(j)
+          raw = raw.replace(new RegExp(j, "g"), fnT(j))
+        })
+        if (isArray(data.jobsInclude)) data.jobsInclude.forEach(j => {
+          fn(j)
+          raw = raw.replace(new RegExp(j, "g"), fnT(j))
+        })
+
+        // OPacks
+        if (isMap(data.ojob) && isArray(data.ojob.opacks)) {
+          data.ojob.opacks.forEach(p => {
+            var _p = Object.keys(p)[0]
+            if (_p.toLowerCase() != "openaf") {
+              var r = getOPackRemoteDB()[_p]
+              if (isMap(r.repository) && isString(r.repository.url)) {
+                print("Get opack " + r.repository.url + "...")
+                $rest().get2File(_p + ".opack", r.repository.url)
+
+                plugin("ZIP")
+                var zip = new ZIP()
+                zip.loadFile(_p + ".opack")
+                io.mkdir(_p)
+                $from(zip.list())
+                .select(_r => {
+                  print(" writing " + _p + "/" + _r.name + "...")
+                  ioStreamCopy(io.writeFileStream(_p + "/" + _r.name), zip.streamGetFileStream(_p + ".opack", _r.name))
+                })
+                zip.close()
+                io.rm(_p + ".opack")
+              }
+            }
+          })
+        }
+
+        fnW(fnT(_j), raw)
+      }
+      fn(args.job)
+    } else {
+      print($job("Get job", { job: args.job }))
+    }

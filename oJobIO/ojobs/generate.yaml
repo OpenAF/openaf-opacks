@@ -41,7 +41,7 @@ init:
 
     ojob:
       opacks      :
-      - openaf: 20211229
+      - openaf: 20220822
       catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
