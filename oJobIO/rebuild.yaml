@@ -8,6 +8,7 @@ init:
 todo:
 - Prepare output
 - Copy content
+- Copy static resources
 - Get oJob-commons
 - Finish output
 
@@ -22,13 +23,15 @@ jobs:
     io.rm("_output")
     io.mkdir("_output")
 
-# -------------------
-- name: Finish output
-  deps:
+# --------------------
+- name : Finish output
+  check:
+    in:
+      output: isString.default("output")
+  deps :
   - Get oJob-commons
   - Copy content
-  exec: |
-    args.output     = _$(args.output, "output").default("output")
+  exec : |
     args.init.proto = _$(args.PROTO, "PROTO").default(args.init.proto)
     args.init.name  = _$(args.NAME, "NAME").default(args.init.name)
     args.init.url   = _$(args.URL, "URL").default(args.init.url)
@@ -48,7 +51,7 @@ jobs:
             lp.push(orig)
           }
        } else {
-          if (r.isDirectory && r.filename != "common" && !r.filename.startsWith("_")) lp.push(r.filepath)
+          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css" && !r.filename.startsWith("_")) lp.push(r.filepath)
        }
     })
 
@@ -84,6 +87,14 @@ jobs:
           html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
         }, cuuid.inc(), { shareArgs: false }, true)
  
+       if ( isDef(j) && (f.match(/\.(ya?ml)$/)) ) {
+         log("Generate static version for " + f + "...")
+         oJobRunFile("ojobs/compile.yaml", {
+          source : f,
+          target : f.replace(/\.(ya?ml)$/, ".json")
+         }, cuuid.inc(), { shareArgs: false }, true)
+       }
+
         var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
         htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
@@ -103,8 +114,8 @@ jobs:
     io.mv("_output", args.output)
 
     $sh("sudo apk add zip")
-    .pwd("/openaf/output")
-    .sh("/openaf/ojob hash.yaml url=. file=_integrity.json")
+    .pwd(args.output)
+    .sh(getOpenAFPath() + "ojob hash.yaml url=. file=_integrity.json")
     .sh("zip -9r _output.zip *")
     .exec()
 
@@ -130,3 +141,16 @@ jobs:
          io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
        }
     })
+
+# ---------------------------
+- name: Copy static resources
+  deps: Prepare output
+  exec: |
+    var _copy = (source, target) => {
+      var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
+      var os = io.writeFileStream("_output/" + target)
+
+      ioStreamCopy(os, is)
+    }
+
+    [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ].forEach(r => _copy(r, r))
