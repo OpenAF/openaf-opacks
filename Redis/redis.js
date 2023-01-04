@@ -5,11 +5,12 @@
  * </odoc>
  */
 var Redis = function(aHost, aPort, aDBId) {
-    $path(io.listFiles(getOPackPath("Redis")).files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
+    $path(io.listFiles(getOPackPath("Redis") || ".").files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
         af.externalAddClasspath("file:///" + v);
     });
     this.host = aHost;
     this.port = aPort;
+    this.dbid = aDBId
 
     this.jedis = new Packages.redis.clients.jedis.Jedis(this.host, this.port);
     if (isDef(aDBId)) this.select(aDBId);
@@ -364,6 +365,11 @@ Redis.prototype.sortedSets_toArray = function(aKeyName) {
     return ar;
 };
 
+Redis.prototype.getCh = function(aCh) {
+    _$(aCh, "aCh").isString().$_()
+    return $ch(aCh).create(1, "redis", { host: this.host, port: this.port, dbid: this.dbid })
+}
+
 ow.loadObj();
 ow.obj.pool.REDIS = function(aHost, aPort, aDBId) {
     var p = this.create();
@@ -374,3 +380,125 @@ ow.obj.pool.REDIS = function(aHost, aPort, aDBId) {
     );
     return p;
 };
+
+ow.loadCh()
+ow.loadObj()
+// redis implementation
+//
+/**
+* <odoc>
+* <key>ow.ch.types.redis</key>
+* The redis channel OpenAF simplistic implementation. The creation options are:\
+* \
+*    - host  (String)  The Redis server host.\
+*    - port  (Number)  The Redis server port (e.g. 6379).\
+     - dbid  (String)  Optionally provided the Redis db id.\
+* \
+* </odoc>
+*/
+ow.ch.__types.redis = {
+    __channels: {},
+    create       : function(aName, shouldCompress, options) {
+      options = _$(options, "options").isMap().default({})
+      _$(options.host, "redis host").isString().$_()
+      options.port = _$(options.port, "redis port").isNumber().default(6379)
+
+      var redis = new Redis(options.host, options.port, options.dbid)
+      this.__channels[aName] = {
+        r: redis,
+        o: options
+      }
+    },
+    destroy      : function(aName) {
+      this.__channels[aName].r.close()
+      delete this.__channels[aName]
+    },
+    size         : function(aName) {
+      return this.__channels[aName].r.size()
+    },
+    forEach      : function(aName, aFunction) {
+      this.getKeys(aName).forEach(k => {
+        aFunction(k, this.get(aName, k))
+      })
+    },
+    getAll       : function(aName, full) {
+      return this.getKeys(aName, full).map(k => this.get(aName, k))
+    },
+    getKeys      : function(aName, full) {
+      var _ks = this.__channels[aName].r.getKeys(full)
+      return _ks.map(k => {
+        if ((String(k.trim()).startsWith("{") && String(k.trim()).endsWith("}")) || (String(k.trim()).startsWith("[") && String(k.trim()).endsWith("]"))) 
+            return jsonParse(String(k), true)
+        else
+            return k
+      })
+
+    },
+    getSortedKeys: function(aName, full) {
+      return this.__channels[aName].r.getKeys(full)
+    },
+    getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
+      throw "Redis $ch getSet not implemented"
+    },
+    set          : function(aName, aK, aV, aTimestamp) {
+        if (isMap(aK) && isDef(aK.key)) aK = aK.key
+        if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
+        if (isMap(aV) && isDef(aV.value)) aV = aV.value
+        if (isMap(aV)) aV = stringify(sortMapKeys(aV), __, "")
+        return this.__channels[aName].r.set(aK, aV)
+    },
+    setAll       : function(aName, aKs, aVs, aTimestamp) {
+        aKs = _$(aKs).isArray().default([])
+        _$(aVs).isArray().$_()
+
+        var c = 0
+        aVs.forEach(v => {
+            c++
+            this.set(aName, ow.obj.filterKeys(aKs, v), v)
+        })
+        return c
+    },
+    unsetAll     : function(aName, aKs, aVs, aTimestamp) {
+        aKs = _$(aKs).isArray().default([])
+        _$(aVs).isArray().$_()
+
+        var c = 0
+        aVs.forEach(v => {
+            c++
+            this.unset(aName, ow.obj.filterKeys(aKs, v), v)
+        })
+        return c
+    },
+    get          : function(aName, aK) {
+        if (isMap(aK) && isDef(aK.key)) aK = aK.key
+        if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
+        var _v = this.__channels[aName].r.get(aK)
+        if (isDef(_v))
+            if ((String(_v.trim()).startsWith("{") && String(_v.trim()).endsWith("}")) || (String(_v.trim()).startsWith("[") && String(_v.trim()).endsWith("]"))) 
+                _v = jsonParse(String(_v), true)
+        return _v
+    },
+    pop          : function(aName) {
+        var _lst = this.getKeys(aName)
+        if (_lst.length > 0) {
+          var _v = this.get(_lst[_lst.size-1])
+          this.unset(_lst[_lst.size-1])
+          return _v
+        }
+        return __
+    },
+    shift        : function(aName) {
+      var _lst = this.getKeys(aName)
+      if (_lst.length > 0) {
+        var _v = this.get(_lst[0])
+        this.unset(_lst[0])
+        return _v
+      }
+      return __
+    },
+    unset        : function(aName, aK, aTimestamp) {
+        if (isMap(aK) && isDef(aK.key)) aK = aK.key
+        if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
+        return this.__channels[aName].r.del(aK)
+    }
+}

@@ -13,6 +13,11 @@
             <version>3.12.11</version>
         </dependency>
         <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>4.4.0-m1</version>
+        </dependency>
+        <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
             <artifactId>svnkit-cli</artifactId>
             <version>1.9.1</version>
