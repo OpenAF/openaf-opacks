@@ -1,0 +1,77 @@
+# Author: Nuno Aguiar
+help:
+  text   : Tries to compile a YAML oJob with OpenAF exec code into JSON oJob compressed file
+  expects: 
+  - name   : source
+    desc   : The YAML oJob file
+    example: ojob.yaml
+    mandatory: true
+  - name   : target
+    desc   : The target json file
+    example: ojob.json
+    mandatory: true
+
+todo:
+- Get jobs
+- Output ojob
+
+ojob:
+  opacks      :
+  - openaf: 20220822
+  - GoogleCompiler
+  catch       : "ow.oJob.output({ Help: args.init.help }, args); logErr(exception); return false;"
+  logToConsole: true   # to change when finished
+  channels    :
+    create:
+    - name: jobs
+
+jobs:
+# ---------------
+- name : Get jobs
+  each : Compile job
+  check:
+    in:
+      source: isString
+  exec : |
+    if (!args.source.match(/\.(ya?ml|json)$/)) throw "Can't compile " + args.source
+    var oj = args.source.endsWith(".yaml") || args.source.endsWith(".yml") ? io.readFileYAML(args.source) : io.readFileJSON(args.source)
+    global._source = args.source 
+
+    $set("source", oj)
+    if (isArray(oj.jobs)) oj.jobs.forEach(r => each(r))
+
+# -----------------
+- name: Compile job
+  exec: |
+    if (isDef(args.lang) && (args.lang != "openaf" || args.lang != "oaf" || args.lang != "js" || args.lang != "javascript")) {
+      log(global._source + " | Ignoring '" + args.name + "'...")
+    } else {
+      if (isDef(args.exec)) {
+        log(global._source + " | Processing '" + args.name + "'...");
+
+        var res = $sh()
+                  .sh(ow.format.getJavaHome() + "/bin/java -jar " + getOPackPath("GoogleCompiler") + "/compiler.jar --language_out ECMASCRIPT5 --env CUSTOM --strict_mode_input false --rewrite_polyfills false", "(function() {" + args.exec +"})()")
+                  .get(0);
+
+        $ch("jobs").set({ 
+          name: args.name
+        }, {
+          name: args.name,
+          exec: res.stdout.replace(/^\(function\(\){/, "").replace(/\}\)\(\)\;\n$/, "")
+        })
+      }
+    }
+  
+# -----------------
+- name: Output ojob
+  exec: |
+    var oj = $get("source");
+
+    if (isArray(oj.jobs)) {
+      oj.jobs.map(j => {
+        var t = $ch("jobs").get({ name: j.name });
+        if (isDef(t) && isDef(t.exec)) j.exec = t.exec;
+      });
+    }
+    args.target = _$(args.target, "target").isString().default(args.source.replace(/\.yaml$/, ".json"));
+    io.writeFileJSON(args.target, oj, "");

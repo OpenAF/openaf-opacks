@@ -6,14 +6,21 @@ init:
   lname : 7
 
 todo:
+- ojob final report
 - Prepare output
 - Copy content
+- Copy static resources
 - Get oJob-commons
 - Finish output
 
 ojob:
   async       : true
   argsFromEnvs: true
+  oPacks      :
+  - oJob-common
+
+include:
+- ojob.json
 
 jobs:
 # --------------------
@@ -22,13 +29,15 @@ jobs:
     io.rm("_output")
     io.mkdir("_output")
 
-# -------------------
-- name: Finish output
-  deps:
+# --------------------
+- name : Finish output
+  check:
+    in:
+      output: isString.default("output")
+  deps :
   - Get oJob-commons
   - Copy content
-  exec: |
-    args.output     = _$(args.output, "output").default("output")
+  exec : |
     args.init.proto = _$(args.PROTO, "PROTO").default(args.init.proto)
     args.init.name  = _$(args.NAME, "NAME").default(args.init.name)
     args.init.url   = _$(args.URL, "URL").default(args.init.url)
@@ -48,13 +57,15 @@ jobs:
             lp.push(orig)
           }
        } else {
-          if (r.isDirectory && r.filename != "common" && !r.filename.startsWith("_")) lp.push(r.filepath)
+          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css" && !r.filename.startsWith("_")) lp.push(r.filepath)
        }
     })
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n"
     var htmlmdindex = mdindex
     var cuuid = $atomic()
+    var tasks = []
+
     lp.forEach(f => {
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
@@ -75,21 +86,53 @@ jobs:
        }
 
        if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any() || isDef(j.help)) {
-        log("Generating markdown for " + f + "...")
-        oJobRunFile("ojobs/doc.yaml", {
-          job   : f,
-          name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
-          mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-          output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
-          html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
-        }, cuuid.inc(), { shareArgs: false }, true)
+        tasks.push($do(() => {
+          log("Generating markdown for " + f + "...")
+          /*oJobRunFile("ojobs/doc.yaml", {
+            job   : f,
+            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
+            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
+            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
+            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
+          }, cuuid.inc(), { shareArgs: false }, true)*/
+          $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
+            job   : f,
+            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
+            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
+            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
+            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
+          }))
+          .exec()
+        }).catch(e => logErr(f + " | " + e)))
  
+        if ( isDef(j) && (f.match(/\.(ya?ml)$/)) ) {
+          tasks.push($do(() => {
+            log("Generate static version for " + f + "...")
+            /*oJobRunFile("ojobs/compile.yaml", {
+              source : f,
+              target : f.replace(/\.(ya?ml)$/, ".json")
+            }, cuuid.inc(), { shareArgs: false }, true*/
+            /*$sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
+              source : f,
+              target : f.replace(/\.(ya?ml)$/, ".json")
+            }))
+            .exec()*/
+            var _target = f.replace(/\.(ya?ml)$/, ".json")
+            if (!io.fileExists(_target)) {
+              io.writeFileJSON(_target, io.readFileJSON(f), "")
+              io.cp(_target, _target.replace(/\.json$/, ""))
+            }
+          }))
+        }
+
         var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
         htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
        }
        return 1
     })
+
+    $doWait($doAll(tasks))
 
     io.writeFileString("_output/index.md", mdindex)
     io.writeFileString("_output/index.html", ow.template.parseMD2HTML(htmlmdindex, true))
@@ -102,9 +145,10 @@ jobs:
     io.rm(args.output)
     io.mv("_output", args.output)
 
+    log("Creating _output.zip...")
     $sh("sudo apk add zip")
-    .pwd("/openaf/output")
-    .sh("/openaf/ojob hash.yaml url=. file=_integrity.json")
+    .pwd(args.output)
+    .sh(getOpenAFPath() + "ojob hash.yaml url=. file=_integrity.json")
     .sh("zip -9r _output.zip *")
     .exec()
 
@@ -130,3 +174,16 @@ jobs:
          io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
        }
     })
+
+# ---------------------------
+- name: Copy static resources
+  deps: Prepare output
+  exec: |
+    var _copy = (source, target) => {
+      var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
+      var os = io.writeFileStream("_output/" + target)
+
+      ioStreamCopy(os, is)
+    }
+
+    [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ].forEach(r => _copy(r, r))
