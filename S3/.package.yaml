@@ -33,11 +33,11 @@ files:
 - .precompile
 - s3.js
 filesHash:
-  s3.yaml: d8640c30f3609c9ead42f29956ffd090a556db15
+  s3.yaml: a83a1f3863b121aa7feec9c176484441c2d0293e
   minio-8.5.0-all.jar: 7027650d9ef07391c0db0e05f0b1c037b4aa96a3
   .maven.yaml: f2b662ed2fb04d522ed94008f9326d6ce32ccdc8
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3-ojob-test.yaml: 2a8722842df6ed3d8346a1cfebb2a5d2a3ad4ae8
+  s3-ojob-test.yaml: 160f0476bbaed8d1a978813a34284737411d2b6b
   .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
   s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca

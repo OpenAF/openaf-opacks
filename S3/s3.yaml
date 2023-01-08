@@ -31,6 +31,37 @@ jobs:
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
       s3.makeBucket(args.bucket, args.region)
       
+  # ----------------------
+  - name : S3 List Buckets
+    help :
+      text   : Retrieves a list of buckets. If successfull the list will be output to args.list.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+        required: false
+      - name    : secret
+        desc    : The secret key to the S3 service
+        required: false
+      - name    : region
+        desc    : The S3 region
+        required: false
+      returns:
+      - name: list
+        desc: The list of buckets
+    check :
+      in:
+        url          : isString
+        accessKey    : isString.default(__)
+        secret       : isString.default(__)
+        region       : isString.default(__)  
+    exec : |
+      loadLib("s3.js")
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+      args.list = s3.listBuckets()
+
   # --------------
   - name : S3 List
     help :
@@ -56,12 +87,16 @@ jobs:
         desc    : Boolean to determine if the list should recursive (default false)
       - name    : metric
         desc    : Identify the oJob metric to use (only for openaf version > 20211103)
+      returns:
+      - name    : list
+        desc    : The corresponding list of objects
     check:
       in:
         url          : isString
         bucket       : isString
         accessKey    : isString.default(__)
         secret       : isString.default(__)
+        region       : isString.default(__)
         objectPrefix : isString.default(__)
         needFull     : toBoolean.isBoolean.default(false)
         needRecursive: toBoolean.isBoolean.default(false)
@@ -152,6 +187,7 @@ jobs:
         bucket    : isString
         accessKey : isString.default(__)
         secret    : isString.default(__)
+        region    : isString.default(__)
         objectName: isString
         localPath : isString
         meta      : isMap.default(__)
@@ -230,6 +266,42 @@ jobs:
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.removeObject(args.bucket, args.objectName);
 
+  # ----------------------------------
+  - name : S3 Remove objects by prefix
+    help :
+      text   : 
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : bucket
+        desc    : The S3 bucket
+        required: true
+      - name    : prefix
+        desc    : The object prefix to delete
+        required: true
+      - name    : limitPerCall
+        desc    : The limit per call (AWS is limited per 1000 calls)
+    check:
+      in:
+        url         : isString
+        bucket      : isString
+        accessKey   : isString.default(__)
+        secret      : isString.default(__)
+        region      : isString.default(__)
+        prefix      : isString
+        limitPerCall: isNumber.default(__)
+    exec : |
+      loadLib("s3.js")
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+      s3.removeObjectsByPrefix(args.bucket, args.prefix, args.limitPerCall)
+
   # ---------------------
   - name : S3 Copy object
     help : 
@@ -266,6 +338,7 @@ jobs:
         bucket      : isString
         accessKey   : isString.default(__)
         secret      : isString.default(__)
+        region      : isString.default(__)
         sourceBucket: isString
         sourceObject: isString
         targetBucket: isString
@@ -276,3 +349,65 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.copyObject(args.sourceBucket, args.sourceObject, args.targetBucket, args.targetObject, args.meta, args.copyOptions);
+
+  # ---------------------
+  - name : S3 Sync folder
+    help :
+      text   :
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : bucket
+        desc    : The S3 bucket
+        required: true
+      - name    : prefix
+        desc    : The S3 prefix
+      - name    : localPath
+        desc    : The loacl path
+        required: true
+      - name    : squash
+        desc    : If defined and squash=remote it will take the local state and overwrite/delete on the S3 bucket. If squash=lost it will take the remote state and overwrite/delete on the local path.
+      - name    : execute
+        desc    : If execute=true the actions will be executed
+      - name    : numThreads
+        desc    : If defined it will force the number of threads to use if execute=true
+      returns:
+      - name: actions
+        desc: List of sync actions
+    check:
+      in:
+        url         : isString
+        bucket      : isString
+        accessKey   : isString.default(__)
+        secret      : isString.default(__)
+        region      : isString.default(__)
+        squash      : isString.default("")
+        prefix      : isString.default("")
+        localPath   : isString
+        numThreads  : toNumber.isNumber.default(__)
+        execute     : toBoolean.isBoolean.default(false)
+    exec : |
+      loadLib("s3.js")
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+
+      switch(args.squash.toLowerCase()) {
+      case "remote":
+        args.actions = s3.squashRemoteActions(args.bucket, args.prefix, args.localPath)
+        break
+      case "local" :
+        args.actions = s3.squashLocalActions(args.bucket, args.prefix, args.localPath)
+        break
+      default      :
+        args.actions = s3.syncActions(args.bucket, args.prefix. args.localPath)
+      }
+
+      if (args.execute) {
+        s3.execActions(args.actions, __, __, args.numThreads)
+      }

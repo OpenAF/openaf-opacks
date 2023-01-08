@@ -8,11 +8,14 @@ init:
   testBucket: &BUCKET openaf-test
 
 todo:
+- Count buckets
 - Create bucket
 - Put object
 - Copy object
 - List objects
 - Remove object
+- Sync squash remote
+- Remove all objects
 - Destroy bucket
 
 ojob:
@@ -33,6 +36,17 @@ jobs:
     secret   : *SECRET
     #region   : *REGION
     bucket   : *BUCKET
+
+# -------------------
+- name : Count buckets
+  from : Set args
+  to   : 
+  - S3 List Buckets
+  - ojob output
+  args:
+    # ojob output args
+    __key        : args
+    __path       : length(list)
 
 # --------------------
 - name : Create bucket
@@ -78,6 +92,30 @@ jobs:
   args :
   - objectName  : s3-ojob-test.yaml
   - objectName  : s3-ojob-test2.yaml
+
+# -------------------------
+- name : Sync squash remote
+  from : Set args
+  to   : 
+  - S3 Sync folder
+  - ojob output
+  args :
+    # s3 sync folder args
+    prefix   : ""
+    localPath: .
+    squash   : remote
+    execute  : true
+    # ojob output args
+    __key        : args
+    __path       : actions
+
+# -------------------------
+- name : Remove all objects
+  from : Set args
+  to   : S3 Remove objects by prefix
+  args :
+    prefix: ""
+    #limitPerCall: 1000
 
 # ---------------------
 - name : Destroy bucket
