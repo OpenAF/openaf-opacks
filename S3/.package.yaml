@@ -18,25 +18,27 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20221221'
+version: '20220107'
 dependencies:
   OpenAF: '>=20210515'
 files:
-- minio-8.4.6-all.jar
-- .package.yaml
-- s3-test.yaml
-- .odoc.db
-- s3.js
-- README.md
 - s3.yaml
-- .precompile
+- minio-8.5.0-all.jar
+- .package.yaml
 - .maven.yaml
+- README.md
+- s3-ojob-test.yaml
+- .odoc.db
+- s3-test.yaml
+- .precompile
+- s3.js
 filesHash:
-  minio-8.4.6-all.jar: 30bce13bc5de3686247ce34a11bfc4bc41f3ff8b
-  s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
-  .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
-  s3.js: 0ff6046c4325a9317bbe3556a6fbef5260ba72fa
+  s3.yaml: d8640c30f3609c9ead42f29956ffd090a556db15
+  minio-8.5.0-all.jar: 7027650d9ef07391c0db0e05f0b1c037b4aa96a3
+  .maven.yaml: f2b662ed2fb04d522ed94008f9326d6ce32ccdc8
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3.yaml: 0ee4245f4d3dd2a9ebcc8ed024181f38fe25ba69
+  s3-ojob-test.yaml: 2a8722842df6ed3d8346a1cfebb2a5d2a3ad4ae8
+  .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
+  s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
-  .maven.yaml: 81a0d162485b06318acc7abf49ffec5d1fb0f2fa
+  s3.js: 0ff6046c4325a9317bbe3556a6fbef5260ba72fa

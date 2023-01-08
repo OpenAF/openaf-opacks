@@ -1,50 +1,72 @@
 jobs:
-  #---------------------
-  - name: S3 Make bucket
-    help: >
-      Creates a S3 bucket. Expects:
-
-        url        (String)   The S3 endpoint URL
-        bucket     (String)   The S3 bucket name
-        accessKey  (String)   The access key to the S3 service
-        secret     (String)   The secret key to the S3 service
-        region     (String)   The S3 region
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket).$_("Please provide a S3 bucket name");
-      //_$(args.accessKey).$_("Please provide the S3 access key");
-      //_$(args.secret).$_("Please provide the S3 access secret");
+  # ---------------------
+  - name : S3 Make bucket
+    help : 
+      text   : "Creates a S3 bucket."
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+        required: false
+      - name    : secret
+        desc    : The secret key to the S3 service
+        required: false
+      - name    : region
+        desc    : The S3 region
+        required: false
+    check:
+      in:
+        url      : isString
+        bucket   : isString
+        accessKey: isString.default(__)
+        secret   : isString.default(__)
+        region   : isString.default(__)
+    exec : |
+      loadLib("s3.js")
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+      s3.makeBucket(args.bucket, args.region)
       
-      loadLib("s3.js");
-      var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.makeBucket(args.bucket, args.region);
-
-  # -------------
-  - name: S3 List
-    help: >
-      Retrieves the list of objects in a S3 Bucket. Expects:
-
-        url           (String)  The S3 endpoint URL
-        bucket        (String)  The S3 bucket name
-        accessKey     (String)  The access key to the S3 service
-        secret        (String)  The secret key to the S3 service
-        region        (String)  The S3 region
-        objectPrefix  (String)  The object prefix
-        needFull      (Boolean) If the list needs to include the contentType
-        needRecursive (Boolean) If the list should recursive
-        metric        (String)  Identify the oJob metric to use (only for openaf version > 20211103)
-
-      If successfull the list will be output to args.list
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
-      //_$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
-      //_$(args.secret, "secret").$_("Please provide the S3 access secret");
-      args.objectPrefix  = _$(args.objectPrefix, "objectPrefix").default(__);
-      args.needFull      = toBoolean(_$(args.needFull, "needFull").default("false"));
-      args.needRecursive = toBoolean(_$(args.needRecursive, "needRecursive").default("false"));
-      args.metric        = _$(args.metric).isString().default(__)
-
+  # --------------
+  - name : S3 List
+    help :
+      text   : Retrieves the list of objects in a S3 Bucket. If successfull the list will be output to args.list.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : objectPrefix
+        desc    : The object prefix
+      - name    : needFull
+        desc    : Boolean to determine if the list needs to include the contentType (default false)
+      - name    : needRecursive
+        desc    : Boolean to determine if the list should recursive (default false)
+      - name    : metric
+        desc    : Identify the oJob metric to use (only for openaf version > 20211103)
+    check:
+      in:
+        url          : isString
+        bucket       : isString
+        accessKey    : isString.default(__)
+        secret       : isString.default(__)
+        objectPrefix : isString.default(__)
+        needFull     : toBoolean.isBoolean.default(false)
+        needRecursive: toBoolean.isBoolean.default(false)
+        metric       : isString.default({__})
+    exec : |
       var _met = {}
       if (isDef(args.metric)) _met = _$(ow.oJob.getMetric(args.metric)).isMap().default({})
 
@@ -72,117 +94,185 @@ jobs:
         ow.oJob.setMetric(args.metric, _met)
       }
       
-  #-----------------------
-  - name: S3 Remove bucket
-    help: >
-      Removes a S3 bucket. Expects:
-
-        url        (String)   The S3 endpoint URL
-        bucket     (String)   The S3 bucket name
-        accessKey  (String)   The access key to the S3 service
-        secret     (String)   The secret key to the S3 service
-        region     (String)   The S3 region
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket).$_("Please provide a S3 bucket name");
-      //_$(args.accessKey).$_("Please provide the S3 access key");
-      //_$(args.secret).$_("Please provide the S3 access secret");
-      
+  #------------------------
+  - name : S3 Remove bucket
+    help :
+      text   : Removes a S3 bucket.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+    check:
+      in:
+        url      : isString
+        bucket   : isString
+        accessKey: isString.default(__)
+        secret   : isString.default(__)
+        region   : isString.default(__)
+    exec : |      
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.removeBucket(args.bucket);        
+      s3.removeBucket(args.bucket);       
 
-  #--------------------
-  - name: S3 Put object
-    help: >
-      Sends an object to a S3 bucket. Expects:
-
-        url        (String)   The S3 endpoint URL
-        bucket     (String)   The S3 bucket name
-        accessKey  (String)   The access key to the S3 service
-        secret     (String)   The secret key to the S3 service
-        region     (String)   The S3 region
-        objectName (String)   The S3 object name to use
-        localPath  (String)   The local path file to send to the bucket
-        meta       (Map)      The meta object to add to the object
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket).$_("Please provide a S3 bucket name");
-      //_$(args.accessKey).$_("Please provide the S3 access key");
-      //_$(args.secret).$_("Please provide the S3 access secret");
-      _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
-      _$(args.localPath, "localPath").$_("Please provide a local path file to send to the bucket");
-      
+  #---------------------
+  - name : S3 Put object
+    help :
+      text   : Sends an object to a S3 bucket.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : objectName
+        desc    : The S3 object name to use
+      - name    : localPath
+        desc    : The local path file to send to the bucket
+      - name    : meta 
+        desc    : The meta map object to add to the object
+    check:
+      in:
+        url       : isString
+        bucket    : isString
+        accessKey : isString.default(__)
+        secret    : isString.default(__)
+        objectName: isString
+        localPath : isString
+        meta      : isMap.default(__)
+    exec : |
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.putObject(args.bucket, args.objectName, args.localPath, args.meta);        
+      s3.putObject(args.bucket, args.objectName, args.localPath, args.meta);  
 
-  #--------------------
-  - name: S3 Get object
-    help: >
-      Retrieves an object from a S3 bucket. Expects:
-
-        url        (String)   The S3 endpoint URL
-        bucket     (String)   The S3 bucket name
-        accessKey  (String)   The access key to the S3 service
-        secret     (String)   The secret key to the S3 service
-        region     (String)   The S3 region
-        objectName (String)   The S3 object name to use
-        localPath  (String)   The local path to store the object
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket, "bucket").$_("Please provide a S3 bucket name");
-      //_$(args.accessKey, "accessKey").$_("Please provide the S3 access key");
-      //_$(args.secret, "secret").$_("Please provide the S3 access secret");
-      _$(args.objectName, "objectName").$_("Please provide a S3 objectName");
-      _$(args.localPath, "localPath").$_("Please provide a local path to store the retrieved object");
-      
+  # --------------------
+  - name : S3 Get object
+    help :
+      text   : Retrieves an object from a S3 bucket.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : objectName
+        desc    : The S3 object name to use
+        required: true
+      - name    : localPath
+        desc    : The local path to store the object
+        required: true
+    check:
+      in:
+        url       : isString
+        bucket    : isString
+        accessKey : isString.default(__)
+        secret    : isString.default(__)
+        region    : isString.default(__)
+        objectName: isString
+        localPath : isString
+    exec : |
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.getObject(args.bucket, args.objectName, args.localPath);
 
-  #-----------------------
+  # ----------------------
   - name: S3 Remove object
-    help: >
-      Removes an object from a S3 bucket. Expects:
-
-        url        (String)   The S3 endpoint URL
-        bucket     (String)   The S3 bucket name
-        accessKey  (String)   The access key to the S3 service
-        secret     (String)   The secret key to the S3 service
-        region     (String)   The S3 region
-        objectName (String)   The S3 object name to remove
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket).$_("Please provide a S3 bucket name");
-      //_$(args.accessKey).$_("Please provide the S3 access key");
-      //_$(args.secret).$_("Please provide the S3 access secret");
-      
+    help: 
+      text   : Removes an object from a S3 bucket.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : objectName
+        desc    : The S3 object name to remove
+        required: true
+    check:
+      in:
+        url       : isString
+        bucket    : isString
+        accessKey : isString.default(__)
+        secret    : isString.default(__)
+        region    : isString.default(__)
+        objectName: isString
+    exec: | 
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.getObject(args.bucket, args.objectName);
+      s3.removeObject(args.bucket, args.objectName);
 
-  #---------------------
-  - name: S3 Copy object
-    help: >
-      Copy an object between S3 buckets. Expects:
-
-        url          (String)   The S3 endpoint URL
-        accessKey    (String)   The access key to the S3 service
-        secret       (String)   The secret key to the S3 service
-        region       (String)   The S3 region
-        sourceBucket (String)   The S3 source bucket
-        sourceObject (String)   The S3 source object name
-        targetBucket (String)   The S3 target bucket
-        targetObject (String)   The S3 target object name
-        meta         (Map)      Change the S3 target object metadata
-        copyOptions  (Map)      Optionally specify matchETag (string), matchETagNone (string), modified, unmodified
-    exec: |
-      _$(args.url).$_("Please provide a S3 endpoint url");
-      _$(args.bucket).$_("Please provide a S3 bucket name");
-      //_$(args.accessKey).$_("Please provide the S3 access key");
-      //_$(args.secret).$_("Please provide the S3 access secret");
-      
+  # ---------------------
+  - name : S3 Copy object
+    help : 
+      text   : Copy an object between S3 buckets.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : sourceBucket
+        desc    : The S3 source bucket
+        required: true
+      - name    : sourceObject
+        desc    : The S3 source object name
+        required: true
+      - name    : targetBucket
+        desc    : The S3 target bucket
+        required: true
+      - name    : targetObject
+        desc    : The S3 target object name
+        required: true
+      - name    : meta
+        desc    : Change the S3 target object map metadata
+      - name    : copyOptions
+        desc    : Optionally specify a map with matchETag (string), matchETagNone (string), modified, unmodified
+    check:
+      in:
+        url         : isString
+        bucket      : isString
+        accessKey   : isString.default(__)
+        secret      : isString.default(__)
+        sourceBucket: isString
+        sourceObject: isString
+        targetBucket: isString
+        targetObject: isString
+        meta        : isMap.default(__)
+        copyOptions : isMap.default(__)
+    exec : |
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.copyObject(args.sourceBucket, args.sourceObject, args.targetBucket, args.targetObject, args.meta, args.copyOptions);

@@ -1,0 +1,85 @@
+# Author: Nuno Aguiar
+
+init:
+  url       : &URL https://play.min.io:9000
+  accessKey : &KEY Q3AM3UQ867SPQQA43P2F
+  secretKey : &SECRET zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+  #region    : &REGION 
+  testBucket: &BUCKET openaf-test
+
+todo:
+- Create bucket
+- Put object
+- Copy object
+- List objects
+- Remove object
+- Destroy bucket
+
+ojob:
+  opacks      :
+  - openaf: 20220822
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+        
+include:
+- s3.yaml
+- ojob.io/common/ojob
+
+jobs:
+- name : Set args
+  args :
+    url      : *URL
+    accessKey: *KEY
+    secret   : *SECRET
+    #region   : *REGION
+    bucket   : *BUCKET
+
+# --------------------
+- name : Create bucket
+  from : Set args
+  to   : S3 Make bucket
+
+# -----------------
+- name : Put object
+  from : Set args
+  to   : S3 Put object
+  args :
+    objectName  : s3-ojob-test.yaml
+    localPath   : s3-ojob-test.yaml
+
+# ------------------
+- name : Copy object
+  from : Set args
+  to   : S3 Copy object
+  args :
+    sourceBucket: *BUCKET
+    targetBucket: *BUCKET
+    sourceObject: s3-ojob-test.yaml
+    targetObject: s3-ojob-test2.yaml
+
+# -------------------
+- name : List objects
+  from : Set args
+  to   : 
+  - S3 List
+  - ojob output
+  args :
+    # S3 List args
+    needFull     : true
+    needRecursive: true
+    # ojob output args
+    __key        : args
+    __path       : list
+
+# --------------------
+- name : Remove object
+  from : Set args
+  to   : S3 Remove object
+  args :
+  - objectName  : s3-ojob-test.yaml
+  - objectName  : s3-ojob-test2.yaml
+
+# ---------------------
+- name : Destroy bucket
+  from : Set args
+  to   : S3 Remove bucket
