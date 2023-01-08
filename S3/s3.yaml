@@ -370,7 +370,7 @@ jobs:
       - name    : prefix
         desc    : The S3 prefix
       - name    : localPath
-        desc    : The loacl path
+        desc    : The local path
         required: true
       - name    : squash
         desc    : If defined and squash=remote it will take the local state and overwrite/delete on the S3 bucket. If squash=lost it will take the remote state and overwrite/delete on the local path.
