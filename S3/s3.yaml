@@ -269,7 +269,7 @@ jobs:
   # ----------------------------------
   - name : S3 Remove objects by prefix
     help :
-      text   : 
+      text   : Remove objects by a specific prefix
       expects:
       - name    : url
         desc    : The S3 endpoint URL
@@ -353,7 +353,7 @@ jobs:
   # ---------------------
   - name : S3 Sync folder
     help :
-      text   :
+      text   : Sync the files of a local folder with a S3 bucket prefix. Optionally squash remote or local files.
       expects:
       - name    : url
         desc    : The S3 endpoint URL
