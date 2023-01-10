@@ -52,6 +52,7 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
                      var ar = r.split("=").map(s => s.trim()); 
                      if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
                      if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
+                     if (ar[0] == "aws_session_token") o.Token = ar[1]
                   })
                }
             }
