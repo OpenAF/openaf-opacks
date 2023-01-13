@@ -62,7 +62,7 @@ jobs:
         // OPacks
         if (isMap(data.ojob) && isArray(data.ojob.opacks)) {
           data.ojob.opacks.forEach(p => {
-            var _p = Object.keys(p)[0]
+            var _p = isMap(p) ? Object.keys(p)[0] : p
             if (_p.toLowerCase() != "openaf") {
               var r = getOPackRemoteDB()[_p]
               if (isMap(r.repository) && isString(r.repository.url)) {
