@@ -33,6 +33,7 @@
   |Kube|Kubernetes REST API access wrapper|
   |MDB|Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
   |MSBot|Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
+  |Mac|Wrapper around Mac functionality.|
   |Maven|A Maven2 repositories access wrapper to get or update existing artifacts/jars.|
   |Mongo|An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
   |Morse|Simple morse code translator|

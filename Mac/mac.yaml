@@ -1,0 +1,48 @@
+# Author: Nuno Aguiar
+jobs:
+# ----------------
+- name : mac check
+  help :
+    text: Check if it's running on a Mac. Throws an exception if not.
+  exec : |
+    var go = false
+    if (!ow.format.isWindows()) {
+      var res = $sh("uname -o").get(0)
+      if (res.exitcode == 0 && res.stdout == "Darwin") go = true
+    }
+    if (!go) throw "No Mac OS was detected!"
+
+# -----------------------
+- name : mac run shortcut
+  from : mac check
+  help :
+    text   : Run a Mac Shortcut that receives data through 'Receive Text input from' and outputs with 'Stop and output'.
+    expects:
+    - name: __key
+      desc: The key that holds template and/or data (default to 'res'). If 'args' it will use the current arguments.
+    - name: __path
+      desc: The path to consider from the __key.
+    - name: __out
+      desc: The output will be stored into the provided key (defaults to 'res').
+    - name: shortcut
+      desc: The name of the Mac Shortcut to execute.
+  check:
+    in:
+      __key   : isString.default("res")
+      __path  : isString.default("@")
+      __out   : isString.default("res")
+      shortcut: isString
+  exec : |
+    var tmpIn  = io.createTempFile("shortcutInData", ".in")
+    var tmpOut = io.createTempFile("shortcutOutData", ".out")
+    var data = $path(args.__key == 'args' ? args : $get(args.__key), args.__path)
+    io.writeFileJSON(tmpIn, _$(data, "data in " + args.__key + "(" + args.__path + ")").isMap().default({}), "")
+    $sh("shortcuts run \"" + args.shortcut + "\" -i " + tmpIn + " > " + tmpOut).exec()
+    if (io.fileExists(tmpOut)) {
+      data = io.readFileJSON(tmpOut)
+      if (args.__key == 'args') {
+        args = merge(args, data)
+      } else {
+        $set(args.__key, data)
+      }
+    }

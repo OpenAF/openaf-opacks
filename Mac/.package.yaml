@@ -1,0 +1,28 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- mac
+- apple
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: ''
+  url: https://openaf.io/opacks/Mac.opack
+description: Wrapper around Mac functionality.
+name: Mac
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20230121'
+dependencies:
+  OpenAF: '>=20221216'
+files:
+- mac.yaml
+- .package.yaml
+filesHash:
+  mac.yaml: 847a46444176c2db094698616711f2e8bb158dbb
