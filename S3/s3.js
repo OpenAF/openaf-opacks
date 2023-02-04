@@ -1,33 +1,31 @@
 /**
  * <odoc>
- * <key>S3.S3(aURL, aAccessKey, aSecret, aRegion, useVersion1)</key>
+ * <key>S3.S3(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertCheck)</key>
  * Given aURL (e.g. https://s3.amazonaws.com) and, optionally aAccessKey, aSecret and aRegion,
  * creates a S3 compatible client access object. If useVersion1=true it will use API version 1 where possible.
  * </odoc>
  */
-var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1) {
+var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertCheck) {
+    ignoreCertCheck = _$(ignoreCertCheck, "ignoreCertCheck").isBoolean().default(false)
     if (isUnDef(getOPackPath("S3")))
-        loadExternalJars(".");
+        loadExternalJars(".")
     else
-        loadExternalJars(getOPackPath("S3"));
+        loadExternalJars(getOPackPath("S3"))
 
-    aURL = _$(aURL).default("https://s3.amazonaws.com");
+    aURL = _$(aURL).default("https://s3.amazonaws.com")
 
     if (isDef(aAccessKey)) {
-        if (isUnDef(aRegion))
-            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret)).build();
-        else
-            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret)).region(aRegion).build();
+        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret))
+        if (isDef(aRegion)) this.s3 = this.s3.region(aRegion)
     } else {
-        if (aURL.indexOf(".amazonaws.com") > 0) {
-            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentialsProvider(new Packages.io.minio.credentials.IamAwsProvider(null, null)).build();
-        } else {
-            this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).build();
-        }
+        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL)
+        if (aURL.indexOf(".amazonaws.com") > 0) this.s3 = this.s3.credentialsProvider(new Packages.io.minio.credentials.IamAwsProvider(null, null))
     }
+    this.s3 = this.s3.build()
+    if (ignoreCertCheck) this.s3 = this.s3.ignoreCertCheck()
 
-    this.useVersion1 = useVersion1;
-};
+    this.useVersion1 = useVersion1
+}
 
 /**
  * <odoc>
