@@ -1,7 +1,7 @@
 artifacts:
 - id     : kubernetes-client
   group  : io.fabric8
-  version: 6.2.0
+  version: 6.4.1
 - id     : bcpkix-jdk15on
   group  : org.bouncycastle
   version: "1.70"
