@@ -2,6 +2,9 @@ var $kube = function(aMap) {
 	aMap = _$(aMap, "aMap").isMap().default({})
 
 	var _r = {
+		getObj: () => {
+			return _r
+		},
 		ns   : aNS => {
 			_r._ns = aNS
 			return _r
@@ -43,6 +46,17 @@ var $kube = function(aMap) {
 		events: aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
 			var res = _r._k.getEvents(aNS)
+			_r._k.close()
+			return res
+		},
+		getPodsMetrics: aNS => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.getPodsMetrics(aNS)
+			_r._k.close()
+			return res
+		},
+		getNodesMetrics: () => {
+			var res = _r._k.getNodesMetrics()
 			_r._k.close()
 			return res
 		}
@@ -826,11 +840,25 @@ Kube.prototype.__dR = function(aObj) {
 			if (f.startsWith("get") && exc.indexOf(f) < 0) {
 				try {
 					var rr = f1[f]();
+					var _isA = false
+
+					var _suffix = f.replace(/^get/, "")
+					_suffix = _suffix.charAt(0).toLowerCase() + _suffix.slice(1)
+					var _path = p + (p == "" ? "" : ".") + _suffix
+
 					if (!isNull(rr) && isDef(rr.entrySet)) {
 						rr = rr.entrySet().toArray()
+						if (rr.length > 0) {
+							_isA = true
+							ow.obj.setPath(r, _path, [])
+						}
 					} else {
 						if (!isNull(rr) && isDef(rr.toArray) && !(rr instanceof java.util.ImmutableCollections)) {
 							rr = af.fromJavaArray(rr.toArray())
+							if (rr.length > 0) {
+								_isA = true
+								ow.obj.setPath(r, _path, [])
+							}
 						} else {
 							rr = [rr]
 						}
@@ -838,10 +866,13 @@ Kube.prototype.__dR = function(aObj) {
 
 					for (var ii in rr) {
 						if (rr[ii] instanceof java.lang.String || rr[ii] instanceof java.lang.Integer) {
-							ow.obj.setPath(r, p + "." + f.replace(/^get/, ""), (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
+							ow.obj.setPath(r, _path, (rr[ii] instanceof java.lang.Integer) ? Number(rr[ii]) : String(rr[ii]));
 						} else {
 							if (!isNull(rr[ii])) {
-								fn(rr[ii], p + "." + f.replace(/^get/, "") + "[" + ii + "]");
+								if (_isA)
+									fn(rr[ii], _path + "[" + ii + "]")
+								else
+									fn(rr[ii], _path)
 							}
 						}
 					}
@@ -884,12 +915,8 @@ Kube.prototype.__displayResult = function(aObj) {
 			var fn = (f1, p) => {
 				p = _$(p).default("");
 				var f0 = Object.keys(f1); 
-			var f0 = Object.keys(f1); 
-				var f0 = Object.keys(f1); 
 
 				for(var i in f0) {
-					var f = f0[i]; 
-				var f = f0[i]; 
 					var f = f0[i]; 
 					if (f.startsWith("get") && f != "getClass" && f != "getApiVersion" && f != "get" && f != "getOrDefault") {
 						try {
