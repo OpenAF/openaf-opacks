@@ -84,6 +84,8 @@ var $kube = function(aMap) {
 	  { ab: "DS",     fn: "getDaemonSets"  },
 	  { ab: "CJ",     fn: "getCronJobs"    },
 	  { ab: "Deploy", fn: "getDeployments" },
+	  { ab: "Version",fn: "getVersion"     },
+	  { ab: "Node",   fn: "getNode"        },
 	  { ab: "EP",     fn: "getEndpoints"   } ].forEach(m => {
 		_r["get" + m.ab] = aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
@@ -563,6 +565,10 @@ Kube.prototype.getNodes = function(aNamespace, full) {
 	}
 };
 
+Kube.prototype.getNode = function(aNodeName) {
+	return this.__dR(this.client.nodes().withName(aNodeName))
+}
+
 /**
  * <odoc>
  * <key>Kube.getPods(aNamespace) : Array</key>
@@ -978,6 +984,10 @@ Kube.prototype.getNames = function (aNamespace, full) {
 		});
 	}
 };
+
+Kube.prototype.getVersion = function() {
+	return this.__dR(this.client.getKubernetesVersion())
+}
 
 Kube.prototype.getEvents = function(aNamespace) {
         aNamespace = _$(aNamespace, "namespace").default(__);

@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230210'
+version: '20230221'
 dependencies:
   OpenAF: '>=20220822'
 files:
@@ -81,7 +81,7 @@ filesHash:
   kubernetes-model-autoscaling-6.4.1.jar: 29d5fcf449fd2275d29bbc3867cdee7d05b75e92
   kubernetes-model-gatewayapi-6.4.1.jar: 8e9e8aef4a83cfb8df22bf5e067287ea4ad89d52
   kubernetes-model-flowcontrol-6.4.1.jar: 547054f42ea92fd717a7fe5684f781ebe725af2b
-  kube.js: eadf3be9cb3476899ff4a5bbec45481d75e3c59c
+  kube.js: c156a723cf274ce5f1f4df3abef652252053d931
   kubernetes-model-metrics-6.4.1.jar: fe0538eb8832d02e5875c821b0e9263e3a95fe70
   kubernetes-model-core-6.4.1.jar: fa64acb69bba6233136cc22fe904257d913ed1d8
   kubernetes-model-rbac-6.4.1.jar: 4d728a817a60e15c6638bdcfee69e259aaa0dbac
