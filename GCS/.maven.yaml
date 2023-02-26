@@ -1,0 +1,5 @@
+artifacts:
+#- group  : com.google.cloud
+#  id     : google-cloud-storage
+- group  : com.google.cloud
+  id     : google-cloud-nio
