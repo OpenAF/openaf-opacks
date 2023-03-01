@@ -836,13 +836,13 @@ Kube.prototype.__dR = function(aObj) {
 	ow.loadObj();
 
 	var r = {};
-	var fn = (f1, p) => {
+	var fn = (f1, p) => { 
 		p = _$(p).default("");
 		if (isNull(f1)) return;
 		var f0 = Object.keys(f1);
 
 		for (var i in f0) {
-			var f = f0[i]; var exc = ["getAdditionalProperties", "getClass", "getOrDefault", "get", "getRemainingItemCount", "getContinue", "getModule", "getUnits", "getFinalizers", "getOwnerReferences", "getManagedFields"];
+			var f = f0[i]; var exc = ["getConstructor", "getSuperclass", "getAnnotatedSuperclass", "getProtectedDomain", "getClassLoader", "getUnnamedModule", "getNestHost", "getGenericSuperclass", "getDeclaredConstructor", "getDeclaringClass", "getAdditionalProperties", "getClass", "getOrDefault", "get", "getRemainingItemCount", "getContinue", "getModule", "getUnits", "getFinalizers", "getOwnerReferences", "getManagedFields"];
 			if (f.startsWith("get") && exc.indexOf(f) < 0) {
 				try {
 					var rr = f1[f]();
@@ -851,6 +851,7 @@ Kube.prototype.__dR = function(aObj) {
 					var _suffix = f.replace(/^get/, "")
 					_suffix = _suffix.charAt(0).toLowerCase() + _suffix.slice(1)
 					var _path = p + (p == "" ? "" : ".") + _suffix
+					if (_path.endsWith(_suffix + "." + _suffix)) return
 
 					if (!isNull(rr) && isDef(rr.entrySet)) {
 						rr = rr.entrySet().toArray()
