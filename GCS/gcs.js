@@ -72,27 +72,35 @@ GCS.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) 
     if (!needRecursive) _o.push(com.google.cloud.storage.Storage.BlobListOption.currentDirectory())
     var p  = this._storage['list(java.lang.String,com.google.cloud.storage.Storage$BlobListOption[])'](aBucket, _o)
 
-    var data = []
-    p.getValues().forEach(file => {
-      if (file.isDirectory() && String(file.getName()) == "/") return 
-
-      data.push({
-        isDirectory: file.isDirectory(),
-        isFile: !file.isDirectory(),
-        isLatest: __,
-        filename: String(file.getName()), 
-        filepath: String(file.getName()),
-        canonicalPath: String(file.getName()),
-        lastModified: Number(file.getUpdateTime()),
-        size: Number(file.getSize()),
-        storageClass: String(file.getStorageClass()),
-        etag: String(file.getEtag()),
-        owner: String(file.getOwner()),
-        version: __,
-        metadata: af.fromJavaMap(file.getMetadata()),
-        contentType: String(file.getContentType())
+    var data = [], _go = false
+    do {
+      p.getValues().forEach(file => {
+        if (file.isDirectory() && String(file.getName()) == "/") return 
+  
+        data.push({
+          isDirectory: file.isDirectory(),
+          isFile: !file.isDirectory(),
+          isLatest: __,
+          filename: String(file.getName()), 
+          filepath: String(file.getName()),
+          canonicalPath: String(file.getName()),
+          lastModified: Number(file.getUpdateTime()),
+          size: Number(file.getSize()),
+          storageClass: String(file.getStorageClass()),
+          etag: String(file.getEtag()),
+          owner: String(file.getOwner()),
+          version: __,
+          metadata: af.fromJavaMap(file.getMetadata()),
+          contentType: String(file.getContentType())
+        })
       })
-    })
+      if (p.hasNextPage()) {
+        _go = true
+        p = p.getNextPage()
+      } else {
+        _go = false
+      }
+    } while(_go)
 
     return data
 }
