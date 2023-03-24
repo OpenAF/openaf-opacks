@@ -21,6 +21,7 @@
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
   |EncryptText|Encrypts a password by asking the user and not displaying on the shell session.|
   |GCP|Simplified and light GCP API calls to avoid including the GCP Java SDK (work in progress)|
+  |GCS|Google Cloud Storage (GCS) wrapper|
   |GIST|Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
   |GenData|Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.|
   |GitHub|GitHub partially API wrapper|
@@ -51,6 +52,7 @@
   |ScaleWay|Wrapper around ScaleWay API|
   |SerializedObjects|Package to Serialize and Unserialize Java Objects|
   |SocksServer|Provides a wrapper around a Java SocksServer implementation|
+  |SysBench|Wrapper around SysBench to perform cpu, io and memory benchmark tests.|
   |Terraform|OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
   |TimeLive|Wrapper for TimeLive timesheets API|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
@@ -67,4 +69,5 @@
   |plugin-SVN|OpenAF plugin to access SVN repositories.|
   |plugin-XLS|OpenAF plugin to create and modify XLS and DOC files.|
   |rocksdb|OpenAF channels wrapper for RocksDB|
+  |||
   

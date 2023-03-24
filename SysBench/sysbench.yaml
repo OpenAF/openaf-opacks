@@ -1,0 +1,136 @@
+# Author: Nuno Aguiar
+help:
+  text   : Wrapper around SysBench
+  expects: 
+  - name     : test
+    desc     : Perform a built-in sysbench test (e.g. fileio, cpu, memory, threads or mutex)
+    example  : "cpu"
+    mandatory: true
+  - name     : flat
+    desc     : Boolean indicating if the result should be a flatten map for convinience
+    example  : "true"
+    mandatory: false
+  - name     : mode
+    desc     : For test=fileio the mode (seqwr,seqrewr,seqrd,rndrd,rndwr,rndrw) is also required
+    example  : "seqwr"
+    mandatory: false
+  - name     : options
+    desc     : Optional comma delimited list of sysbench options to add
+    example  : "--threads=2"
+    mandatory: false
+
+todo:
+- Run a sysbench test
+
+ojob:
+  opacks      :
+  - openaf: 20221216
+  - oJob-common
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: false   # to change when finished
+  
+include:
+- ojob.yaml
+
+jobs:
+# --------------------------
+- name : Run a sysbench test
+  to   : ojob options
+  check:
+    in:
+      test: isString.oneOf(["fileio", "cpu", "memory", "theads", "mutex"])
+  args :
+    __optionOn : test
+    __lowerCase: true
+    __todos    :
+      fileio : Run SysBench fileio
+      cpu    : Run SysBench cpu
+      memory : Run SysBench memory
+      threads: Run SysBench threads
+      mutex  : Run SysBench mutex
+
+# -------------------
+- name : Run SysBench
+  check:
+    in:
+      cmd : isString
+      flat: toBoolean.isBoolean.default(false)
+  exec : |
+    var p = getOPackPath("SysBench") || "."
+    if (!io.fileExists(p + "/sysbench")) throw "sysbench not found"
+    if (io.fileInfo(p + "/sysbench").permissions.indexOf("x") < 0) $sh("chmod u+x " + p + "/sysbench").exec()
+    var cmd = p + "/sysbench " + args.cmd
+    printErr("Executing 'sysbench " + args.cmd + "'...")
+    var res = $sh(cmd).get(0)
+    var _r
+    if (res.exitcode == 0 && res.stdout.indexOf("---") > 0) {
+      _r = af.fromYAML(res.stdout.substring(res.stdout.indexOf("---")))
+      _r._cmd = args.cmd
+    } else {
+      _r = res
+    }
+    if (args.flat) return ow.loadObj().flatMap(_r); else return _r
+
+# --------------------------
+- name : Run SysBench fileio
+  check:
+    in:
+      mode   : isString.oneOf(["seqwr","seqrewr","seqrd","rndrd","rndwr","rndrw"])
+      options: isString.default("")
+  exec : |
+    var options = args.options.split(",")
+    options.push("--file-test-mode=" + args.mode)
+    if (args.options.indexOf("file-block-size") < 0) options.push("--file-block-size=4096")
+    if (args.options.indexOf("file-extra-flags") < 0) options.push("--file-extra-flags=direct")
+
+    $job("Run SysBench", { cmd: "fileio prepare --file-test-mode=" + args.mode, flat: args.flat })
+    var data = $job("Run SysBench", { cmd: "fileio run " + options.join(" "), flat: args.flat })
+
+    // Delete files
+    $from(io.listFiles(".").files)
+    .starts("filename", "test_file.")
+    .select(r => {
+      io.rm(r.canonicalPath)
+    })
+
+    ow.oJob.output(data, args)
+
+# -----------------------
+- name : Run SysBench cpu
+  check:
+    in:
+      options: isString.default("")
+  exec : |
+    var options = args.options.split(",")
+    var data = $job("Run SysBench", { cmd: "cpu run " + options.join(" "), flat: args.flat })
+    ow.oJob.output(data, args)
+
+# --------------------------
+- name : Run SysBench memory
+  check:
+    in:
+      options: isString.default("")
+  exec : |
+    var options = args.options.split(",")
+    var data = $job("Run SysBench", { cmd: "memory run " + options.join(" "), flat: args.flat })
+    ow.oJob.output(data, args)
+
+# ---------------------------
+- name : Run SysBench threads
+  check:
+    in:
+      options: isString.default("")
+  exec : |
+    var options = args.options.split(",")
+    var data = $job("Run SysBench", { cmd: "threads run " + options.join(" "), flat: args.flat })
+    ow.oJob.output(data, args)
+
+# -------------------------
+- name : Run SysBench mutex
+  check:
+    in:
+      options: isString.default("")
+  exec : |
+    var options = args.options.split(",")
+    var data = $job("Run SysBench", { cmd: "mutex run " + options.join(" "), flat: args.flat })
+    ow.oJob.output(data, args)
