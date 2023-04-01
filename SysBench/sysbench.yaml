@@ -24,13 +24,10 @@ todo:
 
 ojob:
   opacks      :
-  - openaf: 20221216
-  - oJob-common
+  - openaf: 20230325
   catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
   logToConsole: false   # to change when finished
-  
-include:
-- ojob.yaml
+  includeOJob : true
 
 jobs:
 # --------------------------
@@ -38,16 +35,43 @@ jobs:
   to   : ojob options
   check:
     in:
-      test: isString.oneOf(["fileio", "cpu", "memory", "theads", "mutex"])
+      test: isString.oneOf(["all", "fileio", "cpu", "memory", "theads", "mutex"])
   args :
     __optionOn : test
     __lowerCase: true
     __todos    :
-      fileio : Run SysBench fileio
-      cpu    : Run SysBench cpu
-      memory : Run SysBench memory
-      threads: Run SysBench threads
-      mutex  : Run SysBench mutex
+      fileio : 
+      - Run SysBench fileio
+      - Output
+      cpu    : 
+      - Run SysBench cpu
+      - Output
+      memory : 
+      - Run SysBench memory
+      - Output
+      threads: 
+      - Run SysBench threads
+      - Output
+      mutex  : 
+      - Run SysBench mutex
+      - Output
+      all    :
+      - name: Run SysBench fileio seqwr
+      - name: Run SysBench fileio seqrewr
+      - name: Run SysBench fileio seqrd
+      - name: Run SysBench fileio rndwr
+      - name: Run SysBench fileio rndrw
+      - name: Run SysBench fileio rndrd
+      - name: Run SysBench cpu
+      - name: Run SysBench memory
+      - name: Run SysBench threads
+      - name: Run SysBench mutex
+      - Output
+
+# -------------
+- name : Output
+  exec : |
+    ow.oJob.output(args.data, args)
 
 # -------------------
 - name : Run SysBench
@@ -71,6 +95,42 @@ jobs:
     }
     if (args.flat) return ow.loadObj().flatMap(_r); else return _r
 
+# -------------------------------
+- name: Run SysBench fileio seqwr
+  to  : Run SysBench fileio
+  args: 
+    mode: seqwr
+
+# ---------------------------------
+- name: Run SysBench fileio seqrewr
+  to  : Run SysBench fileio
+  args: 
+    mode: seqrewr
+
+# -------------------------------
+- name: Run SysBench fileio seqrd
+  to  : Run SysBench fileio
+  args: 
+    mode: seqrd
+
+# -------------------------------
+- name: Run SysBench fileio rndwr
+  to  : Run SysBench fileio
+  args: 
+    mode: rndwr
+
+# --------------------------------
+- name: Run SysBench fileio rndrw
+  to  : Run SysBench fileio
+  args: 
+    mode: rndrw
+
+# -------------------------------
+- name: Run SysBench fileio rndrd
+  to  : Run SysBench fileio
+  args: 
+    mode: rndrd
+
 # --------------------------
 - name : Run SysBench fileio
   check:
@@ -93,7 +153,9 @@ jobs:
       io.rm(r.canonicalPath)
     })
 
-    ow.oJob.output(data, args)
+    var _d = {}
+    _d["fileio_" + args.mode] = data
+    args.data = merge(args.data, _d)
 
 # -----------------------
 - name : Run SysBench cpu
@@ -103,7 +165,7 @@ jobs:
   exec : |
     var options = args.options.split(",")
     var data = $job("Run SysBench", { cmd: "cpu run " + options.join(" "), flat: args.flat })
-    ow.oJob.output(data, args)
+    args.data = merge(args.data, { cpu: data })
 
 # --------------------------
 - name : Run SysBench memory
@@ -113,7 +175,7 @@ jobs:
   exec : |
     var options = args.options.split(",")
     var data = $job("Run SysBench", { cmd: "memory run " + options.join(" "), flat: args.flat })
-    ow.oJob.output(data, args)
+    args.data = merge(args.data, { mem: data })
 
 # ---------------------------
 - name : Run SysBench threads
@@ -123,7 +185,7 @@ jobs:
   exec : |
     var options = args.options.split(",")
     var data = $job("Run SysBench", { cmd: "threads run " + options.join(" "), flat: args.flat })
-    ow.oJob.output(data, args)
+    args.data = merge(args.data, { threads: data })
 
 # -------------------------
 - name : Run SysBench mutex
@@ -133,4 +195,4 @@ jobs:
   exec : |
     var options = args.options.split(",")
     var data = $job("Run SysBench", { cmd: "mutex run " + options.join(" "), flat: args.flat })
-    ow.oJob.output(data, args)
+    args.data = merge(args.data, { mutex: data })

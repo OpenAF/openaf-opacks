@@ -18,14 +18,13 @@ name: SysBench
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230323'
+version: '20230331'
 dependencies:
-  openaf: '>=20221216'
-  oJob-common: '>=20230220'
+  openaf: '>=20230325'
 files:
 - .package.yaml
 - sysbench.yaml
 - sysbench
 filesHash:
-  sysbench.yaml: 8b4f5cb699a3bf0c30e42e678aa035e300e128e7
+  sysbench.yaml: 77a9b9191717ac5cb90dd1805ac2fd2c3ce43935
   sysbench: 2f111fceccc5849de54ba67a2a681b6d1da76667
