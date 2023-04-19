@@ -6,16 +6,17 @@
  * </odoc>
  */
 var ElasticSearch = function(aURL, aUser, aPassword) {
-	if (isUnDef(aURL)) throw "Please provide aURL";
+	this.url  = _$(aURL, "url").isString().$_()
+	this.user = _$(aUser, "user").isString().default(__)
+	this.pass = _$(aPassword, "pass").isString().default(__)
 
-	this.url = aURL;
-	this.user = aUser;
-	this.pass = aPassword;
+	if (this.url.endsWith("/")) this.url = this.url.substring(0, this.url.length -1)
+
 	this.restmap = {
 		login: Packages.openaf.AFCmdBase.afc.dIP(this.user),
 		pass : Packages.openaf.AFCmdBase.afc.dIP(this.pass)
-	};
-};
+	}
+}
 
 /**
  * <odoc>
