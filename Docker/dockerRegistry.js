@@ -8,8 +8,8 @@
  var DockerRegistry = function(aURL, aLogin, aPass) {
    this._restparams = {};
 
-   this._url = _$(aURL, "aURL").isString().$_();
-   var url = (new java.net.URL(aURL));
+   this._url = _$(aURL, "aURL").isString().default("https://registry.hub.docker.com")
+   var url = (new java.net.URL(this._url));
 
    // If no authentication info was provided
    if (isNull(url.getUserInfo()) && (isUnDef(aLogin) || isUnDef(aPass))) {
@@ -59,6 +59,29 @@ DockerRegistry.prototype.listTags = function(aRepository) {
 
    return $rest(this._restparams).get(this._url + "/v2/" + aRepository + "/tags/list");
 };
+
+/**
+ * <odoc>
+ * <key>DockerRegistry.hubListTags(aRepository, onlyRecent) : Array</key>
+ * Uses Docker Hub API to list more details about the tags of the provided aRepository.
+ * Note: might not work with all docker container registries. If onlyRecent = true it will only
+ * list the latest.
+ * </odoc>
+ */
+DockerRegistry.prototype.hubListTags = function(aRepository, onlyRecent) {
+   aRepository = _$(aRepository, "aRepository").isString().$_()
+
+   var data = [], url = this._url + "/" + aRepository + "/tags"
+    do {
+      var lst = $rest(this._restparams).get(url)
+      if (isMap(lst) && isArray(lst.results)) {
+        data = data.concat(lst.results)
+        url = lst.next
+      }
+    } while(!onlyRecent && isMap(lst) && isString(url))
+
+   return data
+}
 
 /**
  * <odoc>
@@ -125,7 +148,8 @@ DockerRegistry.prototype.manifestExists = function(aImage, aReference) {
    aReference = _$(aReference, "aReference").isString().$_();
 
    var res = $rest(this._restparams).head(this._url + "/v2/" + aImage + "/manifests/" + aReference);
-   return isUnDef(res.error);
+   if (isDef(res.error) && res.error.responseCode != 404) throw af.toSLON(res.error)
+   return isUnDef(res.error)
 };
 
 /**
