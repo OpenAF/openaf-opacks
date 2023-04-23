@@ -8,7 +8,7 @@
  var DockerRegistry = function(aURL, aLogin, aPass) {
    this._restparams = {};
 
-   this._url = _$(aURL, "aURL").isString().default("https://registry.hub.docker.com")
+   this._url = _$(aURL, "aURL").isString().default("https://registry.hub.docker.com/v2/repositories")
    var url = (new java.net.URL(this._url));
 
    // If no authentication info was provided
@@ -70,13 +70,37 @@ DockerRegistry.prototype.listTags = function(aRepository) {
  */
 DockerRegistry.prototype.hubListTags = function(aRepository, onlyRecent) {
    aRepository = _$(aRepository, "aRepository").isString().$_()
+   var parent = this
 
    var data = [], url = this._url + "/" + aRepository + "/tags"
     do {
-      var lst = $rest(this._restparams).get(url)
+      var lst = $rest(parent._restparams).get(url)
       if (isMap(lst) && isArray(lst.results)) {
         data = data.concat(lst.results)
         url = lst.next
+      } else {
+         if (isMap(lst) && isDef(lst.error) && lst.error.responseCode == 404) {
+            var tags = parent.listTags(aRepository)
+            if (isDef(tags) && isArray(tags.tags)) {
+               if (onlyRecent) {
+                  while(tags.tags.length > 10) {
+                     tags.tags.shift()
+                  }
+               }
+
+               tags.tags.forEach(r => {
+                  var manif = parent.getManifest(aRepository, r)
+                  if (isUnDef(manif.error)) {
+                     data.push({
+                        name         : r,
+                        last_updated : $from(manif.history).attach("date", s=>new Date(s.v1Compatibility.created.replace(/\.\d+Z$/,"Z"))).max("date").date.toISOString(),
+                        //images       : $from(r.history).select(r => ({ architecture: r.v1Compatibility.architecture })),
+                        full_size    : $from(manif.layers).sum("size") 
+                     })
+                  }
+               })
+            }
+         }
       }
     } while(!onlyRecent && isMap(lst) && isString(url))
 

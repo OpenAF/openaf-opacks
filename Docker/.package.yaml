@@ -17,7 +17,7 @@ name: Docker
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220422'
+version: '20230422'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -71,7 +71,7 @@ filesHash:
   lib/javax.json-api-1.1.4.jar: c8efa3cfaeee2b05c2dfd54cba21548a081b1746
   lib/asm-analysis-5.0.3.jar: c7126aded0e8e13fed5f913559a0dd7b770a10f3
   lib/httpcore-4.4.16.jar: 51cf043c87253c9f58b539c9f7e44c8894223850
-  dockerRegistry.js: 2f7ac2a1b90b71f829f23562fc83c73c2fcde0a9
+  dockerRegistry.js: 895d4c5ea6a2f3c088a4280159ec2c144f6fd646
   docker.js: c7aa54380d5a1bf1adaf7e459040217b07c572a8
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
   .odoc.db: 27f658edb007cd50d76b15c39faddd18f2436ffa
