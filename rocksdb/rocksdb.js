@@ -1,4 +1,6 @@
-ow.loadCh();
+ow.loadCh()
+loadExternalJars(getOPackPath("rocksdb") || ".")
+Packages.org.rocksdb.RocksDB.loadLibrary()
 
 ow.ch.utils.rocksdb = {
 	cleanDir: function(aFilePath) {
@@ -8,6 +10,91 @@ ow.ch.utils.rocksdb = {
                             f.filename == "LOG") io.rm(f.canonicalPath);
 			if (f.filename.endsWith(".log") && f.size == 0) io.rm(f.canonicalPath);
 		});
+	},
+	roStats: function(aFilePath) {
+		var stats = {}
+
+		var f = new java.io.File(aFilePath)
+		var roptions = new Packages.org.rocksdb.Options()
+		var db = new Packages.org.rocksdb.RocksDB.openReadOnly(roptions, f.getAbsolutePath())
+		var ii = db.newIterator()
+		var c = 0, o = __
+		ii.seekToFirst()
+		while(ii.isValid()) {
+			c++;
+			ii.next()
+		}
+		stats.name = db.getName()
+		stats.size = c
+		stats.numberLevels = db.numberLevels()
+
+		var levels = db.getColumnFamilyMetaData().levels()
+		stats.levels = []
+		for(var level of levels) {
+			var files = []
+			for (var file of level.files()) {
+				files.push({
+					fileName       : file.fileName(),
+					beingCompacted : file.beingCompacted(),
+					numEntries     : file.numEntries(),
+					numDeletions   : file.numDeletions(),
+					numReadsSampled: file.numReadsSampled()
+				})
+			}
+			stats.levels.push({
+				numberFiles: level.files().size(),
+				files: files
+			})
+		}
+
+		var getObj = obj => {
+			var _h = o => {
+				if (o instanceof java.lang.String) o = String(o)
+				switch(descType(o)) {
+				case "bytearray":
+					o = af.fromBytes2String(o)
+					break
+				case "java":
+					o = getObj(o)
+					break						
+				}
+				return o
+			}
+
+			var data = {}
+			if (isDef(obj.entrySet)) {
+				for(entry of obj.entrySet().toArray()) {
+					var v = obj.get( entry.getKey() )
+					if (v instanceof java.lang.String) v = String(v)
+					if (isByteArray(v)) v = af.fromBytes2String(v)
+
+					if (isJavaObject(v)) {
+						Object.keys(v)
+						.filter(k => k.startsWith("get"))
+						.filter(k => ["getClass", "getChars", "getBytes"].indexOf(k) < 0)
+						.forEach(k => {
+							try {
+								var _v = _h(v[k]())
+								data[k.replace(/^get/, "")] = _v
+							} catch(e) {
+								printErr("Problem with '" + k + "': " + e)
+							}
+						})
+					} else {
+						data[String(entry.getKey())] = v
+					}
+				}
+			} else {
+				printErr(" --- " + obj.getClass())
+			}
+			return data
+		}		
+
+		stats = merge(stats, getObj(db.getPropertiesOfAllTables()))
+
+		ii.close()
+		db.close()
+		return stats
 	}
 }
 
@@ -15,8 +102,6 @@ ow.ch.__types.rocksdb = {
 	db: {},
     options: {},
 	create       : function(aName, shouldCompress, options) {
-   		loadExternalJars(getOPackPath("rocksdb") || ".");
-
 		options       = _$(options).isMap().default({});
    		var aFilePath = _$(options.path, "path").isString().$_();
    		var readonly  = _$(options.readonly, "readonly").isBoolean().default(false);
@@ -24,7 +109,6 @@ ow.ch.__types.rocksdb = {
    		var f = new java.io.File(aFilePath);
    		io.mkdir(aFilePath);
 
-   		Packages.org.rocksdb.RocksDB.loadLibrary();
    		var roptions = new Packages.org.rocksdb.Options();
    		roptions.setCreateIfMissing(true);
 
@@ -35,8 +119,8 @@ ow.ch.__types.rocksdb = {
 		}
  		this.options[aName] = options;
                 
-                var compact = _$(roptions.compact, "compact").isBoolean().default(false);
-                if (!readonly && compact) this.db[aName].compactRange();
+        var compact = _$(roptions.compact, "compact").isBoolean().default(false);
+        if (!readonly && compact) this.db[aName].compactRange();
 	},
 	destroy      : function(aName) {
  		if (!this.options[aName].readonly) {
