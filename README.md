@@ -17,6 +17,7 @@
   |DRProxy|DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs communication. It allows the interception of pre-proxy and post-proxy requests for any debug need.|
   |Debug|Debug wrapper functionality to transform comments into active debugging|
   |Docker|A wrapper to access the amihaiemil/docker-java-api api to access a docker client.|
+  |DockerRegistry|A wrapper to access docker registry services.|
   |Docsify|Wrapper to quickly build and server Docsify markdown documentation.|
   |ElasticSearch|Provides ElasticSearch functionality for OpenAF scripts.|
   |EncryptText|Encrypts a password by asking the user and not displaying on the shell session.|

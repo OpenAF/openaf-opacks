@@ -1,0 +1,30 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- docker
+- containers
+- registry
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/DockerRegistry.opack
+description: A wrapper to access docker registry services.
+name: DockerRegistry
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20230429'
+dependencies:
+  openaf: '>=20211229'
+files:
+- dockerRegistry.js
+- .package.yaml
+- .odoc.db
+filesHash:
+  dockerRegistry.js: e11928c4b2308f19807ec64f6a8304919edbac8f
+  .odoc.db: c19f70dcfa0da8e992a11cfa41d78f3cedbd0f65
