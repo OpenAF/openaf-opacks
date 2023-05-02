@@ -24,35 +24,37 @@ version: '20210710'
 dependencies:
   openaf: '>=20210515'
 files:
+- PEGGY-LICENSE
 - plugins/ActionsPlugin.js
 - plugins/DebugPlugin.js
-- .precompile
-- PEGGY-LICENSE
-- tests/autoTest.yaml
-- grammars/arithmetics.pegjs
-- grammars/css.pegjs
-- grammars/json.pegjs
-- grammars/javascript.pegjs
-- grammars/ietf/rfc3986-uri.pegjs
-- grammars/ietf/rfc3339-timestamps.pegjs
-- grammars/ietf/rfc5234-core-abnf.pegjs
 - lib/peggy.min.js
 - .package.yaml
 - README.md
+- tests/autoTest.yaml
 - peg.js
+- grammars/semver.peggy
+- grammars/css.pegjs
+- grammars/ietf/rfc3339-timestamps.pegjs
+- grammars/ietf/rfc5234-core-abnf.pegjs
+- grammars/ietf/rfc3986-uri.pegjs
+- grammars/json.pegjs
+- grammars/arithmetics.pegjs
+- grammars/javascript.pegjs
+- .precompile
 filesHash:
+  PEGGY-LICENSE: a5d86b420bfa54b35a63fee061b04c4b6b1e1572
   plugins/ActionsPlugin.js: 2d3fd1cb0ae4a2f03d49a38201edbb6afefdb61e
   plugins/DebugPlugin.js: 996101483af5d34a96f058f804b26ac95e3aea47
-  .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
-  PEGGY-LICENSE: a5d86b420bfa54b35a63fee061b04c4b6b1e1572
+  lib/peggy.min.js: 25afaa3d1d4cca5b967b0c28954653bc3d07c6fd
+  README.md: 9a2790c6e945ae749802490f5058dacb44836857
   tests/autoTest.yaml: 29e87cecbbc519e90811d178153d6799736414e3
-  grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
+  peg.js: dccb60ce8a6bafa841c7bac8efd0bc5687903aa5
+  grammars/semver.peggy: e5c950984dd7b7f141f12aa627cb2fdddfb65860
   grammars/css.pegjs: 3edfcc8ec4cc9c3ac94e49f822da937d2530958d
-  grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
-  grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
-  grammars/ietf/rfc3986-uri.pegjs: 18c7613916948fdb74b0f910909dff4f471aba35
   grammars/ietf/rfc3339-timestamps.pegjs: f451b11922c0e21362747d81d2f12371223e7a85
   grammars/ietf/rfc5234-core-abnf.pegjs: 3a9e727a003f862c3153b264ec8131d5f4e62985
-  lib/peggy.min.js: 3cde5856dacd07d6297853446439f190b5a07e78
-  README.md: 9a2790c6e945ae749802490f5058dacb44836857
-  peg.js: dccb60ce8a6bafa841c7bac8efd0bc5687903aa5
+  grammars/ietf/rfc3986-uri.pegjs: 18c7613916948fdb74b0f910909dff4f471aba35
+  grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
+  grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
+  grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
+  .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
