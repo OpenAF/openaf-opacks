@@ -121,15 +121,18 @@ jobs:
           .select(r => {
             if (io.fileExists(r.canonicalPath + "/.precompile")) { 
               log("Precompile " + r.canonicalPath + "/.precompile");
-              io.readFileYAML(r.canonicalPath + "/.precompile").map(r2 => { loadCompiled(r.canonicalPath + "/" + r2, __, true); }); 
+              io.readFileYAML(r.canonicalPath + "/.precompile").forEach(r2 => { 
+                log(" compiling " + r.canonicalPath + "/" + r2 + "...")
+                loadCompiled(r.canonicalPath + "/" + r2, __, true); 
+              }); 
             }
           })
         }
       }
 
-      $sh("jre/bin/java " + global.jvmargs + " -Djava.system.class.loader=openaf.OAFdCL -jar openaf/openaf.jar --ojob -e ojob.io/opack/compileOPacks")
+      /*$sh("jre/bin/java " + global.jvmargs + " -Djava.system.class.loader=openaf.OAFdCL -jar openaf/openaf.jar --ojob -e ojob.io/opack/compileOPacks")
       .prefix("compileOPacks")
-      .get()
+      .get()*/
 
       io.rm("openaf/openaf.jar");
       io.rm("openaf-opacks.zip");
