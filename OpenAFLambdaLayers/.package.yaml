@@ -25,20 +25,20 @@ files:
 - Dockerfile.lambda
 - build.yaml
 - lambda.js
+- buildARM.yaml.old
 - .package.yaml
 - README.md
-- buildARM.yaml
+- Dockerfile.arm.old
 - Dockerfile
-- Dockerfile.arm
 - bootstrap
 - lambda.orig.js
 filesHash:
   Dockerfile.lambda: feb2169b375f60a26347e5383c6812a64963794c
-  build.yaml: 6f293c815822356b1677a8dfb65dbab3386f415b
+  build.yaml: 8bce43965c3d7ae9d77c631c457b3b52c3ccdc57
   lambda.js: 9a00d4b99ae7911e142966151da78c43906805cc
+  buildARM.yaml.old: 2a36105b0264c70a8b398bd5c156d76b3061774e
   README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474
-  buildARM.yaml: 8b703dde0e55491ee92e86e0b9dc2214176cad26
+  Dockerfile.arm.old: 677cddcef5f9889e0c0590c61aa603aa17f2ef40
   Dockerfile: d4da6c98f0713bed26318780aee5f6873140a3bb
-  Dockerfile.arm: 677cddcef5f9889e0c0590c61aa603aa17f2ef40
   bootstrap: 708b20f05596161c43f092b9313a3d77fa1fac68
   lambda.orig.js: 4452a894636a82c5568335eb3a69cf68f4cfc44c

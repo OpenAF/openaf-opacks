@@ -11,9 +11,12 @@ todo:
 - Move layers to output
 
 jobs:
-  #-------------------
-  - name: Download JRE
-    exec: |
+  #--------------------
+  - name : Download JRE
+    check:
+      in: 
+        arch: isString.default("aarch64")
+    exec : |
       ow.loadObj(); ow.loadFormat();
       var h = new ow.obj.http();
 
@@ -46,9 +49,9 @@ jobs:
     exec: |
       ow.loadFormat();
       log("Repack JRE...");
-      io.rm("minijvmARM.zip");
-      sh("zip -9r minijvmARM.zip jre", __, __, false, __, __, ow.format.streamSHPrefix("unzip jre"));
-      log("Built minijvmARM.zip.");
+      io.rm("minijvm.zip");
+      sh("zip -9r minijvm.zip jre", __, __, false, __, __, ow.format.streamSHPrefix("unzip jre"));
+      log("Built minijvm.zip.");
 
 
   #--------------
@@ -66,8 +69,11 @@ jobs:
       - Repack JRE
 
   #----------------------------
-  - name: Move layers to output
-    deps:
+  - name : Move layers to output
+    check:
+      in: 
+        arch: isString.default("aarch64")
+    deps :
     - Build minijvm layer
-    exec: |
-      io.cp("minijvmARM.zip", "/output/minijvmARM.zip");
+    exec : |
+      io.cp("minijvm.zip", "/output/minijvm_" + args.arch + ".zip");

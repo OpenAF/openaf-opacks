@@ -13,8 +13,11 @@ todo:
 
 jobs:
   #-------------------
-  - name: Download JRE
-    exec: |
+  - name : Download JRE
+    check:
+      in: 
+        arch: isString.default("x64")
+    exec : |
       ow.loadObj(); ow.loadFormat();
       var h = new ow.obj.http();
       
@@ -159,13 +162,16 @@ jobs:
       - Repack openaf
       - Install additional opacks
 
-  #----------------------------
-  - name: Move layers to output
-    deps:
+  #-----------------------------
+  - name : Move layers to output
+    check:
+      in: 
+        arch: isString.default("x64")
+    deps :
       - Build openaf layer
       - Build minijvm layer
-    exec: |
+    exec : |
       io.cp("openaf.zip", "/output/openaf.zip");
       io.cp("openaf-opacks.zip", "/output/openaf-opacks.zip");
-      io.cp("minijvm.zip", "/output/minijvm.zip");
+      io.cp("minijvm.zip", "/output/minijvm_" + args.arch + ".zip");
       io.cp("Dockerfile.lambda", "/output/Dockerfile");
