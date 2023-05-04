@@ -40,5 +40,5 @@ filesHash:
   README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474
   Dockerfile.arm.old: 677cddcef5f9889e0c0590c61aa603aa17f2ef40
   Dockerfile: d4da6c98f0713bed26318780aee5f6873140a3bb
-  bootstrap: 708b20f05596161c43f092b9313a3d77fa1fac68
+  bootstrap: a945e2603fb5d5b0233dd8cdc0e85f423fc2646c
   lambda.orig.js: 4452a894636a82c5568335eb3a69cf68f4cfc44c
