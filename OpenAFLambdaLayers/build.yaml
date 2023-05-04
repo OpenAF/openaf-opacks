@@ -175,6 +175,6 @@ jobs:
       - Build minijvm layer
     exec : |
       io.cp("openaf.zip", "/output/openaf_" + args.arch + ".zip");
-      io.cp("openaf-opacks.zip", "/output/openaf-opacks_ " + args.arch + ".zip");
+      io.cp("openaf-opacks.zip", "/output/openaf-opacks_" + args.arch + ".zip");
       io.cp("minijvm.zip", "/output/minijvm_" + args.arch + ".zip");
       io.cp("Dockerfile.lambda", "/output/Dockerfile");

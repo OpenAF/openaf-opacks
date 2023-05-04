@@ -34,7 +34,7 @@ files:
 - lambda.orig.js
 filesHash:
   Dockerfile.lambda: feb2169b375f60a26347e5383c6812a64963794c
-  build.yaml: 348afa405cf1d3795b87b05eed1474c09bc3f4ea
+  build.yaml: aa0fff00403e48a20f413ec05932b375f58f57d8
   lambda.js: 9a00d4b99ae7911e142966151da78c43906805cc
   buildARM.yaml.old: 2a36105b0264c70a8b398bd5c156d76b3061774e
   README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474
