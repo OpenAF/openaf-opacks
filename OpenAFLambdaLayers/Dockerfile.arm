@@ -1,18 +1,12 @@
-FROM adoptopenjdk/openjdk11:alpine
+FROM amazonlinux
 
-RUN apk update\
- && apk add zip\
+RUN yum update\
+ && yum -y install java-11 zip tar gzip wget openssl\
  && mkdir /openaf\
  && cd /openaf\
- && wget -O openaf.jar.orig https://openaf.io/nightly/openaf.jar -q\
- && wget -O openaf.jar https://openaf.io/nightly/openaf.jar.repacked -q\
+ && wget -O openaf.jar.orig https://openaf.io/openaf.jar -q\
+ && wget -O openaf.jar https://openaf.io/openaf.jar.repacked -q\
  && java -jar openaf.jar --install
-
-# Update SSL certificates
-RUN apk update\
- && apk add ca-certificates wget\
- && update-ca-certificates\
- && apk --no-cache add openssl wget
 
 RUN mkdir /opt/build\
  && mkdir /output

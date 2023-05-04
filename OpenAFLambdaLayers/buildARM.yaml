@@ -19,7 +19,7 @@ jobs:
 
       log("Downloading jre...");
       var arch = _$(args.arch, "arch").default("aarch64") // or aarch64
-      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/11/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
+      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/17/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
 
   #---------------------
   - name: Uncompress JRE

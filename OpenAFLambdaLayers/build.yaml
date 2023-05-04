@@ -20,7 +20,7 @@ jobs:
       
       log("Downloading jre...");
       var arch = _$(args.arch, "arch").default("x64") // or aarch64
-      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/11/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
+      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/17/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
 
   #---------------------
   - name: Uncompress JRE
@@ -74,13 +74,13 @@ jobs:
       var h = new ow.obj.http();
 
       log("Downloading openaf...");
-      var si = h.get("https://openaf.io/nightly/openaf.jar", __, __, false, __, true);
-      //var si = h.get("https://openaf.io/openaf.jar", __, __, false, __, true);
+      //var si = h.get("https://openaf.io/nightly/openaf.jar", __, __, false, __, true);
+      var si = h.get("https://openaf.io/openaf.jar", __, __, false, __, true);
       var so = io.writeFileStream("openaf.jar.orig");
       ioStreamCopy(so, si);
 
-      si = h.get("https://openaf.io/nightly/openaf.jar.repacked", __, __, false, __, true);
-      //si = h.get("https://openaf.io/openaf.jar.repacked", __, __, false, __, true);
+      //si = h.get("https://openaf.io/nightly/openaf.jar.repacked", __, __, false, __, true);
+      si = h.get("https://openaf.io/openaf.jar.repacked", __, __, false, __, true);
       so = io.writeFileStream("openaf.jar");
       ioStreamCopy(so, si);
 
