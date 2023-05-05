@@ -117,3 +117,15 @@ PEG.prototype.parse = function(aInput, aOptions) {
     if (isUnDef(this._p)) throw new Error("Grammar not set yet.");
     return this._p.parse(aInput, aOptions);
 }
+
+/**
+ * <odoc>
+ * <key>PEG.generateCode(aOptions) : String</key>
+ * After setting a pegjs grammar it will output javascript code intended to be saved in a js file and 
+ * loaded afterwards with "var myparser = require('myparser.js')". The returned object will have a standalone
+ * parse function. Optionally additional aOptions can be provided.
+ * </odoc>
+ */
+PEG.prototype.generateCode = function(aOptions) {
+    return peggy.generate(this.grammar, merge({ format: "commonjs", output: "source" }, aOptions))
+}
