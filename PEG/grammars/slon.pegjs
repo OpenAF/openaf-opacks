@@ -98,10 +98,10 @@ zero
 string "string"
   = quotation_mark chars:char* quotation_mark { return chars.join(""); }
   / quotation_mark_single chars:char* quotation_mark_single { return chars.join(""); }
-  / chars:charkey+ { return chars.join(""); }
+  / chars:charpart+ { return chars.join(""); }
 
-charkey
-  = [^:\(\)]
+charpart
+  = [^\:\(\)\,]
 
 char
   = unescaped

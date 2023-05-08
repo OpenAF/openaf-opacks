@@ -58,7 +58,7 @@ filesHash:
   grammars/ietf/rfc3986-uri.pegjs: 18c7613916948fdb74b0f910909dff4f471aba35
   grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
   grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
-  grammars/slon.pegjs: 84750ad6d08a91edad6215bc9dbf3c2bf8b8a659
+  grammars/slon.pegjs: 97eb2c17736cece34ffd8d3aab65fc9eee42b31b
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
   grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
   .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
