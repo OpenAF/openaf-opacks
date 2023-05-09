@@ -73,7 +73,7 @@ DockerRegistry.prototype.hubListTags = function(aRepository, onlyRecent) {
    var parent = this
 
    var data = [], url = this._url + "/" + aRepository + "/tags", go = true
-    do {
+   do {
       var lst = $rest(parent._restparams).get(url)
       if (isMap(lst) && isArray(lst.results)) {
         data = data.concat(lst.results)
@@ -103,7 +103,17 @@ DockerRegistry.prototype.hubListTags = function(aRepository, onlyRecent) {
             go = false
          }
       }
-    } while(!onlyRecent && go && isMap(lst) && isString(url))
+   } while(!onlyRecent && go && isMap(lst) && isString(url))
+
+   traverse(data, (aK, aV, aP, aO) => {
+      try {
+         if (isString(aV) && aV.match(/\d+-\d+-\d+T\d+:\d+:\d+\.\d{3}\d+Z/)) {
+            aO[aK] = aV.replace(/\.(\d{3})\d+Z$/, ".$1Z")
+         }
+      } catch(e) {
+         // do nothing
+      }
+   })
 
    return data
 }
