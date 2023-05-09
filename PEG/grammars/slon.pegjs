@@ -1,6 +1,8 @@
 SLON_text
   = ws @value ws
 
+// Delimiters
+
 begin_array     = ws "[" ws
 begin_object    = ws "(" ws
 end_array       = ws "]" ws
@@ -9,24 +11,27 @@ name_separator  = ws ":" ws
 value_separator = ws "," ws
 array_separator = ws "|" ws
 
+// Whitespace
+
 ws "whitespace" = [ \t\n\r]*
 
-// ----- 3. Values -----
+// Values
 
 value
   = false
   / null
   / true
+  / datetime
   / object
   / array
   / number
   / string
 
-false = "false" { return false; }
-null  = "null"  { return null;  }
-true  = "true"  { return true;  }
+false = "false" { return false }
+null  = "null"  { return null  }
+true  = "true"  { return true  }
 
-// ----- 4. Objects -----
+// Object
 
 object
   = begin_object
@@ -36,35 +41,42 @@ object
       {
         var result = {};
         [head].concat(tail).forEach(function(element) {
-          result[element.name] = element.value;
+          result[element.name] = element.value
         });
-        return result;
+        return result
       }
     )?
     end_object
-    { return members !== null ? members: {}; }
+    { return members !== null ? members: {} }
 
 member
   = name:string name_separator value:value {
-      return { name: name, value: value };
+      return { name: name, value: value }
     }
 
-// ----- 5. Arrays -----
+// Array
 
 array
   = begin_array
     values:(
       head:value
       tail:(array_separator @value)*
-      { return [head].concat(tail); }
+      { return [head].concat(tail) }
     )?
     end_array
-    { return values !== null ? values : []; }
+    { return values !== null ? values : [] }
 
-// ----- 6. Numbers -----
+// Datetime
+
+datetime
+  = year:DIGIT|4| "-" month:DIGIT|2| "-" day:DIGIT|2| "/" hour:DIGIT|2| ":" minute:DIGIT|2| ":" second:DIGIT|2| "." msecond:DIGIT|3| {
+    return new Date(Number(year.join("")), Number(month.join(""))-1, Number(day.join("")), Number(hour.join("")), Number(minute.join("")), Number(second.join("")), Number(msecond.join("")))
+  }
+
+// Number
 
 number "number"
-  = minus? int frac? exp? { return parseFloat(text()); }
+  = minus? int frac? exp? { return parseFloat(text()) }
 
 decimal_point
   = "."
@@ -93,12 +105,12 @@ plus
 zero
   = "0"
 
-// ----- 7. Strings -----
+// String
 
 string "string"
-  = quotation_mark chars:char* quotation_mark { return chars.join(""); }
-  / quotation_mark_single chars:char* quotation_mark_single { return chars.join(""); }
-  / chars:charpart+ { return chars.join(""); }
+  = quotation_mark chars:char* quotation_mark { return chars.join("") }
+  / quotation_mark_single chars:char* quotation_mark_single { return chars.join("") }
+  / chars:charpart+ { return chars.join("") }
 
 charpart
   = [^\:\(\)\,]
@@ -111,16 +123,16 @@ char
       / "'"
       / "\\"
       / "/"
-      / "b" { return "\b"; }
-      / "f" { return "\f"; }
-      / "n" { return "\n"; }
-      / "r" { return "\r"; }
-      / "t" { return "\t"; }
+      / "b" { return "\b" }
+      / "f" { return "\f" }
+      / "n" { return "\n" }
+      / "r" { return "\r" }
+      / "t" { return "\t" }
       / "u" digits:$(HEXDIG HEXDIG HEXDIG HEXDIG) {
-          return String.fromCharCode(parseInt(digits, 16));
+          return String.fromCharCode(parseInt(digits, 16))
         }
     )
-    { return sequence; }
+    { return sequence }
 
 escape
   = "\\"
@@ -133,6 +145,8 @@ quotation_mark_single
 
 unescaped
   = [^\0-\x1F\x22\x27\x5C]
+
+// General
 
 DIGIT  = [0-9]
 HEXDIG = [0-9a-f]i
