@@ -5,7 +5,11 @@ help:
   - name     : test
     desc     : Perform a built-in sysbench test (e.g. fileio, cpu, memory, threads or mutex)
     example  : "cpu"
-    mandatory: true
+    mandatory: false
+  - name     : set
+    desc     : Perform a set of sysbench tests (e.g. default, simple)
+    example  : "default"
+    mandatory: false
   - name     : flat
     desc     : Boolean indicating if the result should be a flatten map for convinience
     example  : "true"
@@ -20,7 +24,11 @@ help:
     mandatory: false
 
 todo:
-- Run a sysbench test
+- name: Identify tests to perform
+- name: Run a sysbench test set
+  when: set
+- name: Run a sysbench test
+  when: noset
 
 ojob:
   opacks      :
@@ -29,9 +37,55 @@ ojob:
   logToConsole: false   # to change when finished
   includeOJob : true
 
+init:
+  tests:
+    # -----
+    simple:
+    - name: cpu
+      cmds:
+      - "--time 60 cpu run --threads=1"
+      - "--time 60 cpu run --threads=2"
+      - "--time 60 cpu run --threads={{halfVcpus}}"
+      - "--time 60 cpu run --threads={{Vcpus}}"
+    - name: memory
+      cmds:
+      - "memory run"
+    - name: fileio
+      cmds:
+      - "rm test_file.*"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G fileio prepare"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G --file-test-mode=seqwr --file-extra-flags=direct fileio run"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G fileio prepare"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G --file-test-mode=seqrd --file-extra-flags=direct fileio run"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G fileio prepare"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G --file-test-mode=rndwr --file-extra-flags=direct fileio run"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G fileio prepare"
+      - "--file-num=512 --file-block-size=4096 --file-total-size=10G --file-test-mode=rndrd --file-extra-flags=direct fileio run"
+    # ------
+    default:
+    - name: cpu
+      cmds:
+    - name: memory
+      cmds:
+    - name: fileio
+      cmds:
+
 jobs:
+# --------------------------------
+- name : Identify tests to perform
+  check:
+    in:
+      test: isString.default(__)
+      set : isString.default(__)
+  exec : |
+    if (isDef(args.test)) ow.oJob.setState("noset")
+    if (isDef(args.set))  ow.oJob.setState("set")
+
+    if (ow.oJob.setState == "init") throw "Either a set or a test should be choosen."
+
 # --------------------------
 - name : Run a sysbench test
+  deps : Identify tests to perform
   to   : ojob options
   check:
     in:
@@ -72,6 +126,18 @@ jobs:
 - name : Output
   exec : |
     ow.oJob.output(args.data, args)
+
+# ------------------------------
+- name : Run a sysbench test set
+  check:
+    in:
+      set: isString
+  exec : |
+    if (isDef(args.init[args.set])) {
+      
+    } else {
+      throw "Test set '" + args.set + "' not found."
+    }
 
 # -------------------
 - name : Run SysBench
