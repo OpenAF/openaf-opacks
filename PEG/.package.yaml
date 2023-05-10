@@ -40,6 +40,7 @@ files:
 - grammars/json.pegjs
 - grammars/arithmetics.pegjs
 - grammars/slon.pegjs
+- grammars/nlinq.pegjs
 - grammars/semver.pegjs
 - grammars/javascript.pegjs
 - .precompile
@@ -59,6 +60,7 @@ filesHash:
   grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
   grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
   grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
+  grammars/nlinq.pegjs: 968f4c4db31ab9b61693e080244886820afe5a24
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
   grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
   .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
