@@ -1,48 +1,55 @@
 # Author: Nuno Aguiar
-help: &HELP
+help: 
   text   : Downloads and returns corresponding job help.
   expects: 
-  - name   : job
-    desc   : The job location or url (e.g. ojob.io/get) 
-    example: abc.yaml
+  - name     : job
+    desc     : The job location or url (e.g. ojob.io/get) 
+    example  : abc.yaml
+    mandatory: true
 
 todo:
 - Download help
 
 ojob:
   opacks      :
-  - openaf: 20210404
+  - openaf: 20221216
   catch       : logErr(exception);
   logToConsole: false   # to change when finished
 
 jobs:
-# ----------
-- name: Help
-  help: *HELP
-
-# -------------------
-- name: Download help
-  exec: |
-    _$(args.job, "job").$_();
+# --------------------
+- name : Download help
+  check:
+    in:
+      job: isString
+  exec : |
+    var oo
     if (!(args.job.toLowerCase().match(/^https?:\/\//))) {
-      var newjob = "https://" + args.job;
+      if (io.fileExists(args.job)) {
+        oo = (args.job.match(/\.json$/) ? io.readFileJSON(args.job) : io.readFileYAML(args.job))
+      } else {
+        var newjob = "https://" + args.job
 
-      ow.loadFormat();
-      var host = (new java.net.URL(newjob).getHost());
-      if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job;
-      args.job = newjob;
-    }
+        var host = (new java.net.URL(newjob).getHost())
+        if (!ow.format.testPort(host, 443) && ow.format.testPort(host, 80)) newjob = "http://" + args.job
+        args.job = newjob
 
-    var oo = $rest({ uriQuery: true }).get(args.job);
+        oo = $rest({ uriQuery: true }).get(args.job)
+      }
+    } 
+
     if (isMap(oo) && isArray(oo.jobs)) {
       args.out = $from(oo.jobs)
                  .equals("name", "Help")
-                 .at(0);
-      if (isMap(args.out) && isDef(args.out.help)) args.out = args.out.help;
-      if (isDef(args.out.text) && isArray(args.out.expects)) {
-        args.out.text = [ { help: args.out.text} ];
-        //delete args.out.text;
+                 
+      if (args.out.any() && isDef(args.out.at(0).help)) {
+        args.out = args.out.at(0).help
+        if (isDef(args.out.text) && isArray(args.out.expects)) {
+          args.out.text = [ { help: args.out.text} ]
+        }
+      } else {
+        if (isDef(oo.help)) args.out = oo.help
       }
     }
 
-    ow.oJob.output(args.out, args);
+    ow.oJob.output(args.out, args)
