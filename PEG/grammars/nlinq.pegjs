@@ -83,11 +83,11 @@ charselect
   = "mselect" / "removed" / "select" / "define"
 
 chartransform
-  = "ignoreCase" / "averageBy" / "countBy"  / "skipTake" / "distinct" / "average" / "groupBy" / "useCase" / "toDate" / "limit" / "group" / "minBy" / "maxBy" / "sumBy" / "tail" / "head" / "take" / "skip" / "sort" / "min" / "max" / "sum"
+  = "ignoreCase" / "skipTake" / "useCase" / "toDate" / "limit" / "tail" / "head" / "take" / "skip" / "sort"
 
 charselector
-  = "reverse" / "count" / "first" / "last" / "none" / "all" / "any" / "at"
-
+  =  "averageBy" / "distinct" / "average" / "groupBy" / "countBy" / "reverse" / "group"  / "first" / "maxBy" / "sumBy" / "minBy" / "count" / "last" / "none" / "all" / "any" / "min" / "max" / "sum" / "at"
+  
 list_arguments
   = values:(
       head:value
