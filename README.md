@@ -8,6 +8,7 @@
   |AWS|Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
   |AsciiMo|Wrapper around AsciiMo/Figlet to produce ascii based banners.|
   |Asciidoc|Provides a wrapper around asciidoctor.js enabling conversion to HTML|
+  |Badgen|The Badgen library to generate badge like SVG rewritten for OpenAF|
   |BouncyCastle|Extra Java BouncyCastle crypto algorithms.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
@@ -57,8 +58,6 @@
   |Terraform|OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
   |TimeLive|Wrapper for TimeLive timesheets API|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
-  |UnixPAM|Provides UNIX PAM based authentication|
-  |XChart|Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |etcd3|Wrapper to access etcd3 functionality as a client|
   |inBrowser|Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.|
   |initd|Creates initd scripts to use with the openaf&#x27;s --daemon command line option.|
@@ -69,6 +68,7 @@
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
   |plugin-SVN|OpenAF plugin to access SVN repositories.|
   |plugin-XLS|OpenAF plugin to create and modify XLS and DOC files.|
+  |UnixPAM|Provides UNIX PAM based authentication|
+  |XChart|Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |rocksdb|OpenAF channels wrapper for RocksDB|
-  |||
   
