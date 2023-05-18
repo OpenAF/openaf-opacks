@@ -112,7 +112,7 @@
    *   label      (String) The label text to use\
    *   status     (String) The status text to use\
    *   color      (String) The color name or RGB for the status background\
-   *   style      (String) A choice between 'classical' and 'flat'\
+   *   style      (String) A choice between 'classical' (default) and 'flat'\
    *   icon       (String) The result of badgen.fromSVG for the intended icon\
    *   iconWidth  (Number) The total width of the provided icon (defaults to 18)\
    *   labelColor (String) The color name or RGB for the label background color\
@@ -127,7 +127,7 @@
       style: "classic",
       icon: __,
       iconWidth: 18,
-      labelColor: '555',
+      labelColor: 'grey2',
       scale: 1
     }
   

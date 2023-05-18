@@ -1,0 +1,84 @@
+jobs:
+# ---------------------------
+- name : Badgen generate file
+  help : 
+    text:
+    expects:
+    - name: file
+      desc: The generated SVG file path 
+    - name: label
+      desc: The label text to include (the left part)
+    - name: status
+      desc: The status text to include (the right part)
+    - name: color
+      desc: The color name or RGB for the status background
+    - name: labelColor
+      desc: The color name or RGB for the label background color
+    - name: style
+      desc: A choice between 'classical' (default) and 'flat'
+    - name: icon
+      desc: The icon SVG file to optionally include in the label
+  check:
+    in:
+      file      : isString
+      label     : isString
+      status    : isString
+      color     : isString.default(__)
+      labelColor: isString.default(__)
+      style     : isString.oneOf(['flat','classical']).default(__)
+      icon      : isString.default(__)
+  exec : |
+    var r = require("badgen.js")
+    io.writeFileString(args.file, r.badgen({
+      label     : args.label,
+      status    : args.status,
+      color     : args.color,
+      labelColor: args.labelColor,
+      style     : args.style,
+      icon      : (isDef(args.icon) ? r.fromSVG(args.icon) : __)
+    }))
+
+# ---------------------------
+- name : Badgen generate HTML
+  help : 
+    text:
+    expects:
+    - name: __key
+      desc: Where the result should be stored (a map with a 'out' key)
+    - name: label
+      desc: The label text to include (the left part)
+    - name: status
+      desc: The status text to include (the right part)
+    - name: color
+      desc: The color name or RGB for the status background
+    - name: labelColor
+      desc: The color name or RGB for the label background color
+    - name: style
+      desc: A choice between 'classical' (default) and 'flat'
+    - name: icon
+      desc: The icon SVG file to optionally include in the label
+  check:
+    in:
+      __key     : isString.default("res")
+      label     : isString
+      status    : isString
+      color     : isString.default(__)
+      labelColor: isString.default(__)
+      style     : isString.oneOf(['flat','classical']).default(__)
+      icon      : isString.default(__)
+  exec : |
+    var r = require("badgen.js")
+    var out = templify('<img src="{{{svg}}}">', { svg: r.fromSVG(r.badgen({
+      label     : args.label,
+      status    : args.status,
+      color     : args.color,
+      labelColor: args.labelColor,
+      style     : args.style,
+      icon      : (isDef(args.icon) ? r.fromSVG(args.icon) : __)
+    })) })
+
+    if (args.__key == "args") {
+      args.out = out
+    } else {
+      $set(args.__key, { out: out })
+    }
