@@ -21,6 +21,5 @@ AWS.prototype.STS_GetCallerIdentity = function(aRegion) {
 
     var res = this.postURLEncoded(aURL, aURI, "", params, "sts", aHost, aRegion)
 
-    sprint(res)
     if (isMap(res)) return res; else return af.fromXML2Obj(res)
 }

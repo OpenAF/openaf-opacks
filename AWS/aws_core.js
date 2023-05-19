@@ -9,14 +9,44 @@
  * </odoc>
  */
  var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
-   ow.loadFormat();
-   ow.loadObj();
+   ow.loadFormat()
+   ow.loadObj()
+   ow.loadNet()
+
    this.accessKey = aAccessKey;
    this.secretKey = aSecretKey;
    this.stoken    = aSessionToken;
 
    this.connect(aAccessKey, aSecretKey, aSessionToken, aRegion);
 };
+
+AWS.prototype._imds = function() {
+	var _role, _cred, _token
+
+	if (ow.net.testPort("169.254.169.254", 80)) {
+		// IMDSv1
+		var url = "http://169.254.169.254/latest/meta-data"
+		var uris = "/iam/security-credentials"
+		if ($rest().get(url).responseCode == 200) {
+			_role = $rest().get(url + uris).trim().split("\n")[0]
+			_cred = $rest().get(url + uris + "/" + _role)
+			if (_cred.Code != "Success") throw "Problem trying to use IMDSv1: " + af.toSLON(_cred)
+		} else {
+			// IMDSv2
+			_token = $rest({ requestHeaders: { "X-aws-ec2-metadata-token-ttl-seconds": 21600 } }).put("http://169.254.169.254/latest/api/token")
+			var rh = { requestHeaders: { "X-aws-ec2-metadata-token": _token } }
+			_role = $rest(rh).get(url + uris).trim().split("\n")[0]
+			_cred = $rest(rh).get(url + uris + "/" + _role)
+			if (_cred.Code != "Success") throw "Problem trying to use IMDSv2: " + af.toSLON(_cred)
+		}
+	}
+
+	return {
+		accessKey: _cred.AccessKeyId,
+		secretKey: _cred.SecretAccessKey,
+		token    : _cred.Token
+	}
+}
 
 /**
  * <odoc>
@@ -54,6 +84,14 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
                      if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
                      if (ar[0] == "aws_session_token") o.Token = ar[1]
                   })
+               } else {
+                  // Fallback to IMDS
+                  var _cred = this._imds()
+                  if (isMap(_cred)) {
+                     o.AccessKeyId     = _cred.accessKey
+                     o.SecretAccessKey = _cred.secretKey
+                     o.Token           = _cred.token
+                  }
                }
             }
          }
