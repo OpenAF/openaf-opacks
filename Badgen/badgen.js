@@ -90,7 +90,7 @@
    * </odoc>
    */
   exports.fromSVG = function(aFile) {
-    var path = getOPackPath("badgen") || "."
+    var path = getOPackPath("Badgen") || "."
     var data = aFile
 
     if (io.fileExists(path + "/svgs/" + aFile)) {
