@@ -1,0 +1,34 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- chart
+- mermaid
+- diagram
+- flowchart
+- gantt
+- mindmap
+- timeline
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Mermaid.opack
+description: Wrapper for Mermaid JS library
+name: Mermaid
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20230520'
+dependencies:
+  openaf: '>=20230521'
+files:
+- lib/mermaid.min.js
+- .package.yaml
+- mermaid.js
+filesHash:
+  lib/mermaid.min.js: 99a4696a98c67c668a97d58813ddcb4a2d03c49a
+  mermaid.js: c878ddc4689f7f840b72008da1bd9096a528c817

@@ -38,6 +38,7 @@
   |MSBot|Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |Mac|Wrapper around Mac functionality.|
   |Maven|A Maven2 repositories access wrapper to get or update existing artifacts/jars.|
+  |Mermaid|Wrapper for Mermaid JS library|
   |Mongo|An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
   |Morse|Simple morse code translator|
   |Notifications|Provides libraries to use notifications services. Currently pushover.js.|
@@ -58,6 +59,8 @@
   |Terraform|OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
   |TimeLive|Wrapper for TimeLive timesheets API|
   |Tunnels|Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
+  |UnixPAM|Provides UNIX PAM based authentication|
+  |XChart|Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |etcd3|Wrapper to access etcd3 functionality as a client|
   |inBrowser|Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.|
   |initd|Creates initd scripts to use with the openaf&#x27;s --daemon command line option.|
@@ -68,7 +71,6 @@
   |plugin-SMB|OpenAF plugin to access samba/window shares.|
   |plugin-SVN|OpenAF plugin to access SVN repositories.|
   |plugin-XLS|OpenAF plugin to create and modify XLS and DOC files.|
-  |UnixPAM|Provides UNIX PAM based authentication|
-  |XChart|Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |rocksdb|OpenAF channels wrapper for RocksDB|
+  |||
   
