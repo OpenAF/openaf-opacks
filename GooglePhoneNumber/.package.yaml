@@ -19,33 +19,31 @@ name: GooglePhoneNumber
 main: main.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220131'
+version: '20230522'
 dependencies:
   openaf: '>=20210515'
 files:
-- lib/protobuf-javanano-3.0.0-alpha-7.jar
-- lib/LICENSE
-- lib/carrier-1.189.jar
-- lib/geocoder-2.199.jar
-- lib/prefixmapper-2.199.jar
-- lib/libphonenumber-8.13.5.jar
-- .openaf_precompiled/googlePhoneNumber_js.class
-- googlePhoneNumber.yaml
-- googlePhoneNumber.js
 - .package.yaml
-- updateGooglePhoneNumber.yaml
-- main.js
 - .precompile
+- googlePhoneNumber.js
+- googlePhoneNumber.yaml
+- lib/LICENSE
+- lib/carrier-1.196.jar
+- lib/geocoder-2.206.jar
+- lib/libphonenumber-8.13.12.jar
+- lib/prefixmapper-2.206.jar
+- lib/protobuf-javanano-3.0.0-alpha-7.jar
+- main.js
+- updateGooglePhoneNumber.yaml
 filesHash:
-  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
-  lib/LICENSE: a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33
-  lib/carrier-1.189.jar: 8fd6099bbd2ca2c9e38ea58aa7697575243048ca
-  lib/geocoder-2.199.jar: b645af2559072e1fdc49a3ab1fd57aa6cc653f94
-  lib/prefixmapper-2.199.jar: 11342b1607b34b9fdc78cdff9431ef4b9ce64437
-  lib/libphonenumber-8.13.5.jar: c42da425adaeff98cdad34f6464ac1ca47e0686b
-  .openaf_precompiled/googlePhoneNumber_js.class: c89334da2ede744359a23e17f1f2658f523598d9
-  googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
-  googlePhoneNumber.js: 0cfd02acaf50f7a16999ac200366c9a52d258a41
-  updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
-  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
   .precompile: 3f9b1bb8aa12e89a9f5a7528f8f27976e4d1fca4
+  googlePhoneNumber.js: 0cfd02acaf50f7a16999ac200366c9a52d258a41
+  googlePhoneNumber.yaml: 18ae61211a2440ad82e975583756836e7e2ef08d
+  lib/LICENSE: a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33
+  lib/carrier-1.196.jar: dd2e8114aa7c853a8c99bb1bc1cd4ccc1b677fcb
+  lib/geocoder-2.206.jar: a8ea3b3e3630ef5f5e3597c3f6c1da020a27a240
+  lib/libphonenumber-8.13.12.jar: 90ab8d2943f344ec27a4c1271616437f5dc3be17
+  lib/prefixmapper-2.206.jar: 3d4d2f365825837739770b21700859c0c95b4362
+  lib/protobuf-javanano-3.0.0-alpha-7.jar: 52587934797e3433992a9d69178a1471e4a8f85d
+  main.js: 7a2dc8cd47ee6d46b102418328d74a7243b4fe75
+  updateGooglePhoneNumber.yaml: 0da06fa271e5dec1af969bfd0de4af8b236ec5d8
