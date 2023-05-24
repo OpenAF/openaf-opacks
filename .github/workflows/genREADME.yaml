@@ -41,6 +41,6 @@ jobs:
           git push origin $NBRANCH
           gh pr create --title "Update README.md" --body "Updates the README.md" --base master --head $NBRANCH
           #gh pr review ${{ github.event.pull_request.number }} --approve
-          git checkout main
+          git checkout master
           #git branch -D $NBRANCH
         fi
