@@ -1,8 +1,12 @@
 jobs:
 - name: Update opack
   exec: |
-    tlog("updating {{filepath}}...", args)
-    sh("cd " + args.filepath + " && opack genpack .")
+    if (io.fileExists(args.filepath + "/.package.yaml") || io.fileExists(args.filepath + "/.package.json")) {
+      tlog("updating {{filepath}}...", args)
+      sh("cd " + args.filepath + " && opack genpack .")
+    } else {
+      tlogErr("No .packege file found in '{{filepath}}'", args)
+    }
 
 todo:
 - name: Update opack

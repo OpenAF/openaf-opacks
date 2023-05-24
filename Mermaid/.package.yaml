@@ -26,8 +26,8 @@ version: '20230520'
 dependencies:
   openaf: '>=20230521'
 files:
-- lib/mermaid.min.js
 - .package.yaml
+- lib/mermaid.min.js
 - mermaid.js
 filesHash:
   lib/mermaid.min.js: 99a4696a98c67c668a97d58813ddcb4a2d03c49a

@@ -1,4 +1,4 @@
-name: Generate README
+name: Update packages
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  update-packages:
     runs-on    : ubuntu-latest
     permissions:
       contents: write
@@ -16,21 +16,21 @@ jobs:
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
       with:
-        key : oaf-nightly
+        key : oaf-t8
         path: /tmp/oaf
 
-    - name: Run genREADME
+    - name: Run updatePacks
       uses: openaf/ojob-action@v2
       with:
-        ojob: 'genREADME.yaml'
-        dist: nightly
+        ojob: 'updatePacks.yaml'
+        dist: t8
 
     - name: Commit changes
       run : |
         git config user.name github-actions
         git config user.email github-actions@github.com
         if [[ $(git diff --quiet && git diff --staged --quiet) ]]; then
-          git add README
-          git commit -m "update README"
+          git add .
+          git commit -m "update package files"
           git push
         fi
