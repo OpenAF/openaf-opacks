@@ -1,0 +1,29 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  opacks:
+  - oJob-common
+
+jobs:
+# -----------------
+- name: Futex::Park
+  to  : oJob Test
+  args:
+    func: |
+      ow.test.test("Futex::Park", () => {
+          for(var i = 0; i < 1000; i++) {
+              java.util.concurrent.locks.LockSupport.parkNanos(java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(1))
+          }
+      })
+
+# -------------------
+- name: Futex::NoPark
+  to  : oJob Test
+  args:
+    func: |
+      ow.test.test("Futex::NoPark", () => {
+        for(var i = 0; i < 1000; i++) {
+            ;
+        }
+      })

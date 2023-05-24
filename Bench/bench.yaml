@@ -1,0 +1,9 @@
+ojob:
+  opacks:
+  - oJob-common
+
+include:
+- oJobTest.yaml
+
+includeOJobs:
+- java/futex.yaml
