@@ -9,7 +9,7 @@
   |AsciiMo|Wrapper around AsciiMo/Figlet to produce ascii based banners.|
   |Asciidoc|Provides a wrapper around asciidoctor.js enabling conversion to HTML|
   |Badgen|The Badgen library to generate badge like SVG rewritten for OpenAF|
-  |Bench|A collection of benchmark/performance tests|
+  |Bench|A collection of benchmark performance tests|
   |BouncyCastle|Extra Java BouncyCastle crypto algorithms.|
   |CmdUtils|Common object library for command utilities|
   |Compress|Provides encapsulation for the Apache Compress library.|
