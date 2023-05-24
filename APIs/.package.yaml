@@ -34,13 +34,13 @@ version: '20220515'
 dependencies:
   openaf: '>=20211229'
 files:
-- apis.js
 - .odoc.db
 - .package.yaml
 - .precompile
 - apiYFinance.js
+- apis.js
 filesHash:
-  apis.js: 0e0a39f9018f9dc7a69b70a4ecd4db02813caf0d
   .odoc.db: 37e4c7f26a99df6cb922abe29746b51d52349da9
   .precompile: d1cd5d57e3a52a9d6e1aa6d4486e9d9dfa733639
   apiYFinance.js: 300dcc9493f4fc6a85199319424d30358607b1e0
+  apis.js: 0e0a39f9018f9dc7a69b70a4ecd4db02813caf0d

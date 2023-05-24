@@ -22,15 +22,15 @@ version: '20170802'
 dependencies:
   openaf: '>=20170601'
 files:
-- .precompile
-- test/TAR.yaml
-- .package.yaml
-- TAR/.odoc.db
-- TAR.js
 - .odoc.db
+- .package.yaml
+- .precompile
+- TAR.js
+- TAR/.odoc.db
+- test/TAR.yaml
 filesHash:
-  .precompile: 2ea6e078793f791e44a84d6dab4ffd75f71f8010
-  test/TAR.yaml: f905dbcffc89eebe48f25a3fd4d8604086caff28
-  TAR/.odoc.db: fa830a86e046eb1044c859a59f07a92e8e6de1f4
-  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
   .odoc.db: e74db67ea836f1762c8cf7c1dffa8f71d91f8afb
+  .precompile: 2ea6e078793f791e44a84d6dab4ffd75f71f8010
+  TAR.js: e287b16126f7ec42708be15961cc6ea5c50dd4d9
+  TAR/.odoc.db: fa830a86e046eb1044c859a59f07a92e8e6de1f4
+  test/TAR.yaml: f905dbcffc89eebe48f25a3fd4d8604086caff28

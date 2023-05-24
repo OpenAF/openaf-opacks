@@ -24,43 +24,43 @@ version: '20230512'
 dependencies:
   openaf: '>=20230325'
 files:
-- PEGGY-LICENSE
-- plugins/ActionsPlugin.js
-- plugins/DebugPlugin.js
-- lib/peggy.min.js
-- .package.yaml
-- README.md
 - .odoc.db
-- tests/autoTest.yaml
-- peg.js
+- .package.yaml
+- .precompile
+- PEGGY-LICENSE
+- README.md
+- grammars/arithmetics.pegjs
 - grammars/css.pegjs
 - grammars/ietf/rfc3339-timestamps.pegjs
-- grammars/ietf/rfc5234-core-abnf.pegjs
 - grammars/ietf/rfc3986-uri.pegjs
+- grammars/ietf/rfc5234-core-abnf.pegjs
+- grammars/javascript.pegjs
 - grammars/json.pegjs
-- grammars/arithmetics.pegjs
-- grammars/slon.pegjs
 - grammars/nlinq.pegjs
 - grammars/semver.pegjs
-- grammars/javascript.pegjs
-- .precompile
+- grammars/slon.pegjs
+- lib/peggy.min.js
+- peg.js
+- plugins/ActionsPlugin.js
+- plugins/DebugPlugin.js
+- tests/autoTest.yaml
 filesHash:
-  PEGGY-LICENSE: a5d86b420bfa54b35a63fee061b04c4b6b1e1572
-  plugins/ActionsPlugin.js: 2d3fd1cb0ae4a2f03d49a38201edbb6afefdb61e
-  plugins/DebugPlugin.js: 996101483af5d34a96f058f804b26ac95e3aea47
-  lib/peggy.min.js: 5aad44916dc27fa4a7f5dd980f08c166ad570684
-  README.md: 9a2790c6e945ae749802490f5058dacb44836857
   .odoc.db: d59b72b2e9f8a9cdd1a69e5a788e19e20a130821
-  tests/autoTest.yaml: 29e87cecbbc519e90811d178153d6799736414e3
-  peg.js: 666beebe1de7f1ff2b18d49f698b33fba53ec181
+  .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
+  PEGGY-LICENSE: a5d86b420bfa54b35a63fee061b04c4b6b1e1572
+  README.md: 9a2790c6e945ae749802490f5058dacb44836857
+  grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
   grammars/css.pegjs: 3edfcc8ec4cc9c3ac94e49f822da937d2530958d
   grammars/ietf/rfc3339-timestamps.pegjs: f451b11922c0e21362747d81d2f12371223e7a85
-  grammars/ietf/rfc5234-core-abnf.pegjs: 3a9e727a003f862c3153b264ec8131d5f4e62985
   grammars/ietf/rfc3986-uri.pegjs: 18c7613916948fdb74b0f910909dff4f471aba35
+  grammars/ietf/rfc5234-core-abnf.pegjs: 3a9e727a003f862c3153b264ec8131d5f4e62985
+  grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
   grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
-  grammars/arithmetics.pegjs: e9407e81e92afc5bd43da06dc34d925af461f348
-  grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
   grammars/nlinq.pegjs: 8ffb3bc6fa407410c5b31c5c9b8d9a3120cab303
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
-  grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
-  .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
+  grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
+  lib/peggy.min.js: 5aad44916dc27fa4a7f5dd980f08c166ad570684
+  peg.js: 666beebe1de7f1ff2b18d49f698b33fba53ec181
+  plugins/ActionsPlugin.js: 2d3fd1cb0ae4a2f03d49a38201edbb6afefdb61e
+  plugins/DebugPlugin.js: 996101483af5d34a96f058f804b26ac95e3aea47
+  tests/autoTest.yaml: 29e87cecbbc519e90811d178153d6799736414e3

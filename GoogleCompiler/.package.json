@@ -29,18 +29,18 @@
   "version": "20230422",
   "dependencies": {},
   "files": [
-    "compiler.jar",
     ".maven.yaml",
-    "compiler11.jar",
+    ".package.json",
     "LICENSE",
-    "main.js",
-    ".package.json"
+    "compiler.jar",
+    "compiler11.jar",
+    "main.js"
   ],
   "filesHash": {
-    "compiler.jar": "8e7597243416b3d890c19d9cc57a35e5b96d0f2a",
     ".maven.yaml": "3a26b01e8d74224474d3c5c38a6b786dea1c11d3",
-    "compiler11.jar": "d96d74857ca1e38d34ca7364c462e8a19732c4c9",
     "LICENSE": "2b8b815229aa8a61e483fb4ba0588b8b6c491890",
+    "compiler.jar": "8e7597243416b3d890c19d9cc57a35e5b96d0f2a",
+    "compiler11.jar": "d96d74857ca1e38d34ca7364c462e8a19732c4c9",
     "main.js": "e3e25e56222f7b591988dc9d000bc8a5d8b64f51"
   }
 }

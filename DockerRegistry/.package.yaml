@@ -22,9 +22,9 @@ version: '20230508'
 dependencies:
   openaf: '>=20211229'
 files:
-- dockerRegistry.js
-- .package.yaml
 - .odoc.db
+- .package.yaml
+- dockerRegistry.js
 filesHash:
-  dockerRegistry.js: 69cbb9812dc749acf6070b47bb83b03bfc0aac59
   .odoc.db: c19f70dcfa0da8e992a11cfa41d78f3cedbd0f65
+  dockerRegistry.js: 69cbb9812dc749acf6070b47bb83b03bfc0aac59

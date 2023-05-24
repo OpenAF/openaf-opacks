@@ -24,9 +24,9 @@ version: '20180706'
 dependencies:
   openaf: '>=20180706'
 files:
+- .package.yaml
 - .precompile
 - SerializedObjects.js
-- .package.yaml
 filesHash:
   .precompile: 460966577550d5e91e2a4ebcc366b9bf389aa91d
   SerializedObjects.js: 2dc7bac10d0ffe3a1c112bffe6fc11b75be1ca47

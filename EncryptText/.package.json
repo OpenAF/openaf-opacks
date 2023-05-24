@@ -33,7 +33,6 @@
     "encrypt-text.js"
   ],
   "filesHash": {
-    ".package.json": "da65d2bc98907355dba2aaf3b53bf96354824f5f",
     "encrypt-text.js": "2a8bf753339ed19c531ccbf44e9003a8d3a0da8c"
   }
 }

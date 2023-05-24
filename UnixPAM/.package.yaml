@@ -25,11 +25,11 @@ dependencies:
 files:
 - .odoc.db
 - .package.yaml
-- lib/libpam4j-1.11.jar
-- lib/LICENSE.txt
 - PAM.js
+- lib/LICENSE.txt
+- lib/libpam4j-1.11.jar
 filesHash:
   .odoc.db: 6576227860754f5cd436dfe8091249179a63c191
-  lib/libpam4j-1.11.jar: 82cfca73e813c165c83b5d6b1d16808cb5291fe7
-  lib/LICENSE.txt: 2b9dd84b5e5cdebab569b69a9a45d0281affb014
   PAM.js: fe566f2d5de6b60c7fdaedf285d7dc24e26ea2dc
+  lib/LICENSE.txt: 2b9dd84b5e5cdebab569b69a9a45d0281affb014
+  lib/libpam4j-1.11.jar: 82cfca73e813c165c83b5d6b1d16808cb5291fe7

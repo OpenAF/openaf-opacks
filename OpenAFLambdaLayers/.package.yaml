@@ -22,23 +22,23 @@ version: '20230503'
 dependencies:
   openaf: '>=20220822'
 files:
-- Dockerfile.lambda
-- build.yaml
-- lambda.js
-- buildARM.yaml.old
 - .package.yaml
-- README.md
-- Dockerfile.arm.old
 - Dockerfile
+- Dockerfile.arm.old
+- Dockerfile.lambda
+- README.md
 - bootstrap
+- build.yaml
+- buildARM.yaml.old
+- lambda.js
 - lambda.orig.js
 filesHash:
-  Dockerfile.lambda: feb2169b375f60a26347e5383c6812a64963794c
-  build.yaml: aa0fff00403e48a20f413ec05932b375f58f57d8
-  lambda.js: 9a00d4b99ae7911e142966151da78c43906805cc
-  buildARM.yaml.old: 2a36105b0264c70a8b398bd5c156d76b3061774e
-  README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474
-  Dockerfile.arm.old: 677cddcef5f9889e0c0590c61aa603aa17f2ef40
   Dockerfile: d4da6c98f0713bed26318780aee5f6873140a3bb
+  Dockerfile.arm.old: 677cddcef5f9889e0c0590c61aa603aa17f2ef40
+  Dockerfile.lambda: feb2169b375f60a26347e5383c6812a64963794c
+  README.md: 58b6189f9f14b2d92ab2fbabaf24cd5f753dc474
   bootstrap: a945e2603fb5d5b0233dd8cdc0e85f423fc2646c
+  build.yaml: aa0fff00403e48a20f413ec05932b375f58f57d8
+  buildARM.yaml.old: 2a36105b0264c70a8b398bd5c156d76b3061774e
+  lambda.js: 9a00d4b99ae7911e142966151da78c43906805cc
   lambda.orig.js: 4452a894636a82c5568335eb3a69cf68f4cfc44c

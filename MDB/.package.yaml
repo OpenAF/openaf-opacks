@@ -22,19 +22,19 @@ version: '20180104'
 dependencies:
   openaf: '>=20160601'
 files:
+- .package.yaml
 - .precompile
-- lib/jackcess-2.1.8.jar
-- lib/hsqldb.jar
+- MDB.js
 - lib/LICENSE
 - lib/commons-lang-2.6.jar
+- lib/hsqldb.jar
+- lib/jackcess-2.1.8.jar
 - lib/ucanaccess-4.0.2.jar
-- .package.yaml
-- MDB.js
 filesHash:
   .precompile: 63161db78fa474437a6ef015ec429e47c93ba3f0
-  lib/jackcess-2.1.8.jar: dfc7156e11ce33bbcb7f4f6724a87b9d969f2fd6
-  lib/hsqldb.jar: 195957160ed990dbc798207c0d577280d9919208
+  MDB.js: e232d8dc975761bc4ab0b1a6fd391f2dec8a5193
   lib/LICENSE: 3809b4e8be6b906334959cac98d49bb09e6ba93f
   lib/commons-lang-2.6.jar: 0ce1edb914c94ebc388f086c6827e8bdeec71ac2
+  lib/hsqldb.jar: 195957160ed990dbc798207c0d577280d9919208
+  lib/jackcess-2.1.8.jar: dfc7156e11ce33bbcb7f4f6724a87b9d969f2fd6
   lib/ucanaccess-4.0.2.jar: c700526cbd4e67a856bb0535713600dfaf0f312b
-  MDB.js: e232d8dc975761bc4ab0b1a6fd391f2dec8a5193

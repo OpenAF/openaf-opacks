@@ -20,21 +20,21 @@ version: 20211210
 dependencies:
   openaf: '>=20180601'
 files:
-- jira.yaml
-- .precompile
-- templates/taskDone.yaml
-- templates/taskCreate.yaml
-- templates/subTaskCreate.yaml
+- .odoc.db
 - .package.yaml
+- .precompile
 - README.md
 - jira.js
-- .odoc.db
+- jira.yaml
+- templates/subTaskCreate.yaml
+- templates/taskCreate.yaml
+- templates/taskDone.yaml
 filesHash:
-  jira.yaml: 6bc16bda81544b6fed9947fa552bf2ec4bf46da1
+  .odoc.db: 8887754139201114f0da808026bf54c61b6db527
   .precompile: 12e814ce8a61ba32b276df688984540cbf675ead
-  templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38
-  templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
-  templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
   README.md: 537ba48f3f24cf9b15984008ffa28ed960f9f0ec
   jira.js: 0f27bf7e31c864248f4daaf749100cc6f35579ed
-  .odoc.db: 8887754139201114f0da808026bf54c61b6db527
+  jira.yaml: 6bc16bda81544b6fed9947fa552bf2ec4bf46da1
+  templates/subTaskCreate.yaml: 8a48b7aedecb58a289044f16c9a9f85a9f65f80c
+  templates/taskCreate.yaml: ad27b50e74dc26f6aa9cdcdd6db31acc0ca3b4f9
+  templates/taskDone.yaml: 16454ae2d9d9f0a16b66c02be06d0c0187617a38

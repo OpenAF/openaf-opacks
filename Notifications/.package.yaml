@@ -27,18 +27,18 @@ dependencies:
   openaf: '>=20210515'
 files:
 - .odoc.db
-- pushover.js
-- .precompile
-- notificationsSlack.yaml
-- notificationsPushover.yaml
-- slack.js
-- msteams.js
 - .package.yaml
+- .precompile
+- msteams.js
+- notificationsPushover.yaml
+- notificationsSlack.yaml
+- pushover.js
+- slack.js
 filesHash:
   .odoc.db: bccc183a8df3aebb9a9d894604dda29bdc23416c
-  pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf
   .precompile: 296680c7a954da9eb871b3c3ee40ff7fba58ee5d
-  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
-  notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
-  slack.js: 92dbc7f3934e7da1e40c3643d06a89e38b01a9c1
   msteams.js: c1b24936bbd2898a6d59dea3dcdd644e44213d39
+  notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
+  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
+  pushover.js: 1ab4d6e385a2780e667edbe4466c9474654f1ddf
+  slack.js: 92dbc7f3934e7da1e40c3643d06a89e38b01a9c1

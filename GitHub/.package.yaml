@@ -21,9 +21,9 @@ version: '20201027'
 dependencies:
   openaf: '>=20100801'
 files:
+- .package.yaml
 - .precompile
 - github.js
-- .package.yaml
 filesHash:
   .precompile: 9f0a145c0333411609b49d2491db8a593b820cdc
   github.js: a9f2fcabf6ea732ff9256c868b01e0f425ae2b9b

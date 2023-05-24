@@ -22,31 +22,31 @@ version: '20220312'
 dependencies:
   openaf: '>=20210515'
 files:
-- cache-api-1.0.0.jar
 - .maven.yaml
+- .odoc.db
 - .package.yaml
-- annotations-16.0.3.jar
-- plugin-ignite.jar
-- src/openaf/plugins/Ignite.java
-- src/openaf/plugins/Ignite$2.class
-- src/openaf/plugins/Ignite$1.class
-- src/openaf/plugins/Ignite.class
 - LICENSES.txt
+- annotations-16.0.3.jar
+- cache-api-1.0.0.jar
 - compile.yaml
 - ignite-core-2.12.0.jar
 - ignite-shmem-1.0.0.jar
-- .odoc.db
+- plugin-ignite.jar
+- src/openaf/plugins/Ignite$1.class
+- src/openaf/plugins/Ignite$2.class
+- src/openaf/plugins/Ignite.class
+- src/openaf/plugins/Ignite.java
 filesHash:
-  cache-api-1.0.0.jar: 2b57384801243f387f1a2e7ab8066ac79c2a91d3
   .maven.yaml: b574e00b0648f3a6a91f05818917abb78e3e115c
-  annotations-16.0.3.jar: 62c7299ced2a089cc541726c6d763da9417604a0
-  plugin-ignite.jar: f65c0e9b86ae8248810ec937249a381537f474a7
-  src/openaf/plugins/Ignite.java: 29f68c4c15d529abd8531dcbc5437ea1e0e8db1e
-  src/openaf/plugins/Ignite$2.class: 7e4e0c6eb6b21c5b00b9fd0f37b85affcf3885fb
-  src/openaf/plugins/Ignite$1.class: 0cc24b206f805aa91171e78cd76a2077aff2ac59
-  src/openaf/plugins/Ignite.class: 846167396feb23a068abd83b9031ba9e0600b434
+  .odoc.db: 8d83128b761d120a63117fbee3f0d0cf3e4fa1aa
   LICENSES.txt: d7ce9e985cc6d97abbbea1e8422417783f4fb773
+  annotations-16.0.3.jar: 62c7299ced2a089cc541726c6d763da9417604a0
+  cache-api-1.0.0.jar: 2b57384801243f387f1a2e7ab8066ac79c2a91d3
   compile.yaml: 8106ec1fb849b830e67608c158ed7f27228021fe
   ignite-core-2.12.0.jar: a0a2be0591b317dad5578338172a92b8c4229440
   ignite-shmem-1.0.0.jar: 1874ee7f7fa2c7f4bc0c458f5dd1e3a3876418e9
-  .odoc.db: 8d83128b761d120a63117fbee3f0d0cf3e4fa1aa
+  plugin-ignite.jar: f65c0e9b86ae8248810ec937249a381537f474a7
+  src/openaf/plugins/Ignite$1.class: 0cc24b206f805aa91171e78cd76a2077aff2ac59
+  src/openaf/plugins/Ignite$2.class: 7e4e0c6eb6b21c5b00b9fd0f37b85affcf3885fb
+  src/openaf/plugins/Ignite.class: 846167396feb23a068abd83b9031ba9e0600b434
+  src/openaf/plugins/Ignite.java: 29f68c4c15d529abd8531dcbc5437ea1e0e8db1e

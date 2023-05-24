@@ -24,15 +24,15 @@ version: '20171029'
 dependencies:
   OpenAF: '>=20170601'
 files:
-- .precompile
-- lib/InstallCert.class
-- lib/InstallCert$SavingTrustManager.class
 - .package.yaml
+- .precompile
 - InstallCert.js
+- lib/InstallCert$SavingTrustManager.class
+- lib/InstallCert.class
 - src/InstallCert.java
 filesHash:
   .precompile: b5c68e8b86437dac53afa939bd94eadbfa83b1a8
-  lib/InstallCert.class: 8cb550436fffa51b2a5ccc99083428b39d498c4c
-  lib/InstallCert$SavingTrustManager.class: 29e86e17db020084290974bf6e4b170a96e64698
   InstallCert.js: cbbfb69b915edf41bdf897c3cceaa1761e876acd
+  lib/InstallCert$SavingTrustManager.class: 29e86e17db020084290974bf6e4b170a96e64698
+  lib/InstallCert.class: 8cb550436fffa51b2a5ccc99083428b39d498c4c
   src/InstallCert.java: d8771d979c110e7765bec059e46addde2b633349

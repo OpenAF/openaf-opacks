@@ -5,45 +5,45 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - openaf
-  - smb
-  - plugins
-  - samba
-  - windows
+- openaf
+- smb
+- plugins
+- samba
+- windows
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/plugin-SVN.opack'
+  url: https://openaf.io/opacks/plugin-SVN.opack
 description: OpenAF plugin to access SVN repositories.
 name: plugin-SVN
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20200128'
 dependencies:
   openaf: '>=20190128'
 files:
-  - .maven.yaml
-  - .odoc.db
-  - .package.yaml
-  - antlr-runtime-3.4.jar
-  - compile.yaml
-  - LICENSES.txt
-  - plugin-svn.jar
-  - sequence-library-1.0.3.jar
-  - sqljet-1.1.11.jar
-  - src/openaf/plugins/SVN.class
-  - src/openaf/plugins/SVN.java
-  - svnkit-1.9.1.jar
-  - svnkit-javahl16-1.9.1.jar
-  - trilead-ssh2-1.0.0-build221.jar
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- LICENSES.txt
+- antlr-runtime-3.4.jar
+- compile.yaml
+- plugin-svn.jar
+- sequence-library-1.0.3.jar
+- sqljet-1.1.11.jar
+- src/openaf/plugins/SVN.class
+- src/openaf/plugins/SVN.java
+- svnkit-1.9.1.jar
+- svnkit-javahl16-1.9.1.jar
+- trilead-ssh2-1.0.0-build221.jar
 filesHash:
   .maven.yaml: 20c33ff19fd992e48b16310c69590439907a9551
   .odoc.db: b0695729f24ee33b401580fc3f2a328ae0192d7d
+  LICENSES.txt: 63c09d6e039752fd33cef562f80b5c3d55d2c93c
   antlr-runtime-3.4.jar: 8f011408269a8e42b8548687e137d8eeb56df4b4
   compile.yaml: e9278c35a1a9eb4197cd930d7188fcac49221219
-  LICENSES.txt: 63c09d6e039752fd33cef562f80b5c3d55d2c93c
   plugin-svn.jar: d6d79db6db5d477b4a0c3f39efe4d4bcecf3a570
   sequence-library-1.0.3.jar: 3bcf12fa805a735bb26369cd66c5933767c026de
   sqljet-1.1.11.jar: 68c946d051fa4aa9d3f2a793c556c35fcfba0be3

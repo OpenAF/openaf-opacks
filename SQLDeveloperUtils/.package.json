@@ -32,14 +32,13 @@
   },
   "files": [
     ".package.json",
+    "SQLDeveloperPasswordUtil.js",
     "lib/adf-share-ca.jar",
-    "lib/db-ca.jar",
-    "SQLDeveloperPasswordUtil.js"
+    "lib/db-ca.jar"
   ],
   "filesHash": {
-    ".package.json": "08939bae0d131a108ac8cb459be88e923101e6e6",
+    "SQLDeveloperPasswordUtil.js": "97f56fb5b16543e112bc11d12c87d403c8fe2ae7",
     "lib/adf-share-ca.jar": "c00240d3a1bde2cff818411b3ea793475fb9b022",
-    "lib/db-ca.jar": "f87b915e2fcaca97b8f640eebefe717e87f8611f",
-    "SQLDeveloperPasswordUtil.js": "97f56fb5b16543e112bc11d12c87d403c8fe2ae7"
+    "lib/db-ca.jar": "f87b915e2fcaca97b8f640eebefe717e87f8611f"
   }
 }

@@ -25,12 +25,12 @@ dependencies:
   OpenAF: '>=20211229'
 files:
 - .package.yaml
-- fonts.zip
 - SOURCES
-- lib_asciimo.js
 - asciimo.js
+- fonts.zip
+- lib_asciimo.js
 filesHash:
-  fonts.zip: 58054e315597b41ad1719f16f585991c636bc990
   SOURCES: 3e0917f36ef2f114ad7ed0ed755fae9d30dece55
-  lib_asciimo.js: 536dc8517129c6e4ecc3e61066fb280b8b9b6470
   asciimo.js: c8ffbcab32180f8d20fc1e758dab08933f33bd1c
+  fonts.zip: 58054e315597b41ad1719f16f585991c636bc990
+  lib_asciimo.js: 536dc8517129c6e4ecc3e61066fb280b8b9b6470

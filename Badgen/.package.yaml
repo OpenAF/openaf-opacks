@@ -22,21 +22,21 @@ version: '20230520'
 dependencies:
   openaf: '>=20230325'
 files:
-- badgen.js
+- .odoc.db
 - .package.yaml
 - README.md
-- .odoc.db
+- badgen.js
+- badgen.yaml
 - svgs/nattrmon.svg
-- svgs/openaf_grey.svg
 - svgs/nattrmon_grey.svg
 - svgs/openaf.svg
-- badgen.yaml
+- svgs/openaf_grey.svg
 filesHash:
-  badgen.js: 3d2a0d42e992735bf3f3d74359148aa94fd3da73
-  README.md: ea592402dd209dab6bd3ec804377a5a5a0b5e752
   .odoc.db: b22c085a609d3d3a8f1213157835d6419259188d
+  README.md: ea592402dd209dab6bd3ec804377a5a5a0b5e752
+  badgen.js: 3d2a0d42e992735bf3f3d74359148aa94fd3da73
+  badgen.yaml: 4304cdf7bf05706bd5545ab29954eb5e91b76d8e
   svgs/nattrmon.svg: 1b028dd1d7e5ba9ebdf55848fd920d7fe54e8218
-  svgs/openaf_grey.svg: 557e7cad1e3624f268b45216ad2f77a4f1f81fa0
   svgs/nattrmon_grey.svg: afc7ddf94357fbf6b40556410b6783f20f272d90
   svgs/openaf.svg: 515e3749b46f3547f1f050d93eb0cadb2613c931
-  badgen.yaml: 4304cdf7bf05706bd5545ab29954eb5e91b76d8e
+  svgs/openaf_grey.svg: 557e7cad1e3624f268b45216ad2f77a4f1f81fa0

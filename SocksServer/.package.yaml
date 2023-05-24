@@ -21,19 +21,19 @@ version: '20221205'
 dependencies:
   openaf: '>=20211229'
 files:
-- README.md
-- .odoc.db
-- LICENSES.txt
-- .package.yaml
-- java-socks-proxy-server-2.0.1.jar
 - .maven.yaml
-- socksServer.js
+- .odoc.db
+- .package.yaml
+- LICENSES.txt
+- README.md
+- java-socks-proxy-server-2.0.1.jar
 - lombok-1.18.24.jar
+- socksServer.js
 filesHash:
-  README.md: 8803453b84d7a23c63e5cddff9f69a4fb9d62482
+  .maven.yaml: 5d95afdfca5571c86c4d2e2d597ce6a1a65dd5d3
   .odoc.db: 8fe14acac10462a5b6c5c1c803ee223a1a938cc2
   LICENSES.txt: adef8f697505f8376e6597fc422cf0880aff8044
+  README.md: 8803453b84d7a23c63e5cddff9f69a4fb9d62482
   java-socks-proxy-server-2.0.1.jar: d9cb13d097f7cc00da167d8a3eba0579cd239e6f
-  .maven.yaml: 5d95afdfca5571c86c4d2e2d597ce6a1a65dd5d3
-  socksServer.js: 90fe30371c0da6f491662760f8b9b1f95c52cddc
   lombok-1.18.24.jar: 13a394eed5c4f9efb2a6d956e2086f1d81e857d9
+  socksServer.js: 90fe30371c0da6f491662760f8b9b1f95c52cddc

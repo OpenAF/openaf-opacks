@@ -35,7 +35,6 @@
     "tunnels.yaml"
   ],
   "filesHash": {
-    ".package.json": "9eb552c7c888095ee39e0a0f6eb8aa15bc6209a7",
     "connectTunnels.js": "eb5fcbdf35e7e394aa75f9eb50500833a2063ba2",
     "tunnels.yaml": "bc78f93dffab21808158edc894127331512fde00"
   }

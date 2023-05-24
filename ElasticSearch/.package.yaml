@@ -21,13 +21,13 @@ version: '20230418'
 dependencies:
   openaf: '>=20230325'
 files:
-- elasticsearch.js
-- .package.yaml
 - .odoc.db
-- ElasticSearch.yaml
+- .package.yaml
 - .precompile
+- ElasticSearch.yaml
+- elasticsearch.js
 filesHash:
-  elasticsearch.js: 56785460f86f561678bc559472f36a766e97f4e9
   .odoc.db: 74daeb9da919f0941cced7acb29cfd869a5aac30
-  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
   .precompile: 65efea614ff4d1a11ea14ddea08713710e04296e
+  ElasticSearch.yaml: 4740cc89a433c0f736dbdd397285ce6182b03ed7
+  elasticsearch.js: 56785460f86f561678bc559472f36a766e97f4e9

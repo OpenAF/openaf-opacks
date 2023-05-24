@@ -22,16 +22,16 @@ dependencies:
   openaf: '>=20211229'
 files:
 - .package.yaml
+- README.adoc
 - asciidoc.js
 - lib/asciidoctor.css
 - lib/asciidoctor.min.js
 - lib/highlight.css
 - lib/highlight.min.js
-- README.adoc
 filesHash:
+  README.adoc: 766d2d19895de790486da3305fee574fb60b550d
   asciidoc.js: f721369c34c9fbef1f6212ccc49c20cb5c8b5a55
   lib/asciidoctor.css: 720f4b4c8c7b89b92d6327ae1359c1943f8ad288
   lib/asciidoctor.min.js: c659cbfa6ed0082fc6429cb2cce7a2e1c9434b6b
   lib/highlight.css: 9dafcb6d23472adb90f9c9f55bd9dbd590392953
   lib/highlight.min.js: d264ad16bdf39cfec2b06c20223b87fcb37ad27b
-  README.adoc: 766d2d19895de790486da3305fee574fb60b550d

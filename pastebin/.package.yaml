@@ -5,27 +5,27 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - pastebin
-  - paste
+- pastebin
+- paste
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/PasteBin.opack'
+  url: https://openaf.io/opacks/PasteBin.opack
 description: Wrapper around PasteBin functionality.
 name: PasteBin
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20191025'
 dependencies:
   openaf: '>=20190901'
 files:
-  - pastebin.js
-  - .package.yaml
-  - .odoc.db
-  - .precompile
+- .odoc.db
+- .package.yaml
+- .precompile
+- pastebin.js
 filesHash:
-  pastebin.js: f2466218146c0abd05578df80fd1a9b98d140799
   .odoc.db: b53f72f3fe9c4fc1501331a029c441ad2aee5d17
   .precompile: 71599ba6a03ab0c2c75670d129195a0effc66ea2
+  pastebin.js: f2466218146c0abd05578df80fd1a9b98d140799

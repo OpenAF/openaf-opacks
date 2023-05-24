@@ -5,30 +5,28 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - opack
-  - server
-  - opackserver
+- opack
+- server
+- opackserver
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/oPackServer.opack'
-description: >-
-  Provides an ojob or docker container to launch a private oPack server and
-  easily add it to any OpenAF client.
+  url: https://openaf.io/opacks/oPackServer.opack
+description: Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.
 name: oPackServer
 main: ''
 mainJob: main.yaml
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20190209'
 dependencies:
   openaf: '>=20181229'
 files:
-  - Dockerfile
-  - .package.yaml
-  - main.yaml
-  - README.md
+- .package.yaml
+- Dockerfile
+- README.md
+- main.yaml
 filesHash:
   Dockerfile: 9d6694ebff092b470b76a2955f2c78bb53a0c573
-  main.yaml: 9f72ea4390b78fdbf7f4237b8c407ad9108dce6f
   README.md: 2b6388ad35a00f63e9bc919198b3a1a266c480cd
+  main.yaml: 9f72ea4390b78fdbf7f4237b8c407ad9108dce6f

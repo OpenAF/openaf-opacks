@@ -23,8 +23,8 @@ dependencies:
   openaf: '>=20230325'
 files:
 - .package.yaml
-- sysbench.yaml
 - sysbench
+- sysbench.yaml
 filesHash:
-  sysbench.yaml: b461a92d6cfd5b239ce78102859861b89af0c825
   sysbench: c1d69eae192b4821031f22cc40e6a2ea1e729c41
+  sysbench.yaml: b461a92d6cfd5b239ce78102859861b89af0c825

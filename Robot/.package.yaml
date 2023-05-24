@@ -24,29 +24,29 @@ version: '20200501'
 dependencies:
   openaf: '>=20190801'
 files:
+- .odoc.db
+- .package.yaml
 - .precompile
-- examples/winExample.yaml
+- README.md
 - examples/macGetPublicIP.yaml
 - examples/winCopyClipboard.yaml
+- examples/winExample.yaml
 - examples/winKeepAlive.yaml
 - oJobRobot.yaml
-- .package.yaml
-- robot_win32.js
 - robot.js
-- README.md
-- vks/pt_PT.json
+- robot_win32.js
 - vks/en_US.json
-- .odoc.db
+- vks/pt_PT.json
 filesHash:
+  .odoc.db: ff701400394c3427d12d12a31509ee9ebb9d1089
   .precompile: fcc831aeb23bfa3664ca323541b815e876f9b625
-  examples/winExample.yaml: d13e81c7df2710fdb9ec151baa31debf7f92e4a9
+  README.md: 655c961bc575f6d06c02d700ec8d8f550950c9e0
   examples/macGetPublicIP.yaml: c66e3d1b157948615048ad23c17fe28fc81367ee
   examples/winCopyClipboard.yaml: bd740294b2b9ca5bdd5def503802a3cf489a040f
+  examples/winExample.yaml: d13e81c7df2710fdb9ec151baa31debf7f92e4a9
   examples/winKeepAlive.yaml: 99f730b3dbe9613e09f3bb0566d68e2ffad9ac1f
   oJobRobot.yaml: 826e961cd89eb81596f8f174cf94626dbf52429a
-  robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
   robot.js: 4d586f05abac923c3538f80250f615914e8fcb5f
-  README.md: 655c961bc575f6d06c02d700ec8d8f550950c9e0
-  vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e
+  robot_win32.js: 4c32564ce8b81c578b7ac7f01f59f6e0aedaf309
   vks/en_US.json: db1bf55439ce1ae5a02cfa6091db52414bb1a38d
-  .odoc.db: ff701400394c3427d12d12a31509ee9ebb9d1089
+  vks/pt_PT.json: f3022fc67f09ea4524c1e3e623648db33ae2987e

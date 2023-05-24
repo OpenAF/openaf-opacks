@@ -5,29 +5,28 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - initd
-  - systemd
-  - startup
-  - restart
+- initd
+- systemd
+- startup
+- restart
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  backurl: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/initd'
-  url: 'https://openaf.io/opacks/initd.opack'
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/initd
+  url: https://openaf.io/opacks/initd.opack
 description: Creates initd scripts to use with the openaf's --daemon command line option.
 name: initd
 main: ''
 mainJob: generateInitScript.yaml
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20170418'
 dependencies:
   openaf: '>=20170410'
 files:
-  - .package.yaml
-  - generateInitScript.yaml
-  - script.hbs
+- .package.yaml
+- generateInitScript.yaml
+- script.hbs
 filesHash:
-  .package.yaml: 98a8c50c3975e78370e183d77afaae636480f3a5
   generateInitScript.yaml: b0e5ee123dcafdbb7f6e263b905b6209fc9efc2b
   script.hbs: 5b6eea5a1df6033557f9ca5fb9ccc4e4a6e9d733

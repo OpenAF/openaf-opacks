@@ -36,8 +36,7 @@
     "sample.js"
   ],
   "filesHash": {
-    ".package.json": "562fb8159a294f6fae451438a3487cff7c5140f1",
-    "lib/copyFiles.js": "751e0b0503555b48ab99693f4c361cb2f3267360",
+    "lib/copyFiles.js": "f2e4745d375bcdee41e35f014a214cb5de4e2d53",
     "lib/main.js": "87da33e2b540be6f4c787210b2ff3ba948e52e79",
     "sample.js": "7f5c262ea1c21dd20e0e4ecb5d50e9365b286ebb"
   }

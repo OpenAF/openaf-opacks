@@ -23,14 +23,14 @@ dependencies:
   openaf: '>=20221216'
 files:
 - .maven.yaml
-- .package.yaml
-- redis.js
-- .precompile
 - .odoc.db
+- .package.yaml
+- .precompile
 - jedis-4.4.0-m1.jar
+- redis.js
 filesHash:
   .maven.yaml: df3056eca4e827a2dc79e924d2ffce5a2acc4e34
-  redis.js: bb5a9f636ebb2f074bf7f9163398c8eb425029a5
-  .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   .odoc.db: d302c765935d8e69f979ce0989295982ecff1e94
+  .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   jedis-4.4.0-m1.jar: fd429b17d8a30b6436f9801e4eb77a4d5ab83498
+  redis.js: bb5a9f636ebb2f074bf7f9163398c8eb425029a5

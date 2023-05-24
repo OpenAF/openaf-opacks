@@ -22,23 +22,23 @@ version: '20230515'
 dependencies:
   OpenAF: '>=20210515'
 files:
-- minio-8.5.2-all.jar
-- s3.yaml
-- .package.yaml
 - .maven.yaml
-- README.md
-- s3-ojob-test.yaml
 - .odoc.db
-- s3-test.yaml
+- .package.yaml
 - .precompile
+- README.md
+- minio-8.5.2-all.jar
+- s3-ojob-test.yaml
+- s3-test.yaml
 - s3.js
+- s3.yaml
 filesHash:
-  minio-8.5.2-all.jar: 81f43aaf9f52340f6e3f3814eeaa2eabb46f57dd
-  s3.yaml: 27dbd3f3f9ef1ce3f9f4dd4a4ca686a52b10c7fc
   .maven.yaml: c8ac24c335100d5c4cdc29317958091341eebe80
-  README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
-  s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
+  README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
+  minio-8.5.2-all.jar: 81f43aaf9f52340f6e3f3814eeaa2eabb46f57dd
+  s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
+  s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
   s3.js: 9786d70a3b8b27e7eae1d6293c5edd29663da192
+  s3.yaml: 27dbd3f3f9ef1ce3f9f4dd4a4ca686a52b10c7fc

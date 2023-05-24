@@ -7,20 +7,20 @@ scripts:
 keywords:
 - morse
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/morse'
+  url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/morse
 description: Simple morse code translator
 name: Morse
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20220827'
 dependencies:
   openaf: '>=20211229'
 files:
-- morse.js
 - .package.yaml
+- morse.js
 filesHash:
   morse.js: 8c53a392b6b6cee7dbeb97b5cc71ea92da85cfff

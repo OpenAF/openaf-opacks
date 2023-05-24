@@ -22,11 +22,11 @@ license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20180813'
 dependencies: {}
 files:
-- .precompile
-- keepalive.js
 - .package.yaml
+- .precompile
 - README.md
+- keepalive.js
 filesHash:
   .precompile: a8fcf60b4085ffcc446ba438ea78586ef56c2c4a
-  keepalive.js: 73b17e711807a38200625c85ac501f5c7744b091
   README.md: 97209f3d283b5c252f28a068ce53e3e3b3d6e841
+  keepalive.js: 73b17e711807a38200625c85ac501f5c7744b091

@@ -25,8 +25,8 @@ dependencies:
   packa: '>=20100101'
   packb: <20120101
 files:
-- .precompile
 - .package.yaml
+- .precompile
 - MSBot.js
 filesHash:
   .precompile: e197229b05ddf5ccd71996bb511958c1c292dddb

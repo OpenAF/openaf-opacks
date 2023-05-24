@@ -22,11 +22,11 @@ version: '20230424'
 dependencies:
   openaf: '>=20221216'
 files:
-- rocksdb.js
 - .package.yaml
-- rocksdbjni-8.0.0.jar
 - .precompile
+- rocksdb.js
+- rocksdbjni-8.0.0.jar
 filesHash:
+  .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
   rocksdb.js: d5262f7b7d49f6cbca16ca96df03e6a43bbb241f
   rocksdbjni-8.0.0.jar: 3b39d9a67f4551aa0925e832d130165f957385d7
-  .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5

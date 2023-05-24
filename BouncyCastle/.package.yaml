@@ -21,13 +21,13 @@ version: '20210429'
 dependencies:
   openaf: '>=20211229'
 files:
-- bcutil-jdk15on-1.70.jar
 - .maven.yaml
-- bcprov-jdk15on-1.70.jar
-- bcpkix-jdk15on-1.70.jar
 - .package.yaml
+- bcpkix-jdk15on-1.70.jar
+- bcprov-jdk15on-1.70.jar
+- bcutil-jdk15on-1.70.jar
 filesHash:
-  bcutil-jdk15on-1.70.jar: 54280e7195a7430d7911ded93fc01e07300b9526
   .maven.yaml: 036e0228c2032ccee73593c88143905cb2fa7383
-  bcprov-jdk15on-1.70.jar: 4636a0d01f74acaf28082fb62b317f1080118371
   bcpkix-jdk15on-1.70.jar: f81e5af49571a9d5a109a88f239a73ce87055417
+  bcprov-jdk15on-1.70.jar: 4636a0d01f74acaf28082fb62b317f1080118371
+  bcutil-jdk15on-1.70.jar: 54280e7195a7430d7911ded93fc01e07300b9526

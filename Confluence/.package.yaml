@@ -20,8 +20,8 @@ version: '20181113'
 dependencies:
   openaf: '>=20181113'
 files:
-- .precompile
 - .package.yaml
+- .precompile
 - confluence.js
 filesHash:
   .precompile: 4bbd73b384c173136acae7b62333eb59e149bf86

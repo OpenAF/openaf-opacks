@@ -5,27 +5,27 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
-  - rss
-  - feed
+- rss
+- feed
 bugs:
-  url: 'https://github.com/OpenAF/openaf-opacks/issues'
+  url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: 'https://openaf.io/opacks/RSS.opack'
+  url: https://openaf.io/opacks/RSS.opack
 description: A simple library to create and serve RSS feeds.
 name: RSS
 main: ''
 mainJob: ''
-license: 'https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE'
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20200309'
 dependencies:
   openaf: '>=20200101'
 files:
-  - rss.js
-  - .package.yaml
-  - .odoc.db
-  - .precompile
+- .odoc.db
+- .package.yaml
+- .precompile
+- rss.js
 filesHash:
-  rss.js: b6ccf4de037a792fab1b8b2365a867dcb96789cb
   .odoc.db: d453774b01e9a5f5616051f03f05088a466f9995
   .precompile: 8d74a2f741f47e49e312eb8b257a1c933cd2a810
+  rss.js: b6ccf4de037a792fab1b8b2365a867dcb96789cb

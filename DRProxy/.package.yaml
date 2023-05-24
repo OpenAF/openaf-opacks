@@ -22,13 +22,13 @@ version: '20180114'
 dependencies:
   OpenAF: '>=20180114'
 files:
-- .precompile
+- .odoc.db
 - .package.yaml
+- .precompile
 - README.md
 - drproxy.js
-- .odoc.db
 filesHash:
+  .odoc.db: 808e2380a9a1dbc55ebf1ba1838775a5fb0f4102
   .precompile: d3c6980a666d0a9184f9f8e4594e3c0c8297b17d
   README.md: cd86592bb2eab20b0203ffc920e9b634c06f5c31
   drproxy.js: 75dd837bcd77e41d60bd00a0bf447aebdd8d4c54
-  .odoc.db: 808e2380a9a1dbc55ebf1ba1838775a5fb0f4102

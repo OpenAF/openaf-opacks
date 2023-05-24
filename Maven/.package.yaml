@@ -22,11 +22,11 @@ version: '20181018'
 dependencies:
   OpenAF: '>=20180601'
 files:
+- .odoc.db
+- .package.yaml
 - .precompile
 - maven.js
-- .package.yaml
-- .odoc.db
 filesHash:
+  .odoc.db: 0a99ac83d31fcdb75693dd525233261288c37dc5
   .precompile: 4a18627431df72418344ca16b0e89267483a5d92
   maven.js: a6b99123cfeda491d4a8406b93a9c0aac6c94e7b
-  .odoc.db: 0a99ac83d31fcdb75693dd525233261288c37dc5

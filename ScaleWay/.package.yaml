@@ -20,8 +20,8 @@ version: '20200313'
 dependencies:
   openaf: '>=20200101'
 files:
-- .precompile
 - .package.yaml
+- .precompile
 - scaleway.js
 filesHash:
   .precompile: 89f667c6063c18e1d7d80fb06c6ffec4e41e1383
