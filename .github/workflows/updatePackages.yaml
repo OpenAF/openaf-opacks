@@ -32,13 +32,14 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         if [[ -n "$(git status --porcelain)" ]]; then
-          git checkout -b "update-packs-$RANDOM"
-          git push --set-upstream origin "update-packs-$RANDOM"
+          export NBRANCH=update-packs-$RANDOM
+          git checkout -b $NBRANCH
+          git push --set-upstream origin $NBRANCH
           git add .
           git commit -m "update packs"
-          git push origin "update-packs-$RANDOM"
-          gh pr create --title "Update packages" --body "Updates the package manifests" --base master --head "update-packs-$RANDOM"
+          git push origin $NBRANCH
+          gh pr create --title "Update packages" --body "Updates the package manifests" --base master --head $NBRANCH
           #gh pr review ${{ github.event.pull_request.number }} --approve
           git checkout main
-          #git branch -D "update-readme-$RANDOM"
+          #git branch -D $NBRANCH
         fi
