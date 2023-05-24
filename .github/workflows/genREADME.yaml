@@ -33,13 +33,13 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         if [[ -n "$(git status --porcelain)" ]]; then
-          git checkout -b update-readme
-          git push --set-upstream origin update-readme
+          git checkout -b "update-readme-$RANDOM"
+          git push --set-upstream origin "update-readme-$RANDOM"
           git add README.md
           git commit -m "update README.md"
-          git push origin update-readme
-          gh pr create --title "Update README.md" --body "Updates the README.md" --base master --head update-readme
-          gh pr review ${{ github.event.pull_request.number }} --approve
+          git push origin "update-readme-$RANDOM"
+          gh pr create --title "Update README.md" --body "Updates the README.md" --base master --head "update-readme-$RANDOM"
+          #gh pr review ${{ github.event.pull_request.number }} --approve
           git checkout main
-          git branch -D update-readme
+          #git branch -D "update-readme-$RANDOM"
         fi
