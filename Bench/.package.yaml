@@ -13,7 +13,7 @@ bugs:
 repository:
   type: http
   url: https://openaf.io/opacks/Bench.opack
-description: A collection of benchmark/performance tests
+description: A collection of benchmark performance tests
 name: Bench
 main: ''
 mainJob: ''
