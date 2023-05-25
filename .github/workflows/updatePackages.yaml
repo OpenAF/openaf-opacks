@@ -20,7 +20,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run updatePacks
-      uses: openaf/ojob-action@v2
+      uses: openaf/ojob-action@v3
       with:
         ojob: 'updatePacks.yaml'
         dist: t8
@@ -28,18 +28,7 @@ jobs:
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run : |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        if [[ -n "$(git status --porcelain)" ]]; then
-          export NBRANCH=update-packs-$RANDOM
-          git checkout -b $NBRANCH
-          git push --set-upstream origin $NBRANCH
-          git add .
-          git commit -m "update packs"
-          git push origin $NBRANCH
-          gh pr create --title "Update packages" --body "Updates the package manifests" --base master --head $NBRANCH
-          #gh pr review ${{ github.event.pull_request.number }} --approve
-          git checkout master
-          #git branch -D $NBRANCH
-        fi
+      uses: openaf/ojob-action@v3
+      with:
+        ojob: 'ojob.io/git/githubCheckIn'
+        dist: t8
