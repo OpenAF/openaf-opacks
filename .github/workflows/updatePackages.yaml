@@ -31,4 +31,5 @@ jobs:
       uses: openaf/ojob-action@v3
       with:
         ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ packs" title="Update\ packs"'
         dist: t8
