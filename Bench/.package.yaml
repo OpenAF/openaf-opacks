@@ -20,12 +20,12 @@ mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20230523'
 dependencies:
-  openaf  : '>=20230325'
+  openaf: '>=20230325'
   SysBench: '>=20230515'
 files:
+- .package.yaml
 - bench.yaml
 - java/futex.yaml
-- .package.yaml
 filesHash:
   bench.yaml: 1cc765a2e86bf72677287107e3c742c9896e25ca
   java/futex.yaml: badc9ff7fe474b6d71e0ab06189f505037c39087
