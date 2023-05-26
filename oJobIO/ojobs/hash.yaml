@@ -40,7 +40,7 @@ jobs:
       urls = $rest().get(args.url).init.l
     } else {
       global.isLocal = true
-      urls = listFilesRecursive(args.url).map(r => r.canonicalPath)
+      urls = listFilesRecursive(args.url).map(r => r.filepath)
     }
     
     log("Found #" + urls.length + " urls.")

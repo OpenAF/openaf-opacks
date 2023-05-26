@@ -31,5 +31,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v3
       with:
-        ojob: 'ojob.io/git/githubCheckIn'
+        ojob: 'ojob.io/git/hub/checkIn'
         dist: nightly
