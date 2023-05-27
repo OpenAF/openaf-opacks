@@ -34,5 +34,5 @@ jobs:
       uses: openaf/ojob-action@v3
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ packs" title="Update\ packs"'
+        args: 'message="Update\ GooglePhone" title="Update\ GooglePhone\ oPack" body="Automatic\ bump\ of\ GooglePhone\ oPack"'
         dist: t8
