@@ -2,6 +2,8 @@ name: Update GooglePhone
 
 on:
   workflow_dispatch:
+  schedule:
+  - cron: '03 7 * * *'
 
 jobs:
   update-googlephone:
