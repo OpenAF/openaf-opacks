@@ -23,11 +23,14 @@ jobs:
       with:
         script: |
           // Run update ojob
-          $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml")
-          .sh("rm -rf .openaf_precompiled")
-          .pwd("GooglePhoneNumber")
-          .prefix("opack")
-          .get()
+          var res = $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml")
+                    .sh("rm -rf .openaf_precompiled")
+                    .pwd("GooglePhoneNumber")
+                    .prefix("opack")
+                    .get(0)
+                    
+          // Store results
+          io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n````")
 
           // Bump opack version
           var opack = io.readFileYAML("GooglePhoneNumber/.package.yaml")
@@ -47,5 +50,5 @@ jobs:
       uses: openaf/ojob-action@v3
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ GooglePhone" title="Update\ GooglePhone\ oPack" body="Automatic\ bump\ of\ GooglePhone\ oPack"'
+        args: 'message="Update\ GooglePhone" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
         dist: t8
