@@ -23,6 +23,7 @@ jobs:
       with:
         script: |
           $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml")
+          .sh("rm -rf .openaf_precompiled")
           .pwd("GooglePhoneNumber")
           .prefix("opack")
           .get()
