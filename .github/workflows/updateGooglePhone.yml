@@ -22,8 +22,20 @@ jobs:
       uses: openaf/ojob-action@v3
       with:
         script: |
+          // Run update ojob
           $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml")
           .sh("rm -rf .openaf_precompiled")
+          .pwd("GooglePhoneNumber")
+          .prefix("opack")
+          .get()
+
+          // Bump opack version
+          var opack = io.readFileYAML("GooglePhoneNumber/.package.yaml")
+          opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+          io.writeFileYAML("GooglePhoneNumber/.package.yaml", opack)
+
+          // Update pack
+          $sh(getOpenAFPath() + "opack genpack .")
           .pwd("GooglePhoneNumber")
           .prefix("opack")
           .get()
