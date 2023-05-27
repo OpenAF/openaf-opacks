@@ -1,0 +1,40 @@
+name: Update GooglePhone
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  update-googlephone:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
+
+    - name: Run GooglePhone
+      uses: openaf/ojob-action@v3
+      with:
+        script: |
+          $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml")
+          .pwd("GooglePhoneNumber")
+          .prefix("opack")
+          .get()
+        dist: t8
+
+    - name: Commit changes
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v3
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ packs" title="Update\ packs"'
+        dist: t8
