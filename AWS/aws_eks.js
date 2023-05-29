@@ -65,9 +65,11 @@ AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
   }
 }
 
-AWS.prototype.EKS_GetKubeConfig = function(aRegion, aClusterName) {
+AWS.prototype.EKS_GetKubeConfig = function(aRegion, aClusterName, aCmd, aArgs) {
   aRegion      = _$(aRegion, "aRegion").isString().default(this.region)
   aClusterName = _$(aClusterName, "aClusterName").isString().$_()
+  aCmd         = _$(aCmd, "aCmd").isString().default(java.lang.System.getProperty("java.home") + java.io.File.separator + "bin" + java.io.File.separator + "java")
+  aArgs        = _$(aArgs, "aArgs").isArray().default(["-jar", getOpenAFJar(), "-c", "load('aws.js');aws=new AWS();sprint(aws.EKS_GetToken('" + aRegion + "','" + aClusterName + "'))"])
 
   var _cluster = this.EKS_DescribeCluster(aRegion, aClusterName)
 
@@ -100,11 +102,8 @@ AWS.prototype.EKS_GetKubeConfig = function(aRegion, aClusterName) {
         user: {
           exec: {
             apiVersion: "client.authentication.k8s.io/v1beta1",
-            command: getOpenAFPath() + "oaf",
-            args: [
-              "-c",
-              "load('aws.js');aws=new AWS();sprint(aws.EKS_GetToken('" + aRegion + "','" + aClusterName + "'))"
-            ]
+            command: aCmd,
+            args: aArgs
           }
         }
       }
