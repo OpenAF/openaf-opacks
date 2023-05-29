@@ -49,26 +49,65 @@ AWS.prototype.EKS_DescribeCluster = function(aRegion, aName) {
     return this.getURLEncoded(aURL, aURI, "", {}, "eks", aHost, aRegion, {})
 }
 
-/**
- * <odoc>
- * <key>AWS.EKS_GetToken(aRegion, aName) : Map</key>
- * </odoc>
- */
-/*AWS.prototype.EKS_GetToken = function(aRegion, aName) {
-  aRegion = _$(aRegion).isString().default(this.region)
-  aName   = _$(aName).isString().$_()
-  var aURL = "https://eks." + aRegion + ".amazonaws.com/" + aName
-  var url = new java.net.URL(aURL)
-  var aHost = String(url.getHost())
-  var aURI = String(url.getPath())
+AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
+  aRegion      = _$(aRegion, "aRegion").isString().default(this.region)
+  aClusterName = _$(aClusterName, "aClusterName").isString().$_()
 
-  var res = this.postURLEncoded(aURL, aURI, "", { 
-    Action: "GetQueueAttributes", 
-    QueueUrl: aURL,
-    "AttributeName.1": "All",
-    Version: "2012-11-05" 
- }, "sqs", aHost, aRegion);
- 
- if (isString(res)) res = af.fromXML2Obj(res);
- return res;
-}*/
+  var _data = this.__getRequest("get", "/", "sts", "sts." + aRegion + ".amazonaws.com", aRegion, "Action=GetCallerIdentity&Version=2011-06-15", "", { "x-k8s-aws-id": aClusterName },__,__, true)
+  return {
+    kind: "ExecCredential",
+    apiVersion: "client.authentication.k8s.io/v1beta1",
+    spec: {},
+    status: {
+      expirationTimestamp: new Date(ow.format.toDate( _data._query.match(/X-Amz-Date=([^&]+)&/)[1], "yyyyMMdd'T'HHmmss'Z'").getTime() + 60000).toISOString(),
+      token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes(_data._query))
+    }
+  }
+}
+
+AWS.prototype.EKS_GetKubeConfig = function(aRegion, aClusterName) {
+  aRegion      = _$(aRegion, "aRegion").isString().default(this.region)
+  aClusterName = _$(aClusterName, "aClusterName").isString().$_()
+
+  var _cluster = this.EKS_DescribeCluster(aRegion, aClusterName)
+
+  return {
+    apiVersion: "v1",
+    clusters: [
+      { 
+        cluster: {
+          "certificate-authority-data": _cluster.cluster.certificateAuthority.data,
+          server: _cluster.cluster.endpoint,
+        },
+        name: _cluster.cluster.arn
+      }
+    ],
+    contexts: [
+      {
+        context: {
+          cluster: _cluster.cluster.arn,
+          user: _cluster.cluster.arn
+        },
+        name: _cluster.cluster.arn
+      }
+    ],
+    "current-context": _cluster.cluster.arn,
+    kind: "Config",
+    preferences: {},
+    users: [
+      {
+        name: _cluster.cluster.arn,
+        user: {
+          exec: {
+            apiVersion: "client.authentication.k8s.io/v1beta1",
+            command: getOpenAFPath() + "oaf",
+            args: [
+              "-c",
+              "load('aws.js');aws=new AWS();sprint(aws.EKS_GetToken('" + aRegion + "','" + aClusterName + "'))"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

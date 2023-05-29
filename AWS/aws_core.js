@@ -8,7 +8,7 @@
  * taken from environment variables or provided directly.
  * </odoc>
  */
- var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
+var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
    ow.loadFormat()
    ow.loadObj()
    ow.loadNet()
@@ -16,50 +16,53 @@
    this.accessKey = aAccessKey;
    this.secretKey = aSecretKey;
    this.stoken    = aSessionToken;
+   this.__debug   = false
+
+   aRegion = _$(aRegion).isString().default("us-east-1")
 
    this.connect(aAccessKey, aSecretKey, aSessionToken, aRegion);
 };
 
 AWS.prototype._imds = function() {
-	var _role, _cred, _token
+        var _role, _cred, _token
 
-	if (ow.net.testPort("169.254.169.254", 80)) {
-		// IMDSv1
-		var url = "http://169.254.169.254/latest/meta-data"
-		var uris = "/iam/security-credentials"
-		try {
-			if ($rest().get(url).responseCode == 200) {
-				var _r = $rest().get(url + uris)
-				if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
-					throw "Problem trying to use IMDSv1: No IAM role was found."
-				} else {
-					_role = _r.trim().split("\n")[0]
-					_cred = $rest().get(url + uris + "/" + _role)
-					if (_cred.Code != "Success") throw "Problem trying to use IMDSv1: " + af.toSLON(_cred)
-				}
-			} else {
-				// IMDSv2
-				_token = $rest({ requestHeaders: { "X-aws-ec2-metadata-token-ttl-seconds": 21600 } }).put("http://169.254.169.254/latest/api/token")
-				var rh = { requestHeaders: { "X-aws-ec2-metadata-token": _token } }
-				var _r = $rest(rh).get(url + uris)
-				if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
-					throw "Problem trying to use IMDSv2: No IAM role was found."
-				} else {
-					_role = _r.trim().split("\n")[0]
-					_cred = $rest(rh).get(url + uris + "/" + _role)
-					if (_cred.Code != "Success") throw "Problem trying to use IMDSv2: " + af.toSLON(_cred)
-				}
-			}
-		} catch(e) {
-			throw "Problem trying to determine or use AWS IMDS: " + String(e)
-		}
+        if (ow.net.testPort("169.254.169.254", 80)) {
+                // IMDSv1
+                var url = "http://169.254.169.254/latest/meta-data"
+                var uris = "/iam/security-credentials"
+                try {
+                        if ($rest().get(url).responseCode == 200) {
+                                var _r = $rest().get(url + uris)
+                                if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
+                                        throw "Problem trying to use IMDSv1: No IAM role was found."
+                                } else {
+                                        _role = _r.trim().split("\n")[0]
+                                        _cred = $rest().get(url + uris + "/" + _role)
+                                        if (_cred.Code != "Success") throw "Problem trying to use IMDSv1: " + af.toSLON(_cred)
+                                }
+                        } else {
+                                // IMDSv2
+                                _token = $rest({ requestHeaders: { "X-aws-ec2-metadata-token-ttl-seconds": 21600 } }).put("http://169.254.169.254/latest/api/token")
+                                var rh = { requestHeaders: { "X-aws-ec2-metadata-token": _token } }
+                                var _r = $rest(rh).get(url + uris)
+                                if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
+                                        throw "Problem trying to use IMDSv2: No IAM role was found."
+                                } else {
+                                        _role = _r.trim().split("\n")[0]
+                                        _cred = $rest(rh).get(url + uris + "/" + _role)
+                                        if (_cred.Code != "Success") throw "Problem trying to use IMDSv2: " + af.toSLON(_cred)
+                                }
+                        }
+                } catch(e) {
+                        throw "Problem trying to determine or use AWS IMDS: " + String(e)
+                }
 
       return {
          accessKey: _cred.AccessKeyId,
          secretKey: _cred.SecretAccessKey,
          token    : _cred.Token
       }
-	} else {
+        } else {
       return __
    }
 }
@@ -261,7 +264,8 @@ AWS.prototype.__getSignedHeaders = function(key, dateStamp, regionName, serviceN
    return ow.format.string.toHex(this.__getSignatureKey(key, dateStamp, regionName, serviceName), "").toLowerCase();
 };
 
-AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType) {
+AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType, altGet) { 
+   altGet = _$(altGet).isBoolean().default(false)
    aPayload = _$(aPayload).isString().default("");
    aRequestParams = _$(aRequestParams).isString().default("");
    aURI = _$(aURI).isString().default("/");
@@ -281,7 +285,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var can_uri = aURI;
    var can_querystring = aRequestParams; // must be sorted by name
    //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
-   var can_headers = (isDef(content_type) ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n";
+   var can_headers = (isDef(content_type) ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + (altGet ? "" : "x-amz-date:" + amzdate + "\n");
 
    var amzFieldsHeaders = Object.keys(aAmzFields), amzHeaders = [];
    for (var amzFieldI in amzFieldsHeaders) {
@@ -292,15 +296,27 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
       }
    } 
 
-   var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host;x-amz-date" + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
-
+   var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host" + (altGet ? "" : ";x-amz-date") + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
    var payload_hash = sha256(aPayload);
-
-   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + payload_hash;
 
    // Part 2
    var credential_scope = datestamp + "/" + aRegion + "/" + aService + "/" + "aws4_request";
+   var altGetFields = {}
+   if (altGet) {
+      altGetFields = { 
+         "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
+         "X-Amz-Credential": Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope,
+         "X-Amz-Date": amzdate,
+         "X-Amz-Expires": 60,
+         "X-Amz-Security-Token": this.stoken,
+         "X-Amz-SignedHeaders": signed_headers 
+      }
+      can_querystring = can_querystring + "&" + $rest().query(altGetFields)
+   } 
+   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + payload_hash
+   if (this.__debug) { cprint(can_Request); print("----") }
    var string_to_sign = "AWS4-HMAC-SHA256" + "\n" + amzdate + "\n" + credential_scope + "\n" + sha256(can_Request);
+   if (this.__debug) { cprint(string_to_sign); print("++++") }
 
    // Part 3
    var signing_key = this.__getSignatureKey(Packages.openaf.AFCmdBase.afc.dIP(this.secretKey), datestamp, aRegion, aService);
@@ -310,11 +326,19 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var authorization_header = "AWS4-HMAC-SHA256" + " " + "Credential=" + Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope + ", " + "SignedHeaders=" + signed_headers + ", " + "Signature=" + signature;
 
    if (aMethod == "GET") {
-      request = merge(request, {
+      if (altGet) {
+        can_querystring += "&X-Amz-Signature=" + signature
+        delete request["X-Amz-Security-Token"]
+        //request = merge(request, { _query: can_querystring, "X-Amz-Signature": signature, "X-Amz-Date": amzdate, "Authorization": authorization_header })
+        //request = merge(request, { _query: can_querystring, "X-Amz-Date": amzdate, "Authorization": authorization_header })
+        request._query = can_querystring
+      } else {
+        request = merge(request, {
          "Content-Type": (isDef(aContentType) ? aContentType : void 0),
          "X-Amz-Date": amzdate,
          "Authorization": authorization_header
-      });
+        })
+      }
    } else {
       request = merge(request, {
          "Content-Type": (isDef(aContentType) ? aContentType : void 0),
@@ -322,7 +346,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
          "Authorization": authorization_header,
       });
    }
-   
+
    return request;
 };
 
@@ -402,16 +426,20 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
  * Returns the object returned by the API.
  * </odoc>
  */
-AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) {
+AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType, aextra) {
    if (isObject(aParams)) aParams = $rest().query(aParams);
    var params = _$(aParams).isString().default("");
 
-   var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType);
+   var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType, aextra);
+ 
+   if (aextra) {
+      aURL += "?" + extra._query
+      delete extra._query
+   } 
 
    return $rest({ 
-      urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
       requestHeaders: extra
-   }).get(aURL, aArgs);
+   }).get(aURL);
 };
 
 AWS.prototype.get = function(aService, aRegion, aPartURI, aParams, aArgs, aAmzFields, aDate, aContentType) {
