@@ -30,20 +30,22 @@ jobs:
                     .pwd("GooglePhoneNumber")
                     .prefix("opack")
                     .get(0)
-                    
-          // Store results
-          io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n````")
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n````")
 
-          // Bump opack version
-          var opack = io.readFileYAML("GooglePhoneNumber/.package.yaml")
-          opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-          io.writeFileYAML("GooglePhoneNumber/.package.yaml", opack)
+            // Bump opack version
+            var opack = io.readFileYAML("GooglePhoneNumber/.package.yaml")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML("GooglePhoneNumber/.package.yaml", opack)
 
-          // Update pack
-          $sh(getOpenAFPath() + "opack genpack .")
-          .pwd("GooglePhoneNumber")
-          .prefix("opack")
-          .get()
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("GooglePhoneNumber")
+            .prefix("opack")
+            .get()
+          }
         dist: t8
 
     - name: Commit changes
