@@ -61,7 +61,7 @@ AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
     spec: {},
     status: {
       expirationTimestamp: (new Date((new Date(ow.format.toDate(_data._data["X-Amz-Date"], "yyyyMMdd'T'HHmmss'Z'"))).getTime() + (14*60000))).toISOString().replace(".000Z","Z"),
-      token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)).replace(/\=\=$/, "")
+      token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)).replace(/\=+$/, "")
     }
   }
 }
