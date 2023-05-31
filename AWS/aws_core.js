@@ -308,12 +308,12 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
          "X-Amz-Credential": encodeURIComponent(Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope),
          "X-Amz-Date": amzdate,
          "X-Amz-Expires": 60,
-         "X-Amz-Security-Token": this.stoken,
+         "X-Amz-Security-Token": (isDef(this.stoken) ? encodeURIComponent(this.stoken) : __),
          "X-Amz-SignedHeaders": encodeURIComponent(signed_headers)
       }
       //can_querystring = can_querystring + "&" + $rest().query(altGetFields)
-      can_querystring = can_querystring + "&" + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
       if (this.__debug) cprint(altGetFields)
+      can_querystring = can_querystring + "&" + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}{{#if X-Amz-Security-Token}}&X-Amz-Security-Token={{X-Amz-Security-Token}}{{/if}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
    }
    var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + payload_hash
    if (this.__debug) { cprint(can_Request); print("----") }
@@ -331,7 +331,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    if (aMethod == "GET") {
       if (altGet) {
         altGetFields["X-Amz-Signature"] = signature
-        delete request["X-Amz-Security-Token"]
+        //delete request["X-Amz-Security-Token"]
         //request = merge(request, { _query: can_querystring, "X-Amz-Signature": signature, "X-Amz-Date": amzdate, "Authorization": authorization_header })
         //request = merge(request, { _query: can_querystring, "X-Amz-Date": amzdate, "Authorization": authorization_header })
         request._query = can_querystring + "&X-Amz-Signature=" + signature
