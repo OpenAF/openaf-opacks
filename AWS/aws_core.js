@@ -4,7 +4,7 @@
 /**
  * <odoc>
  * <key>AWS.AWS(aAccessKey, aSecretKey, aSessionToken)</key>
- * Creates an instance of AWS light simplified API access. The accessKey, secretKey and temporary sessionToken will be 
+ * Creates an instance of AWS light simplified API access. The accessKey, secretKey and temporary sessionToken will be
  * taken from environment variables or provided directly.
  * </odoc>
  */
@@ -78,7 +78,7 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
    this.secretKey = _$(aSecretKey).default(this._aSecretKey);
    this.stoken    = _$(aSessionToken).default(this.aSessionToken);
 
-   if (isUnDef(this.accessKey) && isDef(getEnv("AWS_ACCESS_KEY_ID"))) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID")); 
+   if (isUnDef(this.accessKey) && isDef(getEnv("AWS_ACCESS_KEY_ID"))) this.accessKey = String(getEnv("AWS_ACCESS_KEY_ID"));
    if (isUnDef(this.secretKey) && isDef(getEnv("AWS_SECRET_ACCESS_KEY"))) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
    if (isUnDef(this.stoken) && isDef(getEnv("AWS_SESSION_TOKEN"))) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
@@ -97,8 +97,8 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
                   io.readFileString(_cf)
                   .split("\n")
                   .filter(r => r.trim().match(/^aws_(access_|secret_)/))
-                  .forEach(r => { 
-                     var ar = r.split("=").map(s => s.trim()); 
+                  .forEach(r => {
+                     var ar = r.split("=").map(s => s.trim());
                      if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
                      if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
                      if (ar[0] == "aws_session_token") o.Token = ar[1]
@@ -234,7 +234,7 @@ AWS.prototype.flattenMap2Params = function(aMap) {
             if (mts) {
                res[aP.replace(/^\./, "").replace(/\[(\d+)\]/g, (r) => { return ".Id." + (Number(r.substr(1, r.length -2)) +1); }) + "." + aK] = aV;
             } else {
-               res[(aP != "" ? aP.substr(1, aP.length) + "." : "") + aK] = aV; 
+               res[(aP != "" ? aP.substr(1, aP.length) + "." : "") + aK] = aV;
             }
          }
       }
@@ -264,7 +264,7 @@ AWS.prototype.__getSignedHeaders = function(key, dateStamp, regionName, serviceN
    return ow.format.string.toHex(this.__getSignatureKey(key, dateStamp, regionName, serviceName), "").toLowerCase();
 };
 
-AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType, altGet) { 
+AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType, altGet) {
    altGet = _$(altGet).isBoolean().default(false)
    aPayload = _$(aPayload).isString().default("");
    aRequestParams = _$(aRequestParams).isString().default("");
@@ -281,7 +281,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var datestamp = ow.format.fromDate(aDate, "yyyyMMdd", "UTC");
    //var content_type = 'application/x-amz-json-1.0';
    var content_type = _$(aContentType).isString().default(void 0);
-   
+
    var can_uri = aURI;
    var can_querystring = aRequestParams; // must be sorted by name
    //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
@@ -294,7 +294,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
          amzHeaders.push(amzFieldsHeaders[amzFieldI].toLowerCase());
          can_headers += amzFieldsHeaders[amzFieldI].toLowerCase() + ":" + aAmzFields[amzFieldsHeaders[amzFieldI]] + "\n";
       }
-   } 
+   }
 
    var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host" + (altGet ? "" : ";x-amz-date") + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
    var payload_hash = sha256(aPayload);
@@ -303,16 +303,18 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var credential_scope = datestamp + "/" + aRegion + "/" + aService + "/" + "aws4_request";
    var altGetFields = {}
    if (altGet) {
-      altGetFields = { 
+      altGetFields = {
          "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
-         "X-Amz-Credential": Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope,
+         "X-Amz-Credential": encodeURIComponent(Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope),
          "X-Amz-Date": amzdate,
          "X-Amz-Expires": 60,
          "X-Amz-Security-Token": this.stoken,
-         "X-Amz-SignedHeaders": signed_headers 
+         "X-Amz-SignedHeaders": encodeURIComponent(signed_headers)
       }
-      can_querystring = can_querystring + "&" + $rest().query(altGetFields)
-   } 
+      //can_querystring = can_querystring + "&" + $rest().query(altGetFields)
+      can_querystring = can_querystring + "&" + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
+      if (this.__debug) cprint(altGetFields)
+   }
    var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + payload_hash
    if (this.__debug) { cprint(can_Request); print("----") }
    var string_to_sign = "AWS4-HMAC-SHA256" + "\n" + amzdate + "\n" + credential_scope + "\n" + sha256(can_Request);
@@ -321,17 +323,19 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    // Part 3
    var signing_key = this.__getSignatureKey(Packages.openaf.AFCmdBase.afc.dIP(this.secretKey), datestamp, aRegion, aService);
    var signature = ow.format.string.toHex(this.__HmacSHA256(string_to_sign, signing_key), "").toLowerCase();
+   if (this.__debug) { cprint(signature); }
 
    // Part 4
    var authorization_header = "AWS4-HMAC-SHA256" + " " + "Credential=" + Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope + ", " + "SignedHeaders=" + signed_headers + ", " + "Signature=" + signature;
 
    if (aMethod == "GET") {
       if (altGet) {
-        can_querystring += "&X-Amz-Signature=" + signature
+        altGetFields["X-Amz-Signature"] = signature
         delete request["X-Amz-Security-Token"]
         //request = merge(request, { _query: can_querystring, "X-Amz-Signature": signature, "X-Amz-Date": amzdate, "Authorization": authorization_header })
         //request = merge(request, { _query: can_querystring, "X-Amz-Date": amzdate, "Authorization": authorization_header })
-        request._query = can_querystring
+        request._query = can_querystring + "&X-Amz-Signature=" + signature
+	request._data  = altGetFields
       } else {
         request = merge(request, {
          "Content-Type": (isDef(aContentType) ? aContentType : void 0),
@@ -399,9 +403,9 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
 
          aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
          var aPayload = (aContentType == "application/x-www-form-urlencoded" ? $rest().query(aOps.aDataRowMap) : stringify(aOps.aDataRowMap, void 0, ""));
-         aPayload = _$(aPayload).default("");       
-         aOps.reqHeaders = merge(aOps.reqHeaders, 
-            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, aPayload, aAmzFields, aDate, aContentType));        
+         aPayload = _$(aPayload).default("");
+         aOps.reqHeaders = merge(aOps.reqHeaders,
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, aPayload, aAmzFields, aDate, aContentType));
       } else {
          var url = new java.net.URL(aOps.aBaseURL);
          var aHost = String(url.getHost());
@@ -410,10 +414,10 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
 
          if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap);
          if (params == "null") params = $rest().query(aOps.aIdxMap);
-         
-         aOps.reqHeaders = merge(aOps.reqHeaders, 
+
+         aOps.reqHeaders = merge(aOps.reqHeaders,
             parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? void 0 : aContentType)));
-      }      
+      }
 
       return aOps;
    };
@@ -431,13 +435,13 @@ AWS.prototype.getURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHo
    var params = _$(aParams).isString().default("");
 
    var extra = this.__getRequest("get", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType, aextra);
- 
+
    if (aextra) {
       aURL += "?" + extra._query
       delete extra._query
-   } 
+   }
 
-   return $rest({ 
+   return $rest({
       requestHeaders: extra
    }).get(aURL);
 };
@@ -474,8 +478,8 @@ AWS.prototype.delete = function(aService, aRegion, aPartURI, aParams, aArgs, aAm
 
    var extra = this.__getRequest("delete", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType);
 
-   return $rest({ 
-      urlEncode: (aContentType == "application/x-www-form-urlencoded"), 
+   return $rest({
+      urlEncode: (aContentType == "application/x-www-form-urlencoded"),
       requestHeaders: extra
    }).delete(aURL, aArgs);
 };

@@ -2,7 +2,7 @@
 // EKS
 
 loadLib("aws_core.js");
- 
+
 /**
  * <odoc>
  * <key>AWS.EKS_ListClusters(aRegion, aParamsMap) : Array</key>
@@ -31,7 +31,7 @@ AWS.prototype.EKS_ListClusters = function(aRegion, params) {
     } while(isDef(res) && !isNull(res.nextToken))
 
     return data
-}  
+}
 
 /**
  * <odoc>
@@ -54,13 +54,14 @@ AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
   aClusterName = _$(aClusterName, "aClusterName").isString().$_()
 
   var _data = this.__getRequest("get", "/", "sts", "sts." + aRegion + ".amazonaws.com", aRegion, "Action=GetCallerIdentity&Version=2011-06-15", "", { "x-k8s-aws-id": aClusterName },__,__, true)
+  $rest({ requestHeaders: { "x-k8s-aws-id": aClusterName } }).get("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)
   return {
     kind: "ExecCredential",
     apiVersion: "client.authentication.k8s.io/v1beta1",
     spec: {},
     status: {
-      expirationTimestamp: new Date(ow.format.toDate( _data._query.match(/X-Amz-Date=([^&]+)&/)[1], "yyyyMMdd'T'HHmmss'Z'").getTime() + 60000).toISOString(),
-      token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes(_data._query))
+      expirationTimestamp: (new Date((new Date(ow.format.toDate(_data._data["X-Amz-Date"], "yyyyMMdd'T'HHmmss'Z'"))).getTime() + (14*60000))).toISOString().replace(".000Z","Z"),
+      token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)).replace(/\=\=$/, "")
     }
   }
 }
@@ -69,14 +70,14 @@ AWS.prototype.EKS_GetKubeConfig = function(aRegion, aClusterName, aCmd, aArgs) {
   aRegion      = _$(aRegion, "aRegion").isString().default(this.region)
   aClusterName = _$(aClusterName, "aClusterName").isString().$_()
   aCmd         = _$(aCmd, "aCmd").isString().default(java.lang.System.getProperty("java.home") + java.io.File.separator + "bin" + java.io.File.separator + "java")
-  aArgs        = _$(aArgs, "aArgs").isArray().default(["-jar", getOpenAFJar(), "-c", "load('aws.js');aws=new AWS();sprint(aws.EKS_GetToken('" + aRegion + "','" + aClusterName + "'))"])
+  aArgs        = _$(aArgs, "aArgs").isArray().default(["-jar", getOpenAFJar(), "-c", "load('aws.js');aws=new AWS();sprint(aws.EKS_GetToken('" + aRegion + "','" + aClusterName + "'),'    ')"])
 
   var _cluster = this.EKS_DescribeCluster(aRegion, aClusterName)
 
   return {
     apiVersion: "v1",
     clusters: [
-      { 
+      {
         cluster: {
           "certificate-authority-data": _cluster.cluster.certificateAuthority.data,
           server: _cluster.cluster.endpoint,
