@@ -19,7 +19,8 @@
     yellowgreen: '9ACD32',
     lightgrey: 'D3D3D3',
     blueviolet: '8A2BE2',
-    grey2: '444D56'
+    grey2: '444D56',
+    grey3: '24292E'
   }
 
   function sanitize(str) {
