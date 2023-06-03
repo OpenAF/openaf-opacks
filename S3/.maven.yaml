@@ -4,5 +4,5 @@
 artifacts:
   - id      : minio 
     group   : io.minio
-    version : 8.5.2
+    version : 8.5.3
     template: minio-{{version}}-all.jar
