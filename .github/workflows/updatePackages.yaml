@@ -31,6 +31,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v3
       with:
-        ojob: 'ojob.io/git/hub/checkIn'
+        ojob: 'ojob.io/git/hub/contentIn'
         args: 'message="Update\ packs" title="Update\ packs"'
         dist: t8
