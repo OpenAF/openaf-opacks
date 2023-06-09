@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.trilead</groupId>
             <artifactId>trilead-ssh2</artifactId>
-            <version>1.0.0-build221</version>
+            <version>1.0.0-build222</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
