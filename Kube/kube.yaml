@@ -1,0 +1,19 @@
+ojob: 
+  langs:
+  - lang  : kube
+    langFn: |
+      loadLib("kube.js")
+
+      _$(args.kube, "args.kube").isMap().$_()
+      _$(args.kube.pod, "args.kube.pod").isString().$_()
+      args.kube.ns = _$(args.kube.ns, "args.kube.ns").isString().default("default")
+
+      var kube = new Kube(args.kube.url, args.kube.user, args.kube.pass, __, args.kube.token)
+      var id = nowNano()
+      var c = ["bin/sh", "-c", "cat << ___EOF > /tmp/" + id + ".sh && /bin/sh /tmp/" + id + ".sh && rm /tmp/" + id + ".sh \n" + code + "\n___EOF"]
+      args.result = kube.exec(args.kube.ns, args.kube.pod, c, args.kube.timeout, false, args.kube.container)
+      var prefix = "kube"
+      if (isDef(job.typeArgs) && isString(job.typeArgs.shellPrefix)) prefix = objOrStr(args, job.typeArgs.shellPrefix)
+      print( args.result.split("\n").map(l => ansiColor("BOLD,BLACK", "[" + prefix + "] ") + l).join("\n") )
+
+      kube.close()
