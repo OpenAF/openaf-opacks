@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.68</version>
+            <version>1.70</version>
         </dependency>
         <dependency>
             <groupId>eu.agno3.jcifs</groupId>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.5.1</version>
+            <version>8.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ignite</groupId>
