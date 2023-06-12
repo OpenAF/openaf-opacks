@@ -111,11 +111,11 @@ var $kube = function(aMap) {
 
 /**
  * <odoc>
- * <key>Kube.Kube(aURL, aUser, aPass, aWSTimeout, aToken)</key>
- * Creates an instance to access a kubernetes (k8s) cluster on aURL. If defined, using aUser and aPass or aToken.
+ * <key>Kube.Kube(aURLorFile, aUser, aPass, aWSTimeout, aToken)</key>
+ * Creates an instance to access a kubernetes (k8s) cluster on aURL or kubectl config file. If defined, using aUser and aPass or aToken.
  * </odoc>
  */
-var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
+var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 	plugin("HTTP");
 	ow.loadFormat();
 	this.url = aURL; 
@@ -130,21 +130,37 @@ var Kube = function (aURL, aUser, aPass, aWSTimeout, aToken) {
 	if (isUnDef(aURL)) {
 		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build();
 	} else {
-		if (isDef(aToken)) {
-			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
-			.withMasterUrl(this.url)
-			.withTrustCerts(true)
-			.withWebsocketTimeout(aWSTimeout)
-			.withOauthToken(aToken)
-			.build();
+		if (aURL.toLowerCase().startsWith("http")) {
+			if (isDef(aToken)) {
+				this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+				.withMasterUrl(this.url)
+				.withTrustCerts(true)
+				.withWebsocketTimeout(aWSTimeout)
+				.withOauthToken(aToken)
+				.build();
+			} else {
+				this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
+				.withMasterUrl(this.url)
+				.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
+				.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
+				.withTrustCerts(true)
+				.withWebsocketTimeout(aWSTimeout)
+				.build();
+			}
 		} else {
-			this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
-			.withMasterUrl(this.url)
-			.withUsername(Packages.openaf.AFCmdBase.afc.dIP(this.user))
-			.withPassword(Packages.openaf.AFCmdBase.afc.dIP(this.pass))
-			.withTrustCerts(true)
-			.withWebsocketTimeout(aWSTimeout)
-			.build();
+			if (io.fileExists(aURL)) {
+				sync(() => {
+					var oldValue = java.lang.System.getProperty("kubeconfig")
+					java.lang.System.setProperty("kubeconfig", aURL)
+					this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build()
+					if (oldValue == null) 
+						java.lang.System.clearProperty("kubeconfig")
+					else
+						java.lang.System.setProperty("kubeconfig", oldValue)
+				})
+			} else {
+				throw "'" + aURL + "' not found."
+			}
 		}
 	}
 
