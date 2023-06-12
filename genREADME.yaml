@@ -38,7 +38,7 @@ jobs:
            label     : pack.name,
            labelColor: "grey3",
            color     : "blue",
-           status    : pack.version,
+           status    : "v" + pack.version,
            icon      : "openaf_grey.svg",
            file      : ".github/badges/" + pack.name + ".svg"
         })
