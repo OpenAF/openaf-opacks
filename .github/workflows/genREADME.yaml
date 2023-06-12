@@ -33,3 +33,11 @@ jobs:
       with:
         ojob: 'ojob.io/git/hub/contentIn'
         dist: nightly
+        
+    - name: Commit badges changes
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v3
+      with:
+        ojob: 'ojob.io/git/hub/contentIn paths=.github/badges/'
+        dist: nightly
