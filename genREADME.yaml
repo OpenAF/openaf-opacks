@@ -16,6 +16,7 @@ include:
 
 todo:
   - Gather opack info trigger
+  - Generate version badge
   - Get list of opacks
   - Generate README.md
 
@@ -24,7 +25,7 @@ jobs:
   - name    : Generate version badge
     type    : subscribe
     typeArgs:
-      chSubscribe: output
+      chSubscribe: outputs
     exec    : |
       if (args.op != "set" && args.op != "setall") return
       if (args.op == "set") args.v = [ args.v ]
