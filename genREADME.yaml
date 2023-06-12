@@ -1,7 +1,9 @@
 # author: Nuno Aguiar
 
 ojob:
-  async: true  
+  async   : true  
+  opacks  :
+  - Badgen: 20230603
   channels:
     create:
       - name: opacks
@@ -9,12 +11,37 @@ ojob:
       - name: outputs
         type: simple
 
+include:
+- badgen.yaml
+
 todo:
   - Gather opack info trigger
   - Get list of opacks
   - Generate README.md
 
 jobs:
+  # --------------------------------
+  - name    : Generate version badge
+    type    : subscribe
+    typeArgs:
+      chSubscribe: output
+    exec    : |
+      if (args.op != "set" && args.op != "setall") return
+      if (args.op == "set") args.v = [ args.v ]
+      
+      for(var ii in args.v) {
+        var pack = args.v[ii]
+        
+        $job("Badgen generate file", {
+           label     : pack.name,
+           labelColor: "grey3",
+           color     : "blue",
+           status    : pack.version,
+           icon      : "openaf_grey.svg",
+           file      : ".github/badges/" + pack.name + ".svg"
+        })
+      }
+  
   #####################################
   - name    : Gather opack info trigger
     type    : subscribe
