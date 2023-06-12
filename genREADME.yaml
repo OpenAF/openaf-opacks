@@ -33,12 +33,12 @@ jobs:
       for(var ii in args.v) {
         var pack = args.v[ii]
         
-        log(" generating badge '" + ".github/badges/" + pack.name + ".svg'")
+        log(" generating badge '.github/badges/" + pack.name + ".svg'")
         $job("Badgen generate file", {
            label     : pack.name,
            labelColor: "grey3",
            color     : "blue",
-           status    : "v" + pack.version,
+           status    : String(pack.version),
            icon      : "openaf_grey.svg",
            file      : ".github/badges/" + pack.name + ".svg"
         })
