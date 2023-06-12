@@ -24,6 +24,7 @@ todo:
 - S3::Upload, list, download and delete an object
 - S3::Upload and stat with metadata
 - S3::Copy object
+- S3::Close
 
 jobs:
 # -------------
@@ -44,6 +45,11 @@ jobs:
   exec: |
     loadLib("s3.js");
     global.s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+
+# ---------------
+- name: S3::Close
+  exec: |
+    global.s3.close()
 
 # ---------------------------------------
 - name: S3::Create, list and remove bucket

@@ -30,6 +30,7 @@ jobs:
       loadLib("s3.js")
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
       s3.makeBucket(args.bucket, args.region)
+      s3.close()
       
   # ----------------------
   - name : S3 List Buckets
@@ -61,6 +62,7 @@ jobs:
       loadLib("s3.js")
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
       args.list = s3.listBuckets()
+      s3.close()
 
   # --------------
   - name : S3 List
@@ -128,6 +130,8 @@ jobs:
         _met.type        = "s3"
         ow.oJob.setMetric(args.metric, _met)
       }
+
+      s3.close()
       
   #------------------------
   - name : S3 Remove bucket
@@ -156,7 +160,8 @@ jobs:
     exec : |      
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.removeBucket(args.bucket);       
+      s3.removeBucket(args.bucket);      
+      s3.close() 
 
   #---------------------
   - name : S3 Put object
@@ -195,6 +200,7 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.putObject(args.bucket, args.objectName, args.localPath, args.meta);  
+      s3.close()
 
   # --------------------
   - name : S3 Get object
@@ -232,6 +238,7 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.getObject(args.bucket, args.objectName, args.localPath);
+      s3.close()
 
   # ----------------------
   - name: S3 Remove object
@@ -265,6 +272,7 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.removeObject(args.bucket, args.objectName);
+      s3.close()
 
   # ----------------------------------
   - name : S3 Remove objects by prefix
@@ -301,6 +309,7 @@ jobs:
       loadLib("s3.js")
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
       s3.removeObjectsByPrefix(args.bucket, args.prefix, args.limitPerCall)
+      s3.close()
 
   # ---------------------
   - name : S3 Copy object
@@ -349,6 +358,7 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.copyObject(args.sourceBucket, args.sourceObject, args.targetBucket, args.targetObject, args.meta, args.copyOptions);
+      s3.close()
 
   # ---------------------
   - name : S3 Sync folder
@@ -411,3 +421,5 @@ jobs:
       if (args.execute) {
         s3.execActions(args.actions, __, __, args.numThreads)
       }
+      
+      s3.close()

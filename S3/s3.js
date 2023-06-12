@@ -14,17 +14,29 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertChe
 
     aURL = _$(aURL).default("https://s3.amazonaws.com")
 
+    this.httpClient = new Packages.okhttp3.OkHttpClient()
+
     if (isDef(aAccessKey)) {
-        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret))
+        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).httpClient(this.httpClient).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret))
         if (isDef(aRegion)) this.s3 = this.s3.region(aRegion)
     } else {
-        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL)
+        this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).httpClient(this.httpClient)
         if (aURL.indexOf(".amazonaws.com") > 0) this.s3 = this.s3.credentialsProvider(new Packages.io.minio.credentials.IamAwsProvider(null, null))
     }
     this.s3 = this.s3.build()
     if (ignoreCertCheck) this.s3 = this.s3.ignoreCertCheck()
 
     this.useVersion1 = useVersion1
+}
+
+/**
+ * <odoc>
+ * <key>S3.close()</key>
+ * Tries to close the current client. After this, no other calls will be possible.
+ * </odoc>
+ */
+S3.prototype.close = function() {
+    this.httpClient.dispatcher().executorService().shutdown()
 }
 
 /**

@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230602'
+version: '20230611'
 dependencies:
   OpenAF: '>=20210515'
 files:
@@ -39,6 +39,6 @@ filesHash:
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   minio-8.5.3-all.jar: 14d6260b79bf80e6e4207361b2f9bbd6fb24d986
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
-  s3-test.yaml: 8784b42f051817565ccb5b6961af82e61235d501
-  s3.js: 9786d70a3b8b27e7eae1d6293c5edd29663da192
-  s3.yaml: 27dbd3f3f9ef1ce3f9f4dd4a4ca686a52b10c7fc
+  s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
+  s3.js: b293081d8e3e580eace1304bf9dfe20462c4bdcd
+  s3.yaml: 07e28faf838fc79dc7a8af01b9812349f5c6ce7f
