@@ -177,5 +177,30 @@
             <artifactId>etcd-java</artifactId>
             <version>0.0.21</version>
         </dependency>
+        <dependency>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <version>8.1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projog</groupId>
+            <artifactId>projog-core</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ucanaccess</groupId>
+            <artifactId>ucanaccess</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amihaiemil.web</groupId>
+            <artifactId>docker-java-api</artifactId>
+            <version>0.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-nio</artifactId>
+            <version>0.126.6</version>
+        </dependency>
     </dependencies>
 </project>
