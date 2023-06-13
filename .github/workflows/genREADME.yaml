@@ -21,7 +21,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run genREADME
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'genREADME.yaml'
         dist: nightly
@@ -29,7 +29,7 @@ jobs:
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/contentIn paths="README.md"'
         dist: nightly
@@ -37,7 +37,7 @@ jobs:
     - name: Commit badges changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/contentIn paths=".github/badges/"'
         dist: nightly
