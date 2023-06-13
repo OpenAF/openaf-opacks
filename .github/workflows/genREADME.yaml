@@ -31,7 +31,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v3
       with:
-        ojob: 'ojob.io/git/hub/contentIn'
+        ojob: 'ojob.io/git/hub/contentIn paths=README.md'
         dist: nightly
         
     - name: Commit badges changes
