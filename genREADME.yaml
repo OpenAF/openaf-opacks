@@ -96,10 +96,10 @@ jobs:
         \n\
         List of OpenAF opacks:\n\
         \n\
-        | Name   | Description   | Version |\n\
-        |--------|---------------|---------|\n\
+        | Name   | Description   |\n\
+        |--------|---------------|\n\
         {{#each opacks}}\n\
-        {{#if name}}|{{name}}|{{description}}|![.github/badges/{{name}}.svg](.github/badges/{{name}}.svg)|{{/if}}\n\
+        {{#if name}}|![.github/badges/{{name}}.svg](.github/badges/{{name}}.svg)|{{description}}|{{/if}}\n\
         {{/each}}\n\
         \
       ", { opacks: $from($ch("outputs").getAll()).sort("name").select() }));
