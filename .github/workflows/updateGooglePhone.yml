@@ -17,11 +17,11 @@ jobs:
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
       with:
-        key : oaf-t8
+        key : oaf-nightly
         path: /tmp/oaf
 
     - name: Run GooglePhone
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         script: |
           // Run update ojob
@@ -46,13 +46,13 @@ jobs:
             .prefix("opack")
             .get()
           }
-        dist: t8
+        dist: nightly
 
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/contentIn'
-        args: 'message="Update\ GooglePhone" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
-        dist: t8
+        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        dist: nightly
