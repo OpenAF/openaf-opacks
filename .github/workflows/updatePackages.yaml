@@ -21,7 +21,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run updatePacks
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'updatePacks.yaml'
         dist: t8
@@ -29,7 +29,7 @@ jobs:
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v3
+      uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/contentIn'
         args: 'message="Update\ packs" title="Update\ packs"'
