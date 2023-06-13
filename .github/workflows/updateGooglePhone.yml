@@ -25,7 +25,7 @@ jobs:
       with:
         script: |
           // Run update ojob
-          var res = $sh(getOpenAFPath() + "ojob updateGooglePhoneNumber.yaml").sh("rm -rf .openaf_precompiled").pwd("GooglePhoneNumber").prefix("opack").get(0)
+          var res = $sh([getOpenAFPath() + "ojob", "updateGooglePhoneNumber.yaml"]).sh("rm -rf .openaf_precompiled").pwd("GooglePhoneNumber").prefix("opack").get(0)
           
           if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
             // Store results
