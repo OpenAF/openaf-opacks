@@ -33,15 +33,17 @@ jobs:
       for(var ii in args.v) {
         var pack = args.v[ii]
         
-        log(" generating badge '.github/badges/" + pack.name + ".svg'")
-        $job("Badgen generate file", {
-           label     : pack.name,
-           labelColor: "grey3",
-           color     : "blue",
-           status    : String(pack.version),
-           icon      : "openaf_grey.svg",
-           file      : ".github/badges/" + pack.name + ".svg"
-        })
+        if (isDef(pack.name)) {
+          log(" generating badge '.github/badges/" + pack.name + ".svg'")
+          $job("Badgen generate file", {
+            label     : pack.name,
+            labelColor: "grey3",
+            color     : "blue",
+            status    : String(pack.version),
+            icon      : "openaf_grey.svg",
+            file      : ".github/badges/" + pack.name + ".svg"
+          })
+        }
       }
   
   #####################################
@@ -94,10 +96,10 @@ jobs:
         \n\
         List of OpenAF opacks:\n\
         \n\
-        | Name   | Description   |\n\
-        |--------|---------------|\n\
+        | Name   | Description   | Version |\n\
+        |--------|---------------|---------|\n\
         {{#each opacks}}\n\
-        |{{name}}|{{description}}|\n\
+        {{#if name}}|{{name}}|{{description}}|![.github/badges/{{name}}.svg](.github/badges/{{name}}.svg)|{{/if}}\n\
         {{/each}}\n\
         \
       ", { opacks: $from($ch("outputs").getAll()).sort("name").select() }));

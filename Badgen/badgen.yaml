@@ -28,14 +28,14 @@ jobs:
       style     : isString.oneOf(['flat','classical']).default(__)
       icon      : isString.default(__)
   exec : |
-    var r = require("badgen.js")
-    io.writeFileString(args.file, r.badgen({
+    loadLib("badgen.js")
+    io.writeFileString(args.file, badgen.badgen({
       label     : args.label,
       status    : args.status,
       color     : args.color,
       labelColor: args.labelColor,
       style     : args.style,
-      icon      : (isDef(args.icon) ? r.fromSVG(args.icon) : __)
+      icon      : (isDef(args.icon) ? badgen.fromSVG(args.icon) : __)
     }))
 
 # ---------------------------
