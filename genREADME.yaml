@@ -99,7 +99,7 @@ jobs:
         | Name   | Description   |\n\
         |--------|---------------|\n\
         {{#each opacks}}\n\
-        {{#if name}}|![.github/badges/{{name}}.svg](.github/badges/{{name}}.svg)|{{description}}|{{/if}}\n\
+        {{#if name}}|<img src=".github/badges/{{name}}.svg" height=60>|{{description}}|{{/if}}\n\
         {{/each}}\n\
         \
       ", { opacks: $from($ch("outputs").getAll()).sort("name").select() }));
