@@ -84,22 +84,22 @@ jobs:
         .select()
       );
 
-      $ch("opacks").waitForJobs();
-      $ch("outputs").waitForJobs();
+      $ch("opacks").waitForJobs()
+      $ch("outputs").waitForJobs()
 
+  # ------------------------
   - name: Generate README.md
     deps: 
-      - Get list of opacks
+    - Get list of opacks
     exec: |
-      io.writeFileString("README.md", templify("\
-        # openaf-opacks\n\
-        \n\
-        List of OpenAF opacks:\n\
-        \n\
-        | Name   | Description   |\n\
-        |--------|---------------|\n\
-        {{#each opacks}}\n\
-        {{#if name}}|<img src=".github/badges/{{name}}.svg" height=60>|{{description}}|{{/if}}\n\
-        {{/each}}\n\
-        \
-      ", { opacks: $from($ch("outputs").getAll()).sort("name").select() }));
+      io.writeFileString("README.md", templify(`
+        # openaf-opacks
+        
+        List of OpenAF opacks:
+        
+        | Name   | Description   |
+        |--------|---------------|
+        {{#each opacks}}
+        {{#if name}}|<img src=".github/badges/{{name}}.svg" height=60>|{{description}}|{{/if}}
+        {{/each}}
+      `, { opacks: $from($ch("outputs").getAll()).sort("name").select() }));
