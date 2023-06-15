@@ -55,6 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v4
       with:
-        ojob: 'ojob.io/git/hub/contentIn'
+        ojob: 'ojob.io/git/hub/checkIn'
         args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
         dist: t8
