@@ -48,7 +48,7 @@ jobs:
             .prefix("opack")
             .get()
           }
-        dist: nightly
+        dist: t8
 
     - name: Commit changes
       env :
@@ -56,5 +56,5 @@ jobs:
       uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/contentIn'
-        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
-        dist: nightly
+        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        dist: t8
