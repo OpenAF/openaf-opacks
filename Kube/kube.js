@@ -118,7 +118,7 @@ var $kube = function(aMap) {
 var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 	plugin("HTTP");
 	ow.loadFormat();
-	this.url = aURL; 
+	this.url = aURLorFile; 
 	this.user = aUser;
 	this.pass = aPass;
 	
@@ -127,10 +127,10 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 
 	aWSTimeout = _$(aWSTimeout).isNumber().default(5000);
 	
-	if (isUnDef(aURL)) {
+	if (isUnDef(aURLorFile)) {
 		this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build();
 	} else {
-		if (aURL.toLowerCase().startsWith("http")) {
+		if (aURLorFile.toLowerCase().startsWith("http")) {
 			if (isDef(aToken)) {
 				this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder())
 				.withMasterUrl(this.url)
@@ -148,10 +148,10 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 				.build();
 			}
 		} else {
-			if (io.fileExists(aURL)) {
+			if (io.fileExists(aURLorFile)) {
 				sync(() => {
 					var oldValue = java.lang.System.getProperty("kubeconfig")
-					java.lang.System.setProperty("kubeconfig", aURL)
+					java.lang.System.setProperty("kubeconfig", aURLorFile)
 					this.config = (new Packages.io.fabric8.kubernetes.client.ConfigBuilder()).build()
 					if (oldValue == null) 
 						java.lang.System.clearProperty("kubeconfig")
@@ -159,7 +159,7 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 						java.lang.System.setProperty("kubeconfig", oldValue)
 				})
 			} else {
-				throw "'" + aURL + "' not found."
+				throw "'" + aURLorFile + "' not found."
 			}
 		}
 	}
