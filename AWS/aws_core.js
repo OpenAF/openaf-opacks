@@ -24,45 +24,52 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
 };
 
 AWS.prototype._imds = function() {
-        var _role, _cred, _token
+   var _role, _cred, _token
 
-        if (ow.net.testPort("169.254.169.254", 80)) {
-                // IMDSv1
-                var url = "http://169.254.169.254/latest/meta-data"
-                var uris = "/iam/security-credentials"
-                try {
-                        if ($rest().get(url).responseCode == 200) {
-                                var _r = $rest().get(url + uris)
-                                if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
-                                        throw "Problem trying to use IMDSv1: No IAM role was found."
-                                } else {
-                                        _role = _r.trim().split("\n")[0]
-                                        _cred = $rest().get(url + uris + "/" + _role)
-                                        if (_cred.Code != "Success") throw "Problem trying to use IMDSv1: " + af.toSLON(_cred)
-                                }
-                        } else {
-                                // IMDSv2
-                                _token = $rest({ requestHeaders: { "X-aws-ec2-metadata-token-ttl-seconds": 21600 } }).put("http://169.254.169.254/latest/api/token")
-                                var rh = { requestHeaders: { "X-aws-ec2-metadata-token": _token } }
-                                var _r = $rest(rh).get(url + uris)
-                                if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
-                                        throw "Problem trying to use IMDSv2: No IAM role was found."
-                                } else {
-                                        _role = _r.trim().split("\n")[0]
-                                        _cred = $rest(rh).get(url + uris + "/" + _role)
-                                        if (_cred.Code != "Success") throw "Problem trying to use IMDSv2: " + af.toSLON(_cred)
-                                }
-                        }
-                } catch(e) {
-                        throw "Problem trying to determine or use AWS IMDS: " + String(e)
-                }
+   if (ow.net.testPort("169.254.169.254", 80)) {
+           // IMDSv1
+           var url = "http://169.254.169.254/latest/meta-data"
+           var uris = "/iam/security-credentials"
+           try {
+                   var _res = $rest().get(url)
+                   if (isMap(_res) && isDef(_res.responseCode) && _res.responseCode == 200) {
+                           var _r = $rest().get(url + uris)
+                           if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
+                                   throw "Problem trying to use IMDSv1: No IAM role was found."
+                           } else {
+                                   if (isMap(_r)) throw "Problem trying to use IMDSv1: " + af.toSLON(_r)
+                                   _role = _r.trim().split("\n")[0]
+                                   _cred = $rest().get(url + uris + "/" + _role)
+                                   if (_cred.Code != "Success") throw "Problem trying to use IMDSv1: " + af.toSLON(_cred)
+                           }
+                   } else {
+                           if (isMap(_res) && isDef(_res.error) && _res.error.responseCode != 401) {
+                                   throw "error accessing IMDS: " + af.toSLON(_res) + (_res.error.responseCode == 403 ? " (Is the AWS instance metadata service enabled?)" : "")
+                           }
 
-      return {
-         accessKey: _cred.AccessKeyId,
-         secretKey: _cred.SecretAccessKey,
-         token    : _cred.Token
-      }
-        } else {
+                           // IMDSv2
+                           _token = $rest({ requestHeaders: { "X-aws-ec2-metadata-token-ttl-seconds": 21600 } }).put("http://169.254.169.254/latest/api/token")
+                           var rh = { requestHeaders: { "X-aws-ec2-metadata-token": _token } }
+                           var _r = $rest(rh).get(url + uris)
+                           if (isMap(_r) && isDef(_r.error) && isDef(_r.error.responseCode) && _r.error.responseCode == 404) {
+                                   throw "Problem trying to use IMDSv2: No IAM role was found."
+                           } else {
+                                   if (isMap(_r)) throw "Problem trying to use IMDSv2: " + af.toSLON(_r)
+                                   _role = _r.trim().split("\n")[0]
+                                   _cred = $rest(rh).get(url + uris + "/" + _role)
+                                   if (_cred.Code != "Success") throw "Problem trying to use IMDSv2: " + af.toSLON(_cred)
+                           }
+                   }
+           } catch(e) {
+                   throw "Problem trying to determine or use AWS IMDS: " + String(e)
+           }
+
+           return {
+                   accessKey: _cred.AccessKeyId,
+                   secretKey: _cred.SecretAccessKey,
+                   token    : _cred.Token
+           }
+   } else {
       return __
    }
 }
