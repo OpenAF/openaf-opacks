@@ -27,17 +27,17 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- minio-8.5.3-all.jar
+- minio-8.5.4-all.jar
 - s3-ojob-test.yaml
 - s3-test.yaml
 - s3.js
 - s3.yaml
 filesHash:
-  .maven.yaml: 385b019cb824f610343148962d4cd53c6ae620d0
+  .maven.yaml: 10eda64ea44957f2508649f195c4f9871057fdfe
   .odoc.db: b48947451bbbfaeaed852effb74ccc7c0a7b8efd
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
-  minio-8.5.3-all.jar: 14d6260b79bf80e6e4207361b2f9bbd6fb24d986
+  minio-8.5.4-all.jar: 09a0c788c18fe8522f65303b4a2a886cad98a827
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
   s3.js: b340b9ff6d129b5e5a7ec4b768afe602f7a9a215
