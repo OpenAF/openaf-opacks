@@ -21,9 +21,9 @@ version: '20230628'
 dependencies:
   openaf: '>=20230325'
 files:
+- .package.yaml
 - README.md
 - rust.yaml
-- .package.yaml
 filesHash:
   README.md: 8d51d96fb15aa24d3b56cac4bdfbc31aa0399e28
   rust.yaml: ef2750d583db68f59ba5585cd1597249ddb146a3
