@@ -1,4 +1,4 @@
-name: Update GooglePhone
+name: Update Packs
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
   - cron: '03 7 * * *'
 
 jobs:
-  update-googlephone:
+  update-packs:
     runs-on    : ubuntu-latest
     permissions:
       contents: write
@@ -45,6 +45,35 @@ jobs:
             // Update pack
             $sh(getOpenAFPath() + "opack genpack .")
             .pwd("GooglePhoneNumber")
+            .prefix("opack")
+            .get()
+          }
+        dist: t8
+
+    - name: Run GoogleCompiler
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          // Run update ojob
+          var res = $sh([getOpenAFPath() + "oaf", "-f", "main.js", "-e", "--update"])
+                    .pwd("GoogleCompiler")
+                    .get(0)
+                    
+          print(res.stdout)
+          printErr(res.stderr)
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of GoogleCompiler oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
+
+            // Bump opack version
+            var opack = io.readFileJSON("GoogleCompiler/.package.json")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileJSON("GoogleCompiler/.package.json", opack)
+
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("GoogleCompiler")
             .prefix("opack")
             .get()
           }
