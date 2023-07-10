@@ -50,6 +50,15 @@ jobs:
           }
         dist: t8
 
+    - name: Commit changes GooglePhoneNumber
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        dist: t8
+
     - name: Run GoogleCompiler
       uses: openaf/ojob-action@v4
       with:
@@ -79,11 +88,11 @@ jobs:
           }
         dist: t8
 
-    - name: Commit changes
+    - name: Commit GoogleCompiler
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
         dist: t8
