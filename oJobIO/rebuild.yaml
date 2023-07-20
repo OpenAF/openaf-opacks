@@ -146,7 +146,8 @@ jobs:
     io.mv("_output", args.output)
 
     log("Creating _output.zip...")
-    $sh("sudo apk add zip")
+    $sh("sudo apk add zip").exec()
+    $sh()
     .pwd(args.output)
     .sh(getOpenAFPath() + "ojob hash.yaml url=. file=_integrity.json")
     .sh("zip -9r _output.zip *")
