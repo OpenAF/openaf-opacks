@@ -18,7 +18,7 @@ name: oJobIO
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230510'
+version: '20230719'
 dependencies:
   openaf: '>=20220822'
 files:
