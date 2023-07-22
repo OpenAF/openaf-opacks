@@ -34,6 +34,7 @@ jobs:
   check:
     in:
       output: isString.default("output")
+      compile: toBoolean.isBoolean.default(false)
   deps :
   - Get oJob-commons
   - Copy content
@@ -112,14 +113,16 @@ jobs:
               source : f,
               target : f.replace(/\.(ya?ml)$/, ".json")
             }, cuuid.inc(), { shareArgs: false }, true*/
-            /*$sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
-              source : f,
-              target : f.replace(/\.(ya?ml)$/, ".json")
-            }))
-            .exec()*/
+            if (args.compile) {
+              $sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
+                source : f,
+                target : f.replace(/\.(ya?ml)$/, ".json")
+              }))
+              .exec()
+            }
             var _target = f.replace(/\.(ya?ml)$/, ".json")
             if (!io.fileExists(_target)) {
-              io.writeFileJSON(_target, io.readFileJSON(f), "")
+              io.writeFileJSON(_target, (args.compile ? io.readFileJSON(f) : io.readFileYAML(f)), "")
               io.cp(_target, _target.replace(/\.json$/, ""))
             }
           }))
