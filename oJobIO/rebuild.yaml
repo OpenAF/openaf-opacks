@@ -4,6 +4,16 @@ init:
   url   : ojob.io
   proto : https
   lname : 7
+  intro : |
+    These are a set of frequent routines (denominated [oJobs](https://docs.openaf.io/docs/concepts/oJob)) across several domains. 
+    To execute any of them you just need to [install OpenAF](https://docs.openaf.io/#installing) and execute:
+
+    ````bash
+    ojob {{URL}}/domain/routine param1=value1 param2=value2
+    ```` 
+
+    Clicking on each of the links below will get you a brief explanation and example of each oJob available in this repository.
+    You can also check more execution options on the [ojob.io documentation](https://docs.openaf.io/docs/concepts/oJobIO.html).
 
 todo:
 - ojob final report
@@ -63,6 +73,7 @@ jobs:
     })
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n"
+    mdindex += mdindex + $templify(args.init.intro, args) + "\n"
     var htmlmdindex = mdindex
     var cuuid = $atomic()
     var tasks = []
