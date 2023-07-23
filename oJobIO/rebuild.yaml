@@ -175,6 +175,7 @@ jobs:
     var git = new GIT()
     git.clone("https://github.com/openaf/oJob-common.git", "_output/common")
     io.rm("_output/common/.git")
+    io.rm("_output/common/.github")
 
 # ------------------
 - name: Copy content
