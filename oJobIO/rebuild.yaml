@@ -73,7 +73,7 @@ jobs:
     })
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n"
-    mdindex += mdindex + $templify(args.init.intro, args) + "\n"
+    mdindex += mdindex + templify(args.init.intro, args) + "\n"
     var htmlmdindex = mdindex
     var cuuid = $atomic()
     var tasks = []
