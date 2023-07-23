@@ -38,6 +38,11 @@ jobs:
   exec: |
     io.rm("_output")
     io.mkdir("_output")
+    $sh("sudo apk add zip unzip").exec()
+    if (io.fileExists("_output.zip")) {
+      $sh("cd _output && unzip ../_output.zip").exec()
+    }
+    global.diff = []
 
 # --------------------
 - name : Finish output
@@ -78,7 +83,7 @@ jobs:
     var cuuid = $atomic()
     var tasks = []
 
-    lp.forEach(f => {
+    lp.filter(r => global.diff.indexOf(r.replace(/^_output\//, "/")) >= 0).forEach(f => {
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
          htmlmdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
@@ -160,7 +165,6 @@ jobs:
     io.mv("_output", args.output)
 
     log("Creating _output.zip...")
-    $sh("sudo apk add zip").exec()
     $sh()
     .pwd(args.output)
     .sh(getOpenAFPath() + "ojob hash.yaml url=. file=_integrity.json")
@@ -182,12 +186,24 @@ jobs:
   deps: Prepare output
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
+       var _t = "_output" + r.filepath.replace(/^ojobs\//, "/")
+       if (io.fileExists(_t)) {
+         var _ss = io.readFileStream(r.canonicalPath)
+         var _ts = io.readFileStream(_t)
+         var _s5 = md5(_ss)
+         var _t5 = md5(_ts)
+         _ss.close()
+         _ts.close()
+         if (_s5 != _t5) global.diff.push(_t)
+       } else {
+        global.diff.push(_t)
+       }
        if (r.isFile) {
          log("Copying " + r.filepath + "...")
-         io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"))
+         io.cp(r.canonicalPath, _t)
        } else {
          log("Creating folder " + r.filepath + "...")
-         io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
+         io.mkdir(_t)
        }
     })
 
