@@ -187,6 +187,7 @@ jobs:
   deps: Prepare output
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
+      try {
        var _t = "_output" + r.filepath.replace(/^ojobs\//, "/")
        if (io.fileExists(_t)) {
          var _ss = io.readFileStream(r.canonicalPath)
@@ -206,6 +207,9 @@ jobs:
          log("Creating folder " + r.filepath + "...")
          io.mkdir(_t)
        }
+      } catch(e) {
+         logErr("Error while copying " + r.filepath + ": " + e)
+      }
     })
 
 # ---------------------------
