@@ -105,7 +105,6 @@ jobs:
 
        if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any() || isDef(j.help)) {
         tasks.push($do(() => {
-          log("Generating markdown for " + f + "...")
           /*oJobRunFile("ojobs/doc.yaml", {
             job   : f,
             name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
@@ -114,6 +113,7 @@ jobs:
             html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
           }, cuuid.inc(), { shareArgs: false }, true)*/
           if (global.diff.indexOf(_o) < 0) {
+            log("Generating markdown for " + f + "...")
             $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
               job   : f,
               name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
@@ -123,12 +123,14 @@ jobs:
             }))
             .exec()
           } else {
+            log("Copying markdown for " + f + "...")
             io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md"), f.replace(/(\.ya?ml|\.json)$/, ".md"))
             io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html"), f.replace(/(\.ya?ml|\.json)$/, ".html"))
           }
         }).catch(e => logErr(f + " | " + e)))
+       }
 
-        if ( isDef(j) && (f.match(/\.(ya?ml)$/)) ) {
+       if (isDef(j) && isDef(j.jobs) && (f.match(/\.(ya?ml)$/)) ) {
           tasks.push($do(() => {
             log("Generate static version for " + f + "...")
             /*oJobRunFile("ojobs/compile.yaml", {
@@ -192,12 +194,14 @@ jobs:
 
 # ------------------
 - name: Copy content
-  deps: Prepare output
+  deps:
+  - Prepare output
+  - Get oJob-commons
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
       try {
        var _t = "_tmp" + r.filepath.replace(/^ojobs\//, "/")
-       if (io.fileExists(_t)) {
+       if (io.fileExists(_t) && r.isFile) {
          var _ss = io.readFileStream(r.canonicalPath)
          var _ts = io.readFileStream(_t)
          var _s5 = md5(_ss)
