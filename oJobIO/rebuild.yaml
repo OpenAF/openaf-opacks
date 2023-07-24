@@ -112,7 +112,7 @@ jobs:
             output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
             html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
           }, cuuid.inc(), { shareArgs: false }, true)*/
-          if (global.diff.indexOf(_o) < 0) {
+          if (global.diff.indexOf("_tmp/" + _o) < 0) {
             log("Generating markdown for " + f + "...")
             $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
               job   : f,
@@ -130,13 +130,9 @@ jobs:
         }).catch(e => logErr(f + " | " + e)))
        }
 
-       if (isDef(j) && isDef(j.jobs) && (f.match(/\.(ya?ml)$/)) ) {
+       if (isDef(j) && (isDef(j.jobs) || isDef(j.todo)) && (f.match(/\.(ya?ml)$/)) ) {
           tasks.push($do(() => {
             log("Generate static version for " + f + "...")
-            /*oJobRunFile("ojobs/compile.yaml", {
-              source : f,
-              target : f.replace(/\.(ya?ml)$/, ".json")
-            }, cuuid.inc(), { shareArgs: false }, true*/
             if (args.compile) {
               $sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
                 source : f,
@@ -145,18 +141,21 @@ jobs:
               .exec()
             }
             var _target = f.replace(/\.(ya?ml)$/, ".json")
+            log("Checking for " + _target + "...")
             if (!io.fileExists(_target)) {
+              log("Write to " + _target + "...")
               io.writeFileJSON(_target, (args.compile ? io.readFileJSON(f) : io.readFileYAML(f)), "")
+              log("Write to " + _target.replace(/\.json$/, ""))
               io.cp(_target, _target.replace(/\.json$/, ""))
             }
           }))
         }
+       }
 
-        if (!io.fileInfo(f).filename.startsWith("_")) {
-          var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
-          mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
-          htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
-        }
+       if (!io.fileInfo(f).filename.startsWith("_")) {
+         var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
+         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
+         htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
        }
        return 1
     })
