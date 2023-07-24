@@ -39,10 +39,10 @@ jobs:
     io.rm("_output")
     io.mkdir("_output")
     $sh("sudo apk add zip unzip").exec()
-    /*if (io.fileExists("_output.zip")) {
-      $sh("cd _output && unzip ../_output.zip").exec()
-    }*/
     global.diff = []
+    if (io.fileExists("_output.zip")) {
+      $sh("mkdir _tmp && cd _tmp && unzip ../_output.zip").exec()
+    }
 
 # --------------------
 - name : Finish output
@@ -68,12 +68,12 @@ jobs:
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
           var orig = r.filepath
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "")
-          if (r.filename != ".package.yaml" && !r.filename.startsWith("_")) {
+          if (r.filename != ".package.yaml") {
             l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") )
             lp.push(orig)
           }
        } else {
-          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css" && !r.filename.startsWith("_")) lp.push(r.filepath)
+          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css") lp.push(r.filepath)
        }
     })
 
@@ -83,8 +83,8 @@ jobs:
     var cuuid = $atomic()
     var tasks = []
 
-    //lp.filter(r => global.diff.indexOf(r.replace(/^_output\//, "/")) >= 0).forEach(f => {
     lp.forEach(f => {
+       var _o = f.replace(/^_output\//, "")
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
          htmlmdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
@@ -113,16 +113,21 @@ jobs:
             output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
             html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
           }, cuuid.inc(), { shareArgs: false }, true)*/
-          $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
-            job   : f,
-            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
-            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
-            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
-          }))
-          .exec()
+          if (global.diff.indexOf(_o) < 0) {
+            $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
+              job   : f,
+              name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
+              mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
+              output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
+              html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
+            }))
+            .exec()
+          } else {
+            io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md"), f.replace(/(\.ya?ml|\.json)$/, ".md"))
+            io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html"), f.replace(/(\.ya?ml|\.json)$/, ".html"))
+          }
         }).catch(e => logErr(f + " | " + e)))
- 
+
         if ( isDef(j) && (f.match(/\.(ya?ml)$/)) ) {
           tasks.push($do(() => {
             log("Generate static version for " + f + "...")
@@ -145,9 +150,11 @@ jobs:
           }))
         }
 
-        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
-        mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
-        htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
+        if (!io.fileInfo(f).filename.startsWith("_")) {
+          var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
+          mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
+          htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
+        }
        }
        return 1
     })
@@ -189,7 +196,7 @@ jobs:
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
       try {
-       var _t = "_output" + r.filepath.replace(/^ojobs\//, "/")
+       var _t = "_tmp" + r.filepath.replace(/^ojobs\//, "/")
        if (io.fileExists(_t)) {
          var _ss = io.readFileStream(r.canonicalPath)
          var _ts = io.readFileStream(_t)
@@ -197,7 +204,7 @@ jobs:
          var _t5 = md5(_ts)
          _ss.close()
          _ts.close()
-         if (_s5 != _t5) global.diff.push(_t)
+         if (_s5 == _t5) global.diff.push(_t)
        } else {
         global.diff.push(_t)
        }
