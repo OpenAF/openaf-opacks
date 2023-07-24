@@ -177,6 +177,7 @@ jobs:
   exec: |
     plugin("GIT")
     var git = new GIT()
+    io.rm("_output/common")
     git.clone("https://github.com/openaf/oJob-common.git", "_output/common")
     io.rm("_output/common/.git")
     io.rm("_output/common/.github")
