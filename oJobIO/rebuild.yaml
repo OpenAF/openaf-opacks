@@ -39,9 +39,9 @@ jobs:
     io.rm("_output")
     io.mkdir("_output")
     $sh("sudo apk add zip unzip").exec()
-    if (io.fileExists("_output.zip")) {
+    /*if (io.fileExists("_output.zip")) {
       $sh("cd _output && unzip ../_output.zip").exec()
-    }
+    }*/
     global.diff = []
 
 # --------------------
