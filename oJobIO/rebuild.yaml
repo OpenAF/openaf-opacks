@@ -83,7 +83,8 @@ jobs:
     var cuuid = $atomic()
     var tasks = []
 
-    lp.filter(r => global.diff.indexOf(r.replace(/^_output\//, "/")) >= 0).forEach(f => {
+    //lp.filter(r => global.diff.indexOf(r.replace(/^_output\//, "/")) >= 0).forEach(f => {
+    lp.forEach(f => {
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
          htmlmdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
