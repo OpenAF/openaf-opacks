@@ -210,10 +210,10 @@ jobs:
        }
        if (r.isFile) {
          log("Copying " + r.filepath + "...")
-         io.cp(r.canonicalPath, _t)
+         io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"))
        } else {
          log("Creating folder " + r.filepath + "...")
-         io.mkdir(_t)
+         io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
        }
       } catch(e) {
          logErr("Error while copying " + r.filepath + ": " + e)
