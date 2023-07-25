@@ -271,6 +271,38 @@ S3.prototype.putObject = function(aBucket, aObjectName, aLocalPath, aMetaMap) {
 
 /**
  * <odoc>
+ * <key>S3.putSnowballObjects(aBucket, aPrefix, anArrayOfFilepaths, aLocalPrefix)</key>
+ * Puts, using a single snowball (tar) file, all the filepaths provided in anArrayOfFilepaths or a string representing a folder (from which all files
+ * will be recursively determined) into aBucket with aPrefix.
+ * Optionally if an array of file paths is provided aLocalPrefix can be provided to remove the corresponding folder path from the filepaths to use.
+ * </odoc>
+ */
+S3.prototype.putSnowballObjects = function(aBucket, aPrefix, anArrayOfFilepaths, aLocalPrefix) {
+    _$(aBucket, "aBucket").isString().$_("Please provide a bucket name.")
+    _$(aPrefix, "aPrefix").isString().$_("Please provide an object prefix.")
+    _$(anArrayOfFilepaths, "anArrayOfFilepaths").$_("Please provide an array of filepaths or a folder")
+    _$(aLocalPrefix, "aLocalPrefix").isString().default("")
+
+    // If anArrayOfFilepaths is actually a folder make the conversion
+    if (io.fileExists(anArrayOfFilepaths) && io.fileInfo(anArrayOfFilepaths).isDirectory) {
+        aLocalPrefix = anArrayOfFilepaths
+        anArrayOfFilepaths = listFilesRecursive(anArrayOfFilepaths).filter(f => f.isFile).map(f => f.filepath)
+    }
+
+    _$(anArrayOfFilepaths, "anArrayOfFilepaths").isArray().$_("Please provide an array of filepaths or a folder")
+
+    // Check aPrefix
+    if (!aPrefix.endsWith("/") && aPrefix.length > 0) aPrefix = aPrefix + "/"
+
+    // Convert list of files into an array of snowball objects
+    var objs = anArrayOfFilepaths.map(f => new Packages.io.minio.SnowballObject(aPrefix + f.replace(new RegExp("^" + aLocalPrefix), ""), String(f)))
+    cprint(objs.map(f => f.filename()))
+    var cfg = Packages.io.minio.UploadSnowballObjectsArgs.builder().bucket(aBucket).compression(true).object(aPrefix).objects(objs)
+    this.s3.uploadSnowballObjects(cfg.build())
+}
+
+/**
+ * <odoc>
  * <key>S3.putObjectByURL(aURL, aLocalPath)</key>
  * Puts the file on aLocalPath into aURL.  Optionally you can provide a meta map.
  * Note: use "/" on the name to simulate folders.
@@ -760,7 +792,7 @@ S3.prototype.syncActions = function(aBucket, aPrefix, aLocalPath) {
 
 /**
  * <odoc>
- * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads)</key>
+ * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads, ignoreActions)</key>
  * Given anArrayOfActions produce by other S3.*Actions functions will execute them in parallel recording changes with,
  * optionally, the provided aLogFunction and aLogErrorFunction (that receive a text message). To execute actions with a 
  * given order (for example: first copy then delete) each element of anArrayOfActions should be an array of actions (e.g.
@@ -768,22 +800,28 @@ S3.prototype.syncActions = function(aBucket, aPrefix, aLocalPath) {
  * can provide the number of threads.
  * </odoc>
  */
-S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads) {
+S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads, ignoreActions) {
     var parent = this;
 
+    ignoreActions = _$(ignoreActions, "ignoreActions").isArray().default([])
     anArrayOfActions = _$(anArrayOfActions).isArray().default([]);
     aLogFunction = _$(aLogFunction).isFunction().default(log);
     aLogErrorFunction = _$(aLogErrorFunction).isFunction().default(logErr);
 
     if (isArray(anArrayOfActions[0])) {
         for(var ii in anArrayOfActions) {
-            this.execActions(anArrayOfActions[ii], aLogFunction, aLogErrorFunction);
+            this.execActions(anArrayOfActions[ii], aLogFunction, aLogErrorFunction, numThreads, ignoreActions)
         }
-        return;
+        return
     }
 
     parallel4Array(anArrayOfActions, function(action) {
         try {
+            if (ignoreActions.indexOf(action.cmd) >= 0) {
+                aLogFunction("Ignoring action: " + af.toSLON(action))
+                return true
+            }
+
             switch(action.cmd) {
             case 'get': 
                 aLogFunction("Get '" + action.sourceBucket + ":" + action.source + "' to '" + action.target + "'");

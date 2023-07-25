@@ -19,6 +19,15 @@ jobs:
       - name    : region
         desc    : The S3 region
         required: false
+    typeArgs:
+      shortcut:
+        name  : S3MakeBucket
+        keyArg: bucket
+        args  :
+          url      : url
+          accessKey: accessKey
+          secret   : secret
+          region   : region
     check:
       in:
         url      : isString
@@ -52,6 +61,14 @@ jobs:
       returns:
       - name: list
         desc: The list of buckets
+    typeArgs:
+      shortcut:
+        name: S3ListBuckets
+        args:
+          url      : url
+          accessKey: accessKey
+          secret   : secret
+          region   : region
     check :
       in:
         url          : isString
@@ -92,6 +109,19 @@ jobs:
       returns:
       - name    : list
         desc    : The corresponding list of objects
+    typeArgs:
+      shortcut:
+        name  : S3ListObjs
+        keyArg: objectPrefix
+        args  :
+          url          : url
+          bucket       : bucket
+          accessKey    : accessKey
+          secret       : secret
+          region       : region
+          needFull     : needFull
+          needRecursive: needRecursive
+          metric       : metric
     check:
       in:
         url          : isString
@@ -150,6 +180,15 @@ jobs:
         desc    : The secret key to the S3 service
       - name    : region
         desc    : The S3 region
+    typeArgs:
+      shortcut:
+        name  : S3RemoveBucket
+        keyArg: bucket
+        args  :
+          url      : url
+          accessKey: accessKey
+          secret   : secret
+          region   : region
     check:
       in:
         url      : isString
@@ -186,6 +225,18 @@ jobs:
         desc    : The local path file to send to the bucket
       - name    : meta 
         desc    : The meta map object to add to the object
+    typeArgs:
+      shortcut:
+        name  : S3PutObj
+        keyArg: objectName
+        args  :
+          localPath: localPath
+          meta     : meta
+          url      : url
+          bucket   : bucket
+          accessKey: accessKey
+          secret   : secret
+          region   : region
     check:
       in:
         url       : isString
@@ -200,6 +251,56 @@ jobs:
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
       s3.putObject(args.bucket, args.objectName, args.localPath, args.meta);  
+      s3.close()
+
+  #-------------------------------
+  - name : S3 Put snowball objects
+    help :
+      text   : Sends, a snowball tar object, to a S3 bucket based on array or folder.
+      expects:
+      - name    : url
+        desc    : The S3 endpoint URL
+        required: true
+      - name    : bucket
+        desc    : The S3 bucket name
+        required: true
+      - name    : accessKey
+        desc    : The access key to the S3 service
+      - name    : secret
+        desc    : The secret key to the S3 service
+      - name    : region
+        desc    : The S3 region
+      - name    : prefix
+        desc    : The S3 object prefix to use
+      - name    : filepaths
+        desc    : A local folder or an array of filepaths to send to the bucket via snowball tar
+      - name    : localPrefix 
+        desc    : Local path prefix to remove from the filepaths provided
+    typeArgs:
+      shortcut:
+        name  : S3PutSnowObj
+        keyArg: prefix
+        args  :
+          url        : url
+          accessKey  : accessKey
+          secret     : secret
+          region     : region
+          bucket     : bucket
+          filepaths  : filepaths
+          localPrefix: localPrefix
+    check:
+      in:
+        url        : isString
+        bucket     : isString
+        accessKey  : isString.default(__)
+        secret     : isString.default(__)
+        region     : isString.default(__)
+        prefix     : isString.default("")
+        localPrefix: isString.default(__)
+    exec : |
+      loadLib("s3.js")
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+      s3.putSnowballObjects(args.bucket, args.prefix, args.filepaths, args.localPrefix)
       s3.close()
 
   # --------------------
@@ -225,6 +326,17 @@ jobs:
       - name    : localPath
         desc    : The local path to store the object
         required: true
+    typeArgs:
+      shortcut:
+        name  : S3GetObj
+        keyArg: objectName
+        args  :
+          url      : url
+          accessKey: accessKey
+          bucket   : bucket
+          secret   : secret
+          region   : region
+          localPath: localPath
     check:
       in:
         url       : isString
@@ -260,6 +372,16 @@ jobs:
       - name    : objectName
         desc    : The S3 object name to remove
         required: true
+    typeArgs:
+      shortcut:
+        name  : S3RemoveObj
+        keyArg: objectName
+        args  :
+          url      : url
+          accessKey: accessKey
+          bucket   : bucket
+          secret   : secret
+          region   : region
     check:
       in:
         url       : isString
@@ -296,6 +418,17 @@ jobs:
         required: true
       - name    : limitPerCall
         desc    : The limit per call (AWS is limited per 1000 calls)
+    typeArgs:
+      shortcut:
+        name  : S3RemoveObjsByPrefix
+        keyArg: prefix
+        args  :
+          url         : url
+          accessKey   : accessKey
+          bucket      : bucket
+          secret      : secret
+          region      : region
+          limitPerCall: limitPerCall
     check:
       in:
         url         : isString
@@ -341,6 +474,20 @@ jobs:
         desc    : Change the S3 target object map metadata
       - name    : copyOptions
         desc    : Optionally specify a map with matchETag (string), matchETagNone (string), modified, unmodified
+    typeArgs:
+      shortcut:
+        name  : S3CopyObj
+        keyArg: copyOptions
+        args  :
+          url         : url
+          accessKey   : accessKey
+          secret      : secret
+          region      : region
+          meta        : meta
+          sourceObject: sourceObject
+          sourceBucket: sourceBucket
+          targetObject: targetObject
+          targetBucket: targetBucket
     check:
       in:
         url         : isString
@@ -388,9 +535,25 @@ jobs:
         desc    : If execute=true the actions will be executed
       - name    : numThreads
         desc    : If defined it will force the number of threads to use if execute=true
+      - name    : ignore
+        desc    : An array of actions to ignore
       returns:
       - name: actions
         desc: List of sync actions
+    typeArgs:
+      shortcut:
+        name  : S3Sync
+        keyArg: squash
+        args  :
+          url         : url
+          accessKey   : accessKey
+          secret      : secret
+          region      : region
+          bucket      : bucket
+          prefix      : prefix
+          localPath   : localPath
+          execute     : execute
+          numThreads  : numThreads
     check:
       in:
         url         : isString
@@ -403,6 +566,7 @@ jobs:
         localPath   : isString
         numThreads  : toNumber.isNumber.default(__)
         execute     : toBoolean.isBoolean.default(false)
+        ignore      : isArray.default([])
     exec : |
       loadLib("s3.js")
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
@@ -419,7 +583,7 @@ jobs:
       }
 
       if (args.execute) {
-        s3.execActions(args.actions, __, __, args.numThreads)
+        s3.execActions(args.actions, __, __, args.numThreads, args.ignore)
       }
       
       s3.close()
