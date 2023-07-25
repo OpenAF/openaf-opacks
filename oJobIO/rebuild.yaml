@@ -105,14 +105,7 @@ jobs:
 
        if (isDef(j) && isDef(j.jobs) && ($from(j.jobs).equals("name", "Help").any() || isDef(j.help))) {
         tasks.push($do(() => {
-          /*oJobRunFile("ojobs/doc.yaml", {
-            job   : f,
-            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
-            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
-            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
-          }, cuuid.inc(), { shareArgs: false }, true)*/
-          if (global.diff.indexOf("_tmp/" + _o) < 0) {
+          if (global.diff.indexOf("_tmp/" + _o) < 0 || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md")) || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html")) {
             log("Generating markdown for " + f + "...")
             $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
               job   : f,
