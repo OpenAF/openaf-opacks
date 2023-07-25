@@ -40,5 +40,5 @@ filesHash:
   minio-8.5.4-all.jar: 09a0c788c18fe8522f65303b4a2a886cad98a827
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: 92596d01fe2466f61a1d3bfedbaa75edaf14cb7e
-  s3.yaml: 07593d373b070ec75b8bc59999b34f606cbf6848
+  s3.js: 57e615cbee6dbe92f3e699da5617fa850efeade2
+  s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
