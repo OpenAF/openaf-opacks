@@ -67,7 +67,7 @@ filesHash:
   ojobs/help.yaml: fe76d69c19cd98ea76edaca9741799dee363b4dd
   ojobs/html.yaml: acddc4878f22fd826263211d1cf01c9683bdd056
   ojobs/index.html: dd122581c8cd44d0227f9c305581ffcb4b6f1b46
-  ojobs/list.yaml: 60dd60aa986524c8fdca1baef6669bdc3b46bc08
+  ojobs/list.yaml: 8d544f456de900e72f0777415086537c586ef81a
   ojobs/map.yaml: 6b3963f2be74011ceeb9f00aa4de55f928d63962
   ojobs/pipe.yaml: 5420a6e76dfc988b111f68859a6eaf225c6e90ce
   rebuild.hbs: 43daa6ce9ae912dfd75f9deb7f55976804c27fcc
