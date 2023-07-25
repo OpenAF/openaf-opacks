@@ -103,7 +103,7 @@ jobs:
          logErr("Problem reading file '" + f + "': " + String(e))
        }
 
-       if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any() || isDef(j.help)) {
+       if (isDef(j) && isDef(j.jobs) && ($from(j.jobs).equals("name", "Help").any() || isDef(j.help))) {
         tasks.push($do(() => {
           /*oJobRunFile("ojobs/doc.yaml", {
             job   : f,
@@ -129,7 +129,7 @@ jobs:
           }
         }).catch(e => logErr(f + " | " + e)))
        }
-
+       
        if (isDef(j) && (isDef(j.jobs) || isDef(j.todo)) && (f.match(/\.(ya?ml)$/)) ) {
           tasks.push($do(() => {
             log("Generate static version for " + f + "...")
@@ -149,12 +149,11 @@ jobs:
               io.cp(_target, _target.replace(/\.json$/, ""))
             }
           }))
-        }
        }
-
+       
        if (!io.fileInfo(f).filename.startsWith("_")) {
-         var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
-         mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
+         var mentry   = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
+         mdindex     += "  * [" + mentry + "](" + mentry + ".md)\n"
          htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
        }
        return 1
