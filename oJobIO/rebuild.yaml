@@ -105,7 +105,7 @@ jobs:
 
        if (isDef(j) && isDef(j.jobs) && ($from(j.jobs).equals("name", "Help").any() || isDef(j.help))) {
         tasks.push($do(() => {
-          if (global.diff.indexOf("_tmp/" + _o) < 0 || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md")) || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html")) {
+          if (global.diff.indexOf("_tmp/" + _o) < 0 || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md")) || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html")) ) {
             log("Generating markdown for " + f + "...")
             $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
               job   : f,
