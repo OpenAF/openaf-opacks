@@ -226,4 +226,6 @@ jobs:
       ioStreamCopy(os, is)
     }
 
+    io.writeFileString("_output/error.html", "Not found!")
+
     [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ].forEach(r => _copy(r, r))
