@@ -296,7 +296,6 @@ S3.prototype.putSnowballObjects = function(aBucket, aPrefix, anArrayOfFilepaths,
 
     // Convert list of files into an array of snowball objects
     var objs = anArrayOfFilepaths.map(f => new Packages.io.minio.SnowballObject(aPrefix + f.replace(new RegExp("^" + aLocalPrefix), ""), String(f)))
-    cprint(objs.map(f => f.filename()))
     var cfg = Packages.io.minio.UploadSnowballObjectsArgs.builder().bucket(aBucket).compression(true).object(aPrefix).objects(objs)
     this.s3.uploadSnowballObjects(cfg.build())
 }
