@@ -161,6 +161,12 @@ jobs:
     _tmpl.init.l = l
     io.writeFileJSON("_output/index.json", _tmpl)
     io.cp("imgs/openaf.png", "_output/logo.png")
+
+    // Generate bash auto complete
+    var lst = io.readFileJSON("_output/index.json").init.l
+    lst = lst.map(r => r.replace(/^https?:\/\//, "").replace(/\.yaml$/, ""))
+    var out = "complete -W '" + lst.join(" ") + "' -o default ojob"
+    io.writeFileString("_output/autoComplete.sh", out)
   
     io.rm(args.output)
     io.mv("_output", args.output)
