@@ -226,10 +226,14 @@ jobs:
   deps: Prepare output
   exec: |
     var _copy = (source, target) => {
-      var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
-      var os = io.writeFileStream("_output/" + target)
+      try {
+        var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
+        var os = io.writeFileStream("_output/" + target)
 
-      ioStreamCopy(os, is)
+        ioStreamCopy(os, is)
+      } catch(e) {
+        logErr("Error copying static resources from: " + e)
+      }
     }
 
     io.writeFileString("_output/error.html", "Not found!")
