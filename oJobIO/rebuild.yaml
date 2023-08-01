@@ -225,7 +225,7 @@ jobs:
 - name: Copy static resources
   deps: Prepare output
   exec: |
-    var _copy = (source, target) => {
+    var _copy = (source,target)=>{
       try {
         var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
         var os = io.writeFileStream("_output/" + target)
