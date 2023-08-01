@@ -238,4 +238,5 @@ jobs:
 
     io.writeFileString("_output/error.html", "Not found!")
 
-    [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ].forEach(r => _copy(r, r))
+    var ar = [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ]
+    ar.forEach(r => _copy(r, r))
