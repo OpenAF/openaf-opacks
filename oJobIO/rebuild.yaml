@@ -161,6 +161,7 @@ jobs:
     _tmpl.init.l = l
     io.writeFileJSON("_output/index.json", _tmpl)
     io.cp("imgs/openaf.png", "_output/logo.png")
+    io.cp("imgs/favicon.ico", "_output/favicon.ico")
 
     // Generate bash auto complete
     var lst = io.readFileJSON("_output/index.json").init.l
