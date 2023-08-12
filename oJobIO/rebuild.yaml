@@ -144,7 +144,7 @@ jobs:
           }))
        }
        
-       if (!io.fileInfo(f).filename.startsWith("_")) {
+       if (!io.fileInfo(f).filename.startsWith("_") && !(io.fileInfo(f).filepath.indexOf("/common/") >= 0) ) {
          var mentry   = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
          mdindex     += "  * [" + mentry + "](" + mentry + ".md)\n"
          htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
