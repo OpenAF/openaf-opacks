@@ -31,7 +31,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v4
       with:
-        ojob: 'ojob.io/git/hub/contentIn paths="README.md"'
+        ojob: 'ojob.io/git/hub/contentIn'
+        args: 'message="README\ changes\ {{date}}/{{time}}" title="Badge changes" paths="README.md"'
         dist: nightly
         
     - name: Commit badges changes
@@ -39,5 +40,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v4
       with:
-        ojob: 'ojob.io/git/hub/contentIn paths=".github/badges/"'
+        ojob: 'ojob.io/git/hub/contentIn'
+        args: 'message="Badge\ changes\ {{date}}/{{time}}" title="Badge changes" paths=".github/badges/"'
         dist: nightly
