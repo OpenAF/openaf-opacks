@@ -83,7 +83,7 @@ charselect
   = "mselect" / "removed" / "select" / "define"
 
 chartransform
-  = "ignoreCase" / "skipTake" / "useCase" / "toDate" / "limit" / "tail" / "head" / "take" / "skip" / "sort"
+  = "ignoreCase" / "skipTake" / "useCase" / "toDate" / "limit" / "tail" / "head" / "take" / "skip" / "sort" / "detach"
 
 charselector
   =  "averageBy" / "distinct" / "average" / "groupBy" / "countBy" / "reverse" / "group"  / "first" / "maxBy" / "sumBy" / "minBy" / "count" / "last" / "none" / "all" / "any" / "min" / "max" / "sum" / "at"
