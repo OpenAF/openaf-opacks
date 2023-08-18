@@ -6,7 +6,7 @@ scripts:
   postinstall: ''
 keywords:
 - crypto
-- bouncycaster
+- bouncycastle
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
@@ -17,17 +17,17 @@ name: BouncyCastle
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210429'
+version: '20230817'
 dependencies:
   openaf: '>=20211229'
 files:
 - .maven.yaml
 - .package.yaml
-- bcpkix-jdk15on-1.70.jar
-- bcprov-jdk15on-1.70.jar
-- bcutil-jdk15on-1.70.jar
+- bcpkix-jdk18on-1.76.jar
+- bcprov-jdk18on-1.76.jar
+- bcutil-jdk18on-1.76.jar
 filesHash:
-  .maven.yaml: 036e0228c2032ccee73593c88143905cb2fa7383
-  bcpkix-jdk15on-1.70.jar: f81e5af49571a9d5a109a88f239a73ce87055417
-  bcprov-jdk15on-1.70.jar: 4636a0d01f74acaf28082fb62b317f1080118371
-  bcutil-jdk15on-1.70.jar: 54280e7195a7430d7911ded93fc01e07300b9526
+  .maven.yaml: aaa565927eaf6b23858b95070eaec62e5be3cf71
+  bcpkix-jdk18on-1.76.jar: 10c9cf5c1b4d64abeda28ee32fbade3b74373622
+  bcprov-jdk18on-1.76.jar: 3a785d0b41806865ad7e311162bfa3fa60b3965b
+  bcutil-jdk18on-1.76.jar: 8c7594e651a278bcde18e038d8ab55b1f97f4d31
