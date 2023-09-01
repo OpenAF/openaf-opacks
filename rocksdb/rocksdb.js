@@ -11,6 +11,84 @@ ow.ch.utils.rocksdb = {
 			if (f.filename.endsWith(".log") && f.size == 0) io.rm(f.canonicalPath);
 		});
 	},
+	liveStats: function(aChannel) {
+		_$(aChannel, "aChannel").isString().$_()
+
+		if (isUnDef(ow.ch.__types.rocksdb.db[aChannel])) throw "RocksDB channel '" + aChannel + "' not found."
+
+		var _g = prop => {
+			try {
+				return ow.ch.__types.rocksdb.db[aChannel].getProperty(prop)
+			} catch(e) {
+				return __
+			}
+		}
+
+		var stats = {};
+
+		[ 
+			"rocksdb.stats",
+			"rocksdb.sstables",
+			"rocksdb.cfstats",
+			"rocksdb.cfstats-no-file-histogram",
+			"rocksdb.cf-file-histogram",
+			"rocksdb.cf-write-stall-stats",
+			"rocksdb.db-write-stall-stats",
+			"rocksdb.dbstats",
+			"rocksdb.levelstats",
+			"rocksdb.block-cache-entry-stats",
+			"rocksdb.fast-block-cache-entry-stats",
+			"rocksdb.num-immutable-mem-table",
+			"rocksdb.num-immutable-mem-table-flushed",
+			"rocksdb.mem-table-flush-pending",
+			"rocksdb.num-running-flushes",
+			"rocksdb.compaction-pending",
+			"rocksdb.num-running-compactions",
+			"rocksdb.background-errors",
+			"rocksdb.cur-size-active-mem-table",
+			"rocksdb.cur-size-all-mem-tables",
+			"rocksdb.size-all-mem-tables",
+			"rocksdb.num-entries-active-mem-table",
+			"rocksdb.num-entries-imm-mem-tables",
+			"rocksdb.num-deletes-active-mem-table",
+			"rocksbd.num-deletes-imm-mem-tables",
+			"rocksdb.estimate-num-keys",
+			"rocksdb.estimate-table-readers-mem",
+			"rocksdb.is-file-deletions-enabled",
+			"rocksdb.num-snapshots",
+			"rocksdb.oldest-snapshot-time",
+			"rocksdb.oldest-snapshot-sequence",
+			"rocksdb.num-live-versions",
+			"rocksdb.current-super-version-number",
+			"rocksdb.estimate-live-data-size",
+			"rocksdb.min-log-number-to-keep",
+			"rocksdb.min-obsolete-sst-number-to-keep",
+			"rocksdb.total-sst-files-size",
+			"rocksdb.live-sst-files-size",
+			"rocksdb.obsolete-sst-files-size",
+			"rocksdb.live_sst_files_size_at_temperature",
+			"rocksdb.base-level",
+			"rocksdb.estimate-pending-compaction-bytes",
+			"rocksdb.aggregated-table-properties",
+			"rocksdb.actual-delayed-write-rate",
+			"rocksdb.is-write-stopped",
+			"rocksdb.estimate-oldest-key-time",
+			"rocksdb.block-cache-capacity",
+			"rocksdb.block-cache-usage",
+			"rocksdb.block-cache-pinned-usage",
+			"rocksdb.options-statistics",
+			"rocksdb.num-blob-files",
+			"rocksdb.blob-stats",
+			"rocksdb.total-blob-file-size",
+			"rocksdb.live-blob-file-size",
+			"rocksdb.live-blob-file-garbage-size",
+			"rocksdb.blob-cache-capacity",
+			"rocksdb.blob-cache-usage",
+			"rocksdb.blob-cache-pinned-usage"
+	    ].forEach(p => { stats[p] = _g(p) })
+
+		return stats
+	},
 	roStats: function(aFilePath) {
 		var stats = {}
 

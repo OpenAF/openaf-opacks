@@ -28,5 +28,5 @@ files:
 - rocksdbjni-8.3.2.jar
 filesHash:
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
-  rocksdb.js: 7b0df43b9e12360a1850a44230b8ced47f8c2ce8
+  rocksdb.js: f5bb41903c418af5426fcc182e890a8a7afd8c15
   rocksdbjni-8.3.2.jar: 58691480ac749ec2b12b1f3ea9941ac9f7d5a361
