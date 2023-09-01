@@ -29,17 +29,27 @@ ow.ch.utils.rocksdb = {
 		stats.numberLevels = db.numberLevels()
 
 		var levels = db.getColumnFamilyMetaData().levels()
+		var lfmeta = {}
+		for(var meta of db.getLiveFilesMetaData()) {
+			lfmeta[meta.fileName()] = meta
+		}
 		stats.levels = []
 		for(var level of levels) {
-			var files = []
+			var files = [], _i = 0
 			for (var file of level.files()) {
 				files.push({
-					fileName       : file.fileName(),
-					beingCompacted : file.beingCompacted(),
-					numEntries     : file.numEntries(),
-					numDeletions   : file.numDeletions(),
-					numReadsSampled: file.numReadsSampled()
+					fileName        : file.fileName(),
+					columnFamilyName: af.fromBytes2String(lfmeta[file.fileName()].columnFamilyName()),
+					beingCompacted  : file.beingCompacted(),
+					numEntries      : file.numEntries(),
+					numDeletions    : file.numDeletions(),
+					numReadsSampled : file.numReadsSampled(),
+					largestKeySize  : lfmeta[file.fileName()].largestKey().length,
+					smallestKeySize : lfmeta[file.fileName()].smallestKey().length,
+					largestSeqno    : lfmeta[file.fileName()].largestSeqno(),
+					smallestSeqno   : lfmeta[file.fileName()].smallestSeqno()
 				})
+				_i++
 			}
 			stats.levels.push({
 				numberFiles: level.files().size(),
@@ -91,6 +101,9 @@ ow.ch.utils.rocksdb = {
 		}		
 
 		stats = merge(stats, getObj(db.getPropertiesOfAllTables()))
+		stats.LatestSnapshotSequenceNumber = db.getSnapshot().getSequenceNumber()
+		stats.LatestSequenceNumber = db.getLatestSequenceNumber()
+		if (isDef(stats.CreationTime)) stats.__CreationTimeDate = new Date(stats.CreationTime * 1000)
 
 		ii.close()
 		db.close()
