@@ -4,6 +4,16 @@ init:
   url   : ojob.io
   proto : https
   lname : 7
+  intro : |
+    These are a set of frequent routines (denominated [oJobs](https://docs.openaf.io/docs/concepts/oJob)) across several domains. To execute any of them you just need to [install OpenAF](https://docs.openaf.io/#installing) and execute:
+
+    ````bash
+    ojob {{URL}}/domain/routine param1=value1 param2=value2
+    ```` 
+
+    Clicking on each of the links below will get you a brief explanation and example of each oJob available in this repository. You can also check more execution options on the [ojob.io documentation](https://docs.openaf.io/docs/concepts/oJobIO.html).
+
+    ---
 
 todo:
 - ojob final report
@@ -28,12 +38,18 @@ jobs:
   exec: |
     io.rm("_output")
     io.mkdir("_output")
+    $sh("sudo apk add zip unzip").exec()
+    global.diff = []
+    if (io.fileExists("_output.zip")) {
+      $sh("mkdir _tmp && cd _tmp && unzip ../_output.zip").exec()
+    }
 
 # --------------------
 - name : Finish output
   check:
     in:
       output: isString.default("output")
+      compile: toBoolean.isBoolean.default(false)
   deps :
   - Get oJob-commons
   - Copy content
@@ -52,21 +68,23 @@ jobs:
        if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
           var orig = r.filepath
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "")
-          if (r.filename != ".package.yaml" && !r.filename.startsWith("_")) {
+          if (r.filename != ".package.yaml") {
             l.push( args.init.proto + "://" + args.init.url + r.filepath.replace(/^_output\//, "/") )
             lp.push(orig)
           }
        } else {
-          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css" && !r.filename.startsWith("_")) lp.push(r.filepath)
+          if (r.isDirectory && r.filename != "common" && r.filename != "js" && r.filename != "css") lp.push(r.filepath)
        }
     })
 
     var mdindex = "# " + args.init.url + "<img src='/logo.png' align='right'/>\n"
+    mdindex += templify(args.init.intro, args) + "\n"
     var htmlmdindex = mdindex
     var cuuid = $atomic()
     var tasks = []
 
     lp.forEach(f => {
+       var _o = f.replace(/^_output\//, "")
        if (io.fileInfo(f).isDirectory) {
          mdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
          htmlmdindex += "\n## " + f.replace(/^_output\//, args.init.url + "/") + "\n"
@@ -85,49 +103,51 @@ jobs:
          logErr("Problem reading file '" + f + "': " + String(e))
        }
 
-       if (isDef(j) && isDef(j.jobs) && $from(j.jobs).equals("name", "Help").any() || isDef(j.help)) {
+       if (isDef(j) && isDef(j.jobs) && ($from(j.jobs).equals("name", "Help").any() || isDef(j.help))) {
         tasks.push($do(() => {
-          log("Generating markdown for " + f + "...")
-          /*oJobRunFile("ojobs/doc.yaml", {
-            job   : f,
-            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
-            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
-            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
-          }, cuuid.inc(), { shareArgs: false }, true)*/
-          $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
-            job   : f,
-            name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
-            mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
-            output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
-            html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
-          }))
-          .exec()
+          if (global.diff.indexOf("_tmp/" + _o) < 0 || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md")) || !io.fileExists("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html")) ) {
+            log("Generating markdown for " + f + "...")
+            $sh(templify(getOpenAFPath() + "ojob ojobs/doc.yaml job={{job}} name={{name}} mdfile={{mdfile}} output={{output}} html={{html}}", {
+              job   : f,
+              name  : f.replace(/^_output\//, args.init.url + "/").replace(/(\/index)?(\.ya?ml|\.json)$/, ""),
+              mdfile: f.replace(/(.+)\/(.+)(\.ya?ml|\.json)$/, "$1/_$2.md"),
+              output: f.replace(/(\.ya?ml|\.json)$/, ".md"),
+              html  : f.replace(/(\.ya?ml|\.json)$/, ".html"),
+            }))
+            .exec()
+          } else {
+            log("Copying markdown for " + f + "...")
+            io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".md"), f.replace(/(\.ya?ml|\.json)$/, ".md"))
+            io.cp("_tmp/" + _o.replace(/(\.ya?ml|\.json)$/, ".html"), f.replace(/(\.ya?ml|\.json)$/, ".html"))
+          }
         }).catch(e => logErr(f + " | " + e)))
- 
-        if ( isDef(j) && (f.match(/\.(ya?ml)$/)) ) {
+       }
+       
+       if (isDef(j) && (isDef(j.jobs) || isDef(j.todo)) && (f.match(/\.(ya?ml)$/)) ) {
           tasks.push($do(() => {
             log("Generate static version for " + f + "...")
-            /*oJobRunFile("ojobs/compile.yaml", {
-              source : f,
-              target : f.replace(/\.(ya?ml)$/, ".json")
-            }, cuuid.inc(), { shareArgs: false }, true*/
-            /*$sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
-              source : f,
-              target : f.replace(/\.(ya?ml)$/, ".json")
-            }))
-            .exec()*/
-            var _target = f.replace(/\.(ya?ml)$/, ".json")
-            if (!io.fileExists(_target)) {
-              io.writeFileJSON(_target, io.readFileJSON(f), "")
-              io.cp(_target, _target.replace(/\.json$/, ""))
+            if (args.compile) {
+              $sh(templify(getOpenAFPath() + "ojob ojobs/compile.yaml source={{source}} target={{target}}", {
+                source : f,
+                target : f.replace(/\.(ya?ml)$/, ".json")
+              }))
+              .exec()
             }
+            var _target = f.replace(/\.(ya?ml)$/, ".json")
+            log("Checking for " + _target + "...")
+            if (!io.fileExists(_target)) {
+              log("Write to " + _target + "...")
+              io.writeFileJSON(_target, (args.compile ? io.readFileJSON(f) : io.readFileYAML(f)), "")
+            }
+            log("Write to " + _target.replace(/\.json$/, ""))
+            io.cp(_target, _target.replace(/\.json$/, ""))
           }))
-        }
-
-        var mentry = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
-        mdindex += "  * [" + mentry + "](" + mentry + ".md)\n"
-        htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
+       }
+       
+       if (!io.fileInfo(f).filename.startsWith("_") && !(io.fileInfo(f).filepath.indexOf("/common/") >= 0) ) {
+         var mentry   = f.replace(/^_output\//, args.init.url + "/").replace(new RegExp("^" + args.init.url), "").replace(/(\.ya?ml)|(\.json)$/, "")
+         mdindex     += "  * [" + mentry + "](" + mentry + ".md)\n"
+         htmlmdindex += "  * [" + mentry + "](" + mentry + ".html)\n"
        }
        return 1
     })
@@ -141,12 +161,19 @@ jobs:
     _tmpl.init.l = l
     io.writeFileJSON("_output/index.json", _tmpl)
     io.cp("imgs/openaf.png", "_output/logo.png")
+    io.cp("imgs/favicon.ico", "_output/favicon.ico")
+
+    // Generate bash auto complete
+    var lst = io.readFileJSON("_output/index.json").init.l
+    lst = lst.map(r => r.replace(/^https?:\/\//, "").replace(/\.yaml$/, ""))
+    var out = "complete -W '" + lst.join(" ") + "' -o default ojob"
+    io.writeFileString("_output/autoComplete.sh", out)
   
     io.rm(args.output)
     io.mv("_output", args.output)
 
     log("Creating _output.zip...")
-    $sh("sudo apk add zip")
+    $sh()
     .pwd(args.output)
     .sh(getOpenAFPath() + "ojob hash.yaml url=. file=_integrity.json")
     .sh("zip -9r _output.zip *")
@@ -158,14 +185,31 @@ jobs:
   exec: |
     plugin("GIT")
     var git = new GIT()
+    io.rm("_output/common")
     git.clone("https://github.com/openaf/oJob-common.git", "_output/common")
     io.rm("_output/common/.git")
+    io.rm("_output/common/.github")
 
 # ------------------
 - name: Copy content
-  deps: Prepare output
+  deps:
+  - Prepare output
+  - Get oJob-commons
   exec: |
     listFilesRecursive("ojobs").forEach(r => {
+      try {
+       var _t = "_tmp" + r.filepath.replace(/^ojobs\//, "/")
+       if (io.fileExists(_t) && r.isFile) {
+         var _ss = io.readFileStream(r.canonicalPath)
+         var _ts = io.readFileStream(_t)
+         var _s5 = md5(_ss)
+         var _t5 = md5(_ts)
+         _ss.close()
+         _ts.close()
+         if (_s5 == _t5) global.diff.push(_t)
+       } else {
+        global.diff.push(_t)
+       }
        if (r.isFile) {
          log("Copying " + r.filepath + "...")
          io.cp(r.canonicalPath, "_output" + r.filepath.replace(/^ojobs\//, "/"))
@@ -173,17 +217,27 @@ jobs:
          log("Creating folder " + r.filepath + "...")
          io.mkdir("_output" + r.filepath.replace(/^ojobs\//, "/"))
        }
+      } catch(e) {
+         logErr("Error while copying " + r.filepath + ": " + e)
+      }
     })
 
 # ---------------------------
 - name: Copy static resources
   deps: Prepare output
   exec: |
-    var _copy = (source, target) => {
-      var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
-      var os = io.writeFileStream("_output/" + target)
+    var _copy = (source,target)=>{
+      try {
+        var is = af.fromBytes2InputStream(io.readFileBytes(getOpenAFJar() + "::" + source))
+        var os = io.writeFileStream("_output/" + target)
 
-      ioStreamCopy(os, is)
+        ioStreamCopy(os, is)
+      } catch(e) {
+        logErr("Error copying static resources from: " + e)
+      }
     }
 
-    [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ].forEach(r => _copy(r, r))
+    io.writeFileString("_output/error.html", "Not found!")
+
+    var ar = [ "css/github-gist.css", "css/github-markdown.css", "css/nJSMap.css", "js/highlight.js" ]
+    ar.forEach(r => _copy(r, r))

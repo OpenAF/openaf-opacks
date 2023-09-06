@@ -29,7 +29,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230528'
+version: '20230618'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -62,13 +62,13 @@ filesHash:
   aws.js: d73ea4a4177e9c6c621837534071cc3a210f3860
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_cloudwatch.js: 582fc6453bdd7e75572f68ad86d82a164d143694
-  aws_core.js: 3225c01a1d3188f1b5d1c66ed3412a87871430ab
+  aws_core.js: 40239d5704c685c4ec442b9d42ccc121eb78abad
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: a1c02a89f0af3a3693fadc8e2a1bd28a1d06a4ae
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws_ecr.js: ea5683ea7ac5cd71e1ad0487631e802f43844137
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
-  aws_eks.js: f0c46168ba153d58cfd9023f54362b3da16c977d
+  aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b

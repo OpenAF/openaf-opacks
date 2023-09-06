@@ -1,0 +1,98 @@
+name: Update Packs
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '03 7 * * *'
+
+jobs:
+  update-packs:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
+
+    - name: Run GooglePhone
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          // Run update ojob
+          var res = $sh([getOpenAFPath() + "ojob", "updateGooglePhoneNumber.yaml"])
+                    .sh("rm -rf .openaf_precompiled")
+                    .pwd("GooglePhoneNumber")
+                    .get(0)
+                    
+          print(res.stdout)
+          printErr(res.stderr)
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
+
+            // Bump opack version
+            var opack = io.readFileYAML("GooglePhoneNumber/.package.yaml")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML("GooglePhoneNumber/.package.yaml", opack)
+
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("GooglePhoneNumber")
+            .prefix("opack")
+            .get()
+          }
+        dist: t8
+
+    - name: Commit changes GooglePhoneNumber
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        dist: t8
+
+    - name: Run GoogleCompiler
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          // Run update ojob
+          var res = $sh([getOpenAFPath() + "oaf", "-f", "main.js", "-e", "--update"])
+                    .pwd("GoogleCompiler")
+                    .get(0)
+                    
+          print(res.stdout)
+          printErr(res.stderr)
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of GoogleCompiler oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
+
+            // Bump opack version
+            var opack = io.readFileJSON("GoogleCompiler/.package.json")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileJSON("GoogleCompiler/.package.json", opack)
+
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("GoogleCompiler")
+            .prefix("opack")
+            .get()
+          }
+        dist: t8
+
+    - name: Commit GoogleCompiler
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
+        dist: t8

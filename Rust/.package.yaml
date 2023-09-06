@@ -1,0 +1,29 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- rust
+- ojob
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Rust.opack
+description: A simple wrapper for oJob Rust language support.
+name: Rust
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20230628'
+dependencies:
+  openaf: '>=20230325'
+files:
+- .package.yaml
+- README.md
+- rust.yaml
+filesHash:
+  README.md: 8d51d96fb15aa24d3b56cac4bdfbc31aa0399e28
+  rust.yaml: ef2750d583db68f59ba5585cd1597249ddb146a3

@@ -1,7 +1,22 @@
 var classPath;
 
 if (__expr.match(/--update/)) {
-        throw "Not supported temporarially.";
+    //throw "Not supported temporarially.";
+	ow.loadJava()
+	var m = new ow.java.maven()
+	var ver = m.getLatestVersionString("com.google.javascript.closure-compiler")
+	m.getFile("com.google.javascript.closure-compiler", "closure-compiler-{{version}}.jar", ".")
+
+	var orig = md5(io.readFileBytes("compiler11.jar"))
+	var dest = md5(io.readFileBytes("closure-compiler-" + ver + ".jar"))
+	if (orig == dest) {
+		io.rm("closure-compiler-" + ver + ".jar")
+		log("No update needed.")
+	} else {
+		io.mv("closure-compiler-" + ver + ".jar", "compiler11.jar")
+		log("Updated to version " + ver)
+	}
+	exit(0)
 }
 
 if (isUnDef(classPath)) {

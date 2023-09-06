@@ -25,6 +25,6 @@ jobs:
       url: isString
   exec : |
     if (!args.url.toLowerCase().match(/^https?:\/\//)) args.url = "https://" + args.url
-    var lst = $rest().get(args.url).init.l
+    var lst = $rest().get(args.url + "/index.json").init.l
 
     ow.oJob.output(lst.sort(), args)

@@ -18,7 +18,7 @@ name: plugin-XLS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220702'
+version: '20230608'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -29,40 +29,40 @@ files:
 - SparseBitSet-1.2.jar
 - compile.yaml
 - curvesapi-1.07.jar
-- log4j-api-2.18.0.jar
-- log4j-core-2.18.0.jar
+- log4j-api-2.20.0.jar
+- log4j-core-2.20.0.jar
 - plugin-xls.jar
-- poi-5.2.2.jar
-- poi-excelant-5.2.2.jar
-- poi-ooxml-5.2.2.jar
-- poi-ooxml-full-5.2.2.jar
-- poi-scratchpad-5.2.2.jar
+- poi-5.2.3.jar
+- poi-excelant-5.2.3.jar
+- poi-ooxml-5.2.3.jar
+- poi-ooxml-full-5.2.3.jar
+- poi-scratchpad-5.2.3.jar
 - src/openaf/plugins/DOC.java
 - src/openaf/plugins/XLS.java
 - tests/autoTestAll.DOC.js
 - tests/autoTestAll.DOC.yaml
 - tests/autoTestAll.XLS.js
 - tests/autoTestAll.XLS.yaml
-- xmlbeans-5.1.0.jar
+- xmlbeans-5.1.1.jar
 filesHash:
-  .maven.yaml: 65e1752bc06b5e3da816708b98e52f4f4dd5533b
-  .odoc.db: 27b380ee24d9cb8700797c41eac7f8617bf2661b
+  .maven.yaml: a5b94056f77f2a8857d834e1046e76a423726c8a
+  .odoc.db: 9814dbc44f03208725af25d2b8393522d88ea2b5
   LICENSES.txt: 669904728da776a91f2ccd00a126e0a3835a462e
   SparseBitSet-1.2.jar: 8467c813d442837fcaeddbc42cf5c5359fab4933
   compile.yaml: de86da7fe869b3bfcb9f7daa4be5e32b583dd203
   curvesapi-1.07.jar: 863654849995f9d4f0ed2ed1a3870da3a108473c
-  log4j-api-2.18.0.jar: c72ad9b1d8d42e4ea7befd8248bf05877af4c63d
-  log4j-core-2.18.0.jar: 07c1882ede137548925eadb750615edab2f6e13c
-  plugin-xls.jar: dc1aae0985dd6e216e89944c719ea9f99e21461b
-  poi-5.2.2.jar: 5513d31545085c33809c4b6553c2009fd19a6016
-  poi-excelant-5.2.2.jar: ef5fd8fa2cddd62b4bb716efcccccf54b71b3145
-  poi-ooxml-5.2.2.jar: a201b5bdc92c0fae4bed4b8e5546388c4c2f9eb0
-  poi-ooxml-full-5.2.2.jar: a9a43ce6062a0e28c1bd0300e8c0e7709027f322
-  poi-scratchpad-5.2.2.jar: 8c5cd5f1b3e7b3656ab983b73bbbf8bf5f14f793
+  log4j-api-2.20.0.jar: 1fe6082e660daf07c689a89c94dc0f49c26b44bb
+  log4j-core-2.20.0.jar: eb2a9a47b1396e00b5eee1264296729a70565cc0
+  plugin-xls.jar: 5ab6cb39e430be13d7272378c500e4f924c93586
+  poi-5.2.3.jar: 2fb22ae74ad5aea6af1a9c64b9542f2ccf348604
+  poi-excelant-5.2.3.jar: a4ab266e32ef29e756a605b431afa8ae52f882ec
+  poi-ooxml-5.2.3.jar: 02efd11c940adb18c03eb9ce7ad88fc40ee6a196
+  poi-ooxml-full-5.2.3.jar: 339a05530a7076e8a86b88253a48a44e0144ce25
+  poi-scratchpad-5.2.3.jar: 2a7fce47e22b7fedb1b277347ff4fe36d6eda50d
   src/openaf/plugins/DOC.java: 4ee69b1443a3506aa8c0642dcf571b0dc32ea73a
   src/openaf/plugins/XLS.java: 4366de277c6ea5b336d74b9248f99fe8ea29964c
   tests/autoTestAll.DOC.js: 7c4949acc1aa155506986b5b770d7f16aea079dc
   tests/autoTestAll.DOC.yaml: b423211694d2f92ab40eadb5eced03da6aa94ef0
   tests/autoTestAll.XLS.js: d187ea75619f7615f9ca411c51cdb216b663a487
   tests/autoTestAll.XLS.yaml: 8178f14a7f5fb165c1817e906f99d191c8ea3b8d
-  xmlbeans-5.1.0.jar: 3534ab896663e6f6d8a2cf46882d7407641d7a31
+  xmlbeans-5.1.1.jar: 48a369df0eccb509d46203104e4df9cb00f0f68b

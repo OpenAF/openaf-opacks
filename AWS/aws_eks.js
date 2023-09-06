@@ -49,9 +49,10 @@ AWS.prototype.EKS_DescribeCluster = function(aRegion, aName) {
     return this.getURLEncoded(aURL, aURI, "", {}, "eks", aHost, aRegion, {})
 }
 
-AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
+AWS.prototype.EKS_GetToken = function(aRegion, aClusterName, expireTime) {
   aRegion      = _$(aRegion, "aRegion").isString().default(this.region)
   aClusterName = _$(aClusterName, "aClusterName").isString().$_()
+  expireTime   = _$(expireTime, "expireTime").isNumber().default(14*60000)
 
   var _data = this.__getRequest("get", "/", "sts", "sts." + aRegion + ".amazonaws.com", aRegion, "Action=GetCallerIdentity&Version=2011-06-15", "", { "x-k8s-aws-id": aClusterName },__,__, true)
   $rest({ requestHeaders: { "x-k8s-aws-id": aClusterName } }).get("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)
@@ -60,7 +61,7 @@ AWS.prototype.EKS_GetToken = function(aRegion, aClusterName) {
     apiVersion: "client.authentication.k8s.io/v1beta1",
     spec: {},
     status: {
-      expirationTimestamp: (new Date((new Date(ow.format.toDate(_data._data["X-Amz-Date"], "yyyyMMdd'T'HHmmss'Z'"))).getTime() + (14*60000))).toISOString().replace(".000Z","Z"),
+      expirationTimestamp: (new Date((new Date(ow.format.toDate(_data._data["X-Amz-Date"], "yyyyMMdd'T'HHmmss'Z'"))).getTime() + (expireTime))).toISOString().replace(".000Z","Z"),
       token: "k8s-aws-v1." + af.fromBytes2String(af.toBase64Bytes("https://sts." + aRegion + ".amazonaws.com/?" + _data._query)).replace(/\=+$/, "")
     }
   }

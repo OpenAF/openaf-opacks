@@ -1,0 +1,36 @@
+ojob:
+  langs:
+  - lang  : "rust"
+    langFn: |
+      // Check for templates
+      if (isDef(job.typeArgs) && !job.typeArgs.noTemplate) {
+        code = templify(code, args)
+      }
+      // Fingerprint && reuse
+      var _fp = md5(job.name + "|" + code)
+      if (isUnDef(global.__rustReuse)) global.__rustReuse = {}
+      if (isUnDef(global.__rustReuse[_fp])) {
+        var _sfp = io.createTempFile(_fp, ".rs")
+        io.writeFileString(_sfp, code)
+        var _bfp = io.createTempFile(_fp, "rust")
+        
+        // Compile
+        var _res = $sh("rustc " + _sfp + " -o " + _bfp).get(0)
+        if (_res.exitcode != 0) throw _res.stdout + _res.stderr
+
+        global.__rustReuse[_fp] = _bfp
+      }
+
+      // Executing
+      var _res = $sh()
+                 .envs(ow.oJob.__toEnvs(args))
+                 .sh(global.__rustReuse[_fp])
+                 .getJson(0)
+      if (_res.exitcode != 0) throw _res.stdout + _res.stderr
+      if (isMap(_res.stdout)) {
+        args = merge(args, _res.stdout)
+      } else {
+        printnl(_res.stdout)
+        if (isString(_res.stderr) && _res.stderr.length > 0) printErrnl(_res.stderr)
+      }
+
