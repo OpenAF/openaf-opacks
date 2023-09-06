@@ -17,7 +17,7 @@ name: Prolog
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220311'
+version: '20230905'
 dependencies:
   openaf: '>=20201111'
 files:
@@ -26,14 +26,16 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- projog-core-0.5.0.jar
+- projog-clp-0.3.0.jar
+- projog-core-0.9.0.jar
 - prolog.js
 - prolog.yaml
 filesHash:
-  .maven.yaml: 7ed166b01c3484e07895cde50145caae12bee1cb
+  .maven.yaml: 0c5ded10f3b0ff7759b85b9c28a3823ad789cc18
   .odoc.db: a216883b46f9c6dd79cba2528c49a876f9d2b2e1
   .precompile: 61adf0138f2b4c4f5a6f4ce1116d1a439e4c9aff
   README.md: 11fa0d1f43baa377d79c76a1176e7e4bdbf09894
-  projog-core-0.5.0.jar: ad3053c0f4c22ba4b4c7cb9181f4b38e137ef96b
+  projog-clp-0.3.0.jar: 5a46819536cb8c3cef0cfdc85103b46645fd7f6e
+  projog-core-0.9.0.jar: 53a672e00c3ef4839bf717633f4a05a7dd4567cc
   prolog.js: 972cb4d381f5810408f436d189fe2bb6aae1f7d3
   prolog.yaml: ff4214def94e85120e4da52f7ea8046bd963f552
