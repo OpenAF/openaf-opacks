@@ -20,9 +20,9 @@ name: plugin-SVN
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20200128'
+version: '20230905'
 dependencies:
-  openaf: '>=20190128'
+  openaf: '>=20230704'
 files:
 - .maven.yaml
 - .odoc.db
@@ -30,25 +30,41 @@ files:
 - LICENSES.txt
 - antlr-runtime-3.4.jar
 - compile.yaml
+- eddsa-0.3.0.jar
+- jcl-over-slf4j-1.7.32.jar
+- jna-5.6.0.jar
+- jna-platform-5.6.0.jar
+- lz4-java-1.4.1.jar
 - plugin-svn.jar
-- sequence-library-1.0.3.jar
-- sqljet-1.1.11.jar
+- sequence-library-1.0.4.jar
+- slf4j-api-1.7.32.jar
+- sqljet-1.1.15.jar
 - src/openaf/plugins/SVN.class
 - src/openaf/plugins/SVN.java
-- svnkit-1.9.1.jar
-- svnkit-javahl16-1.9.1.jar
-- trilead-ssh2-1.0.0-build221.jar
+- sshd-common-2.9.2.jar
+- sshd-core-2.9.2.jar
+- svnkit-1.10.11.jar
+- svnkit-cli-1.10.11.jar
+- trilead-ssh2-1.0.0-build222.jar
 filesHash:
-  .maven.yaml: 20c33ff19fd992e48b16310c69590439907a9551
-  .odoc.db: b0695729f24ee33b401580fc3f2a328ae0192d7d
+  .maven.yaml: 6e3ba2fa9aa13bebf6b5b31659fd8a8dfbee22de
+  .odoc.db: 04cfc3ffe7ffa419502c84c966054d6efe9254ab
   LICENSES.txt: 63c09d6e039752fd33cef562f80b5c3d55d2c93c
   antlr-runtime-3.4.jar: 8f011408269a8e42b8548687e137d8eeb56df4b4
-  compile.yaml: e9278c35a1a9eb4197cd930d7188fcac49221219
-  plugin-svn.jar: d6d79db6db5d477b4a0c3f39efe4d4bcecf3a570
-  sequence-library-1.0.3.jar: 3bcf12fa805a735bb26369cd66c5933767c026de
-  sqljet-1.1.11.jar: 68c946d051fa4aa9d3f2a793c556c35fcfba0be3
-  src/openaf/plugins/SVN.class: 887bf1fb1e3cb683ebc7f9f5fc1eef6b1c2a4acd
+  compile.yaml: a14ca4294752aba1c0dcbaed0c11d4182da00371
+  eddsa-0.3.0.jar: 1901c8d4d8bffb7d79027686cfb91e704217c3e1
+  jcl-over-slf4j-1.7.32.jar: 32c060250bcc5282cdbc1fd7008c12eb4ebad00e
+  jna-5.6.0.jar: 330f2244e9030119ab3030fc3fededc86713d9cc
+  jna-platform-5.6.0.jar: d18424ffb8bbfd036d71bcaab9b546858f2ef986
+  lz4-java-1.4.1.jar: ad89b11ac280a2992d65e078af06f6709f1fe2fc
+  plugin-svn.jar: e2eba8db4a85128f37206d0be1fd7727b20c9add
+  sequence-library-1.0.4.jar: b623e7e429e446ef36c7fd649647586ed49f16aa
+  slf4j-api-1.7.32.jar: cdcff33940d9f2de763bc41ea05a0be5941176c3
+  sqljet-1.1.15.jar: 3262b9ec45ea10c19856ff1003580160a8680df5
+  src/openaf/plugins/SVN.class: 70296b80e21bf48132ad04796185ed4474fd883e
   src/openaf/plugins/SVN.java: 7f82dd878694a61f81d77dc2c6915ad0a77a4d42
-  svnkit-1.9.1.jar: 2b6af356de0ed3f26203a2c321a61d92f7fd8a3a
-  svnkit-javahl16-1.9.1.jar: 73269ae2c65ffc97c9732f7cd0986386d536d51d
-  trilead-ssh2-1.0.0-build221.jar: c14d6fbab5e4ac1eb355f92e91b4c2c28a17e9b9
+  sshd-common-2.9.2.jar: 9671e971cf1f05d221c0a86cecc165d88156c8ed
+  sshd-core-2.9.2.jar: cca012d0214f0540dc00903b8f5f731280ca6dfc
+  svnkit-1.10.11.jar: 5b191b74bb77af2f755dc11d47badfb7c74ad4b5
+  svnkit-cli-1.10.11.jar: b4a8c6514f33556af8dd14dd09ee089206fc3c52
+  trilead-ssh2-1.0.0-build222.jar: eff401f7bc7839aee792ab17319eb78e6a919aa7
