@@ -1,7 +1,7 @@
 ow.loadFormat();
 var OPACK_PATH = getOPackPaths()["XChart"] || ".";
 
-af.externalAddClasspath((new java.io.File(OPACK_PATH + "/lib/xchart-3.5.0.jar")).toURL());
+af.externalAddClasspath((new java.io.File(OPACK_PATH + "/lib/xchart-3.8.5.jar")).toURL());
 
 /**
  * <odoc>
