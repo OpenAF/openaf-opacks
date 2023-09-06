@@ -1,0 +1,5 @@
+artifacts:
+  - id      : ucanaccess
+    group   : net.sf.ucanaccess
+    version : 5.0.1
+    #template: xchart-{{version}}.jar

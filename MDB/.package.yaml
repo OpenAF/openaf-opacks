@@ -18,23 +18,25 @@ name: MDB
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20180104'
+version: '20230905'
 dependencies:
-  openaf: '>=20160601'
+  openaf: '>=20230704'
 files:
 - .package.yaml
 - .precompile
 - MDB.js
+- lib/.maven.yaml
 - lib/LICENSE
-- lib/commons-lang-2.6.jar
-- lib/hsqldb.jar
-- lib/jackcess-2.1.8.jar
-- lib/ucanaccess-4.0.2.jar
+- lib/commons-lang3-3.8.1.jar
+- lib/hsqldb-2.5.0.jar
+- lib/jackcess-3.0.1.jar
+- lib/ucanaccess-5.0.1.jar
 filesHash:
   .precompile: 63161db78fa474437a6ef015ec429e47c93ba3f0
   MDB.js: e232d8dc975761bc4ab0b1a6fd391f2dec8a5193
+  lib/.maven.yaml: 3f6ad52dfcd79e7b257d12bb00b2f6eef772c60c
   lib/LICENSE: 3809b4e8be6b906334959cac98d49bb09e6ba93f
-  lib/commons-lang-2.6.jar: 0ce1edb914c94ebc388f086c6827e8bdeec71ac2
-  lib/hsqldb.jar: 195957160ed990dbc798207c0d577280d9919208
-  lib/jackcess-2.1.8.jar: dfc7156e11ce33bbcb7f4f6724a87b9d969f2fd6
-  lib/ucanaccess-4.0.2.jar: c700526cbd4e67a856bb0535713600dfaf0f312b
+  lib/commons-lang3-3.8.1.jar: 6505a72a097d9270f7a9e7bf42c4238283247755
+  lib/hsqldb-2.5.0.jar: 59298fcd77faf01e02b405def2f80cccbf582508
+  lib/jackcess-3.0.1.jar: e753ed760d06a0b6849c02d3d4c603ae6c8e05c8
+  lib/ucanaccess-5.0.1.jar: 1a362db0e8f4bfa727b033f20c52542ea6416259
