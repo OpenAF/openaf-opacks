@@ -34,10 +34,12 @@ jobs:
     args:
       - outputDir: *OUTPUT_DIR
     exec: |
-      ow.loadJava();
-      var arts = io.readFileYAML(".maven.yaml");
-      var maven = new ow.java.maven();
-      maven.processMavenFile(args.outputDir);
+      //ow.loadJava();
+      //var arts = io.readFileYAML(".maven.yaml");
+      //var maven = new ow.java.maven();
+      //maven.processMavenFile(args.outputDir);
+      oJobRunFile("ojob.io/oaf/mavenGetJars", {}, nowNano(), __, true)
+      $sh("ojob ojob.io/oaf/checkOAFJars remove=true path=.").exec()
 
   ##########################
   - name: Compile Ignite plugin
