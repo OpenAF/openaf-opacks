@@ -13,20 +13,22 @@ bugs:
 repository:
   type: http
   url: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/rocksdb
-description: OpenAF channels wrapper for RocksDB
+description: OpenAF channels wrapper and utilities for RocksDB
 name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230912'
+version: '20230914'
 dependencies:
   openaf: '>=20221216'
 files:
+- .odoc.db
 - .package.yaml
 - .precompile
 - rocksdb.js
 - rocksdbjni-8.5.3.jar
 filesHash:
+  .odoc.db: 1737cc42c3e23351e5e40bae50dcc8aee5a86d34
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
-  rocksdb.js: f5bb41903c418af5426fcc182e890a8a7afd8c15
+  rocksdb.js: 2f2ae434ab898e04996c52ef279f4f112cf74c63
   rocksdbjni-8.5.3.jar: bd14fc38bf271581c9c8046d0b6ad377028ec01c

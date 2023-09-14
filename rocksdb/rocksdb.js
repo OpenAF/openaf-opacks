@@ -3,6 +3,12 @@ loadExternalJars(getOPackPath("rocksdb") || ".")
 Packages.org.rocksdb.RocksDB.loadLibrary()
 
 ow.ch.utils.rocksdb = {
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.cleanDir(aFilePath)</key>
+	 * Deletes old logs from an existing aFilePath.
+	 * </odoc>
+	 */
 	cleanDir: function(aFilePath) {
 		io.listFiles(aFilePath).files.forEach(f => {
 			if (f.filename.indexOf(".old.") > 0 ||
@@ -11,20 +17,88 @@ ow.ch.utils.rocksdb = {
 			if (f.filename.endsWith(".log") && f.size == 0) io.rm(f.canonicalPath);
 		});
 	},
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.liveDBOptions(aChannel) : Map</key>
+	 * Given an existing rocksdb aChannel returns the current DB options set.
+	 * </odoc>
+	 */
+	liveDBOptions: function(aChannel) {
+		_$(aChannel, "aChannel").isString().$_()
+
+		var _r = {}
+		var _o = ow.ch.__types.rocksdb.db[aChannel].getDBOptions()
+		String(_o.build()).split(";").forEach(r => {
+			var m = {}
+			ar = r.split("=")
+			_r[ar[0]] = ar[1]
+		})
+		return _r
+	},
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.liveOptions(aChannel) : Map</key>
+	 * Given an existing rocksdb aChannel returns the current options (column family options) set.
+	 * </odoc>
+	 */
+	liveOptions: function(aChannel) {
+		_$(aChannel, "aChannel").isString().$_() 
+
+		var _r = {}
+		var _o = ow.ch.__types.rocksdb.db[aChannel].getOptions()
+		String(_o.build()).split(";").forEach(r => {
+			var m = {}
+			ar = r.split("=")
+			_r[ar[0]] = ar[1]
+		})
+		return _r
+	},
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.liveProperty(aChannel, aPropertyName) : Object</key>
+	 * Given an existing rocksdb aChannel and aPropertyName returns the corresponding value.
+	 * </odoc>
+	 */
+	liveProperty: function(aChannel, prop) {
+		_$(aChannel, "aChannel").isString().$_()
+		_$(prop, "prop").isString().$_()
+
+		var _mr, _r, _fmr = true, _fr = true
+		try { _mr = ow.ch.__types.rocksdb.db[aChannel].getMapProperty(prop) } catch(e) { _fmr = false }
+		try { _r  = ow.ch.__types.rocksdb.db[aChannel].getProperty(prop) } catch(e) { _fr = false }
+		if (!_fmr && _fr) return _r
+
+		if (_fmr && _mr instanceof java.util.Map) {
+			var _t = sortMapKeys( af.fromJavaMap( _mr ) )
+			if (_fr) _t.__text = _r
+			return _t
+		} else {
+			return _mr
+		}
+	},
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.liveStats(aChannel) : Map</key>
+	 * Given an existing rocksdb aChannel returns a map with the value of several properties.
+	 * </odoc>
+	 */
 	liveStats: function(aChannel) {
 		_$(aChannel, "aChannel").isString().$_()
 
 		if (isUnDef(ow.ch.__types.rocksdb.db[aChannel])) throw "RocksDB channel '" + aChannel + "' not found."
 
-		var _g = prop => {
-			try {
-				return ow.ch.__types.rocksdb.db[aChannel].getProperty(prop)
-			} catch(e) {
-				return __
-			}
-		}
-
 		var stats = {};
+
+		var numLevels = ow.ch.__types.rocksdb.db[aChannel].getColumnFamilyMetaData().levels().length;
+
+		[
+			"rocksdb.num-files-at-level",
+			"rocksdb.compression-ratio-at-level"
+		].forEach(p => {
+			range(numLevels, 0).forEach(l => {
+				stats[p + l] = this.liveProperty(aChannel, p + l)
+			})
+		});
 
 		[ 
 			"rocksdb.stats",
@@ -85,10 +159,16 @@ ow.ch.utils.rocksdb = {
 			"rocksdb.blob-cache-capacity",
 			"rocksdb.blob-cache-usage",
 			"rocksdb.blob-cache-pinned-usage"
-	    ].forEach(p => { stats[p] = _g(p) })
+	    ].forEach(p => { stats[p] = this.liveProperty(aChannel, p) })
 
 		return stats
 	},
+	/**
+	 * <odoc>
+	 * <key>ow.ch.utils.rocksdb.roStats(aFilePath) : Map</key>
+	 * Given aFilePath containing a rocksdb database will return a map with the corresponding stats.
+	 * </odoc>
+	 */
 	roStats: function(aFilePath) {
 		var stats = {}
 
@@ -105,6 +185,8 @@ ow.ch.utils.rocksdb = {
 		stats.name = db.getName()
 		stats.size = c
 		stats.numberLevels = db.numberLevels()
+		stats.fileCount = db.getColumnFamilyMetaData().fileCount()
+		stats.columnFamilySize = db.getColumnFamilyMetaData().size()
 
 		var levels = db.getColumnFamilyMetaData().levels()
 		var lfmeta = {}
@@ -117,11 +199,13 @@ ow.ch.utils.rocksdb = {
 			for (var file of level.files()) {
 				files.push({
 					fileName        : file.fileName(),
+					level           : lfmeta[file.fileName()].level(),
 					columnFamilyName: af.fromBytes2String(lfmeta[file.fileName()].columnFamilyName()),
 					beingCompacted  : file.beingCompacted(),
 					numEntries      : file.numEntries(),
 					numDeletions    : file.numDeletions(),
 					numReadsSampled : file.numReadsSampled(),
+					size            : lfmeta[file.fileName()].size(),
 					largestKeySize  : lfmeta[file.fileName()].largestKey().length,
 					smallestKeySize : lfmeta[file.fileName()].smallestKey().length,
 					largestSeqno    : lfmeta[file.fileName()].largestSeqno(),
@@ -178,7 +262,10 @@ ow.ch.utils.rocksdb = {
 			return data
 		}		
 
-		stats = merge(stats, getObj(db.getPropertiesOfAllTables()))
+		stats.liveFiles = af.fromJavaArray( db.getLiveFiles().files )
+		stats.sortedWalFiles = af.fromJavaArray( db.getSortedWalFiles() )
+
+		stats = merge(stats, sortMapKeys(getObj(db.getPropertiesOfAllTables())))
 		stats.LatestSnapshotSequenceNumber = db.getSnapshot().getSequenceNumber()
 		stats.LatestSequenceNumber = db.getLatestSequenceNumber()
 		if (isDef(stats.CreationTime)) stats.__CreationTimeDate = new Date(stats.CreationTime * 1000)
@@ -189,18 +276,43 @@ ow.ch.utils.rocksdb = {
 	}
 }
 
+/**
+ * <odoc>
+ * <key>ow.ch.types.rocksdb</key>
+ * Implementation of RocksDB as an OpenAF channel. The creation options are:\
+ * \
+ *   - path      (String)  The path to the folder where the RocksDB files reside.\
+ *   - dboptions (Map)     A map with RocksDB options.\
+ *   - options   (Map)     A map with column family options.\
+ *   - readonly  (Boolean) If true the database is open in read-only mode, otherwise will be open as read-write.\
+ *   - compact   (Boolean) If true will try to compact the database upon channel destroy.\
+ * \
+ * </odoc>
+ */
 ow.ch.__types.rocksdb = {
 	db: {},
     options: {},
 	create       : function(aName, shouldCompress, options) {
 		options       = _$(options).isMap().default({});
    		var aFilePath = _$(options.path, "path").isString().$_();
+		var dboptions = _$(options.dboptions, "dboptions").isMap().default({})
+		var options   = _$(options.options, "options").isMap().default({})
    		var readonly  = _$(options.readonly, "readonly").isBoolean().default(false);
 
    		var f = new java.io.File(aFilePath);
    		io.mkdir(aFilePath);
 
-   		var roptions = new Packages.org.rocksdb.Options();
+		var dbois = af.fromString2InputStream(Object.keys(dboptions).map(k => k + "=" + dboptions[k]).join(";").trim())
+		var ois   = af.fromString2InputStream(Object.keys(options).map(k => k + "=" + options[k]).join(";").trim())
+		var p_dbois = new java.util.Properties(), p_ois = new java.util.Properties()
+		p_dbois.load(dbois)
+		p_ois.load(ois)
+		dbois.close()
+		ois.close()
+		
+		var cfgOpts = (new Packages.org.rocksdb.ConfigOptions()).setIgnoreUnknownOptions(true)
+		var roptions = new Packages.org.rocksdb.Options(Object.keys(dboptions).length > 0 ? Packages.org.rocksdb.DBOptions.getDBOptionsFromProps(cfgOpts, p_dbois) : new Packages.org.rocksdb.DBOptions(), 
+		                                                Object.keys(options).length > 0 ? Packages.org.rocksdb.ColumnFamilyOptions.getColumnFamilyOptionsFromProps(cfgOpts, p_ois) : new Packages.org.rocksdb.ColumnFamilyOptions())
    		roptions.setCreateIfMissing(true);
 
 		if (readonly) {
@@ -208,6 +320,7 @@ ow.ch.__types.rocksdb = {
 		} else {
    			this.db[aName] = new Packages.org.rocksdb.RocksDB.open(roptions, f.getAbsolutePath());
 		}
+
  		this.options[aName] = options;
                 
         var compact = _$(roptions.compact, "compact").isBoolean().default(false);
