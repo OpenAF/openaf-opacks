@@ -39,6 +39,7 @@ files:
 - grammars/nlinq.pegjs
 - grammars/semver.pegjs
 - grammars/slon.pegjs
+- grammars/sql.pegjs
 - lib/peggy.min.js
 - peg.js
 - plugins/ActionsPlugin.js
@@ -59,6 +60,7 @@ filesHash:
   grammars/nlinq.pegjs: edcd4d6df8b41c98e74b046ae928caf5f551bfd0
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
   grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
+  grammars/sql.pegjs: 65a34f3b289e50cbcc5e4b7bba1b3cf11be49cda
   lib/peggy.min.js: 5aad44916dc27fa4a7f5dd980f08c166ad570684
   peg.js: 666beebe1de7f1ff2b18d49f698b33fba53ec181
   plugins/ActionsPlugin.js: 2d3fd1cb0ae4a2f03d49a38201edbb6afefdb61e
