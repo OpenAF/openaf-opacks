@@ -25,6 +25,7 @@ ow.ch.utils.rocksdb = {
 	 */
 	liveDBOptions: function(aChannel) {
 		_$(aChannel, "aChannel").isString().$_()
+        if (isUnDef(ow.ch.__types.rocksdb.db[aChannel])) throw "RocksDB channel '" + aChannel + "' not found."
 
 		var _r = {}
 		var _o = ow.ch.__types.rocksdb.db[aChannel].getDBOptions()
@@ -43,6 +44,7 @@ ow.ch.utils.rocksdb = {
 	 */
 	liveOptions: function(aChannel) {
 		_$(aChannel, "aChannel").isString().$_() 
+		if (isUnDef(ow.ch.__types.rocksdb.db[aChannel])) throw "RocksDB channel '" + aChannel + "' not found."
 
 		var _r = {}
 		var _o = ow.ch.__types.rocksdb.db[aChannel].getOptions()
@@ -62,6 +64,8 @@ ow.ch.utils.rocksdb = {
 	liveProperty: function(aChannel, prop) {
 		_$(aChannel, "aChannel").isString().$_()
 		_$(prop, "prop").isString().$_()
+
+		if (isUnDef(ow.ch.__types.rocksdb.db[aChannel])) throw "RocksDB channel '" + aChannel + "' not found."
 
 		var _mr, _r, _fmr = true, _fr = true
 		try { _mr = ow.ch.__types.rocksdb.db[aChannel].getMapProperty(prop) } catch(e) { _fmr = false }
