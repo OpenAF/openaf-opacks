@@ -57,7 +57,7 @@ filesHash:
   grammars/ietf/rfc5234-core-abnf.pegjs: 3a9e727a003f862c3153b264ec8131d5f4e62985
   grammars/javascript.pegjs: 0779b1cf8ca337632ee333b0c4c40111919b2f6c
   grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
-  grammars/nlinq.pegjs: bc496ef56f115339ba45f859ee5b79a1555bf8a3
+  grammars/nlinq.pegjs: e10687527864e639dacf12508944bdb847e0ff04
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
   grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
   grammars/sql.pegjs: 65a34f3b289e50cbcc5e4b7bba1b3cf11be49cda

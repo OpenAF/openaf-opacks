@@ -18,7 +18,7 @@ expression
   / head:where tail:("." @expression)?
     { if (isNull(tail)) tail = {}
       if (isUnDef(tail.where)) tail.where = []
-      tail.where.push(head)
+      tail.where.unshift(head)
       return tail }
   / head:selector tail:("." @expression)?
     { if (isNull(tail)) tail = {}
@@ -60,6 +60,9 @@ whereFn
   = fn:charwhen begin_function args:list_arguments end_function {
     return { cond: fn, args: args }
   }
+  / fn:charwhen {
+    return { cond: fn, args: [] }
+  }
 
 transformFn
   = fn:chartransform begin_function args:list_arguments end_function {
@@ -77,7 +80,7 @@ selectFn
   }
 
 charwhen
-  = "andNotGreaterEquals" / "andNotBetweenEquals" / "orNotBetweenEquals" / "orNotGreaterEquals" / "notGreaterEquals" / "andNotLessEquals" / "andBetweenEquals" / "andGreaterEquals" / "notBetweenEquals" / "orBetweenEquals" / "orNotLessEquals" / "orGreaterEquals" / "andNotContains" / "greaterEquals" / "notLessEquals" / "andNotGreater" / "orNotContains" / "betweenEquals" / "andNotBetween" / "andLessEquals" / "orLessEquals" / "andNotStarts" / "orNotBetween" / "orNotGreater" / "andNotEquals" / "orNotEquals" / "notContains" / "andContains" / "andNotMatch" / "andNotEmpty" / "orNotStarts" / "orNotMatch" / "notBetween" / "orNotEmpty" / "andNotLess" / "andBetween" / "notGreater" / "andNotEnds" / "andNotType" / "orContains" / "andGreater" / "lessEquals" / "andEquals" / "notEquals" / "orNotLess" / "orGreater" / "notStarts" / "orNotEnds" / "orNotType" / "andStarts" / "orBetween" / "orStarts" / "notMatch" / "notEmpty" / "andNotIs" / "contains" / "orEquals" / "andMatch" / "andEmpty" / "orNotIs" / "orMatch" / "notType" / "greater" / "notLess" / "notEnds" / "between" / "andEnds" / "andType" / "andLess" / "orEmpty" / "equals" / "orType" / "andNot" / "orLess" / "starts" / "orEnds" / "andIs" / "notIs" / "orNot" / "match" / "empty" / "begin" / "orIs" / "ends" / "less" / "type" / "not" / "end" / "and" / "is" / "or"
+  = "andNotGreaterEquals" / "andNotBetweenEquals" / "orNotBetweenEquals" / "orNotGreaterEquals" / "notGreaterEquals" / "andNotLessEquals" / "andBetweenEquals" / "andGreaterEquals" / "notBetweenEquals" / "orBetweenEquals" / "orNotLessEquals" / "orGreaterEquals" / "andNotContains" / "greaterEquals" / "notLessEquals" / "andNotGreater" / "orNotContains" / "betweenEquals" / "andNotBetween" / "andLessEquals" / "orLessEquals" / "andNotStarts" / "orNotBetween" / "orNotGreater" / "andNotEquals" / "orNotEquals" / "notContains" / "andContains" / "andNotMatch" / "andNotEmpty" / "orNotStarts" / "orNotMatch" / "notBetween" / "orNotEmpty" / "andNotLess" / "andBetween" / "notGreater" / "andNotEnds" / "andNotType" / "orContains" / "andGreater" / "lessEquals" / "andEquals" / "notEquals" / "andBegin" / "orNotLess" / "orGreater" / "notStarts" / "orNotEnds" / "orNotType" / "andStarts" / "orBetween" / "orStarts" / "notMatch" / "notEmpty" / "andNotIs" / "contains" / "orEquals" / "andMatch" / "andEmpty" / "orNotIs" / "orMatch" / "orBegin" / "notType" / "greater" / "notLess" / "notEnds" / "between" / "andEnds" / "andType" / "andLess" / "orEmpty" / "equals" / "orType" / "andNot" / "orLess" / "starts" / "orEnds" / "andIs" / "notIs" / "orNot" / "match" / "empty" / "begin" / "orIs" / "ends" / "less" / "type" / "not" / "end" / "and" / "is" / "or"
 
 charselect
   = "mselect" / "removed" / "select" / "define"
