@@ -70,6 +70,7 @@
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
   |**oJobIO**|<img src=".github/badges/oJobIO.svg"><br>Service to provide easy-to-access oJobs for daily routines.|
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
+  |**plugin-GIT**|<img src=".github/badges/plugin-GIT.svg"><br>OpenAF plugin to access GIT repositories.|
   |**plugin-Ignite**|<img src=".github/badges/plugin-Ignite.svg"><br>OpenAF plugin to wrap Ignite functionality.|
   |**plugin-SMB**|<img src=".github/badges/plugin-SMB.svg"><br>OpenAF plugin to access samba/window shares.|
   |**plugin-SVN**|<img src=".github/badges/plugin-SVN.svg"><br>OpenAF plugin to access SVN repositories.|
