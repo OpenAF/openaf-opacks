@@ -1,0 +1,78 @@
+consts:
+  outputDir: &OUTPUT_DIR .
+
+ojob:
+  async: true
+
+todo:
+  - Clean up
+  - Download jars
+  - Compile GIT plugin
+  - Prepare GIT jar
+  - Prepare help
+
+jobs:
+  ################
+  - name: Clean up
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
+      classpath.forEach((afile) => {
+        io.rm(afile);
+      });
+      
+      var classes = $path(listFilesRecursive(args.outputDir), "[?ends_with(filename, '.class')].filepath");
+      classes.forEach((afile) => {
+        io.rm(afile);
+      });
+
+  #####################
+  - name: Download jars
+    deps:
+      - Clean up
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      oJobRunFile("ojob.io/oaf/mavenGetJars", {}, nowNano(), __, true)
+      $sh("ojob ojob.io/oaf/checkOAFJars remove=true path=.").exec()
+
+  ##########################
+  - name: Compile GIT plugin
+    deps:
+      - Download jars
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      ow.loadFormat();
+
+      io.rm(args.outputDir + "/plugin-GIT.jar");
+      var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
+      classpath.push(getOpenAFJar());
+      var sources = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.java')].filepath");
+      var sep = java.io.File.pathSeparator;
+      sh(["javac", "-source", "1.8", "-target", "1.8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources), void 0, void 0, true, args.outputDir, true);
+ 
+  ####################### 
+  - name: Prepare GIT jar
+    deps:
+      - Compile GIT plugin
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: |
+      plugin("ZIP");
+      var zip = new ZIP();
+      var classes = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.class')].filepath");
+      classes.forEach((afile) => {
+        log("Packing " + afile.replace(args.outputDir + "/src/", "") + "...");
+        zip.streamPutFileStream(args.outputDir + "/plugin-git.jar", afile.replace(args.outputDir + "/src/", ""), io.readFileStream(afile));
+      });
+
+  ####################
+  - name: Prepare help
+    deps:
+      - Compile GIT plugin
+    args:
+      - outputDir: *OUTPUT_DIR
+    exec: | 
+      saveHelp(args.outputDir, { "GIT": args.outputDir + "/src/openaf/plugins/GIT.java" })

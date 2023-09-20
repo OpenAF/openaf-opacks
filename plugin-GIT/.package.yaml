@@ -1,0 +1,44 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- openaf
+- git
+- plugins
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/plugin-GIT.opack
+description: OpenAF plugin to access GIT repositories.
+name: plugin-GIT
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20230919'
+dependencies:
+  openaf: '>=20230704'
+files:
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- JavaEWAH-1.1.13.jar
+- compile.yaml
+- org.eclipse.jgit-5.13.2.202306221912-r.jar
+- plugin-git.jar
+- slf4j-api-1.7.30.jar
+- src/openaf/plugins/GIT.class
+- src/openaf/plugins/GIT.java
+filesHash:
+  .maven.yaml: eca956d0f2b8da97c42c8bbdecf8d27124e90a83
+  .odoc.db: 8fd248f854581e8a69e38d723897cb50c198f679
+  JavaEWAH-1.1.13.jar: 32cd724a42dc73f99ca08453d11a4bb83e0034c7
+  compile.yaml: 9c4d186ba5bd2ff42923716faf9c3b4ec9a55db2
+  org.eclipse.jgit-5.13.2.202306221912-r.jar: 9821f341f01485ff1d542d7f45c289626059af1f
+  plugin-git.jar: 963eef884f55adda0114763fda185551f92329ad
+  slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
+  src/openaf/plugins/GIT.class: 9d2a5878ab96f17c163c14da502ec661861bef5c
+  src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11

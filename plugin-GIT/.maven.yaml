@@ -1,0 +1,4 @@
+artifacts:
+- id     : org.eclipse.jgit
+  group  : org.eclipse.jgit
+  version: 5.13.2.202306221912-r
