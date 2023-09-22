@@ -377,7 +377,7 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
    if (aContentType.startsWith("application/x-www-form-urlencoded"))
       payload = ow.obj.rest.writeQuery(aArgs);
    else
-      payload = stringify(aArgs, void 0, "");
+      payload = isString(aArgs) ? aArgs : stringify(aArgs, void 0, "");
    var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, aContentType);
 
    return $rest({
