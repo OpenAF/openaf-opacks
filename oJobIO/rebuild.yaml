@@ -28,6 +28,7 @@ ojob:
   argsFromEnvs: true
   oPacks      :
   - oJob-common
+  - plugin-GIT
 
 include:
 - ojob.json

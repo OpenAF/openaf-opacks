@@ -10,6 +10,7 @@ ojob:
   sequential  : true
   opacks      :
   - openaf: 20220822
+  - plugin-GIT
   catch       : logErr(exception)
   logToConsole: true   # to change when finished
 
