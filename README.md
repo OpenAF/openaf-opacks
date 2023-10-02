@@ -45,7 +45,7 @@
   |**Morse**|<img src=".github/badges/Morse.svg"><br>Simple morse code translator|
   |**Notifications**|<img src=".github/badges/Notifications.svg"><br>Provides libraries to use notifications services. Currently pushover.js.|
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build the lambda layers to run OpenAF lambda functions|
-  |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>Wrapper around the OpenAI API functionality.|
+  |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**PEG**|<img src=".github/badges/PEG.svg"><br>Wrapper around the Peggy javascript library allowing the parsing of grammars.|
   |**PasteBin**|<img src=".github/badges/PasteBin.svg"><br>Wrapper around PasteBin functionality.|
   |**Prolog**|<img src=".github/badges/Prolog.svg"><br>Wrapper for the projob library to add prolog functionality.|
