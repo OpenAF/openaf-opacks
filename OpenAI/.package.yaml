@@ -1,0 +1,32 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- openai
+- ai
+- chatgpt
+- chat
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: ''
+  url: https://openaf.io/opacks/OpenAI.opack
+description: Wrapper around the OpenAI API functionality.
+name: OpenAPI
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20231001'
+dependencies:
+  OpenAF: '>=20230704'
+files:
+- .odoc.db
+- .package.yaml
+- openai.js
+filesHash:
+  .odoc.db: 6d7a1fc81170f742297c6a52e6e597aeaf57348b
+  openai.js: b9a10fd4a4870502879f4f9aa93f0c34adcc6c0d
