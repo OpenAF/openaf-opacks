@@ -16,7 +16,7 @@ repository:
   backurl: ''
   url: https://openaf.io/opacks/OpenAI.opack
 description: Wrapper around the OpenAI API functionality.
-name: OpenAPI
+name: OpenAI
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
