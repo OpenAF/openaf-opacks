@@ -8,7 +8,7 @@ var OpenAI = function(aKey, aTimeout) {
    aTimeout = _$(aTimeout, "aTimeout").isNumber().default(60000)
    ow.loadObj()
    this._key = aKey
-   this._h = new ow.obj.http(__, __, __, __, __, __, __, { timeout: aTimeout })
+   this._timeout = aTimeout
 }
 
 OpenAI.prototype._request = function(aURI, aData, aVerb) {
@@ -16,14 +16,15 @@ OpenAI.prototype._request = function(aURI, aData, aVerb) {
    aData = _$(aData, "aData").isMap().default({})
    aVerb = _$(aVerb, "aVerb").isString().default("POST")
 
+   var _h = new ow.obj.http(__, __, __, __, __, __, __, { timeout: this._timeout })
    var _r = $rest({ 
       conTimeout    : 60000,
-      httpClient    : this._h,
+      httpClient    : _h,
       requestHeaders: { 
          Authorization: "Bearer " + Packages.openaf.AFCmdBase.afc.dIP(this._key) 
       } 
    })
-
+   _h.close()
    //if (aURI.startsWith("/")) aURI = aURI.substring(1)
 
    switch(aVerb.toUpperCase()) {
@@ -44,21 +45,27 @@ OpenAI.prototype.getModels = function() {
 
 /**
  * <odoc>
- * <key>OpenAI.chat(aContent, aModel, aTemperature) : Map</key>
- * Given aContent as an user sends the chat request to aModel (defaults to gpt-3.5-turbo) and
+ * <key>OpenAI.chat(aContent, aCId, aModel, aTemperature) : Map</key>
+ * Given aContent (string or array of the conversation) as an user sends the chat request to aModel (defaults to gpt-3.5-turbo) and
  * returns the corresponding chat completion.
  * Optionally you can provide a different temperature from 0.7.
  * </odoc>
  */
-OpenAI.prototype.chat = function(aContent, aModel, aTemperature) {
-   _$(aContent, "aContent").isString().$_()
+OpenAI.prototype.chat = function(aContent, aCId, aModel, aTemperature) {
+   _$(aContent, "aContent").$_()
+   aCId         = _$(aCId, "aCId").isString().default(__)
    aTemperature = _$(aTemperature, "aTemperature").isNumber().default(0.7)
    aModel       = _$(aModel, "aModel").isString().default("gpt-3.5-turbo")
 
+   var msgs = []
+   if (isString(aContent)) aContent = [ aContent ]
+   msgs = aContent.map(c => ({ role: "user", content: c }))
+
    return this._request("/v1/chat/completions", {
+      id: aCId,
       model: aModel,
       temperature: aTemperature,
-      messages: [ { role: "user", content: aContent }]
+      messages: msgs
    })   
 }
 
