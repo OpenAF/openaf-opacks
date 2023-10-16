@@ -22,7 +22,7 @@ AWS.prototype.ROUTE53_ChangeResourceRecordSet = function(aIdentifier, aChangeMap
     var aHost  = String(url.getHost())
     var aURI   = String(url.getPath())
 
-    var _r = af.fromXML2Obj(aws.postURLEncoded(aURL, aURI, "", af.fromObj2XML({ ChangeResourceRecordSetsRequest: { ChangeBatch: aChangeMap } }).replace("<ChangeResourceRecordSetsRequest", "<ChangeResourceRecordSetsRequest xmlns=\"https://route53.amazonaws.com/doc/2013-04-01/\""), "route53", aHost, "us-east-1", __, __, "text/xml"))
+    var _r = af.fromXML2Obj(this.postURLEncoded(aURL, aURI, "", af.fromObj2XML({ ChangeResourceRecordSetsRequest: { ChangeBatch: aChangeMap } }).replace("<ChangeResourceRecordSetsRequest", "<ChangeResourceRecordSetsRequest xmlns=\"https://route53.amazonaws.com/doc/2013-04-01/\""), "route53", aHost, "us-east-1", __, __, "text/xml"))
 
     if (isDef(_r) && isDef(_r.error)) return _r
 
@@ -91,7 +91,7 @@ AWS.prototype.ROUTE53_GetHostedZone = function(aIdentifier) {
     var aHost  = String(url.getHost())
     var aURI   = String(url.getPath())
 
-    var _r = aws.getURLEncoded(aURL, aURI, "", {}, "route53", aHost, "us-east-1", __) 
+    var _r = this.getURLEncoded(aURL, aURI, "", {}, "route53", aHost, "us-east-1", __) 
     if (isDef(_r) && isDef(_r.error)) return _r
 
     return af.fromXML2Obj(_r)
@@ -113,7 +113,7 @@ AWS.prototype.ROUTE53_ListHostedZones = function() {
 
     var _r = [], __r = {}
     do {
-        var __r = af.fromXML2Obj( aws.getURLEncoded(aURL + "/" + $rest().query({marker: __r.NextMarker}), aURI + "/" + $rest().query({marker: __r.NextMarker}), "", { }, "route53", aHost, "us-east-1", __) )
+        var __r = af.fromXML2Obj( this.getURLEncoded(aURL + "/" + $rest().query({marker: __r.NextMarker}), aURI + "/" + $rest().query({marker: __r.NextMarker}), "", { }, "route53", aHost, "us-east-1", __) )
         if (isMap(__r) && isDef(__r.ListHostedZonesResponse)) 
             _r = _r.concat(__r.ListHostedZonesResponse.HostedZones.HostedZone)
         else

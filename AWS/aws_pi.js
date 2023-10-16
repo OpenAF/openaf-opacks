@@ -24,7 +24,7 @@ AWS.prototype.PI_GetDimensionKeyDetails = function(aRegion, aIdentifier, aGroupI
         GroupIdentifier    : aGroupIdentifier, 
         RequestedDimensions: [ "statement" ]
     };
-    return aws.postURLEncoded(aURL, aURI, "", params, "pi", aHost, aRegion, { "x-amz-target": "PerformanceInsightsv20180227.GetDimensionKeyDetails" }, __ , "application/x-amz-json-1.1");
+    return this.postURLEncoded(aURL, aURI, "", params, "pi", aHost, aRegion, { "x-amz-target": "PerformanceInsightsv20180227.GetDimensionKeyDetails" }, __ , "application/x-amz-json-1.1");
 }
 
 /**
@@ -36,7 +36,7 @@ AWS.prototype.PI_GetDimensionKeyDetails = function(aRegion, aIdentifier, aGroupI
  * </odoc>
  */
 AWS.prototype.PI_GetResourceMetrics = function(aRegion, aIdentifier, aPeriod, aQueries, aStartTime, aEndTime, aNextToken) {
-    aRegion     = _$(aRegion).isString().default(aws.region);
+    aRegion     = _$(aRegion).isString().default(this.region);
     aIdentifier = _$(aIdentifier, "aIdentifier").isString().$_();
     aPeriod     = _$(aPeriod, "aPeriod").isNumber().$_();
     aQueries    = _$(aQueries, "aQueries").isArray().$_();
@@ -56,7 +56,7 @@ AWS.prototype.PI_GetResourceMetrics = function(aRegion, aIdentifier, aPeriod, aQ
         EndTime        : aEndTime.getTime() / 1000,
         NextToken      : aNextToken
     };
-    return aws.postURLEncoded(aURL, aURI, "", params, "pi", aHost, aRegion, { "x-amz-target": "PerformanceInsightsv20180227.GetResourceMetrics" }, __ , "application/x-amz-json-1.1");
+    return this.postURLEncoded(aURL, aURI, "", params, "pi", aHost, aRegion, { "x-amz-target": "PerformanceInsightsv20180227.GetResourceMetrics" }, __ , "application/x-amz-json-1.1");
 }
 
 /**
