@@ -74,9 +74,9 @@ filesHash:
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
-  aws_pi.js: 4dfe2ca9661fc42a9072452005953344c1ee61b2
+  aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
-  aws_route53.js: 122ce96c21547d93fa537cd0ff882a63b30f37cf
+  aws_route53.js: 6ec78676b0791e92920346e19f35de5ee57baffe
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
