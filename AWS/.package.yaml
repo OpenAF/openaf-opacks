@@ -76,7 +76,7 @@ filesHash:
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 15518551361378139b152192e479ef764d741e70
-  aws_route53.js: 6ec78676b0791e92920346e19f35de5ee57baffe
+  aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
