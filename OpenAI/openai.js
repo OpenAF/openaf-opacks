@@ -1,14 +1,15 @@
 /**
  * <odoc>
  * <key>OpenAI.OpenAI(aKey, aTimeout) : OpenAI</key>
- * Creates a new wrapper with aKey. Optionally you can provide a different aTimeout in ms (defaults to 1 min).
+ * Creates a new wrapper with aKey. Optionally you can provide a different aTimeout in ms (defaults to 5 min).
  * </odoc>
  */
 var OpenAI = function(aKey, aTimeout) {
-   aTimeout = _$(aTimeout, "aTimeout").isNumber().default(60000)
+   aTimeout = _$(aTimeout, "aTimeout").isNumber().default(5 * 60000)
    ow.loadObj()
    this._key = aKey
    this._timeout = aTimeout
+   this.conversation = []
 }
 
 OpenAI.prototype._request = function(aURI, aData, aVerb) {
@@ -52,14 +53,14 @@ OpenAI.prototype.getModels = function() {
  * </odoc>
  */
 OpenAI.prototype.chat = function(aContent, aCId, aModel, aTemperature) {
-   _$(aContent, "aContent").$_()
+   aContent     = _$(aContent, "aContent").default(this.conversation)
    aCId         = _$(aCId, "aCId").isString().default(__)
    aTemperature = _$(aTemperature, "aTemperature").isNumber().default(0.7)
    aModel       = _$(aModel, "aModel").isString().default("gpt-3.5-turbo")
 
    var msgs = []
    if (isString(aContent)) aContent = [ aContent ]
-   msgs = aContent.map(c => ({ role: "user", content: c }))
+   msgs = aContent.map(c => isMap(c) ? c : { role: aRole, content: c })
 
    return this._request("/v1/chat/completions", {
       id: aCId,
@@ -67,6 +68,57 @@ OpenAI.prototype.chat = function(aContent, aCId, aModel, aTemperature) {
       temperature: aTemperature,
       messages: msgs
    })   
+}
+
+OpenAI.prototype.add = function(aRole, aContent) {
+   if (isUnDef(aContent)) {
+      aContent = aRole
+      aRole = "user"
+   }
+   if (isString(aContent)) this.conversation.push({ role: aRole.toLowerCase(), content: aContent })
+   if (isArray(aContent))  this.conversation = this.conversation.concat(aContent)
+   return this
+}
+
+OpenAI.prototype.buildChat4JSOJob = function() {
+   this.conversation = [{
+      role:"system", 
+      content: `You can only output a json map with a property called 'code' with javascript code, a property  to be integrated a larger piece of code which must
+         be browser compatible code and should have all inputs and outputs has properties of a javascript map called 'args' 
+         that doesn't need to be declared or output. No use of the 'const' keyword is allowed.
+         No user input should be requested neigher any output should be printed. Any input should not be checked for type or value on the code.
+         You should comment the written code liberally to explain what each piece does and why it's written that way.`
+   }]
+   return this
+}
+
+OpenAI.prototype.buildChat4PythonOJob = function() {
+   this.conversation = [{
+      role:"system", 
+      content: `You are writing code snippet so you can only reply with Python 3 compatible code using the standard libraries assuming all inputs
+         and outputs are properties of a dictionary called 'args'. Comment the code liberally to explain what each piece does and why it's written 
+         that way.`
+   }]
+   return this
+}
+
+OpenAI.prototype.buildChat4ShellOJob = function() {
+   this.conversation = [{
+      role:"system", 
+      content: `You are writing code snippet so you can only reply with unix shell script compatible code assuming all inputs are environment
+         variables and all outputs are written to environment variables. If the code snippet has outputs the absolute last line of the code snippet
+         must be always a comment line starting with the word 'return' (in lower case) followed by a space followed by the list of output environment
+         variables separated with commas. Comment the code liberally to explain what each piece does and why it's written that way.`
+   }]
+   return this
+}
+
+OpenAI.prototype.buildChat4JSON = function() {
+   this.conversation = [{
+      role:"system",
+      content:"You can only output answers in JSON format."
+   }]
+   return this
 }
 
 /**
@@ -83,6 +135,13 @@ OpenAI.prototype.chatGPT = function(aContent, aModel, aTemperature) {
       }
    }
    return _r
+}
+
+OpenAI.prototype.jsonChatGPT = function(aContent, aModel, aTemperature) {
+   this.buildChat4JSON().add(aContent)
+
+   var out = this.chatGPT(__, aModel, aTemperature)
+   return isString(out) ? jsonParse(out, __, __, true) : out
 }
 
 /**

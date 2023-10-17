@@ -20,13 +20,17 @@ name: OpenAI
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20231001'
+version: '20231017'
 dependencies:
   OpenAF: '>=20230704'
 files:
 - .odoc.db
 - .package.yaml
 - openai.js
+- openai.yaml
+- test.yaml
 filesHash:
   .odoc.db: c70b4a9fe2ac569c3fcb9e5fec507ae6e7d200f1
-  openai.js: 2e682facbcd969b9e4495fcdcbab4b7c748f47f5
+  openai.js: 3afa3b7a27b29db0bf5d762b7f20e0c81ca544cc
+  openai.yaml: da8aa59816a0bb676eef452482c0f618b3105bda
+  test.yaml: 1db0231188dd1e8c2d68e71b1f82833bedf02628

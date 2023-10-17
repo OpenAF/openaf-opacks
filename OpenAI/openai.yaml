@@ -1,0 +1,54 @@
+jobs:
+# ------------------
+- name    : GPT Chat
+  shortcut:
+    name  : gptchat
+    keyArg: chat
+    args  :
+      apiToken   : apiToken
+      inKey      : inKey
+      inPath     : inPath
+      outKey     : outKey
+      outPath    : outPath
+      model      : model
+      temperature: temperature
+  args    :
+    secIgnore: true
+  check   :
+    in:
+      chat       : default(__)
+      apiToken   : isString
+      inKey      : isString.default(__)
+      inPath     : isString.default("")
+      outKey     : isString.default("res")
+      outPath    : isString.default("output")
+      model      : isString.default(__)
+      temperature: isNumber.default(__)
+  from    :
+  - ojob sec get
+  exec    : |
+    load("openai.js")
+
+    var oai = new OpenAI(args.apiToken)
+    // Input handling
+    if (isDef(args.inKey)) {
+      if (args.inKey == "args") {
+        args.chat = $$(args).get(args.inPath)
+      } else {
+        args.chat = $$($get(args.inKey)).get(args.inPath)
+      }
+    }
+
+    if (isString(args.chat)) args.chat = [ args.chat ]
+    args.chat.forEach(msg => {
+      if (isMap(msg) && Object.keys(msg).length > 0) oai = oai.add(msg[ Object.keys(msg)[0] ], msg[ Object.values(msg)[0] ])
+      if (isString(msg)) oai = oai.add(msg)
+    })
+    var out = oai.chatGPT(__, args.model, args.temperature)
+    
+    // Output handling
+    if (args.outKey == "args") {
+      $$(args).set(args.outPath, out)
+    } else {
+      $set(args.outKey, out)
+    }

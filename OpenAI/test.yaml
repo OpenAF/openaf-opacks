@@ -1,0 +1,20 @@
+jobs:
+# ---------------------
+- name    : GPT Chat MD
+  args    :
+    outKey : args
+    outPath: __text
+  from    : 
+  - GPT Chat
+  to      :
+  - ojob print md
+  exec    : |
+    args.__text = "🙋\n\n" + args.chat + "\n---\n🤖\n\n" + args.__text + "\n"
+
+include:
+- openai.yaml
+
+todo:
+- name: GPT Chat MD
+  args:
+    apiToken: ""
