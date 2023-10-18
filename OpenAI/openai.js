@@ -60,7 +60,7 @@ OpenAI.prototype.chat = function(aContent, aCId, aModel, aTemperature) {
 
    var msgs = []
    if (isString(aContent)) aContent = [ aContent ]
-   msgs = aContent.map(c => isMap(c) ? c : { role: aRole, content: c })
+   msgs = aContent.map(c => isMap(c) ? c : { role: "user", content: c })
 
    return this._request("/v1/chat/completions", {
       id: aCId,
