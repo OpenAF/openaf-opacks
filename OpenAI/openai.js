@@ -141,7 +141,7 @@ OpenAI.prototype.buildChat4JSON = function() {
  * </odoc>
  */
 OpenAI.prototype.chatGPT = function(aContent, aModel, aTemperature) {
-   var _r = this.chat(aContent, aModel, aTemperature)
+   var _r = this.chat(aContent, __, aModel, aTemperature)
    if (isArray(_r.choices) && _r.choices.length > 0) {
       if (_r.choices[0].finish_reason == "stop") {
          return _r.choices[0].message.content
