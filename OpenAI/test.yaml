@@ -17,4 +17,4 @@ include:
 todo:
 - name: GPT Chat MD
   args:
-    apiToken: ""
+    #apiToken: ""

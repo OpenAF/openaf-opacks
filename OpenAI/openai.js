@@ -70,6 +70,13 @@ OpenAI.prototype.chat = function(aContent, aCId, aModel, aTemperature) {
    })   
 }
 
+/**
+ * <odoc>
+ * <key>OpenAI.add(aRole, aContent) : OpenAI</key>
+ * Adds aContent with a specific aRole (system or user). If aContent is not defined the aRole is used as the content
+ * assuming aRole = user.
+ * </odoc>
+ */
 OpenAI.prototype.add = function(aRole, aContent) {
    if (isUnDef(aContent)) {
       aContent = aRole
@@ -113,6 +120,12 @@ OpenAI.prototype.buildChat4ShellOJob = function() {
    return this
 }
 
+/**
+ * <odoc>
+ * <key>OpenAI.buildChat4JSON() : OpenAI</key>
+ * Adds a system message to ensure answers will be in JSON format.
+ * </odoc>
+ */
 OpenAI.prototype.buildChat4JSON = function() {
    this.conversation = [{
       role:"system",
@@ -137,8 +150,16 @@ OpenAI.prototype.chatGPT = function(aContent, aModel, aTemperature) {
    return _r
 }
 
+/**
+ * <odoc>
+ * <key>OpenAI.jsonChatGPT(aContent, aModel, aTemperature) : Object</key>
+ * Given a string or conversation array (with a series of maps each with role and content) aContent 
+ * will configure a persona for answering in JSON for a corresponding aModel and aTemperature. See more
+ * detais in OpenAI.chatGPT.
+ * </odoc>
+ */
 OpenAI.prototype.jsonChatGPT = function(aContent, aModel, aTemperature) {
-   this.buildChat4JSON().add(aContent)
+   if (isString(aContent)) this.buildChat4JSON().add(aContent)
 
    var out = this.chatGPT(__, aModel, aTemperature)
    return isString(out) ? jsonParse(out, __, __, true) : out
