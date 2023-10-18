@@ -25,14 +25,12 @@ dependencies:
   OpenAF: '>=20230704'
 files:
 - .odoc.db
-- .openaf_precompiled/openai_js.class
 - .package.yaml
 - openai.js
 - openai.yaml
 - test.yaml
 filesHash:
   .odoc.db: c70b4a9fe2ac569c3fcb9e5fec507ae6e7d200f1
-  .openaf_precompiled/openai_js.class: b3b8da4ab2a5d77cd0fbcdf9358ac0e6471722cd
   openai.js: 92925a31be43dd46de00fb9e24126ef815e9dc8d
   openai.yaml: da8aa59816a0bb676eef452482c0f618b3105bda
   test.yaml: c87922a5a4df791dea0e0b29b37bb3900ede08d8
