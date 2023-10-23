@@ -18,7 +18,7 @@ name: Redis
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20231002'
+version: '20231023'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -27,16 +27,16 @@ files:
 - .package.yaml
 - .precompile
 - commons-pool2-2.11.1.jar
-- jedis-5.0.1.jar
-- json-20230618.jar
+- jedis-5.0.2.jar
+- json-20231013.jar
 - redis.js
 - slf4j-api-1.7.36.jar
 filesHash:
-  .maven.yaml: 96da11f038f33c56fd07561c322d6e05fadfe63e
+  .maven.yaml: db1c0f69615842be87327b7c52f9773324811f17
   .odoc.db: d302c765935d8e69f979ce0989295982ecff1e94
   .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   commons-pool2-2.11.1.jar: 8970fd110c965f285ed4c6e40be7630c62db6f68
-  jedis-5.0.1.jar: 0a759fdb468b9d3947ff6b13c8e8c06ab7c9d92e
-  json-20230618.jar: 1ae16df7d556d02713e241086f878399e99260d6
+  jedis-5.0.2.jar: 47d917ce322cef3fc1fbe7534f351e25d977e52b
+  json-20231013.jar: e22e0c040fe16f04ffdb85d851d77b07fc05ea52
   redis.js: bb5a9f636ebb2f074bf7f9163398c8eb425029a5
   slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14
