@@ -2,7 +2,7 @@ author: Nuno Aguiar
 scripts:
   preerase: ''
   posterase: ''
-  preinstall: ''
+  preinstall: 'if (Number(ow.format.getJavaVersion().replace(/^1\./, "").replace(/(\d+).*/, "$1")) < 11) throw("Only supported Java >= 11")'
   postinstall: ''
 keywords:
 - openaf
