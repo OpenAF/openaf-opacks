@@ -2,7 +2,9 @@ include:
    - oJobTest.yaml
 
 ojob:
-   async: true
+   catch: printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+   opacks:
+   - oJob-common
 
 todo:
    - SMB::Connect

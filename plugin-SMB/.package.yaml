@@ -23,28 +23,29 @@ license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
 version: '20210620'
 dependencies:
   openaf: '>=20210515'
+  BouncyCastle: '>=20230817'
 files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
 - LICENSES.txt
-- bcprov-jdk15on-1.68.jar
+- bcprov-jdk18on-1.76.jar
 - compile.yaml
-- jcifs-ng-2.1.6.jar
+- jcifs-ng-2.1.10.jar
 - plugin-smb.jar
 - src/openaf/plugins/SMB.class
 - src/openaf/plugins/SMB.java
 - tests/autoTestSMB.js
 - tests/autoTestSMB.yaml
 filesHash:
-  .maven.yaml: 0e559a3cfdaaf27bb659708b072672073434cb4d
-  .odoc.db: d6fd6847f238914ae75d7130abac7aaab356773d
-  LICENSES.txt: b7ccfc865a1fe7ca9e2495fff17efa62b0b3776e
-  bcprov-jdk15on-1.68.jar: 46a080368d38b428d237a59458f9bc915222894d
+  .maven.yaml: 096e2e9f8933644a0624dbb5eb2c0d3e98fb0c0b
+  .odoc.db: 56fe586e3373b0d93514a6df0316c1cdcad2b670
+  LICENSES.txt: b083b42567957f979ab4fb5a4f171a8ba93c0080
+  bcprov-jdk18on-1.76.jar: 3a785d0b41806865ad7e311162bfa3fa60b3965b
   compile.yaml: 65950cd663e8840ab5a7329a74e1e862281c9e67
-  jcifs-ng-2.1.6.jar: a53e090ba20751d29a18cab49c0a65a13d9be5ff
-  plugin-smb.jar: 789ab5864968d1711b6b959906a26b33768d23ea
-  src/openaf/plugins/SMB.class: 193236148a049f2cdb538b267c6518839e2b3534
+  jcifs-ng-2.1.10.jar: 94b4c0b173540ae98c379ea278713665fd8ab3eb
+  plugin-smb.jar: ca4eb73645efa1ac3ee7eadfb42a023231dadec4
+  src/openaf/plugins/SMB.class: 774b43d662ce074f31704002e09fa8934c076b7a
   src/openaf/plugins/SMB.java: 2830c601409b9058dbe70f7d077359fa9496cc3d
   tests/autoTestSMB.js: bfeb9b25141899d25b2e6dad15ab7e4a9b7b1fff
-  tests/autoTestSMB.yaml: f53ae337e3d4d2c9a5af03348523c1544d2bdc0c
+  tests/autoTestSMB.yaml: 77b7ed45a34253b0d8015b68b74b4bff49039d33

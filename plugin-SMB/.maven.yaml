@@ -1,10 +1,5 @@
 artifacts:
 
-  - id     : bcprov-jdk15on
-    group  : org.bouncycastle
-    version: 1.68
-
   - id     : jcifs-ng
     group  : eu.agno3.jcifs
-    version: 2.1.6
-
+    version: 2.1.10
