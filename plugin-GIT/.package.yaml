@@ -2,7 +2,7 @@ author: Nuno Aguiar
 scripts:
   preerase: ''
   posterase: ''
-  preinstall: 'if (Number(ow.format.getJavaVersion().replace(/^1\./, "").replace(/(\d+).*/, "$1")) < 11) throw("Only supported Java >= 11")'
+  preinstall: if (Number(ow.format.getJavaVersion().replace(/^1\./, "").replace(/(\d+).*/, "$1")) < 11) throw("Only supported Java >= 11")
   postinstall: ''
 keywords:
 - openaf
@@ -25,20 +25,20 @@ files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
-- JavaEWAH-1.1.13.jar
+- JavaEWAH-1.2.3.jar
 - compile.yaml
-- org.eclipse.jgit-5.13.2.202306221912-r.jar
+- org.eclipse.jgit-6.7.0.202309050840-r.jar
 - plugin-git.jar
-- slf4j-api-1.7.30.jar
+- slf4j-api-1.7.36.jar
 - src/openaf/plugins/GIT.class
 - src/openaf/plugins/GIT.java
 filesHash:
-  .maven.yaml: eca956d0f2b8da97c42c8bbdecf8d27124e90a83
-  .odoc.db: 8fd248f854581e8a69e38d723897cb50c198f679
-  JavaEWAH-1.1.13.jar: 32cd724a42dc73f99ca08453d11a4bb83e0034c7
+  .maven.yaml: 63fd8ef65497318909ff544741ac73d1663e6c3b
+  .odoc.db: cf0aa7cfbc0f7a60419eb8c6e4b2fec3c464695a
+  JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
   compile.yaml: 9c4d186ba5bd2ff42923716faf9c3b4ec9a55db2
-  org.eclipse.jgit-5.13.2.202306221912-r.jar: 9821f341f01485ff1d542d7f45c289626059af1f
-  plugin-git.jar: 963eef884f55adda0114763fda185551f92329ad
-  slf4j-api-1.7.30.jar: b5a4b6d16ab13e34a88fae84c35cd5d68cac922c
-  src/openaf/plugins/GIT.class: 9d2a5878ab96f17c163c14da502ec661861bef5c
+  org.eclipse.jgit-6.7.0.202309050840-r.jar: 30599f446abe09ab51cfe24d3433170f2599f9cc
+  plugin-git.jar: df9860e79404c6608c8aff00f3858d713752f19c
+  slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14
+  src/openaf/plugins/GIT.class: 03d7818592ed10392ce1471cb1b86b463b28667b
   src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11
