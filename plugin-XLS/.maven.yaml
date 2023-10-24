@@ -1,23 +1,23 @@
 artifacts:
     - id     : curvesapi
       group  : com.github.virtuald
-      version: 1.07
+      version: 1.08
 
     - id     : SparseBitSet
       group  : com.zaxxer
-      version: 1.2
+      version: 1.3
 
     - id     : poi
       group  : org.apache.poi
-      version: 5.2.3
+      version: 5.2.4
   
     - id     : poi-excelant
       group  : org.apache.poi
-      version: 5.2.3
+      version: 5.2.4
   
     - id     : poi-ooxml
       group  : org.apache.poi
-      version: 5.2.3
+      version: 5.2.4
     
     # - id     : poi-ooxml-schemas
     #   group  : org.apache.poi
@@ -25,19 +25,19 @@ artifacts:
 
     - id     : poi-ooxml-full
       group  : org.apache.poi
-      version: 5.2.3
+      version: 5.2.4
 
     - id     : poi-scratchpad
       group  : org.apache.poi
-      version: 5.2.3
+      version: 5.2.4
 
     - id     : log4j-api
       group  : org.apache.logging.log4j
-      version: 2.20.0
+      version: 2.21.0
 
     - id     : log4j-core
       group  : org.apache.logging.log4j
-      version: 2.20.0
+      version: 2.21.0
 
     - id     : xmlbeans
       group  : org.apache.xmlbeans
