@@ -40,6 +40,41 @@ AWS.prototype.ECR_ListImages = function(aRegion, aRepoName, params) {
 
 /**
  * <odoc>
+ * <key>AWS.ECR_DescribeImages(aRegion, aRepoName, params) : Array</key>
+ * Describe all images and tabs for aRepoName on aRegion. Optionally you can provide extra params.
+ * \
+ * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_DescribeImages.html\
+ * \
+ * </odoc>
+ */
+AWS.prototype.ECR_DescribeImages = function(aRegion, aRepoName, params) {
+   var aURL
+   aRegion = _$(aRegion).isString().default(this.region)
+   aRepoName = _$(aRepoName).isString().$_()
+   params    = _$(params).isMap().default({})
+
+   aURL = "https://ecr." + aRegion + ".amazonaws.com/"
+   var url = new java.net.URL(aURL)
+   var aHost = String(url.getHost())
+   var aURI = String(url.getPath())
+
+   params.repositoryName = aRepoName
+
+   var _res = this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.DescribeImages"
+   }, __, "application/x-amz-json-1.1")
+
+   var res
+   if (isDef(_res) && isDef(_res.nextToken)) {
+      res = _res.imageDetails.concat(this.ECR_DescribeImages(aRegion, aRepoName, merge(params, { nextToken: _res.nextToken })))
+   } else {
+      res = _res
+   }
+   return (isDef(res.imageDetails) ? res.imageDetails : res)
+}
+
+/**
+ * <odoc>
  * <key>AWS.ECR_DescribeRepositories(aRegion, params) : Array</key>
  * List all repositories on aRegion. Optionally you can provide extra params.\
  * \
