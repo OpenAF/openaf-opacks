@@ -58,7 +58,7 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 423e5aebc6bb940232b1d890759d34e02879588f
+  .odoc.db: 84f8950b18643c9e067cfbb6231d5cf588746936
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6e387f26895fb1e417b3b2f93fdf289d347d7faf
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
@@ -67,7 +67,7 @@ filesHash:
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: a1c02a89f0af3a3693fadc8e2a1bd28a1d06a4ae
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
-  aws_ecr.js: ea5683ea7ac5cd71e1ad0487631e802f43844137
+  aws_ecr.js: 9b76a79bb7c78d65643f1140301ebda7b26dc863
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
   aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
