@@ -65,3 +65,26 @@ results in a similar result to:
   }
 ]
 ````
+
+## Generate contacts
+
+Generating sample names, emails and phone numbers:
+
+```js
+genData()
+.loadList("names",  "lists/clients/list_names.db")
+.loadList("emails", "lists/clients/list_emailsdomains.db")
+.generate((g, f) => {
+  var d = g.getFromList("emails").domain
+  var n = g.getFromList("names").name
+
+  var r = {
+    name  : n,
+    email : f.genUsername(g, n) + "@" + d,
+    number: f.genPhone(g, "US", "mobile").phone
+  }
+
+  return r
+}, 1000)
+.dump()
+```
