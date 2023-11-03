@@ -601,6 +601,16 @@ Kube.prototype.getPods = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getNodeMetrics(aNode) : Map</key>
+ * Tries to retrieve metrics for a specific aNode using a direct API call (might require access to node stats and for a Kube metrics server to be installed in the cluster).
+ * </odoc>
+ */
+Kube.prototype.getNodeMetrics = function(aNode) {
+    return jsonParse(this.client.raw(this.client.getMasterUrl() + "api/v1/nodes/" + aNode + "/proxy/stats/summary"), true)
+}
+
+/**
+ * <odoc>
  * <key>Kube.getNodesMetrics() : Array</key>
  * Tries to retrieve metrics for all nodes on the current k8s cluster
  * </odoc>

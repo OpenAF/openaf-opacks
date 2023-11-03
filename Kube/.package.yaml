@@ -64,14 +64,14 @@ files:
 - zjsonpatch-0.3.0.jar
 filesHash:
   .maven.yaml: db80ed959e59567bf2814775c8a3cf41e908baee
-  .odoc.db: 859c2ecbd1178186ca8c99137e8d6a2257005d7f
+  .odoc.db: 5f4b37c060c50b9efbf6e99cee1b71b90dbb6d2b
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   jackson-annotations-2.15.2.jar: 4724a65ac8e8d156a24898d50fd5dbd3642870b8
   jackson-core-2.15.2.jar: a6fe1836469a69b3ff66037c324d75fc66ef137c
   jackson-databind-2.15.2.jar: 9353b021f10c307c00328f52090de2bdb4b6ff9c
   jackson-dataformat-yaml-2.15.2.jar: 58194ff9f51915ad6bf6b6f24818232d7566418a
   jackson-datatype-jsr310-2.15.2.jar: 30d16ec2aef6d8094c5e2dce1d95034ca8b6cb42
-  kube.js: c18d575ab116116728b3e134b4bb7b0de27764b3
+  kube.js: fe13d1783a61894931f99f6b68492accd8b05aed
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-6.9.1.jar: 4d0ba4f62f181154f523174ee01d26bff3e7b7e1
   kubernetes-client-api-6.9.1.jar: 4d67d03617a58cb0a9eaacbdabf2420c923ff117
