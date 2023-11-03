@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230911'
+version: '20231102'
 dependencies:
   OpenAF: '>=20220822'
 files:
