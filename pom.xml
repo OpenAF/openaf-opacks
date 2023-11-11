@@ -110,7 +110,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>6.9.1</version>
+            <version>6.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -165,7 +165,7 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-nio</artifactId>
-            <version>0.127.6</version>
+            <version>0.127.7</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
