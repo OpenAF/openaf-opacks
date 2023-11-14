@@ -736,21 +736,23 @@ Kube.prototype.get = function(aNamespace, aStream) {
 
 /**
  * <odoc>
- * <key>Kube.getObject(aNamespace, aKind, aName) : Map</key>
+ * <key>Kube.getObject(aNamespace, aKind, aName, aVersion) : Map</key>
  * Given an object aKind and aName will try to retrieve the current object definition.
  * </odoc>
  */
-Kube.prototype.getObject = function(aNamespace, aKind, aName) {
-	_$(aNamespace, "namespace").isString().$_();
-	_$(aKind, "kind").isString().$_();
-    _$(aName, "name").isString().$_();
+Kube.prototype.getObject = function(aNamespace, aKind, aName, aVersion) {
+	_$(aNamespace, "namespace").isString().$_()
+	_$(aKind, "kind").isString().$_()
+    _$(aName, "name").isString().$_()
+	aVersion = _$(aVersion, "version").isString().default("v1")
 
 	return this.__displayResult(this.client.inNamespace(aNamespace).load(af.fromString2InputStream(stringify({
+		apiVersion: aVersion,
 		kind: aKind,
 		metadata: {
 			name: aName
 		}
-	}))).fromServer().get());
+	}))).fromServer().get())
 };
 
 /**

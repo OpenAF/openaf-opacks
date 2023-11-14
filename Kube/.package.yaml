@@ -26,6 +26,7 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - jackson-annotations-2.15.2.jar
 - jackson-core-2.15.2.jar
 - jackson-databind-2.15.2.jar
@@ -66,12 +67,13 @@ filesHash:
   .maven.yaml: d3bb673c7bf70aef81715460a6ff50adb4a0d85d
   .odoc.db: 5f4b37c060c50b9efbf6e99cee1b71b90dbb6d2b
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
+  README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
   jackson-annotations-2.15.2.jar: 4724a65ac8e8d156a24898d50fd5dbd3642870b8
   jackson-core-2.15.2.jar: a6fe1836469a69b3ff66037c324d75fc66ef137c
   jackson-databind-2.15.2.jar: 9353b021f10c307c00328f52090de2bdb4b6ff9c
   jackson-dataformat-yaml-2.15.2.jar: 58194ff9f51915ad6bf6b6f24818232d7566418a
   jackson-datatype-jsr310-2.15.2.jar: 30d16ec2aef6d8094c5e2dce1d95034ca8b6cb42
-  kube.js: fe13d1783a61894931f99f6b68492accd8b05aed
+  kube.js: a0995330fdb1a09199fafbbf1dd684f5c23b53e4
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-6.9.2.jar: 3f99e58ba2ed4c382557f61a604deec2505de81a
   kubernetes-client-api-6.9.2.jar: 7bfa0707707f541736bc239862efde1ec25967d4
