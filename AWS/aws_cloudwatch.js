@@ -89,7 +89,7 @@ AWS.prototype.CLOUDWATCH_ListMetrics = function(aRegion, aParams) {
    var nextToken = __
 
    do {
-      var res = this.postURLEncoded(aURL, aURI, "", merge(merge(aParams, { NextToken: nextToken } ), true, {
+      var res = this.postURLEncoded(aURL, aURI, "", merge(merge(aParams, { NextToken: nextToken } ), {
          Action: "ListMetrics",
          Version: "2010-08-01"
       }), "monitoring", aHost, aRegion)
