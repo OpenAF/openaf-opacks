@@ -140,7 +140,7 @@
         <dependency>
             <groupId>com.ibm.etcd</groupId>
             <artifactId>etcd-java</artifactId>
-            <version>0.0.23</version>
+            <version>0.0.24</version>
         </dependency>
         <dependency>
             <groupId>org.rocksdb</groupId>
