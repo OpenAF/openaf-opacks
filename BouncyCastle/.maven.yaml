@@ -1,4 +1,4 @@
 artifacts:
 - id     : bcpkix-jdk18on
   group  : org.bouncycastle
-  version: "1.76"
+  version: "1.77"
