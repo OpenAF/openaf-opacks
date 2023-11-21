@@ -1,12 +1,9 @@
 consts:
   outputDir: &OUTPUT_DIR .
 
-ojob:
-  async: true
-
 todo:
-#- Clean up
-#- Download jars
+- Clean up
+- Download jars
 - Compile XLS plugin
 - Prepare XLS jar
 - Prepare help
