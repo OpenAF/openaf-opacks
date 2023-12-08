@@ -1,5 +1,5 @@
 artifacts:
   - id      : xchart
     group   : org.knowm.xchart
-    version : 3.8.5
+    #version : 3.8.5
     #template: xchart-{{version}}.jar
