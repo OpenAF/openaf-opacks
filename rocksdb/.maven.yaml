@@ -4,6 +4,6 @@
 artifacts:
   - id      : rocksdbjni 
     group   : org.rocksdb
-    version : 8.6.7
+    #version : 8.6.7
 
     #template: minio-{{version}}-all.jar
