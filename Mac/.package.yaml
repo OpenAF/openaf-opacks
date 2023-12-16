@@ -18,11 +18,13 @@ name: Mac
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230121'
+version: '20231215'
 dependencies:
   OpenAF: '>=20221216'
 files:
 - .package.yaml
+- mac.js
 - mac.yaml
 filesHash:
+  mac.js: 52bcba39cba29b2dff2d904e0acd8ca4cf2237bc
   mac.yaml: 847a46444176c2db094698616711f2e8bb158dbb
