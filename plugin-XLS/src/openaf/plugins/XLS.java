@@ -916,18 +916,18 @@ public class XLS extends ScriptableObject {
 		if (evaluateFormulas && cell.getCellType() == CellType.FORMULA) {
 			CellValue cellValue = evaluator.evaluate(cell);
 			
-			CellType ct = cellValue.getCellType();
-		    if (ct == CellType.BOOLEAN) cellS.put("val", cellS, new Boolean(cellValue.getBooleanValue())); 
-		    else if (ct == CellType.NUMERIC) { 
-				double d = cellValue.getNumberValue();
+				CellType ct = cellValue.getCellType();
+			    if (ct == CellType.BOOLEAN) cellS.put("val", cellS, cellValue.getBooleanValue()); 
+			    else if (ct == CellType.NUMERIC) { 
+					double d = cellValue.getNumberValue();
 
-				if (DateUtil.isCellDateFormatted(cell)) {
-					cellS.put("val", cellS, toDate(d));
-				} else {
-					cellS.put("val", cellS, new Double(d)); 
-				}
-		    } 
-		    else if (ct == CellType.STRING) cellS.put("val", cellS, cellValue.getStringValue());
+					if (DateUtil.isCellDateFormatted(cell)) {
+						cellS.put("val", cellS, toDate(d));
+					} else {
+						cellS.put("val", cellS, d); 
+					}
+			    } 
+			    else if (ct == CellType.STRING) cellS.put("val", cellS, cellValue.getStringValue());
 		    //else if (ct == CellType.BLANK)
 		    //else if (ct == CellType.ERROR)
 		    //else if (ct == CellType.FORMULA)
