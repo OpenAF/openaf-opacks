@@ -1,7 +1,6 @@
 artifacts:
 - id      : lombok
   group   : org.projectlombok
-  version : 1.18.24
 # based on github.com/nmaguiar/
 #- id      : java-socks-proxy-server
 #  group   : com.github.bbottema
