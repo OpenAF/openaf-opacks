@@ -1,36 +1,33 @@
-author: Nuno Aguiar
+author: The author(s) name(s)
 scripts:
   preerase: ''
   posterase: ''
-  preinstall: if (Number(ow.format.getJavaVersion().replace(/^1\./, "").replace(/(\d+).*/, "$1")) < 11) throw("Only supported Java >= 11")
+  preinstall: ''
   postinstall: ''
 keywords:
-- socks
-- proxy
+- Keyword1
+- keyword2
 bugs:
-  url: https://github.com/OpenAF/openaf-opacks/issues
+  url: URL to track bugs
 repository:
   type: http
-  url: https://openaf.io/opacks/SocksServer.opack
-description: Provides a wrapper around a Java SocksServer implementation
-name: SocksServer
+  url: URL to main repository
+description: A nice description
+name: A_nice_name
 main: ''
 mainJob: ''
-license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20221222'
+license: The licence description
+version: '20010101'
 dependencies:
-  openaf: '>=20211229'
+  packa: '>=20100101'
+  packb: <20120101
 files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
 - LICENSES.txt
 - README.md
-<<<<<<< HEAD
 - java-socks-proxy-server-2.0.1.jar
-=======
-- java-socks-proxy-server-2.0.2.jar
->>>>>>> e94e84cf3a11267fc3584cb7455a5d0ec5db6f31
 - lombok-1.18.30.jar
 - socksServer.js
 filesHash:
@@ -38,10 +35,6 @@ filesHash:
   .odoc.db: 8fe14acac10462a5b6c5c1c803ee223a1a938cc2
   LICENSES.txt: adef8f697505f8376e6597fc422cf0880aff8044
   README.md: 8803453b84d7a23c63e5cddff9f69a4fb9d62482
-<<<<<<< HEAD
   java-socks-proxy-server-2.0.1.jar: d9cb13d097f7cc00da167d8a3eba0579cd239e6f
-=======
-  java-socks-proxy-server-2.0.2.jar: 8d0286bfd53fc1f7203120ddbd7783f291bb3402
->>>>>>> e94e84cf3a11267fc3584cb7455a5d0ec5db6f31
   lombok-1.18.30.jar: f195ee86e6c896ea47a1d39defbe20eb59cd149d
   socksServer.js: 90fe30371c0da6f491662760f8b9b1f95c52cddc
