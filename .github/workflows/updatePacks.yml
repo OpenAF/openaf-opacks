@@ -20,6 +20,8 @@ jobs:
         key : oaf-t8
         path: /tmp/oaf
 
+    # -----------
+    # GooglePhone
     - name: Run GooglePhone
       uses: openaf/ojob-action@v4
       with:
@@ -59,6 +61,8 @@ jobs:
         args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
         dist: t8
 
+    # --------------
+    # GoogleCompiler
     - name: Run GoogleCompiler
       uses: openaf/ojob-action@v4
       with:
@@ -95,4 +99,47 @@ jobs:
       with:
         ojob: 'ojob.io/git/hub/checkIn'
         args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
+        dist: t8
+
+    # -------
+    # RocksDB
+    - name: Run RocksDB
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          // Run update ojob
+          var res = $sh("rm *.jar")
+                    .sh([getOpenAFPath() + "ojob", "ojob.io/oaf/mavenGetJars"])
+                    .sh([getOpenAFPath() + "ojob", "tests/autoTestRocks.yaml"])
+                    .sh("rm -rf .openaf_precompiled")
+                    .pwd("rocksdb")
+                    .get(2)
+                    
+          print(res.stdout)
+          printErr(res.stderr)
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of RocksDB oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
+
+            // Bump opack version
+            var opack = io.readFileYAML("RocksDB/.package.yaml")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML("RocksDB/.package.yaml", opack)
+
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("rocksdb")
+            .prefix("opack")
+            .get()
+          }
+        dist: t8
+
+    - name: Commit RocksDB
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ RocksDB" paths="RocksDB/" title="Update\ RocksDB\ oPack" bodyFile=/tmp/output.out'
         dist: t8

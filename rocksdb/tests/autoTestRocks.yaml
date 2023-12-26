@@ -1,0 +1,45 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- rocks::Run tests
+- Test results
+
+jobs:
+# -----------------
+- name: rocks::Init
+  exec: |
+    loadLib("rocksdb.js")
+    global.tests = require("tests/autoTestRocks.js")
+
+# ----------------------
+- name: rocks::Run tests
+  from:
+  - rocks::Init
+  - (todo):
+    - (test   ): rocks::Create DB
+      ((func )): global.tests.testCreateDB()
+    - (test   ): rocks::Static Stats
+      ((func )): global.tests.testStaticStats()
+    - (test   ): rocks::Using DB
+      ((func )): global.tests.testUsingDB()
+
+# ------------------
+- name: Test results
+  deps: rocks::Run tests
+  from: oJob Test Results
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }
