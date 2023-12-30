@@ -25,7 +25,7 @@ init:
       ## Usage
   
       ````bash
-      ojob {{name}} {{#each expects}}{{name}}={{example}} {{/each}}
+      ojob {{name}} {{#each expects}}{{name}}={{{example}}} {{/each}}
       ````
   
       ## Description
@@ -84,6 +84,13 @@ jobs:
         data.more = io.readFileString(mdFile);
     }
   
+    // Check the examples for double-quotes
+    for(var i in data.expects) {
+      if (isDef(data.expects[i].example) && data.expects[i].example.indexOf(" ") >= 0) {
+        data.expects[i].example = '"' + data.expects[i].example + '"'
+      }
+    }
+
     var out = templify(args.init.tmpl, data);
     if (isDef(args.output)) {
       log("Writing to '" + args.output + "'...") 
