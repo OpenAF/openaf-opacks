@@ -58,7 +58,7 @@ filesHash:
   ojobs/check.yaml: aa4085a88d4dcadff1a6f2bdd0408d4d6f5f9947
   ojobs/clean.yaml: 29b1b7776b2349e2df42e265318be80eb5eef43a
   ojobs/compile.yaml: 93802be9b3e902f61c9680d5b4b4ee526d8b95df
-  ojobs/doc.yaml: de70cd08235246cd08f571b809a6b30b7bd486b7
+  ojobs/doc.yaml: 5b63d7395386ddab87fa32db91d432b8b949eb40
   ojobs/echo.yaml: e082de2ae8260a8a9da2c873e91f8aab76d62cd8
   ojobs/envs.yaml: 1d261affa726f53d3f09db1ca2588da2eb94d753
   ojobs/generate.yaml: fae22ce0c9c47453590ab9a0887d725712813b56

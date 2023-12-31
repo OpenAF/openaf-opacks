@@ -57,13 +57,13 @@ jobs:
   exec: |
     _$(args.job, "job").$_();
   
-    var j;
+    var j, dontGenerate = false
     if (args.job.match(/\.ya?ml$/)) j = io.readFileYAML(args.job);
     if (args.job.match(/\.json$/))  j = io.readFileJSON(args.job);
 
     if (isUnDef(j) || isUnDef(j.jobs)) {
       logWarn("No jobs found in '" + args.job + "'...");
-      return false;
+      dontGenerate = true
     }
 
     var data = {};
@@ -86,20 +86,25 @@ jobs:
   
     // Check the examples for double-quotes
     for(var i in data.expects) {
-      if (isDef(data.expects[i].example) && data.expects[i].example.indexOf(" ") >= 0) {
-        data.expects[i].example = '"' + data.expects[i].example + '"'
+      if (isDef(data.expects[i].example)) {
+        data.expects[i].example = String(data.expects[i].example)
+        if (data.expects[i].example.indexOf(" ") >= 0) {
+          data.expects[i].example = '"' + data.expects[i].example + '"'
+        }
       }
     }
 
-    var out = templify(args.init.tmpl, data);
-    if (isDef(args.output)) {
-      log("Writing to '" + args.output + "'...") 
-      io.writeFileString(args.output, out);
-    } else {
-      print(out);
-    }
-
-    if (isDef(args.html)) {
-      log("Writing to '" + args.html + "'...")
-      io.writeFileString(args.html, ow.template.parseMD2HTML(out.replace(mdFile, mdFile.replace(/\.md$/, ".html")), true))
+    if (!dontGenerate) {
+      var out = templify(args.init.tmpl, data);
+      if (isDef(args.output)) {
+        log("Writing to '" + args.output + "'...") 
+        io.writeFileString(args.output, out);
+      } else {
+        print(out);
+      }
+  
+      if (isDef(args.html)) {
+        log("Writing to '" + args.html + "'...")
+        io.writeFileString(args.html, ow.template.parseMD2HTML(out.replace(mdFile, mdFile.replace(/\.md$/, ".html")), true))
+      }
     }
