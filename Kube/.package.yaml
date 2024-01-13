@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20231110'
+version: '20240112'
 dependencies:
   OpenAF: '>=20220822'
 files:
@@ -27,80 +27,80 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- jackson-annotations-2.15.2.jar
-- jackson-core-2.15.2.jar
-- jackson-databind-2.15.2.jar
-- jackson-dataformat-yaml-2.15.2.jar
-- jackson-datatype-jsr310-2.15.2.jar
+- jackson-annotations-2.16.0.jar
+- jackson-core-2.16.0.jar
+- jackson-databind-2.16.0.jar
+- jackson-dataformat-yaml-2.16.0.jar
+- jackson-datatype-jsr310-2.16.0.jar
 - kube.js
 - kube.yaml
-- kubernetes-client-6.9.2.jar
-- kubernetes-client-api-6.9.2.jar
-- kubernetes-httpclient-okhttp-6.9.2.jar
-- kubernetes-model-admissionregistration-6.9.2.jar
-- kubernetes-model-apiextensions-6.9.2.jar
-- kubernetes-model-apps-6.9.2.jar
-- kubernetes-model-autoscaling-6.9.2.jar
-- kubernetes-model-batch-6.9.2.jar
-- kubernetes-model-certificates-6.9.2.jar
-- kubernetes-model-common-6.9.2.jar
-- kubernetes-model-coordination-6.9.2.jar
-- kubernetes-model-core-6.9.2.jar
-- kubernetes-model-discovery-6.9.2.jar
-- kubernetes-model-events-6.9.2.jar
-- kubernetes-model-extensions-6.9.2.jar
-- kubernetes-model-flowcontrol-6.9.2.jar
-- kubernetes-model-gatewayapi-6.9.2.jar
-- kubernetes-model-metrics-6.9.2.jar
-- kubernetes-model-networking-6.9.2.jar
-- kubernetes-model-node-6.9.2.jar
-- kubernetes-model-policy-6.9.2.jar
-- kubernetes-model-rbac-6.9.2.jar
-- kubernetes-model-resource-6.9.2.jar
-- kubernetes-model-scheduling-6.9.2.jar
-- kubernetes-model-storageclass-6.9.2.jar
+- kubernetes-client-6.10.0.jar
+- kubernetes-client-api-6.10.0.jar
+- kubernetes-httpclient-okhttp-6.10.0.jar
+- kubernetes-model-admissionregistration-6.10.0.jar
+- kubernetes-model-apiextensions-6.10.0.jar
+- kubernetes-model-apps-6.10.0.jar
+- kubernetes-model-autoscaling-6.10.0.jar
+- kubernetes-model-batch-6.10.0.jar
+- kubernetes-model-certificates-6.10.0.jar
+- kubernetes-model-common-6.10.0.jar
+- kubernetes-model-coordination-6.10.0.jar
+- kubernetes-model-core-6.10.0.jar
+- kubernetes-model-discovery-6.10.0.jar
+- kubernetes-model-events-6.10.0.jar
+- kubernetes-model-extensions-6.10.0.jar
+- kubernetes-model-flowcontrol-6.10.0.jar
+- kubernetes-model-gatewayapi-6.10.0.jar
+- kubernetes-model-metrics-6.10.0.jar
+- kubernetes-model-networking-6.10.0.jar
+- kubernetes-model-node-6.10.0.jar
+- kubernetes-model-policy-6.10.0.jar
+- kubernetes-model-rbac-6.10.0.jar
+- kubernetes-model-resource-6.10.0.jar
+- kubernetes-model-scheduling-6.10.0.jar
+- kubernetes-model-storageclass-6.10.0.jar
 - logging-interceptor-3.12.12.jar
-- snakeyaml-2.0.jar
+- snakeyaml-2.2.jar
 - snakeyaml-engine-2.7.jar
 - zjsonpatch-0.3.0.jar
 filesHash:
-  .maven.yaml: d3bb673c7bf70aef81715460a6ff50adb4a0d85d
-  .odoc.db: 5f4b37c060c50b9efbf6e99cee1b71b90dbb6d2b
+  .maven.yaml: 046b1d4b813cefe4c5b564ffa1a5c3d3b738d6a4
+  .odoc.db: 4200cf9af204a8761739822dee3a070e36d2fcd2
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
-  jackson-annotations-2.15.2.jar: 4724a65ac8e8d156a24898d50fd5dbd3642870b8
-  jackson-core-2.15.2.jar: a6fe1836469a69b3ff66037c324d75fc66ef137c
-  jackson-databind-2.15.2.jar: 9353b021f10c307c00328f52090de2bdb4b6ff9c
-  jackson-dataformat-yaml-2.15.2.jar: 58194ff9f51915ad6bf6b6f24818232d7566418a
-  jackson-datatype-jsr310-2.15.2.jar: 30d16ec2aef6d8094c5e2dce1d95034ca8b6cb42
-  kube.js: a0995330fdb1a09199fafbbf1dd684f5c23b53e4
+  jackson-annotations-2.16.0.jar: dc30995f7428c0a405eba9b8c619b20d2b3b9905
+  jackson-core-2.16.0.jar: 899e5cf01be55fbf094ad72b2edb0c5df99111ee
+  jackson-databind-2.16.0.jar: 3a6b7f8ff7b30d518bbd65678e9c30cd881f19a7
+  jackson-dataformat-yaml-2.16.0.jar: 2033e2c5f531785d17f3a2bc31842e3bbb7983b2
+  jackson-datatype-jsr310-2.16.0.jar: 77e3a27823f795d928b897d8444744ddb044a5c3
+  kube.js: e03ae41021f6aac1024016a3c29740c472941cde
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
-  kubernetes-client-6.9.2.jar: 3f99e58ba2ed4c382557f61a604deec2505de81a
-  kubernetes-client-api-6.9.2.jar: 7bfa0707707f541736bc239862efde1ec25967d4
-  kubernetes-httpclient-okhttp-6.9.2.jar: 997b7dd581a22e955ef180cc23d603074f9bbf86
-  kubernetes-model-admissionregistration-6.9.2.jar: a525f6eeba9c3e5effecd14514b8e5f4ee0f9f90
-  kubernetes-model-apiextensions-6.9.2.jar: 1dee29a2ce0fd3bdc37098cb822cd40cc5a60098
-  kubernetes-model-apps-6.9.2.jar: dbf5268feef3ba3c74153df0b2b4417280aa2cd9
-  kubernetes-model-autoscaling-6.9.2.jar: da411df3e5986a1dd7bdf8706060ef437ccfae86
-  kubernetes-model-batch-6.9.2.jar: cfd830fe85aeae35bb87ef91092d06ffff467eec
-  kubernetes-model-certificates-6.9.2.jar: 556425840c4d43159b02a5c98095fb5df6e784c5
-  kubernetes-model-common-6.9.2.jar: 01b4d463c461004330371b8a0b4ced7122ad5919
-  kubernetes-model-coordination-6.9.2.jar: c4aaac2c0be0cc8d7da190c9f79bf39c7f2ce56f
-  kubernetes-model-core-6.9.2.jar: 12699e1f15de4b25719209aeb249d2130f1f43ed
-  kubernetes-model-discovery-6.9.2.jar: fd0334c9937d03340a39dc4c45f8d62152c4e5ae
-  kubernetes-model-events-6.9.2.jar: ff7f84010e6ef1b68617fad4e69b50da400b4cf4
-  kubernetes-model-extensions-6.9.2.jar: 3a61bd618670a5ec3c51a3f89f68f9e31c433097
-  kubernetes-model-flowcontrol-6.9.2.jar: c0e6688c4c045c2d4e7f011fd42d887de083ff78
-  kubernetes-model-gatewayapi-6.9.2.jar: 20e46d88bcb43a225bae08fb8b3c70aedd8b65be
-  kubernetes-model-metrics-6.9.2.jar: bfa5695f82fd5e6aedf4e2d8c84c6b58e99ed9d4
-  kubernetes-model-networking-6.9.2.jar: 1c300a5daa658e920305d9fedf0353deb3ced82a
-  kubernetes-model-node-6.9.2.jar: 067c65801ef19ec87dd527485ee0cb2884d1d6f8
-  kubernetes-model-policy-6.9.2.jar: 4393225b21e664c11239e83d8799fe4955d7129c
-  kubernetes-model-rbac-6.9.2.jar: 5e1c9d300c4a45ceca0e6ae7dc622e3e83f4f39e
-  kubernetes-model-resource-6.9.2.jar: d53783a6d3896ac477f2945ed6014f4210d6782c
-  kubernetes-model-scheduling-6.9.2.jar: 36d957c26e3364bd8ae1a17bfd3cf724057fae17
-  kubernetes-model-storageclass-6.9.2.jar: 4b8e8f8c376a713a9e87e6c7fef78c4c45d56818
+  kubernetes-client-6.10.0.jar: e92ba504d5d7de00af391769112360376c5eb2a8
+  kubernetes-client-api-6.10.0.jar: 743ccecdc20ad831fab1897d8dfbf759c56b7608
+  kubernetes-httpclient-okhttp-6.10.0.jar: db8ac9af378537a86fe60ffe46d5415637b8082c
+  kubernetes-model-admissionregistration-6.10.0.jar: 3d4b12febdc13a04aff9edd3ffb677ba3149ab93
+  kubernetes-model-apiextensions-6.10.0.jar: 3d6fd69bce401d40804fabdfdf4e1cab588c3309
+  kubernetes-model-apps-6.10.0.jar: 359eaca9e33408f7b2135b588cb05b8fd62ab827
+  kubernetes-model-autoscaling-6.10.0.jar: 4e3d7a852e37d2b978530cd802f91274122ef58b
+  kubernetes-model-batch-6.10.0.jar: 37413e08b21d5fb216201dc4762ce72ce7cde6e2
+  kubernetes-model-certificates-6.10.0.jar: 438a207ef0053bd3a225c84873d3521ebdf62dad
+  kubernetes-model-common-6.10.0.jar: 526f7a456fa62ada71c74509cdb81851d45ccab0
+  kubernetes-model-coordination-6.10.0.jar: 9dad5b905740b2e0389bbde4918d36d8dea90f11
+  kubernetes-model-core-6.10.0.jar: 89905cb84a2067cb286ee6843382fa131bf66cf6
+  kubernetes-model-discovery-6.10.0.jar: cba115f54ce296ffef8d7a6eb1871dd4b21573e7
+  kubernetes-model-events-6.10.0.jar: 95963ab9f6d0080bd7b26ea466acfd42d20b9e19
+  kubernetes-model-extensions-6.10.0.jar: bb592cc169e25719d1083f73c2d9b2e5e4e41075
+  kubernetes-model-flowcontrol-6.10.0.jar: 8e28f619f626f70bc621ac0649d91f47f8679eec
+  kubernetes-model-gatewayapi-6.10.0.jar: 17378e8f982f2da3379c675c7b761b6bfd73c5cd
+  kubernetes-model-metrics-6.10.0.jar: 86fd6fd1313918aa27a2e08aac539b51f07092dc
+  kubernetes-model-networking-6.10.0.jar: a453793e981cdaff9aae71ef098b31df273fca6c
+  kubernetes-model-node-6.10.0.jar: a195c697e1163424bbb51f1f35eedadb2f626d49
+  kubernetes-model-policy-6.10.0.jar: 0388682156ba4ce71b2d06c5cf886bee93031ee8
+  kubernetes-model-rbac-6.10.0.jar: a959f2cfd2192289de46a8bff69180d7b9c26cab
+  kubernetes-model-resource-6.10.0.jar: b9fffbc45cf728bdb2b07046004606a7ae3af9c0
+  kubernetes-model-scheduling-6.10.0.jar: e97336c7798664e990d6ea943af3020c2cd4e43b
+  kubernetes-model-storageclass-6.10.0.jar: 71fbda74c51b5e150c7ebda51beb77ec6cb34f74
   logging-interceptor-3.12.12.jar: d952189f6abb148ff72aab246aa8c28cf99b469f
-  snakeyaml-2.0.jar: 3aab2116756442bf0d4cd1c089b24d34c3baa253
+  snakeyaml-2.2.jar: 3af797a25458550a16bf89acc8e4ab2b7f2bfce0
   snakeyaml-engine-2.7.jar: 5213e62e87e62ac009d80aeb64c8240075bf078a
   zjsonpatch-0.3.0.jar: d3ebf0f291297649b4c8dc3ecc81d2eddedc100d

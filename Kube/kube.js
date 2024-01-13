@@ -59,6 +59,12 @@ var $kube = function(aMap) {
 			var res = _r._k.getNodesMetrics()
 			_r._k.close()
 			return res
+		},
+		getLog: (aNS, aPodName, aContainer, aStream) => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			var res = _r._k.getLog(aNS, aPodName, aContainer, aStream)
+			_r._k.close()
+			return res
 		}
 	};
 
@@ -598,6 +604,34 @@ Kube.prototype.getPods = function(aNamespace, full) {
 		return (full ? this.__dR(this.client.pods()) : this.__displayResult(this.client.pods().list().items));
 	}
 };
+
+/**
+ * <odoc>
+ * <key>Kube.getLog(aNamespace, aPodName, aContainer, aStream) : LogWatchCallback</key>
+ * Tries to retrieve the log of aPodName on aNamespace. Optionally you can provide aContainer and aStream (a java stream).
+ * If aStream is provided it will return a LogWatchCallback and aStream will be updated with the log until LogWatchCallback.close
+ * is called. If aStream is not provided it will return the log as a string.
+ * </odoc>
+ */
+Kube.prototype.getLog = function(aNamespace, aPodName, aContainer, aStream) {
+	if (isDef(aNamespace)) {
+		var _c = this.client.inNamespace(aNamespace).pods().withName(aPodName)
+		if (isDef(aContainer)) _c = _c.inContainer(aContainer)
+		if (isDef(aStream)) {
+			return _c.watchLog(aStream)
+		} else {
+			return String(_c.getLog())
+		}
+	} else {
+		var _c = this.client.pods().withName(aPodName).inContainer(aContainer)
+		if (isDef(aContainer)) _c = _c.inContainer(aContainer)
+		if (isDef(aStream)) {
+			return _c.watchLog(aStream)
+		} else {
+			return String(_c.getLog())
+		}
+	}
+}
 
 /**
  * <odoc>
