@@ -2,7 +2,7 @@ artifacts:
 
   - id     : ignite-core
     group  : org.apache.ignite
-    version: 2.15.0
+    version: 2.16.0
 
   #- id     : ignite-shmem
   #  group  : org.gridgain
@@ -14,4 +14,4 @@ artifacts:
 
   - id     : annotations
     group  : org.jetbrains
-    version: 24.0.1
+    version: 24.1.0
