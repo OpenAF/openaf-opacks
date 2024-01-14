@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.projog</groupId>
             <artifactId>projog-core</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.projog</groupId>
