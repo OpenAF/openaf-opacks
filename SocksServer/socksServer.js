@@ -4,11 +4,15 @@
  * Initiates a SockServer wrapper.
  * </odoc>
  */
-var SocksServer = function() {
+var SocksServer = function(aCacheTTL) {
     if (isUnDef(getOPackPath("SocksServer")))
         loadExternalJars(".")
     else
         loadExternalJars(getOPackPath("SocksServer"))
+
+    this._cache = {}
+    this._old   = now()
+    this._ttl   = _$(aCacheTTL, "aCacheTTL").isNumber().default(60000)
 }
 
 /**
@@ -54,31 +58,50 @@ SocksServer.prototype.getLogCallback = function(verboseLog, detailLog, includeSt
 
 /**
  * <odoc>
- * <key>SocksServer.getNetFilter(ipFilters) : Function</key>
- * Returns a function to be used with SocksServer.getCallback to filter an array of ipFilters masks (e.g. as cidr).
+ * <key>SocksServer.getNetFilter(ipFilters, hostFilters) : Function</key>
+ * Returns a function to be used with SocksServer.getCallback to filter an array of ipFilters masks (e.g. as cidr) and/or an array of
+ * hostFilters suffixes (e.g. "mydomain.com").
  * </odoc>
  */
-SocksServer.prototype.getNetFilter = function(ipFilters) {
-    ipFilters = _$(ipFilters, "ipFilters").isArray().default([])
+SocksServer.prototype.getNetFilter = function(ipFilters, hostFilters) {
+    ipFilters   = _$(ipFilters, "ipFilters").isArray().default([])
+    hostFilters = _$(hostFilters, "hostFilters").isArray().default([])
 
     // TODO: cache filters
+    var parent = this
     return function(data) {
-        var _cmp = (aSource, filters) => {
-            var go = false
+        var _cmp = (aSource, filters, hfilters) => {
+            if (parent._old + parent._ttl < now()) parent._cache = {}
+            if (isDef(parent._cache[aSource])) return parent._cache[aSource]
+
+            var go = false, go2 = false
             var d = aSource.getAddress().map(r => ow.format.toBinary(Number(r & 255), 8)).join("")
-            filters.forEach(ip => {
+            for (let ip of filters) {
+                if (go) break
                 if (ip.indexOf("/") > 0) {
                     var _p = ip.split("/")
                     var t = java.net.InetAddress.getByName(_p[0]).getAddress().map(r => ow.format.toBinary(Number(r & 255), 8)).join("")
-                    //var l = (java.net.InetAddress.getByName(_p[0]).getHostAddress().indexOf(":") >= 0 ? 128 : 32)
     
                     if (d.substring(0, _p[1]) == t.substring(0, _p[1])) go = true
                 }
-            })
-            return !go
+            }
+            if (isUnDef(hfilters) || hfilters.length == 0) 
+                go2 = go
+            else {
+                if (isUnDef(filters) || filters.length == 0) 
+                    go2 = true
+                var _p = String(aSource).split("/")
+                for (let h of hfilters) {
+                    if (go2) break
+                    if (_p[0].endsWith(h)) go2 = true
+                }
+            }
+
+            parent._cache[aSource] = !go2
+            return !go2
         }
 
-        return _cmp(data, ipFilters)
+        return _cmp(data, ipFilters, hostFilters)
     }
 }
 
