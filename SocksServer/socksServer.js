@@ -1,10 +1,10 @@
 /**
  * <odoc>
- * <key>SocksServer.SocksServer()</key>
- * Initiates a SockServer wrapper.
+ * <key>SocksServer.SocksServer(aCacheTTL, aNumberOfWorkers)</key>
+ * Initiates a SockServer wrapper. Optionally you can provide aCacheTTL (in ms) and aNumberOfWorkers (default number of cores times 2).
  * </odoc>
  */
-var SocksServer = function(aCacheTTL) {
+var SocksServer = function(aCacheTTL, aNumberOfWorkers) {
     if (isUnDef(getOPackPath("SocksServer")))
         loadExternalJars(".")
     else
@@ -13,6 +13,8 @@ var SocksServer = function(aCacheTTL) {
     this._cache = {}
     this._old   = now()
     this._ttl   = _$(aCacheTTL, "aCacheTTL").isNumber().default(60000)
+
+    this._workers = aNumberOfWorkers
 }
 
 /**
@@ -26,7 +28,7 @@ SocksServer.prototype.start = function(aPort, aCallback) {
     aPort = _$(aPort).isNumber().default(1080)
 
     if (isUnDef(this._server)) {
-        this._server = new Packages.org.bbottema.javasocksproxyserver.SocksServer()
+        this._server = (isDef(this._workers) ? new Packages.org.bbottema.javasocksproxyserver.SocksServer(this._workers) : new Packages.org.bbottema.javasocksproxyserver.SocksServer())
     }
     if (isDef(aCallback)) {
         return this._server.start(aPort, aCallback)

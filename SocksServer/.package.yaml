@@ -26,14 +26,14 @@ files:
 - .package.yaml
 - LICENSES.txt
 - README.md
-- java-socks-proxy-server-2.0.1.jar
+- java-socks-proxy-server-2.0.2.jar
 - lombok-1.18.30.jar
 - socksServer.js
 filesHash:
   .maven.yaml: 5d86a7561d199b1accddfaead8f5527588e14d38
-  .odoc.db: a678f2e825c1a9e59e949a1940629b43a23ca709
+  .odoc.db: f0ab27ff912c74424e9eeb4c2f2226da276711c2
   LICENSES.txt: adef8f697505f8376e6597fc422cf0880aff8044
-  README.md: 8803453b84d7a23c63e5cddff9f69a4fb9d62482
-  java-socks-proxy-server-2.0.1.jar: d9cb13d097f7cc00da167d8a3eba0579cd239e6f
+  README.md: df5359997e1cd99147247ea9bdb7c8c7eb288777
+  java-socks-proxy-server-2.0.2.jar: 8a0007798464261a941808f9761779a8e8646be1
   lombok-1.18.30.jar: f195ee86e6c896ea47a1d39defbe20eb59cd149d
-  socksServer.js: 3fc4d3ee389d6db2da772155531f0ad30761c697
+  socksServer.js: 576560db30795d9b9e8687ace39b85c9085cf2d6
