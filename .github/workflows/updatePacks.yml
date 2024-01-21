@@ -123,9 +123,9 @@ jobs:
             io.writeFileString("/tmp/output.out", "Automatic bump of RocksDB oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
 
             // Bump opack version
-            var opack = io.readFileYAML("RocksDB/.package.yaml")
+            var opack = io.readFileYAML("rocksdb/.package.yaml")
             opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-            io.writeFileYAML("RocksDB/.package.yaml", opack)
+            io.writeFileYAML("rocksdb/.package.yaml", opack)
 
             // Update pack
             $sh(getOpenAFPath() + "opack genpack .")
@@ -141,5 +141,5 @@ jobs:
       uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ RocksDB" paths="RocksDB/" title="Update\ RocksDB\ oPack" bodyFile=/tmp/output.out'
+        args: 'message="Update\ RocksDB" paths="rocksdb/" title="Update\ RocksDB\ oPack" bodyFile=/tmp/output.out'
         dist: t8
