@@ -1,7 +1,7 @@
 /**
  * <odoc>
- * <key>SocksServer.SocksServer(aCacheTTL, aNumberOfWorkers)</key>
- * Initiates a SockServer wrapper. Optionally you can provide aCacheTTL (in ms) and aNumberOfWorkers (default number of cores times 2).
+ * <key>SocksServer.SocksServer(aCacheTTL)</key>
+ * Initiates a SockServer wrapper.
  * </odoc>
  */
 var SocksServer = function(aCacheTTL, aNumberOfWorkers) {
