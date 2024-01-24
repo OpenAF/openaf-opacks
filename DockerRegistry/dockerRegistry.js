@@ -7,8 +7,9 @@
  */
  var DockerRegistry = function(aURL, aLogin, aPass) {
    this._restparams = {};
+   this._dockerhub = "https://registry.hub.docker.com/v2/repositories"
 
-   this._url = _$(aURL, "aURL").isString().default("https://registry.hub.docker.com/v2/repositories")
+   this._url = _$(aURL, "aURL").isString().default(this._dockerhub)
    var url = (new java.net.URL(this._url));
 
    // If no authentication info was provided
@@ -36,7 +37,17 @@
       this._restparams.login = aLogin;
       this._restparams.pass  = aPass;
    }
+
+   this._getToken()
 };
+
+DockerRegistry.prototype._getToken = function() {
+   var _token = $rest().get(this._url + "/token")
+   if (isMap(_token) && isDef(_token.token)) {
+      _token = _token.token
+      this._restparams.requestHeaders = { Authorization: "Bearer " + _token }
+   }
+}
 
 /**
  * <odoc>
@@ -57,7 +68,15 @@ DockerRegistry.prototype.listRepositories = function() {
 DockerRegistry.prototype.listTags = function(aRepository) {
    aRepository = _$(aRepository, "aRepository").isString().$_();
 
-   return $rest(this._restparams).get(this._url + "/v2/" + aRepository + "/tags/list");
+   if (this._url == this._dockerhub) {
+      var _r = this.hubListTags(aRepository)
+      return {
+         name: aRepository,
+         tags: _r.map(r => r.name)
+      }
+   } else {
+      return $rest(this._restparams).get(this._url + "/v2/" + aRepository + "/tags/list")
+   }
 };
 
 /**
@@ -93,9 +112,9 @@ DockerRegistry.prototype.hubListTags = function(aRepository, onlyRecent) {
                   if (isUnDef(manif.error)) {
                      data.push({
                         name         : r,
-                        last_updated : $from(manif.history).attach("date", s=>new Date(s.v1Compatibility.created.replace(/\.\d+Z$/,"Z"))).max("date").date.toISOString(),
+                        last_updated : (isUnDef(manif.history) || manif.history.length <= 0? __ : $from(manif.history).attach("date", s=>new Date(s.v1Compatibility.created.substring(0, 23))).max("date").date.toISOString()),
                         //images       : $from(r.history).select(r => ({ architecture: r.v1Compatibility.architecture })),
-                        full_size    : $from(manif.layers).sum("size") 
+                        full_size    : (isUnDef(manif.layers) || manif.layers.length <= 0 ? __ : $from(manif.layers).sum("size"))
                      })
                   }
                })
