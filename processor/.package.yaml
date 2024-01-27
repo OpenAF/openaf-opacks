@@ -1,0 +1,52 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: |
+    if (io.fileExists(getOpenAFPath() + "oafp")) {
+      logWarn("Removing " + getOpenAFPath() + "oafp...")
+      io.rm(getOpenAFPath() + "oafp")
+    }
+  preinstall: ''
+  postinstall: |
+    if (outputPath.startsWith(getOpenAFPath())) {
+      log("Installing 'oafp' in " + getOpenAFPath() + "...")
+      io.cp(outputPath + "/oafp.js", getOpenAFPath() + "oafp.js")
+      $sh(getOpenAFPath() + "oaf --sb " + getOpenAFPath() + "oafp.js").exec()
+      log("Renaming oafp.js to oafp...")
+      io.mv(getOpenAFPath() + "oafp.js", getOpenAFPath() + "oafp")
+    } else {
+      log("Creating 'oafp'...")
+      io.cp(outputPath + "/oafp.js", "oafp.js")
+      $sh(getOpenAFPath() + "oaf --sb oafp.js").exec()
+      log("Renaming oafp.js to oafp...")
+      io.mv("oafp.js", "oafp")
+    }
+keywords:
+- data
+- processor
+- yaml
+- json
+- xml
+- csv
+- ndjson
+- slon
+- md
+- visualisation
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/processor.opack
+description: A command-line data processor for various input and output formats with query capabilities.
+name: processor
+main: oafp.js
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20240127'
+dependencies:
+  openaf: '>=20231222'
+files:
+- .package.yaml
+- oafp.js
+filesHash:
+  oafp.js: 132f1b752e2995d59eea05b6aa67b8f80545ddb0
