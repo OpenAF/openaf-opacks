@@ -1,8 +1,3 @@
-#!/usr/bin/env /Applications/OpenAF/oaf-sb
-
-var params = processExpr(" ");
-// sprint(params)
-
 // var params = processExpr(" ")
 // Author : Nuno Aguiar
 var showHelp = () => {
