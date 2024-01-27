@@ -14,14 +14,14 @@ scripts:
       $sh(getOpenAFPath() + "oaf --sb " + getOpenAFPath() + "oafp.js").exec()
       log("Renaming oafp.js to oafp...")
       io.mv(getOpenAFPath() + "oafp.js", getOpenAFPath() + "oafp")
-      print("\n --> Installed in " + io.fileInfo(getOpenAFPath() + "oafp").canonicalPath + " <--\n")
+      print("\n --> Run '" + io.fileInfo(getOpenAFPath() + "oafp").canonicalPath + " -h' for usage details <--\n")
     } else {
       log("Creating 'oafp'...")
       io.cp(outputPath + "/oafp.js", "oafp.js")
       $sh(getOpenAFPath() + "oaf --sb oafp.js").exec()
       log("Renaming oafp.js to oafp...")
       io.mv("oafp.js", "oafp")
-      print("\n --> Installed in " + io.fileInfo("oafp").canonicalPath + " <--\n")
+      print("\n --> Run '" + io.fileInfo("oafp").canonicalPath + " -h' for usage details <--\n")
     }
 keywords:
 - data
