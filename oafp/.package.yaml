@@ -32,13 +32,14 @@ keywords:
 - slon
 - md
 - visualisation
+- oafp
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: https://openaf.io/opacks/processor.opack
+  url: https://openaf.io/opacks/oafp.opack
 description: A command-line data processor for various input and output formats with query capabilities.
-name: processor
+name: oafp
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
