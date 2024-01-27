@@ -47,6 +47,8 @@ dependencies:
   openaf: '>=20231222'
 files:
 - .package.yaml
+- README.md
 - oafp.js
 filesHash:
-  oafp.js: 132f1b752e2995d59eea05b6aa67b8f80545ddb0
+  README.md: aea537b2d128fbd3f203e0b80481c3ce59bf428b
+  oafp.js: 9e13d8d6983c241297693077ec04c77bbaa79ff5
