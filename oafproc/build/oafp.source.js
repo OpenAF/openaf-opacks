@@ -3,7 +3,7 @@ var params = processExpr(" ")
 var showHelp = () => {
     __initializeCon()
 
-    var _f = (getOPackPath("processor") || ".") + "/README.md"
+    var _f = (getOPackPath("oafproc") || ".") + "/README.md"
     if (io.fileExists(_f)) {
         __ansiColorFlag = true
 		__conConsole = true
@@ -12,7 +12,7 @@ var showHelp = () => {
         else
             print(ow.format.withMD( io.readFileString(_f) ))
     } else {
-        print("Check https://github.com/OpenAF/openaf-opacks/blob/master/processor/README.md")
+        print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/README.md")
     }
 
     exit(0)
