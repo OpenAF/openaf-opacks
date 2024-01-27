@@ -1,0 +1,69 @@
+# Author: Nuno Aguiar
+help:
+  text   : Build oafp
+  # expects: 
+  # - name     : something
+  #   desc     : To do something
+  #   example  : aValueExample
+  #   mandatory: false
+
+todo:
+- Build oafp
+
+ojob:
+  opacks      :
+  - openaf: 20231222
+  - GoogleCompiler
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+
+jobs:
+# -----------------------
+- name : Find oafp source
+  exec : |
+    if (io.fileExists("oafp.source.js")) {
+      args.path = "."
+    } else {
+      if (io.fileExists("build/oafp.source.js")) {
+        args.path = "build"
+      }
+    }
+
+    if (isUnDef(args.path)) throw "Could not find oafp.source.js"
+    log("Source found in: " + args.path + "/oafp.source.js")
+  
+# ---------------------
+- name : Remove shebang
+  args :
+    replace:
+      "var params=processExpr(\" \"),": ""
+  exec : |
+    args.inputFile  = args.path + "/oafp.js"
+    args.outputFile = args.path + "/oafp.js"
+
+    log("Removing shebang...")
+  to   :  
+  - name: ojob find/replace
+    args:
+      __key    : args
+      __path   : replace
+
+# ---------------------
+- name : Compile source
+  exec : |
+    log("Compiling source...")
+    $sh([getOpenAFPath() + "opack", "exec", "GoogleCompiler", "--language_out", "ECMASCRIPT_2019", "--env", "CUSTOM", "--strict_mode_input", "false", "--rewrite_polyfills", "false", "--js", args.path + "/oafp.source.js", "--js_output_file", args.path + "/oafp.js"])
+    .prefix("compiler")
+    .get()
+
+# -----------------
+- name : Build oafp
+  from : 
+  - Find oafp source
+  - Compile source
+  - Remove shebang
+  exec : |
+    if (args.path == "build") io.mv(args.path + "/oafp.js", "oafp.js")
+    if (args.path == ".")     io.mv(args.path + "/oafp.js", "../oafp.js")
+
+    

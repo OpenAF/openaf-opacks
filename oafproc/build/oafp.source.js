@@ -1,4 +1,4 @@
-// var params = processExpr(" ")
+var params = processExpr(" ")
 // Author : Nuno Aguiar
 var showHelp = () => {
     __initializeCon()

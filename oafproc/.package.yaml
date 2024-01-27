@@ -14,12 +14,14 @@ scripts:
       $sh(getOpenAFPath() + "oaf --sb " + getOpenAFPath() + "oafp.js").exec()
       log("Renaming oafp.js to oafp...")
       io.mv(getOpenAFPath() + "oafp.js", getOpenAFPath() + "oafp")
+      print("\n --> Installed in " + io.fileInfo(getOpenAFPath() + "oafp").canonicalPath + " <--\n")
     } else {
       log("Creating 'oafp'...")
       io.cp(outputPath + "/oafp.js", "oafp.js")
       $sh(getOpenAFPath() + "oaf --sb oafp.js").exec()
       log("Renaming oafp.js to oafp...")
       io.mv("oafp.js", "oafp")
+      print("\n --> Installed in " + io.fileInfo("oafp").canonicalPath + " <--\n")
     }
 keywords:
 - data
@@ -39,7 +41,7 @@ repository:
   type: http
   url: https://openaf.io/opacks/oafp.opack
 description: A command-line data processor for various input and output formats with query capabilities.
-name: oafp
+name: oafproc
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
@@ -49,7 +51,11 @@ dependencies:
 files:
 - .package.yaml
 - README.md
+- build/build.yaml
+- build/oafp.source.js
 - oafp.js
 filesHash:
   README.md: 4e3221fc80f0bd43cd6d8b53d40719be77bcecd4
-  oafp.js: 047d85b2d572449137f128f4afca53bcdbf72e70
+  build/build.yaml: 6336b246b812bbb468116b229d39749b7c2d437a
+  build/oafp.source.js: b3a29a46ea6ecd746c2da3439151727b9342b39a
+  oafp.js: d39edac1ff084bd144ba38105f88c8f76a0b9751
