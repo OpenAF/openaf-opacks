@@ -21,17 +21,19 @@ var showHelp = () => {
 ow.loadFormat()
 if (__expr.indexOf(" -h") > -1) showHelp()
 
-var _file = params.file, _format = params.output || params.format, _type = params.input || params.type, _from = params.from, _sql = params.sql, _path = params.path, _csv = params.csv, _pause = params.pause
-var _sortmapkeys = params.sortmapkeys, _searchkeys = params.searchkeys, _searchvalues = params.searchvalues
-var _xmlignored = params.xmlignored, _xmlprefix = params.xmlprefix, _xmlfiltertag = params.xmlfiltertag
-var _ndjsonjoin = params.ndjsonjoin
+params.format = params.output || params.format, params.type = params.input || params.type
+//var _from = params.from, _sql = params.sql, _path = params.path, _csv = params.csv, _pause = params.pause
+//var _sortmapkeys = params.sortmapkeys, _searchkeys = params.searchkeys, _searchvalues = params.searchvalues, _maptoarray = params.maptoarray, _maptoarraykey = params.maptoarraykey, _arraytomap = params.arraytomap, _arraytomapkey = _arraytomapkey
+//var params.xmlignored = params.xmlignored, params.xmlprefix = params.xmlprefix, params.xmlfiltertag = params.xmlfiltertag
+//var params.ndjsonjoin = params.ndjsonjoin
 
 // File extensions list
 const _fileExtensions = new Map([
     [".json", "json"],
     [".yaml", "yaml"],
     [".xml", "xml"],
-    [".csv", "csv"]
+    [".csv", "csv"],
+    [".md", "md"]
 ])
 
 // List of input types that should not be stored in memory
@@ -40,7 +42,7 @@ var _inputNoMem = new Set([ "csv" ])
 // Input functions processing per line
 var _inputLineFns = {
     "ndjson": (r, options) => {
-        if (!_ndjsonjoin) {
+        if (!params.ndjsonjoin) {
             $o(jsonParse(r, __, __, true), options)
             noFurtherOutput = true
         }
@@ -49,9 +51,11 @@ var _inputLineFns = {
 
 // Transform functions
 var _transformFns = {
-    "_sortmapkeys" : _r => (toBoolean(_sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
-    "_searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, _searchkeys) : _r),
-    "_searchvalues": _r => (isObject(_r) ? searchValues(_r, _searchvalues) : _r)
+    "_sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
+    "_searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
+    "_searchvalues": _r => (isObject(_r) ? searchValues(_r, params.earchvalues) : _r),
+    "_maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
+    "_arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey) : _r)
 }
 
 // Util functions
@@ -84,13 +88,13 @@ const _$o = (r, options) => {
 var _outputFns = new Map([
     ["yaml" , (_res, options) => _$o(af.fromYAML(_res), options)],
     ["xml"  , (_res, options) => {
-        _xmlignored = _$(_xmlignored, "xmlignored").isString().default(__)
-        _xmlprefix = _$(_xmlprefix, "xmlprefix").isString().default(__)
-        _xmlfiltertag = toBoolean(_$(_xmlfiltertag, "xmlfiltertag").isString().default(__))
-        _$o(af.fromXML2Obj(_res, _xmlignored, _xmlprefix, _xmlfiltertag), options)
+        params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
+        params.xmlprefix = _$(params.xmlprefix, "xmlprefix").isString().default(__)
+        params.xmlfiltertag = toBoolean(_$(params.xmlfiltertag, "xmlfiltertag").isString().default(__))
+        _$o(af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, params.xmlfiltertag), options)
     }],
     ["ndjson", (_res, options) => {
-        if (_ndjsonjoin) {
+        if (params.ndjsonjoin) {
             _$o(_res.split('\n').map(e => jsonParse(e.trim(), __, __, true)), options)
         } else {
             io.readLinesNDJSON(af.fromString2InputStream(_res), r => {
@@ -104,8 +108,8 @@ var _outputFns = new Map([
         print(ow.format.withMD(_res))
     }],
     ["csv", (_res, options) => {
-        if (isDef(_file)) {
-            var is = io.readFileStream(_file)
+        if (isDef(params.file)) {
+            var is = io.readFileStream(params.file)
             _$o($csv().fromInStream(is).toOutArray(), options)
             is.close()
         } else {
@@ -116,27 +120,27 @@ var _outputFns = new Map([
 ])
 
 // Default format
-_format = _$(_format, "format").isString().default("ctree")
+params.format = _$(params.format, "format").isString().default("ctree")
 
 // Initialize console detection
 __initializeCon()
 
 // Set options
-var options = { __format: _format, __from: _from, __sql: _sql, __path: _path, __csv: _csv, __pause: _pause }
+var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause }
 // ndjson options
-if (_type == "ndjson") {
-    _ndjsonjoin = toBoolean(_$(_ndjsonjoin, "ndjsonjoin").isString().default(__))
+if (params.type == "ndjson") {
+    params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
 }
 
 // Read input from stdin or file
 var _res = "", noFurtherOutput = false
-if (isDef(_file)) {
-    if (!_inputNoMem.has(_type)) _res = io.readFileString(_file)
+if (isDef(params.file)) {
+    if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
 } else {
     _res = []
     io.pipeLn(r => {
-        if (isDef(_inputLineFns[_type])) 
-            _inputLineFns[_type](_transform(r), options)
+        if (isDef(_inputLineFns[params.type])) 
+            _inputLineFns[params.type](_transform(r), options)
         else
             _res.push(r)
         return false
@@ -146,26 +150,26 @@ if (isDef(_file)) {
 
 if (!noFurtherOutput) {
     // Detect type if not provided
-    if (isUnDef(_type)) {
+    if (isUnDef(params.type)) {
         // File name based
-        if (isDef(_file)) {
-            let _ext = _file.substring(_file.lastIndexOf('.'))
-            if (isDef(_fileExtensions[_ext])) _type = _fileExtensions[_ext]
+        if (isDef(params.file)) {
+            let _ext = params.file.substring(params.file.lastIndexOf('.'))
+            if (_fileExtensions.has(_ext)) params.type = _fileExtensions.get(_ext)
         }
 
         // Content-based
-        if (isUnDef(_type)) {
+        if (isUnDef(params.type)) {
             let _tres = _res.trim()
             if (_tres.startsWith("{") || _tres.startsWith("[")) {
-                _type = "json"
+                params.type = "json"
             } else if (_tres.startsWith("<")) {
-                _type = "xml"
+                params.type = "xml"
             } else {
                 if (isString(_tres) && _tres.length > 0) {
                     if (_tres.substring(0, _tres.indexOf('\n')).split(",").length > 1) {
-                        _type = "csv"
+                        params.type = "csv"
                     } else if (_tres.substring(0, _tres.indexOf(': ') > 0)) {
-                        _type = "yaml"
+                        params.type = "yaml"
                     }
                 } else {
                     printErr("Please provide the input type.")
@@ -176,8 +180,8 @@ if (!noFurtherOutput) {
     }
 
     // Determine input type and execute
-    if (isDef(_outputFns.has(_type))) {
-        _outputFns.get(_type)(_res, options)
+    if (isDef(_outputFns.has(params.type))) {
+        _outputFns.get(params.type)(_res, options)
     } else {      
         _outputFnsget("json")(_res, options)
     }

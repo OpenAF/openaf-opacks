@@ -43,7 +43,7 @@ List of available formats to use with the _output_ option:
 | json   | A JSON format without spacing |
 | prettyjson | A JSON format with spacing |
 | yaml   | A YAML format |
-| stable | A table-like format with word-wrap (only for list outputs) |
+| stable | A table-like format with separation (only for list outputs) |
 | table  | A table-like format without size constraints (only for list outputs) |
 | xml    | An XML format |
 | ndjson | A NDJSON format |
