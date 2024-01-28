@@ -26,7 +26,7 @@ Usage: _oafp [options]_
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
 
-> The transforms are applied to the parsed input before any filters.
+> The transforms are applied after the parsed input is filtered.
 
 ---
 

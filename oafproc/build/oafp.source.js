@@ -64,7 +64,20 @@ const _transform = r => {
     return r
 }
 const _$o = (r, options) => {
-    $o(_transform(r), options)
+    if (options.__path) {
+        r = $path(r, options.__path)
+        delete options.__path
+    }
+    if (options.__from) {
+        r = $from(r).query(af.fromNLinq(options.__from))
+        delete options.__from
+    }
+    if (options.__sql) {
+        r = $sql(r, options.__sql)
+        delete options.__sql
+    }
+    r = _transform(r)
+    $o(r, options)
 }
 
 // Output functions
