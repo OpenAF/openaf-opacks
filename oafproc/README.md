@@ -16,6 +16,8 @@ Usage: _oafp [options]_
 | csv    | If type=csv, the CSV options to use |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 
+---
+
 ## 🚜 Optional transforms:
 
 | Option | Type | Description |
@@ -23,6 +25,8 @@ Usage: _oafp [options]_
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
+
+> The transforms are applied to the parsed input before any filters.
 
 ---
 
