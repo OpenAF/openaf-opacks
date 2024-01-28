@@ -113,12 +113,18 @@ const _$o = (r, options) => {
             $o(r, merge(options, { __format: "yaml" }))
         }
         break
+    case "mdtable":
+        if (isArray(r)) {
+            ow.loadTemplate()
+            print( ow.template.md.table(r) )
+        }
+        break
     default   :
         $o(r, options)
     }
 }
 
-// Output functions
+// Output functions (input parsers)
 var _outputFns = new Map([
     ["yaml" , (_res, options) => _$o(af.fromYAML(_res), options)],
     ["xml"  , (_res, options) => {
@@ -150,6 +156,11 @@ var _outputFns = new Map([
         __ansiColorFlag = true
         __conConsole = true
         print(ow.format.withMD(_res))
+    }],
+    ["mdtable", (_res, options) => {
+        ow.loadTemplate()
+        var _s = ow.template.md.fromTable(_res)
+        _$o(_s, options)
     }],
     ["csv", (_res, options) => {
         if (isDef(params.file)) {
