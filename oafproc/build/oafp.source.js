@@ -90,7 +90,8 @@ const _$o = (r, options) => {
     }
     r = _transform(r)
 
-    if (options.__format == "log") {
+    switch(options.__format) {
+    case "log":
         var _arr = r
         if (isMap(r)) _arr = [ r ]
         if (isArray(_arr)) {
@@ -101,7 +102,18 @@ const _$o = (r, options) => {
                 print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
             })
         }
-    } else {
+        break
+    case "mdyaml":
+        if (isArray(r)) {
+            r.forEach((_y, i) => {
+                $o(_y, merge(options, { __format: "yaml" }))
+                if (i < r.length - 1) print("---\n")
+            })
+        } else {
+            $o(r, merge(options, { __format: "yaml" }))
+        }
+        break
+    default   :
         $o(r, options)
     }
 }
