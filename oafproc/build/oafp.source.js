@@ -51,11 +51,11 @@ var _inputLineFns = {
 
 // Transform functions
 var _transformFns = {
-    "_sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
-    "_searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
-    "_searchvalues": _r => (isObject(_r) ? searchValues(_r, params.earchvalues) : _r),
-    "_maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
-    "_arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey) : _r)
+    "sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
+    "searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
+    "searchvalues": _r => (isObject(_r) ? searchValues(_r, params.earchvalues) : _r),
+    "maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
+    "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r)
 }
 
 // Util functions
@@ -63,7 +63,7 @@ const _transform = r => {
     var _ks = Object.keys(_transformFns)
     for(var ikey = 0; ikey < _ks.length; ikey++) {
         var key = _ks[ikey]
-        if (isDef(global[key])) r = _transformFns[key](r)
+        if (isDef(params[key])) r = _transformFns[key](r)
     }
     return r
 }
