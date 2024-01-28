@@ -19,13 +19,21 @@ var showHelp = () => {
 }
 
 ow.loadFormat()
-if (__expr.indexOf(" -h") > -1) showHelp()
+if (params["-h"] == "") showHelp()
 
 params.format = params.output || params.format, params.type = params.input || params.type
-//var _from = params.from, _sql = params.sql, _path = params.path, _csv = params.csv, _pause = params.pause
-//var _sortmapkeys = params.sortmapkeys, _searchkeys = params.searchkeys, _searchvalues = params.searchvalues, _maptoarray = params.maptoarray, _maptoarraykey = params.maptoarraykey, _arraytomap = params.arraytomap, _arraytomapkey = _arraytomapkey
-//var params.xmlignored = params.xmlignored, params.xmlprefix = params.xmlprefix, params.xmlfiltertag = params.xmlfiltertag
-//var params.ndjsonjoin = params.ndjsonjoin
+
+// Check if file is provided
+if (isUnDef(params.file)) {
+    let _found = __
+    for (let key in params) {
+        if (params[key] === "") {
+            _found = key
+            break;
+        }
+    }
+    params.file = _found
+}
 
 // File extensions list
 const _fileExtensions = new Map([
@@ -53,7 +61,7 @@ var _inputLineFns = {
 var _transformFns = {
     "sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
     "searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
-    "searchvalues": _r => (isObject(_r) ? searchValues(_r, params.earchvalues) : _r),
+    "searchvalues": _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
     "maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
     "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r)
 }
@@ -110,10 +118,10 @@ var _outputFns = new Map([
     ["csv", (_res, options) => {
         if (isDef(params.file)) {
             var is = io.readFileStream(params.file)
-            _$o($csv().fromInStream(is).toOutArray(), options)
+            _$o($csv(params.inputcsv).fromInStream(is).toOutArray(), options)
             is.close()
         } else {
-            _$o($csv().fromInString( _res ).toOutArray(), options)
+            _$o($csv(params.inputcsv).fromInString( _res ).toOutArray(), options)
         }
     }],
     ["json", (_res, options) => _$o(jsonParse(_res, __, __, true), options)]
@@ -130,6 +138,13 @@ var options = { __format: params.format, __from: params.from, __sql: params.sql,
 // ndjson options
 if (params.type == "ndjson") {
     params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
+}
+// csv options
+if (isDef(params.inputcsv)) {
+    params.inputcsv = params.csv.trim().startsWith("{") ? jsonParse(params.inputcsv, true) : af.fromSLON(params.inputcsv)
+}
+if (isDef(params.csv)) {
+    params.csv = params.csv.trim().startsWith("{") ? jsonParse(params.csv, true) : af.fromSLON(params.csv)
 }
 
 // Read input from stdin or file
