@@ -1,0 +1,70 @@
+todo:
+- Load test
+
+- oafp::JSON2JSON
+- oafp::JSON2YAML
+- oafp::YAML2YAML
+- oafp::YAML2JSON
+
+- Results
+
+
+include:
+- oJobTest.yaml
+
+ojob:
+  async : false
+  opacks:
+  - oJob-common
+  - openaf: 20231222
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true 
+
+jobs:
+# ---------------
+- name: Load test
+  exec: |
+    global.test = require("autoTest.js")
+
+# ---------------------
+- name: oafp::JSON2JSON
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testJSON2JSON()"
+
+# ---------------------
+- name: oafp::JSON2YAML
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testJSON2YAML()"
+
+# ---------------------
+- name: oafp::YAML2YAML
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testYAML2YAML()"
+
+# ---------------------
+- name: oafp::YAML2JSON
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testYAML2JSON()"
+
+# -------------
+- name: Results
+  from: oJob Test Results
+  type: shutdown
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) printErr("There are failed tests")
+    io.writeFileString("oafp-test.md", ow.test.toMarkdown())
+    io.writeFileJSON("oafp-test.json", args.results)
+

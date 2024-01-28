@@ -102,8 +102,12 @@ files:
 - build/build.yaml
 - build/oafp.source.js
 - oafp.js
+- tests/autoTest.js
+- tests/autoTest.yaml
 filesHash:
-  README.md: 4e3221fc80f0bd43cd6d8b53d40719be77bcecd4
+  README.md: b6e4046bcf0bd1d18b4c343a9c9541dd2c72ac2c
   build/build.yaml: 6336b246b812bbb468116b229d39749b7c2d437a
-  build/oafp.source.js: cd991014dfe9c6cfeb6a588dde3bf99e5f9c5670
-  oafp.js: 93695a846ce8e148025f19931a6bfdb17082ab22
+  build/oafp.source.js: 3ac15f8d189e812e08f14f8d68c479182ee0eee4
+  oafp.js: 90d6c8c8d985cb207e26c320fde3682b5aea0218
+  tests/autoTest.js: 7e7947029b6cdb6c6effef5d5a0b2dd9e88de027
+  tests/autoTest.yaml: 322544d3a1686428cf6a87e4b8b56660ffd8ae7b
