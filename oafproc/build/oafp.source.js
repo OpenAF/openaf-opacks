@@ -183,6 +183,6 @@ if (!noFurtherOutput) {
     if (isDef(_outputFns.has(params.type))) {
         _outputFns.get(params.type)(_res, options)
     } else {      
-        _outputFnsget("json")(_res, options)
+        _outputFns.get("json")(_res, options)
     }
 }
