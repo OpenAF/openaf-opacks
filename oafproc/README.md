@@ -1,4 +1,4 @@
-# OpenAF parser
+# OpenAF processor
     
 **Usage**: _oafp [file] [options]_
 
