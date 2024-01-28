@@ -105,7 +105,7 @@ files:
 - tests/autoTest.js
 - tests/autoTest.yaml
 filesHash:
-  README.md: f010032501beaca6e80892104dcae4e7462fba88
+  README.md: 775336fd49bfd92f2e0886135bc597d177ff062e
   build/build.yaml: 6336b246b812bbb468116b229d39749b7c2d437a
   build/oafp.source.js: 6452e969f67049ad3876f904c092f5cf5bd2764e
   oafp.js: d5db2133849c9d3d2b6b598299d09b1374f6957c
