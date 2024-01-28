@@ -150,6 +150,5 @@ curl -L https://blog.google/rss | oafp path="rss.channel.item" sql="select title
 # table with the number of people in space per space craft
 curl http://api.open-notify.org/astros.json | oafp path="people" sql="select \"craft\", count(1) \"people\" group by \"craft\"" output=ctable
 
-# HTML with the list of all of the known meteorite landings
-curl -L "https://data.nasa.gov/api/views/gh4g-9sfh/rows.csv?accessType=DOWNLOAD" | oafp output=html
-```
+# markdown table with the current closest asteroids to earth
+curl "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="near_earth_objects" maptoarray=true output=json | oafp path="[0][].{name:name,magnitude:absolute_magnitude_h,hazardous:is_potentially_hazardous_asteroid,distance:close_approach_data[0].miss_distance.kilometers}" sql="select * order by distance" output=mdtable```
