@@ -119,6 +119,14 @@ const _$o = (r, options) => {
             print( ow.template.md.table(r) )
         }
         break
+    case "template":
+        ow.loadTemplate()
+        ow.template.addConditionalHelpers()
+        ow.template.addOpenAFHelpers()
+        ow.template.addFormatHelpers()
+        if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
+        tprint(io.readFileString(params.template), r)
+        break
     default   :
         $o(r, options)
     }

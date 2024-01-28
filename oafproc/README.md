@@ -61,27 +61,28 @@ These options will change the parsed input data included any filters provided.
 List of available formats to use with the _output_ option:
 
 | Output format | Description |
-|---------|-------------|
-| ctree   | A tree-like forcely colored format |
-| cjson   | A JSON forcely colored format |
-| ctable  | A table-like forcely colored format (only for list outputs) |
-| tree    | A tree-like format |
-| json    | A JSON format without spacing |
+|----------|-------------|
+| ctree    | A tree-like forcely colored format |
+| cjson    | A JSON forcely colored format |
+| ctable   | A table-like forcely colored format (only for list outputs) |
+| tree     | A tree-like format |
+| json     | A JSON format without spacing |
 | prettyjson | A JSON format with spacing |
-| yaml    | A YAML format |
-| mdyaml  | A multi document YAML format (only for list outputs) |
-| stable  | A table-like format with separation (only for list outputs) |
-| table   | A table-like format without size constraints (only for list outputs) |
-| xml     | An XML format |
-| ndjson  | A NDJSON format |
-| cslon   | A SLON format forcely colored |
-| slon    | A SLON format |
-| csv     | A CSV format (only for list outputs) |
-| map     | A rectangle map format |
-| html    | An HTML format |
-| md      | A Markdown format |
-| mdtable | A Markdown table format (only for list outputs) |
-| log     | If input has Logstash compatible fields outputs a human-readable log |
+| yaml     | A YAML format |
+| mdyaml   | A multi document YAML format (only for list outputs) |
+| stable   | A table-like format with separation (only for list outputs) |
+| table    | A table-like format without size constraints (only for list outputs) |
+| xml      | An XML format |
+| ndjson   | A NDJSON format |
+| cslon    | A SLON format forcely colored |
+| slon     | A SLON format |
+| csv      | A CSV format (only for list outputs) |
+| map      | A rectangle map format |
+| html     | An HTML format |
+| md       | A Markdown format |
+| mdtable  | A Markdown table format (only for list outputs) |
+| template | A Handlebars template format (requires template=someTemplate.hbs) |
+| log      | If input has Logstash compatible fields outputs a human-readable log |
 
 ---
 
