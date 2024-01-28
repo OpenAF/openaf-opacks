@@ -45,13 +45,13 @@ const _fileExtensions = new Map([
 ])
 
 // List of input types that should not be stored in memory
-var _inputNoMem = new Set([ "csv" ])
+var _inputNoMem = new Set([ "csv", "ndjson" ])
 
 // Input functions processing per line
 var _inputLineFns = {
     "ndjson": (r, options) => {
         if (!params.ndjsonjoin) {
-            $o(jsonParse(r, __, __, true), options)
+            _$o(jsonParse(r, __, __, true), options)
             noFurtherOutput = true
         }
     }
@@ -89,7 +89,21 @@ const _$o = (r, options) => {
         delete options.__sql
     }
     r = _transform(r)
-    $o(r, options)
+
+    if (options.__format == "log") {
+        var _arr = r
+        if (isMap(r)) _arr = [ r ]
+        if (isArray(_arr)) {
+            _arr.forEach(_r => {
+                let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : "(no timestamp)")
+                let l = (isDef(_r.level) ? _r.level : __)
+                let m = (isDef(_r.message) ? _r.message : "")
+                print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+            })
+        }
+    } else {
+        $o(r, options)
+    }
 }
 
 // Output functions
@@ -103,11 +117,21 @@ var _outputFns = new Map([
     }],
     ["ndjson", (_res, options) => {
         if (params.ndjsonjoin) {
-            _$o(_res.split('\n').map(e => jsonParse(e.trim(), __, __, true)), options)
+            if (isDef(params.file)) {
+                _res = io.readFileString(params.file)
+            }
+            _$o(_res.split('\n').filter(l => l.length > 0).map(e => jsonParse(e.trim(), __, __, true)), options)
         } else {
-            io.readLinesNDJSON(af.fromString2InputStream(_res), r => {
+            var _stream
+            if (isDef(params.file)) {
+                _stream = io.readFileStream(params.file)
+            } else {
+                _stream = af.fromString2InputStream(_res)
+            }
+            io.readLinesNDJSON(_stream, r => {
                 _$o(r, options)
             })
+            _stream.close()
         }
     }],
     ["md", (_res, options) => {

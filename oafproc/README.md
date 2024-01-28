@@ -78,6 +78,17 @@ List of available formats to use with the _output_ option:
 | map    | A rectangle map format |
 | html   | An HTML format |
 | md     | A Markdown format |
+| log    | If input has Logstash compatible fields outputs a human-readable log |
+
+---
+
+## 🧾 ndJSON input options
+
+List of options to use when _input=ndjson_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
 
 ---
 
