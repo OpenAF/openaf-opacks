@@ -69,7 +69,8 @@ var _transformFns = {
     "searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
     "searchvalues": _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
     "maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
-    "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r)
+    "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
+    "flatmap"     : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
 }
 
 // --- add extra _transformFns here ---

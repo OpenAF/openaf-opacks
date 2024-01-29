@@ -56,6 +56,7 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
+| flatmap | Boolean | If true a map structure will be flat to just one level |
 
 ---
 
