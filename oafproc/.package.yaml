@@ -48,7 +48,7 @@ scripts:
         if (io.fileExists("/usr/bin/oaf")) installIn = "/usr/bin"
         if (io.fileExists("/bin/oaf"))     installIn = "/bin"
         if (isDef(installIn)) {
-          io.writeFileString(installIn + "/oafp", "#!/bin/sh\n/bin/sh " + installPath + " \"$@\"")
+          io.writeFileString(installIn + "/oafp", "#!/bin/sh\n" + installPath + " \"$@\"\n")
           $sh("chmod a+x " + installIn + "/oafp").exec()
         }
       }
