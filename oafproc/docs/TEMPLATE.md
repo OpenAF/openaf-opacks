@@ -1,4 +1,4 @@
-# OpenAF processor
+# OpenAF processor template
 
 The _output=template_ option uses javascript [Handlebars](https://handlebarsjs.com/guide/) library.
 
