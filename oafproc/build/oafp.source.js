@@ -72,8 +72,21 @@ var _inputNoMem = new Set([ "csv", "ndjson" ])
 var _inputLineFns = {
     "ndjson": (r, options) => {
         if (!params.ndjsonjoin) {
+            if (isUnDef(global.__ndjsonbuf) && r.length != 0 && r.trim().startsWith("{")) global.__ndjsonbuf = ""
+            if (isDef(global.__ndjsonbuf)) {
+                if (r.length != 0 && !r.trim().endsWith("}")) { global.__ndjsonbuf += r.trim(); return }
+                if (global.__ndjsonbuf.length > 0) { r = global.__ndjsonbuf + r; global.__ndjsonbuf = __ }
+            }
+            if (r.length == 0 || r.length > 0 && r.trim().substring(0, 1) != "{") { 
+                _$o(jsonParse(global.__ndjsonbuf, __, __, true), options)
+                noFurtherOutput = true
+                global.__ndjsonbuf = __
+                return 
+            }
             _$o(jsonParse(r, __, __, true), options)
             noFurtherOutput = true
+        } else {
+            return true
         }
     }
 }
@@ -201,11 +214,31 @@ var _inputFns = new Map([
         _$o(af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag), options)
     }],
     ["ndjson", (_res, options) => {
+        global.__ndjsonbuf = __
+        var _ndjline = (r, fn) => {
+            if (isUnDef(global.__ndjsonbuf) && r.length != 0 && r.trim().startsWith("{")) global.__ndjsonbuf = ""
+            if (isDef(global.__ndjsonbuf)) {
+                if (r.length != 0 && !r.trim().endsWith("}")) { global.__ndjsonbuf += r.trim(); return }
+                if (global.__ndjsonbuf.length > 0) { r = global.__ndjsonbuf + r; global.__ndjsonbuf = __ }
+            }
+            if (r.length == 0 || r.length > 0 && r.trim().substring(0, 1) != "{") { 
+                fn(r)
+                global.__ndjsonbuf = __
+                return 
+            }
+            fn(r)
+        }
+        var _ndjproc = res => {
+            var _j = []
+            res.split("\n").filter(l => l.length > 0).forEach(r => _ndjline(r, r => _j.push(jsonParse(r, __, __, true))))
+            return _j
+        }
+
         if (params.ndjsonjoin) {
             if (isDef(params.file)) {
                 _res = io.readFileString(params.file)
             }
-            _$o(_res.split('\n').filter(l => l.length > 0).map(e => jsonParse(e.trim(), __, __, true)), options)
+            _$o(_ndjproc(_res), options)
         } else {
             var _stream
             if (isDef(params.file)) {
@@ -213,8 +246,8 @@ var _inputFns = new Map([
             } else {
                 _stream = af.fromString2InputStream(_res)
             }
-            io.readLinesNDJSON(_stream, r => {
-                _$o(r, options)
+            ioStreamReadLines(_stream, r => {
+                _ndjline(r, r => _$o(jsonParse(r, __, __, true), clone(options)))
             })
             _stream.close()
         }
@@ -281,10 +314,13 @@ if (isDef(params.file)) {
 } else {
     _res = []
     io.pipeLn(r => {
-        if (isDef(_inputLineFns[params.type])) 
-            _inputLineFns[params.type](_transform(r), options)
-        else
+        if (isDef(_inputLineFns[params.type])) {
+            if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                _res.push(r)
+            }
+        } else { 
             _res.push(r)
+        }
         return false
     })
     _res = _res.join('\n')

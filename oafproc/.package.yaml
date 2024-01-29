@@ -111,11 +111,11 @@ files:
 filesHash:
   README.md: 896dd498c723a8a1301ba46d1df347263403b3f6
   build/build.yaml: e485376df992f40552b8ef2f84e10a2ee54e3157
-  build/oafp.source.js: 30b0df40b765faf4dcf08f3e1773d76f0e6ba1e2
+  build/oafp.source.js: 70ab7192fc645438d34d37cfacaf1155289d0843
   buildStaticOAFP.yaml: 3cfba475fdd4c1cb8c7fc90c4462647805626b75
   docs/FILTERS.md: 8902b72223b5f3a281a134f3a57e2dadfed681ce
   docs/TEMPLATE.md: 9a2bd251824efb34c75398fd4511e9ddfb4811d1
   docs/USAGE.md: 6127918facbbdfa2dddf883684733c9cb157c192
-  oafp.js: 3de4a38804e0682a285d93fccff4aa53bba040f9
+  oafp.js: 162bdacbf9e9d3b7c49998a6483fb606db4feff8
   tests/autoTest.js: 7e7947029b6cdb6c6effef5d5a0b2dd9e88de027
   tests/autoTest.yaml: 322544d3a1686428cf6a87e4b8b56660ffd8ae7b
