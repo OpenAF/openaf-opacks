@@ -1,6 +1,6 @@
 # Author: Nuno Aguiar
 help:
-  text   : Builds a standalone oafp version with README.md contents included.
+  text   : Builds a standalone oafp version with USAGE.md contents included.
   expects: 
   - name     : oafpath
     desc     : OpenAF path to use
@@ -26,15 +26,15 @@ jobs:
 - name : Check oafp file
   exec : |
     args.path = (getOPackPath("oafproc") || ".")
-    args.file = args.path + "/README.md"
+    args.file = args.path + "/docs/USAGE.md"
     if (isDef(args.file) && io.fileExists(args.file)) {
-      log("README.md found in: " + args.file)
+      log("USAGE.md found in: " + args.file)
     } else {
-      throw "Could not find README.md"
+      throw "Could not find USAGE.md"
     }
 
 # --------------------
-- name : Add README.md
+- name : Add USAGE.md
   args :
     replace:
       "// ---": ""
@@ -45,7 +45,7 @@ jobs:
     args.replace = {}
     args.replace["// ---"] = "const _help=`" + io.readFileString(args.file).replace(/`/g, "\\`") + "`;"
 
-    log("Adding README.md contents...")
+    log("Adding USAGE.md contents...")
   to   :  
   - name: ojob find/replace
     args:
@@ -71,7 +71,7 @@ jobs:
 - name : Generate standalone oafp
   from :
   - Check oafp file
-  - Add README.md
+  - Add USAGE.md
   - Add shebang
   - Set permissions
   check:

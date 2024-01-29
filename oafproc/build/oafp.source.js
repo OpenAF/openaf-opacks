@@ -3,7 +3,15 @@ var params = processExpr(" ")
 var showHelp = () => {
     __initializeCon()
 
-    var _f = (getOPackPath("oafproc") || ".") + "/README.md"
+    var _ff
+    params.help = _$(params.help, "help").isString().default("")
+    switch(params.help.toLowerCase()) {
+    case "filters" : _ff = "docs/FILTERS.md"; break
+    case "template": _ff = "docs/TEMPLATE.md"; break
+    default        : _ff = "docs/USAGE.md"
+    }
+
+    var _f = (getOPackPath("oafproc") || ".") + "/" + _ff
     if (io.fileExists(_f)) {
         __ansiColorFlag = true
 		__conConsole = true
@@ -20,7 +28,7 @@ var showHelp = () => {
             else
                 print(ow.format.withMD( _help ))
         } else {
-            print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/README.md")
+            print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/" + _ff)
         }
     }
 
@@ -28,7 +36,7 @@ var showHelp = () => {
 }
 
 ow.loadFormat()
-if (params["-h"] == "" || toBoolean(params.help)) showHelp()
+if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) showHelp()
 
 params.format = params.output || params.format, params.type = params.input || params.type
 

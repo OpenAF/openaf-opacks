@@ -1,6 +1,6 @@
 # OpenAF processor filters
 
-## Path
+## 🪚 Path
 
 The _path=_ filter tool is based on the JMESPath library. To see all the available options please refer to http://jmespath.org. Here are some examples:
 
@@ -78,10 +78,10 @@ Example:
 * delete(map, 'field')
 * substring(a, ini, end)
 
-## From
+## 🏹 From
 
 _tbc_
 
-## SQL
+## 🤔 SQL
 
 _tbc_

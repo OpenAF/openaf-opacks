@@ -4,7 +4,7 @@ The _output=template_ option uses javascript [Handlebars](https://handlebarsjs.c
 
 Additionally OpenAF processor uses the following Handlebars custom helpers.
 
-## Generic OpenAF helpers
+## 🎯 Generic OpenAF helpers
 
 Here are some of the available helpers:
 
@@ -56,7 +56,7 @@ Here are some of the available helpers:
 | $set            | block set of a provided key                  |
 | $concat         | concatenates all arguments as a single value |
 
-## Conditional helpers
+## 🤨 Conditional helpers
 
 Here are some of the available conditional helpers:
 
