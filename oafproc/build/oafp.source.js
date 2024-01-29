@@ -20,7 +20,7 @@ var showHelp = () => {
         else
             print(ow.format.withMD( io.readFileString(_f) ))
     } else {
-        if (isDef(_help)) {
+        if (isDef(_help) && _ff == "docs/USAGE.md") {
             __ansiColorFlag = true
             __conConsole = true
             if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
