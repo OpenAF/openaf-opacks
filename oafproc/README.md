@@ -12,6 +12,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | Option | Description | 
 |--------|-------------|
 | -h     | Show this document |
+| help   | Alternative way to show this document |
 | file   | The file to parse (if not provide stdin is used) |
 | output | The output format (default: ctree) |
 | input  | The input type (if not provided it will try to be auto-detected) |
@@ -34,6 +35,8 @@ List of data input types that can be auto-detected (through the file extension o
 | xml     | An XML format (auto-detected) |
 | csv     | A CSV format (auto-detected) |
 | ndjson  | A NDJSON format |
+| hsperf  | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
+| base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
 
@@ -81,6 +84,8 @@ List of available formats to use with the _output_ option:
 | html     | An HTML format |
 | md       | A Markdown format |
 | mdtable  | A Markdown table format (only for list outputs) |
+| openmetrics | Converts a map or list to OpenMetrics format |
+| base64   | A base64 text format | 
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 
@@ -112,6 +117,17 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 > Example of options provided in JSON: csv="{withHeader:false,withDelimiter:'|'}"
 > Example of options provided in SLON: inputcsv="(withHeader: false, quoteMode: ALL)"
+
+---
+
+## 🧾 OpenMetrics output options
+
+List of options to use when _output=openmetrics_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| metricsprefix | String | The prefix to use for each metric (defaults to 'metrics') |
+| metricstimestamp | Number | Unix Epoch in seconds for each metric |
 
 ---
 

@@ -19,7 +19,7 @@ var showHelp = () => {
 }
 
 ow.loadFormat()
-if (params["-h"] == "") showHelp()
+if (params["-h"] == "" || toBoolean(params.help)) showHelp()
 
 params.format = params.output || params.format, params.type = params.input || params.type
 
@@ -44,8 +44,12 @@ const _fileExtensions = new Map([
     [".md", "md"]
 ])
 
+// --- add extra _fileExtensions here ---
+
 // List of input types that should not be stored in memory
 var _inputNoMem = new Set([ "csv", "ndjson" ])
+
+// --- add extra _inputNoMem here ---
 
 // Input functions processing per line
 var _inputLineFns = {
@@ -57,6 +61,8 @@ var _inputLineFns = {
     }
 }
 
+// --- add extra _inputLineFns here ---
+
 // Transform functions
 var _transformFns = {
     "sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
@@ -65,6 +71,69 @@ var _transformFns = {
     "maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
     "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r)
 }
+
+// --- add extra _transformFns here ---
+
+var _outputFns = new Map([
+    ["log", (r, options) => {
+        var _arr = r
+        if (isMap(r)) _arr = [ r ]
+        if (isArray(_arr)) {
+            _arr.forEach(_r => {
+                let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : "(no timestamp)")
+                let l = (isDef(_r.level) ? _r.level : __)
+                let m = (isDef(_r.message) ? _r.message : "")
+                print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+            })
+        }
+    }],
+    ["mdyaml", (r, options) => {
+        if (isArray(r)) {
+            r.forEach((_y, i) => {
+                $o(_y, merge(options, { __format: "yaml" }))
+                if (i < r.length - 1) print("---\n")
+            })
+        } else {
+            $o(r, merge(options, { __format: "yaml" }))
+        }
+    }],
+    ["mdtable", (r, options) => {
+        if (isArray(r)) {
+            ow.loadTemplate()
+            print( ow.template.md.table(r) )
+        }
+    }],
+    ["template", (r, options) => {
+        ow.loadTemplate()
+        ow.template.addConditionalHelpers()
+        ow.template.addOpenAFHelpers()
+        ow.template.addFormatHelpers()
+        if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
+        tprint(io.readFileString(params.template), r)
+    }],
+    ["openmetrics", (r, options) => {
+        ow.loadMetrics()
+        var _out = ow.metrics.fromObj2OpenMetrics(r, params.metricsprefix, params.metricstimestamp)
+        _out = _out.split("\n").map(line => {
+            if (line.indexOf("{_id=\"") >= 0) line = line.replace(/{_id=\"\d+\",/, "{")
+            if (line.indexOf(",_id=\"") >= 0) line = line.replace(/,_id=\"\d+\"}/, "}")
+            if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
+            return line
+        }).join("\n")
+        $o(_out, options)
+    }],
+    ["base64", (r, options) => {
+        var _o = ""
+        if (isString(r))
+            _o = r
+        else
+            _o = stringify(r)
+
+        print(af.fromBytes2String(af.toBase64Bytes(_o)))
+    }]
+])
+
+// --- add extra _inputFns here ---
 
 // Util functions
 const _transform = r => {
@@ -90,50 +159,14 @@ const _$o = (r, options) => {
     }
     r = _transform(r)
 
-    switch(options.__format) {
-    case "log":
-        var _arr = r
-        if (isMap(r)) _arr = [ r ]
-        if (isArray(_arr)) {
-            _arr.forEach(_r => {
-                let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : "(no timestamp)")
-                let l = (isDef(_r.level) ? _r.level : __)
-                let m = (isDef(_r.message) ? _r.message : "")
-                print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
-            })
-        }
-        break
-    case "mdyaml":
-        if (isArray(r)) {
-            r.forEach((_y, i) => {
-                $o(_y, merge(options, { __format: "yaml" }))
-                if (i < r.length - 1) print("---\n")
-            })
-        } else {
-            $o(r, merge(options, { __format: "yaml" }))
-        }
-        break
-    case "mdtable":
-        if (isArray(r)) {
-            ow.loadTemplate()
-            print( ow.template.md.table(r) )
-        }
-        break
-    case "template":
-        ow.loadTemplate()
-        ow.template.addConditionalHelpers()
-        ow.template.addOpenAFHelpers()
-        ow.template.addFormatHelpers()
-        if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
-        tprint(io.readFileString(params.template), r)
-        break
-    default   :
+    if (_outputFns.has(options.__format)) 
+        _outputFns.get(options.__format)(r, options)
+    else
         $o(r, options)
-    }
 }
 
-// Output functions (input parsers)
-var _outputFns = new Map([
+// Input functions (input parsers)
+var _inputFns = new Map([
     ["yaml" , (_res, options) => _$o(af.fromYAML(_res), options)],
     ["xml"  , (_res, options) => {
         params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
@@ -179,8 +212,21 @@ var _outputFns = new Map([
             _$o($csv(params.inputcsv).fromInString( _res ).toOutArray(), options)
         }
     }],
+    ["hsperf", (_res, options) => {
+        if (isDef(params.file)) {
+            ow.loadJava()
+            _$o( ow.java.parseHSPerf(params.file), options )
+        } else {
+            throw "hsperf only supports file input"
+        }
+    }],
+    ["base64", (_res, options) => {
+        _$o(af.fromBytes2String(af.fromBase64(_res)), options)
+    }],
     ["json", (_res, options) => _$o(jsonParse(_res, __, __, true), options)]
 ])
+
+// --- add extra _inputFns here ---
 
 // Default format
 params.format = _$(params.format, "format").isString().default("ctree")
@@ -250,9 +296,9 @@ if (!noFurtherOutput) {
     }
 
     // Determine input type and execute
-    if (isDef(_outputFns.has(params.type))) {
-        _outputFns.get(params.type)(_res, options)
+    if (isDef(_inputFns.has(params.type))) {
+        _inputFns.get(params.type)(_res, options)
     } else {      
-        _outputFns.get("json")(_res, options)
+        _inputFns.get("json")(_res, options)
     }
 }

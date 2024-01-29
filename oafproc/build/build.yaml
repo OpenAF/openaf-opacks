@@ -10,6 +10,10 @@ help:
 todo:
 - Build oafp
 
+init:
+  header: |
+    // (author: Nuno Aguiar, version: {{version}})
+
 ojob:
   opacks      :
   - openaf: 20231222
@@ -31,6 +35,9 @@ jobs:
 
     if (isUnDef(args.path)) throw "Could not find oafp.source.js"
     log("Source found in: " + args.path + "/oafp.source.js")
+
+    if (args.path == "build") args.pack = "."
+    if (args.path == ".")     args.pack = ".."
   
 # ---------------------
 - name : Remove shebang
@@ -48,6 +55,14 @@ jobs:
       __key    : args
       __path   : replace
 
+# ----------------------------
+- name : Add header on compile
+  exec : |
+    var pack = io.readFileYAML(args.pack + "/.package.yaml")
+    io.writeFileString(args.path + "/oafp.js", $t(args.init.header, {
+      version: pack.version
+    }) + io.readFileString(args.path + "/oafp.js") )
+
 # ---------------------
 - name : Compile source
   exec : |
@@ -62,6 +77,7 @@ jobs:
   - Find oafp source
   - Compile source
   - Remove shebang
+  - Add header on compile
   exec : |
     if (args.path == "build") io.mv(args.path + "/oafp.js", "oafp.js")
     if (args.path == ".")     io.mv(args.path + "/oafp.js", "../oafp.js")
