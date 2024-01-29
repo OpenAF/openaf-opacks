@@ -95,13 +95,21 @@ var _transformFns = {
 var _outputFns = new Map([
     ["log", (r, options) => {
         var _arr = r
-        if (isMap(r)) _arr = [ r ]
+        if (isMap(r) || isString(r)) _arr = [ r ]
         if (isArray(_arr)) {
             _arr.forEach(_r => {
-                let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : "(no timestamp)")
-                let l = (isDef(_r.level) ? _r.level : __)
-                let m = (isDef(_r.message) ? _r.message : "")
-                print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+                if (isMap(_r)) {
+                    let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : __)
+                    let l = (isDef(_r.level) ? _r.level : __)
+                    let m = (isDef(_r.message) ? _r.message : __)
+                    if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
+                    if (isDef(m) || isDef(d)) 
+                        print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+                    else
+                        print("")
+                } else {
+                    print(_r.replace(/\n$/, ""))
+                }
             })
         }
     }],
