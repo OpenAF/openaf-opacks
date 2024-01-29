@@ -127,6 +127,16 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 ---
 
+## 🧾 Log output options
+
+List of options to use when _output=log_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| logprintall | Boolean | If true all original non data (string) lines will be output |
+
+---
+
 ## 🧾 OpenMetrics output options
 
 List of options to use when _output=openmetrics_:

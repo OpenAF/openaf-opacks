@@ -78,12 +78,12 @@ var _inputLineFns = {
                 if (global.__ndjsonbuf.length > 0) { r = global.__ndjsonbuf + r; global.__ndjsonbuf = __ }
             }
             if (r.length == 0 || r.length > 0 && r.trim().substring(0, 1) != "{") { 
-                _$o(jsonParse(global.__ndjsonbuf, __, __, true), options)
+                _$o(jsonParse(global.__ndjsonbuf, __, __, true), options, true)
                 noFurtherOutput = true
                 global.__ndjsonbuf = __
                 return 
             }
-            _$o(jsonParse(r, __, __, true), options)
+            _$o(jsonParse(r, __, __, true), options, true)
             noFurtherOutput = true
         } else {
             return true
@@ -107,23 +107,22 @@ var _transformFns = {
 
 var _outputFns = new Map([
     ["log", (r, options) => {
-        var _arr = r
-        if (isMap(r) || isString(r)) _arr = [ r ]
-        if (isArray(_arr)) {
-            _arr.forEach(_r => {
-                if (isMap(_r)) {
-                    let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : __)
-                    let l = (isDef(_r.level) ? _r.level : __)
-                    let m = (isDef(_r.message) ? _r.message : __)
-                    if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
-                    if (isDef(m) || isDef(d)) 
-                        print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
-                    else
-                        print("")
-                } else {
-                    print(_r.replace(/\n$/, ""))
-                }
-            })
+        if (isString(r) && toBoolean(params.logprintall)) {
+            print(r.replace(/\n$/, ""))
+        } else {
+            var _arr = r
+            if (isMap(r)) _arr = [ r ]
+            if (isArray(_arr)) {
+                _arr.forEach(_r => {
+                    if (isMap(_r)) {
+                        let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : __)
+                        let l = (isDef(_r.level) ? _r.level : __)
+                        let m = (isDef(_r.message) ? _r.message : __)
+                        if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
+                        if (isDef(m) || isDef(d)) print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+                    }
+                })
+            }
         }
     }],
     ["mdyaml", (r, options) => {
@@ -183,7 +182,9 @@ const _transform = r => {
     }
     return r
 }
-const _$o = (r, options) => {
+const _$f = (r, options) => {
+    if (isString(r)) return _transform(r)
+
     if (options.__path) {
         r = $path(r, options.__path)
         delete options.__path
@@ -197,6 +198,15 @@ const _$o = (r, options) => {
         delete options.__sql
     }
     r = _transform(r)
+    return r
+}
+const _$o = (r, options, lineByLine) => {
+    if (!isString(r)) {
+        if (lineByLine)
+            r = _$f([r], options)[0]
+        else
+            r = _$f(r, options)
+    }
 
     if (_outputFns.has(options.__format)) 
         _outputFns.get(options.__format)(r, options)
@@ -247,7 +257,7 @@ var _inputFns = new Map([
                 _stream = af.fromString2InputStream(_res)
             }
             ioStreamReadLines(_stream, r => {
-                _ndjline(r, r => _$o(jsonParse(r, __, __, true), clone(options)))
+                _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
             })
             _stream.close()
         }
