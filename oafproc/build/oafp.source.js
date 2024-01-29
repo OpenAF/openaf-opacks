@@ -151,7 +151,7 @@ var _outputFns = new Map([
     }]
 ])
 
-// --- add extra _inputFns here ---
+// --- add extra _outputFns here ---
 
 // Util functions
 const _transform = r => {
