@@ -7,7 +7,7 @@ var showHelp = () => {
     if (io.fileExists(_f)) {
         __ansiColorFlag = true
 		__conConsole = true
-        if (isDef(ow.format.string.pauseString))
+        if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
             ow.format.string.pauseString( ow.format.withMD( io.readFileString(_f) ) )
         else
             print(ow.format.withMD( io.readFileString(_f) ))
@@ -15,7 +15,7 @@ var showHelp = () => {
         if (isDef(_help)) {
             __ansiColorFlag = true
             __conConsole = true
-            if (isDef(ow.format.string.pauseString))
+            if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
                 ow.format.string.pauseString( ow.format.withMD( _help ) )
             else
                 print(ow.format.withMD( _help ))
@@ -182,7 +182,7 @@ var _inputFns = new Map([
         params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
         params.xmlprefix = _$(params.xmlprefix, "xmlprefix").isString().default(__)
         params.xmlfiltertag = toBoolean(_$(params.xmlfiltertag, "xmlfiltertag").isString().default(__))
-        _$o(af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, params.xmlfiltertag), options)
+        _$o(af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag), options)
     }],
     ["ndjson", (_res, options) => {
         if (params.ndjsonjoin) {
