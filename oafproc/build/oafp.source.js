@@ -12,7 +12,16 @@ var showHelp = () => {
         else
             print(ow.format.withMD( io.readFileString(_f) ))
     } else {
-        print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/README.md")
+        if (isDef(_help)) {
+            __ansiColorFlag = true
+            __conConsole = true
+            if (isDef(ow.format.string.pauseString))
+                ow.format.string.pauseString( ow.format.withMD( _help ) )
+            else
+                print(ow.format.withMD( _help ))
+        } else {
+            print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/README.md")
+        }
     }
 
     exit(0)

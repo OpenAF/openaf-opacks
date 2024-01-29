@@ -12,7 +12,8 @@ todo:
 
 init:
   header: |
-    // (author: Nuno Aguiar, version: {{version}})
+    // (author: Nuno Aguiar, version: {{version}}, license: Apache 2.0, url: https://github.com/OpenAF/openaf-opacks/tree/master/oafproc)
+    // ---
 
 ojob:
   opacks      :

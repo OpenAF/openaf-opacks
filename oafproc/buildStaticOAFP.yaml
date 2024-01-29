@@ -1,0 +1,82 @@
+# Author: Nuno Aguiar
+help:
+  text   : Builds a standalone oafp version with README.md contents included.
+  expects: 
+  - name     : oafpath
+    desc     : OpenAF path to use
+    example  : /opt/oaf
+    mandatory: false
+  - name     : output
+    desc     : Output file
+    example  : oafp
+    mandatory: false
+
+todo:
+- Generate standalone oafp
+
+ojob:
+  opacks      :
+  - openaf: 20231222
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+        
+
+jobs:
+# ----------------------
+- name : Check oafp file
+  exec : |
+    args.path = (getOPackPath("oafproc") || ".")
+    args.file = args.path + "/README.md"
+    if (isDef(args.file) && io.fileExists(args.file)) {
+      log("README.md found in: " + args.file)
+    } else {
+      throw "Could not find README.md"
+    }
+
+# --------------------
+- name : Add README.md
+  args :
+    replace:
+      "// ---": ""
+  exec : |
+    args.inputFile  = args.path + "/oafp.js"
+    args.outputFile = (isDef(args.output) ? args.output : args.path + "/oafp")
+
+    args.replace = {}
+    args.replace["// ---"] = "const _help=`" + io.readFileString(args.file).replace(/`/g, "\\`") + "`;"
+
+    log("Adding README.md contents...")
+  to   :  
+  - name: ojob find/replace
+    args:
+      __key    : args
+      __path   : replace
+
+# ------------------
+- name : Add shebang
+  exec : |
+    log("Adding shebang...")
+    if (isUnDef(args.oafpath)) args.oafpath = getOpenAFPath()
+    io.writeFileString(args.outputFile, "#!/usr/bin/env " + args.oafpath + "oaf-sb\nvar params=processExpr(\" \");\n" + io.readFileString(args.outputFile))
+
+# ----------------------
+- name : Set permissions
+  exec : |
+    if (!ow.format.isWindows()) {
+      log("Setting permissions...")
+      $sh("chmod a+x " + args.outputFile).exec()
+    }
+
+# -------------------------------
+- name : Generate standalone oafp
+  from :
+  - Check oafp file
+  - Add README.md
+  - Add shebang
+  - Set permissions
+  check:
+    in:
+      oafpath: isString.default(__)
+      output : isString.default("oafp")
+  to   :
+  - (log): Done

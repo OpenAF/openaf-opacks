@@ -22,6 +22,10 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | csv    | If type=csv, the CSV options to use |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 
+> Filter options apply in the following order: _path_, _from_ and _sql_.
+
+> For _path_ syntax check https://jmespath.org/tutorial.html
+
 ---
 
 ## ⬇️  Input types
@@ -90,6 +94,8 @@ List of available formats to use with the _output_ option:
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 
+> For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
+
 ---
 
 ## 🧾 ndJSON input options
@@ -155,7 +161,7 @@ cat someJsonFile.json | oafp output=ctree | less -r
 
 # specifying the input type and output format
 cat data.ndjson | oafp input=ndjson output=cslon
-``````
+```
 
 ```bash
 # markdown parsing of a file
