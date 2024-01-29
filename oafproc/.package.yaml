@@ -87,7 +87,7 @@ bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: https://openaf.io/opacks/oafp.opack
+  url: https://openaf.io/opacks/oafproc.opack
 description: A command-line data processor for various input and output formats with query capabilities.
 name: oafproc
 main: oafp.js
