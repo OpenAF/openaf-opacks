@@ -1,0 +1,45 @@
+# Author: Nuno Aguiar
+help:
+  text   : Provides a wrapper tp OpenAF's processor
+
+todo:
+- Run oafp
+
+ojob:
+  opacks      :
+  - openaf : 20231222
+  - oafproc: 20240127
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+
+jobs:
+# ---------------
+- name : Run oafp
+  exec : |
+    var id = genUUID().substring(0, 8)
+    var params = clone(args)
+
+    params.output = "key"
+    params.__key  = id
+    delete params.__format
+    delete params.init
+    delete params.execid
+    delete params.objId
+
+    if (isDef(__pm) && (isMap(__pm._map) || isArray(__pm._list))) {
+      params.input = "pm"
+    }
+
+    if (io.fileExists(getOPackPath("oafproc") + "/oafp.js")) {
+      if (isUnDef(global.oafp)) {
+        __expr = "____ojob=true"
+        loadLib(getOPackPath("oafproc") + "/oafp.js")
+      }
+      var k = Object.keys(params)[0]
+      if (params[k] == "") delete params[k]
+      global.oafp(params)
+      ow.oJob.output($get(id), args)
+      $unset(id)
+    } else {
+      throw "oafp.js not found in " + getOPackPath("oafproc") + "/oafp.js"
+    }

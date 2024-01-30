@@ -1,5 +1,7 @@
 var params = processExpr(" ")
 // Author : Nuno Aguiar
+const oafp = (params) => {
+if (isUnDef(params) || isDef(params.____ojob)) return 
 var showHelp = () => {
     __initializeCon()
 
@@ -106,6 +108,12 @@ var _transformFns = {
 // --- add extra _transformFns here ---
 
 var _outputFns = new Map([
+    ["pm", (r, options) => {
+        $o(r, options)
+    }],
+    ["key", (r, options) => {
+        $o(r, options)
+    }],
     ["log", (r, options) => {
         if (isString(r) && toBoolean(params.logprintall)) {
             print(r.replace(/\n$/, ""))
@@ -168,6 +176,54 @@ var _outputFns = new Map([
             _o = stringify(r)
 
         print(af.fromBytes2String(af.toBase64Bytes(_o)))
+    }],
+    ["xls", (r, options) => {
+        try {
+            includeOPack("plugin-XLS")
+        } catch(e) {
+            throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+        }
+
+        plugin("XLS")
+        var ar
+        if (isMap(r)) {
+            ow.loadObj()
+            var o = ow.obj.flatMap(r)
+            ar = Object.keys(o).map(r => ({ key: r, value: o[r] }))
+        }
+        if (isArray(r)) {
+            ar = r
+        }
+        traverse(ar, (aK, aV, aP, aO) => {
+            if (isString(aV) && aV.startsWith("=")) aO[aK] = "'" + aV
+        })
+
+        var tempFile = false
+        if (isUnDef(params.xlsfile)) {
+            tempFile = true
+            params.xlsfile = io.createTempFile("oafp", ".xlsx")
+        }
+
+        var xls = new XLS()
+        var sheet = xls.getSheet("data")
+        params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
+        if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
+        if (params.xlsformat.trim().startsWith("(")) params.xlsformat = af.fromSLON(params.xlsformat)
+        ow.format.xls.setTable(xls, sheet, "A", 1, ar, __, params.xlsformat)
+        xls.writeFile(params.xlsfile)
+        xls.close()
+
+        params.xlsopenwait = _$(params.xlsopenwait, "xlsopenwait").isNumber().default(5000)
+        params.xlsopen     = toBoolean(_$(params.xlsopen, "xlsopen").isString().default("true"))
+        if (params.xlsopen) {
+            if (ow.format.isWindows()) {
+                $sh("start " + params.xlsfile).exec()
+                if (tempFile) sleep(params.xlsopenwait, true)
+            } else if (ow.format.getOS().startsWith("Mac")) {
+                $sh("open " + params.xlsfile).exec()
+                if (tempFile) sleep(params.xlsopenwait, true)
+            } 
+        }
     }]
 ])
 
@@ -216,6 +272,7 @@ const _$o = (r, options, lineByLine) => {
 
 // Input functions (input parsers)
 var _inputFns = new Map([
+    ["pm"   , (_res, options) => { if (isDef(__pm._map)) _res = __pm._map; if (isDef(__pm._list)) _res = __pm._list; _$o(_res, options) }],
     ["yaml" , (_res, options) => _$o(af.fromYAML(_res), options)],
     ["xml"  , (_res, options) => {
         params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
@@ -272,6 +329,30 @@ var _inputFns = new Map([
         var _s = ow.template.md.fromTable(_res)
         _$o(_s, options)
     }],
+    ["xls", (_res, options) => {
+        try {
+            includeOPack("plugin-XLS")
+        } catch(e) {
+            throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+        }
+        
+        params.xlssheet        = _$(params.xlssheet, "xlssheet").isString().default(0)
+        params.xlsevalformulas = toBoolean(_$(params.xlsevalformulas, "xlsevalformulas").isString().default(true))
+        params.xlscol          = _$(params.xlscol, "xlscol").isString().default("A")
+        params.xlsrow          = _$(params.xlsrow, "xlsrow").isString().default(1)
+
+        plugin("XLS")
+        if (isDef(params.file)) {
+            var xls = new XLS(params.file)
+            var sheet = xls.getSheet(params.xlssheet)
+            var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
+            xls.close()
+            if (isDef(_r) && isMap(_r)) _r = _r.table
+            _$o(_r, options)
+        } else {
+            throw "XLS only supports file input. Please provide a file=..."
+        }
+    }],
     ["csv", (_res, options) => {
         if (isDef(params.file)) {
             var is = io.readFileStream(params.file)
@@ -304,7 +385,7 @@ params.format = _$(params.format, "format").isString().default("ctree")
 __initializeCon()
 
 // Set options
-var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause }
+var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }
 // ndjson options
 if (params.type == "ndjson") {
     params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
@@ -322,18 +403,20 @@ var _res = "", noFurtherOutput = false
 if (isDef(params.file)) {
     if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
 } else {
-    _res = []
-    io.pipeLn(r => {
-        if (isDef(_inputLineFns[params.type])) {
-            if (_inputLineFns[params.type](_transform(r), clone(options))) {
+    if (params.input != "pm") {
+        _res = []
+        io.pipeLn(r => {
+            if (isDef(_inputLineFns[params.type])) {
+                if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                    _res.push(r)
+                }
+            } else { 
                 _res.push(r)
             }
-        } else { 
-            _res.push(r)
-        }
-        return false
-    })
-    _res = _res.join('\n')
+            return false
+        })
+        _res = _res.join('\n')
+    }
 }
 
 if (!noFurtherOutput) {
@@ -374,3 +457,5 @@ if (!noFurtherOutput) {
         _inputFns.get("json")(_res, options)
     }
 }
+}
+oafp(params)

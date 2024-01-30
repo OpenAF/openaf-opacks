@@ -19,7 +19,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
 | path   | A JMESPath expression to filter output |
-| csv    | If type=csv, the CSV options to use |
+| csv    | If type=csv, the CSV options to use | 
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
@@ -43,6 +43,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
+| xls     | A XLSx compatible file (requires file=abc.xlsx) |
 
 ---
 
@@ -91,6 +92,7 @@ List of available formats to use with the _output_ option:
 | mdtable  | A Markdown table format (only for list outputs) |
 | openmetrics | Converts a map or list to OpenMetrics format |
 | base64   | A base64 text format | 
+| xls      | A XLSx output format |
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 
@@ -105,6 +107,19 @@ List of options to use when _input=ndjson_:
 | Option | Type | Description |
 |--------|------|-------------|
 | ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
+
+---
+
+## 🧾 XLS input options
+
+List of options to use when _input=xls_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| xlssheet | String | The name of sheet to consider (default to the first sheet) |
+| xlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
+| xlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
+| xlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
 
 ---
 
@@ -136,6 +151,20 @@ List of options to use when _output=log_:
 | logprintall | Boolean | If true all original non data (string) lines will be output |
 
 ---
+
+## 🧾 XLS output options
+
+List of options to use when _output=xls_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| xlsfile | String | The output filename (if not defined a temporary file will be used to open with the OS's Excel-compatible application) |
+| xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
+| xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
+| xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
+
+---
+
 
 ## 🧾 OpenMetrics output options
 
