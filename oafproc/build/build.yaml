@@ -50,7 +50,7 @@ jobs:
     args.outputFile = args.path + "/oafp.js"
 
     log("Removing shebang...")
-    cprint(args.replace)
+    //cprint(args.replace)
   to   :  
   - name: ojob find/replace
     args:
