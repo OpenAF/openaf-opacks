@@ -44,17 +44,19 @@ jobs:
 - name : Remove shebang
   args :
     replace:
-      "var params=processExpr(\" \"),": ""
+      "var\\s+params=processExpr\\(\" \"\\)[;,]": ""
   exec : |
     args.inputFile  = args.path + "/oafp.js"
     args.outputFile = args.path + "/oafp.js"
 
     log("Removing shebang...")
+    cprint(args.replace)
   to   :  
   - name: ojob find/replace
     args:
       __key    : args
       __path   : replace
+      useRegExp: true
 
 # ----------------------------
 - name : Add header on compile
