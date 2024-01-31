@@ -98,12 +98,12 @@ var _inputLineFns = {
 
 // Transform functions
 var _transformFns = {
-    "sortmapkeys" : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
-    "searchkeys"  : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
-    "searchvalues": _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
-    "maptoarray"  : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
-    "arraytomap"  : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
-    "flatmap"     : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
+    "sortmapkeys"   : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
+    "searchkeys"    : _r => (isObjecvat(_r) ? searchKeys(_r, params.searchkeys) : _r),
+    "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
+    "maptoarray"    : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
+    "arraytomap"    : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
+    "flatmap"       : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r)
 }
 
 // --- add extra _transformFns here ---
@@ -398,6 +398,7 @@ params.format = _$(params.format, "format").isString().default("ctree")
 
 // Initialize console detection
 __initializeCon()
+__con.getTerminal().settings.set("sane")
 
 // Set options
 var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }
