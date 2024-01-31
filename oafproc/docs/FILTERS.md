@@ -78,6 +78,14 @@ Example:
 * delete(map, 'field')
 * substring(a, ini, end)
 
+Examples:
+
+```bash
+# Given all AWS EC2 instances in an account produces a table with name, type, vpc and private ip sorted by vpn
+
+aws ec2 describe-instances | ./oafp path="Reservations[].Instances[].{name:join('',Tags[?Key=='Name'].Value),type:InstanceType,vpc:VpcId,ip:PrivateIpAddress} | sort_by(@, &vpc)" output=ctable
+```
+
 ## 🏹 From
 
 _tbc_
