@@ -114,7 +114,7 @@ filesHash:
   build/build.yaml: 7548c8db8d109081d85a111ff2cd3767b2c20ade
   build/oafp.source.js: 4f2793ea7856488783321d4cc91e16f3ea2e0491
   buildStaticOAFP.yaml: 3cfba475fdd4c1cb8c7fc90c4462647805626b75
-  docs/FILTERS.md: 117f4df2fb2f722880f8f3bc4ad1519c0762e586
+  docs/FILTERS.md: bb9bfef417984f9f0bf3bcac977c7cc47749c6a2
   docs/TEMPLATE.md: 9a2bd251824efb34c75398fd4511e9ddfb4811d1
   docs/USAGE.md: 2adcabfb842b03876ef43cba8b36c749237a884d
   oafp.js: 13abae2c7187ca6d9cf149559883f9931abe12dd
