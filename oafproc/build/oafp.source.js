@@ -211,7 +211,7 @@ var _outputFns = new Map([
         }
 
         var xls = new XLS()
-        var sheet = xls.getSheet("data")
+        var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
         params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
         if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
         if (params.xlsformat.trim().startsWith("(")) params.xlsformat = af.fromSLON(params.xlsformat)
