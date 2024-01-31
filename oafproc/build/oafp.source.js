@@ -98,12 +98,46 @@ var _inputLineFns = {
 
 // Transform functions
 var _transformFns = {
-    "sortmapkeys"   : _r => (toBoolean(params.sortmapkeys) && isObject(_r) ? sortMapKeys(_r) : _r),
-    "searchkeys"    : _r => (isObjecvat(_r) ? searchKeys(_r, params.searchkeys) : _r),
+    "sortmapkeys"   : _r => {
+        if (toBoolean(params.sortmapkeys) && isObject(_r)) {
+            let _sortMapKeys = (aMap, moreLevels) => {
+                let keys = Object.keys(aMap).sort()
+                let result = {}
+            
+                for(let i = 0; i < keys.length; i++) {
+                    let key = keys[i]
+                    let value = aMap[key]
+            
+                    if (moreLevels && typeof value === 'object' && value !== null && value !== undefined) {
+                        result[key] = _sortMapKeys(value, moreLevels)
+                    } else {
+                        result[key] = value
+                    }
+                }
+            
+                return result
+            }
+            return _sortMapKeys(_r, true)
+        } else {
+            return _r
+        }
+    },
+    "searchkeys"    : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
     "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
     "maptoarray"    : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
     "arraytomap"    : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
-    "flatmap"       : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r)
+    "flatmap"       : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
+    "merge"         : _r => {
+        if (toBoolean(params.merge) && isArray(_r) && _r.length > 1) {
+            var _rr
+            for(var i = 0; i < _r.length; i++) {
+                _rr = ( i == 0 ? _r[i] : merge(_rr, _r[i]) )
+            }
+            return _rr
+        } else {
+            return _r
+        }
+    }
 }
 
 // --- add extra _transformFns here ---
@@ -260,6 +294,7 @@ const _$f = (r, options) => {
         delete options.__sql
     }
     r = _transform(r)
+    
     return r
 }
 const _$o = (r, options, lineByLine) => {
@@ -269,6 +304,8 @@ const _$o = (r, options, lineByLine) => {
         else
             r = _$f(r, options)
     }
+
+    if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
 
     if (_outputFns.has(options.__format)) 
         _outputFns.get(options.__format)(r, options)
@@ -303,7 +340,7 @@ var _inputFns = new Map([
         }
         var _ndjproc = res => {
             var _j = []
-            res.split("\n").filter(l => l.length > 0).forEach(r => _ndjline(r, r => _j.push(jsonParse(r, __, __, true))))
+            res.split("\n").filter(l => l.length > 0).forEach(r => _ndjline(r, r => _j.push(jsonParse(r, __, __, toBoolean(params.ndjsonfilter)))))
             return _j
         }
 

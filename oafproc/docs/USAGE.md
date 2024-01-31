@@ -20,6 +20,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | sql    | A SQL expression to filter output |
 | path   | A JMESPath expression to filter output |
 | csv    | If type=csv, the CSV options to use | 
+| outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
@@ -63,6 +64,7 @@ These options will change the parsed input data included any filters provided.
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
+| merge | Boolean | If input is a list/array of maps will merge each element into one map |
 
 ---
 
@@ -109,6 +111,7 @@ List of options to use when _input=ndjson_:
 | Option | Type | Description |
 |--------|------|-------------|
 | ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
+| ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
 
 ---
 
@@ -210,13 +213,13 @@ cat data.ndjson | oafp input=ndjson output=cslon
 oafp file=someFile.md input=md
 
 # table with the latest news from Google
-curl -L https://blog.google/rss | oafp path="rss.channel.item" sql="select title, pubDate" output=ctable
+curl -s -L https://blog.google/rss | oafp path="rss.channel.item" sql="select title, pubDate" output=ctable
 
 # table with the number of people in space per space craft
-curl http://api.open-notify.org/astros.json | oafp path="people" sql="select \"craft\", count(1) \"people\" group by \"craft\"" output=ctable
+curl -s http://api.open-notify.org/astros.json | oafp path="people" sql="select \"craft\", count(1) \"people\" group by \"craft\"" output=ctable
 
 # markdown table with the current closest asteroids to earth
-curl "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="near_earth_objects" maptoarray=true output=json | oafp path="[0][].{name:name,magnitude:absolute_magnitude_h,hazardous:is_potentially_hazardous_asteroid,distance:close_approach_data[0].miss_distance.kilometers}" sql="select * order by distance" output=mdtable
+curl -s "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="near_earth_objects" maptoarray=true output=json | oafp path="[0][].{name:name,magnitude:absolute_magnitude_h,hazardous:is_potentially_hazardous_asteroid,distance:close_approach_data[0].miss_distance.kilometers}" sql="select * order by distance" output=mdtable
 ```
 
 ---

@@ -99,7 +99,7 @@ Examples:
 ```bash
 # Simple SQL getting specific fields and ordering by one of them
 
-curl https://api.github.com/repos/openaf/openaf/releases | oafp sql="select name, tag_name, published_at order by published_at" output=ctable
+curl -s https://api.github.com/repos/openaf/openaf/releases | oafp sql="select name, tag_name, published_at order by published_at" output=ctable
 
 ```
 
@@ -110,7 +110,7 @@ curl https://api.github.com/repos/openaf/openaf/releases | oafp sql="select name
 ```bash
 # Using "path" to rename fields and then using "from" to limit the number of records
 
-curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[].{version:name, description:body}" from="limit(3)"
+curl -s https://api.github.com/repos/openaf/openaf/releases | oafp path="[].{version:name, description:body}" from="limit(3)"
 ```
 
 ### Use path to select a markdown field and parse it
@@ -118,7 +118,7 @@ curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[].{versio
 ```bash
 # Get just the markdown body of the latest release and parsing it
 
-curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[0].body" output=md
+curl -s https://api.github.com/repos/openaf/openaf/releases | oafp path="[0].body" output=md
 ```
 
 ### Use path projections and SQL aggregation
@@ -126,5 +126,5 @@ curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[0].body" 
 ```bash
 # Use path to rename fields and the SQL to group by category of drink
 
-curl "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=martini" | oafp path="drinks[].{drink:strDrink,category:strCategory,alchool:strAlcoholic}" sql="select \"category\", count(1) \"count\" group by \"category\"" output=ctable
+curl -s "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=martini" | oafp path="drinks[].{drink:strDrink,category:strCategory,alchool:strAlcoholic}" sql="select \"category\", count(1) \"count\" group by \"category\"" output=ctable
 ```
