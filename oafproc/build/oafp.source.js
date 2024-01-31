@@ -60,6 +60,7 @@ const _fileExtensions = new Map([
     [".yaml", "yaml"],
     [".xml", "xml"],
     [".csv", "csv"],
+    [".ini", "ini"],
     [".md", "md"]
 ])
 
@@ -133,6 +134,11 @@ var _outputFns = new Map([
             }
         }
     }],
+    ["ini", (r, options) => {
+        ow.loadJava()
+        var ini = new ow.java.ini()
+        print( ini.put(r).save() )
+    }], 
     ["mdyaml", (r, options) => {
         if (isArray(r)) {
             r.forEach((_y, i) => {
@@ -328,6 +334,15 @@ var _inputFns = new Map([
         ow.loadTemplate()
         var _s = ow.template.md.fromTable(_res)
         _$o(_s, options)
+    }],
+    ["ini", (r, options) => {
+        ow.loadJava()
+        var ini = new ow.java.ini()
+        if (isDef(params.file)) {
+            _$o( ini.loadFile(params.file).get(), options )
+        } else {
+            _$o( ini.load(r).get(), options )
+        }
     }],
     ["xls", (_res, options) => {
         try {

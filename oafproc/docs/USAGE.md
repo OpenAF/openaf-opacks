@@ -43,6 +43,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
+| ini     | INI/Properties format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
 
 ---
@@ -92,6 +93,7 @@ List of available formats to use with the _output_ option:
 | mdtable  | A Markdown table format (only for list outputs) |
 | openmetrics | Converts a map or list to OpenMetrics format |
 | base64   | A base64 text format | 
+| ini      | A INI/Properties format (arrays are not supported) |
 | xls      | A XLSx output format |
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
