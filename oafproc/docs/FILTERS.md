@@ -84,4 +84,35 @@ _tbc_
 
 ## 🤔 SQL
 
-_tbc_
+You can use simple SQL or H2 SQL. Althought you don't need to refer the table the data can be refered from the _'_TMP'_ table.
+
+Examples:
+
+```bash
+# Simple SQL getting specific fields and ordering by one of them
+curl https://api.github.com/repos/openaf/openaf/releases | oafp sql="select name, tag_name, published_at order by published_at" output=ctable
+
+```
+
+## Using Path, From and/or SQL at the same time
+
+### Using path and from
+
+```bash
+# Using "path" to rename fields and then using "from" to limit the number of records
+curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[].{version:name, description:body}" from="limit(3)"
+```
+
+### Use path to select a markdown field and parse it
+
+```bash
+# Get just the markdown body of the latest release and parsing it
+curl https://api.github.com/repos/openaf/openaf/releases | oafp path="[0].body" output=md
+```
+
+### Use path projections and SQL aggregation
+
+```bash
+# Use path to rename fields and the SQL to group by category of drink
+curl "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=martini" | oafp path="drinks[].{drink:strDrink,category:strCategory,alchool:strAlcoholic}" sql="select \"category\", count(1) \"count\" group by \"category\"" output=ctable
+```
