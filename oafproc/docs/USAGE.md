@@ -161,6 +161,7 @@ List of options to use when _output=xls_:
 | Option | Type | Description |
 |--------|------|-------------|
 | xlsfile | String | The output filename (if not defined a temporary file will be used to open with the OS's Excel-compatible application) |
+| xlssheet | String | The name of sheet to use (default to 'data') |
 | xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
 | xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
 | xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
