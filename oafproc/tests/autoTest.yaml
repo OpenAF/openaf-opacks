@@ -5,6 +5,11 @@ todo:
 - oafp::JSON2YAML
 - oafp::YAML2YAML
 - oafp::YAML2JSON
+- oafp::JSON2Base64
+- oafp::JSON2Base64Gzip
+
+- oafp::merge
+- oafp::sortMapKeys
 
 - Results
 
@@ -53,6 +58,34 @@ jobs:
   deps: Load test
   args:
     func: "global.test.testYAML2JSON()"
+
+# -----------------------
+- name: oafp::JSON2Base64
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testJSON2Base64()"
+
+# ---------------------------
+- name: oafp::JSON2Base64Gzip
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testJSON2Base64Gzip()"
+
+# -----------------
+- name: oafp::merge
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testMerge()"
+
+# -----------------
+- name: oafp::sortMapKeys
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testSortMapKeys()"
 
 # -------------
 - name: Results

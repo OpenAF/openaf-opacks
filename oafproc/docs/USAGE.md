@@ -147,6 +147,16 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 ---
 
+## 🧾 Base64 input/output options
+
+List of options to use when _input=base64_ or _output=base64_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| base64gzip | Boolean | If true the contents will thet gzip/gunzip respectively to reduce the size of the base64 output |
+
+---
+
 ## 🧾 Log output options
 
 List of options to use when _output=log_:

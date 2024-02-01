@@ -108,7 +108,15 @@ var _transformFns = {
                     let key = keys[i]
                     let value = aMap[key]
             
-                    if (moreLevels && typeof value === 'object' && value !== null && value !== undefined) {
+                    if (Array.isArray(value)) {
+                        result[key] = value.map(item => {
+                            if (typeof item === 'object' && item !== null && item !== undefined) {
+                                return sortMapKeys(item, moreLevels)
+                            } else {
+                                return item
+                            }
+                        })
+                    } else if (moreLevels && typeof value === 'object' && value !== null && value !== undefined) {
                         result[key] = _sortMapKeys(value, moreLevels)
                     } else {
                         result[key] = value
@@ -169,9 +177,11 @@ var _outputFns = new Map([
         }
     }],
     ["ini", (r, options) => {
-        ow.loadJava()
-        var ini = new ow.java.ini()
-        print( ini.put(r).save() )
+        if (!isString(r)) {
+            ow.loadJava()
+            var ini = new ow.java.ini()
+            print( ini.put(r).save() )
+        }
     }], 
     ["mdyaml", (r, options) => {
         if (isArray(r)) {
@@ -190,23 +200,27 @@ var _outputFns = new Map([
         }
     }],
     ["template", (r, options) => {
-        ow.loadTemplate()
-        ow.template.addConditionalHelpers()
-        ow.template.addOpenAFHelpers()
-        ow.template.addFormatHelpers()
-        if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
-        tprint(io.readFileString(params.template), r)
+        if (!isString(r)) {
+            ow.loadTemplate()
+            ow.template.addConditionalHelpers()
+            ow.template.addOpenAFHelpers()
+            ow.template.addFormatHelpers()
+            if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
+            tprint(io.readFileString(params.template), r)
+        }
     }],
     ["openmetrics", (r, options) => {
-        ow.loadMetrics()
-        var _out = ow.metrics.fromObj2OpenMetrics(r, params.metricsprefix, params.metricstimestamp)
-        _out = _out.split("\n").map(line => {
-            if (line.indexOf("{_id=\"") >= 0) line = line.replace(/{_id=\"\d+\",/, "{")
-            if (line.indexOf(",_id=\"") >= 0) line = line.replace(/,_id=\"\d+\"}/, "}")
-            if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
-            return line
-        }).join("\n")
-        $o(_out, options)
+        if (!isString(r)) {
+            ow.loadMetrics()
+            var _out = ow.metrics.fromObj2OpenMetrics(r, params.metricsprefix, params.metricstimestamp)
+            _out = _out.split("\n").map(line => {
+                if (line.indexOf("{_id=\"") >= 0) line = line.replace(/{_id=\"\d+\",/, "{")
+                if (line.indexOf(",_id=\"") >= 0) line = line.replace(/,_id=\"\d+\"}/, "}")
+                if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
+                return line
+            }).join("\n")
+            $o(_out, options)
+        }
     }],
     ["base64", (r, options) => {
         var _o = ""
@@ -215,54 +229,60 @@ var _outputFns = new Map([
         else
             _o = stringify(r)
 
-        print(af.fromBytes2String(af.toBase64Bytes(_o)))
+        if (toBoolean(params.base64gzip)) {
+            print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
+        } else {
+            print(af.fromBytes2String(af.toBase64Bytes(_o)))
+        }
     }],
     ["xls", (r, options) => {
-        try {
-            includeOPack("plugin-XLS")
-        } catch(e) {
-            throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
-        }
-
-        plugin("XLS")
-        var ar
-        if (isMap(r)) {
-            ow.loadObj()
-            var o = ow.obj.flatMap(r)
-            ar = Object.keys(o).map(r => ({ key: r, value: o[r] }))
-        }
-        if (isArray(r)) {
-            ar = r
-        }
-        traverse(ar, (aK, aV, aP, aO) => {
-            if (isString(aV) && aV.startsWith("=")) aO[aK] = "'" + aV
-        })
-
-        var tempFile = false
-        if (isUnDef(params.xlsfile)) {
-            tempFile = true
-            params.xlsfile = io.createTempFile("oafp", ".xlsx")
-        }
-
-        var xls = new XLS()
-        var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
-        params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
-        if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
-        if (params.xlsformat.trim().startsWith("(")) params.xlsformat = af.fromSLON(params.xlsformat)
-        ow.format.xls.setTable(xls, sheet, "A", 1, ar, __, params.xlsformat)
-        xls.writeFile(params.xlsfile)
-        xls.close()
-
-        params.xlsopenwait = _$(params.xlsopenwait, "xlsopenwait").isNumber().default(5000)
-        params.xlsopen     = toBoolean(_$(params.xlsopen, "xlsopen").isString().default("true"))
-        if (params.xlsopen) {
-            if (ow.format.isWindows()) {
-                $sh("start " + params.xlsfile).exec()
-                if (tempFile) sleep(params.xlsopenwait, true)
-            } else if (ow.format.getOS().startsWith("Mac")) {
-                $sh("open " + params.xlsfile).exec()
-                if (tempFile) sleep(params.xlsopenwait, true)
-            } 
+        if (!isString(r)) {
+            try {
+                includeOPack("plugin-XLS")
+            } catch(e) {
+                throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+            }
+    
+            plugin("XLS")
+            var ar
+            if (isMap(r)) {
+                ow.loadObj()
+                var o = ow.obj.flatMap(r)
+                ar = Object.keys(o).map(r => ({ key: r, value: o[r] }))
+            }
+            if (isArray(r)) {
+                ar = r
+            }
+            traverse(ar, (aK, aV, aP, aO) => {
+                if (isString(aV) && aV.startsWith("=")) aO[aK] = "'" + aV
+            })
+    
+            var tempFile = false
+            if (isUnDef(params.xlsfile)) {
+                tempFile = true
+                params.xlsfile = io.createTempFile("oafp", ".xlsx")
+            }
+    
+            var xls = new XLS()
+            var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
+            params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
+            if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
+            if (params.xlsformat.trim().startsWith("(")) params.xlsformat = af.fromSLON(params.xlsformat)
+            ow.format.xls.setTable(xls, sheet, "A", 1, ar, __, params.xlsformat)
+            xls.writeFile(params.xlsfile)
+            xls.close()
+    
+            params.xlsopenwait = _$(params.xlsopenwait, "xlsopenwait").isNumber().default(5000)
+            params.xlsopen     = toBoolean(_$(params.xlsopen, "xlsopen").isString().default("true"))
+            if (params.xlsopen) {
+                if (ow.format.isWindows()) {
+                    $sh("start " + params.xlsfile).exec()
+                    if (tempFile) sleep(params.xlsopenwait, true)
+                } else if (ow.format.getOS().startsWith("Mac")) {
+                    $sh("open " + params.xlsfile).exec()
+                    if (tempFile) sleep(params.xlsopenwait, true)
+                } 
+            }
         }
     }]
 ])
@@ -303,14 +323,19 @@ const _$o = (r, options, lineByLine) => {
             r = _$f([r], options)[0]
         else
             r = _$f(r, options)
+    } else {
+        if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
+            r = _$f(jsonParse(r, __, __, true), options)
+        }
     }
 
     if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
 
-    if (_outputFns.has(options.__format)) 
+    if (_outputFns.has(options.__format)) {
         _outputFns.get(options.__format)(r, options)
-    else
+    } else {
         $o(r, options)
+    }
 }
 
 // Input functions (input parsers)
@@ -365,7 +390,12 @@ var _inputFns = new Map([
     ["md", (_res, options) => {
         __ansiColorFlag = true
         __conConsole = true
-        print(ow.format.withMD(_res))
+        //print(ow.format.withMD(_res))
+        if (isUnDef(params.format) && isUnDef(options.__format)) {
+            params.format = "md"
+            options.__format = "md"
+        }
+        _$o(_res, options)
     }],
     ["mdtable", (_res, options) => {
         ow.loadTemplate()
@@ -423,7 +453,11 @@ var _inputFns = new Map([
         }
     }],
     ["base64", (_res, options) => {
-        _$o(af.fromBytes2String(af.fromBase64(_res)), options)
+        if (toBoolean(params.base64gzip)) {
+            _$o(af.fromBytes2String(io.gunzip(af.fromBase64(_res, true))), options)
+        } else {
+            _$o(af.fromBytes2String(af.fromBase64(_res)), options)
+        }
     }],
     ["json", (_res, options) => _$o(jsonParse(_res, __, __, true), options)]
 ])
@@ -431,7 +465,7 @@ var _inputFns = new Map([
 // --- add extra _inputFns here ---
 
 // Default format
-params.format = _$(params.format, "format").isString().default("ctree")
+params.format = _$(params.format, "format").isString().default(__)
 
 // Initialize console detection
 __initializeCon()
