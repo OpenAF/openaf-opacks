@@ -447,7 +447,43 @@ var _inputFns = new Map([
     ["hsperf", (_res, options) => {
         if (isDef(params.file)) {
             ow.loadJava()
-            _$o( ow.java.parseHSPerf(params.file), options )
+            var data = ow.java.parseHSPerf(params.file)
+            // Enrich data
+            data.__ts = new Date()
+
+            var r = { max: 0, total: 0, used: 0, free: 0 }
+            data.sun.gc.generation.forEach(gen => {
+                gen.space.forEach(space => {
+                    r.max   = (r.max < Number(space.maxCapacity)) ? Number(space.maxCapacity) : r.max
+                    r.used  = r.used + Number(space.used)
+                    r.total = isNumber(space.capacity) ? r.total + Number(space.capacity) : r.total
+                    data.sun.gc["__percUsed_" + space.name] = (100 * space.used) / space.capacity
+                })
+            })
+            data.sun.gc.__percUsed_meta = (100 * data.sun.gc.metaspace.used) / data.sun.gc.metaspace.capacity
+            data.sun.gc.__percUsed_ccs = (100 * data.sun.gc.compressedclassspace.used) / data.sun.gc.compressedclassspace.capacity
+
+            // Java 8
+            var _ygc = $from(data.sun.gc.collector).equals("name", "PSScavenge").at(0)
+            data.sun.gc.__ygc = isDef(_ygc) ? Number(_ygc.invocations) : 0
+            data.sun.gc.__ygct = isDef(_ygc) ? Number(_ygc.time / 1000000000) : 0
+            
+            var _fgc = $from(data.sun.gc.collector).equals("name", "PSParallelCompact").orEquals("name", "").at(0)
+            data.sun.gc.__fgc = isDef(_fgc) ? Number(_fgc.invocations) : 0
+            data.sun.gc.__fgct = isDef(_fgc) ? Number(_fgc.time / 1000000000) : 0
+
+            data.sun.gc.__gct = $from(data.sun.gc.collector).sum("time") / 1000000000
+
+            data.java.__mem = {
+            total    : r.total,
+            used     : r.used,
+            free     : r.total - r.used,
+            metaMax  : data.sun.gc.metaspace.maxCapacity,
+            metaTotal: data.sun.gc.metaspace.capacity,
+            metaUsed : data.sun.gc.metaspace.used,
+            metaFree : data.sun.gc.metaspace.capacity - data.sun.gc.metaspace.used
+            }
+            _$o( data, options )
         } else {
             throw "hsperf only supports file input"
         }
