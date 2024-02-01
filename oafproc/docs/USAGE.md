@@ -14,6 +14,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | -h     | Show this document |
 | help   | Alternative way to show this document or others (e.g. filters, template) |
 | file   | The file to parse (if not provide stdin is used) |
+| cmd    | Alternative to file and stdin to execute a command (e.g. kubectl, docker) to get the file contents |
 | output | The output format (default: ctree) |
 | input  | The input type (if not provided it will try to be auto-detected) |
 | from   | An OpenAF nLinq path expression to filter output |

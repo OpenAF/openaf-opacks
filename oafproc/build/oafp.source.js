@@ -43,7 +43,7 @@ if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) sho
 params.format = params.output || params.format, params.type = params.input || params.type
 
 // Check if file is provided
-if (isUnDef(params.file)) {
+if (isUnDef(params.file) && isUnDef(params.cmd)) {
     let _found = __
     for (let key in params) {
         if (params[key] === "") {
@@ -337,6 +337,18 @@ const _$o = (r, options, lineByLine) => {
         $o(r, options)
     }
 }
+const _runCmd2Bytes = (cmd, toStr) => {
+    var data
+    var ostream = af.newOutputStream()
+    $sh(cmd)
+    .cb((o, e, i) => {
+      ioStreamCopy(ostream, o)
+      var ba = ostream.toByteArray()
+      if (ba.length > 0) data = ba
+    })
+    .get()
+    return toStr ? af.fromBytes2String(data) : data
+}
 
 // Input functions (input parsers)
 var _inputFns = new Map([
@@ -370,16 +382,23 @@ var _inputFns = new Map([
         }
 
         if (params.ndjsonjoin) {
-            if (isDef(params.file)) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
                 _res = io.readFileString(params.file)
+            }
+            if (isDef(params.cmd)) {
+                _res = _runCmd2Bytes(params.cmd, true)
             }
             _$o(_ndjproc(_res), options)
         } else {
             var _stream
-            if (isDef(params.file)) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
                 _stream = io.readFileStream(params.file)
             } else {
-                _stream = af.fromString2InputStream(_res)
+                if (isDef(params.cmd)) {
+                    _stream = af.fromBytes2InputStream(_runCmd2Bytes(params.cmd))
+                } else {
+                    _stream = af.fromString2InputStream(_res)
+                }
             }
             ioStreamReadLines(_stream, r => {
                 _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
@@ -424,8 +443,8 @@ var _inputFns = new Map([
         params.xlsrow          = _$(params.xlsrow, "xlsrow").isString().default(1)
 
         plugin("XLS")
-        if (isDef(params.file)) {
-            var xls = new XLS(params.file)
+        if (isDef(params.file) || isDef(params.cmd)) {
+            var xls = new XLS(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file)
             var sheet = xls.getSheet(params.xlssheet)
             var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
             xls.close()
@@ -436,8 +455,8 @@ var _inputFns = new Map([
         }
     }],
     ["csv", (_res, options) => {
-        if (isDef(params.file)) {
-            var is = io.readFileStream(params.file)
+        if (isDef(params.file) || isDef(params.cmd)) {
+            var is = isDef(params.cmd) ? af.fromBytes2InputStream(_runCmd2Bytes(params.cmd)) : io.readFileStream(params.file)
             _$o($csv(params.inputcsv).fromInStream(is).toOutArray(), options)
             is.close()
         } else {
@@ -445,9 +464,9 @@ var _inputFns = new Map([
         }
     }],
     ["hsperf", (_res, options) => {
-        if (isDef(params.file)) {
+        if (isDef(params.file) || isDef(params.cmd)) {
             ow.loadJava()
-            var data = ow.java.parseHSPerf(params.file)
+            var data = isDef(params.cmd) ? ow.java.parseHSPerf(_runCmd2Bytes(params.cmd)) : ow.java.parseHSPerf(params.file)
             // Enrich data
             data.__ts = new Date()
 
@@ -526,19 +545,23 @@ var _res = "", noFurtherOutput = false
 if (isDef(params.file)) {
     if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
 } else {
-    if (params.input != "pm") {
-        _res = []
-        io.pipeLn(r => {
-            if (isDef(_inputLineFns[params.type])) {
-                if (_inputLineFns[params.type](_transform(r), clone(options))) {
+    if (isDef(params.cmd)) {
+        _res = _runCmd2Bytes(params.cmd, true)
+    } else {
+        if (params.input != "pm") {
+            _res = []
+            io.pipeLn(r => {
+                if (isDef(_inputLineFns[params.type])) {
+                    if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                        _res.push(r)
+                    }
+                } else { 
                     _res.push(r)
                 }
-            } else { 
-                _res.push(r)
-            }
-            return false
-        })
-        _res = _res.join('\n')
+                return false
+            })
+            _res = _res.join('\n')
+        }
     }
 }
 
