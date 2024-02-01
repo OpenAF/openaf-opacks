@@ -338,7 +338,7 @@ const _$o = (r, options, lineByLine) => {
     }
 }
 const _runCmd2Bytes = (cmd, toStr) => {
-    var data
+    var data = af.fromString2Bytes("")
     var ostream = af.newOutputStream()
     $sh(cmd)
     .cb((o, e, i) => {
