@@ -22,6 +22,7 @@ const showHelp = () => {
     switch(params.help.toLowerCase()) {
     case "filters" : _ff = "docs/FILTERS.md"; break
     case "template": _ff = "docs/TEMPLATE.md"; break
+    case "examples": _ff = "docs/EXAMPLES.md"; break
     default        : _ff = "docs/USAGE.md"
     }
 
@@ -318,7 +319,7 @@ var _outputFns = new Map([
                 params.xlsfile = io.createTempFile("oafp", ".xlsx")
             }
     
-            var xls = new XLS()
+            var xls = new XLS(io.fileExists(params.xlsfile) ? params.xlsfile : __)
             var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
             params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
             if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)

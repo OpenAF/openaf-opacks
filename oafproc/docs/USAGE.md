@@ -244,4 +244,5 @@ curl -s "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="ne
 |------|-------------|
 | help=filters | Provides more details regarding the use of "path=", "from=" and "sql=" |
 | help=template | Provides more details regarding the use of "output=template" |
+| help=examples | Provide several examples |
 | help=readme | Returns this document |
