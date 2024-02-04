@@ -83,11 +83,13 @@ if (isUnDef(params.file) && isUnDef(params.cmd)) {
 // File extensions list
 const _fileExtensions = new Map([
     [".json", "json"],
+    [".ndjson", "ndjson"],
     [".yaml", "yaml"],
     [".xml", "xml"],
     [".csv", "csv"],
     [".ini", "ini"],
-    [".md", "md"]
+    [".md", "md"],
+    [".xls", "xls"]
 ])
 
 // --- add extra _fileExtensions here ---
@@ -158,9 +160,9 @@ var _transformFns = {
     },
     "searchkeys"    : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
     "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
-    "maptoarray"    : _r => (isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
-    "arraytomap"    : _r => (isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
-    "flatmap"       : _r => (isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
+    "maptoarray"    : _r => (toBoolean(params.maptoarray) && isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
+    "arraytomap"    : _r => (toBoolean(params.arraytomap) && isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
+    "flatmap"       : _r => (toBoolean(params.flatmap) && isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
     "merge"         : _r => {
         if (toBoolean(params.merge) && isArray(_r) && _r.length > 1) {
             var _rr
@@ -173,10 +175,10 @@ var _transformFns = {
         }
     },
     "correcttypes"  : _r => {
-        if (isObject(_r)) {
+        if (toBoolean(params.correcttypes) && isObject(_r)) {
             traverse(_r, (aK, aV, aP, aO) => {
                 switch(descType(aV)) {
-                case "number": aO[aK] = toNumber(aV); break
+                case "number": if (isString(aV)) aO[aK] = Number(aV); break
                 case "string": 
                     // String boolean
                     if (aV.trim().toLowerCase() == "true" || aV.trim().toLowerCase() == "false") { aO[aK] = toBoolean(aV); break }

@@ -10,6 +10,12 @@ todo:
 
 - oafp::merge
 - oafp::sortMapKeys
+- oafp::correctTypes
+- oafp::searchKeys
+- oafp::searchValues
+- oafp::mapToArray
+- oafp::arrayToMap
+- oafp::flatMap
 
 - Results
 
@@ -86,6 +92,48 @@ jobs:
   deps: Load test
   args:
     func: "global.test.testSortMapKeys()"
+
+# ------------------------
+- name: oafp::correctTypes
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testCorrectTypes()"
+
+# ----------------------
+- name: oafp::searchKeys
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testSearchKeys()"
+
+# ------------------------
+- name: oafp::searchValues
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testSearchValues()"
+
+# ----------------------
+- name: oafp::mapToArray
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testMapToArray()"
+
+# ----------------------
+- name: oafp::arrayToMap
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testArrayToMap()"
+
+# -------------------
+- name: oafp::flatMap
+  to  : oJob Test
+  deps: Load test
+  args:
+    func: "global.test.testFlatMap()"
 
 # -------------
 - name: Results
