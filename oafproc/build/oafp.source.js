@@ -525,7 +525,7 @@ params.format = _$(params.format, "format").isString().default(__)
 
 // Initialize console detection
 __initializeCon()
-__con.getTerminal().settings.set("sane")
+if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.getTerminal().settings.set("sane")
 
 // Set options
 var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }

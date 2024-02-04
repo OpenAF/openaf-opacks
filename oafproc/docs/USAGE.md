@@ -4,7 +4,7 @@
 
 Takes an input, usually a data structure such as json, and transforms it to an equivalent data structure in another format or visualization. The output data can be filtered through JMESPath, SQL or OpenAF's nLinq and provided transformers can also be applied to it.
 
-> If a _file_ or _file=somefile_ is not provided the input will be expected to be provided through stdin/pipe.
+> If a _file_ or _file=somefile_ or _file=zipfile::somefile_ is not provided the input will be expected to be provided through stdin/pipe.
 > Options are expected to be provided as _option=value_. Check the lists below for all the available options.
 
 ## Main options:

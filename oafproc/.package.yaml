@@ -63,6 +63,12 @@ scripts:
     }
     if (!isWin) $sh("chmod a+x " + installPath).exec()
 
+    // If windows, build script
+    if (isWin) {
+      log("Building oafp.bat...")
+      io.writeFileString(installPath + ".bat", "@echo off\nset thispath=%~dp0\nset DIR=%thispath:~0,-1%\nset OAF_DIR=\"%DIR%\"\nchcp 65001 > NUL\n%OAF_DIR%/oaf.bat -f %OAF_DIR%/oafp -e \"%*\"")
+    }
+
     // Determine if it's static install
     if (getOpenAFPath().startsWith(String(java.lang.System.getProperty("java.io.tmpdir")) + "/_oaf_")) {
       log("Static install detected.")
@@ -112,12 +118,12 @@ files:
 filesHash:
   README.md: 896dd498c723a8a1301ba46d1df347263403b3f6
   build/build.yaml: 7548c8db8d109081d85a111ff2cd3767b2c20ade
-  build/oafp.source.js: 6d658673479d6834fa10301596c7ae0a3593390f
+  build/oafp.source.js: 666d98b42820076c867c9faf0d19574414a03f9c
   buildStaticOAFP.yaml: 3cfba475fdd4c1cb8c7fc90c4462647805626b75
   docs/FILTERS.md: 289bcdd328a806d894d79aa0a8b68a903e3ff1c4
   docs/TEMPLATE.md: 9a2bd251824efb34c75398fd4511e9ddfb4811d1
-  docs/USAGE.md: f986a5dae7f2a655a3e876f2860f7147b0d0056c
-  oafp.js: 99d79963a2a783bea07c6bdfc1717c573b38a67a
+  docs/USAGE.md: 95419cafaaa3db2154fcfe74125b3d496659b8b6
+  oafp.js: 68ca48bb4fd7012df47b24548b4591eaf47c1b18
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
   tests/autoTest.js: e886f97d0e72ed75c3658e868d567ceb38ecbd9c
   tests/autoTest.yaml: 0e197b1ec984280b55d6e53c591dd6eb87d803c2
