@@ -89,7 +89,8 @@ const _fileExtensions = new Map([
     [".csv", "csv"],
     [".ini", "ini"],
     [".md", "md"],
-    [".xls", "xls"]
+    [".xls", "xls"],
+    [".xlsx", "xls"]
 ])
 
 // --- add extra _fileExtensions here ---
