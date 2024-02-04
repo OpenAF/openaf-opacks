@@ -2,7 +2,19 @@ var params = processExpr(" ")
 // Author : Nuno Aguiar
 const oafp = (params) => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
-var showHelp = () => {
+
+// Exit function
+const _exit = (code, msg) => {
+    if (isUnDef(msg)) msg = "exit: " + code
+    if (isUnDef(ow.oJob) && !toBoolean(params.noexit)) {
+        printErr(msg)
+        exit(code)
+    } else {
+        throw msg
+    }
+}
+
+const showHelp = () => {
     __initializeCon()
 
     var _ff
@@ -22,6 +34,7 @@ var showHelp = () => {
         else
             print(ow.format.withMD( io.readFileString(_f) ))
     } else {
+        var _help
         if (isDef(_help) && _ff == "docs/USAGE.md") {
             __ansiColorFlag = true
             __conConsole = true
@@ -34,7 +47,20 @@ var showHelp = () => {
         }
     }
 
-    exit(0)
+    _exit(0)
+}
+
+const showVersion = () => {
+    var _ff = (getOPackPath("oafproc") || ".") + "/.package.yaml"
+    var oafpv = (io.fileExists(_ff) ? io.readFileYAML(_ff).version : "(not available)")
+    var _v = {
+        oafp: oafpv,
+        openaf: {
+            version: getVersion(),
+            distribution: getDistribution()
+        }
+    }
+    return stringify(_v, __, "")
 }
 
 ow.loadFormat()
@@ -43,7 +69,7 @@ if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) sho
 params.format = params.output || params.format, params.type = params.input || params.type
 
 // Check if file is provided
-if (isUnDef(params.file)) {
+if (isUnDef(params.file) && isUnDef(params.cmd)) {
     let _found = __
     for (let key in params) {
         if (params[key] === "") {
@@ -227,7 +253,7 @@ var _outputFns = new Map([
             ow.template.addConditionalHelpers()
             ow.template.addOpenAFHelpers()
             ow.template.addFormatHelpers()
-            if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
+            if (isUnDef(params.template)) _exit(-1, "For output=handlebars you need to provide a template=someFile.hbs")
             tprint(io.readFileString(params.template), r)
         }
     }],
@@ -266,7 +292,7 @@ var _outputFns = new Map([
             try {
                 includeOPack("plugin-XLS")
             } catch(e) {
-                throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+                _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
             }
     
             plugin("XLS")
@@ -363,6 +389,18 @@ const _$o = (r, options, lineByLine) => {
         $o(r, options)
     }
 }
+const _runCmd2Bytes = (cmd, toStr) => {
+    var data = af.fromString2Bytes("")
+    var ostream = af.newOutputStream()
+    $sh(cmd)
+    .cb((o, e, i) => {
+      ioStreamCopy(ostream, o)
+      var ba = ostream.toByteArray()
+      if (ba.length > 0) data = ba
+    })
+    .get()
+    return toStr ? af.fromBytes2String(data) : data
+}
 
 // Input functions (input parsers)
 var _inputFns = new Map([
@@ -396,16 +434,23 @@ var _inputFns = new Map([
         }
 
         if (params.ndjsonjoin) {
-            if (isDef(params.file)) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
                 _res = io.readFileString(params.file)
+            }
+            if (isDef(params.cmd)) {
+                _res = _runCmd2Bytes(params.cmd, true)
             }
             _$o(_ndjproc(_res), options)
         } else {
             var _stream
-            if (isDef(params.file)) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
                 _stream = io.readFileStream(params.file)
             } else {
-                _stream = af.fromString2InputStream(_res)
+                if (isDef(params.cmd)) {
+                    _stream = af.fromBytes2InputStream(_runCmd2Bytes(params.cmd))
+                } else {
+                    _stream = af.fromString2InputStream(_res)
+                }
             }
             ioStreamReadLines(_stream, r => {
                 _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
@@ -441,7 +486,7 @@ var _inputFns = new Map([
         try {
             includeOPack("plugin-XLS")
         } catch(e) {
-            throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+            _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
         }
         
         params.xlssheet        = _$(params.xlssheet, "xlssheet").isString().default(0)
@@ -450,20 +495,20 @@ var _inputFns = new Map([
         params.xlsrow          = _$(params.xlsrow, "xlsrow").isString().default(1)
 
         plugin("XLS")
-        if (isDef(params.file)) {
-            var xls = new XLS(params.file)
+        if (isDef(params.file) || isDef(params.cmd)) {
+            var xls = new XLS(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file)
             var sheet = xls.getSheet(params.xlssheet)
             var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
             xls.close()
             if (isDef(_r) && isMap(_r)) _r = _r.table
             _$o(_r, options)
         } else {
-            throw "XLS only supports file input. Please provide a file=..."
+            _exit(-1, "XLS is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
         }
     }],
     ["csv", (_res, options) => {
-        if (isDef(params.file)) {
-            var is = io.readFileStream(params.file)
+        if (isDef(params.file) || isDef(params.cmd)) {
+            var is = isDef(params.cmd) ? af.fromBytes2InputStream(_runCmd2Bytes(params.cmd)) : io.readFileStream(params.file)
             _$o($csv(params.inputcsv).fromInStream(is).toOutArray(), options)
             is.close()
         } else {
@@ -471,11 +516,47 @@ var _inputFns = new Map([
         }
     }],
     ["hsperf", (_res, options) => {
-        if (isDef(params.file)) {
+        if (isDef(params.file) || isDef(params.cmd)) {
             ow.loadJava()
-            _$o( ow.java.parseHSPerf(params.file), options )
+            var data = isDef(params.cmd) ? ow.java.parseHSPerf(_runCmd2Bytes(params.cmd)) : ow.java.parseHSPerf(params.file)
+            // Enrich data
+            data.__ts = new Date()
+
+            var r = { max: 0, total: 0, used: 0, free: 0 }
+            data.sun.gc.generation.forEach(gen => {
+                gen.space.forEach(space => {
+                    r.max   = (r.max < Number(space.maxCapacity)) ? Number(space.maxCapacity) : r.max
+                    r.used  = r.used + Number(space.used)
+                    r.total = isNumber(space.capacity) ? r.total + Number(space.capacity) : r.total
+                    data.sun.gc["__percUsed_" + space.name] = (100 * space.used) / space.capacity
+                })
+            })
+            data.sun.gc.__percUsed_meta = (100 * data.sun.gc.metaspace.used) / data.sun.gc.metaspace.capacity
+            data.sun.gc.__percUsed_ccs = (100 * data.sun.gc.compressedclassspace.used) / data.sun.gc.compressedclassspace.capacity
+
+            // Java 8
+            var _ygc = $from(data.sun.gc.collector).equals("name", "PSScavenge").at(0)
+            data.sun.gc.__ygc = isDef(_ygc) ? Number(_ygc.invocations) : 0
+            data.sun.gc.__ygct = isDef(_ygc) ? Number(_ygc.time / 1000000000) : 0
+            
+            var _fgc = $from(data.sun.gc.collector).equals("name", "PSParallelCompact").orEquals("name", "").at(0)
+            data.sun.gc.__fgc = isDef(_fgc) ? Number(_fgc.invocations) : 0
+            data.sun.gc.__fgct = isDef(_fgc) ? Number(_fgc.time / 1000000000) : 0
+
+            data.sun.gc.__gct = $from(data.sun.gc.collector).sum("time") / 1000000000
+
+            data.java.__mem = {
+            total    : r.total,
+            used     : r.used,
+            free     : r.total - r.used,
+            metaMax  : data.sun.gc.metaspace.maxCapacity,
+            metaTotal: data.sun.gc.metaspace.capacity,
+            metaUsed : data.sun.gc.metaspace.used,
+            metaFree : data.sun.gc.metaspace.capacity - data.sun.gc.metaspace.used
+            }
+            _$o( data, options )
         } else {
-            throw "hsperf only supports file input"
+            _exit(-1, "hsperf is only supported with either 'file' or 'cmd' defined.")
         }
     }],
     ["base64", (_res, options) => {
@@ -495,7 +576,7 @@ params.format = _$(params.format, "format").isString().default(__)
 
 // Initialize console detection
 __initializeCon()
-__con.getTerminal().settings.set("sane")
+if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.getTerminal().settings.set("sane")
 
 // Set options
 var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }
@@ -511,24 +592,42 @@ if (isDef(params.csv)) {
     params.csv = params.csv.trim().startsWith("{") ? jsonParse(params.csv, true) : af.fromSLON(params.csv)
 }
 
+// Check version
+var _version = false
+if (params["-v"] == "" || (isString(params.version) && params.version.length > 0)) {
+    _version = true
+    showVersion()
+}
+
 // Read input from stdin or file
 var _res = "", noFurtherOutput = false
-if (isDef(params.file)) {
-    if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
+if (_version) {
+    _res = showVersion()
 } else {
-    if (params.input != "pm") {
-        _res = []
-        io.pipeLn(r => {
-            if (isDef(_inputLineFns[params.type])) {
-                if (_inputLineFns[params.type](_transform(r), clone(options))) {
-                    _res.push(r)
-                }
-            } else { 
-                _res.push(r)
+    if (isDef(params.file)) {
+        if (!(io.fileExists(params.file))) {
+            _exit(-1, "ERROR: File not found: '" + params.file + "'")
+        }
+        if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
+    } else {
+        if (isDef(params.cmd)) {
+            _res = _runCmd2Bytes(params.cmd, true)
+        } else {
+            if (params.input != "pm") {
+                _res = []
+                io.pipeLn(r => {
+                    if (isDef(_inputLineFns[params.type])) {
+                        if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                            _res.push(r)
+                        }
+                    } else { 
+                        _res.push(r)
+                    }
+                    return false
+                })
+                _res = _res.join('\n')
             }
-            return false
-        })
-        _res = _res.join('\n')
+        }
     }
 }
 
@@ -556,8 +655,7 @@ if (!noFurtherOutput) {
                         params.type = "yaml"
                     }
                 } else {
-                    printErr("Please provide the input type.")
-                    exit(-1)
+                    _exit(-1, "Please provide the input type.")
                 }
             }
         }
@@ -566,7 +664,8 @@ if (!noFurtherOutput) {
     // Determine input type and execute
     if (isDef(_inputFns.has(params.type))) {
         _inputFns.get(params.type)(_res, options)
-    } else {      
+    } else {
+        printErr("WARN: " + params.type + " input type not supported. Using json.")
         _inputFns.get("json")(_res, options)
     }
 }

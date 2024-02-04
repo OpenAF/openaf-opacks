@@ -4,7 +4,7 @@
 
 Takes an input, usually a data structure such as json, and transforms it to an equivalent data structure in another format or visualization. The output data can be filtered through JMESPath, SQL or OpenAF's nLinq and provided transformers can also be applied to it.
 
-> If a _file_ or _file=somefile_ is not provided the input will be expected to be provided through stdin/pipe.
+> If a _file_ or _file=somefile_ or _file=zipfile::somefile_ is not provided the input will be expected to be provided through stdin/pipe.
 > Options are expected to be provided as _option=value_. Check the lists below for all the available options.
 
 ## Main options:
@@ -14,6 +14,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | -h     | Show this document |
 | help   | Alternative way to show this document or others (e.g. filters, template) |
 | file   | The file to parse (if not provide stdin is used) |
+| cmd    | Alternative to file and stdin to execute a command (e.g. kubectl, docker) to get the file contents |
 | output | The output format (default: ctree) |
 | input  | The input type (if not provided it will try to be auto-detected) |
 | from   | An OpenAF nLinq path expression to filter output |
@@ -22,6 +23,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | csv    | If type=csv, the CSV options to use | 
 | outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
+| -v     | Changes the input to a map with the tool's version info |
+| version | Alternative way to change the input to a map with the tool's version |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
 
