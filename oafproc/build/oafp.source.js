@@ -2,7 +2,19 @@ var params = processExpr(" ")
 // Author : Nuno Aguiar
 const oafp = (params) => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
-var showHelp = () => {
+
+// Exit function
+const _exit = (code, msg) => {
+    if (isUnDef(msg)) msg = "exit: " + code
+    if (isUnDef(ow.oJob) && !toBoolean(params.noexit)) {
+        printErr(msg)
+        exit(code)
+    } else {
+        throw msg
+    }
+}
+
+const showHelp = () => {
     __initializeCon()
 
     var _ff
@@ -35,7 +47,20 @@ var showHelp = () => {
         }
     }
 
-    exit(0)
+    _exit(0)
+}
+
+const showVersion = () => {
+    var _ff = (getOPackPath("oafproc") || ".") + "/.package.yaml"
+    var oafpv = (io.fileExists(_ff) ? io.readFileYAML(_ff).version : "(not available)")
+    var _v = {
+        oafp: oafpv,
+        openaf: {
+            version: getVersion(),
+            distribution: getDistribution()
+        }
+    }
+    return stringify(_v, __, "")
 }
 
 ow.loadFormat()
@@ -206,7 +231,7 @@ var _outputFns = new Map([
             ow.template.addConditionalHelpers()
             ow.template.addOpenAFHelpers()
             ow.template.addFormatHelpers()
-            if (isUnDef(params.template)) throw "For output=handlebars you need to provide a template=someFile.hbs"
+            if (isUnDef(params.template)) _exit(-1, "For output=handlebars you need to provide a template=someFile.hbs")
             tprint(io.readFileString(params.template), r)
         }
     }],
@@ -241,7 +266,7 @@ var _outputFns = new Map([
             try {
                 includeOPack("plugin-XLS")
             } catch(e) {
-                throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+                _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
             }
     
             plugin("XLS")
@@ -435,7 +460,7 @@ var _inputFns = new Map([
         try {
             includeOPack("plugin-XLS")
         } catch(e) {
-            throw "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)"
+            _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
         }
         
         params.xlssheet        = _$(params.xlssheet, "xlssheet").isString().default(0)
@@ -452,7 +477,7 @@ var _inputFns = new Map([
             if (isDef(_r) && isMap(_r)) _r = _r.table
             _$o(_r, options)
         } else {
-            throw "XLS only supports file input. Please provide a file=..."
+            _exit(-1, "XLS is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
         }
     }],
     ["csv", (_res, options) => {
@@ -505,7 +530,7 @@ var _inputFns = new Map([
             }
             _$o( data, options )
         } else {
-            throw "hsperf only supports file input"
+            _exit(-1, "hsperf is only supported with either 'file' or 'cmd' defined.")
         }
     }],
     ["base64", (_res, options) => {
@@ -541,27 +566,41 @@ if (isDef(params.csv)) {
     params.csv = params.csv.trim().startsWith("{") ? jsonParse(params.csv, true) : af.fromSLON(params.csv)
 }
 
+// Check version
+var _version = false
+if (params["-v"] == "" || (isString(params.version) && params.version.length > 0)) {
+    _version = true
+    showVersion()
+}
+
 // Read input from stdin or file
 var _res = "", noFurtherOutput = false
-if (isDef(params.file)) {
-    if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
+if (_version) {
+    _res = showVersion()
 } else {
-    if (isDef(params.cmd)) {
-        _res = _runCmd2Bytes(params.cmd, true)
+    if (isDef(params.file)) {
+        if (!(io.fileExists(params.file))) {
+            _exit(-1, "ERROR: File not found: '" + params.file + "'")
+        }
+        if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
     } else {
-        if (params.input != "pm") {
-            _res = []
-            io.pipeLn(r => {
-                if (isDef(_inputLineFns[params.type])) {
-                    if (_inputLineFns[params.type](_transform(r), clone(options))) {
+        if (isDef(params.cmd)) {
+            _res = _runCmd2Bytes(params.cmd, true)
+        } else {
+            if (params.input != "pm") {
+                _res = []
+                io.pipeLn(r => {
+                    if (isDef(_inputLineFns[params.type])) {
+                        if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                            _res.push(r)
+                        }
+                    } else { 
                         _res.push(r)
                     }
-                } else { 
-                    _res.push(r)
-                }
-                return false
-            })
-            _res = _res.join('\n')
+                    return false
+                })
+                _res = _res.join('\n')
+            }
         }
     }
 }
@@ -590,8 +629,7 @@ if (!noFurtherOutput) {
                         params.type = "yaml"
                     }
                 } else {
-                    printErr("Please provide the input type.")
-                    exit(-1)
+                    _exit(-1, "Please provide the input type.")
                 }
             }
         }
@@ -600,7 +638,8 @@ if (!noFurtherOutput) {
     // Determine input type and execute
     if (isDef(_inputFns.has(params.type))) {
         _inputFns.get(params.type)(_res, options)
-    } else {      
+    } else {
+        printErr("WARN: " + params.type + " input type not supported. Using json.")
         _inputFns.get("json")(_res, options)
     }
 }

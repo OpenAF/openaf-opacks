@@ -23,6 +23,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | csv    | If type=csv, the CSV options to use | 
 | outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
+| -v     | Changes the input to a map with the tool's version info |
+| version | Alternative way to change the input to a map with the tool's version |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
 
