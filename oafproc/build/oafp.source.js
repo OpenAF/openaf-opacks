@@ -145,6 +145,28 @@ var _transformFns = {
         } else {
             return _r
         }
+    },
+    "correcttypes"  : _r => {
+        if (isObject(_r)) {
+            traverse(_r, (aK, aV, aP, aO) => {
+                switch(descType(aV)) {
+                case "number": aO[aK] = toNumber(aV); break
+                case "string": 
+                    // String boolean
+                    if (aV.trim().toLowerCase() == "true" || aV.trim().toLowerCase() == "false") { aO[aK] = toBoolean(aV); break }
+                    // String ISO date
+                    if (aV.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)) { aO[aK] = new Date(aV); break }
+                    // String date
+                    if (aV.trim().match(/^\d{4}-\d{2}-\d{2}$/)) { aO[aK] = new Date(aV); break }
+                    // String time with seconds
+                    if (aV.trim().match(/^\d{2}:\d{2}:\d{2}$/)) { aO[aK] = new Date(aV); break }
+                    // String time without seconds
+                    if (aV.trim().match(/^\d{2}:\d{2}$/)) { aO[aK] = new Date(aV); break }
+                    break
+                }
+            })
+        }
+        return _r
     }
 }
 
@@ -221,6 +243,10 @@ var _outputFns = new Map([
             }).join("\n")
             $o(_out, options)
         }
+    }],
+    ["pjson", (r, options) => {
+        options.__format = "prettyjson"
+        $o(r, options)
     }],
     ["base64", (r, options) => {
         var _o = ""

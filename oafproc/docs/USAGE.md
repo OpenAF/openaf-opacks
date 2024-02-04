@@ -79,6 +79,7 @@ List of available formats to use with the _output_ option:
 | ctable   | A table-like forcely colored format (only for list outputs) |
 | tree     | A tree-like format |
 | json     | A JSON format without spacing |
+| pjson    | A JSON format with spacing (equivalent to prettyjson) |
 | prettyjson | A JSON format with spacing |
 | yaml     | A YAML format |
 | mdyaml   | A multi document YAML format (only for list outputs) |
