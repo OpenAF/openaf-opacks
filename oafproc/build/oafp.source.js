@@ -313,13 +313,13 @@ var _outputFns = new Map([
                 if (isString(aV) && aV.startsWith("=")) aO[aK] = "'" + aV
             })
     
-            var tempFile = false
+            var tempFile = false, origFile = params.xlsfile
             if (isUnDef(params.xlsfile)) {
                 tempFile = true
                 params.xlsfile = io.createTempFile("oafp", ".xlsx")
             }
-    
-            var xls = new XLS(io.fileExists(params.xlsfile) ? params.xlsfile : __)
+   
+            var xls = new XLS(params.origFile && io.fileExists(params.origFile) ? params.origFile : __)
             var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
             params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
             if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
