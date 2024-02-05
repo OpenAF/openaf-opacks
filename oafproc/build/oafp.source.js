@@ -318,8 +318,8 @@ var _outputFns = new Map([
                 tempFile = true
                 params.xlsfile = io.createTempFile("oafp", ".xlsx")
             }
-   
-            var xls = new XLS(params.origFile && io.fileExists(params.origFile) ? params.origFile : __)
+  
+            var xls = new XLS(isDef(origFile) && io.fileExists(origFile) ? origFile : __)
             var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
             params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
             if (params.xlsformat.trim().startsWith("{")) params.xlsformat = jsonParse(params.xlsformat, true)
