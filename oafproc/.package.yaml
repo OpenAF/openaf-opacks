@@ -124,7 +124,7 @@ filesHash:
   docs/EXAMPLES.md: ba17c58353e98dfb24693121d6966bd96bf1a05a
   docs/FILTERS.md: 289bcdd328a806d894d79aa0a8b68a903e3ff1c4
   docs/TEMPLATE.md: 9a2bd251824efb34c75398fd4511e9ddfb4811d1
-  docs/USAGE.md: aeb0be3c439066838524a03c2938cc96e271f0ba
+  docs/USAGE.md: fe58280c3af6d0335be32b17b533b1de11f29fc4
   oafp.js: 082bfe6abd11bedc0ca5ebb3fbb36a8971bf2e83
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
   tests/autoTest.js: d075915c640f06f04abfffd19923ae5dd042bb31

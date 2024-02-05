@@ -66,6 +66,7 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
+| correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
 
