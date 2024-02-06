@@ -405,19 +405,37 @@ const _runCmd2Bytes = (cmd, toStr) => {
     .get()
     return toStr ? af.fromBytes2String(data) : data
 }
+const _msg = "(processing data...)"
+const _showTmpMsg  = msg => printErrnl(_$(msg).default(_msg))
+const _clearTmpMsg = msg => printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r")
 
 // Input functions (input parsers)
 var _inputFns = new Map([
-    ["pm"   , (_res, options) => { if (isDef(__pm._map)) _res = __pm._map; if (isDef(__pm._list)) _res = __pm._list; _$o(_res, options) }],
-    ["yaml" , (_res, options) => _$o(af.fromYAML(_res), options)],
+    ["pm"   , (_res, options) => { 
+        _showTmpMsg()
+        if (isDef(__pm._map)) _res = __pm._map
+        if (isDef(__pm._list)) _res = __pm._list
+        _clearTmpMsg()
+        _$o(_res, options) 
+    }],
+    ["yaml" , (_res, options) => {
+        _showTmpMsg()
+        var _r = af.fromYAML(_res)
+        _clearTmpMsg()
+        _$o(_r, options)
+    }],
     ["xml"  , (_res, options) => {
+        _showTmpMsg()
         params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
         params.xmlprefix = _$(params.xmlprefix, "xmlprefix").isString().default(__)
         params.xmlfiltertag = toBoolean(_$(params.xmlfiltertag, "xmlfiltertag").isString().default(__))
         if (_res.indexOf("<?xml") >= 0) _res = _res.substring(_res.indexOf("?>") + 2).trim()
-        _$o(af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag), options)
+        var _r = af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag)
+        _clearTmpMsg()
+        _$o(_r, options)
     }],
     ["ndjson", (_res, options) => {
+        _showTmpMsg()
         global.__ndjsonbuf = __
         var _ndjline = (r, fn) => {
             if (isUnDef(global.__ndjsonbuf) && r.length != 0 && r.trim().startsWith("{")) global.__ndjsonbuf = ""
@@ -445,6 +463,7 @@ var _inputFns = new Map([
             if (isDef(params.cmd)) {
                 _res = _runCmd2Bytes(params.cmd, true)
             }
+            _clearTmpMsg()
             _$o(_ndjproc(_res), options)
         } else {
             var _stream
@@ -457,6 +476,7 @@ var _inputFns = new Map([
                     _stream = af.fromString2InputStream(_res)
                 }
             }
+            _clearTmpMsg()
             ioStreamReadLines(_stream, r => {
                 _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
             })
@@ -464,6 +484,7 @@ var _inputFns = new Map([
         }
     }],
     ["md", (_res, options) => {
+        _showTmpMsg()
         __ansiColorFlag = true
         __conConsole = true
         //print(ow.format.withMD(_res))
@@ -471,23 +492,30 @@ var _inputFns = new Map([
             params.format = "md"
             options.__format = "md"
         }
+        _clearTmpMsg()
         _$o(_res, options)
     }],
     ["mdtable", (_res, options) => {
+        _showTmpMsg()
         ow.loadTemplate()
         var _s = ow.template.md.fromTable(_res)
+        _clearTmpMsg()
         _$o(_s, options)
     }],
     ["ini", (r, options) => {
+        _showTmpMsg()
         ow.loadJava()
-        var ini = new ow.java.ini()
+        var ini = new ow.java.ini(), _r
         if (isDef(params.file)) {
-            _$o( ini.loadFile(params.file).get(), options )
+            _r = ini.loadFile(params.file).get()
         } else {
-            _$o( ini.load(r).get(), options )
+            _r = ini.load(r).get()
         }
+        _clearTmpMsg()
+        _$o(_r, options)
     }],
     ["xls", (_res, options) => {
+        _showTmpMsg()
         try {
             includeOPack("plugin-XLS")
         } catch(e) {
@@ -506,22 +534,29 @@ var _inputFns = new Map([
             var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
             xls.close()
             if (isDef(_r) && isMap(_r)) _r = _r.table
+            _clearTmpMsg()
             _$o(_r, options)
         } else {
+            _clearTmpMsg()
             _exit(-1, "XLS is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
         }
     }],
     ["csv", (_res, options) => {
+        var _r
+        _showTmpMsg()
         if (isDef(params.file) || isDef(params.cmd)) {
             var is = isDef(params.cmd) ? af.fromBytes2InputStream(_runCmd2Bytes(params.cmd)) : io.readFileStream(params.file)
-            _$o($csv(params.inputcsv).fromInStream(is).toOutArray(), options)
+            _r = $csv(params.inputcsv).fromInStream(is).toOutArray()
             is.close()
         } else {
-            _$o($csv(params.inputcsv).fromInString( _res ).toOutArray(), options)
+            _r = $csv(params.inputcsv).fromInString( _res ).toOutArray()
         }
+        _clearTmpMsg()
+        _$o(_r, options)
     }],
     ["hsperf", (_res, options) => {
         if (isDef(params.file) || isDef(params.cmd)) {
+            _showTmpMsg()
             ow.loadJava()
             var data = isDef(params.cmd) ? ow.java.parseHSPerf(_runCmd2Bytes(params.cmd)) : ow.java.parseHSPerf(params.file)
             // Enrich data
@@ -559,19 +594,41 @@ var _inputFns = new Map([
             metaUsed : data.sun.gc.metaspace.used,
             metaFree : data.sun.gc.metaspace.capacity - data.sun.gc.metaspace.used
             }
+            _clearTmpMsg()
             _$o( data, options )
         } else {
             _exit(-1, "hsperf is only supported with either 'file' or 'cmd' defined.")
         }
     }],
     ["base64", (_res, options) => {
+        var _r
+        _showTmpMsg()
         if (toBoolean(params.base64gzip)) {
-            _$o(af.fromBytes2String(io.gunzip(af.fromBase64(_res, true))), options)
+            _r = af.fromBytes2String(io.gunzip(af.fromBase64(_res, true)))
         } else {
-            _$o(af.fromBytes2String(af.fromBase64(_res)), options)
+            _r = af.fromBytes2String(af.fromBase64(_res))
         }
+        _clearTmpMsg()
+        _$o(_r, options)
     }],
-    ["json", (_res, options) => _$o(jsonParse(_res, __, __, true), options)]
+    ["llm", (_res, options) => {
+        params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+        params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+            _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
+
+        _showTmpMsg()
+        var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
+                  .promptJSON(_res)
+        _clearTmpMsg()
+        
+        _$o(jsonParse(res, __, __, true), options)
+    }],
+    ["json", (_res, options) => {
+        _showTmpMsg()
+        _$o(jsonParse(_res, __, __, true), options)
+        _clearTmpMsg()
+    }]
 ])
 
 // --- add extra _inputFns here ---
