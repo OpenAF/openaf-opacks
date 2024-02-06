@@ -387,6 +387,7 @@ const _$o = (r, options, lineByLine) => {
 
     if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
 
+    _clearTmpMsg()
     if (_outputFns.has(options.__format)) {
         _outputFns.get(options.__format)(r, options)
     } else {
@@ -415,13 +416,11 @@ var _inputFns = new Map([
         _showTmpMsg()
         if (isDef(__pm._map)) _res = __pm._map
         if (isDef(__pm._list)) _res = __pm._list
-        _clearTmpMsg()
         _$o(_res, options) 
     }],
     ["yaml" , (_res, options) => {
         _showTmpMsg()
         var _r = af.fromYAML(_res)
-        _clearTmpMsg()
         _$o(_r, options)
     }],
     ["xml"  , (_res, options) => {
@@ -431,7 +430,6 @@ var _inputFns = new Map([
         params.xmlfiltertag = toBoolean(_$(params.xmlfiltertag, "xmlfiltertag").isString().default(__))
         if (_res.indexOf("<?xml") >= 0) _res = _res.substring(_res.indexOf("?>") + 2).trim()
         var _r = af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag)
-        _clearTmpMsg()
         _$o(_r, options)
     }],
     ["ndjson", (_res, options) => {
@@ -463,7 +461,7 @@ var _inputFns = new Map([
             if (isDef(params.cmd)) {
                 _res = _runCmd2Bytes(params.cmd, true)
             }
-            _clearTmpMsg()
+
             _$o(_ndjproc(_res), options)
         } else {
             var _stream
@@ -476,7 +474,7 @@ var _inputFns = new Map([
                     _stream = af.fromString2InputStream(_res)
                 }
             }
-            _clearTmpMsg()
+
             ioStreamReadLines(_stream, r => {
                 _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
             })
@@ -492,14 +490,12 @@ var _inputFns = new Map([
             params.format = "md"
             options.__format = "md"
         }
-        _clearTmpMsg()
         _$o(_res, options)
     }],
     ["mdtable", (_res, options) => {
         _showTmpMsg()
         ow.loadTemplate()
         var _s = ow.template.md.fromTable(_res)
-        _clearTmpMsg()
         _$o(_s, options)
     }],
     ["ini", (r, options) => {
@@ -511,7 +507,6 @@ var _inputFns = new Map([
         } else {
             _r = ini.load(r).get()
         }
-        _clearTmpMsg()
         _$o(_r, options)
     }],
     ["xls", (_res, options) => {
@@ -534,10 +529,10 @@ var _inputFns = new Map([
             var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
             xls.close()
             if (isDef(_r) && isMap(_r)) _r = _r.table
-            _clearTmpMsg()
+
             _$o(_r, options)
         } else {
-            _clearTmpMsg()
+
             _exit(-1, "XLS is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
         }
     }],
@@ -551,7 +546,6 @@ var _inputFns = new Map([
         } else {
             _r = $csv(params.inputcsv).fromInString( _res ).toOutArray()
         }
-        _clearTmpMsg()
         _$o(_r, options)
     }],
     ["hsperf", (_res, options) => {
@@ -594,7 +588,7 @@ var _inputFns = new Map([
             metaUsed : data.sun.gc.metaspace.used,
             metaFree : data.sun.gc.metaspace.capacity - data.sun.gc.metaspace.used
             }
-            _clearTmpMsg()
+
             _$o( data, options )
         } else {
             _exit(-1, "hsperf is only supported with either 'file' or 'cmd' defined.")
@@ -608,7 +602,6 @@ var _inputFns = new Map([
         } else {
             _r = af.fromBytes2String(af.fromBase64(_res))
         }
-        _clearTmpMsg()
         _$o(_r, options)
     }],
     ["llm", (_res, options) => {
@@ -620,14 +613,12 @@ var _inputFns = new Map([
         _showTmpMsg()
         var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
                   .promptJSON(_res)
-        _clearTmpMsg()
         
         _$o(jsonParse(res, __, __, true), options)
     }],
     ["json", (_res, options) => {
         _showTmpMsg()
         _$o(jsonParse(_res, __, __, true), options)
-        _clearTmpMsg()
     }]
 ])
 
