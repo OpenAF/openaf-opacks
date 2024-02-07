@@ -47,6 +47,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
+| sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
 
@@ -66,8 +67,10 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
-| correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
+| correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
+| removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
+| sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
 
 ---

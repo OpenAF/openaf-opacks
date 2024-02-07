@@ -91,7 +91,8 @@ const _fileExtensions = new Map([
     [".ini", "ini"],
     [".md", "md"],
     [".xls", "xls"],
-    [".xlsx", "xls"]
+    [".xlsx", "xls"],
+    [".sql", "sql"]
 ])
 
 // --- add extra _fileExtensions here ---
@@ -198,6 +199,24 @@ var _transformFns = {
         }
         return _r
     },
+    "removenulls": _r => {
+        if (toBoolean(params.removenulls)) {
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (isNull(aV) || isUnDef(aV)) delete aO[aK]
+            })
+        }
+        return _r
+    },
+    "sqlfilter": _r => {
+        if (isString(params.sqlfilter)) {
+            switch(params.sqlfilter.toLowerCase()) {
+            case "simple"  : __flags.SQL_QUERY_METHOD = "nlinq"; break
+            case "advanced": __flags.SQL_QUERY_METHOD = "h2"; break
+            default        : __flags.SQL_QUERY_METHOD = "auto"
+            }
+        }
+        return _r
+    },
     "llmprompt": _r => {
         if (isString(params.llmprompt)) {
             params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
@@ -265,7 +284,7 @@ var _outputFns = new Map([
             var ini = new ow.java.ini()
             print( ini.put(r).save() )
         }
-    }], 
+    }],
     ["mdyaml", (r, options) => {
         if (isArray(r)) {
             r.forEach((_y, i) => {
@@ -389,15 +408,15 @@ const _$f = (r, options) => {
     if (isString(r)) return _transform(r)
 
     if (options.__path) {
-        r = $path(r, options.__path)
+        r = $path(r, options.__path.trim())
         delete options.__path
     }
     if (options.__from) {
-        r = $from(r).query(af.fromNLinq(options.__from))
+        r = $from(r).query(af.fromNLinq(options.__from.trim()))
         delete options.__from
     }
     if (options.__sql) {
-        r = $sql(r, options.__sql)
+        r = $sql(r, options.__sql.trim())
         delete options.__sql
     }
     r = _transform(r)
@@ -541,6 +560,13 @@ var _inputFns = new Map([
             _r = ini.load(r).get()
         }
         _$o(_r, options)
+    }],
+    ["sql", (r, options) => {
+        if (isString(r)) {
+            _$o(af.fromSQL(r).ast, options)
+        } else {
+            _$o(r, options)
+        }
     }],
     ["xls", (_res, options) => {
         _showTmpMsg()
