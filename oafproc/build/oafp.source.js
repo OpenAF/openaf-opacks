@@ -197,6 +197,37 @@ var _transformFns = {
             })
         }
         return _r
+    },
+    "llmprompt": _r => {
+        if (isString(params.llmprompt)) {
+            params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+            params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+
+            var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv) )
+            var type = "json", shouldStr = true
+            if (isString(params.input)) {
+                if (params.input == "md") {
+                    type = "markdown"
+                    shouldStr = false
+                }
+                if (params.input == "mdtable") {
+                    type = "markdown table"
+                    shouldStr = false
+                }
+                if (params.input == "hsperf") type = "java hsperf file"
+            }
+            
+            res = res.withContext(shouldStr ? stringify(_r,__,true) : _r, `${type} input data`)
+            if (isString(params.output)) {
+                if (params.output == "md" || params.output == "mdtable") {
+                    res = res.prompt(params.llmprompt)
+                    return res
+                }
+            }
+            res = res.promptJSON(params.llmprompt)
+            return res
+        }
+        return _r
     }
 }
 
@@ -382,6 +413,8 @@ const _$o = (r, options, lineByLine) => {
     } else {
         if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
             r = _$f(jsonParse(r, __, __, true), options)
+        } else {
+            r = _$f(r, options)
         }
     }
 
