@@ -107,6 +107,7 @@ List of available formats to use with the _output_ option:
 | xls      | A XLSx output format |
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
+| raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
 > For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
 

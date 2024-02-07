@@ -278,6 +278,12 @@ var _outputFns = new Map([
             }
         }
     }],
+    ["raw", (r, options) => {
+        if (isString(r))
+            print(r)
+        else
+            sprint(r)
+    }],
     ["ini", (r, options) => {
         if (!isString(r)) {
             ow.loadJava()
