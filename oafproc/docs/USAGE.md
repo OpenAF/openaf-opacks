@@ -70,6 +70,7 @@ These options will change the parsed input data included any filters provided.
 | flatmap | Boolean | If true a map structure will be flat to just one level |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
+| removedups | Boolean | If true will try to remove duplicates from an array |
 | sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
 

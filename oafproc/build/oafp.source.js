@@ -207,6 +207,27 @@ var _transformFns = {
         }
         return _r
     },
+    "removedups": _r => {
+        if (toBoolean(params.removedups)) {
+            if (isArray(_r)) {
+                var _dups = new Set()
+                var _r2 = []
+                _r.forEach(r => {
+                    var rs = r
+                    if (isObject(r)) rs = sortMapKeys(rs)
+                    rs = stringify(rs, __, true)
+                    if (!_dups.has(rs)) {
+                        _dups.add(rs)
+                        _r2.push(r)
+                    }
+                })
+                return _r2
+            } else {
+                _exit(-1, "removedups is only supported for arrays")
+            }
+        }
+        return _r
+    },
     "sqlfilter": _r => {
         if (isString(params.sqlfilter)) {
             switch(params.sqlfilter.toLowerCase()) {
