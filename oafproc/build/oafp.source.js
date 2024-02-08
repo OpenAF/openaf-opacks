@@ -735,7 +735,7 @@ if (params.type == "ndjson") {
 }
 // csv options
 if (isDef(params.inputcsv)) {
-    params.inputcsv = params.csv.trim().startsWith("{") ? jsonParse(params.inputcsv, true) : af.fromSLON(params.inputcsv)
+    params.inputcsv = params.inputcsv.trim().startsWith("{") ? jsonParse(params.inputcsv, true) : af.fromSLON(params.inputcsv)
 }
 if (isDef(params.csv)) {
     params.csv = params.csv.trim().startsWith("{") ? jsonParse(params.csv, true) : af.fromSLON(params.csv)
