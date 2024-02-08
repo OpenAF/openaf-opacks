@@ -234,11 +234,15 @@ var _transformFns = {
                     shouldStr = false
                 }
                 if (params.input == "hsperf") type = "java hsperf file"
+                if (params.input == "raw") {
+                    type = "raw"
+                    shouldStr = false
+                }
             }
             
-            res = res.withContext(shouldStr ? stringify(_r,__,true) : _r, `${type} input data`)
+            res = res.withContext(shouldStr ? stringify(_r,__,true) : _r, (isDef(params.llmcontext) ? params.llmcontext : `${type} input data`))
             if (isString(params.output)) {
-                if (params.output == "md" || params.output == "mdtable") {
+                if (params.output == "md" || params.output == "mdtable" || params.output == "raw") {
                     res = res.prompt(params.llmprompt)
                     return res
                 }
@@ -555,6 +559,10 @@ var _inputFns = new Map([
         ow.loadTemplate()
         var _s = ow.template.md.fromTable(_res)
         _$o(_s, options)
+    }],
+    ["raw", (_res, options) => {
+        _showTmpMsg()
+        _$o(_res, options)
     }],
     ["ini", (r, options) => {
         _showTmpMsg()
