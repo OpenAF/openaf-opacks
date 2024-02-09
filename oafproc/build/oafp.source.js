@@ -709,12 +709,12 @@ var _inputFns = new Map([
         _showTmpMsg()
         var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
                   .promptJSON(_res)
-        
-        _$o(jsonParse(res, __, __, true), options)
+
+        _$o(jsonParse(res, __, __, isString(res)), options)
     }],
     ["json", (_res, options) => {
         _showTmpMsg()
-        _$o(jsonParse(_res, __, __, true), options)
+        _$o(jsonParse(_res, __, __, isString(_res)), options)
     }]
 ])
 
