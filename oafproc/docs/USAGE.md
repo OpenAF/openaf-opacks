@@ -47,6 +47,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
+| llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
@@ -69,6 +70,8 @@ These options will change the parsed input data included any filters provided.
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
+| llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
+| llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
 | removedups | Boolean | If true will try to remove duplicates from an array |
@@ -166,6 +169,17 @@ List of options to use when _input=base64_ or _output=base64_:
 | Option | Type | Description |
 |--------|------|-------------|
 | base64gzip | Boolean | If true the contents will thet gzip/gunzip respectively to reduce the size of the base64 output |
+
+---
+
+## 🧾 LLM input/transform options
+
+List of options to use when _input=llm_ or _llmprompt=..._:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
+| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
 
 ---
 

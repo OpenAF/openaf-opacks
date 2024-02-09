@@ -1,4 +1,4 @@
-// (author: Nuno Aguiar, version: 20240205, license: Apache 2.0, url: https://github.com/OpenAF/openaf-opacks/tree/master/oafproc)
+// (author: Nuno Aguiar, version: 20240209, license: Apache 2.0, url: https://github.com/OpenAF/openaf-opacks/tree/master/oafproc)
 // ---
 
 const oafp=b=>{if(!isUnDef(b)&&!isDef(b.____ojob)){var n=(a,c)=>{isUnDef(c)&&(c="exit: "+a);if(isUnDef(ow.oJob)&&!toBoolean(b.noexit))printErr(c),exit(a);else throw c;},r=()=>{__initializeCon();b.help=_$(b.help,"help").isString().default("");switch(b.help.toLowerCase()){case "filters":var a="docs/FILTERS.md";break;case "template":a="docs/TEMPLATE.md";break;case "examples":a="docs/EXAMPLES.md";break;default:a="docs/USAGE.md"}var c=(getOPackPath("oafproc")||".")+"/"+a;io.fileExists(c)?(__conConsole=
