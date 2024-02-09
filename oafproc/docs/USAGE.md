@@ -50,6 +50,7 @@ List of data input types that can be auto-detected (through the file extension o
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
+| raw     | Passes the input directly to transforms and output |
 
 ---
 
@@ -108,6 +109,7 @@ List of available formats to use with the _output_ option:
 | xls      | A XLSx output format |
 | template | A Handlebars template format (requires template=someTemplate.hbs) |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
+| sql      | Outputs a series of SQL statements for an input list/array data |
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
 > For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
@@ -174,6 +176,18 @@ List of options to use when _output=log_:
 | Option | Type | Description |
 |--------|------|-------------|
 | logprintall | Boolean | If true all original non data (string) lines will be output |
+
+---
+
+## 🧾 SQL output options
+
+List of options to use when _output=sql_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| sqltable | String | The table name to use for the SQL statements (defaults to 'data') |
+| sqlicase | Boolean | If true the table and fields names won't be double-quoted |
+| sqlnocreate | Boolean | If true the create table statement won't be generated |
 
 ---
 

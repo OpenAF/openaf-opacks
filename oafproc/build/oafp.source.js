@@ -285,6 +285,18 @@ var _outputFns = new Map([
     ["key", (r, options) => {
         $o(r, options)
     }],
+    ["ctable", (r, options) => {
+        if (!isArray(r)) _exit(-1, "ctable is only supported for arrays/lists")
+        $o(r, options)
+    }],
+    ["stable", (r, options) => {
+        if (!isArray(r)) _exit(-1, "stable is only supported for arrays/lists")
+        $o(r, options)
+    }],
+    ["table", (r, options) => {
+        if (!isArray(r)) _exit(-1, "table is only supported for arrays/lists")
+        $o(r, options)
+    }],
     ["log", (r, options) => {
         if (isString(r) && toBoolean(params.logprintall)) {
             print(r.replace(/\n$/, ""))
@@ -372,6 +384,39 @@ var _outputFns = new Map([
         } else {
             print(af.fromBytes2String(af.toBase64Bytes(_o)))
         }
+    }],
+    ["sql", (r, options) => {
+        if (!isArray(r) || r.length < 1) _exit(-1, "sql is only supported for filled arrays/lists")
+        params.sqltable = _$(params.sqltable, "sqltable").isString().default("data")
+        params.sqlicase = toBoolean(_$(params.sqlicase, "sqlicase").isString().default("false"))
+        params.sqlnocreate = toBoolean(_$(params.sqlnocreate, "sqlnocreate").isString().default("false"))
+
+        ow.loadObj()
+       if (!params.sqlnocreate) print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
+
+        var okeys, ookeys = Object.keys(ow.obj.flatMap(r[0]))
+        if (!params.sqlicase) 
+            okeys = "\"" + ookeys.join("\", \"") + "\""
+        else 
+            okeys = ookeys.join(",").toUpperCase()
+
+        let _parseVal = aValue => {
+            var _value = ow.obj.flatMap(aValue)
+            var values = [];
+            for(var k in ookeys) {
+                values.push(_value[ookeys[k]]);
+            }
+            var binds = ookeys.map(k => {
+                var v = _value[k]
+                if (isString(v)) v = "'" + v.replace(/'/g, "''") + "'"
+                if (isNull(v))   v = "null"
+                return v
+            })
+            var _sql = "INSERT INTO " + (!params.sqlicase ? "\"" + params.sqltable + "\"" : params.sqltable) + " (" + okeys + ") VALUES (" + binds.join(",") + ");"
+            return _sql
+        }
+
+        print(r.map(_parseVal).join("\n"))
     }],
     ["xls", (r, options) => {
         if (!isString(r)) {
