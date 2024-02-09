@@ -164,7 +164,7 @@ var _transformFns = {
     },
     "searchkeys"    : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
     "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
-    "maptoarray"    : _r => (toBoolean(params.maptoarray) && isObject(_r) ? $m4a(_r, params.maptoarraykey) : _r),
+    "maptoarray"    : _r => (toBoolean(params.maptoarray) && isMap(_r) ? $m4a(_r, params.maptoarraykey) : _r),
     "arraytomap"    : _r => (toBoolean(params.arraytomap) && isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
     "flatmap"       : _r => (toBoolean(params.flatmap) && isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
     "merge"         : _r => {
