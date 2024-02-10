@@ -3,6 +3,76 @@ var params = processExpr(" ")
 const oafp = (params) => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
+// --- Util functions
+// Util functions
+const _transform = r => {
+    var _ks = Object.keys(_transformFns)
+    for(var ikey = 0; ikey < _ks.length; ikey++) {
+        var key = _ks[ikey]
+        if (isDef(params[key])) r = _transformFns[key](r)
+    }
+    return r
+}
+const _$f = (r, options) => {
+    if (isString(r)) return _transform(r)
+
+    if (options.__path) {
+        r = $path(r, options.__path.trim())
+        delete options.__path
+    }
+    if (options.__from) {
+        r = $from(r).query(af.fromNLinq(options.__from.trim()))
+        delete options.__from
+    }
+    if (options.__sql) {
+        r = $sql(r, options.__sql.trim())
+        delete options.__sql
+    }
+    r = _transform(r)
+    
+    return r
+}
+const _$o = (r, options, lineByLine) => {
+    if (!isString(r)) {
+        if (lineByLine)
+            r = _$f([r], options)[0]
+        else
+            r = _$f(r, options)
+    } else {
+        if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
+            r = _$f(jsonParse(r, __, __, true), options)
+        } else {
+            r = _$f(r, options)
+        }
+    }
+
+    if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
+
+    _clearTmpMsg()
+    if (_outputFns.has(options.__format)) {
+        _outputFns.get(options.__format)(r, options)
+    } else {
+        $o(r, options)
+    }
+}
+const _runCmd2Bytes = (cmd, toStr) => {
+    var data = af.fromString2Bytes("")
+    var ostream = af.newOutputStream()
+    $sh(cmd)
+    .cb((o, e, i) => {
+      ioStreamCopy(ostream, o)
+      var ba = ostream.toByteArray()
+      if (ba.length > 0) data = ba
+    })
+    .get()
+    return toStr ? af.fromBytes2String(data) : data
+}
+const _msg = "(processing data...)"
+const _showTmpMsg  = msg => printErrnl(_$(msg).default(_msg))
+const _clearTmpMsg = msg => printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r")
+
+// ---
+
 // Exit function
 const _exit = (code, msg) => {
     if (isUnDef(msg)) msg = "exit: " + code
@@ -81,31 +151,63 @@ if (isUnDef(params.file) && isUnDef(params.cmd)) {
     params.file = _found
 }
 
-// File extensions list
+// --- File extensions list
 const _fileExtensions = new Map([
-    [".json", "json"],
-    [".ndjson", "ndjson"],
-    [".yaml", "yaml"],
-    [".xml", "xml"],
-    [".plist", "xml"],
-    [".csv", "csv"],
-    [".ini", "ini"],
-    [".md", "md"],
-    [".xls", "xls"],
-    [".xlsx", "xls"],
-    [".sql", "sql"]
+  [
+    ".json",
+    "json"
+  ],
+  [
+    ".ndjson",
+    "ndjson"
+  ],
+  [
+    ".yaml",
+    "yaml"
+  ],
+  [
+    ".xml",
+    "xml"
+  ],
+  [
+    ".csv",
+    "csv"
+  ],
+  [
+    ".ini",
+    "ini"
+  ],
+  [
+    ".md",
+    "md"
+  ],
+  [
+    ".xls",
+    "xls"
+  ],
+  [
+    ".xlsx",
+    "xls"
+  ],
+  [
+    ".sql",
+    "sql"
+  ]
 ])
-
 // --- add extra _fileExtensions here ---
 
-// List of input types that should not be stored in memory
-var _inputNoMem = new Set([ "csv", "ndjson" ])
-
+// --- List of input types that should not be stored in memory
+var _inputNoMem = new Set([
+  "csv",
+  "ndjson"
+])
 // --- add extra _inputNoMem here ---
 
-// Input functions processing per line
+// --- Input functions processing per line
 var _inputLineFns = {
     "ndjson": (r, options) => {
+        params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
+        
         if (!params.ndjsonjoin) {
             if (isUnDef(global.__ndjsonbuf) && r.length != 0 && r.trim().startsWith("{")) global.__ndjsonbuf = ""
             if (isDef(global.__ndjsonbuf)) {
@@ -125,10 +227,9 @@ var _inputLineFns = {
         }
     }
 }
-
 // --- add extra _inputLineFns here ---
 
-// Transform functions
+// --- Transform functions
 var _transformFns = {
     "sortmapkeys"   : _r => {
         if (toBoolean(params.sortmapkeys) && isObject(_r)) {
@@ -275,9 +376,9 @@ var _transformFns = {
         return _r
     }
 }
-
 // --- add extra _transformFns here ---
 
+// --- Output functions
 var _outputFns = new Map([
     ["pm", (r, options) => {
         $o(r, options)
@@ -469,77 +570,9 @@ var _outputFns = new Map([
         }
     }]
 ])
-
 // --- add extra _outputFns here ---
 
-// Util functions
-const _transform = r => {
-    var _ks = Object.keys(_transformFns)
-    for(var ikey = 0; ikey < _ks.length; ikey++) {
-        var key = _ks[ikey]
-        if (isDef(params[key])) r = _transformFns[key](r)
-    }
-    return r
-}
-const _$f = (r, options) => {
-    if (isString(r)) return _transform(r)
-
-    if (options.__path) {
-        r = $path(r, options.__path.trim())
-        delete options.__path
-    }
-    if (options.__from) {
-        r = $from(r).query(af.fromNLinq(options.__from.trim()))
-        delete options.__from
-    }
-    if (options.__sql) {
-        r = $sql(r, options.__sql.trim())
-        delete options.__sql
-    }
-    r = _transform(r)
-    
-    return r
-}
-const _$o = (r, options, lineByLine) => {
-    if (!isString(r)) {
-        if (lineByLine)
-            r = _$f([r], options)[0]
-        else
-            r = _$f(r, options)
-    } else {
-        if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
-            r = _$f(jsonParse(r, __, __, true), options)
-        } else {
-            r = _$f(r, options)
-        }
-    }
-
-    if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
-
-    _clearTmpMsg()
-    if (_outputFns.has(options.__format)) {
-        _outputFns.get(options.__format)(r, options)
-    } else {
-        $o(r, options)
-    }
-}
-const _runCmd2Bytes = (cmd, toStr) => {
-    var data = af.fromString2Bytes("")
-    var ostream = af.newOutputStream()
-    $sh(cmd)
-    .cb((o, e, i) => {
-      ioStreamCopy(ostream, o)
-      var ba = ostream.toByteArray()
-      if (ba.length > 0) data = ba
-    })
-    .get()
-    return toStr ? af.fromBytes2String(data) : data
-}
-const _msg = "(processing data...)"
-const _showTmpMsg  = msg => printErrnl(_$(msg).default(_msg))
-const _clearTmpMsg = msg => printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r")
-
-// Input functions (input parsers)
+// --- Input functions (input parsers)
 var _inputFns = new Map([
     ["pm"   , (_res, options) => { 
         _showTmpMsg()
@@ -563,6 +596,8 @@ var _inputFns = new Map([
         _$o(_r, options)
     }],
     ["ndjson", (_res, options) => {
+        params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
+
         _showTmpMsg()
         global.__ndjsonbuf = __
         var _ndjline = (r, fn) => {
@@ -762,7 +797,6 @@ var _inputFns = new Map([
         _$o(jsonParse(_res, __, __, isString(_res)), options)
     }]
 ])
-
 // --- add extra _inputFns here ---
 
 // Default format
@@ -775,9 +809,9 @@ if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.get
 // Set options
 var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }
 // ndjson options
-if (params.type == "ndjson") {
+/*if (params.type == "ndjson") {
     params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
-}
+}*/
 // csv options
 if (isDef(params.inputcsv)) {
     params.inputcsv = params.inputcsv.trim().startsWith("{") ? jsonParse(params.inputcsv, true) : af.fromSLON(params.inputcsv)
@@ -798,12 +832,47 @@ var _res = "", noFurtherOutput = false
 if (_version) {
     _res = showVersion()
 } else {
+    // JSON base options
+    params.jsonprefix = _$(params.jsonprefix, "jsonprefix").isString().default(__)
+    params.jsondesc   = toBoolean(_$(params.jsondesc, "jsondesc").isString().default("false"))
+
     if (isDef(params.file)) {
         if (!(io.fileExists(params.file))) {
             _exit(-1, "ERROR: File not found: '" + params.file + "'")
         }
-        if (!_inputNoMem.has(params.type)) _res = io.readFileString(params.file)
+
+        if (!_inputNoMem.has(params.type)) {
+            if (params.type == "json" || isUnDef(params.type)) {
+                if (params.jsondesc) {
+                    var _s = new Set()
+                    io.readStreamJSON(params.file, path => {
+                        var _p = path.substring(2)
+                        if (isDef(params.jsonprefix)) {
+                            if (_p.startsWith(params.jsonprefix)) {
+                                _s.add(_p)
+                            }
+                        } else {
+                            _s.add(_p)
+                        }
+                        return false
+                    })
+                    _res = stringify(Array.from(_s), __, "")
+                } else {
+                    if (isDef(params.jsonprefix)) {
+                        var _r = io.readStreamJSON(params.file, path => path.substring(2).startsWith(params.jsonprefix))
+                        _res = stringify(_r, __, "")
+                    } else {
+                        _res = io.readFileString(params.file)
+                    }
+                }
+            } else {
+                _res = io.readFileString(params.file)
+            }
+        }
     } else {
+        if (params.jsondesc) _exit(-1, "ERROR: jsondesc only available for file input.")
+        if (params.jsonprefix) _exit(-1, "ERROR: jsonprefix only available for file input.")
+
         if (isDef(params.cmd)) {
             _res = _runCmd2Bytes(params.cmd, true)
         } else {
