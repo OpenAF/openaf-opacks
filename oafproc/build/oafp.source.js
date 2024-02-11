@@ -802,7 +802,11 @@ var _inputFns = new Map([
 
         _showTmpMsg()
         var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
-                  .promptJSON(_res)
+        if (params.output == "md" || params.output == "mdtable" || params.output == "raw") {
+            res = res.prompt(_res)
+        } else {
+            res = res.promptJSON(_res)
+        }
 
         _$o(jsonParse(res, __, __, isString(res)), options)
     }],
