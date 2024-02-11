@@ -30,6 +30,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > For _path_ syntax check https://jmespath.org/tutorial.html
 
+> You can list inputs by using _input="?"_; outputs by _output="?"_; transforms by _transforms=true_
+
 ---
 
 ## ⬇️  Input types
@@ -61,22 +63,22 @@ These options will change the parsed input data included any filters provided.
 
 | Option | Type | Description |
 |--------|------|-------------|
-| sortmapkeys | Boolean | If true the resulting map keys will be sorted |
-| searchkeys | String | Will return a map with only keys that match the provided string |
-| searchvalues | String | Will return am map with only values that match the provided string |
 | arraytomap | Boolean | If true will try to convert the input array to a map (see arraytomapkey, arraytomapkeepkey) |
-| arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
+| arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
+| correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
+| flatmap | Boolean | If true a map structure will be flat to just one level |
+| llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
+| llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
-| flatmap | Boolean | If true a map structure will be flat to just one level |
-| llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
-| llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
-| correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
-| removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
-| removedups | Boolean | If true will try to remove duplicates from an array |
-| sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
+| removedups | Boolean | If true will try to remove duplicates from an array |
+| removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
+| searchkeys | String | Will return a map with only keys that match the provided string |
+| searchvalues | String | Will return am map with only values that match the provided string |
+| sortmapkeys | Boolean | If true the resulting map keys will be sorted |
+| sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 
 ---
 
@@ -116,6 +118,17 @@ List of available formats to use with the _output_ option:
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
 > For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
+
+---
+
+## 🧾 JSON input options
+
+List of options to use when _input=json_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| jsondesc | Boolean | If true the output will be a list of JSON paths of the original json.  |
+| jsonprefix | String | Given the 'jsondesc=true' output list you can use each to filter big json files by prefix. |
 
 ---
 

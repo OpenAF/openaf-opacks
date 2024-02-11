@@ -87,3 +87,56 @@ Here are some of the available conditional helpers:
 | unlessLteq | Enables building a block that runs unless 'A' lower than or equals 'B' |
 
 > See examples in https://assemble.io/helpers/helpers-comparison.html
+
+## 📝 Examples
+
+### Weather JSON output to a markdown report
+
+Taking the JSON output from a weather service and converting it into a markdown report.
+
+Let's start by creating the HandleBars template (save it as _weather.hbs_):
+
+```handlebars
+# Weather report ({{nearest_area.0.areaName.0.value}}, {{nearest_area.0.country.0.value}})
+
+## Currently ({{current_condition.0.observation_time}})
+
+{{#with current_condition}}
+| |
+|---|
+| 🌡️  {{0.weatherDesc.0.value}} with a temperature of {{0.temp_C}}°C ({{0.temp_F}}°F) - feels like {{0.FeelsLikeC}}°C ({{0.FeelsLikeF}})°F |
+| 💨 {{0.windspeedKmph}} km/h ({{0.windspeedMiles}} miles/h) winds from the {{0.winddir16Point}}. |
+| 💦 {{0.humidity}}% humidity. |
+| ☔️ {{0.precipMM}}mm of precipitation expected. |
+| 🌥️  {{0.cloudcover}}% cloud cover. |
+| 🌫️  Visibility is {{0.visibility}} km ({{0.visibilityMiles}} miles) |
+| 🛞  Pressure is {{0.pressure}} mbar. |
+| 🌞 UV index is {{0.uvIndex}}. |
+| 🌞 The sun rises at {{../weather.0.astronomy.0.sunrise}} and sets at {{../weather.0.astronomy.0.sunset}}. |
+| 🌙 The moon rises at {{../weather.0.astronomy.0.moonrise}} and sets at {{../weather.0.astronomy.0.moonset}}. |
+| 🌙 The moon phase is {{../weather.0.astronomy.0.moon_phase}}. |
+{{/with}}
+
+## Forecast
+
+{{#each weather}}
+### {{date}}
+
+| Hour | Weather | Temperature | Feels like | Wind | Humidity | Precipitation | Visibility | Pressure | UV Index |
+|---|---|---|---|---|---|---|---|---|---|
+{{#each hourly}}
+| {{$ft '%04d' ($number time)}} | {{weatherDesc.0.value}} | {{tempC}}°C ({{tempF}}°F) | {{FeelsLikeC}}°C ({{FeelsLikeF}}°F) | {{windspeedKmph}} km/h ({{windspeedMiles}} miles/h) from the {{winddir16Point}} | {{humidity}}% | {{precipMM}}mm | {{visibility}} km ({{visibilityMiles}} miles) | {{pressure}} mbar | {{uvIndex}} |
+{{/each}}
+---
+{{/each}}
+```
+
+Now execute (changing the location if needed):
+
+```bash
+# Using oafp to parse the generated markdown
+curl -s "wttr.in/Paris?view=j1" | oafp output=template template=weather.hbs | oafp input=md
+
+# Saving the generated markdown
+curl -s "wttr.in/New%20York?view=j1" | oafp output=template template=weather.hbs > weather.md
+```

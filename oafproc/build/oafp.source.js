@@ -231,6 +231,12 @@ var _inputLineFns = {
 
 // --- Transform functions
 var _transformFns = {
+    "transforms"    : _r => {
+        if (toBoolean(params.transforms)) {
+            var _t = Object.keys(_transformFns).filter(r => r != 'transforms').sort()
+            return _t
+        }
+    },
     "sortmapkeys"   : _r => {
         if (toBoolean(params.sortmapkeys) && isObject(_r)) {
             let _sortMapKeys = (aMap, moreLevels) => {
@@ -380,6 +386,10 @@ var _transformFns = {
 
 // --- Output functions
 var _outputFns = new Map([
+    ["?" , (r, options) => {
+        r = Array.from(_outputFns.keys()).filter(r => r != '?').sort()
+        $o(r, options)
+    }],
     ["pm", (r, options) => {
         $o(r, options)
     }],
@@ -574,6 +584,10 @@ var _outputFns = new Map([
 
 // --- Input functions (input parsers)
 var _inputFns = new Map([
+    ["?"    , (_res, options) => {
+        _res = Array.from(_inputFns.keys()).filter(r => r != '?').sort()
+        _$o(_res, options)
+    }],
     ["pm"   , (_res, options) => { 
         _showTmpMsg()
         if (isDef(__pm._map)) _res = __pm._map

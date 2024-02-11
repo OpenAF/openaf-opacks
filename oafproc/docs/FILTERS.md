@@ -78,7 +78,36 @@ Example:
 * delete(map, 'field')
 * substring(a, ini, end)
 
-Examples:
+Since OpenAF >= 20240209
+
+* a2m(arrFields, arrValues)
+* a4m(arr, 'key', dontRemove)
+* m2a(arrFields, obj)
+* m4a(obj, 'key')
+* format(x, 'format')
+* formatn(x, 'format')
+* to_date(x)
+* to_isoDate(x)
+* template(a, 'template')
+* templateF(x, 'template')
+* to_bytesAbbr(x)
+* to_numAbbr(x)
+* from_bytesAbbr(x)
+* from_siAbbr(x)
+* from_timeAbbr(x)
+* timeago(x)
+* from_ms(x, 'format')
+* replace(x, 're', 'flags', 'replaceText')
+* split(x, 'sep')
+* trim(x)
+* index_of(x, 'search')
+* last_index_of(x, 'search')
+* lower_case(x)
+* upper_case(x)
+* concat(x, y)
+* match(x, 're', 'flags')
+
+Example:
 
 ```bash
 # Given all AWS EC2 instances in an account produces a table with name, type, vpc and private ip sorted by vpn
@@ -94,7 +123,7 @@ _tbc_
 
 You can use simple SQL or H2 SQL. Althought you don't need to refer the table the data can be refered from the _'_TMP'_ table.
 
-Examples:
+## Examples
 
 ```bash
 # Simple SQL getting specific fields and ordering by one of them
