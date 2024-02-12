@@ -138,6 +138,10 @@ ow.loadFormat()
 if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) showHelp()
 
 params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
+params.out = params.format
+params.output = params.format
+params.in = params.type
+params.input = params.type
 
 // Check if file is provided
 if (isUnDef(params.file) && isUnDef(params.cmd)) {
