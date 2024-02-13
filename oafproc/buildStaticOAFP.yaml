@@ -32,6 +32,7 @@ jobs:
     } else {
       throw "Could not find USAGE.md"
     }
+    args.file = args.file.replace(/\/USAGE.md$/, "")
 
 # --------------------
 - name : Add USAGE.md
@@ -39,11 +40,14 @@ jobs:
     replace:
       "// ---": ""
   exec : |
-    args.inputFile  = args.path + "/oafp.js"
+    args.inputFile  = (isDef(args.inputFile) ? args.inputFile : args.path + "/oafp.js")
     args.outputFile = (isDef(args.output) ? args.output : args.path + "/oafp")
 
     args.replace = {}
-    args.replace["// ---"] = "const _help=`" + io.readFileString(args.file).replace(/`/g, "\\`") + "`;"
+    var _rcode = io.listFiles(args.file).files.map(f => {
+      return "'docs/" + f.filename + "':af.fromBytes2String(io.gunzip(af.fromBase64(\"" + af.fromBytes2String(af.toBase64Bytes(io.gzip(io.readFileBytes(args.file + "/" + f.filename)))) + "\")))"
+    }).join(",\n")
+    args.replace["// ---"] = "// ---\nconst _oafphelp={" + _rcode + "};"
 
     log("Adding USAGE.md contents...")
   to   :  

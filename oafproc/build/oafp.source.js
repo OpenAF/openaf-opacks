@@ -77,7 +77,7 @@ const _clearTmpMsg = msg => printErrnl("\r" + " ".repeat(_$(msg).default(_msg).l
 const _exit = (code, msg) => {
     if (isUnDef(msg)) msg = "exit: " + code
     if (isUnDef(ow.oJob) && !toBoolean(params.noexit)) {
-        printErr(msg)
+        if (code != 0) printErr(msg)
         exit(code)
     } else {
         throw msg
@@ -105,16 +105,15 @@ const showHelp = () => {
         else
             print(ow.format.withMD( io.readFileString(_f) ))
     } else {
-        var _help
-        if (isDef(_help) && _ff == "docs/USAGE.md") {
+        if (isDef(global._oafphelp) && isDef(global._oafphelp[_ff])) {
             __ansiColorFlag = true
             __conConsole = true
             if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
-                ow.format.string.pauseString( ow.format.withMD( _help ) )
+                ow.format.string.pauseString( ow.format.withMD( global._oafphelp[_ff] ) )
             else
-                print(ow.format.withMD( _help ))
+                print(ow.format.withMD( global._oafphelp[_ff] ))
         } else {
-            print("Check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/" + _ff)
+            print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
         }
     }
 
