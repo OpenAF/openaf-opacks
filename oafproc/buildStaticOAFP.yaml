@@ -25,7 +25,7 @@ jobs:
 # ----------------------
 - name : Check oafp file
   exec : |
-    args.path = (getOPackPath("oafproc") || ".")
+    args.path = isDef(args.path) ? args.path : (getOPackPath("oafproc") || ".")
     args.file = args.path + "/docs/USAGE.md"
     if (isDef(args.file) && io.fileExists(args.file)) {
       log("USAGE.md found in: " + args.file)
