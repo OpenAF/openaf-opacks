@@ -49,6 +49,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
+| jsonschema | Given a JSON schema format tries to generate sample data for it |
 | llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
@@ -68,6 +69,9 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
+| jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
+| jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
+| jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
 | llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
 | llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |

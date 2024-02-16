@@ -108,7 +108,7 @@ name: oafproc
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240215'
+version: '20240216'
 dependencies:
   openaf: '>=20231222'
 files:
@@ -128,13 +128,13 @@ files:
 filesHash:
   README.md: 896dd498c723a8a1301ba46d1df347263403b3f6
   build/build.yaml: 7548c8db8d109081d85a111ff2cd3767b2c20ade
-  build/oafp.source.js: 3b94707a472cf06e007bb2b0e743df807aa2a6fe
+  build/oafp.source.js: 017f34931f5f872208a38cf9903d58528f79c439
   buildStaticOAFP.yaml: 791ff6e12542fef38b6082e044913e07dc0556b8
   docs/EXAMPLES.md: 159ee341a7f9ec9037b0171d5cd52ed360bd9a09
   docs/FILTERS.md: dfb37c26e533f74e679c7c7556f1b804c9e2bd74
   docs/TEMPLATE.md: d8db7efd206d9735d18b3524533725aa3da70930
-  docs/USAGE.md: c2ee9540d75fb169234e216bbeb3e740ed79cdc7
-  oafp.js: da8c898514eb14c11e65ee0a8424393a345aaa12
+  docs/USAGE.md: 5988f8078e44cb25a08d5c18a352680990adcdd5
+  oafp.js: 3390dfcf9bd72bc024b6a0fe0b042e64b0770478
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
   tests/autoTest.js: d075915c640f06f04abfffd19923ae5dd042bb31
   tests/autoTest.yaml: a3c8109a2b1386a2ef9a68831336ee8c655f0409
