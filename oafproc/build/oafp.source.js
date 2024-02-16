@@ -124,10 +124,37 @@ const showVersion = () => {
     var _ff = (getOPackPath("oafproc") || ".") + "/.package.yaml"
     var oafpv = (io.fileExists(_ff) ? io.readFileYAML(_ff).version : "(not available)")
     var _v = {
-        oafp: oafpv,
+        oafp: {
+            version: oafpv,
+            inputs: Array.from(_inputFns.keys()).filter(r => r != '?').sort(),
+            transforms: Object.keys(_transformFns).filter(r => r != 'transforms').sort(),
+            outputs: Array.from(_outputFns.keys()).filter(r => r != '?').sort()
+        },
         openaf: {
             version: getVersion(),
-            distribution: getDistribution()
+            distribution: getDistribution(),
+            home: getOpenAFPath(),
+            opacks: $from($m4a(getOPackLocalDB())).notEquals("name", "OpenAF").sort("name").select({ name: "", version: ""})
+        },
+        java: {
+            version: ow.format.getJavaVersion(),
+            home: ow.format.getJavaHome(),
+            vendor: String(java.lang.System.getProperty("java.vendor")),
+            params: af.fromJavaArray(java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments())
+        },
+        os: {
+            name: String(java.lang.System.getProperty("os.name")),
+            version: String(java.lang.System.getProperty("os.version")),
+            arch: ow.format.getOSArch(),
+            cpuCores: getNumberOfCores(true),
+            mem: {
+                max: Number(java.lang.Runtime.getRuntime().maxMemory()),
+                total: Number(java.lang.Runtime.getRuntime().totalMemory())
+            },
+            store: {
+                tmpDirPath: String(java.lang.System.getProperty("java.io.tmpdir")),
+                freeTmpDirBytes: Number(java.nio.file.Files.getFileStore(java.nio.file.Paths.get(java.lang.System.getProperty("java.io.tmpdir"))).getUsableSpace()),
+            }
         }
     }
     return stringify(_v, __, "")
