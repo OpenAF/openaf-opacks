@@ -283,6 +283,16 @@ curl -s http://api.open-notify.org/astros.json | oafp path="people" sql="select 
 curl -s "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="near_earth_objects" maptoarray=true output=json | oafp path="[0][].{name:name,magnitude:absolute_magnitude_h,hazardous:is_potentially_hazardous_asteroid,distance:close_approach_data[0].miss_distance.kilometers}" sql="select * order by distance" output=mdtable
 ```
 
+```bash
+# list of OpenAF oPacks and their corresponding version
+oafp -v path="openaf.opacks" output=ctable
+
+# list of OpenAF processor inputs, transforms and outputs
+oafp -v path="oafp.inputs" output=cslon
+oafp -v path="oafp.transforms" output=cslon
+oafp -v path="oafp.outputs" output=cslon
+```
+
 ---
 
 ## 📚 Other help documents
