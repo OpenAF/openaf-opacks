@@ -458,15 +458,12 @@ var _outputFns = new Map([
         $o(r, options)
     }],
     ["ctable", (r, options) => {
-        if (!isArray(r)) _exit(-1, "ctable is only supported for arrays/lists")
         $o(r, options)
     }],
     ["stable", (r, options) => {
-        if (!isArray(r)) _exit(-1, "stable is only supported for arrays/lists")
         $o(r, options)
     }],
     ["table", (r, options) => {
-        if (!isArray(r)) _exit(-1, "table is only supported for arrays/lists")
         $o(r, options)
     }],
     ["log", (r, options) => {
@@ -641,6 +638,7 @@ var _outputFns = new Map([
         }
     }]
 ])
+
 // --- add extra _outputFns here ---
 
 // --- Input functions (input parsers)
