@@ -95,6 +95,7 @@ jobs:
               rm -rf oafproc
               mv oafp/pack oafproc
               rm -rf oafp
+              git add oafproc
 
     # -------------
     - name: Checkin
@@ -104,5 +105,5 @@ jobs:
       with:
         ojob: ojob.io/git/hub/contentIn
         ## Change the following arguments as needed (see https://ojob.io/git/hub/contentIn.md)
-        args: 'message="Automated oafp sync" branchPrefix="auto/" title="Automated oafp sync PR" paths="."'
+        args: 'message="Automated oafp sync" branchPrefix="auto/" title="Automated oafp sync PR" paths="oafproc"'
         dist: t8
