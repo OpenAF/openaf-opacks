@@ -87,7 +87,7 @@ jobs:
             lang: shell
             exec: |
               cd oafp
-              /tmp/ojob src/build.yaml op=pack
+              /tmp/oaf/ojob src/build.yaml op=pack
 
           - name: Replace oafproc
             lang: shell
