@@ -1,0 +1,109 @@
+name: Sync pack action
+on  :
+  ## Comment the entries below you won't be needing
+  #  (and double-check if you repo uses 'main' or 'master')
+  # push        :
+  #   branches:
+  #   - main
+    #paths:
+    #- 'xyz/**'
+    #paths-ignore:
+    #- '.github/**'
+  # pull_request:
+  #   branches:
+  #   - main
+    #paths:
+    #- 'xyz/**'
+    #paths-ignore:
+    #- '.github/**'
+  #schedule    :
+  #- cron: '30 6 * * *'
+
+  ## Uncomment and adapt the following lines to trigger the action upon complete of another
+  ##
+  #workflow_run:
+  #  workflows:
+  #    - 'main.yml'
+  #  types:
+  #    - completed
+
+  workflow_dispatch:
+  ## Uncomment the following lines if you need to provide specific inputs
+  ##
+  #  inputs:
+  #    inputOne:
+  #      description: 'Sample input to use'
+  #      required   : true
+  #      default    : 'some value'
+
+jobs:
+  syncpack:
+    runs-on: ubuntu-latest 
+    permissions:
+      contents     : write
+      pull-requests: write
+
+    steps  :
+    ## To use an input, if defined, just refer to ${{ github.event.inputs.inputOne }}
+
+    ## This action will cache the OpenAF runtime used by openaf/ojob-action to avoid reinstalling 
+    ## everytime the action is invoked. It should be cleared manually from time to time in order
+    ## to use a more updated runtime.
+    # --------------------------
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
+
+    # --------------
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+
+    ## Add here other steps
+    ## If you used workflow_run you can access ${{ github.event.workflow }} and ${{ github.event.workflow_run.conclusion }}
+
+    # -----------------------
+    - name: Build openaf/oafp
+      uses: openaf/ojob-action@v4
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        dist: t8
+        def : |
+          todo:
+          - Checkout oafp
+          - Build oafp pack
+          - Replace oafproc
+
+          jobs:
+          - name: Checkout oafp
+            lang: shell
+            exec: |
+              gh repo clone OpenAF/oafp
+
+          - name: Build oafp pack
+            lang: shell
+            exec: |
+              cd oafp
+              /tmp/ojob src/build.yaml op=pack
+
+          - name: Replace oafproc
+            lang: shell
+            exec: |
+              rm oafproc
+              mv oafp/pack oafproc
+              rm -rf oafp
+              git status
+
+    # # -------------
+    # - name: Checkin
+    #   uses: openaf/ojob-action@v4
+    #   env :
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     ojob: ojob.io/git/hub/contentIn
+    #     ## Change the following arguments as needed (see https://ojob.io/git/hub/contentIn.md)
+    #     args: 'message="Automated check in" branchPrefix="auto/" title="Automated PR" paths="."'
+    #     dist: nightly
