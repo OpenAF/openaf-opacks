@@ -122,6 +122,7 @@ files:
 - docs/USAGE.md
 - oafp.js
 - oafp.yaml
+- src/oafp.source.js
 filesHash:
   README.md: 39e6d4633258b4b425d406177947f9f0b296fccc
   buildStaticOAFP.yaml: 791ff6e12542fef38b6082e044913e07dc0556b8
@@ -131,3 +132,4 @@ filesHash:
   docs/USAGE.md: 5988f8078e44cb25a08d5c18a352680990adcdd5
   oafp.js: c1094283e673f11419f64872d4a81e0ded8224cf
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
+  src/oafp.source.js: 017f34931f5f872208a38cf9903d58528f79c439
