@@ -235,6 +235,23 @@ var _inputNoMem = new Set([
 
 // --- Input functions processing per line
 var _inputLineFns = {
+    "lines": (r, options) => {
+        if (!isBoolean(params.linesjoin)) params.linesjoin = toBoolean(_$(params.linesjoin, "linesjoin").isString().default(__))
+
+        if (!params.linesjoin && isString(r)) {
+            if (r.trim().length == 0) {
+                noFurtherOutput = true
+                return
+            }
+            if (r.trim().length > 0) {
+                r = r.trim().split(/\r?\n/)
+            }
+            _$o(r, options, true)
+            noFurtherOutput = true
+        } else {
+            return true
+        }
+    },
     "ndjson": (r, options) => {
         if (!isBoolean(params.ndjsonjoin)) params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
         
@@ -440,6 +457,10 @@ var _transformFns = {
             res = res.promptJSON(params.llmprompt)
             return res
         }
+        return _r
+    },
+    "splitlines": _r => { 
+        if (toBoolean(params.splitlines) && isString(_r)) return _r.split(/\r?\n/)
         return _r
     }
 }
@@ -675,6 +696,37 @@ var _inputFns = new Map([
         if (_res.indexOf("<!DOCTYPE") >= 0) _res = _res.substring(_res.indexOf(">") + 1).trim()
         var _r = af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag)
         _$o(_r, options)
+    }],
+    ["lines", (_res, options) => {
+        if (!isBoolean(params.linesjoin)) params.linesjoin = toBoolean(_$(params.linesjoin, "linesjoin").isString().default(__))
+
+        _showTmpMsg()
+        if (params.linesjoin) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
+                _res = io.readFileString(params.file)
+            }
+            if (isDef(params.cmd)) {
+                _res = _runCmd2Bytes(params.cmd, true)
+            }
+            _res = _res.split(/\r?\n/)
+            _$o(_res, options)
+        } else {
+            var _stream
+            if (isDef(params.file) && isUnDef(params.cmd)) {
+                _stream = io.readFileStream(params.file)
+            } else {
+                if (isDef(params.cmd)) {
+                    _stream = af.fromBytes2InputStream(_runCmd2Bytes(params.cmd))
+                } else {
+                    _stream = af.fromString2InputStream(_res)
+                }
+            }
+
+            ioStreamReadLines(_stream, r => {
+                _$o(r, clone(options), true)
+            })
+            _stream.close()
+        }
     }],
     ["ndjson", (_res, options) => {
         if (!isBoolean(params.ndjsonjoin)) params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
