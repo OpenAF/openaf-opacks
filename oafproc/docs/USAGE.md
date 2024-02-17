@@ -50,6 +50,7 @@ List of data input types that can be auto-detected (through the file extension o
 | md      | A Markdown format |
 | mdtable | A Markdown table format |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
+| lines   | A given string/text to be processed line by line |
 | llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
@@ -82,6 +83,7 @@ These options will change the parsed input data included any filters provided.
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
+| linesjoin | Boolean | If true and the input data is a string/text it will return an array with each line |
 | sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 
 ---
