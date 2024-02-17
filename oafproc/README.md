@@ -53,3 +53,4 @@ Additional documentation:
 
 * [Filters](docs/FILTERS.md)
 * [Template](docs/TEMPLATE.md)
+* [Examples](src/docs/EXAMPLES.md)
