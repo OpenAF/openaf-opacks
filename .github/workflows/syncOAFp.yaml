@@ -95,15 +95,14 @@ jobs:
               rm -rf oafproc
               mv oafp/pack oafproc
               rm -rf oafp
-              git status
 
-    # # -------------
-    # - name: Checkin
-    #   uses: openaf/ojob-action@v4
-    #   env :
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     ojob: ojob.io/git/hub/contentIn
-    #     ## Change the following arguments as needed (see https://ojob.io/git/hub/contentIn.md)
-    #     args: 'message="Automated check in" branchPrefix="auto/" title="Automated PR" paths="."'
-    #     dist: nightly
+    # -------------
+    - name: Checkin
+      uses: openaf/ojob-action@v4
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        ojob: ojob.io/git/hub/contentIn
+        ## Change the following arguments as needed (see https://ojob.io/git/hub/contentIn.md)
+        args: 'message="Automated oafp sync" branchPrefix="auto/" title="Automated oafp sync PR" paths="."'
+        dist: t8
