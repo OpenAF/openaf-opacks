@@ -1,4 +1,4 @@
-name: Sync pack action
+name: Sync oafproc action
 on  :
   ## Comment the entries below you won't be needing
   #  (and double-check if you repo uses 'main' or 'master')
@@ -37,7 +37,7 @@ on  :
   #      default    : 'some value'
 
 jobs:
-  syncpack:
+  syncoafp:
     runs-on: ubuntu-latest 
     permissions:
       contents     : write
@@ -92,7 +92,7 @@ jobs:
           - name: Replace oafproc
             lang: shell
             exec: |
-              rm oafproc
+              rm -rf oafproc
               mv oafp/pack oafproc
               rm -rf oafp
               git status
