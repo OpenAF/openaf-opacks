@@ -9,6 +9,9 @@ scripts:
     if (io.fileExists(getOpenAFPath() + "oafp")) {
       logWarn("Removing " + getOpenAFPath() + "oafp...")
       io.rm(getOpenAFPath() + "oafp")
+      $sh([getOpenAFPath() + "oaf", "-c", "load(getOpenAFJar()+'::js/genScripts.js')"])
+      .pwd(getOpenAFPath())
+      .exec()
     }
 
     // If Linux and root, install in /usr/bin or /bin if oaf is there also
@@ -109,7 +112,7 @@ name: oafproc
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240217'
+version: '20240218'
 dependencies:
   openaf: '>=20231222'
 files:
@@ -130,6 +133,6 @@ filesHash:
   docs/FILTERS.md: dfb37c26e533f74e679c7c7556f1b804c9e2bd74
   docs/TEMPLATE.md: d8db7efd206d9735d18b3524533725aa3da70930
   docs/USAGE.md: 67a53379765fbe970f794ada8903caa736b5265f
-  oafp.js: 31ffd654d335c4086f797b137b94883340123713
+  oafp.js: 54346c82f168e54fbe11eb6921e72b537627788b
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 22152596289c6b44ec83bfb58b97ad4ecd0950c4
+  src/oafp.source.js: 19c53579e6bbad026554bee0f4a1f67b4ec53bbf
