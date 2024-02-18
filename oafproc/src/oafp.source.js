@@ -89,31 +89,58 @@ const showHelp = () => {
 
     var _ff
     params.help = _$(params.help, "help").isString().default("")
+
+    var _f
     switch(params.help.toLowerCase()) {
     case "filters" : _ff = "docs/FILTERS.md"; break
     case "template": _ff = "docs/TEMPLATE.md"; break
     case "examples": _ff = "docs/EXAMPLES.md"; break
-    default        : _ff = "docs/USAGE.md"
+    case "readme"  :
+    case "usage"   : _ff = "docs/USAGE.md"; break
+    default        : 
+        var _r = params.help.toLowerCase()
+        if (isDef(_oafhelp_libs[_r]))
+            _ff = "docs/" + _r + ".md"
+        else
+            _ff = "docs/USAGE.md"
     }
 
-    var _f = (getOPackPath("oafproc") || ".") + "/" + _ff
-    if (io.fileExists(_f)) {
+    _f = (getOPackPath("oafproc") || ".") + "/" + _ff
+
+    let _customHelp = ""
+    if (_ff == "docs/USAGE.md" && Object.keys(_oafhelp_libs).length > 0) {
+        _customHelp = "\n---\n\n## 📚 Libs help documents\n\n| Lib | Help |\n| --- | --- |\n"
+        for (let key in _oafhelp_libs) {
+            _customHelp += "| " + key + " | help=" + key + " |\n"
+        }
+    }
+
+    if (isDef(_f) && io.fileExists(_f)) {
         __ansiColorFlag = true
 		__conConsole = true
         if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
-            ow.format.string.pauseString( ow.format.withMD( io.readFileString(_f) ) )
+            ow.format.string.pauseString( ow.format.withMD( io.readFileString(_f) + _customHelp ) )
         else
-            print(ow.format.withMD( io.readFileString(_f) ))
+            print(ow.format.withMD( io.readFileString(_f) + _customHelp ))
     } else {
         if (isDef(global._oafphelp) && isDef(global._oafphelp[_ff])) {
             __ansiColorFlag = true
             __conConsole = true
             if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
-                ow.format.string.pauseString( ow.format.withMD( global._oafphelp[_ff] ) )
+                ow.format.string.pauseString( ow.format.withMD( global._oafphelp[_ff] + _customHelp ) )
             else
-                print(ow.format.withMD( global._oafphelp[_ff] ))
+                print(ow.format.withMD( global._oafphelp[_ff] + _customHelp))
         } else {
-            print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
+            if (isString(_oafhelp_libs[params.help])) {
+                __ansiColorFlag = true
+                __conConsole = true
+                if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
+                    ow.format.string.pauseString( ow.format.withMD( _oafhelp_libs[params.help] ) )
+                else
+                    print(ow.format.withMD( _oafhelp_libs[params.help] ))
+            } else {
+                print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
+            }
         }
     }
 
@@ -128,7 +155,8 @@ const showVersion = () => {
             version: oafpv,
             inputs: Array.from(_inputFns.keys()).filter(r => r != '?').sort(),
             transforms: Object.keys(_transformFns).filter(r => r != 'transforms').sort(),
-            outputs: Array.from(_outputFns.keys()).filter(r => r != '?').sort()
+            outputs: Array.from(_outputFns.keys()).filter(r => r != '?').sort(),
+            flags: __flags.oafp
         },
         openaf: {
             version: getVersion(),
@@ -161,7 +189,6 @@ const showVersion = () => {
 }
 
 ow.loadFormat()
-if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) showHelp()
 
 params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
 params.out = params.format
@@ -225,6 +252,13 @@ const _fileExtensions = new Map([
   ]
 ])
 // --- add extra _fileExtensions here ---
+const _addSrcFileExtensions = (ext, type) => {
+    if (!_fileExtensions.has(ext)) {
+        _fileExtensions.set(ext, type)
+    } else {
+        printErr("WARN: Extension '" + ext + "' already exists.")
+    }
+}
 
 // --- List of input types that should not be stored in memory
 var _inputNoMem = new Set([
@@ -232,6 +266,13 @@ var _inputNoMem = new Set([
   "ndjson"
 ])
 // --- add extra _inputNoMem here ---
+const _addSrcFileExtensionsNoMem = ext => {
+    if (!_inputNoMem.has(ext)) {
+        _inputNoMem.add(ext)
+    } else {
+        printErr("WARN: Extension '" + ext + "' already exists.")
+    }
+}
 
 // --- Input functions processing per line
 var _inputLineFns = {
@@ -275,6 +316,13 @@ var _inputLineFns = {
     }
 }
 // --- add extra _inputLineFns here ---
+const _addSrcInputLineFns = (type, fn) => {
+    if (isUnDef(_inputLinesFns[type])) {
+        _inputLineFns[type] = fn
+    } else {
+        printErr("WARN: Input type '" + type + "' already exists.")
+    }
+}
 
 // --- Transform functions
 var _transformFns = {
@@ -465,6 +513,13 @@ var _transformFns = {
     }
 }
 // --- add extra _transformFns here ---
+const _addSrcTransformFns = (type, fn) => {
+    if (isUnDef(_transformFns[type])) {
+        _transformFns[type] = fn
+    } else {
+        printErr("WARN: Transform '" + type + "' already exists.")
+    }
+}
 
 // --- Output functions
 var _outputFns = new Map([
@@ -661,6 +716,13 @@ var _outputFns = new Map([
 ])
 
 // --- add extra _outputFns here ---
+const _addSrcOutputFns = (type, fn) => {
+    if (!_outputFns.has(type)) {
+        _outputFns.set(type, fn)
+    } else {
+        printErr("WARN: Output type '" + type + "' already exists.")
+    }
+}
 
 // --- Input functions (input parsers)
 var _inputFns = new Map([
@@ -935,6 +997,44 @@ var _inputFns = new Map([
     }]
 ])
 // --- add extra _inputFns here ---
+const _addSrcInputFns = (type, fn) => {
+    if (!_inputFns.has(type)) {
+        _inputFns.set(type, fn)
+    } else {
+        printErr("WARN: Input type '" + type + "' already exists.")
+    }
+}
+
+// Check libs and add them (oafp_name.js on oPacks and __flags.oafp.libs)
+let _oafhelp_libs = {}
+if (isString(params.libs)) {
+    params.libs = params.libs.split(",").map(r => r.trim()).filter(r => r.length > 0)
+    if (isDef(__flags.oafp) && isArray(__flags.oafp.libs)) params.libs = __flags.oafp.libs.concat(params.libs)
+    params.libs.forEach(lib => {
+        try {
+            var _req = require("oafp_" + lib + ".js")
+            if (isDef(_req.oafplib)) {
+                var res = _req.oafplib(clone(params), _$o, $o)
+                if (isMap(res)) {
+                    if (isArray(res.fileExtensions))      res.fileExtensions.forEach(r => _addSrcFileExtensions(r.ext, r.type))
+                    if (isArray(res.fileExtensionsNoMem)) res.fileExtensionsNoMem.forEach(r => _addSrcFileExtensionsNoMem(r.ext))
+                    if (isArray(res.input))               res.input.forEach(r => _addSrcInputFns(r.type, r.fn))
+                    if (isArray(res.inputLine))           res.inputLine.forEach(r => _addSrcInputLineFns(r.type, r.fn))
+                    if (isArray(res.transform))           res.transform.forEach(r => _addSrcTransformFns(r.type, r.fn))
+                    if (isArray(res.output))              res.output.forEach(r => _addSrcOutputFns(r.type, r.fn))
+                    if (isString(res.help))               _oafhelp_libs[lib] = res.help
+                }
+            } else {
+                printErr("WARN: Library '" + lib + "' does not have oafplib.")
+            }
+        } catch(e) {
+            printErr("WARN: Library '" + lib + "' error: " + e)
+        }
+    })
+}
+
+// Check if help is requested
+if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) showHelp()
 
 // Default format
 params.format = _$(params.format, "format").isString().default(__)
