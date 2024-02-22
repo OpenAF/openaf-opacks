@@ -157,7 +157,7 @@ const showVersion = () => {
             inputs: Array.from(_inputFns.keys()).filter(r => r != '?').sort(),
             transforms: Object.keys(_transformFns).filter(r => r != 'transforms').sort(),
             outputs: Array.from(_outputFns.keys()).filter(r => r != '?').sort(),
-            flags: __flags.oafp
+            flags: __flags.OAFP
         },
         openaf: {
             version: getVersion(),
@@ -1006,7 +1006,7 @@ const _addSrcInputFns = (type, fn) => {
     }
 }
 
-// Check libs and add them (oafp_name.js on oPacks and __flags.OAFPlibs)
+// Check libs and add them (oafp_name.js on oPacks and __flags.OAFP.libs)
 let _oafhelp_libs = {}
 if (isString(params.libs)) {
     params.libs = params.libs.split(",").map(r => r.trim()).filter(r => r.length > 0)
