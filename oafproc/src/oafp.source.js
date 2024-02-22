@@ -1006,11 +1006,11 @@ const _addSrcInputFns = (type, fn) => {
     }
 }
 
-// Check libs and add them (oafp_name.js on oPacks and __flags.oafp.libs)
+// Check libs and add them (oafp_name.js on oPacks and __flags.OAFPlibs)
 let _oafhelp_libs = {}
 if (isString(params.libs)) {
     params.libs = params.libs.split(",").map(r => r.trim()).filter(r => r.length > 0)
-    if (isDef(__flags.oafp) && isArray(__flags.oafp.libs)) params.libs = __flags.oafp.libs.concat(params.libs)
+    if (isDef(__flags.OAFP) && isArray(__flags.OAFP.libs)) params.libs = __flags.OAFP.libs.concat(params.libs)
     params.libs.forEach(lib => {
         try {
             var _req = require("oafp_" + lib + ".js")
