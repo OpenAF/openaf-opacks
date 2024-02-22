@@ -47,6 +47,7 @@ const _$o = (r, options, lineByLine) => {
     }
 
     if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
+    if (isDef(params.outkey))    r = $$({}).set(params.outkey, r)
 
     _clearTmpMsg()
     if (_outputFns.has(options.__format)) {
