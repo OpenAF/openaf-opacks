@@ -1023,7 +1023,7 @@ if (isArray(params.libs)) {
                     if (isArray(res.inputLine))           res.inputLine.forEach(r => _addSrcInputLineFns(r.type, r.fn))
                     if (isArray(res.transform))           res.transform.forEach(r => _addSrcTransformFns(r.type, r.fn))
                     if (isArray(res.output))              res.output.forEach(r => _addSrcOutputFns(r.type, r.fn))
-                    if (isString(res.help))               _oafhelp_libs[lib] = res.help
+                    if (isString(res.help))               _oafhelp_libs[lib.toLowerCase()] = res.help
                 }
             } else {
                 printErr("WARN: Library '" + lib + "' does not have oafplib.")
