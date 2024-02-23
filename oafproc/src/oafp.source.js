@@ -25,7 +25,15 @@ const _$f = (r, options) => {
         delete options.__from
     }
     if (options.__sql) {
-        r = $sql(r, options.__sql.trim())
+        var method = "auto"
+        if (isString(params.sqlfilter)) {
+            switch(params.sqlfilter.toLowerCase()) {
+            case "simple"  : method = "nlinq"; break
+            case "advanced": method = "h2"; break
+            default        : method = "auto"
+            }
+        }
+        if (isArray(r) && r.length > 0) r = $sql(r, options.__sql.trim(), method)
         delete options.__sql
     }
     r = _transform(r)
@@ -463,16 +471,6 @@ var _transformFns = {
         }
         return _r
     },
-    "sqlfilter": _r => {
-        if (isString(params.sqlfilter)) {
-            switch(params.sqlfilter.toLowerCase()) {
-            case "simple"  : __flags.SQL_QUERY_METHOD = "nlinq"; break
-            case "advanced": __flags.SQL_QUERY_METHOD = "h2"; break
-            default        : __flags.SQL_QUERY_METHOD = "auto"
-            }
-        }
-        return _r
-    },
     "llmprompt": _r => {
         if (isString(params.llmprompt)) {
             params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
@@ -631,6 +629,70 @@ var _outputFns = new Map([
             print(af.fromBytes2String(af.toBase64Bytes(_o)))
         }
     }],
+    ["db", (r, options) => {
+        if (!isArray(r) || r.length < 1) _exit(-1, "db is only supported for filled arrays/lists")
+        params.dbtable = _$(params.dbtable, "outdbtable").isString().default("data")
+        params.dbnocreate = toBoolean(_$(params.dbnocreate, "outdbnocreate").isString().default("false"))
+        params.dbicase = toBoolean(_$(params.dbicase, "outdbicase").isString().default("false"))
+
+        ow.loadObj()
+        var _db
+        try {
+            if (!isString(params.dbjdbc)) _exit(-1, "dbjdbc URL is not defined.")
+            if (isDef(params.dblib)) loadLib("jdbc-" + params.dblib + ".js")
+            _db = new DB(params.dbjdbc, params.dbuser, params.dbpass, params.dbtimeout)
+
+            // Creating table
+            if (!params.dbnocreate) {
+                try {
+                    var _sql = ow.obj.fromObj2DBTableCreate(params.dbtable, r, __, !params.dbicase)
+                    _db.u(_sql)
+                    _db.commit() // needed for some jdbcs
+                } catch(idbe) {
+                    _db.rollback()
+                    _exit(-1, "Error creating table: " + idbe)
+                }
+            }
+
+            // Inserting into table
+            var okeys, ookeys = Object.keys(ow.obj.flatMap(r[0]))
+            if (!params.dbicase) 
+                okeys = "\"" + ookeys.join("\", \"") + "\""
+            else 
+                okeys = ookeys.join(",").toUpperCase()
+    
+            let _sqlH = ""
+            let _parseVal = aValue => {
+                var _value = ow.obj.flatMap(aValue)
+                var values = [];
+                for(var k in ookeys) {
+                    values.push(_value[ookeys[k]]);
+                }
+                var binds = ookeys.map(k => {
+                    var v = _value[k]
+                    return String(v)
+                })
+                var __h = "INSERT INTO " + (!params.dbicase ? "\"" + params.dbtable + "\"" : params.dbtable) + " (" + okeys + ") VALUES (" + binds.map(r => "?").join(", ") + ")"
+                if (__h.length > _sqlH.length) {
+                    _sqlH = String(__h)
+                }
+
+                return binds
+            }
+
+            var vals = r.map(_parseVal)
+            _db.usArray(_sqlH, vals, params.dbbatchsize)
+        } catch(dbe) {
+            if (isDef(_db)) _db.rollback()
+            printErr(dbe)
+            _exit(-1, "Error connecting to the database: " + dbe)
+        } finally {
+            if (isDef(_db)) {
+                _db.commit()
+                _db.close()
+            }
+        }
+    }],
     ["sql", (r, options) => {
         if (!isArray(r) || r.length < 1) _exit(-1, "sql is only supported for filled arrays/lists")
         params.sqltable = _$(params.sqltable, "sqltable").isString().default("data")
@@ -638,7 +700,7 @@ var _outputFns = new Map([
         params.sqlnocreate = toBoolean(_$(params.sqlnocreate, "sqlnocreate").isString().default("false"))
 
         ow.loadObj()
-       if (!params.sqlnocreate) print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
+        if (!params.sqlnocreate) print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
 
         var okeys, ookeys = Object.keys(ow.obj.flatMap(r[0]))
         if (!params.sqlicase) 
@@ -879,6 +941,41 @@ var _inputFns = new Map([
             _$o(af.fromSQL(r).ast, options)
         } else {
             _$o(r, options)
+        }
+    }],
+    ["db", (r, options) => {
+        if (isString(r)) {
+            _showTmpMsg()
+            if (!isString(params.indbjdbc)) _exit(-1, "indbjdbc URL is not defined.")
+            var _db
+            try {
+                if (isDef(params.indblib)) loadLib("jdbc-" + params.indblib + ".js")
+                _db = new DB(params.indbjdbc, params.indbuser, params.indbpass, params.indbtimeout)
+                _db.convertDates(true)
+                if (toBoolean(params.indbexec)) {
+                    var _r = _db.u(r)
+                    _$o({ affectedRows: _r }, options)
+                    _db.commit()
+                } else {
+                    var _r = _db.q(r)
+                    if (isMap(_r) && isArray(_r.results)) {
+                        _$o(_r.results, options)
+                    } else {
+                        _exit(-1, "Invalid DB result: " + stringify(_r))
+                    }
+                }
+            } catch(edb) {
+                printErr(edb.message)
+                if (isDef(_db)) _db.rollback()
+                _exit(-1, "Error executing SQL: " + edb.message)
+            } finally {
+                if (isDef(_db)) {
+                    _db.rollback()
+                    _db.close()
+                }
+            }
+        } else {
+            _exit(-1, "db is only supported with a SQL string.")
         }
     }],
     ["xls", (_res, options) => {

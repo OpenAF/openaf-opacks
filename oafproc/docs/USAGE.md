@@ -19,6 +19,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | input  | The input type (if not provided it will try to be auto-detected) |
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
+| sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | path   | A JMESPath expression to filter output |
 | csv    | If type=csv, the CSV options to use | 
 | outputkey | If defined the map/list output will be prefix with the provided key |
@@ -84,7 +85,6 @@ These options will change the parsed input data included any filters provided.
 | searchvalues | String | Will return am map with only values that match the provided string |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | linesjoin | Boolean | If true and the input data is a string/text it will return an array with each line |
-| sqlfilter | String | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 
 ---
 
