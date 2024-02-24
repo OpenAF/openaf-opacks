@@ -14,12 +14,13 @@ const _transform = r => {
     return r
 }
 const _$f = (r, options) => {
-    if (isString(r)) return _transform(r)
-
     if (options.__path) {
         r = $path(r, options.__path.trim())
         delete options.__path
     }
+
+    if (isString(r)) return _transform(r)
+
     if (options.__from) {
         r = $from(r).query(af.fromNLinq(options.__from.trim()))
         delete options.__from
@@ -41,6 +42,7 @@ const _$f = (r, options) => {
     return r
 }
 const _$o = (r, options, lineByLine) => {
+    if (toBoolean(params.color)) __conConsole = true
     if (!isString(r)) {
         if (lineByLine)
             r = _$f([r], options)[0]
@@ -553,8 +555,13 @@ var _outputFns = new Map([
                         let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : __)
                         let l = (isDef(_r.level) ? _r.level : __)
                         let m = (isDef(_r.message) ? _r.message : __)
+                        let lineC
+                        if (isDef(l)) {
+                            if (l.toLowerCase().indexOf("err") >= 0)  lineC = "RED,BOLD"
+                            if (l.toLowerCase().indexOf("warn") >= 0) lineC = "YELLOW"
+                        }
                         if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
-                        if (isDef(m) || isDef(d)) print(ansiColor("BOLD", d) + (isDef(l) ? " | " + l : "") + " | " + m)
+                        if (isDef(m) || isDef(d)) print(ansiColor("BOLD", d) + (isDef(l) ? " | " + ansiColor(lineC, l) : "") + " | " + ansiColor(lineC, m))
                     }
                 })
             }
@@ -1109,7 +1116,7 @@ if (isString(params.libs)) params.libs = params.libs.split(",").map(r => r.trim(
 if (isDef(__flags.OAFP) && isArray(__flags.OAFP.libs) && isArray(params.libs)) 
     params.libs = __flags.OAFP.libs.concat(params.libs)
 else
-    params.libs = __flags.OAFP.libs
+    params.libs = (isDef(__flags.OAFP) ? __flags.OAFP.libs : [])
 if (isArray(params.libs)) {
     params.libs.forEach(lib => {
         try {
@@ -1263,10 +1270,10 @@ if (!noFurtherOutput) {
     }
 
     // Determine input type and execute
-    if (isDef(_inputFns.has(params.type))) {
+    if (isDef(params.type) && _inputFns.has(params.type)) {
         _inputFns.get(params.type)(_res, options)
     } else {
-        printErr("WARN: " + params.type + " input type not supported. Using json.")
+        if (isString(params.type)) printErr("WARN: " + params.type + " input type not supported. Using json.")
         _inputFns.get("json")(_res, options)
     }
 }

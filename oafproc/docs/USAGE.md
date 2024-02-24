@@ -24,6 +24,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | csv    | If type=csv, the CSV options to use | 
 | outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
+| color  | If 'true' will force colored output if available |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 
