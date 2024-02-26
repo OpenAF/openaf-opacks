@@ -33,11 +33,11 @@ artifacts:
 
     - id     : log4j-api
       group  : org.apache.logging.log4j
-      version: 2.22.1
+      version: 2.23.0
 
     - id     : log4j-core
       group  : org.apache.logging.log4j
-      version: 2.22.1
+      version: 2.23.0
 
     - id     : xmlbeans
       group  : org.apache.xmlbeans
