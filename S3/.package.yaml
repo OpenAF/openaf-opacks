@@ -30,7 +30,7 @@ files:
 - annotations-13.0.jar
 - bcprov-jdk18on-1.76.jar
 - checker-qual-3.37.0.jar
-- commons-compress-1.24.0.jar
+- commons-compress-1.26.0.jar
 - error_prone_annotations-2.21.1.jar
 - failureaccess-1.0.1.jar
 - guava-32.1.3-jre.jar
@@ -61,7 +61,7 @@ filesHash:
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
   bcprov-jdk18on-1.76.jar: 3a785d0b41806865ad7e311162bfa3fa60b3965b
   checker-qual-3.37.0.jar: ba74746d38026581c12166e164bb3c15e90cc4ea
-  commons-compress-1.24.0.jar: b4b1b5a3d9573b2970fddab236102c0a4d27d35e
+  commons-compress-1.26.0.jar: 659feffdd12280201c8aacb8f7be94f9a883c824
   error_prone_annotations-2.21.1.jar: 6d9b10773b5237df178a7b3c1b4208df7d0e7f94
   failureaccess-1.0.1.jar: 1dcf1de382a0bf95a3d8b0849546c88bac1292c9
   guava-32.1.3-jre.jar: 0f306708742ce2bf0fb0901216183bc14073feae
