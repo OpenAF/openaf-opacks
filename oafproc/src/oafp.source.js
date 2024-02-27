@@ -833,6 +833,45 @@ var _inputFns = new Map([
         if (!isBoolean(params.linesjoin)) params.linesjoin = toBoolean(_$(params.linesjoin, "linesjoin").isString().default(__))
 
         _showTmpMsg()
+
+        let _linesvisual_header = __
+        let _linesvisual_header_pos = []
+
+        let _visualProc = r => {
+            // Replace tabs with spaces with the right tab stops
+            r = r.split('\n').map(line => {
+                let endL = ''
+                let c = 0
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '\t') {
+                        let add = 8 - (c % 8)
+                        endL += ' '.repeat(add)
+                        c += add
+                    } else {
+                        endL += line[i]
+                        c++
+                    }
+                }
+                return endL
+            }).join('\n')
+            // If the header is not defined, then the first line is the header
+            if (isUnDef(_linesvisual_header)) {
+                _linesvisual_header = []
+                if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = " \\s+"
+                r.split(new RegExp(params.linesvisualsepre)).forEach(h => {
+                    _linesvisual_header.push(h)
+                    _linesvisual_header_pos.push(r.indexOf(h))
+                })
+                return __
+            } else {
+                var _l = {}
+                _linesvisual_header_pos.forEach((p, i) => {
+                    _l[_linesvisual_header[i]] = r.substring(p, (i + 1 < _linesvisual_header_pos.length ? _linesvisual_header_pos[i + 1]-1 : __)).trim()
+                })
+                return _l
+            }
+        }
+
         if (params.linesjoin) {
             if (isDef(params.file) && isUnDef(params.cmd)) {
                 _res = io.readFileString(params.file)
@@ -841,7 +880,18 @@ var _inputFns = new Map([
                 _res = _runCmd2Bytes(params.cmd, true)
             }
             _res = _res.split(/\r?\n/)
-            _$o(_res, options)
+
+            if (toBoolean(params.linesvisual)) {
+                var _newRes = []
+                _res.forEach(r => {
+                    if (r.length == 0) return
+                    var _r = _visualProc(r)
+                    if (isDef(_r)) _newRes.push(_r)
+                })
+                _$o(_newRes, options)
+            } else {
+                _$o(_res, options)
+            }
         } else {
             var _stream
             if (isDef(params.file) && isUnDef(params.cmd)) {
@@ -855,7 +905,15 @@ var _inputFns = new Map([
             }
 
             ioStreamReadLines(_stream, r => {
-                _$o(r, clone(options), true)
+                // If linesvisual=true then the first line is the header and the space position of
+                // each header title determines the column position for the remaining lines
+
+                if (toBoolean(params.linesvisual)) {
+                    var _r = _visualProc(r)
+                    if (isDef(_r)) _$o(_r, clone(options), true)
+                } else {
+                    _$o(r, clone(options), true)
+                }
             })
             _stream.close()
         }

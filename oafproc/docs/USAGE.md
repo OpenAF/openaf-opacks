@@ -85,7 +85,6 @@ These options will change the parsed input data included any filters provided.
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
-| linesjoin | Boolean | If true and the input data is a string/text it will return an array with each line |
 
 ---
 
@@ -160,6 +159,18 @@ List of options to use when _input=xls_:
 | xlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
 | xlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
 | xlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
+
+---
+
+## 🧾 Lines input options
+
+List of options to use when _input=lines_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| linesjoin | Boolean | If true it will return an array with each processed line |
+| linesvisual | Boolean | If true it will try to determine header and column position from spaces and tabs |
+| linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
 
 ---
 
