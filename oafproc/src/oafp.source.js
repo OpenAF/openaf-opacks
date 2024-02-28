@@ -641,6 +641,7 @@ var _outputFns = new Map([
         params.dbtable = _$(params.dbtable, "outdbtable").isString().default("data")
         params.dbnocreate = toBoolean(_$(params.dbnocreate, "outdbnocreate").isString().default("false"))
         params.dbicase = toBoolean(_$(params.dbicase, "outdbicase").isString().default("false"))
+        params.dbbatchsize = _$(params.dbbatchsize, "dbbatchsize").isNumber().default(__)
 
         ow.loadObj()
         var _db
