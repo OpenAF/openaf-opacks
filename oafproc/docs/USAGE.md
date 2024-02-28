@@ -25,6 +25,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
+| loop   | If defined will loop the processing by the number of seconds provided |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 
@@ -51,6 +52,7 @@ List of data input types that can be auto-detected (through the file extension o
 | base64  | A base64 text format |
 | db      | A JDBC query to a database |
 | md      | A Markdown format |
+| ch      | An OpenAF channel format |
 | mdtable | A Markdown table format |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
 | lines   | A given string/text to be processed line by line |
@@ -115,6 +117,8 @@ List of available formats to use with the _output_ option:
 | html     | An HTML format |
 | db       | Output to a JDBC database |
 | md       | A Markdown format |
+| ch       | An OpenAF channel format |
+| chart    | A line-chart like chart (usefull together with 'loop') |
 | mdtable  | A Markdown table format (only for list outputs) |
 | openmetrics | Converts a map or list to OpenMetrics format |
 | base64   | A base64 text format | 
@@ -195,6 +199,20 @@ List of options to use when _input=db_ (SQL query):
 
 ---
 
+## 🧾 CH input options
+
+List of options to use when _input=ch_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inch   | String | A JSON/SLON configuration string with type and options/url |
+| inchall | Boolean | A boolean flag to determine if the input map will be used for a getAll query |
+
+> Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
+> Example of optiosn provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+
+---
+
 ## 🧾 CSV input/output options
 
 List of options to use with the _inputcsv_ input option (when input type=csv) and/or the _csv_ output option (when output=csv). Both expect the corresponding options to be provided in single JSON or SLON value (see below for example):
@@ -211,6 +229,8 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 > Example of options provided in JSON: csv="{withHeader:false,withDelimiter:'|'}"
 > Example of options provided in SLON: inputcsv="(withHeader: false, quoteMode: ALL)"
+
+> You can also use _incsv_ as a shortcut for _inputcsv_
 
 ---
 
@@ -278,6 +298,34 @@ List of options to use when _output=db_:
 > JDBC oracle: jdbc:oracle:thin:@[host]:[port]:[database]
 > JDBC postgreSQL: jdbc:postgresql://[host]:[port]/[database]
 > JDBC H2: jdbc:h2:[file]   
+
+---
+
+## 🧾 CH output options
+
+List of options to use when _output=ch_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| ch   | String | A JSON/SLON configuration string with type and options/url |
+| chkey | String | A comma delimited list of map keys to build a key from each array value |
+| chunset | Boolean | If true the input data will be used to unset data on the output channel instead of set |
+
+> Example of options provided in JSON: ch="{type:'mvs',options:{file:'data.db'}}"
+> Example of optiosn provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
+
+---
+
+## 🧾 Chart output options
+
+List of options to use when _output=chart_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+| chartcls | Boolean | If true the screen will be cleared for each execution |
+
+> Example: ```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
 
 ---
 
