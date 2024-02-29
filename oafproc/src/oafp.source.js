@@ -42,17 +42,19 @@ const _$f = (r, options) => {
     return r
 }
 const _$o = (r, options, lineByLine) => {
+    var nOptions = clone(options)
+
     if (toBoolean(params.color)) __conConsole = true
     if (!isString(r)) {
         if (lineByLine)
-            r = _$f([r], options)[0]
+            r = _$f([r], nOptions)[0]
         else
-            r = _$f(r, options)
+            r = _$f(r, nOptions)
     } else {
         if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
-            r = _$f(jsonParse(r, __, __, true), options)
+            r = _$f(jsonParse(r, __, __, true), nOptions)
         } else {
-            r = _$f(r, options)
+            r = _$f(r, nOptions)
         }
     }
 
@@ -60,10 +62,10 @@ const _$o = (r, options, lineByLine) => {
     if (isDef(params.outkey))    r = $$({}).set(params.outkey, r)
 
     _clearTmpMsg()
-    if (_outputFns.has(options.__format)) {
-        _outputFns.get(options.__format)(r, options)
+    if (_outputFns.has(nOptions.__format)) {
+        _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
-        $o(r, options)
+        $o(r, nOptions)
     }
 }
 const _runCmd2Bytes = (cmd, toStr) => {
@@ -1253,6 +1255,10 @@ var _inputFns = new Map([
 
         _$o(jsonParse(res, __, __, isString(res)), options)
     }],
+    ["slon", (_res, options) => {
+        _showTmpMsg()
+        _$o(af.fromSLON(_res), options)
+    }],
     ["json", (_res, options) => {
         _showTmpMsg()
         _$o(jsonParse(_res, __, __, isString(_res)), options)
@@ -1439,6 +1445,8 @@ var _run = () => {
                 let _tres = _res.trim()
                 if (_tres.startsWith("{") || _tres.startsWith("[")) {
                     params.type = "json"
+                } else if (_tres.startsWith("(")) {
+                    params.type = "slon"
                 } else if (_tres.startsWith("<")) {
                     params.type = "xml"
                 } else {

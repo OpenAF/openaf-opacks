@@ -34,7 +34,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > For _path_ syntax check https://jmespath.org/tutorial.html
 
-> You can list inputs by using _input="?"_; outputs by _output="?"_; transforms by _transforms=true_
+> You can list inputs by using _in="?"_; outputs by _out="?"_; transforms by _transforms=true_
 
 ---
 
@@ -49,6 +49,7 @@ List of data input types that can be auto-detected (through the file extension o
 | xml     | An XML format (auto-detected) |
 | csv     | A CSV format (auto-detected) |
 | ndjson  | A NDJSON format |
+| slon    | A SLON format (auto-detected) |
 | hsperf  | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | base64  | A base64 text format |
 | db      | A JDBC query to a database |
@@ -137,7 +138,7 @@ List of available formats to use with the _output_ option:
 
 ## 🧾 JSON input options
 
-List of options to use when _input=json_:
+List of options to use when _in=json_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -148,7 +149,7 @@ List of options to use when _input=json_:
 
 ## 🧾 ndJSON input options
 
-List of options to use when _input=ndjson_:
+List of options to use when _in=ndjson_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -159,7 +160,7 @@ List of options to use when _input=ndjson_:
 
 ## 🧾 XLS input options
 
-List of options to use when _input=xls_:
+List of options to use when _in=xls_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -172,7 +173,7 @@ List of options to use when _input=xls_:
 
 ## 🧾 Lines input options
 
-List of options to use when _input=lines_:
+List of options to use when _in=lines_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -184,7 +185,7 @@ List of options to use when _input=lines_:
 
 ## 🧾 DB input options
 
-List of options to use when _input=db_ (SQL query):
+List of options to use when _in=db_ (SQL query):
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -203,7 +204,7 @@ List of options to use when _input=db_ (SQL query):
 
 ## 🧾 CH input options
 
-List of options to use when _input=ch_:
+List of options to use when _in=ch_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -238,7 +239,7 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 ## 🧾 Base64 input/output options
 
-List of options to use when _input=base64_ or _output=base64_:
+List of options to use when _in=base64_ or _out=base64_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -248,7 +249,7 @@ List of options to use when _input=base64_ or _output=base64_:
 
 ## 🧾 LLM input/transform options
 
-List of options to use when _input=llm_ or _llmprompt=..._:
+List of options to use when _in=llm_ or _llmprompt=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -259,7 +260,7 @@ List of options to use when _input=llm_ or _llmprompt=..._:
 
 ## 🧾 Log output options
 
-List of options to use when _output=log_:
+List of options to use when _out=log_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -269,7 +270,7 @@ List of options to use when _output=log_:
 
 ## 🧾 SQL output options
 
-List of options to use when _output=sql_:
+List of options to use when _out=sql_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -281,7 +282,7 @@ List of options to use when _output=sql_:
 
 ## 🧾 DB output options
 
-List of options to use when _output=db_:
+List of options to use when _out=db_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -295,7 +296,7 @@ List of options to use when _output=db_:
 | dbicase | Boolean | If true table and field names will try to ignore case |
 | dbbatchsize | Number | If defined it will changed the default batch data insert process | 
 
-> You can use _output=sql_ to get a preview of the SQL statements the _db_ output type will use
+> You can use _out=sql_ to get a preview of the SQL statements the _db_ output type will use
 
 > JDBC oracle: jdbc:oracle:thin:@[host]:[port]:[database]
 > JDBC postgreSQL: jdbc:postgresql://[host]:[port]/[database]
@@ -305,7 +306,7 @@ List of options to use when _output=db_:
 
 ## 🧾 CH output options
 
-List of options to use when _output=ch_:
+List of options to use when _out=ch_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -320,7 +321,7 @@ List of options to use when _output=ch_:
 
 ## 🧾 Chart output options
 
-List of options to use when _output=chart_:
+List of options to use when _out=chart_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -333,7 +334,7 @@ List of options to use when _output=chart_:
 
 ## 🧾 XLS output options
 
-List of options to use when _output=xls_:
+List of options to use when _out=xls_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -347,7 +348,7 @@ List of options to use when _output=xls_:
 
 ## 🧾 OpenMetrics output options
 
-List of options to use when _output=openmetrics_:
+List of options to use when _out=openmetrics_:
 
 | Option | Type | Description |
 |--------|------|-------------|
@@ -358,7 +359,7 @@ List of options to use when _output=openmetrics_:
 
 ## 🧾 XML output options
 
-List of options to use when _output=xml_:
+List of options to use when _out=xml_:
 
 | Option | Type | Description |
 |--------|------|-------------|
