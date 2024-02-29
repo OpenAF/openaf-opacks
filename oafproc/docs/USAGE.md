@@ -15,8 +15,9 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | help   | Alternative way to show this document or others (e.g. filters, template) |
 | file   | The file to parse (if not provide stdin is used) |
 | cmd    | Alternative to file and stdin to execute a command (e.g. kubectl, docker) to get the file contents |
-| output | The output format (default: ctree) |
-| input  | The input type (if not provided it will try to be auto-detected) |
+| data   | Alternative to file, stdin and cmd to provide data input |
+| out    | The output format (default: ctree) |
+| in     | The input type (if not provided it will try to be auto-detected) |
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
 | sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |

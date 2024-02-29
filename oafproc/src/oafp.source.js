@@ -1402,20 +1402,25 @@ var _run = () => {
             if (isDef(params.cmd)) {
                 _res = _runCmd2Bytes(params.cmd, true)
             } else {
-                if (params.input != "pm") {
-                    _res = []
-                    io.pipeLn(r => {
-                        if (isDef(_inputLineFns[params.type])) {
-                            if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                if (isString(params.data)) {
+                    _res = params.data
+                } else {
+                    if (params.input != "pm") {
+                        _res = []
+                        io.pipeLn(r => {
+                            if (isDef(_inputLineFns[params.type])) {
+                                if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                                    _res.push(r)
+                                }
+                            } else { 
                                 _res.push(r)
                             }
-                        } else { 
-                            _res.push(r)
-                        }
-                        return false
-                    })
-                    _res = _res.join('\n')
+                            return false
+                        })
+                        _res = _res.join('\n')
+                    }
                 }
+
             }
         }
     }
