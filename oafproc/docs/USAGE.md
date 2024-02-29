@@ -55,6 +55,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ch      | An OpenAF channel format |
 | mdtable | A Markdown table format |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
+| openmetrics | An OpenMetrics/Prometheus compatible format |
 | lines   | A given string/text to be processed line by line |
 | llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
@@ -120,7 +121,7 @@ List of available formats to use with the _output_ option:
 | ch       | An OpenAF channel format |
 | chart    | A line-chart like chart (usefull together with 'loop') |
 | mdtable  | A Markdown table format (only for list outputs) |
-| openmetrics | Converts a map or list to OpenMetrics format |
+| openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
 | base64   | A base64 text format | 
 | ini      | A INI/Properties format (arrays are not supported) |
 | xls      | A XLSx output format |

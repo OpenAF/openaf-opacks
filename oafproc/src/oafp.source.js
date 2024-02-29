@@ -1075,6 +1075,14 @@ var _inputFns = new Map([
             _$o(r, options)
         }
     }],
+    ["openmetrics", (r, options) => {
+        if (isString(r)) {
+            ow.loadMetrics()
+            _$o(ow.metrics.fromOpenMetrics2Array(r), options)
+        } else {
+            _$o(r, options)
+        }
+    }],
     ["ch", (r, options) => {
         _showTmpMsg()
         if (isUnDef(params.inch)) _exit(-1, "inch is not defined.")
