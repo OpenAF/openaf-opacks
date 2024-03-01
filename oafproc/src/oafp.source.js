@@ -1374,7 +1374,7 @@ var _run = () => {
         params.jsondesc   = toBoolean(_$(params.jsondesc, "jsondesc").default("false"))
 
         if (isDef(params.file)) {
-            if (!(io.fileExists(params.file))) {
+            if (params.file.indexOf("::") < 0 && !(io.fileExists(params.file))) {
                 _exit(-1, "ERROR: File not found: '" + params.file + "'")
             }
 

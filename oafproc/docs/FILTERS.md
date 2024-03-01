@@ -74,6 +74,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
 | index_of(str, 'search') | 20240209 | Given a string will return the first index where the word 'search' occurs | index_of('This is a test', 'test') |
+| insert(obj, 'field', value) | 20240302 | Adds a 'field' with the corresponding value to the object. |
 | join(string, arrayString) | base | Returns a delimited list with the values of a specific array field | join(', ', files[].filename) |
 | keys(object) | base | Returns a list of fields for a corresponding map | keys(files[0]) |
 | last_index_of(str, 'search') | 20240209 | Given a string will return the last index where the word 'search' occurs | last_index_of('Test of a test', 'test') |
@@ -91,6 +92,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | mod(a, b) | 20240217 | Returns the modular of two numbers | mod(`5`, `2`)|
 | mul() | 20240217 | Multiplies two numbers | mul(`5`, `2`) |
 | not_null(any) | base | Returns the non-null value between the provided fields | [].not_null(a,b) |
+| now(diff) | 20240302 | Returns the current unix timestamp number with a negative diff (or positive for dates in the future) |
 | nvl() | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
 | replace(str, 're', 'flags', 'replaceText') | 20240209 | Equivalent to Javascript's replace function that given a string will search for a regular expression, with the optional flags, a replace with the provided text | replace('This is a test', ' a', 'i', ' not a') |
 | reverse(array) | base | Reverse the provided array | "reverse(@)" |
