@@ -925,11 +925,16 @@ var _inputFns = new Map([
             }).join('\n')
             // If the header is not defined, then the first line is the header
             if (isUnDef(_linesvisual_header)) {
-                _linesvisual_header = []
+                _linesvisual_header = [], lastPos = 0
                 if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = " \\s+"
                 r.split(new RegExp(params.linesvisualsepre)).forEach(h => {
                     _linesvisual_header.push(h)
-                    _linesvisual_header_pos.push(r.indexOf(h))
+                    let _mr = r.substring(lastPos).match(new RegExp(ow.format.escapeRE(h) + "(" + params.linesvisualsepre + "|$)"))
+                    if (!isNull(_mr) && isDef(_mr.index)) {
+                        _linesvisual_header_pos.push(lastPos + _mr.index)
+                        lastPos = _mr.index
+                    } else
+                        _exit(-1, "Problem with linesvisual to find header positioning.")
                 })
                 return __
             } else {
