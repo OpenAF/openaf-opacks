@@ -546,6 +546,14 @@ var _outputFns = new Map([
     ["key", (r, options) => {
         $o(r, options)
     }],
+    ["html", (r, options) => {
+        if (isString(r)) {
+            ow.loadTemplate()
+            print(ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact))))
+        } else {
+            $o(r, options)
+        }
+    }],
     ["ctable", (r, options) => {
         $o(r, options)
     }],
