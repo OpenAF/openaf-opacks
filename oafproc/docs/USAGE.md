@@ -369,6 +369,19 @@ List of options to use when _out=xml_:
 
 ---
 
+## 🧾 HTML output options
+
+List of options to use when _out=html_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| htmlcompact | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will have a visual compact width format |
+| htmlpart | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will be partial and not the complete file |
+| htmlopen | Boolean | Boolean that if false won't try to open the output contents in a browser (defaults to true) |
+| htmlwait | Number | Amount of ms, when htmlopen=true, to wait for the system browser to open an render the html output | 
+
+---
+
 ## 📝 Examples
 
 ```bash

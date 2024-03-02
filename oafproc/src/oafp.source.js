@@ -547,11 +547,28 @@ var _outputFns = new Map([
         $o(r, options)
     }],
     ["html", (r, options) => {
+        let html, tmpf, res = false
+
+        params.htmlopen = toBoolean(_$(params.htmlopen, "htmlopen").isString().default("true"))
+        params.htmlwait = _$(params.htmlwait, "htmlwait").isNumber().default(2500)
+
+        if (params.htmlopen) tmpf = io.createTempFile("oafp_", ".html")
+
+        ow.loadTemplate()
         if (isString(r)) {
-            ow.loadTemplate()
-            print(ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact))))
+            html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact)))
         } else {
-            $o(r, options)
+            let _res = ow.template.html.parseMap(r, true)
+            html = "<html><meta charset=\"utf-8\"><style>" + _res.css + "</style><body>" + _res.out + "</body></html>"
+        }
+        if (params.htmlopen) {
+            io.writeFileString(tmpf, html)
+            res = openInBrowser("file:///" + tmpf.replace(/\\/g, "/"))
+        }
+        if (res) {
+            sleep(params.htmlwait, true)
+        } else {
+            print(html)
         }
     }],
     ["ctable", (r, options) => {
