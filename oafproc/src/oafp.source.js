@@ -3,6 +3,15 @@ var params = processExpr(" ")
 const oafp = (params) => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
+// Ensure params are interpreted as lower case
+Object.keys(params).forEach(pk => {
+    var npk = pk.toLowerCase()
+    if (pk != npk && isUnDef(params[npk])) {
+        params[npk] = params[pk]
+        delete params[pk]
+    }    
+})
+
 // --- Util functions
 // Util functions
 const _transform = r => {
@@ -31,7 +40,7 @@ const _$f = (r, options) => {
             switch(params.sqlfilter.toLowerCase()) {
             case "simple"  : method = "nlinq"; break
             case "advanced": method = "h2"; break
-            default        : method = "auto"
+            default        : method = __
             }
         }
         if (isArray(r) && r.length > 0) r = $sql(r, options.__sql.trim(), method)
@@ -172,7 +181,7 @@ const showHelp = () => {
 
 const showVersion = () => {
     var _ff = (getOPackPath("oafproc") || ".") + "/.package.yaml"
-    var oafpv = (io.fileExists(_ff) ? io.readFileYAML(_ff).version : "(not available)")
+    var oafpv = (io.fileExists(_ff) ? io.readFileYAML(_ff).version : "(not available/embedded)")
     var _v = {
         oafp: {
             version: oafpv,
@@ -1501,6 +1510,12 @@ var _run = () => {
             _inputFns.get("json")(_res, options)
         }
     }
+}
+
+// Verify debug
+if (isDef(params["-debug"])) {
+    //__initializeCon()
+    printErr("DEBUG: " + stringify(params, __, ""))
 }
 
 if (isNumber(params.loop)) {
