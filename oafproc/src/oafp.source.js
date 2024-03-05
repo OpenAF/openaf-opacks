@@ -566,6 +566,7 @@ var _outputFns = new Map([
         ow.loadTemplate()
         if (isString(r)) {
             html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact)))
+            html = html.replace("<html>", "<html><meta charset=\"utf-8\">")
         } else {
             let _res = ow.template.html.parseMap(r, true)
             html = "<html><meta charset=\"utf-8\"><style>" + _res.css + "</style><body>" + _res.out + "</body></html>"
