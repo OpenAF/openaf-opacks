@@ -35,7 +35,7 @@ const _$f = (r, options) => {
         delete options.__from
     }
     if (options.__sql) {
-        var method = "auto"
+        var method = __
         if (isString(params.sqlfilter)) {
             switch(params.sqlfilter.toLowerCase()) {
             case "simple"  : method = "nlinq"; break

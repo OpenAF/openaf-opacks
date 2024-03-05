@@ -69,7 +69,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_json(str) | 20240215 | Converts a json string representation into an object | from_json('{a:123}')" |
 | from_ms(x, 'format') | 20240209 | Shortcut for OpenAF's ow.format.elapsedTime4ms function. The format is represented as a SLON/JSON string | from_ms(`12000`,'(abrev:true)') |
 | from_siAbbr(x) | 20240209 | Given a string with SI numeric abbreviation will convert it to the absolute value | from_siAbbr('100m') |
-| from_slon() | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
+| from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
@@ -90,10 +90,10 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | min(number) | base | Returns the minimum of a numeric field | min(files[].size) |
 | min_by(array, expression) | base | Returns the element for which the expression is the minimum | min_by(files[], &size) |
 | mod(a, b) | 20240217 | Returns the modular of two numbers | mod(`5`, `2`)|
-| mul() | 20240217 | Multiplies two numbers | mul(`5`, `2`) |
+| mul(a, b) | 20240217 | Multiplies two numbers | mul(`5`, `2`) |
 | not_null(any) | base | Returns the non-null value between the provided fields | [].not_null(a,b) |
 | now(diff) | 20240302 | Returns the current unix timestamp number with a negative diff (or positive for dates in the future) |
-| nvl() | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
+| nvl(field, value) | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
 | replace(str, 're', 'flags', 'replaceText') | 20240209 | Equivalent to Javascript's replace function that given a string will search for a regular expression, with the optional flags, a replace with the provided text | replace('This is a test', ' a', 'i', ' not a') |
 | reverse(array) | base | Reverse the provided array | "reverse(@)" |
 | search_keys(arr, 'text') | all | Returns an array of entries where 'text' was found as part of an object property. | search_keys(files, 'filename') |
@@ -104,7 +104,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | split_re(str, 're') | 20240228 | Equivalent to the split Javascript's function for a string given a regular expression separator | split_re(@, '\\s+')  |
 | split_sep(str, sep, arrEnc) | 20240217 | Given a string, a separator regexp and an array of pairs of enclosure chars | split_sep(@, '\\s+', from_slon('[['{'|'}']|['('|')']]'))  |
 | starts_with(string, array) | base | Returns true if a field has the provided prefix | files[?starts_with(filename, 'openaf.jar')] |
-| sub() | 20240217 | Substracts two numbers | sub(`2`, `2`) |
+| sub(a, b) | 20240217 | Substracts two numbers | sub(`2`, `2`) |
 | substring(str, ini, end) | all | Given a string will return a sub-string starting on the initial index until the ending index | substring(@, index_of('test'), 5) |
 | sum(array) | base | Sums the numberic field of a provided array | sum(files[].size) |
 | t(obj, 'template') | 20240228 | Applies the Handlebars 'template' to the provided array or map | t(@, '{{filename}} ({{size}})') |
@@ -117,7 +117,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | to_date(x) | 20240209 | Tries to convert a value to a date | to_date(createDate) |
 | to_datef(str, 'pattern') | 20240228 | Uses a Java date format to convert a string into a date | to_datef(createDate, 'yyyyMMdd') |
 | to_isoDate(x) | 20240209 | Tries to convert a string into an ISO date format string | to_isoDate( to_datef(createDate, 'yyyyMMdd') ) |
-| to_json() | 20240215 | Given an object will return the JSON string representation of it. | to_json(@) |
+| to_json(obj, 'space') | 20240215 | Given an object will return the JSON string representation of it with the provided spacing | to_json(@, '') |
 | to_map(arr, 'field') | all | Given an array it will return a map where each entry is a property using the provided field with a map as value. | to_map(files, 'filename') |
 | to_numAbbr(num) | 20240209 | Given an absolute number will return a string with SI abbreviation | to_numAbbr(`12345678`) |
 | to_number(any) | base | Transforms any input into a number | to_number(`123`) |
