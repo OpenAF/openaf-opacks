@@ -23,12 +23,29 @@ const _transform = r => {
     return r
 }
 const _$f = (r, options) => {
+    if (options.__ifrom) {
+        r = $from(r).query(af.fromNLinq(options.__ifrom.trim()))
+        delete options.__ifrom
+    }
+    if (options.__isql) {
+        var method = __
+        if (isString(params.sqlfilter)) {
+            switch(params.sqlfilter.toLowerCase()) {
+            case "simple"  : method = "nlinq"; break
+            case "advanced": method = "h2"; break
+            default        : method = __
+            }
+        }
+        if (isArray(r) && r.length > 0) r = $sql(r, options.__isql.trim(), method)
+        delete options.__isql
+    }
     if (options.__path) {
         r = $path(r, options.__path.trim())
         delete options.__path
     }
 
     if (isString(r)) return _transform(r)
+    r = _transform(r)
 
     if (options.__from) {
         r = $from(r).query(af.fromNLinq(options.__from.trim()))
@@ -46,7 +63,10 @@ const _$f = (r, options) => {
         if (isArray(r) && r.length > 0) r = $sql(r, options.__sql.trim(), method)
         delete options.__sql
     }
-    r = _transform(r)
+    if (options.__opath) {
+        r = $path(r, options.__opath.trim())
+        delete options.__opath
+    }
     
     return r
 }
@@ -362,6 +382,31 @@ var _transformFns = {
         if (toBoolean(params.transforms)) {
             var _t = Object.keys(_transformFns).filter(r => r != 'transforms').sort()
             return _t
+        }
+    },
+    "cmlt"    : r => {
+        if (toBoolean(params.cmlt)) {
+            var _r = (isArray(r) ? r : [ r ])
+            params.cmltch = _$(params.cmltch, "cmltch").default("(type: simple)")
+            let cmltch = _fromJSSLON(params.cmltch)
+            if (isMap(cmltch)) {
+                if (isUnDef(cmltch.type)) _exit(-1, "cmltch.type is not defined.")
+                if (isDef(cmltch.lib)) loadLib(cmltch.lib)
+                if ($ch().list().indexOf("oafp::cmltdata") < 0) {
+                    if (cmltch.type == "remote") {
+                        $ch("oafp::cmltdata").createRemote(cmltch.url)
+                    } else {
+                        $ch("oafp::cmltdata").create(cmltch.type, cmltch.options)
+                    }
+                    let _sz = Number(_$(params.cmltsize, "cmltsize").isNumber().default(100)) - 1
+                    if (_sz > 0) $ch("oafp::cmltdata").subscribe(ow.ch.utils.getHousekeepSubscriber("oafp::cmltdata", _sz))
+                }
+
+                _r.forEach(_rt => $ch("oafp::cmltdata").set({ t: nowNano() }, _rt))
+                return $ch("oafp::cmltdata").getAll()
+            } else {
+                _exit(-1, "Invalid cmltch parameter")
+            }
         }
     },
     "jsonschemagen" : _r => {
@@ -1374,7 +1419,18 @@ if (isDef(params.secKey)) {
 }
 
 // Set options
-var options = { __format: params.format, __from: params.from, __sql: params.sql, __path: params.path, __csv: params.csv, __pause: params.pause, __key: params.__key }
+var options = { 
+    __format: params.format, 
+    __from: params.from, 
+    __ifrom: params.ifrom, 
+    __isql: params.isql, 
+    __sql: params.sql, 
+    __path: params.path, 
+    __opath: params.opath,
+    __csv: params.csv, 
+    __pause: params.pause, 
+    __key: params.__key 
+}
 // ndjson options
 /*if (params.type == "ndjson") {
     params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
@@ -1521,6 +1577,7 @@ if (isDef(params["-debug"])) {
 
 if (isNumber(params.loop)) {
     while(1) {
+        if (toBoolean(params.loopcls)) cls()
         _run()
         sleep(params.loop * 1000, true)
     }

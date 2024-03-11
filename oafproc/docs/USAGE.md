@@ -27,6 +27,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | loop   | If defined will loop the processing by the number of seconds provided |
+| loopcls | If 'true' and loop is defined it will clear the screen on each loop cycle |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 
@@ -76,6 +77,7 @@ These options will change the parsed input data included any filters provided.
 | arraytomap | Boolean | If true will try to convert the input array to a map (see arraytomapkey, arraytomapkeepkey) |
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
 | arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
+| cmlt | Boolean | If true will accumulate the input values into an output array (useful with loop) |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
@@ -255,6 +257,17 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 |--------|------|-------------|
 | llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
 | llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
+
+---
+
+## 🧾 CMLT transform options
+
+List of options to use when _cmlt=true_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| cmltch | String | A JSON/SLON OpenAF channel configuration string with type and options/url (defaults to simple) |
+| cmltsize | Number | The number of input data values to keep (default 100). If -1 it will keep without a limit |
 
 ---
 

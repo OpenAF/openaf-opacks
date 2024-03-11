@@ -1,5 +1,15 @@
 # OpenAF processor filters
 
+The OpenAF processor filters are applied in the following order:
+
+**input data** -> _path=..._ -> **apply transformers to data** -> _from=..._ -> _sql=..._ -> **output data** 
+
+---
+
+For more advanced cases they can also be applied in the following order:
+
+**input data** -> _ifrom=..._ -> _isql=..._ -> _path=..._ -> **apply transformers to data** -> _from=..._ -> _sql=..._ -> _opath=..._ -> **output data** 
+
 ## 🪚 Path
 
 The _path=_ filter tool is based on the JMESPath library. To see all the available options please refer to http://jmespath.org. Here are some examples:
@@ -71,6 +81,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_siAbbr(x) | 20240209 | Given a string with SI numeric abbreviation will convert it to the absolute value | from_siAbbr('100m') |
 | from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
+| get(nameOrPath) | 20240305 | Given a path to the original object or a name set by 'set' or 'setp' returns the corresponding value | packages[].{name: name, version: version, parentVersion: get('version') } |
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
 | index_of(str, 'search') | 20240209 | Given a string will return the first index where the word 'search' occurs | index_of('This is a test', 'test') |
@@ -98,6 +109,8 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | reverse(array) | base | Reverse the provided array | "reverse(@)" |
 | search_keys(arr, 'text') | all | Returns an array of entries where 'text' was found as part of an object property. | search_keys(files, 'filename') |
 | search_values(arr, 'text') | all | Returns an array of entries where 'text' was found as part of an object property value. | search_values(files, '.git') |
+| set(obj, path) | 20240305 | Given an object will set the value to a name that it's equal to it's path | set(@, 'version').packages[].{ name: name, parentVersion: get('version') } |
+| setp(obj, path, name) | 20240305 | Given an object will set the value to a name given the provided path | set(@, 'version', 'ver').packages[].{ name: name, parentVersion: get('ver') } |
 | sort(array) | base | Sorts the provided array | "sort(@)" |
 | sort_by(array, expression) | base | Sorts the provided array by the provided expression | sort_by(files[], &size) |
 | split(str, 'sep') | 20240209 | Equivalent to the split Javascript's function for a string given a separator | split(@, '\n') |
