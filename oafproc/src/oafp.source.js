@@ -1370,7 +1370,14 @@ if (isArray(params.libs)) {
         try {
             var _req = require("oafp_" + lib + ".js")
             if (isDef(_req.oafplib)) {
-                var res = _req.oafplib(clone(params), _$o, $o, this)
+                var res = _req.oafplib(clone(params), _$o, $o, {
+                    _runCmd2Bytes: _runCmd2Bytes,
+                    _fromJSSLON: _fromJSSLON,
+                    _msg: _msg,
+                    _showTmpMsg: _showTmpMsg,
+                    _clearTmpMsg: _clearTmpMsg,
+                    _exit: _exit
+                })
                 if (isMap(res)) {
                     if (isArray(res.fileExtensions))      res.fileExtensions.forEach(r => _addSrcFileExtensions(r.ext, r.type))
                     if (isArray(res.fileExtensionsNoMem)) res.fileExtensionsNoMem.forEach(r => _addSrcFileExtensionsNoMem(r.ext))
