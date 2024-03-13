@@ -257,6 +257,7 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 |--------|------|-------------|
 | llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
 | llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
+| llmconversation | String | File to keep the LLM conversation |
 
 ---
 
