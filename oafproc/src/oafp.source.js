@@ -119,9 +119,37 @@ const _fromJSSLON = aString => {
 		return af.fromSLON(aString)
 	}
 }
+const _chartPathParse = (r, frmt,prefix) => {
+    prefix = _$(prefix).isString().default("_oafp_fn_")
+    let parts = splitBySepWithEnc(frmt, " ", [["\"","\""],["'","'"]])
+    let nparts = []
+    if (parts.length > 1) {
+        for(let i = 0; i < parts.length; i++) {
+            if (i == 0) {
+                nparts.push(parts[i])
+            } else {
+                let _n = splitBySepWithEnc(parts[i], ":", [["\"","\""],["'","'"]]).map((_p, j) => {
+                    if (j == 0) {
+                        if (!_p.startsWith("-")) {
+                            global[prefix + i] = () => $path(r, _p)
+                            return prefix + i
+                        } else {
+                            return _p
+                        }
+                    } else {
+                        return _p
+                    }
+                }).join(":")
+                nparts.push(_n)
+            }
+        }
+        return nparts.join(" ")
+    }
+    return ""
+}
 const _msg = "(processing data...)"
-const _showTmpMsg  = msg => printErrnl(_$(msg).default(_msg))
-const _clearTmpMsg = msg => printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r")
+const _showTmpMsg  = msg => { if (params.out != 'grid' && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
+const _clearTmpMsg = msg => { if (params.out != 'grid' && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
 
 // ---
 
@@ -732,35 +760,38 @@ var _outputFns = new Map([
             print(af.fromBytes2String(af.toBase64Bytes(_o)))
         }
     }],
+    ["grid" , (r, options) => {
+        if (isUnDef(params.grid)) _exit(-1, "For output=grid you need to provide a grid=...")
+        let _f = _fromJSSLON(_$(params.grid, "grid").isString().$_())
+
+        if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
+            _f.forEach((y, yi) => {
+                y.forEach((x, xi) => {
+                    if (x.type == "chart") {
+                        var _n = "_chrt" + (yi+1) + "." + (xi+1)
+                        x.obj = _n + " " + _chartPathParse(r, x.obj, _n)
+                        if (isUnDef(x.title)) x.title = "Chart " + _n
+                    }
+                    if (isDef(x.path)) {
+                        x.obj = $path(r, x.path)
+                        if (isUnDef(x.title)) x.title = x.path
+                    }
+                })
+            })
+            let _out = ow.format.string.grid(_f, __, __, " ", true)
+            print(_out)
+        } else {
+            _exit(-1, "Invalid grid parameter: '" + stringify(params.grid, __, "") + "'")
+        }
+    }],
     ["chart", (r, options) => {
         if (isUnDef(params.chart)) _exit(-1, "For output=chart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
         if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=chart is not supported in this version of OpenAF")
 
-        let parts = splitBySepWithEnc(params.chart, " ", [["\"","\""],["'","'"]])
-        let nparts = []
-        if (parts.length > 1) {
-            for(let i = 0; i < parts.length; i++) {
-                if (i == 0) {
-                    nparts.push(parts[i])
-                } else {
-                    let _n = splitBySepWithEnc(parts[i], ":", [["\"","\""],["'","'"]]).map((_p, j) => {
-                        if (j == 0) {
-                            if (!_p.startsWith("-")) {
-                                global["_oafp_fn_" + i] = () => $path(r, _p)
-                                return "_oafp_fn_" + i
-                            } else {
-                                return _p
-                            }
-                        } else {
-                            return _p
-                        }
-                    }).join(":")
-                    nparts.push(_n)
-                }
-            }
-
+        let fmt = _chartPathParse(r, params.chart)
+        if (fmt.length > 0) {
             if (toBoolean(params.chartcls)) cls()
-            print(printChart("oafp " + nparts.join(" ")))
+            print(printChart("oafp " + fmt))
         }
 
     }],
@@ -1384,6 +1415,7 @@ if (isArray(params.libs)) {
                     _msg: _msg,
                     _showTmpMsg: _showTmpMsg,
                     _clearTmpMsg: _clearTmpMsg,
+                    _chartPathParse: _chartPathParse,
                     _exit: _exit
                 })
                 if (isMap(res)) {

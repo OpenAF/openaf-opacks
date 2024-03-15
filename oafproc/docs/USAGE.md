@@ -124,6 +124,7 @@ List of available formats to use with the _output_ option:
 | md       | A Markdown format |
 | ch       | An OpenAF channel format |
 | chart    | A line-chart like chart (usefull together with 'loop') |
+| grid     | A multiple output ascii grid (usefull together with 'loop') |
 | mdtable  | A Markdown table format (only for list outputs) |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
 | base64   | A base64 text format | 
@@ -343,6 +344,16 @@ List of options to use when _out=chart_:
 | chartcls | Boolean | If true the screen will be cleared for each execution |
 
 > Example: ```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+
+---
+
+## 🧾 Grid output options
+
+List of options to use when _out=grid_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column. Each map should be composed of a 'title', a 'type' (tree, map, chart, bar, table, area, text and md), a 'path' to select the data (for non chart types) and an 'obj' (for chart type the format is the same of chart=...) |
 
 ---
 

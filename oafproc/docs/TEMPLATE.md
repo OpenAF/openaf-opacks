@@ -30,6 +30,7 @@ Here are some of the available helpers:
 | $default        | to be used with $switch for each case      | 
 | $ptable         | shows an ansi ascii printTable representation of an object  |
 | $ptree          | shows an ansi ascii printTree representation of an object  |
+| $pchart         | shows an ansi ascii line chart with an object and a format string: "unit path:color:legend... [-min:0] [-max:100] [-hsize:40] [-vsize:10]" |
 | $output         | shows an $output representation of an object (aObj as 1st arg and options in slon as 2nd arg) |
 | $cjson          | shows an ansi ascii colority representation fo an object  |
 | $cslon          | shows an ansi ascii colored SLON representation of an object |
