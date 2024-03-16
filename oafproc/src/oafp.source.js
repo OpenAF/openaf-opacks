@@ -767,9 +767,9 @@ var _outputFns = new Map([
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
             _f.forEach((y, yi) => {
                 y.forEach((x, xi) => {
-                    if (x.type == "chart") {
+                    if (x.type == "chart" || x.type == "bar") {
                         var _n = "_chrt" + (yi+1) + "." + (xi+1)
-                        x.obj = _n + " " + _chartPathParse(r, x.obj, _n)
+                        x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(r, x.obj, _n)
                         if (isUnDef(x.title)) x.title = "Chart " + _n
                     }
                     if (isDef(x.path)) {
