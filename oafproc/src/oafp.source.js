@@ -280,7 +280,7 @@ params.input = params.type
 if (isUnDef(params.file) && isUnDef(params.cmd)) {
     let _found = __
     for (let key in params) {
-        if (params[key] === "") {
+        if (params[key] === "" && key != "-debug") {
             _found = key
             break;
         }
@@ -1511,6 +1511,10 @@ var _run = () => {
         params.jsonprefix = _$(params.jsonprefix, "jsonprefix").isString().default(__)
         params.jsondesc   = toBoolean(_$(params.jsondesc, "jsondesc").default("false"))
 
+        if (isDef(params.insecure) && toBoolean(params.insecure)) {
+            ow.loadJava().setIgnoreSSLDomains()
+        }
+
         if (isDef(params.file)) {
             if (params.file.indexOf("::") < 0 && !(io.fileExists(params.file))) {
                 _exit(-1, "ERROR: File not found: '" + params.file + "'")
@@ -1554,19 +1558,42 @@ var _run = () => {
                 if (isString(params.data)) {
                     _res = params.data
                 } else {
-                    if (params.input != "pm") {
-                        _res = []
-                        io.pipeLn(r => {
-                            if (isDef(_inputLineFns[params.type])) {
-                                if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                    if (isDef(params.url)) {
+                        params.urlmethod = _$(params.urlmethod, "urlmethod").isString().default("GET")
+                        let _hp = _fromJSSLON(_$(params.urlparams).isString().default("{}"))
+
+                        let _hd
+                        if (isDef(params.urldata)) _hd = _fromJSSLON(params.urldata)
+
+                        switch(params.urlmethod.toLowerCase()) {
+                        case "post":
+                            _res = $rest(_hp).post(params.url, _hd)
+                            break
+                        case "put":
+                            _res = $rest(_hp).put(params.url, _hd)
+                            break
+                        case "delete":
+                            _res = $rest(_hp).delete(params.url, _hd)
+                            break
+                        default:
+                            _res = $rest(_hp).get(params.url)
+                        }
+                        _res = stringify(_res, __, "")
+                    } else {
+                        if (params.input != "pm") {
+                            _res = []
+                            io.pipeLn(r => {
+                                if (isDef(_inputLineFns[params.type])) {
+                                    if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                                        _res.push(r)
+                                    }
+                                } else { 
                                     _res.push(r)
                                 }
-                            } else { 
-                                _res.push(r)
-                            }
-                            return false
-                        })
-                        _res = _res.join('\n')
+                                return false
+                            })
+                            _res = _res.join('\n')
+                        }
                     }
                 }
 

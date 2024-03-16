@@ -26,6 +26,10 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | outputkey | If defined the map/list output will be prefix with the provided key |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
+| url    | Retrieves data from the provided URL |
+| urlmethod | If 'url' is provided defines the http method to use if different from GET | 
+| urlparams | If 'url' is provided extra parameters (equivalent to OpenAF's $rest) can be provided in JSON/SLON |
+| urldata | If 'url' is provided a JSON/SLON/text data can be provided | 
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen on each loop cycle |
 | -v     | Changes the input to a map with the tool's version info |
