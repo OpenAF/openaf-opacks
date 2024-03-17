@@ -83,6 +83,7 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
 | cmlt | Boolean | If true will accumulate the input values into an output array (useful with loop) |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
+| diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
@@ -140,6 +141,8 @@ List of available formats to use with the _output_ option:
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
 > For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
+
+> For 'log' you can use 'logtheme' or the environment variable 'OAFP_LOGTHEME' with a JSON/SLON map with the colors to use '(errorLevel: red, warnLevel: yellow, timestamp: bold)'
 
 ---
 
@@ -274,6 +277,28 @@ List of options to use when _cmlt=true_:
 |--------|------|-------------|
 | cmltch | String | A JSON/SLON OpenAF channel configuration string with type and options/url (defaults to simple) |
 | cmltsize | Number | The number of input data values to keep (default 100). If -1 it will keep without a limit |
+
+---
+
+## 🧾 Diff transform options
+
+List of options to use when _diff=..._:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| difftheme | String | A JSON/SLON map with the colors to use if color = true: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: '|')" |
+| diffnlines | Boolean | If true will append each line with a line number of the final result of the differences between 'a' and 'b' (just for rough reference) |
+| diffwords | Boolean | If true and the input is text based will perform the diff at the word level | 
+| diffwordswithspace | Boolean | If true and the input is text based will perform the diff at the word + spaces level |
+| difflines | Boolean | If true and the input is text based will perform the diff at the lines level |
+| diffsentences | Boolean | If true and the input is text based will perfom the diff at the sentence level |
+| diffchars | Boolean | If true and the input is text based will perform the diff at the char level |
+
+> If color=true a visual colored diff will be output insted of an array of differences
+
+> If both inputs are array based and color=false (or not provided) the comparition will be performed at the array elements level
+
+> The contents of 'difftheme' can also be provided through the 'OAFP_DIFFTHEME' environment variable
 
 ---
 
