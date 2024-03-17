@@ -23,7 +23,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | path   | A JMESPath expression to filter output |
 | csv    | If type=csv, the CSV options to use | 
-| outputkey | If defined the map/list output will be prefix with the provided key |
+| outkey | If defined the map/list output will be prefix with the provided key |
+| outfile | If defined all output will be written to the provided file |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |
@@ -31,7 +32,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | urlparams | If 'url' is provided extra parameters (equivalent to OpenAF's $rest) can be provided in JSON/SLON |
 | urldata | If 'url' is provided a JSON/SLON/text data can be provided | 
 | loop   | If defined will loop the processing by the number of seconds provided |
-| loopcls | If 'true' and loop is defined it will clear the screen on each loop cycle |
+| loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 

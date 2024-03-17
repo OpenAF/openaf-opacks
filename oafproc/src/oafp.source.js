@@ -9,7 +9,7 @@ Object.keys(params).forEach(pk => {
     if (pk != npk && isUnDef(params[npk])) {
         params[npk] = params[pk]
         delete params[pk]
-    }    
+    }
 })
 
 // --- Util functions
@@ -73,7 +73,13 @@ const _$f = (r, options) => {
 const _$o = (r, options, lineByLine) => {
     var nOptions = clone(options)
 
-    if (toBoolean(params.color)) __conConsole = true
+    if (toBoolean(params.color)) {
+        __conConsole = true
+    } else {
+        if (isDef(params.color)) {
+            __conAnsi = false
+        }
+    }
     if (!isString(r)) {
         if (lineByLine)
             r = _$f([r], nOptions)[0]
@@ -94,7 +100,8 @@ const _$o = (r, options, lineByLine) => {
     if (_outputFns.has(nOptions.__format)) {
         _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
-        $o(r, nOptions)
+        if (isUnDef(nOptions.__format)) nOptions.__format = "tree"
+        _o$o(r, nOptions, __)
     }
 }
 const _runCmd2Bytes = (cmd, toStr) => {
@@ -146,6 +153,19 @@ const _chartPathParse = (r, frmt,prefix) => {
         return nparts.join(" ")
     }
     return ""
+}
+const _print = (m) => {
+    if ("undefined" === typeof params.outfile) {
+        print(m)
+    } else {
+        if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
+        if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
+            ioStreamWrite(global.__oafp_streams[params.outfile].s, m)
+        }
+    }
+}
+const _o$o = (a, b, c) => {
+    _print($o(a, b, c, true))
 }
 const _msg = "(processing data...)"
 const _showTmpMsg  = msg => { if (params.out != 'grid' && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
@@ -201,7 +221,7 @@ const showHelp = () => {
         if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
             ow.format.string.pauseString( ow.format.withMD( io.readFileString(_f) + _customHelp ) )
         else
-            print(ow.format.withMD( io.readFileString(_f) + _customHelp ))
+            _print(ow.format.withMD( io.readFileString(_f) + _customHelp ))
     } else {
         if (isDef(global._oafphelp) && isDef(global._oafphelp[_ff])) {
             __ansiColorFlag = true
@@ -209,7 +229,7 @@ const showHelp = () => {
             if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
                 ow.format.string.pauseString( ow.format.withMD( global._oafphelp[_ff] + _customHelp ) )
             else
-                print(ow.format.withMD( global._oafphelp[_ff] + _customHelp))
+                _print(ow.format.withMD( global._oafphelp[_ff] + _customHelp))
         } else {
             if (isString(_oafhelp_libs[params.help])) {
                 __ansiColorFlag = true
@@ -217,9 +237,9 @@ const showHelp = () => {
                 if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
                     ow.format.string.pauseString( ow.format.withMD( _oafhelp_libs[params.help] ) )
                 else
-                    print(ow.format.withMD( _oafhelp_libs[params.help] ))
+                    _print(ow.format.withMD( _oafhelp_libs[params.help] ))
             } else {
-                print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
+                _print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
             }
         }
     }
@@ -709,13 +729,13 @@ const _addSrcTransformFns = (type, fn) => {
 var _outputFns = new Map([
     ["?" , (r, options) => {
         r = Array.from(_outputFns.keys()).filter(r => r != '?').sort()
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["pm", (r, options) => {
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["key", (r, options) => {
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["html", (r, options) => {
         let html, tmpf, res = false
@@ -740,21 +760,21 @@ var _outputFns = new Map([
         if (res) {
             sleep(params.htmlwait, true)
         } else {
-            print(html)
+            _print(html)
         }
     }],
     ["ctable", (r, options) => {
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["stable", (r, options) => {
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["table", (r, options) => {
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["log", (r, options) => {
         if (isString(r) && toBoolean(params.logprintall)) {
-            print(r.replace(/\n$/, ""))
+            _print(r.replace(/\n$/, ""))
         } else {
             var _arr = r
             if (isMap(r)) _arr = [ r ]
@@ -777,7 +797,7 @@ var _outputFns = new Map([
                             if (l.toLowerCase().indexOf("warn") >= 0) lineC = _lt.warnLevel
                         }
                         if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
-                        if (isDef(m) || isDef(d)) print(ansiColor(_lt.timestamp, d) + (isDef(l) ? " | " + ansiColor(lineC, l) : "") + " | " + ansiColor(lineC, m))
+                        if (isDef(m) || isDef(d)) _print(ansiColor(_lt.timestamp, d) + (isDef(l) ? " | " + ansiColor(lineC, l) : "") + " | " + ansiColor(lineC, m))
                     }
                 })
             }
@@ -785,31 +805,31 @@ var _outputFns = new Map([
     }],
     ["raw", (r, options) => {
         if (isString(r))
-            print(r)
+            _print(r)
         else
-            sprint(r)
+            _print(stringify(r))
     }],
     ["ini", (r, options) => {
         if (!isString(r)) {
             ow.loadJava()
             var ini = new ow.java.ini()
-            print( ini.put(r).save() )
+            _print( ini.put(r).save() )
         }
     }],
     ["mdyaml", (r, options) => {
         if (isArray(r)) {
             r.forEach((_y, i) => {
-                $o(_y, merge(options, { __format: "yaml" }))
-                if (i < r.length - 1) print("---\n")
+                _o$o(_y, merge(options, { __format: "yaml" }))
+                if (i < r.length - 1) _print("---\n")
             })
         } else {
-            $o(r, merge(options, { __format: "yaml" }))
+            _o$o(r, merge(options, { __format: "yaml" }))
         }
     }],
     ["mdtable", (r, options) => {
         if (isArray(r)) {
             ow.loadTemplate()
-            print( ow.template.md.table(r) )
+            _print( ow.template.md.table(r) )
         }
     }],
     ["template", (r, options) => {
@@ -819,7 +839,7 @@ var _outputFns = new Map([
             ow.template.addOpenAFHelpers()
             ow.template.addFormatHelpers()
             if (isUnDef(params.template)) _exit(-1, "For output=handlebars you need to provide a template=someFile.hbs")
-            tprint(io.readFileString(params.template), r)
+            _print($t(io.readFileString(params.template), r))
         }
     }],
     ["openmetrics", (r, options) => {
@@ -832,12 +852,12 @@ var _outputFns = new Map([
                 if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
                 return line
             }).join("\n")
-            $o(_out, options)
+            _o$o(_out, options)
         }
     }],
     ["pjson", (r, options) => {
         options.__format = "prettyjson"
-        $o(r, options)
+        _o$o(r, options)
     }],
     ["base64", (r, options) => {
         var _o = ""
@@ -847,9 +867,9 @@ var _outputFns = new Map([
             _o = stringify(r)
 
         if (toBoolean(params.base64gzip)) {
-            print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
+            _print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
         } else {
-            print(af.fromBytes2String(af.toBase64Bytes(_o)))
+            _print(af.fromBytes2String(af.toBase64Bytes(_o)))
         }
     }],
     ["grid" , (r, options) => {
@@ -859,19 +879,31 @@ var _outputFns = new Map([
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
             _f.forEach((y, yi) => {
                 y.forEach((x, xi) => {
+                    let _rd
+                    if (isDef(x.cmd)) {
+                        var _cr = $sh(x.cmd).getJson(0)
+                        if (isDef(_cr) && isDef(_cr.stdout)) 
+                            _rd = _cr.stdout
+                        else
+                            _rd = ""
+                    } else {
+                        _rd = r
+                    }
                     if (x.type == "chart" || x.type == "bar") {
                         var _n = "_chrt" + (yi+1) + "." + (xi+1)
-                        x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(r, x.obj, _n)
+                        x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(_rd, x.obj, _n)
                         if (isUnDef(x.title)) x.title = "Chart " + _n
                     }
                     if (isDef(x.path)) {
-                        x.obj = $path(r, x.path)
+                        x.obj = $path(_rd, x.path)
                         if (isUnDef(x.title)) x.title = x.path
+                    } else {
+                        if (isString(_rd)) x.obj = _rd
                     }
                 })
             })
             let _out = ow.format.string.grid(_f, __, __, " ", true)
-            print(_out)
+            _print(_out)
         } else {
             _exit(-1, "Invalid grid parameter: '" + stringify(params.grid, __, "") + "'")
         }
@@ -883,7 +915,7 @@ var _outputFns = new Map([
         let fmt = _chartPathParse(r, params.chart)
         if (fmt.length > 0) {
             if (toBoolean(params.chartcls)) cls()
-            print(printChart("oafp " + fmt))
+            _print(printChart("oafp " + fmt))
         }
 
     }],
@@ -984,7 +1016,7 @@ var _outputFns = new Map([
         params.sqlnocreate = toBoolean(_$(params.sqlnocreate, "sqlnocreate").isString().default("false"))
 
         ow.loadObj()
-        if (!params.sqlnocreate) print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
+        if (!params.sqlnocreate) _print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
 
         var okeys, ookeys = Object.keys(ow.obj.flatMap(r[0]))
         if (!params.sqlicase) 
@@ -1008,7 +1040,7 @@ var _outputFns = new Map([
             return _sql
         }
 
-        print(r.map(_parseVal).join("\n"))
+        _print(r.map(_parseVal).join("\n"))
     }],
     ["xls", (r, options) => {
         if (!isString(r)) {
@@ -1501,14 +1533,16 @@ if (isArray(params.libs)) {
         try {
             var _req = require("oafp_" + lib + ".js")
             if (isDef(_req.oafplib)) {
-                var res = _req.oafplib(clone(params), _$o, $o, {
+                var res = _req.oafplib(clone(params), _$o, _o$o, {
                     _runCmd2Bytes: _runCmd2Bytes,
                     _fromJSSLON: _fromJSSLON,
                     _msg: _msg,
                     _showTmpMsg: _showTmpMsg,
                     _clearTmpMsg: _clearTmpMsg,
                     _chartPathParse: _chartPathParse,
-                    _exit: _exit
+                    _exit: _exit,
+                    _print: _print,
+                    _o$o: _o$o
                 })
                 if (isMap(res)) {
                     if (isArray(res.fileExtensions))      res.fileExtensions.forEach(r => _addSrcFileExtensions(r.ext, r.type))
@@ -1594,6 +1628,13 @@ if (params["-v"] == "" || (isString(params.version) && params.version.length > 0
 
 // Read input from stdin or file
 var _res = "", noFurtherOutput = false
+
+// Check for output streams
+if (isDef(params.outfile)) {
+    if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
+    if ("undefined" === typeof global.__oafp_streams[params.outfile])
+        global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile) }
+}
 
 var _run = () => {
     if (_version) {
@@ -1743,12 +1784,22 @@ if (isDef(params["-debug"])) {
 
 if (isNumber(params.loop)) {
     while(1) {
-        if (toBoolean(params.loopcls)) cls()
+        if (toBoolean(params.loopcls)) {
+            if (isDef(params.outfile)) {
+                global.__oafp_streams[params.outfile].close()
+                global.__oafp_streams[params.outfile] = io.writeFileStream(params.outfile)
+            } else {
+                cls()
+            }
+        }
         _run()
         sleep(params.loop * 1000, true)
     }
 } else {
     _run()
 }
+
+// Close streams
+if (isDef(global.__oafp_streams)) Object.keys(global.__oafp_streams).forEach(s => global.__oafp_streams[s].s.close())
 }
 oafp(params)

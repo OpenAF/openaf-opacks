@@ -112,7 +112,7 @@ name: oafproc
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240316'
+version: '20240317'
 dependencies:
   openaf: '>=20231222'
 files:
@@ -132,7 +132,7 @@ filesHash:
   docs/EXAMPLES.md: 159ee341a7f9ec9037b0171d5cd52ed360bd9a09
   docs/FILTERS.md: 58704aaf6e4db179c999b5858734312e64b82e04
   docs/TEMPLATE.md: 7577084d6212eec69bf6feb22bd0e105ae33fe8c
-  docs/USAGE.md: 83ad93a8c1ce6b7a25ac94148b2e25737929a306
-  oafp.js: 7fd76b3a4c8b16d8be684d7a64c3a891a2b9a064
+  docs/USAGE.md: a8d9c9147206b505eca3ed2e5c1a03c81f6c701e
+  oafp.js: 90468276ff8525565fe08e7fe3e9e15938433376
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 1e738a892966bd4cdf78128bf9b81343fdb0f526
+  src/oafp.source.js: 2f36fad21ba3ddc50df8c3c297a203b79b2cb55c
