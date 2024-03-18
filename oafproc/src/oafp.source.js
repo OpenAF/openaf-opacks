@@ -898,7 +898,10 @@ var _outputFns = new Map([
                         x.obj = $path(_rd, x.path)
                         if (isUnDef(x.title)) x.title = x.path
                     } else {
-                        if (isString(_rd)) x.obj = _rd
+                        if (isString(_rd)) 
+                            x.obj = _rd
+                        else if (isObject(_rd))
+                            x.obj = $path(_rd, "@")
                     }
                 })
             })
