@@ -900,7 +900,7 @@ var _outputFns = new Map([
                     } else {
                         if (isString(_rd)) 
                             x.obj = _rd
-                        else if (isObject(_rd))
+                        else if (isObject(_rd) && x.type != "chart")
                             x.obj = $path(_rd, "@")
                     }
                 })
