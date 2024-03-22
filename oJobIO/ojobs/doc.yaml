@@ -61,7 +61,7 @@ jobs:
     if (args.job.match(/\.ya?ml$/)) j = io.readFileYAML(args.job);
     if (args.job.match(/\.json$/))  j = io.readFileJSON(args.job);
 
-    if (isUnDef(j) || isUnDef(j.jobs)) {
+    if (isUnDef(j) || (isUnDef(j.todo) && isUnDef(j.jobs))) {
       logWarn("No jobs found in '" + args.job + "'...");
       dontGenerate = true
     }
