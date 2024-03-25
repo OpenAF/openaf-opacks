@@ -66,10 +66,12 @@ List of data input types that can be auto-detected (through the file extension o
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | lines   | A given string/text to be processed line by line |
 | llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
+| llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
 | raw     | Passes the input directly to transforms and output |
+| rawhex  | Tries to read the input char by char converting into lines with the hexadecimal representation |
 
 ---
 
@@ -224,6 +226,16 @@ List of options to use when _in=ch_:
 
 > Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
 > Example of optiosn provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+
+---
+
+## 🧾 RAWHEX input options
+
+List of options to use when _in=rawhex_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inrawhexline | Number | Number of hexadecimal characters per returned array line | 
 
 ---
 
