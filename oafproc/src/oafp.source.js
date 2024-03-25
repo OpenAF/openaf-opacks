@@ -1506,6 +1506,18 @@ var _inputFns = new Map([
 
         _$o(jsonParse(__res, __, __, isString(__res)), options)
     }],
+    ["llmmodels", (_res, options) => {
+        params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+        params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+            _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
+
+        _showTmpMsg()
+
+        var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
+        if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
+        _$o(res.getModels(), options)
+    }],
     ["slon", (_res, options) => {
         _showTmpMsg()
         _$o(af.fromSLON(_res), options)
