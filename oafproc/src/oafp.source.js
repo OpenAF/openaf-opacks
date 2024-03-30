@@ -859,6 +859,15 @@ var _outputFns = new Map([
         options.__format = "prettyjson"
         _o$o(r, options)
     }],
+    ["ndjson", (r, options) => {
+        if (isArray(r)) {
+            r.forEach(_r => _print(stringify(_r, __, "")))
+        } else if (isMap(r)) {
+            _print(stringify(r, __, ""))
+        } else {
+            _o$o(r, options)
+        }
+    }],
     ["base64", (r, options) => {
         var _o = ""
         if (isString(r))
