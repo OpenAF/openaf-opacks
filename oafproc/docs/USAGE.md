@@ -138,7 +138,7 @@ List of available formats to use with the _output_ option:
 | base64   | A base64 text format | 
 | ini      | A INI/Properties format (arrays are not supported) |
 | xls      | A XLSx output format |
-| template | A Handlebars template format (requires template=someTemplate.hbs) |
+| template | A Handlebars template format |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 | sql      | Outputs a series of SQL statements for an input list/array data |
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
@@ -334,6 +334,18 @@ List of options to use when _out=sql_:
 | sqltable | String | The table name to use for the SQL statements (defaults to 'data') |
 | sqlicase | Boolean | If true the table and fields names won't be double-quoted |
 | sqlnocreate | Boolean | If true the create table statement won't be generated |
+
+---
+
+## 🧾 Template output options
+
+List of options to use when _out=template_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| template | String | A file path to a HandleBars' template |
+| templatepath | String | If 'template' is not provided a path to the template definition |
+| templatedata | String | If defined the template data will be retrieved from the provided path |
 
 ---
 

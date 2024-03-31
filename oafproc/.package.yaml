@@ -132,7 +132,7 @@ filesHash:
   docs/EXAMPLES.md: 159ee341a7f9ec9037b0171d5cd52ed360bd9a09
   docs/FILTERS.md: 58704aaf6e4db179c999b5858734312e64b82e04
   docs/TEMPLATE.md: 7577084d6212eec69bf6feb22bd0e105ae33fe8c
-  docs/USAGE.md: 596ee65919b27ac3c9e55377583ed72020cb1bae
-  oafp.js: dda0bf533f90fa3e6414d1a6af77b16377c878e6
+  docs/USAGE.md: a3603f13d16d66c334e43b2491273822f9a680ae
+  oafp.js: 7e4c5f5c36fb912500a6f89df73e3e8c82868bb1
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 36a4f9bd059f3186e99df3f795eab861e5764640
+  src/oafp.source.js: bdc60a70fe71c34f82a19bcd8eee20dbc2b42bf0
