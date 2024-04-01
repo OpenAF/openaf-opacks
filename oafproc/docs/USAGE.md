@@ -344,7 +344,7 @@ List of options to use when _out=template_:
 | Option | Type | Description |
 |--------|------|-------------|
 | template | String | A file path to a HandleBars' template |
-| templatepath | String | If 'template' is not provided a path to the template definition |
+| templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
 | templatedata | String | If defined the template data will be retrieved from the provided path |
 
 ---

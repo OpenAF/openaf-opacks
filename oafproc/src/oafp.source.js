@@ -23,6 +23,7 @@ const _transform = r => {
     return r
 }
 const _$f = (r, options) => {
+    params.__origr = r
     if (options.__ifrom) {
         r = $from(r).query(af.fromNLinq(options.__ifrom.trim()))
         delete options.__ifrom
@@ -840,7 +841,7 @@ var _outputFns = new Map([
             ow.template.addFormatHelpers()
             if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For output=handlebars you need to provide a template=someFile.hbs or templatepath=...")
             params.templatedata = _$(params.templatedata, "templatedata").isString().default("@")
-            _print($t( isUnDef(params.template) ? $path(r, params.templatepath) : io.readFileString(params.template), $path(r, params.templatedata) ) )
+            _print($t( isUnDef(params.template) ? $path(params.__origr, params.templatepath) : io.readFileString(params.template), $path(r, params.templatedata) ) )
         }
     }],
     ["openmetrics", (r, options) => {
@@ -1813,6 +1814,7 @@ var _run = () => {
             if (isString(params.type)) printErr("WARN: " + params.type + " input type not supported. Using json.")
             _inputFns.get("json")(_res, options)
         }
+        delete params.__origr
     }
 }
 
