@@ -1751,7 +1751,7 @@ var _run = () => {
                         default:
                             _res = $rest(_hp).get(params.url)
                         }
-                        _res = stringify(_res, __, "")
+                        if (isObject(_res)) _res = stringify(_res, __, "")
                     } else {
                         if (params.input != "pm") {
                             _res = []

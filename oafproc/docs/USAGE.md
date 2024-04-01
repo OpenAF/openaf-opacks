@@ -143,7 +143,7 @@ List of available formats to use with the _output_ option:
 | sql      | Outputs a series of SQL statements for an input list/array data |
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
-> For 'template' check https://github.com/OpenAF/openaf-opacks/blob/master/oafproc/docs/TEMPLATE.md
+> For 'template' check https://docs.openaf.io/docs/guides/oafp/oafp-template.html
 
 > For 'log' you can use 'logtheme' or the environment variable 'OAFP_LOGTHEME' with a JSON/SLON map with the colors to use '(errorLevel: red, warnLevel: yellow, timestamp: bold)'
 
