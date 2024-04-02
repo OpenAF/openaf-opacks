@@ -30,4 +30,23 @@
         
         $ch("rocksdb").destroy()
     }
+
+    exports.testGetColumnFamilyMetaData = function() {
+        // Create a tmpDB twice
+        $ch("rocksdb").create("rocksdb", { path: "tmpDB" })
+        $ch("rocksdb").set(1, 1)
+        $ch("rocksdb").destroy()
+        $ch("rocksdb").create("rocksdb", { path: "tmpDB" })
+        $ch("rocksdb").set(2, 2)
+        $ch("rocksdb").destroy()
+
+        var f = new java.io.File("tmpDB")
+        var roptions = new Packages.org.rocksdb.Options()
+        var db = new Packages.org.rocksdb.RocksDB.openReadOnly(roptions, f.getAbsolutePath())
+        var _r = db.getColumnFamilyMetaData().fileCount()
+
+        // Destroy tmpDB
+        io.rm("tmpDB")
+        return isNumber(_r)
+    }
 })()

@@ -22,12 +22,17 @@ jobs:
   from:
   - rocks::Init
   - (todo):
-    - (test   ): rocks::Create DB
-      ((func )): global.tests.testCreateDB()
-    - (test   ): rocks::Static Stats
-      ((func )): global.tests.testStaticStats()
-    - (test   ): rocks::Using DB
-      ((func )): global.tests.testUsingDB()
+    - (test     ): rocks::Create DB
+      ((func   )): global.tests.testCreateDB()
+    - (test     ): rocks::Static Stats
+      ((func   )): global.tests.testStaticStats()
+    - (test     ): rocks::Using DB
+      ((func   )): global.tests.testUsingDB()
+    - (test     ): rocks::Test getColumnFamilyMetaData
+      ((func   )): return global.tests.testGetColumnFamilyMetaData()
+      ((asserts)):
+      - value: true
+        msg  : Problem with getColumnFamilyMetaData
 
 # ------------------
 - name: Test results
