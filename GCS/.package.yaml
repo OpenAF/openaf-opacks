@@ -18,9 +18,9 @@ name: GCS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240225'
+version: '20240402'
 dependencies:
-  OpenAF: '>=20221216'
+  OpenAF: '>=20240318'
 files:
 - .maven.yaml
 - .package.yaml
@@ -29,7 +29,6 @@ files:
 - api-common-2.29.1.jar
 - auto-value-annotations-1.10.4.jar
 - checker-qual-3.42.0.jar
-- commons-codec-1.16.1.jar
 - conscrypt-openjdk-uber-2.5.2.jar
 - error_prone_annotations-2.26.1.jar
 - failureaccess-1.0.2.jar
@@ -69,10 +68,8 @@ files:
 - grpc-stub-1.62.2.jar
 - grpc-util-1.62.2.jar
 - grpc-xds-1.62.2.jar
-- gson-2.10.1.jar
 - guava-33.1.0-jre.jar
 - j2objc-annotations-3.0.0.jar
-- jackson-core-2.17.0.jar
 - javax.annotation-api-1.3.2.jar
 - jsr305-3.0.2.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
@@ -96,7 +93,6 @@ filesHash:
   api-common-2.29.1.jar: d33f23888132e9824288f40035ce308ba11edb99
   auto-value-annotations-1.10.4.jar: 9679de8286eb0a151db6538ba297a8951c4a1224
   checker-qual-3.42.0.jar: 638ec33f363a94d41a4f03c3e7d3dcfba64e402d
-  commons-codec-1.16.1.jar: 47bd4d333fba53406f6c6c51884ddbca435c8862
   conscrypt-openjdk-uber-2.5.2.jar: d858f142ea189c62771c505a6548d8606ac098fe
   error_prone_annotations-2.26.1.jar: c1fde57694bdc14e8618899aaa6e857d9465d7de
   failureaccess-1.0.2.jar: c4a06a64e650562f30b7bf9aaec1bfed43aca12b
@@ -136,10 +132,8 @@ filesHash:
   grpc-stub-1.62.2.jar: fc1e85697502d96d6c912e8dd2a56f46f1aba050
   grpc-util-1.62.2.jar: 98c4138f09fb57c3ad6cbeffb31ed73e302038f7
   grpc-xds-1.62.2.jar: 40d7036c6ae1aa694d754fde3560a5b29eda9574
-  gson-2.10.1.jar: b3add478d4382b78ea20b1671390a858002feb6c
   guava-33.1.0-jre.jar: 9b7ed39143d59e8eabcc6f91ffe4d23db2efe558
   j2objc-annotations-3.0.0.jar: 7399e65dd7e9ff3404f4535b2f017093bdb134c7
-  jackson-core-2.17.0.jar: a6e5058ef9720623c517252d17162f845306ff3a
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
