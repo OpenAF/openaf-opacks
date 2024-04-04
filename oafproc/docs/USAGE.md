@@ -407,7 +407,7 @@ List of options to use when _out=grid_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column. Each map should be composed of a 'title', a 'type' (tree, map, chart, bar, table, area, text and md), a 'path' to select the data (for non chart types) and an 'obj' (for chart type the format is the same of chart=...) |
+| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column. Each map should be composed of a 'title', a 'type' (tree, map, chart, bar, table, area, text and md), a 'path' to select the data (for non chart types) and an 'obj' (for chart type the format is the same of chart=...) or 'cmd' (to run a command that outputs json on stdout). |
 
 ---
 

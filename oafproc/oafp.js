@@ -1,4 +1,4 @@
-// (author: Nuno Aguiar, version: 20240401, license: Apache 2.0, url: https://github.com/openaf/oafp)
+// (author: Nuno Aguiar, version: 20240404, license: Apache 2.0, url: https://github.com/openaf/oafp)
 // ---
 
 const oafp=a=>{if(!isUnDef(a)&&!isDef(a.____ojob)){Object.keys(a).forEach(b=>{var c=b.toLowerCase();b!=c&&isUnDef(a[c])&&(a[c]=a[b],delete a[b])});var J=b=>{for(var c=Object.keys(A),d=0;d<c.length;d++){var f=c[d];isDef(a[f])&&(b=A[f](b))}return b},F=(b,c)=>{a.__origr=b;c.__ifrom&&(b=$from(b).query(af.fromNLinq(c.__ifrom.trim())),delete c.__ifrom);if(c.__isql){var d=__;if(isString(a.sqlfilter))switch(a.sqlfilter.toLowerCase()){case "simple":d="nlinq";break;case "advanced":d="h2";break;default:d=__}isArray(b)&&
