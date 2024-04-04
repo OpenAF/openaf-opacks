@@ -85,7 +85,7 @@ Redis.prototype.getLastSave = function() {
  * </odoc>
  */
 Redis.prototype.close = function() {
-    return this.jedis.quit();
+    return this.jedis.close()
 };
 
 /**
