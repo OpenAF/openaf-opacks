@@ -2,7 +2,7 @@
 
 In order to be able to run serveless AWS Lambda OpenAF scripts and oJobs the current container will build 3 supporting AWS Lambda layers:
 
-  * **MiniJVM** - A small JRE 8 based on IBM's OpenJ9 for faster startup times.
+  * **MiniJVM** - A small JRE.
   * **OpenAF** - The latest OpenAF runtime with the OpenAF opack to access RAID instances.
   * **OpenAFOPacks** - A configurable set of oPacks depending on each specific case needs (by default it adds oJob-Common, Kube, Notifications and ElasticSearch).
 
