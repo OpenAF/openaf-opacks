@@ -1742,6 +1742,26 @@ if (params["-v"] == "" || (isString(params.version) && params.version.length > 0
     showVersion()
 }
 
+// Check list of examples
+if (params["-examples"] == "" || (isString(params.examples) && params.examples.length > 0)) {
+    params.url = "https://ojob.io/oafp-examples.yaml"
+    params.in  = "yaml"
+
+    if (isString(params.examples) && params.examples.length > 0) {
+        options.__format = "template"
+        options.__path   = "data"
+        params.templatepath = "tmpl"
+        options.__sql    = "select * where d like '%" + params.examples + "%'"
+    } else {
+        options.__path   = "data[].{category:c,subCategory:s,description:d}"
+        options.__from   = "sort(category,subCategory,description)"
+        options.__format = "ctable"
+    }
+
+    delete params["-examples"]
+    delete params.file
+}
+
 // Read input from stdin or file
 var _res = "", noFurtherOutput = false
 
@@ -1896,7 +1916,7 @@ var _run = () => {
 // Verify debug
 if (isDef(params["-debug"])) {
     //__initializeCon()
-    printErr("DEBUG: " + stringify(params, __, __))
+    printErr("DEBUG: " + colorify(params))
 }
 
 if (isNumber(params.loop)) {

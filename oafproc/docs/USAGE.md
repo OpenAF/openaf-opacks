@@ -33,6 +33,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | urldata | If 'url' is provided a JSON/SLON/text data can be provided | 
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
+| -examples | Will access an internet based list of oafp examples and list them |
+| examples | Will search the provided keywork in the internet basd list of oafp examples |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 
