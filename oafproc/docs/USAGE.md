@@ -96,6 +96,7 @@ These options will change the parsed input data included any filters provided.
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
+| regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
 | removedups | Boolean | If true will try to remove duplicates from an array |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
 | searchkeys | String | Will return a map with only keys that match the provided string |
@@ -132,6 +133,7 @@ List of available formats to use with the _output_ option:
 | md       | A Markdown format |
 | ch       | An OpenAF channel format |
 | chart    | A line-chart like chart (usefull together with 'loop') |
+| schart   | A static line-chart like chart (for a fixed list/array of values) |
 | grid     | A multiple output ascii grid (usefull together with 'loop') |
 | mdtable  | A Markdown table format (only for list outputs) |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
@@ -315,6 +317,21 @@ List of options to use when _diff=..._:
 
 ---
 
+## 🧾 Regression transform options
+
+List of options to use when _regression=..._:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| regressionpath | String | The path to the array of y values for the regression formulas |
+| regressionx | String | Optional path to the array of x values for the regression formulas (defaults to 1, 2, 3, ...) |
+| regressionoptions | String | A JSON/SLON configuration with order (defaults to 2) and/or precision (defaults to 5) |
+| regressionforecast | String | Optional path to an array of x values for which to forecast the corresponding y |
+
+> Example: ```oafp data="[1,2,3]" regression=linear regressionforecast="from_slon('[4|5]')" out=ctable```
+
+---
+
 ## 🧾 Log output options
 
 List of options to use when _out=log_:
@@ -397,7 +414,21 @@ List of options to use when _out=chart_:
 | chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
 | chartcls | Boolean | If true the screen will be cleared for each execution |
 
-> Example: ```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+Example: 
+```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+
+---
+
+## 🧾 SChart output options
+
+List of options to use when _out=schart_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| schart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+
+Example: 
+```oafp data="[(x:1,y:2)|(x:2,y:5)|(x:1,y:4)|(x:2,y:5)|(x:1,y:5)]" in=slon out=schart schart="int '[].x':red:x '[].y':blue:y -min:0 -vsize:8"```
 
 ---
 
@@ -407,7 +438,15 @@ List of options to use when _out=grid_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column. Each map should be composed of a 'title', a 'type' (tree, map, chart, bar, table, area, text and md), a 'path' to select the data (for non chart types) and an 'obj' (for chart type the format is the same of chart=...) or 'cmd' (to run a command that outputs json on stdout). |
+| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column (see below for the map options) | 
+
+Each map should be composed of a:
+
+  * 'title'
+  * 'type' (tree, map, chart, bar, table, area, text and md)
+  * a 'path' to select the data (for non chart types) 
+  * an 'obj' (for chart type the format is the same of chart=...) 
+  * or 'cmd' (to run a command that outputs json on stdout)
 
 ---
 

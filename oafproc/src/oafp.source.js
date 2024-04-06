@@ -127,10 +127,11 @@ const _fromJSSLON = aString => {
 		return af.fromSLON(aString)
 	}
 }
-const _chartPathParse = (r, frmt,prefix) => {
+const _chartPathParse = (r, frmt, prefix, isStatic) => {
     prefix = _$(prefix).isString().default("_oafp_fn_")
     let parts = splitBySepWithEnc(frmt, " ", [["\"","\""],["'","'"]])
     let nparts = []
+    $ch("__oaf::chart").create()
     if (parts.length > 1) {
         for(let i = 0; i < parts.length; i++) {
             if (i == 0) {
@@ -139,7 +140,27 @@ const _chartPathParse = (r, frmt,prefix) => {
                 let _n = splitBySepWithEnc(parts[i], ":", [["\"","\""],["'","'"]]).map((_p, j) => {
                     if (j == 0) {
                         if (!_p.startsWith("-")) {
-                            global[prefix + i] = () => $path(r, _p)
+                            global[prefix + i] = () => {
+                                if (isString(isStatic)) {
+                                    var _d = $ch("__oaf::chart").get({ name: isStatic })
+                                    if (isUnDef(_d)) _d = []; else _d = _d.data
+                                    var _dr = $path(r, _p)
+                                    if (isArray(_dr)) {
+                                        _dr.forEach((y, _i) => {
+                                            if (isArray(_d[_i])) {
+                                                _d[_i].push(y)
+                                            } else {
+                                                _d[_i] = [ y ]
+                                            }
+                                        })
+                                        let last = _d.pop()
+                                        $ch("__oaf::chart").set({ name: isStatic }, { name: isStatic, data: _d })
+                                        return last[0]
+                                    }
+                                } else {
+                                   return $path(r, _p)
+                                }
+                            }
                             return prefix + i
                         } else {
                             return _p
@@ -715,6 +736,51 @@ var _transformFns = {
     "splitlines": _r => { 
         if (toBoolean(params.splitlines) && isString(_r)) return _r.split(/\r?\n/)
         return _r
+    },
+    "regression": _r => {
+        if (isString(params.regression)) {
+            ow.loadAI()
+            var rg = ow.ai.regression()
+            let regressionpath    = _$(params.regressionpath, "regressionpath").isString().default("@")
+            let regressionoptions = _fromJSSLON(_$(params.regressionoptions, "regressionoptions").isString().default("{order:2,precision:5}"))
+            let _data = $path(_r, regressionpath)
+            if (isArray(_data)) {
+                if (isString(params.regressionx)) {
+                    let _datax = $path(_r, params.regressionx)
+                    _data = _data.map((v, i) => ([ _datax[i], v ]))
+                } else {
+                    _data = _data.map((v, i) => ([ i+1, v ]))
+                }
+                let _rr
+                switch(params.regression) {
+                case "exp"   : _rr = rg.exponential(_data, regressionoptions); break
+                case "poly"  : _rr = rg.polynomial(_data, regressionoptions); break
+                case "power" : _rr = rg.power(_data, regressionoptions); break
+                case "log"   : _rr = rg.logarithmic(_data, regressionoptions); break
+                case "linear": 
+                default      : _rr = rg.linear(_data, regressionoptions); break
+                }
+
+                if (isDef(_rr) && isDef(_rr.points)) {
+                    if (isString(params.regressionforecast)) {
+                        var _f = $path(_r, params.regressionforecast)
+                        if (isArray(_f)) {
+                            _f.forEach(x => {
+                                _rr.points.push(_rr.predict(x))
+                            })
+                        } else {
+                            _exit(-1, "Invalid array of x for regression forecast")
+                        }
+                    }
+                    return _rr.points.map(p => ({ x: p[0], y: p[1] }))
+                } else {
+                    return _rr
+                }
+            } else {
+                _exit(-1, "Invalid data for regression analysis")
+            }
+        }
+        return _r
     }
 }
 // --- add extra _transformFns here ---
@@ -932,6 +998,15 @@ var _outputFns = new Map([
             _print(printChart("oafp " + fmt))
         }
 
+    }],
+    ["schart", (r, options) => {
+        if (isUnDef(params.schart)) _exit(-1, "For output=schart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
+        if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=schart is not supported in this version of OpenAF")
+
+        let fmt = _chartPathParse(r, params.schart, "_oafp_sfn_", "soafp")
+        if (fmt.length > 0) {
+            _print(printChart("soafp " + fmt))
+        }
     }],
     ["ch", (r, options) => {
         if (isUnDef(params.ch))    _exit(-1, "For output=ch you need to provide a ch=\"(type: ...)\"")
