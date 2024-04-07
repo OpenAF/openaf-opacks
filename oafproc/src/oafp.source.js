@@ -957,28 +957,32 @@ var _outputFns = new Map([
             _f.forEach((y, yi) => {
                 y.forEach((x, xi) => {
                     let _rd
-                    if (isDef(x.cmd)) {
-                        var _cr = $sh(x.cmd).getJson(0)
-                        if (isDef(_cr) && isDef(_cr.stdout)) 
-                            _rd = _cr.stdout
-                        else
-                            _rd = ""
+                    if (isUnDef(x.type) || x.type != "empty") {
+                        if (isDef(x.cmd)) {
+                            var _cr = $sh(x.cmd).getJson(0)
+                            if (isDef(_cr) && isDef(_cr.stdout)) 
+                                _rd = _cr.stdout
+                            else
+                                _rd = ""
+                        } else {
+                            _rd = r
+                        }
+                        if (x.type == "chart" || x.type == "bar") {
+                            var _n = "_chrt" + (yi+1) + "." + (xi+1)
+                            x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(_rd, x.obj, _n)
+                            if (isUnDef(x.title)) x.title = "Chart " + _n
+                        }
+                        if (isDef(x.path)) {
+                            x.obj = $path(_rd, x.path)
+                            if (isUnDef(x.title)) x.title = x.path
+                        } else {
+                            if (isString(_rd)) 
+                                x.obj = _rd
+                            else if (isObject(_rd) && x.type != "chart")
+                                x.obj = $path(_rd, "@")
+                        }
                     } else {
-                        _rd = r
-                    }
-                    if (x.type == "chart" || x.type == "bar") {
-                        var _n = "_chrt" + (yi+1) + "." + (xi+1)
-                        x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(_rd, x.obj, _n)
-                        if (isUnDef(x.title)) x.title = "Chart " + _n
-                    }
-                    if (isDef(x.path)) {
-                        x.obj = $path(_rd, x.path)
-                        if (isUnDef(x.title)) x.title = x.path
-                    } else {
-                        if (isString(_rd)) 
-                            x.obj = _rd
-                        else if (isObject(_rd) && x.type != "chart")
-                            x.obj = $path(_rd, "@")
+                        x.obj = ""
                     }
                 })
             })
