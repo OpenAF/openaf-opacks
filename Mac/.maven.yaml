@@ -1,0 +1,4 @@
+
+artifacts:
+  - id      : dd-plist
+    group   : com.googlecode.plist

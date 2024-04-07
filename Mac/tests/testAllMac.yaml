@@ -1,0 +1,78 @@
+include:
+- oJobTest.yaml
+
+todo:
+- Init
+
+# -------------------------------
+- (test     ): Mac::To/From PList
+  ((func   )): |
+    var data = { num: 123, str: "abc", bool: true, arr: [1, 2, 3], map: { x: 1, y: -1 }}
+
+    return {
+      toFromPList: compare(data, af.fromPList(af.toPList(data)))
+    }
+  ((asserts)):
+  - path : toFromPList
+    value: true
+    msg  : Problem with to/from PList
+
+# ----------------------------------------
+- (test     ): Mac::To/From PList XML file
+  ((func   )): |
+    var data = { num: 123, str: "abc", bool: true, arr: [1, 2, 3], map: { x: 1, y: -1 }}
+    var file = io.createTempFile("mac", ".plist")
+
+    io.writeFilePList(file, data)
+    var rdata = io.readFilePList(file)
+
+    return {
+      toFromFilePList: compare(data, rdata)
+    }
+  ((asserts)):
+  - path : toFromFilePList
+    value: true
+    msg  : Problem with to/from PList XML file
+
+# -------------------------------------------
+- (test     ): Mac::To/From PList binary file
+  ((func   )): |
+    var data = { num: 123, str: "abc", bool: true, arr: [1, 2, 3], map: { x: 1, y: -1 }}
+    var file = io.createTempFile("mac", ".plist")
+
+    io.writeFilePListBin(file, data)
+    var rdata = io.readFilePList(file)
+
+    return {
+      toFromFilePList: compare(data, rdata)
+    }
+  ((asserts)):
+  - path : toFromFilePList
+    value: true
+    msg  : Problem with to/from PList binary file
+
+# ====================
+- (testResults): false
+  ((key      )): tests
+  ((noprofile)): true
+
+# ===============================================
+- (if    ): "{{$path ($get 'tests') 'fail'}} > 0"
+  ((then)):
+  - (fail): -1
+
+jobs:
+# ----------
+- name: Init
+  exec: |
+    var _p
+    if (io.fileExists("mac.js")) {
+      _p = "mac.js"
+    } else {
+      if (io.fileExists("../mac.js")) {
+        _p = "../mac.js"
+      } else {
+        throw "Can't find mac.js file."
+      }
+    }
+    load(_p)

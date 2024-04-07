@@ -7,6 +7,7 @@ scripts:
 keywords:
 - mac
 - apple
+- plist
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
@@ -18,13 +19,21 @@ name: Mac
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20231215'
+version: '20240406'
 dependencies:
-  OpenAF: '>=20221216'
+  OpenAF: '>=20240318'
 files:
+- .maven.yaml
 - .package.yaml
+- dd-plist-1.28.jar
 - mac.js
 - mac.yaml
+- oafp_Mac.js
+- tests/testAllMac.yaml
 filesHash:
-  mac.js: 52bcba39cba29b2dff2d904e0acd8ca4cf2237bc
+  .maven.yaml: ac92c000c0d67cd85c1f8f2a2a881285de2ec8cd
+  dd-plist-1.28.jar: 617d08cc6e9c800e4b77266087cc9294b6d87e11
+  mac.js: 0b4b36e41abf0a67562c99fb0cfc5e2a3d9c9bee
   mac.yaml: 847a46444176c2db094698616711f2e8bb158dbb
+  oafp_Mac.js: 3ac669cac56c79c644f1cc7236d4f95a3d258724
+  tests/testAllMac.yaml: dd8367e3e0c1f00b41a566faec3f6fe9f142d7c8
