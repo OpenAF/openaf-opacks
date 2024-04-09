@@ -71,6 +71,7 @@ List of data input types that can be auto-detected (through the file extension o
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
+| toml    | TOML format |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
 | raw     | Passes the input directly to transforms and output |
 | rawhex  | Tries to read the input char by char converting into lines with the hexadecimal representation |
@@ -141,6 +142,7 @@ List of available formats to use with the _output_ option:
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
 | base64   | A base64 text format | 
 | ini      | A INI/Properties format (arrays are not supported) |
+| toml     | A TOML format (arrays will have outkey=list) |
 | xls      | A XLSx output format |
 | template | A Handlebars template format |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
