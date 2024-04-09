@@ -371,6 +371,10 @@ const _fileExtensions = new Map([
   [
     ".sql",
     "sql"
+  ],
+  [
+    ".toml",
+    "toml"
   ]
 ])
 // --- add extra _fileExtensions here ---
@@ -881,6 +885,16 @@ var _outputFns = new Map([
             ow.loadJava()
             var ini = new ow.java.ini()
             _print( ini.put(r).save() )
+        }
+    }],
+    ["toml", (r, options) => {
+        if (isUnDef(af.toTOML)) _exit(-1, "TOML support not found.")
+        if (isMap(r)) {
+            _print( af.toTOML(r) )
+        } else if (isArray(r)) {
+            _print( af.toTOML({ list: r}) )
+        } else {
+            return __
         }
     }],
     ["mdyaml", (r, options) => {
@@ -1622,6 +1636,11 @@ var _inputFns = new Map([
         var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
         if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
         _$o(res.getModels(), options)
+    }],
+    ["toml", (_res, options) => {
+        _showTmpMsg()
+        if (isUnDef(af.fromTOML)) _exit(-1, "TOML support not found.")
+        _$o(af.fromTOML(_res), options)
     }],
     ["slon", (_res, options) => {
         _showTmpMsg()

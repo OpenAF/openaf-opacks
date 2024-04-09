@@ -172,5 +172,10 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <version>6.9.0.202403050737-r</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.plist</groupId>
+            <artifactId>dd-plist</artifactId>
+            <version>1.28</version>
+        </dependency>
     </dependencies>
 </project>
