@@ -2,8 +2,10 @@
  * Author: Nuno Aguiar
  * 
  * toHCL code adapted from https://github.com/NewSpring/node-hcl
- * fromHCL code adapted from https://github.com/gokmen/hcl-to-json
+ * fromHCL code adapted from https://github.com/gokmen/hcl-to-json or using com.bertramlabs.plugins.hcl4j
  */
+
+loadExternalJars(getOPackPath("Terraform") || ".")
 
 /**
  * <odoc>
@@ -12,7 +14,7 @@
  * </odoc>
  */
 var Terraform = function() {
-};
+}
 
 /**
  * <odoc>
@@ -22,23 +24,22 @@ var Terraform = function() {
  */
 Terraform.prototype.toHCL = function(data) {
     var TypeOf = function(aObj) {
-        if (isUnDef(aObj)) return "undefined";
-        if (aObj == null) return "null";
-        if (isBoolean(aObj)) return "boolean";
-        if (isNumber(aObj)) return "number";
-        if (isString(aObj)) return "string";
-        if (isFunction(aObj)) return "function";
-        if (isArray(aObj)) return "array";
-        if (isObject(aObj)) return "object";
-    };
+        if (isUnDef(aObj)) return "undefined"
+        if (aObj == null) return "null"
+        if (isBoolean(aObj)) return "boolean"
+        if (isNumber(aObj)) return "number"
+        if (isString(aObj)) return "string"
+        if (isFunction(aObj)) return "function"
+        if (isArray(aObj)) return "array"
+        if (isObject(aObj)) return "object"
+    }
 
     let string = [],
         nodes = [],
-        indentLevel = "";
+        indentLevel = ""
 
     function buildBlock(member) {
-        //console.log(member)
-        return [];
+        return []
     }
 
     var handlers = {
@@ -46,78 +47,78 @@ Terraform.prototype.toHCL = function(data) {
             // objects will not have `undefined` converted to `null`
             // as this may have unintended consequences
             // For arrays, however, this behavior seems appropriate
-            return undefined;
+            return undefined
         }, 
         "null": function () {
-            return null;
+            return null
         },
         "number": function (x) {
-            return x;
+            return x
         },
         "boolean": function (x) {
-            return x;
+            return x
         },
         "string": function (x) {
             // to avoid the string "true" being confused with the
             // the literal `true`, we always wrap strings in quotes
-            return JSON.stringify(x);
+            return JSON.stringify(x)
         },
         "array": function (x) {
-            var output = '[';
+            var output = '['
 
             if (0 === x.length) {
-            output += '[]';
-            return output;
+            output += '[]'
+            return output
             }
 
-            indentLevel = indentLevel.replace(/$/, '  ');
+            indentLevel = indentLevel.replace(/$/, '  ')
             x.forEach(function (y, index) {
             // TODO how should `undefined` be handled?
-            var handler = handlers[TypeOf(y)];
+            var handler = handlers[TypeOf(y)]
 
-            output += '\n' + indentLevel + '  ' + handler(y);
+            output += '\n' + indentLevel + '  ' + handler(y)
 
             if (index !== (x.length - 1)) {
                 output += ","
             }
 
-            });
+            })
             output += "\n" + indentLevel + "]"
-            indentLevel = indentLevel.replace(/  /, '');
+            indentLevel = indentLevel.replace(/  /, '')
 
-            return output;
+            return output
         },
         "object": function (x) {
 
-            let output = "{\n";
+            let output = "{\n"
 
-            indentLevel = indentLevel.replace(/$/, "  ");
+            indentLevel = indentLevel.replace(/$/, "  ")
 
             for (let key in x) {
                 // console.log(output);
                 if (TypeOf(x[key]) === "object") {
-                    output += "\n";
+                    output += "\n"
                 }
-                output += indentLevel + key + " = " + handlers[TypeOf(x[key])](x[key]) + "\n";
+                output += indentLevel + key + " = " + handlers[TypeOf(x[key])](x[key]) + "\n"
             }
 
-            indentLevel = indentLevel.replace(/  /, '');
-            output += indentLevel + "}";
-            return output;
+            indentLevel = indentLevel.replace(/  /, '')
+            output += indentLevel + "}"
+            return output
         },
         "function": function () {
             // TODO this should throw or otherwise be ignored
-            return '[object Function]';
+            return '[object Function]'
         }
     };
     // return handlers[TypeOf(data)](data) + '\n';
 
     for (let node in data) {
-        let value = data[node];
-        let nodeString = [];
+        let value = data[node]
+        let nodeString = []
 
         let objectLiterals = 0,
-            nonObjectLiterals = 0;
+            nonObjectLiterals = 0
 
         // evaluate the content of the blocks
         // to see if we should format this in a nice way
@@ -136,65 +137,70 @@ Terraform.prototype.toHCL = function(data) {
 
             if (TypeOf(value[member]) === "object") {
 
-            let stringifiedValue = handlers[TypeOf(value[member])](value[member]);
+            let stringifiedValue = handlers[TypeOf(value[member])](value[member])
 
             let newNode = [
                 node + ' "' + member + '" ' + stringifiedValue
             ];
             
-            nodes.push(newNode.join("\n"));
+            nodes.push(newNode.join("\n"))
             }
 
         }
 
         } else {
         // open block
-        nodeString.push(node + " {");
+        nodeString.push(node + " {")
 
 
         // build block memebers
         for (let member in value) {
 
-            indentLevel = indentLevel.replace(/$/, "  ");
+            indentLevel = indentLevel.replace(/$/, "  ")
             if (TypeOf(value[member]) === "object") {
             nodeString.push("")
             }
-            let stringifiedValue = handlers[TypeOf(value[member])](value[member]);
+            let stringifiedValue = handlers[TypeOf(value[member])](value[member])
 
             nodeString.push(
             indentLevel + member + " = " + stringifiedValue
             );
-            indentLevel = indentLevel.replace(/  /, '');
+            indentLevel = indentLevel.replace(/  /, '')
         }
 
         // close block
-        nodeString.push("}");
+        nodeString.push("}")
         }
 
 
-        nodes.push(nodeString.join("\n"));
+        nodes.push(nodeString.join("\n"))
     }
 
     for (let node of nodes) {
         if (nodes.indexOf(node) === (nodes.length -1)) {
-        string.push(node);
+        string.push(node)
         } else {
-        string.push(node + "\n");
+        string.push(node + "\n")
         }
 
     }
 
-    return string.join("\n").replace(/\n\n+/g,"\n").replace(/\n$/,"");
-};
+    return string.join("\n").replace(/\n\n+/g,"\n").replace(/\n$/,"")
+}
 
 /**
  * <odoc>
- * <key>Terraform.fromHCL(aString) : Object</key>
+ * <key>Terraform.fromHCL(aStringOrStream) : Object</key>
  * Tries to convert from HCL representation provide in aString into a javascript object.
  * In case of error the exception object contains the transformed source on the field exception.source.
  * </odoc>
  */
-Terraform.prototype.fromHCL = function(aString) {
+Terraform.prototype.fromHCL = function(aStringOrStream) {
+  var _hcl = new Packages.com.bertramlabs.plugins.hcl4j.HCLParser()
+  return af.fromJavaMap(_hcl.parse(aStringOrStream))
+}
+
+Terraform.prototype.oldFromHCL = function(aString) {
     var parser = function() {
     /*
       * Generated by PEG.js 0.10.0.
@@ -2660,7 +2666,7 @@ Terraform.prototype.fromHCL = function(aString) {
     e.source = aString;
     throw e;
   }
-};
+}
 
 /**
  * <odoc>
@@ -2669,8 +2675,8 @@ Terraform.prototype.fromHCL = function(aString) {
  * </odoc>
  */
 Terraform.prototype.writeFileTF = function(aFile, aObj) {
-  io.writeFileString(aFile, this.toHCL(aObj));
-};
+  io.writeFileString(aFile, this.toHCL(aObj))
+}
 
 /**
  * <odoc>
@@ -2678,9 +2684,13 @@ Terraform.prototype.writeFileTF = function(aFile, aObj) {
  * Tries to return a javascript object with the data from aFile (tf/hcl format).
  * </odoc>
  */
-Terraform.prototype.readFileTF = function (aFile) {
-  return this.fromHCL(io.readFileString(aFile).replace(/<<(.+)\n((.*\n)+.*)\1\n/mg, (m, p1, p2) => { return "\"" + p2.replace(/\n/mg, "\\n").replace(/\\n$/mg, "").replace(/"/mg, "\\\"") + "\"\n" }));
-};
+Terraform.prototype.readFileTF = function(aFile) {
+  var is = io.readFileStream(aFile)
+  var _r = this.fromHCL(is)
+  is.close()
+  return _r
+  //return this.fromHCL(io.readFileString(aFile).replace(/<<(.+)\n((.*\n)+.*)\1\n/mg, (m, p1, p2) => { return "\"" + p2.replace(/\n/mg, "\\n").replace(/\\n$/mg, "").replace(/"/mg, "\\\"") + "\"\n" }));
+}
 
 /**
  * <odoc>
@@ -2688,11 +2698,11 @@ Terraform.prototype.readFileTF = function (aFile) {
  * Tries to return a javascript object with the data from aFile (tf/hcl format).
  * </odoc>
  */
-Terraform.prototype.readFileHCL = Terraform.prototype.readFileTF;
+Terraform.prototype.readFileHCL = Terraform.prototype.readFileTF
 /**
  * <odoc>
  * <key>Terraform.writeFileHCL(aFile, aObject)</key>
  * Tries to write a javascript object to aFile (tf/hcl format).
  * </odoc>
  */
-Terraform.prototype.writeFileHCL = Terraform.prototype.writeFileTF;
+Terraform.prototype.writeFileHCL = Terraform.prototype.writeFileTF

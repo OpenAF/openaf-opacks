@@ -182,7 +182,7 @@ const _print = (m) => {
     } else {
         if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
         if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
-            ioStreamWrite(global.__oafp_streams[params.outfile].s, m)
+            ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (toBoolean(params.outfileappend) ? "\n" : ""))
         }
     }
 }
@@ -1018,7 +1018,7 @@ var _outputFns = new Map([
 
     }],
     ["schart", (r, options) => {
-        if (isUnDef(params.schart)) _exit(-1, "For output=schart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
+        if (isUnDef(params.schart)) _exit(-1, "For output=schart you need to provide a schart=\"<units> [<path[:color][:legend]>...]\"")
         if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=schart is not supported in this version of OpenAF")
 
         let fmt = _chartPathParse(r, params.schart, "_oafp_sfn_", "soafp")
@@ -1792,7 +1792,7 @@ var _res = "", noFurtherOutput = false
 if (isDef(params.outfile)) {
     if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
     if ("undefined" === typeof global.__oafp_streams[params.outfile])
-        global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile) }
+        global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
 }
 
 var _run = () => {
@@ -1947,7 +1947,7 @@ if (isNumber(params.loop)) {
         if (toBoolean(params.loopcls)) {
             if (isDef(params.outfile)) {
                 global.__oafp_streams[params.outfile].close()
-                global.__oafp_streams[params.outfile] = io.writeFileStream(params.outfile)
+                global.__oafp_streams[params.outfile] = io.writeFileStream(params.outfile, toBoolean(params.outfileappend))
             } else {
                 cls()
             }

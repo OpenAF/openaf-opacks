@@ -25,6 +25,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | csv    | If type=csv, the CSV options to use | 
 | outkey | If defined the map/list output will be prefix with the provided key |
 | outfile | If defined all output will be written to the provided file |
+| outfileappend | If 'true' and outfile=true the output will be appended on the provided file |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |

@@ -1,0 +1,3 @@
+artifacts:
+- group: com.bertramlabs.plugins
+  id   : hcl4j
