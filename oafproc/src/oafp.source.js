@@ -187,11 +187,12 @@ const _print = (m) => {
     }
 }
 const _o$o = (a, b, c) => {
-    _print($o(a, b, c, true))
+    var _s = $o(a, b, c, true)
+    if (isDef(_s)) _print(_s)
 }
 const _msg = "(processing data...)"
-const _showTmpMsg  = msg => { if (params.out != 'grid' && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
-const _clearTmpMsg = msg => { if (params.out != 'grid' && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
+const _showTmpMsg  = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
+const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
 
 // ---
 
@@ -1604,6 +1605,41 @@ var _inputFns = new Map([
             _r = af.fromBytes2String(af.fromBase64(_res))
         }
         _$o(_r, options)
+    }],
+    ["oafp", (_res, options) => {
+        params.__inception = true
+        var _r = _fromJSSLON(_res)
+        var id = "_oafp_key_" + genUUID()
+        if (isMap(_r)) {
+            _r.out         = "key"
+            _r.__key       = id
+            _r.__inception = true
+            oafp(_r)
+            var _d = $get(id)
+            $unset(id)
+            _$o(_d, options)
+        } else if (isArray(_r)) {
+            ow.loadObj()
+            $set(id, true)
+            var _out = new ow.obj.syncArray()
+            var _p = _r.map((r, i) => {
+                var sid = id + "_" + String(i)
+                r.out         = "key"
+                r.__key       = sid
+                r.__inception = true
+                return $do(() => {
+                    oafp(r)
+                    _out.add($get(sid))
+                    $unset(sid)
+                }).catch(e => {
+                    sprintErr(e)
+                })
+            })
+            $doWait($doAll(_p))
+            _$o(_out.toArray(), options)
+        } else {
+            _exit(-1, "oafp input data needs to be a map or an array.")
+        }
     }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")

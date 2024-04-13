@@ -73,6 +73,7 @@ List of data input types that can be auto-detected (through the file extension o
 | sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
 | ini     | INI/Properties format |
 | toml    | TOML format |
+| oafp    | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
 | xls     | A XLSx compatible file (requires file=abc.xlsx) |
 | raw     | Passes the input directly to transforms and output |
 | rawhex  | Tries to read the input char by char converting into lines with the hexadecimal representation |
