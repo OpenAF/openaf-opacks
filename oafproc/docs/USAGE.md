@@ -91,11 +91,13 @@ These options will change the parsed input data included any filters provided.
 | arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
 | cmlt | Boolean | If true will accumulate the input values into an output array (useful with loop) |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
+| denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
+| kmeans | Number | Given an array of 'normalized' data will cluster data into the number of centroids provided |
 | llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
 | llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |

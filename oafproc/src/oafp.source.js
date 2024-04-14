@@ -792,13 +792,37 @@ var _transformFns = {
             var _s = _fromJSSLON(params.normalize)
             if (isMap(_s)) {
                 ow.loadAI()
-                return ow.ai.normalize.withSchema(_r, _s, true)
+                if (isMap(_r))   return ow.ai.normalize.withSchema(_r, _s, true)
+                if (isArray(_r)) return _r.map(r => ow.ai.normalize.withSchema(r, _s, true))
             } else {
                 _exit(-1, "Invalid normalize schema")
             }
         } else {
             _exit(-1, "Invalid normalize schema")
         }
+    },
+    "denormalize": _r => {
+        if (isString(params.denormalize)) {
+            var _s = _fromJSSLON(params.denormalize)
+            if (isMap(_s)) {
+                ow.loadAI()
+                if (isUnDef(ow.ai.normalize.denormalizeWithSchema)) _exit(-1, "This version of OpenAF does not support denormalizeWithSchema")
+                
+                if (isMap(_r))   return ow.ai.normalize.denormalizeWithSchema(_r, _s, false)
+                if (isArray(_r)) return _r.map(r => ow.ai.normalize.denormalizeWithSchema(r, _s, false))
+            } else {
+                _exit(-1, "Invalid denormalize schema")
+            }
+        } else {
+            _exit(-1, "Invalid denormalize schema")
+        }
+    },
+    "kmeans": _r => {
+        if (!isNumber(params.kmeans)) params.kmeans = 5
+        if (!isArray(_r)) _exit(-1, "For kmeans transform you need to provide an array as input")
+        ow.loadAI()
+        var _kmeans = ow.ai.cluster({ type: "kmeans", numberOfClusters: Number(params.kmeans) })
+        return _kmeans.classify(_r)
     }
 }
 // --- add extra _transformFns here ---
