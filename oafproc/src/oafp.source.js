@@ -786,6 +786,19 @@ var _transformFns = {
             }
         }
         return _r
+    },
+    "normalize": _r => {
+        if (isString(params.normalize)) {
+            var _s = _fromJSSLON(params.normalize)
+            if (isMap(_s)) {
+                ow.loadAI()
+                return ow.ai.normalize.withSchema(_r, _s, true)
+            } else {
+                _exit(-1, "Invalid normalize schema")
+            }
+        } else {
+            _exit(-1, "Invalid normalize schema")
+        }
     }
 }
 // --- add extra _transformFns here ---
