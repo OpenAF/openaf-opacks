@@ -36,7 +36,7 @@
                     if (isString(params.plistfile)) {
                         io.writeFilePListBin(params.plistfile, r)
                     } else {
-                        _oafp.exit(-1, "Please provide a plist binary file to write to.")
+                        _oafp._exit(-1, "Please provide a plist binary file (plistfile) to write to.")
                     }
                 }
             
