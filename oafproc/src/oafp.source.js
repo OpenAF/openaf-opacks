@@ -487,9 +487,9 @@ var _transformFns = {
     "diff": _r => {
         var _d = _fromJSSLON(params.diff)
         if (isMap(_d)) {
-            if (isUnDef(_d.filea) || isUnDef(_d.fileb) || isUnDef(_d.a) || isUnDef(_d.b)) _exit(-1, "diff.a path and diff.b path are required.")
+            if (!((isDef(_d.filea) && isDef(_d.fileb)) || (isDef(_d.a) && isDef(_d.b)))) _exit(-1, "diff.a path and diff.b path are required.")
 
-            loadDiff()
+            loadDiff() 
             let _d1 = $path(_r, _d.a), _d2 = $path(_r, _d.b), _dt = __
             if (toBoolean(params.color)) {
                 if (isUnDef(params.difftheme) && isDef(getEnv("OAFP_DIFFTHEME"))) params.difftheme = getEnv("OAFP_DIFFTHEME")

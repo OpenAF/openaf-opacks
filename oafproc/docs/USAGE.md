@@ -310,7 +310,7 @@ List of options to use when _diff=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| difftheme | String | A JSON/SLON map with the colors to use if color = true: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: '|')" |
+| difftheme | String | A JSON/SLON map with the colors to use if color = true: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: ':')" |
 | diffnlines | Boolean | If true will append each line with a line number of the final result of the differences between 'a' and 'b' (just for rough reference) |
 | diffwords | Boolean | If true and the input is text based will perform the diff at the word level | 
 | diffwordswithspace | Boolean | If true and the input is text based will perform the diff at the word + spaces level |
