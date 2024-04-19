@@ -957,7 +957,7 @@ var _outputFns = new Map([
             ow.template.addConditionalHelpers()
             ow.template.addOpenAFHelpers()
             ow.template.addFormatHelpers()
-            if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For output=handlebars you need to provide a template=someFile.hbs or templatepath=...")
+            if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For out=handlebars you need to provide a template=someFile.hbs or templatepath=...")
             params.templatedata = _$(params.templatedata, "templatedata").isString().default("@")
             _print($t( isUnDef(params.template) ? $path(params.__origr, params.templatepath) : io.readFileString(params.template), $path(r, params.templatedata) ) )
         }
@@ -972,7 +972,9 @@ var _outputFns = new Map([
                 if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
                 return line
             }).join("\n")
-            _o$o(_out, options)
+            _print(_out)
+        } else {
+            _exit(-1, "For out=openmetrics input needs to be an array or map.")
         }
     }],
     ["pjson", (r, options) => {
@@ -1002,7 +1004,7 @@ var _outputFns = new Map([
         }
     }],
     ["grid" , (r, options) => {
-        if (isUnDef(params.grid)) _exit(-1, "For output=grid you need to provide a grid=...")
+        if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
         let _f = _fromJSSLON(_$(params.grid, "grid").isString().$_())
 
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
@@ -1045,7 +1047,7 @@ var _outputFns = new Map([
         }
     }],
     ["chart", (r, options) => {
-        if (isUnDef(params.chart)) _exit(-1, "For output=chart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
+        if (isUnDef(params.chart)) _exit(-1, "For out=chart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
         if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=chart is not supported in this version of OpenAF")
 
         let fmt = _chartPathParse(r, params.chart)
@@ -1056,7 +1058,7 @@ var _outputFns = new Map([
 
     }],
     ["schart", (r, options) => {
-        if (isUnDef(params.schart)) _exit(-1, "For output=schart you need to provide a schart=\"<units> [<path[:color][:legend]>...]\"")
+        if (isUnDef(params.schart)) _exit(-1, "For out=schart you need to provide a schart=\"<units> [<path[:color][:legend]>...]\"")
         if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=schart is not supported in this version of OpenAF")
 
         let fmt = _chartPathParse(r, params.schart, "_oafp_sfn_", "soafp")
@@ -1065,8 +1067,8 @@ var _outputFns = new Map([
         }
     }],
     ["ch", (r, options) => {
-        if (isUnDef(params.ch))    _exit(-1, "For output=ch you need to provide a ch=\"(type: ...)\"")
-        if (isUnDef(params.chkey)) _exit(-1, "For output=ch you need to provide a chkey=\"key1, key2\"")
+        if (isUnDef(params.ch))    _exit(-1, "For out=ch you need to provide a ch=\"(type: ...)\"")
+        if (isUnDef(params.chkey)) _exit(-1, "For out=ch you need to provide a chkey=\"key1, key2\"")
 
         var _r = (isMap(r) ? [ r ] : r)
         params.ch = _fromJSSLON(params.ch)
