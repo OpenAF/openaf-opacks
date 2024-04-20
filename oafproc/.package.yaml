@@ -96,6 +96,8 @@ keywords:
 - jmespath
 - nlinq
 - transformer
+- openmetrics
+- llm
 - filter
 - parser
 - template
@@ -112,7 +114,7 @@ name: oafproc
 main: oafp.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240419'
+version: '20240420'
 dependencies:
   openaf: '>=20231222'
 files:
@@ -132,7 +134,7 @@ filesHash:
   docs/EXAMPLES.md: 159ee341a7f9ec9037b0171d5cd52ed360bd9a09
   docs/FILTERS.md: 58704aaf6e4db179c999b5858734312e64b82e04
   docs/TEMPLATE.md: 7577084d6212eec69bf6feb22bd0e105ae33fe8c
-  docs/USAGE.md: 1f6690c7197af78abb1292c94bfb458a62fa5850
-  oafp.js: 1d1e2cf843cdacef87571f6a6b2b8cb45e925e52
+  docs/USAGE.md: 4f57b9c8504c83a00fcc48e48caf3839e2236962
+  oafp.js: 054cd2bd0252bb13f4d55159159009079ef36f83
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 8268f9169e5dab1fe2dbf9c36dc52b3c1aa6d3bb
+  src/oafp.source.js: a4e131e035b9b17b697d5442545d18c669adc78d

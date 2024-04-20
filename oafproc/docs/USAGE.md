@@ -35,7 +35,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
 | -examples | Will access an internet based list of oafp examples and list them |
-| examples | Will search the provided keywork in the internet basd list of oafp examples |
+| examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
 
@@ -94,6 +94,7 @@ These options will change the parsed input data included any filters provided.
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
 | flatmap | Boolean | If true a map structure will be flat to just one level |
+| getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
@@ -528,12 +529,6 @@ oafp file=someFile.md input=md
 
 # table with the latest news from Google
 curl -s -L https://blog.google/rss | oafp path="rss.channel.item" sql="select title, pubDate" output=ctable
-
-# table with the number of people in space per space craft
-curl -s http://api.open-notify.org/astros.json | oafp path="people" sql="select \"craft\", count(1) \"people\" group by \"craft\"" output=ctable
-
-# markdown table with the current closest asteroids to earth
-curl -s "https://api.nasa.gov/neo/rest/v1/feed?API_KEY=DEMO_KEY" | oafp path="near_earth_objects" maptoarray=true output=json | oafp path="[0][].{name:name,magnitude:absolute_magnitude_h,hazardous:is_potentially_hazardous_asteroid,distance:close_approach_data[0].miss_distance.kilometers}" sql="select * order by distance" output=mdtable
 ```
 
 ```bash
@@ -544,6 +539,13 @@ oafp -v path="openaf.opacks" output=ctable
 oafp -v path="oafp.inputs" output=cslon
 oafp -v path="oafp.transforms" output=cslon
 oafp -v path="oafp.outputs" output=cslon
+
+# list examples with kubectl
+oafp examples=kubectl
+# list examples for category 'openaf' and sub-category 'oafp'
+oafp examples=openaf::oafp
+# list examples for category 'kubernetes'
+oafp examples=kubernetes::
 ```
 
 ---

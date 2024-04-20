@@ -823,6 +823,22 @@ var _transformFns = {
         ow.loadAI()
         var _kmeans = ow.ai.cluster({ type: "kmeans", numberOfClusters: Number(params.kmeans) })
         return _kmeans.classify(_r)
+    },
+    "getlist": _r => {
+        if (isObject(_r) && (toBoolean(params.getlist) || isNumber(params.getlist)) ) {
+            var found = false, _nr, num = isNumber(params.getlist) ? params.getlist : 1
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (!found && isArray(aV)) {
+                    num--
+                    if (num == 0) found = true
+                    _nr = aV
+                }
+            })
+            if (found)
+                return _nr
+            else
+                return _r
+        }
     }
 }
 // --- add extra _transformFns here ---
@@ -1849,7 +1865,16 @@ if (params["-examples"] == "" || (isString(params.examples) && params.examples.l
         options.__format = "template"
         options.__path   = "data"
         params.templatepath = "tmpl"
-        options.__sql    = "select * where d like '%" + params.examples + "%'"
+        if (params.examples.indexOf("::") > 0) {
+            var parts = params.examples.split("::").filter(r => r.length > 0)
+            if (parts.length == 1) {
+                options.__sql    = "select * where c like '" + parts[0] + "'"
+            } else {
+                options.__sql    = "select * where c like '" + parts[0] + "' and s like '" + parts[1] + "'"
+            }
+        } else {
+            options.__sql    = "select * where d like '%" + params.examples + "%' or s like '%" + params.examples + "%' or c like '%" + params.examples + "%'"
+        } 
     } else {
         options.__path   = "data[].{category:c,subCategory:s,description:d}"
         options.__from   = "sort(category,subCategory,description)"
