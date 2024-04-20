@@ -6,7 +6,7 @@ on:
   - cron: '03 7 * * *'
 
 jobs:
-  update-packs:
+  update-pack-googlephone:
     runs-on    : ubuntu-latest
     permissions:
       contents: write
@@ -61,6 +61,20 @@ jobs:
         args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
         dist: t8
 
+  update-googlecompiler:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
+
     # --------------
     # GoogleCompiler
     - name: Run GoogleCompiler
@@ -100,6 +114,20 @@ jobs:
         ojob: 'ojob.io/git/hub/checkIn'
         args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
         dist: t8
+
+  update-rocksdb:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
 
     # -------
     # RocksDB
