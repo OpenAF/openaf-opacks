@@ -311,13 +311,15 @@ List of options to use when _diff=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| difftheme | String | A JSON/SLON map with the colors to use if color = true: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: ':')" |
+| difftheme | String | A JSON/SLON map with the colors to use if color = true |
 | diffnlines | Boolean | If true will append each line with a line number of the final result of the differences between 'a' and 'b' (just for rough reference) |
 | diffwords | Boolean | If true and the input is text based will perform the diff at the word level | 
 | diffwordswithspace | Boolean | If true and the input is text based will perform the diff at the word + spaces level |
 | difflines | Boolean | If true and the input is text based will perform the diff at the lines level |
 | diffsentences | Boolean | If true and the input is text based will perfom the diff at the sentence level |
 | diffchars | Boolean | If true and the input is text based will perform the diff at the char level |
+
+> 'difftheme' example: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: ':')"
 
 > If color=true a visual colored diff will be output insted of an array of differences
 

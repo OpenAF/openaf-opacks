@@ -547,8 +547,8 @@ var _transformFns = {
                 
                 return $from(s).select({count:__,added:false,removed:false,value:[]})
             }
-            
-            if (isString(_d1) || isString(_d2)) {
+
+            if (isString(_d1) && isString(_d2)) {
                 if (toBoolean(params.diffwords)) {
                     return _f(JsDiff.diffWords(_d1, _d2, _d.options))
                 } else if (toBoolean(params.diffwordswithspace)) {
