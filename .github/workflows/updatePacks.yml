@@ -154,7 +154,7 @@ jobs:
 
             // Update pack
             $sh(getOpenAFPath() + "opack genpack .")
-            .pwd("bouncycastle")
+            .pwd("BouncyCastle")
             .prefix("opack")
             .get()
           }
