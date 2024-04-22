@@ -137,8 +137,9 @@ jobs:
           var res = $sh("rm *.jar")
                     .sh([getOpenAFPath() + "ojob", "ojob.io/oaf/mavenGetJars"])
                     .sh("rm -rf .openaf_precompiled")
+                    .sh("ls -lad *")
                     .pwd("BouncyCastle")
-                    .get(1)
+                    .get(3)
                     
           print(res.stdout)
           printErr(res.stderr)
