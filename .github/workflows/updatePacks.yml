@@ -166,7 +166,7 @@ jobs:
       uses: openaf/ojob-action@v4
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ BouncyCastle" paths="rocksdb/" title="Update\ BouncyCastle\ oPack" bodyFile=/tmp/output.out'
+        args: 'message="Update\ BouncyCastle" paths="BouncyCastle/" title="Update\ BouncyCastle\ oPack" bodyFile=/tmp/output.out'
         dist: t8
 
   update-rocksdb:
