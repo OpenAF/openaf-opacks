@@ -115,6 +115,60 @@ jobs:
         args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
         dist: t8
 
+  update-bouncycastle:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-t8
+        path: /tmp/oaf
+    
+    - name: Run BouncyCastle
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          // Run update ojob
+          var res = $sh("rm *.jar")
+                    .sh([getOpenAFPath() + "ojob", "ojob.io/oaf/mavenGetJars"])
+                    .sh("rm -rf .openaf_precompiled")
+                    .pwd("bouncycastle")
+                    .get(1)
+                    
+          print(res.stdout)
+          printErr(res.stderr)
+          
+          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+            // Store results
+            io.writeFileString("/tmp/output.out", "Automatic bump of BouncyCastle oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
+
+            // Bump opack version
+            var opack = io.readFileYAML("BouncyCastle/.package.yaml")
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML("BouncyCastle/.package.yaml", opack)
+
+            // Update pack
+            $sh(getOpenAFPath() + "opack genpack .")
+            .pwd("bouncycastle")
+            .prefix("opack")
+            .get()
+          }
+        dist: t8
+
+    - name: Commit BouncyCastle
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ BouncyCastle" paths="rocksdb/" title="Update\ BouncyCastle\ oPack" bodyFile=/tmp/output.out'
+        dist: t8
+
   update-rocksdb:
     runs-on    : ubuntu-latest
     permissions:
