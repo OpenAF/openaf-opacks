@@ -18,7 +18,7 @@ name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240422'
+version: '20240423'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -27,14 +27,34 @@ files:
 - .package.yaml
 - .precompile
 - rocksdb.js
-- rocksdbjni-9.0.1.jar
+- rocksdbjni-9.1.0.jar
 - tests/autoTestRocks.js
 - tests/autoTestRocks.yaml
+- tmpDB/000008.sst
+- tmpDB/000009.log
+- tmpDB/CURRENT
+- tmpDB/IDENTITY
+- tmpDB/LOCK
+- tmpDB/LOG
+- tmpDB/LOG.old.1713856481869901
+- tmpDB/MANIFEST-000010
+- tmpDB/OPTIONS-000007
+- tmpDB/OPTIONS-000012
 filesHash:
   .maven.yaml: 06ae44b61d9bd941ce61050e8c61c4c744f7b4c7
   .odoc.db: 1737cc42c3e23351e5e40bae50dcc8aee5a86d34
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
   rocksdb.js: 350d3097abeb5012d39a274f3020994a20c39284
-  rocksdbjni-9.0.1.jar: 40442d552fc030474fad0d787127da4b0295d95e
+  rocksdbjni-9.1.0.jar: 44b734d806b5e1d4ac6d2cd38c6ebc2092068799
   tests/autoTestRocks.js: 0293c08829dd2db5f5d9d3030c613efb2c3773b7
   tests/autoTestRocks.yaml: 930233438b594f1ed9a01e3be2eecba77d1de2f4
+  tmpDB/000008.sst: 1b5384179c806401ebfbeb84fb0537d87c4ee4b5
+  tmpDB/000009.log: 644e4e250a8951bb08064a444d100b21fc6fe8bd
+  tmpDB/CURRENT: 476d3eab15649c40c6aebfb6ac2366db50283d1b
+  tmpDB/IDENTITY: 7e68096b2a5eb1da4331469a7494a46d89186f8b
+  tmpDB/LOCK: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  tmpDB/LOG: a276ab0a8b7bbb06d358e2c1ddf11cbafc0e3e59
+  tmpDB/LOG.old.1713856481869901: f02976211382ff82f2d956a68bca748f72bfba33
+  tmpDB/MANIFEST-000010: ea8923b5b18eba285f3f58df5b0b9691a670190d
+  tmpDB/OPTIONS-000007: 12cde2c4fcc8619b8cf478e1080326fdbf5fef89
+  tmpDB/OPTIONS-000012: 12cde2c4fcc8619b8cf478e1080326fdbf5fef89
