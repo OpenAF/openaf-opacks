@@ -1902,7 +1902,7 @@ if (params["-examples"] == "" || (isString(params.examples) && params.examples.l
     params.in  = "yaml"
 
     if (isString(params.examples) && params.examples.length > 0) {
-        options.__format = "template"
+        if (params.examples.trim() != "?") options.__format = "template"
         options.__path   = "data"
         params.templatepath = "tmpl"
         if (params.examples.indexOf("::") > 0) {
@@ -1913,7 +1913,12 @@ if (params["-examples"] == "" || (isString(params.examples) && params.examples.l
                 options.__sql    = "select * where c like '" + parts[0] + "' and s like '" + parts[1] + "'"
             }
         } else {
-            options.__sql    = "select * where d like '%" + params.examples + "%' or s like '%" + params.examples + "%' or c like '%" + params.examples + "%'"
+            if (params.examples.trim() == "?") {
+                options.__path = "data.sort(map(&concat(c,concat('::',s)),[]))"
+                params.removedups = true
+            } else {
+                options.__sql = "select * where d like '%" + params.examples + "%' or s like '%" + params.examples + "%' or c like '%" + params.examples + "%'"
+            }
         } 
     } else {
         options.__path   = "data[].{category:c,subCategory:s,description:d}"
