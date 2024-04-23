@@ -1062,6 +1062,46 @@ var _outputFns = new Map([
             _exit(-1, "Invalid grid parameter: '" + stringify(params.grid, __, "") + "'")
         }
     }],
+    ["cmd", (r, options) => {
+        if (!isString(params.outcmd)) _exit(-1, "For out=cmd you need to provide a outcmd=\"...\"")
+
+        let _exe = data => {
+            var _s, _d = isString(data) ? data : stringify(data, __, "")
+            if (toBoolean(params.outcmdparam)) {
+                try {
+                _s = $sh(params.outcmd.replace(/([^\\]?){}/g, "$1"+_d)).get(0)
+                } catch(e) {sprintErr(e)}
+            } else {
+                _s = $sh(params.outcmd, _d).get(0)
+            }
+            if (toBoolean(params.outcmdnl)) {
+                if (_s.stdout.length > 0) print(_s.stdout)
+                if (_s.stderr.length > 0) printErr(_s.stderr)
+            } else {
+                if (_s.stdout.length > 0) printnl(_s.stdout)
+                if (_s.stderr.length > 0) printErrnl(_s.stderr)
+            }
+        }
+
+        if (isArray(r)) {
+            if (toBoolean(params.outcmdjoin)) {
+                _exe(r)
+            } else {
+                if (toBoolean(params.outcmdseq)) {
+                    r.forEach(_exe)
+                } else {
+                    parallel4Array(r, _r => {
+                        _exe(_r)
+                    })
+                }
+            }
+        } else {
+            if (isString(r))
+                _exe(r)
+            else
+                _exe(r)
+        }
+    }],
     ["chart", (r, options) => {
         if (isUnDef(params.chart)) _exit(-1, "For out=chart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
         if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=chart is not supported in this version of OpenAF")

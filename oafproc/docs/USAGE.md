@@ -151,6 +151,7 @@ List of available formats to use with the _output_ option:
 | toml     | A TOML format (arrays will have outkey=list) |
 | xls      | A XLSx output format |
 | template | A Handlebars template format |
+| cmd      | Executes a command for each input data entry |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 | sql      | Outputs a series of SQL statements for an input list/array data |
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
@@ -375,6 +376,22 @@ List of options to use when _out=template_:
 | template | String | A file path to a HandleBars' template |
 | templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
 | templatedata | String | If defined the template data will be retrieved from the provided path |
+
+---
+
+## 🧾 Cmd output options
+
+List of options to use when _out=cmd_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| outcmd | String | The command to execute receiving, in pipeline, each input entry in json |
+| outcmdjoin | Boolean | If true and if input is an array the entire array will be the input entry |
+| outcmdseq | Boolean | If true and if input is an array the commands will be executed in sequence |
+| outcmdnl | Boolean | If true each command execution output will be appended with a new-line |
+| outcmdparam | Boolean | If true the input entry will be replaced on the 'outcmd' where '{}' is found |
+
+> If input is an array, without outcmdjoin=true, each entry will result in a command execution in parallel
 
 ---
 
