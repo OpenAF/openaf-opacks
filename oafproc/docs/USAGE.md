@@ -38,6 +38,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
 | -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
+| -r | Resets the terminal before displaying an output (use this if you experience terminal related issues) |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
 
@@ -93,7 +94,7 @@ These options will change the parsed input data included any filters provided.
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
-| flatmap | Boolean | If true a map structure will be flat to just one level |
+| flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
@@ -154,6 +155,7 @@ List of available formats to use with the _output_ option:
 | cmd      | Executes a command for each input data entry |
 | log      | If input has Logstash compatible fields outputs a human-readable log |
 | sql      | Outputs a series of SQL statements for an input list/array data |
+| envs     | Tries to output the input data as OS environment variables setting commands |
 | raw      | Tries to output the internal representation (string or json) of the input transformed data |
 
 > For 'template' check https://docs.openaf.io/docs/guides/oafp/oafp-template.html
@@ -392,6 +394,26 @@ List of options to use when _out=cmd_:
 | outcmdparam | Boolean | If true the input entry will be replaced on the 'outcmd' where '{}' is found |
 
 > If input is an array, without outcmdjoin=true, each entry will result in a command execution in parallel
+
+---
+
+## 🧾 Envs output options
+
+List of options to use when _out=envs_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| envscmd | String | If defined will output the provided command to set each environment variable (defaults to 'export' or 'set' in Windows) |
+| envsprefix | String | If defined uses the provided prefix for each environment variable key (defaults to '_OAFP_') |
+
+Example of a shell script using 'out=envs': 
+
+```
+#!/bin/sh
+eval $(oafp -v out=envs)
+echo Using OpenAF version: $_OAFP_openaf_version - $_OAFP_openaf_distribution
+echo On the operating system: $_OAFP_os_name
+```
 
 ---
 

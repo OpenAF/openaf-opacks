@@ -323,7 +323,7 @@ params.input = params.type
 if (isUnDef(params.file) && isUnDef(params.cmd)) {
     let _found = __
     for (let key in params) {
-        if (params[key] === "" && key != "-debug") {
+        if (params[key] === "" && key != "-debug" && key != "-v" && key != "-r" && key != "-examples") {
             _found = key
             break;
         }
@@ -636,7 +636,7 @@ var _transformFns = {
     "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
     "maptoarray"    : _r => (toBoolean(params.maptoarray) && isMap(_r) ? $m4a(_r, params.maptoarraykey) : _r),
     "arraytomap"    : _r => (toBoolean(params.arraytomap) && isArray(_r) ? $a4m(_r, params.arraytomapkey, toBoolean(params.arraytomapkeepkey)) : _r),
-    "flatmap"       : _r => (toBoolean(params.flatmap) && isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapkey) : _r),
+    "flatmap"       : _r => (toBoolean(params.flatmap) && isObject(_r) ? ow.loadObj().flatMap(_r, params.flatmapsep) : _r),
     "merge"         : _r => {
         if (toBoolean(params.merge) && isArray(_r) && _r.length > 1) {
             var _rr
@@ -1061,6 +1061,23 @@ var _outputFns = new Map([
         } else {
             _exit(-1, "Invalid grid parameter: '" + stringify(params.grid, __, "") + "'")
         }
+    }],
+    ["envs", (r, options) => {
+        var res = ow.loadObj().flatMap(r, "_")
+        var crt = k => params.envsprefix + k.replace(/[^a-zA-Z0-9_]/g, '_')
+        var vcrt = v => String(v).indexOf(" ") >= 0 ? "\"" + v + "\"" : v
+
+        if (isUnDef(params.envscmd)) params.envscmd = (ow.format.isWindows() ? "set" : "export")
+        params.envscmd = String(params.envscmd)
+
+        if (isUnDef(params.envsprefix)) params.envsprefix = "_OAFP_"
+        params.envsprefix = String(params.envsprefix)
+
+        var out = new Set()
+        for (var k in res) {
+            out.add(params.envscmd + (params.envscmd.length > 0 ? " " : "") + crt(k) + "=" + vcrt(res[k]))
+        }
+        _print(Array.from(out).join("\n"))
     }],
     ["cmd", (r, options) => {
         if (!isString(params.outcmd)) _exit(-1, "For out=cmd you need to provide a outcmd=\"...\"")
@@ -1840,7 +1857,10 @@ params.format = _$(params.format, "format").isString().default(__)
 
 // Initialize console detection
 __initializeCon()
-if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.getTerminal().settings.set("sane")
+if (isDef(params["-r"])) {
+    if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.getTerminal().settings.set("sane")
+    delete params["-r"]
+}
 
 // Check for OpenAF's sec buckets
 
@@ -1927,7 +1947,6 @@ if (params["-examples"] == "" || (isString(params.examples) && params.examples.l
     }
 
     delete params["-examples"]
-    delete params.file
 }
 
 // Read input from stdin or file
