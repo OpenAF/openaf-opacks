@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240304'
+version: '20240426'
 dependencies:
   OpenAF: '>=20230704'
 files:
@@ -28,7 +28,7 @@ files:
 - .precompile
 - README.md
 - annotations-13.0.jar
-- bcprov-jdk18on-1.77.jar
+- bcprov-jdk18on-1.78.jar
 - checker-qual-3.41.0.jar
 - error_prone_annotations-2.23.0.jar
 - failureaccess-1.0.2.jar
@@ -40,7 +40,7 @@ files:
 - kotlin-stdlib-jdk7-1.8.21.jar
 - kotlin-stdlib-jdk8-1.8.21.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.5.9.jar
+- minio-8.5.10.jar
 - okio-3.6.0.jar
 - okio-jvm-3.6.0.jar
 - s3-ojob-test.yaml
@@ -50,12 +50,12 @@ files:
 - simple-xml-safe-2.7.1.jar
 - snappy-java-1.1.10.5.jar
 filesHash:
-  .maven.yaml: 97a85e4177dbacf7ae8fe8c3b380812f87a94657
+  .maven.yaml: 85a3d23dc01feaf1a6138973407dde1e11752897
   .odoc.db: f7e246944c84d676c2e0d29e460fd54bf4838d50
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
-  bcprov-jdk18on-1.77.jar: 2cc971b6c20949c1ff98d1a4bc741ee848a09523
+  bcprov-jdk18on-1.78.jar: 619aafb92dc0b4c6cc4cf86c487ca48ee2d67a8e
   checker-qual-3.41.0.jar: 08be6df7f1e9bccb19f8f351b3651f0bac2f5e0c
   error_prone_annotations-2.23.0.jar: 43a27853b6c7d54893e0b1997c2c778c347179eb
   failureaccess-1.0.2.jar: c4a06a64e650562f30b7bf9aaec1bfed43aca12b
@@ -67,7 +67,7 @@ filesHash:
   kotlin-stdlib-jdk7-1.8.21.jar: 7473b8cd3c0ef9932345baf569bc398e8a717046
   kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.5.9.jar: 3582a0c37df14211f69a07d31d91e3c5b4f2bbfd
+  minio-8.5.10.jar: 8a1a0bfa643d355e6f75c3a3287af8e20df5e3db
   okio-3.6.0.jar: 8bf9683c80762d7dd47db12b68e99abea2a7ae05
   okio-jvm-3.6.0.jar: 5600569133b7bdefe1daf9ec7f4abeb6d13e1786
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
