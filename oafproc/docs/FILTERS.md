@@ -67,6 +67,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | contains(string/array, any) | base | Returns true of false if a string field contains a specific value | files[?contains(filename, 'openaf.jar') == `true` |
 | count_by(arr, 'field') | all | Returns a count by array with the '_count' per value of the provided 'field' | count_by([], 'isFile') |
 | date_diff(field, 'unit', nullval) | 20240228 | Given a date field will return the numeric difference to now for the provided unit (e.g. seconds, minutes, hours, days, months, weeks, years). Optionally a nullval will be used if no difference can be calculated | date_diff(modifiedDate, 'days', '-1') |
+| dec(name) | 20240428 | Decrements the counter 'name' provided returning the counter value | dec('my_counter') |
 | delete(map, 'field') | all | Remove a field from the provided map | delete(data, 'timestamp')  |
 | div(a, b) | 20240217 | Divides two numbers.  | div(6, 2) |
 | ends_with(string, array) | base | Returns true if a field has the provided suffix | files[?ends_with(filename, '.jar')] |
@@ -82,8 +83,10 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
 | get(nameOrPath) | 20240305 | Given a path to the original object or a name set by 'set' or 'setp' returns the corresponding value | packages[].{name: name, version: version, parentVersion: get('version') } |
+| getc(name) | 20240428 | Returns the current value of a counter name user with inc/dec | [].{ idx: inc('my_counter'), code: concat('c', get('my_counter')), name: name} |
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
+| inc(name) | 20240428 | Increments the counter 'name' provided returning the counter value | [].{ id: inc('my_counter'), title: title } | 
 | index_of(str, 'search') | 20240209 | Given a string will return the first index where the word 'search' occurs | index_of('This is a test', 'test') |
 | insert(obj, 'field', value) | 20240302 | Adds a 'field' with the corresponding value to the object. |
 | join(string, arrayString) | base | Returns a delimited list with the values of a specific array field | join(', ', files[].filename) |
@@ -140,6 +143,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | type(any) | base | Returns the type of any input | type(to_number(`123`)) |
 | unique(arr) | all | Given an array will return a new de-duplicated array. | unique([]) |
 | upper_case(str) | 20240209 | Given a string returns the uppercase converted version | upper_case('AbC') |
+| unset(name) | 20240428 | Resets a counter name or a set/setp name | unset('my_counter') |
 | values(a) | base | Returns an array with all the values of a map | values(files[0]) |
 
 Example:

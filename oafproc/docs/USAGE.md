@@ -21,6 +21,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
 | sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
+| sqlfiltertables | A JSON/SLON array composed of 'table' name and 'path' to each table's data to be used with the sqlfilter |
 | path   | A JMESPath expression to filter output |
 | csv    | If type=csv, the CSV options to use | 
 | outkey | If defined the map/list output will be prefix with the provided key |
@@ -45,6 +46,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 > For _path_ syntax check https://jmespath.org/tutorial.html
 
 > You can list inputs by using _in="?"_; outputs by _out="?"_; transforms by _transforms=true_
+
+> _sqlfilterstable_ assumes and forces _sqlfilter=advanced_
 
 ---
 

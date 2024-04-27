@@ -37,7 +37,26 @@ const _$f = (r, options) => {
             default        : method = __
             }
         }
-        if (isArray(r) && r.length > 0) r = $sql(r, options.__isql.trim(), method)
+        if (isArray(r) && r.length > 0) {
+            if (isString(params.isqlfiltertables)) {
+                var _sql = $sql()
+                var _tables = _fromJSSLON(params.isqlfiltertables)
+                if (isArray(_tables)) {
+                    // (table: ..., path: ...)
+                    _tables.forEach(t => {
+                        if (isUnDef(t.table)) _exit(-1, "One 'table' not defined in isqlfiltertables")
+                        t.path = _$(t.path, "isqlfiltertables table " + t.table + " path").isString().default("@")
+                        var _rp = $path(r, t.path)
+                        if (isArray(_rp)) _sql = _sql.table(t.table, _rp)
+                    })
+                    // if $sql chained then it's already sqlfilter=advanced by default
+                    r = _sql.closeQuery(options.__isql.trim())
+                }
+            } else {
+                r = $sql(r, options.__isql.trim(), method)
+            }   
+        }
+
         delete options.__isql
     }
     if (options.__path) {
@@ -61,7 +80,25 @@ const _$f = (r, options) => {
             default        : method = __
             }
         }
-        if (isArray(r) && r.length > 0) r = $sql(r, options.__sql.trim(), method)
+        if (isArray(r) && r.length > 0) {
+            if (isString(params.sqlfiltertables)) {
+                var _sql = $sql()
+                var _tables = _fromJSSLON(params.sqlfiltertables)
+                if (isArray(_tables)) {
+                    // (table: ..., path: ...)
+                    _tables.forEach(t => {
+                        if (isUnDef(t.table)) _exit(-1, "One 'table' not defined in sqlfiltertables")
+                        t.path = _$(t.path, "sqlfiltertables table " + t.table + " path").isString().default("@")
+                        var _rp = $path(r, t.path)
+                        if (isArray(_rp)) _sql = _sql.table(t.table, _rp)
+                    })
+                    // if $sql chained then it's already sqlfilter=advanced by default
+                    r = _sql.closeQuery(options.__sql.trim())
+                }
+            } else {
+                r = $sql(r, options.__sql.trim(), method)
+            }
+        }
         delete options.__sql
     }
     if (options.__opath) {
