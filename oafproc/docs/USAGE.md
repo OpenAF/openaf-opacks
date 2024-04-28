@@ -37,9 +37,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
 | -examples | Will access an internet based list of oafp examples and list them |
 | examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
-| -v     | Changes the input to a map with the tool's version info |
 | version | Alternative way to change the input to a map with the tool's version |
-| -r | Resets the terminal before displaying an output (use this if you experience terminal related issues) |
+| -v | Changes the input to a map with the tool's version info |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
 
@@ -48,6 +47,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 > You can list inputs by using _in="?"_; outputs by _out="?"_; transforms by _transforms=true_
 
 > _sqlfilterstable_ assumes and forces _sqlfilter=advanced_
+
+> Use 'OAFP_NORESET=true' to forces not to reset the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
 
 ---
 

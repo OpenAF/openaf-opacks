@@ -360,7 +360,7 @@ params.input = params.type
 if (isUnDef(params.file) && isUnDef(params.cmd)) {
     let _found = __
     for (let key in params) {
-        if (params[key] === "" && key != "-debug" && key != "-v" && key != "-r" && key != "-examples") {
+        if (params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
             _found = key
             break;
         }
@@ -1906,10 +1906,16 @@ params.format = _$(params.format, "format").isString().default(__)
 
 // Initialize console detection
 __initializeCon()
-if (isDef(params["-r"])) {
-    if (!String(java.lang.System.getProperty("os.name")).match(/Windows/)) __con.getTerminal().settings.set("sane")
-    delete params["-r"]
+var _dr = !String(java.lang.System.getProperty("os.name")).match(/Windows/)
+var _drev = getEnv("OAFP_RESET")
+if (isDef(_drev)) {
+    if (toBoolean(_drev)) {
+        _dr = false
+    } else {
+        _dr = true
+    }
 }
+if (_dr) __con.getTerminal().settings.set("sane")
 
 // Check for OpenAF's sec buckets
 
