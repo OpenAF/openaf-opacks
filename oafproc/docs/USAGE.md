@@ -55,32 +55,32 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 List of data input types that can be auto-detected (through the file extension or through it's contents). You can always override it be using the _input_ option:
 
-| Input type   | Description |
-|---------|-------------|
-| json    | A JSON format (auto-detected) |
-| yaml    | A YAML format (auto-detected) |
-| xml     | An XML format (auto-detected) |
-| csv     | A CSV format (auto-detected) |
-| ndjson  | A NDJSON format |
-| slon    | A SLON format (auto-detected) |
-| hsperf  | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
-| base64  | A base64 text format |
-| db      | A JDBC query to a database |
-| md      | A Markdown format |
-| ch      | An OpenAF channel format |
-| mdtable | A Markdown table format |
+| Input type | Description |
+|------------|-------------|
+| base64 | A base64 text format |
+| ch | An OpenAF channel format |
+| csv | A CSV format (auto-detected) |
+| db | A JDBC query to a database |
+| hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
+| ini | INI/Properties format |
+| json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
-| openmetrics | An OpenMetrics/Prometheus compatible format |
-| lines   | A given string/text to be processed line by line |
-| llm     | A large language model input (uses 'llmenv' or 'llmoptions') |
+| lines | A given string/text to be processed line by line |
+| llm | A large language model input (uses 'llmenv' or 'llmoptions') |
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
-| sql     | One or more SQLs statements to AST (Abstract Syntax Tree) |
-| ini     | INI/Properties format |
-| toml    | TOML format |
-| oafp    | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
-| xls     | A XLSx compatible file (requires file=abc.xlsx) |
-| raw     | Passes the input directly to transforms and output |
-| rawhex  | Tries to read the input char by char converting into lines with the hexadecimal representation |
+| md | A Markdown format |
+| mdtable | A Markdown table format |
+| ndjson | A NDJSON format |
+| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
+| openmetrics | An OpenMetrics/Prometheus compatible format |
+| raw | Passes the input directly to transforms and output |
+| rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
+| slon | A SLON format (auto-detected) |
+| sql | One or more SQLs statements to AST (Abstract Syntax Tree) |
+| toml | TOML format |
+| xls | A XLSx compatible file (requires file=abc.xlsx) |
+| xml | An XML format (auto-detected) |
+| yaml | A YAML format (auto-detected) |
 
 ---
 
@@ -123,43 +123,44 @@ These options will change the parsed input data included any filters provided.
 List of available formats to use with the _output_ option:
 
 | Output format | Description |
-|----------|-------------|
-| ctree    | A tree-like forcely colored format |
-| cjson    | A JSON forcely colored format |
-| ctable   | A table-like forcely colored format (only for list outputs) |
-| tree     | A tree-like format |
-| json     | A JSON format without spacing |
-| pjson    | A JSON format with spacing (equivalent to prettyjson) |
-| prettyjson | A JSON format with spacing |
-| yaml     | A YAML format |
-| mdyaml   | A multi document YAML format (only for list outputs) |
-| stable   | A table-like format with separation (only for list outputs) |
-| table    | A table-like format without size constraints (only for list outputs) |
-| xml      | An XML format |
-| ndjson   | A NDJSON format |
-| cslon    | A SLON format forcely colored |
-| slon     | A SLON format |
-| csv      | A CSV format (only for list outputs) |
-| map      | A rectangle map format |
-| html     | An HTML format |
-| db       | Output to a JDBC database |
-| md       | A Markdown format |
-| ch       | An OpenAF channel format |
-| chart    | A line-chart like chart (usefull together with 'loop') |
-| schart   | A static line-chart like chart (for a fixed list/array of values) |
-| grid     | A multiple output ascii grid (usefull together with 'loop') |
-| mdtable  | A Markdown table format (only for list outputs) |
+|---------------|-------------|
+| base64 | A base64 text format |
+| ch | An OpenAF channel format |
+| chart | A line-chart like chart (usefull together with 'loop') |
+| cjson | A JSON forcely colored format |
+| cmd | Executes a command for each input data entry |
+| cslon | A SLON format forcely colored |
+| csv | A CSV format (only for list outputs) |
+| ctable | A table-like forcely colored format (only for list outputs) |
+| ctree | A tree-like forcely colored format |
+| db | Output to a JDBC database |
+| envs | Tries to output the input data as OS environment variables setting commands |
+| grid | A multiple output ascii grid (usefull together with 'loop') |
+| html | An HTML format |
+| ini | A INI/Properties format (arrays are not supported) |
+| json | A JSON format without spacing |
+| log | If input has Logstash compatible fields outputs a human-readable log |
+| map | A rectangle map format |
+| md | A Markdown format |
+| mdtable | A Markdown table format (only for list outputs) |
+| mdyaml | A multi document YAML format (only for list outputs) |
+| ndjson | A NDJSON format |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
-| base64   | A base64 text format | 
-| ini      | A INI/Properties format (arrays are not supported) |
-| toml     | A TOML format (arrays will have outkey=list) |
-| xls      | A XLSx output format |
+| pjson | A JSON format with spacing (equivalent to prettyjson) |
+| prettyjson | A JSON format with spacing |
+| pxml | Tries to output the input data into pretty xml |
+| raw | Tries to output the internal representation (string or json) of the input transformed data |
+| schart | A static line-chart like chart (for a fixed list/array of values) |
+| slon | A SLON format |
+| sql | Outputs a series of SQL statements for an input list/array data |
+| stable | A table-like format with separation (only for list outputs) |
+| table | A table-like format without size constraints (only for list outputs) |
 | template | A Handlebars template format |
-| cmd      | Executes a command for each input data entry |
-| log      | If input has Logstash compatible fields outputs a human-readable log |
-| sql      | Outputs a series of SQL statements for an input list/array data |
-| envs     | Tries to output the input data as OS environment variables setting commands |
-| raw      | Tries to output the internal representation (string or json) of the input transformed data |
+| toml | A TOML format (arrays will have outkey=list) |
+| tree | A tree-like format |
+| xls | A XLSx output format |
+| xml | An XML format |
+| yaml | A YAML format |
 
 > For 'template' check https://docs.openaf.io/docs/guides/oafp/oafp-template.html
 
@@ -167,54 +168,25 @@ List of available formats to use with the _output_ option:
 
 ---
 
-## 🧾 JSON input options
-
-List of options to use when _in=json_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| jsondesc | Boolean | If true the output will be a list of JSON paths of the original json.  |
-| jsonprefix | String | Given the 'jsondesc=true' output list you can use each to filter big json files by prefix. |
+## ⬇️  Input options
 
 ---
 
-## 🧾 ndJSON input options
+### 🧾 CH input options
 
-List of options to use when _in=ndjson_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
-| ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
-
----
-
-## 🧾 XLS input options
-
-List of options to use when _in=xls_:
+List of options to use when _in=ch_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| xlssheet | String | The name of sheet to consider (default to the first sheet) |
-| xlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
-| xlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
-| xlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
+| inch   | String | A JSON/SLON configuration string with type and options/url |
+| inchall | Boolean | A boolean flag to determine if the input map will be used for a getAll query |
+
+> Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
+> Example of optiosn provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
 
 ---
 
-## 🧾 Lines input options
-
-List of options to use when _in=lines_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| linesjoin | Boolean | If true it will return an array with each processed line |
-| linesvisual | Boolean | If true it will try to determine header and column position from spaces and tabs |
-| linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
-
----
-
-## 🧾 DB input options
+### 🧾 DB input options
 
 List of options to use when _in=db_ (SQL query):
 
@@ -233,21 +205,41 @@ List of options to use when _in=db_ (SQL query):
 
 ---
 
-## 🧾 CH input options
+### 🧾 JSON input options
 
-List of options to use when _in=ch_:
+List of options to use when _in=json_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| inch   | String | A JSON/SLON configuration string with type and options/url |
-| inchall | Boolean | A boolean flag to determine if the input map will be used for a getAll query |
-
-> Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
-> Example of optiosn provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+| jsondesc | Boolean | If true the output will be a list of JSON paths of the original json.  |
+| jsonprefix | String | Given the 'jsondesc=true' output list you can use each to filter big json files by prefix. |
 
 ---
 
-## 🧾 RAWHEX input options
+### 🧾 Lines input options
+
+List of options to use when _in=lines_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| linesjoin | Boolean | If true it will return an array with each processed line |
+| linesvisual | Boolean | If true it will try to determine header and column position from spaces and tabs |
+| linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
+
+---
+
+### 🧾 ndJSON input options
+
+List of options to use when _in=ndjson_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
+| ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
+
+---
+
+### 🧾 RAWHEX input options
 
 List of options to use when _in=rawhex_:
 
@@ -257,7 +249,44 @@ List of options to use when _in=rawhex_:
 
 ---
 
-## 🧾 CSV input/output options
+### 🧾 XLS input options
+
+List of options to use when _in=xls_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| xlssheet | String | The name of sheet to consider (default to the first sheet) |
+| xlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
+| xlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
+| xlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
+
+### 🧾 XML input options
+
+List of options to use when _in=xml_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| xmlignored | String | A comma-separated list of XML tags to ignore |
+| xmlprefix | String | A prefix to add to all XML tags |
+| xmlfiltertag | Boolean | If true will filter the XML tags |
+
+---
+
+## ⬇️⬆️  Input/Output options
+
+---
+
+### 🧾 Base64 input/output options
+
+List of options to use when _in=base64_ or _out=base64_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| base64gzip | Boolean | If true the contents will thet gzip/gunzip respectively to reduce the size of the base64 output |
+
+---
+
+### 🧾 CSV input/output options
 
 List of options to use with the _inputcsv_ input option (when input type=csv) and/or the _csv_ output option (when output=csv). Both expect the corresponding options to be provided in single JSON or SLON value (see below for example):
 
@@ -278,29 +307,11 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 ---
 
-## 🧾 Base64 input/output options
-
-List of options to use when _in=base64_ or _out=base64_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| base64gzip | Boolean | If true the contents will thet gzip/gunzip respectively to reduce the size of the base64 output |
+## 🚜 Transform options
 
 ---
 
-## 🧾 LLM input/transform options
-
-List of options to use when _in=llm_ or _llmprompt=..._:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
-| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
-| llmconversation | String | File to keep the LLM conversation |
-
----
-
-## 🧾 CMLT transform options
+### 🧾 CMLT transform options
 
 List of options to use when _cmlt=true_:
 
@@ -311,7 +322,7 @@ List of options to use when _cmlt=true_:
 
 ---
 
-## 🧾 Diff transform options
+### 🧾 Diff transform options
 
 List of options to use when _diff=..._:
 
@@ -335,7 +346,19 @@ List of options to use when _diff=..._:
 
 ---
 
-## 🧾 Regression transform options
+### 🧾 LLM input/transform options
+
+List of options to use when _in=llm_ or _llmprompt=..._:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
+| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
+| llmconversation | String | File to keep the LLM conversation |
+
+---
+
+### 🧾 Regression transform options
 
 List of options to use when _regression=..._:
 
@@ -350,41 +373,40 @@ List of options to use when _regression=..._:
 
 ---
 
-## 🧾 Log output options
-
-List of options to use when _out=log_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| logprintall | Boolean | If true all original non data (string) lines will be output |
+## ⬆️  Output options
 
 ---
 
-## 🧾 SQL output options
+### 🧾 CH output options
 
-List of options to use when _out=sql_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| sqltable | String | The table name to use for the SQL statements (defaults to 'data') |
-| sqlicase | Boolean | If true the table and fields names won't be double-quoted |
-| sqlnocreate | Boolean | If true the create table statement won't be generated |
-
----
-
-## 🧾 Template output options
-
-List of options to use when _out=template_:
+List of options to use when _out=ch_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| template | String | A file path to a HandleBars' template |
-| templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
-| templatedata | String | If defined the template data will be retrieved from the provided path |
+| ch   | String | A JSON/SLON configuration string with type and options/url |
+| chkey | String | A comma delimited list of map keys to build a key from each array value |
+| chunset | Boolean | If true the input data will be used to unset data on the output channel instead of set |
+
+> Example of options provided in JSON: ch="{type:'mvs',options:{file:'data.db'}}"
+> Example of optiosn provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
 
 ---
 
-## 🧾 Cmd output options
+### 🧾 Chart output options
+
+List of options to use when _out=chart_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+| chartcls | Boolean | If true the screen will be cleared for each execution |
+
+Example: 
+```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+
+---
+
+### 🧾 Cmd output options
 
 List of options to use when _out=cmd_:
 
@@ -400,27 +422,7 @@ List of options to use when _out=cmd_:
 
 ---
 
-## 🧾 Envs output options
-
-List of options to use when _out=envs_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| envscmd | String | If defined will output the provided command to set each environment variable (defaults to 'export' or 'set' in Windows) |
-| envsprefix | String | If defined uses the provided prefix for each environment variable key (defaults to '_OAFP_') |
-
-Example of a shell script using 'out=envs': 
-
-```
-#!/bin/sh
-eval $(oafp -v out=envs)
-echo Using OpenAF version: $_OAFP_openaf_version - $_OAFP_openaf_distribution
-echo On the operating system: $_OAFP_os_name
-```
-
----
-
-## 🧾 DB output options
+### 🧾 DB output options
 
 List of options to use when _out=db_:
 
@@ -444,49 +446,27 @@ List of options to use when _out=db_:
 
 ---
 
-## 🧾 CH output options
+### 🧾 Envs output options
 
-List of options to use when _out=ch_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| ch   | String | A JSON/SLON configuration string with type and options/url |
-| chkey | String | A comma delimited list of map keys to build a key from each array value |
-| chunset | Boolean | If true the input data will be used to unset data on the output channel instead of set |
-
-> Example of options provided in JSON: ch="{type:'mvs',options:{file:'data.db'}}"
-> Example of optiosn provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
-
----
-
-## 🧾 Chart output options
-
-List of options to use when _out=chart_:
+List of options to use when _out=envs_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
-| chartcls | Boolean | If true the screen will be cleared for each execution |
+| envscmd | String | If defined will output the provided command to set each environment variable (defaults to 'export' or 'set' in Windows) |
+| envsprefix | String | If defined uses the provided prefix for each environment variable key (defaults to '_OAFP_') |
 
-Example: 
-```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+Example of a shell script using 'out=envs': 
 
----
-
-## 🧾 SChart output options
-
-List of options to use when _out=schart_:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| schart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
-
-Example: 
-```oafp data="[(x:1,y:2)|(x:2,y:5)|(x:1,y:4)|(x:2,y:5)|(x:1,y:5)]" in=slon out=schart schart="int '[].x':red:x '[].y':blue:y -min:0 -vsize:8"```
+```
+#!/bin/sh
+eval $(oafp -v out=envs)
+echo Using OpenAF version: $_OAFP_openaf_version - $_OAFP_openaf_distribution
+echo On the operating system: $_OAFP_os_name
+```
 
 ---
 
-## 🧾 Grid output options
+### 🧾 Grid output options
 
 List of options to use when _out=grid_:
 
@@ -504,21 +484,30 @@ Each map should be composed of a:
 
 ---
 
-## 🧾 XLS output options
+### 🧾 HTML output options
 
-List of options to use when _out=xls_:
+List of options to use when _out=html_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| xlsfile | String | The output filename (if not defined a temporary file will be used to open with the OS's Excel-compatible application) |
-| xlssheet | String | The name of sheet to use (default to 'data') |
-| xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
-| xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
-| xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
+| htmlcompact | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will have a visual compact width format |
+| htmlpart | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will be partial and not the complete file |
+| htmlopen | Boolean | Boolean that if false won't try to open the output contents in a browser (defaults to true) |
+| htmlwait | Number | Amount of ms, when htmlopen=true, to wait for the system browser to open an render the html output | 
 
 ---
 
-## 🧾 OpenMetrics output options
+### 🧾 Log output options
+
+List of options to use when _out=log_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| logprintall | Boolean | If true all original non data (string) lines will be output |
+
+---
+
+### 🧾 OpenMetrics output options
 
 List of options to use when _out=openmetrics_:
 
@@ -529,28 +518,54 @@ List of options to use when _out=openmetrics_:
 
 ---
 
-## 🧾 XML output options
+### 🧾 SChart output options
 
-List of options to use when _out=xml_:
+List of options to use when _out=schart_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| xmlignored | String | A comma-separated list of XML tags to ignore |
-| xmlprefix | String | A prefix to add to all XML tags |
-| xmlfiltertag | Boolean | If true will filter the XML tags |
+| schart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+
+Example: 
+```oafp data="[(x:1,y:2)|(x:2,y:5)|(x:1,y:4)|(x:2,y:5)|(x:1,y:5)]" in=slon out=schart schart="int '[].x':red:x '[].y':blue:y -min:0 -vsize:8"```
 
 ---
 
-## 🧾 HTML output options
+### 🧾 SQL output options
 
-List of options to use when _out=html_:
+List of options to use when _out=sql_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| htmlcompact | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will have a visual compact width format |
-| htmlpart | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will be partial and not the complete file |
-| htmlopen | Boolean | Boolean that if false won't try to open the output contents in a browser (defaults to true) |
-| htmlwait | Number | Amount of ms, when htmlopen=true, to wait for the system browser to open an render the html output | 
+| sqltable | String | The table name to use for the SQL statements (defaults to 'data') |
+| sqlicase | Boolean | If true the table and fields names won't be double-quoted |
+| sqlnocreate | Boolean | If true the create table statement won't be generated |
+
+---
+
+### 🧾 Template output options
+
+List of options to use when _out=template_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| template | String | A file path to a HandleBars' template |
+| templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
+| templatedata | String | If defined the template data will be retrieved from the provided path |
+
+---
+
+### 🧾 XLS output options
+
+List of options to use when _out=xls_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| xlsfile | String | The output filename (if not defined a temporary file will be used to open with the OS's Excel-compatible application) |
+| xlssheet | String | The name of sheet to use (default to 'data') |
+| xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
+| xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
+| xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
 
 ---
 
