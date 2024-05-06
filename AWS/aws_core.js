@@ -388,47 +388,61 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
 
 /**
  * <odoc>
- * <key>AWS.restPreActionAWSSign4(aRegion, aService, aAmzFields, aDate, aContentType) : Function</key>
+ * <key>AWS.restPreActionAWSSign4(aRegionOrMapWithFields, aService, aAmzFields, aDate, aContentType) : Function</key>
  * Provides a preAction function to be used with $rest pre-actions for AWS signed rest requests.
  * </odoc>
  */
 AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aDate, aContentType) {
-   var parent = this;
+   var parent = this
+
+   if (isMap(aRegion)) {
+      var iMap = clone(aRegion)
+      aRegion      = _$(iMap.region, "map.region").isString().default("us-east-1")
+      aService     = _$(iMap.service, "map.service").isString().$_()
+      aAmzFields   = _$(iMap.amzFields, "map.amzFields").isMap().default(__)
+      aDate        = _$(iMap.date, "map.date").isDate().default(__)
+      aContentType = _$(iMap.contentType, "map.contentType").isString().default(__)
+   }
+
    return function(aOps) {
-      aOps.reqHeaders = _$(aOps.reqHeaders).default({});
-      aVerb = aOps.aVerb.toLowerCase();
+      aOps.reqHeaders = _$(aOps.reqHeaders).default({})
+      aVerb = aOps.aVerb.toLowerCase()
 
       if (aVerb == "post" || aVerb == "put" || aVerb == "patch") {
-         var url = new java.net.URL(aOps.aBaseURL);
-         var aHost = String(url.getHost());
-         var aUri = String(url.getPath());
-         var params = String(url.getQuery());
+         var url = new java.net.URL(aOps.aBaseURL)
+         var aHost = String(url.getHost())
+         var aUri = String(url.getPath())
+         var params = String(url.getQuery())
 
-         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap);
-         if (params == "null") params = $rest().query(aOps.aIdxMap);
-         if (params == "" && aOps.aBaseURL.endsWith("?")) aOps.aBaseURL = aOps.aBaseURL.substring(0, aOps.aBaseURL.length -1);
+         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap)
+         if (params == "null") params = $rest().query(aOps.aIdxMap)
+         if (params == "" && aOps.aBaseURL.endsWith("?")) aOps.aBaseURL = aOps.aBaseURL.substring(0, aOps.aBaseURL.length -1)
 
-         aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
-         var aPayload = (aContentType == "application/x-www-form-urlencoded" ? $rest().query(aOps.aDataRowMap) : stringify(aOps.aDataRowMap, void 0, ""));
-         aPayload = _$(aPayload).default("");
+         aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded; charset=utf-8")
+         var aPayload = (aContentType == "application/x-www-form-urlencoded; charset=utf-8" ? $rest().query(aOps.aDataRowMap) : stringify(aOps.aDataRowMap, __, ""))
+         aPayload = _$(aPayload).default("")
          aOps.reqHeaders = merge(aOps.reqHeaders,
-            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, aPayload, aAmzFields, aDate, aContentType));
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, aPayload, aAmzFields, aDate, aContentType))
+
+         aOps.urlEncode = aContentType.startsWith("application/x-www-form-urlencoded")
       } else {
-         var url = new java.net.URL(aOps.aBaseURL);
-         var aHost = String(url.getHost());
-         var aUri = String(url.getPath());
-         var params = String(url.getQuery());
+         var url = new java.net.URL(aOps.aBaseURL)
+         var aHost = String(url.getHost())
+         var aUri = String(url.getPath())
+         var params = String(url.getQuery())
 
-         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap);
-         if (params == "null") params = $rest().query(aOps.aIdxMap);
+         if (params != "null" && Object.keys(aOps.aIdxMap).length > 0) params = params + "&" + $rest().query(aOps.aIdxMap)
+         if (params == "null") params = $rest().query(aOps.aIdxMap)
+
+         aContentType = _$(aContentType).isString().default("application/json; charset=utf-8")
 
          aOps.reqHeaders = merge(aOps.reqHeaders,
-            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? void 0 : aContentType)));
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? __ : aContentType)))
       }
 
-      return aOps;
-   };
-};
+      return aOps
+   }
+}
 
 /**
  * <odoc>
