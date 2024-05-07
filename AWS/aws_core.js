@@ -436,8 +436,10 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
 
          aContentType = _$(aContentType).isString().default("application/json; charset=utf-8")
 
+         /*aOps.reqHeaders = merge(aOps.reqHeaders,
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? __ : aContentType)))*/
          aOps.reqHeaders = merge(aOps.reqHeaders,
-            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, (aVerb == "delete" ? __ : aContentType)))
+            parent.__getRequest(aVerb, aUri, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType))
       }
 
       return aOps
