@@ -281,7 +281,7 @@ const showHelp = () => {
         if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
             ow.format.string.pauseString( ow.format.withMD( io.readFileString(_f) + _customHelp ) )
         else
-            _print(ow.format.withMD( io.readFileString(_f) + _customHelp ))
+            _print((isDef(params.out) && params.out == "raw") ? io.readFileString(_f) + _customHelp : ow.format.withMD( io.readFileString(_f) + _customHelp ))
     } else {
         if (isDef(global._oafphelp) && isDef(global._oafphelp[_ff])) {
             __ansiColorFlag = true
@@ -289,7 +289,7 @@ const showHelp = () => {
             if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
                 ow.format.string.pauseString( ow.format.withMD( global._oafphelp[_ff] + _customHelp ) )
             else
-                _print(ow.format.withMD( global._oafphelp[_ff] + _customHelp))
+                _print((isDef(params.out) && params.out == "raw") ? global._oafphelp[_ff] + _customHelp : ow.format.withMD( global._oafphelp[_ff] + _customHelp))
         } else {
             if (isString(_oafhelp_libs[params.help])) {
                 __ansiColorFlag = true
@@ -297,7 +297,7 @@ const showHelp = () => {
                 if (isDef(ow.format.string.pauseString) && toBoolean(params.pause))
                     ow.format.string.pauseString( ow.format.withMD( _oafhelp_libs[params.help] ) )
                 else
-                    _print(ow.format.withMD( _oafhelp_libs[params.help] ))
+                    _print((isDef(params.out) && params.out == "raw") ? _oafhelp_libs[params.help] : ow.format.withMD( _oafhelp_libs[params.help] ))
             } else {
                 _print("Check https://github.com/OpenAF/oafp/blob/master/src/" + _ff)
             }
