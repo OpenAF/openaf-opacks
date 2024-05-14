@@ -1813,10 +1813,21 @@ var _inputFns = new Map([
         if (isDef(params.llmconversation) && io.fileExists(params.llmconversation)) 
             res.getGPT().setConversation( io.readFileJSON(params.llmconversation) )
         let __res
+        let img
+        if (isString(params.llmimage)) {
+            if (params.llmimage.toLowerCase().match(/^https?:\/\//))
+                img = af.fromBytes2String(af.toBase64Bytes(af.fromInputStream2Bytes($rest().get2Stream(params.llmimage))))
+            else if (io.fileExists(params.llmimage))
+                img = af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))
+        } 
         if (params.output == "md" || params.output == "mdtable" || params.output == "raw") {
-            __res = res.prompt(_res)
+            __res = isDef(img) ? res.promptImage(_res, img) : res.prompt(_res)
         } else {
-            __res = res.promptJSON(_res)
+            if (isDef(img)) {
+                __res = res.promptImage(_res, img, __, __, __, __, true) 
+            } else {
+                __res = res.promptJSON(_res) 
+            }   
         }
         if (isDef(params.llmconversation)) io.writeFileJSON( params.llmconversation, res.getGPT().getConversation(), "" )
 

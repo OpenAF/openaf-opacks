@@ -83,6 +83,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
 | get(nameOrPath) | 20240305 | Given a path to the original object or a name set by 'set' or 'setp' returns the corresponding value | packages[].{name: name, version: version, parentVersion: get('version') } |
+| geta(nameOrPath, arrayIndex) | 20240415 | Given a path to the original objet or name set by 'set' or 'setp' returns the arrayIndex element of the corresponding returning array | ranges(length(get('arr')),`0`,`1`).map(&{ elem: geta('arr',@).elem }, @) |
 | getc(name) | 20240428 | Returns the current value of a counter name user with inc/dec | [].{ idx: inc('my_counter'), code: concat('c', get('my_counter')), name: name} |
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
@@ -90,6 +91,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | index_of(str, 'search') | 20240209 | Given a string will return the first index where the word 'search' occurs | index_of('This is a test', 'test') |
 | insert(obj, 'field', value) | 20240302 | Adds a 'field' with the corresponding value to the object. |
 | join(string, arrayString) | base | Returns a delimited list with the values of a specific array field | join(', ', files[].filename) |
+| k2a(map, 'keyREmatch', 'outkey', removeEmpties) | 20240415 | Given a map will only consider keys that match 'keyREmatch' and will output an array with the corresponding values. Optionally a 'outkey' can be added and removeEmpties boolean flag | k2a(@, 'strIngredient', 'ingredients', `true`) |
 | keys(object) | base | Returns a list of fields for a corresponding map | keys(files[0]) |
 | last_index_of(str, 'search') | 20240209 | Given a string will return the last index where the word 'search' occurs | last_index_of('Test of a test', 'test') |
 | length(string/array/object) | base | Returns the size of any array or list | length(keys(files[0])) |
