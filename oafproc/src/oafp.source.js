@@ -1829,7 +1829,11 @@ var _inputFns = new Map([
                 __res = res.promptJSON(_res) 
             }   
         }
-        if (isDef(params.llmconversation)) io.writeFileJSON( params.llmconversation, res.getGPT().getConversation(), "" )
+        if (isDef(params.llmconversation)) {
+            var _conv = res.getGPT().getConversation()
+            _conv.push({ role: "assistant", content: stringify(__res, __, "") })
+            io.writeFileJSON( params.llmconversation, _conv, "" )
+        }
 
         _$o(jsonParse(__res, __, __, isString(__res)), options)
     }],
