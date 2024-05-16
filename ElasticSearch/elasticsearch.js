@@ -118,17 +118,17 @@ ElasticSearch.prototype.setTemplatePriRep = function(aTemplateName, aListOfIndex
  * </odoc>
  */
 ElasticSearch.prototype.createIndex = function(aIndex, aNumberOfShards, aNumberOfReplicas, extraOptions) {
-	ow.loadObj();
-	var options = {};
+	ow.loadObj()
+	var options = {}
 
-	if (isDef(aNumberOfShards)) options = merge(options, { settings: { index: { number_of_shards: aNumberOfShards } }});
-	if (isDef(aNumberOfReplicas)) options = merge(options, { settings: { index: { number_of_replicas: aNumberOfReplicas } }});
-	if (isDef(extraOptions)) options = merge(options, extraOptions);
+	if (isDef(aNumberOfShards)) options = merge(options, { settings: { index: { number_of_shards: aNumberOfShards } }})
+	if (isDef(aNumberOfReplicas)) options = merge(options, { settings: { index: { number_of_replicas: aNumberOfReplicas } }})
+	if (isDef(extraOptions)) options = merge(options, extraOptions)
 
-	if (isUnDef(aIndex)) throw "Please provide aIndex";
+	if (isUnDef(aIndex)) throw "Please provide aIndex"
 
 	//return ow.obj.rest.jsonSet(this.url + "/" + aIndex, {}, options, this.user, this.pass);
-	return $rest(this.restmap).put(this.url + "/" + aIndex, options);
+	return $rest(this.restmap).put(this.url + "/" + aIndex, Object.keys(options).length == 0 ? __ : options)
 };
 
 ElasticSearch.prototype.alias = function() {
