@@ -5,10 +5,12 @@ if (isUnDef(params) || isDef(params.____ojob)) return
 
 // Ensure params are interpreted as lower case
 Object.keys(params).forEach(pk => {
-    var npk = pk.toLowerCase()
-    if (pk != npk && isUnDef(params[npk])) {
-        params[npk] = params[pk]
-        delete params[pk]
+    if (params[pk].length > 0) {
+        var npk = pk.toLowerCase()
+        if (pk != npk && isUnDef(params[npk])) {
+            params[npk] = params[pk]
+            delete params[pk]
+        }
     }
 })
 

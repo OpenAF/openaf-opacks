@@ -49,7 +49,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > _sqlfilterstable_ assumes and forces _sqlfilter=advanced_
 
-> Use 'OAFP_NORESET=true' to forces not to reset the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
+> Use 'OAFP_RESET=true' to forces to reset the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
 
 ---
 
