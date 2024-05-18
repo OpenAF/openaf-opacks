@@ -63,6 +63,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ch | An OpenAF channel format |
 | csv | A CSV format (auto-detected) |
 | db | A JDBC query to a database |
+| gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
 | json | A JSON format (auto-detected) |
@@ -137,6 +138,7 @@ List of available formats to use with the _output_ option:
 | ctree | A tree-like forcely colored format |
 | db | Output to a JDBC database |
 | envs | Tries to output the input data as OS environment variables setting commands |
+| gb64json | Equivalent to out=base64 and base64gzip=true |
 | grid | A multiple output ascii grid (usefull together with 'loop') |
 | html | An HTML format |
 | ini | A INI/Properties format (arrays are not supported) |

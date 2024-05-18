@@ -1058,6 +1058,15 @@ var _outputFns = new Map([
             _print(af.fromBytes2String(af.toBase64Bytes(_o)))
         }
     }],
+    ["gb64json", (r, options) => {
+        var _o = ""
+        if (isString(r))
+            _o = r
+        else
+            _o = stringify(r)
+
+        _print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
+    }],
     ["grid" , (r, options) => {
         if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
         let _f = _fromJSSLON(_$(params.grid, "grid").isString().$_())
@@ -1767,6 +1776,12 @@ var _inputFns = new Map([
         } else {
             _r = af.fromBytes2String(af.fromBase64(_res))
         }
+        _$o(_r, options)
+    }],
+    ["gb64json", (_res, options) => {
+        var _r
+        _showTmpMsg()
+        _r = af.fromBytes2String(io.gunzip(af.fromBase64(_res, true)))
         _$o(_r, options)
     }],
     ["oafp", (_res, options) => {
