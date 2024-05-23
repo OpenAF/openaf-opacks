@@ -79,7 +79,7 @@ List of data input types that can be auto-detected (through the file extension o
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
 | slon | A SLON format (auto-detected) |
-| sql | One or more SQLs statements to AST (Abstract Syntax Tree) |
+| sql | One or more SQLs statements to AST (Abstract Syntax Tree) or beautified SQL |
 | toml | TOML format |
 | xls | A XLSx compatible file (requires file=abc.xlsx) |
 | xml | An XML format (auto-detected) |
@@ -251,6 +251,26 @@ List of options to use when _in=rawhex_:
 | Option | Type | Description |
 |--------|------|-------------|
 | inrawhexline | Number | Number of hexadecimal characters per returned array line | 
+
+---
+
+### 🧾 SQL input options
+
+List of options to use when _in=sql_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| sqlparse | Boolean | If true instead of returning a SQL AST representation it will beautify the SQL statement(s) | 
+| sqloptions | String | A JSON/SLON map with options for sqlparse=true |
+
+SQL options available:
+
+* indent: the indentation string (defaults to "  ")
+* uppercase: if true will uppercase the SQL (defaults to false)
+* linesBetweenQueries: number of lines between queries (defaults to 1)
+* maxColumnLength: maximum column length (defaults to 50)
+* skipWhitespaceNearBlockParentheses: if true will whitespace near block parentheses (defaults to false)
+* language: the SQL language dialect (Db2, MariaDb, MySql, N1ql, PlSql, PostgreSql, Redshift, SparkSql, StandardSql and TSql)
 
 ---
 

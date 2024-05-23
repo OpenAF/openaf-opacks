@@ -1604,7 +1604,12 @@ var _inputFns = new Map([
     }],
     ["sql", (r, options) => {
         if (isString(r)) {
-            _$o(af.fromSQL(r).ast, options)
+            if (toBoolean(params.sqlparse)) {
+                if (isUnDef(ow.format.sqlFormat)) _exit(-1, "SQL parse not available.")
+                _$o(ow.format.sqlFormat(r, isDef(params.sqloptions) ? _fromJSSLON(params.sqloptions) : __), options)
+            } else {
+                _$o(af.fromSQL(r).ast, options)
+            }
         } else {
             _$o(r, options)
         }
