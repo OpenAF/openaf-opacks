@@ -717,6 +717,14 @@ var _transformFns = {
         }
         return _r
     },
+    "trim": _r => {
+        if (toBoolean(params.trim)) {
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (isString(aV)) aO[aK] = aV.trim()
+            })
+        }
+        return _r
+    },
     "removedups": _r => {
         if (toBoolean(params.removedups)) {
             if (isArray(_r)) {

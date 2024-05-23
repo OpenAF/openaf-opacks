@@ -118,6 +118,7 @@ These options will change the parsed input data included any filters provided.
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
+| trim | Boolean | If true all the strings of the result map/list will be trimmed |
 
 ---
 
