@@ -18,7 +18,7 @@ name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240424'
+version: '20240524'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -27,7 +27,7 @@ files:
 - .package.yaml
 - .precompile
 - rocksdb.js
-- rocksdbjni-9.1.1.jar
+- rocksdbjni-9.2.1.jar
 - tests/autoTestRocks.js
 - tests/autoTestRocks.yaml
 filesHash:
@@ -35,6 +35,6 @@ filesHash:
   .odoc.db: 1737cc42c3e23351e5e40bae50dcc8aee5a86d34
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
   rocksdb.js: 350d3097abeb5012d39a274f3020994a20c39284
-  rocksdbjni-9.1.1.jar: ea99eb59a384f28171daaeec8b0aa717464bd66c
+  rocksdbjni-9.2.1.jar: 28608efe439a0e63183d30b2f9e43c98d25312ac
   tests/autoTestRocks.js: 0293c08829dd2db5f5d9d3030c613efb2c3773b7
   tests/autoTestRocks.yaml: 930233438b594f1ed9a01e3be2eecba77d1de2f4
