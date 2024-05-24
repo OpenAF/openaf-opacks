@@ -18,3 +18,4 @@ loadLib("aws_cost.js");
 loadLib("aws_organizations.js");
 loadLib("aws_athena.js");
 loadLib("aws_route53.js")
+loadLib("aws_bedrock.js")

@@ -292,7 +292,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    var can_uri = aURI;
    var can_querystring = aRequestParams; // must be sorted by name
    //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
-   var can_headers = (isDef(content_type) ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + (altGet ? "" : "x-amz-date:" + amzdate + "\n");
+   var can_headers = (isDef(content_type) && content_type.length > 0 ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + (altGet ? "" : "x-amz-date:" + amzdate + "\n");
 
    var amzFieldsHeaders = Object.keys(aAmzFields), amzHeaders = [];
    for (var amzFieldI in amzFieldsHeaders) {
@@ -303,7 +303,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
       }
    }
 
-   var signed_headers = (isDef(content_type) ? "content-type;" : "") + "host" + (altGet ? "" : ";x-amz-date") + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
+   var signed_headers = (isDef(content_type) && content_type.length > 0 ? "content-type;" : "") + "host" + (altGet ? "" : ";x-amz-date") + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
    var payload_hash = sha256(aPayload);
 
    // Part 2
@@ -342,20 +342,23 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
         //request = merge(request, { _query: can_querystring, "X-Amz-Signature": signature, "X-Amz-Date": amzdate, "Authorization": authorization_header })
         //request = merge(request, { _query: can_querystring, "X-Amz-Date": amzdate, "Authorization": authorization_header })
         request._query = can_querystring + "&X-Amz-Signature=" + signature
-	request._data  = altGetFields
+	     request._data  = altGetFields
       } else {
         request = merge(request, {
-         "Content-Type": (isDef(aContentType) ? aContentType : void 0),
+         "Content-Type": (isString(aContentType) && aContentType.length > 0 ? aContentType : __),
          "X-Amz-Date": amzdate,
          "Authorization": authorization_header
         })
+
+	//if (isUnDef(aContentType) || aContentType.length == 0) delete request["Content-Type"]
       }
    } else {
       request = merge(request, {
-         "Content-Type": (isDef(aContentType) ? aContentType : void 0),
+         "Content-Type": (isString(aContentType) && aContentType.length > 0 ? aContentType : __),
          "x-amz-date": amzdate,
          "Authorization": authorization_header,
       });
+      //if (isUnDef(aContentType) || aContentType.length == 0) delete request["Content-Type"]
    }
 
    return request;
@@ -363,22 +366,22 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
 
 /**
  * <odoc>
- * <key>AWS.postURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) : Object</key>
+ * <key>AWS.postURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType, noUTF8) : Object</key>
  * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzFields, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
  * Returns the object returned by the API.
  * </odoc>
  */
-AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) {
+AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType, noUTF8) {
    var params = _$(aParams).isString().default(""), payload = "";
    aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
 
-   if (!aContentType.endsWith("charset=utf-8")) aContentType = aContentType + "; charset=utf-8"
+   if (aContentType.length > 0 && !aContentType.endsWith("charset=utf-8") && !noUTF8) aContentType = aContentType + "; charset=utf-8"
 
    if (aContentType.startsWith("application/x-www-form-urlencoded"))
       payload = ow.obj.rest.writeQuery(aArgs);
    else
       payload = isString(aArgs) ? aArgs : stringify(aArgs, void 0, "");
-   var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, aContentType);
+   var extra = this.__getRequest("post", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, (aContentType == '' ? __ : aContentType));
 
    return $rest({
       urlEncode: (aContentType.startsWith("application/x-www-form-urlencoded")),

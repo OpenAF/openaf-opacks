@@ -39,7 +39,7 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
 
   if (isString(aInput)) aInput = { "prompt": aInput }
 
-  var res = this.postURLEncoded(aURL, uri, __, aInput, "bedrock", aHost, aRegion, __, __, 'application/json')
+  var res = this.postURLEncoded(aURL, uri, __, aInput, "bedrock", aHost, aRegion, __, __, 'application/json', true)
   if (isDef(res.error)) return res
 
   return res
