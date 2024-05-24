@@ -216,18 +216,22 @@ const _chartPathParse = (r, frmt, prefix, isStatic) => {
     return ""
 }
 const _print = (m) => {
-    if ("undefined" === typeof params.outfile) {
-        print(m)
-    } else {
-        if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
-        if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
-            ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (toBoolean(params.outfileappend) ? "\n" : ""))
+    if ("undefined" !== typeof m) {
+        if ("undefined" === typeof params.outfile) {
+            print(m)
+        } else {
+            if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
+            if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
+                ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (toBoolean(params.outfileappend) ? "\n" : ""))
+            }
         }
     }
 }
 const _o$o = (a, b, c) => {
-    var _s = $o(a, b, c, true)
-    if (isDef(_s)) _print(_s)
+    if ("undefined" !== typeof a) {
+        var _s = $o(a, b, c, true)
+        if (isDef(_s)) _print(_s)
+    }
 }
 const _msg = "(processing data...)"
 const _showTmpMsg  = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
