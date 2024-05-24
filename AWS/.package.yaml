@@ -60,7 +60,7 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: b3e66e010e15d14a93a366abe6a3ecb6f4c6d036
+  .odoc.db: f0bae6ac9bdc9d07926c7b63bb95fb1ee8dd091d
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: ef2b67f8b77547f58bff5b1dbd4654beefa66a41
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
