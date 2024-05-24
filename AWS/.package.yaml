@@ -56,14 +56,15 @@ files:
 - aws_route53.js
 - aws_sqs.js
 - aws_sts.js
+- oafp_aws.js
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: f0bae6ac9bdc9d07926c7b63bb95fb1ee8dd091d
+  .odoc.db: b3e66e010e15d14a93a366abe6a3ecb6f4c6d036
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: ef2b67f8b77547f58bff5b1dbd4654beefa66a41
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_bedrock.js: 8c223dc857a0530db6909b82d88ab458fbafa1f1
+  aws_bedrock.js: bd51e42b92051f06482c74d2842f9643e4278dbf
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_core.js: f6ce1f26ec27654cb355ed4a358d5122cfe8be71
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
@@ -81,5 +82,6 @@ filesHash:
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
+  oafp_aws.js: 5ef19584f8463179709665287d2dd3d6e7101d11
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 4270af4475148191ca82c370d9cc3670708bef85
