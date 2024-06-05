@@ -122,6 +122,9 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | split_re(str, 're') | 20240228 | Equivalent to the split Javascript's function for a string given a regular expression separator | split_re(@, '\\s+')  |
 | split_sep(str, sep, arrEnc) | 20240217 | Given a string, a separator regexp and an array of pairs of enclosure chars | split_sep(@, '\\s+', from_slon('[['{'|'}']|['('|')']]'))  |
 | starts_with(string, array) | base | Returns true if a field has the provided prefix | files[?starts_with(filename, 'openaf.jar')] |
+| sql_format(sql, format) | 20240528 | Returns a beautified SQL with optional 'format' options map in json/slon. Options: indent (str); uppercase (bool); linesBetweenQueries (num); maxColumnLength (int); skipWhitespaceNearBlockParentheses (bool); language (str) | sql_format(sql, '(uppercase: true)') |
+| sort_semver(arrayVersions) | 20240605 | Sorts an array of strings with semantic versioning (e.g. 1.2.3) | sort_semver(@) |
+| sort_by_semver(arrayMaps, stringExp) | 20240605 | Sorts and array of maps where a string represents a semantic version (e.g. 1.2.3) | sort_by_semver([], 'version') |
 | sub(a, b) | 20240217 | Substracts two numbers | sub(`2`, `2`) |
 | substring(str, ini, end) | all | Given a string will return a sub-string starting on the initial index until the ending index | substring(@, index_of('test'), 5) |
 | sum(array) | base | Sums the numberic field of a provided array | sum(files[].size) |
