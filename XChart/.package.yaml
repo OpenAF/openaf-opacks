@@ -16,7 +16,7 @@ name: XChart
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240114'
+version: '20240605'
 dependencies: {}
 files:
 - .package.yaml
@@ -32,7 +32,7 @@ files:
 - lib/graphics2d-3.0.1.jar
 - lib/pdfbox-3.0.1.jar
 - lib/pdfbox-io-3.0.1.jar
-- lib/xchart-3.8.7.jar
+- lib/xchart-3.8.8.jar
 - test/test.html
 - xchart.js
 filesHash:
@@ -48,6 +48,6 @@ filesHash:
   lib/graphics2d-3.0.1.jar: 660c5e7359e89403e14ebd8803ca3e12ab750eda
   lib/pdfbox-3.0.1.jar: c76a2e9c5d36a95abf1a19e4f36728e542a438a6
   lib/pdfbox-io-3.0.1.jar: 111ec75f2754ce7706a2dffb476076484d321ee9
-  lib/xchart-3.8.7.jar: b937149becd93f1041d26146b4218ae6f0e48fc5
+  lib/xchart-3.8.8.jar: b6af19bed8daf42322dfe471f80f62632b5415f8
   test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
   xchart.js: 6b77fb260ab9548e50bdeec92a93434eb00cc536
