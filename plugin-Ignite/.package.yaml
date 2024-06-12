@@ -18,7 +18,7 @@ name: plugin-Ignite
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240114'
+version: '20240611'
 dependencies:
   openaf: '>=20210515'
 files:
@@ -31,20 +31,14 @@ files:
 - compile.yaml
 - ignite-core-2.16.0.jar
 - plugin-ignite.jar
-- src/openaf/plugins/Ignite$1.class
-- src/openaf/plugins/Ignite$2.class
-- src/openaf/plugins/Ignite.class
 - src/openaf/plugins/Ignite.java
 filesHash:
   .maven.yaml: 3a5411f66c9a3a5b5647be8652f865f2c89ecd82
-  .odoc.db: c0c39f9f674276a9a88b2f8ac7da0976be640cb9
+  .odoc.db: 2222cfff1b4e10f57f700a3a25cfc9a97763eada
   LICENSES.txt: d7ce9e985cc6d97abbbea1e8422417783f4fb773
   annotations-24.1.0.jar: 7af6a669488450c4a07c2c3254e2151df42d7d04
   cache-api-1.1.1.jar: c56fb980eb5208bfee29a9a5b9d951aba076bd91
   compile.yaml: f730870ffe1ac8c7cef2aad9ca7ee4c0d5bff83e
   ignite-core-2.16.0.jar: 0fdf5641f83df3383b79f05a4076676169c6e638
-  plugin-ignite.jar: a4a5b0feca776664fc285038a95636dbdde07ba4
-  src/openaf/plugins/Ignite$1.class: 0cc24b206f805aa91171e78cd76a2077aff2ac59
-  src/openaf/plugins/Ignite$2.class: 7e4e0c6eb6b21c5b00b9fd0f37b85affcf3885fb
-  src/openaf/plugins/Ignite.class: 846167396feb23a068abd83b9031ba9e0600b434
-  src/openaf/plugins/Ignite.java: 29f68c4c15d529abd8531dcbc5437ea1e0e8db1e
+  plugin-ignite.jar: c12b81dbeecd91d1261088b08a1bb7aec9fbd7dd
+  src/openaf/plugins/Ignite.java: ffa5ac5bf69d8264e3aab6b39dd8ac77b0e00eef

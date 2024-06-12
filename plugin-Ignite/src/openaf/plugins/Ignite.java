@@ -101,13 +101,14 @@ public class Ignite extends ScriptableObject {
 		if (secretKey != null && !(secretKey instanceof Undefined))
 			config.getConnectorConfiguration().setSecretKey(AFCmdBase.afc.dIP((String) secretKey));
 		if (name != null && !(name instanceof Undefined)) config.setIgniteInstanceName((String) name);
-		Ignition.getOrStart(config);
-		if (name == null || name instanceof Undefined) {
+		ignite = Ignition.getOrStart(config);
+		/*if (name == null || name instanceof Undefined) {
 			ignite = Ignition.ignite();
 		} else {
 			//config.setIgniteInstanceName((String) name);
 			ignite = Ignition.ignite((String) name);
-		}
+		}*/
+		ignite.cluster().state(org.apache.ignite.cluster.ClusterState.ACTIVE);
 	}
 	
 	/**
