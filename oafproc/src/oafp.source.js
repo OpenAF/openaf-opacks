@@ -374,6 +374,11 @@ if (isUnDef(params.file) && isUnDef(params.cmd)) {
     params.file = _found
 }
 
+// Verify the data param
+if ("[object Object]" == Object.prototype.toString.call(params.data)) {
+    params.data = stringify(params.data, __, "")
+}
+
 // --- File extensions list
 const _fileExtensions = new Map([
   [
