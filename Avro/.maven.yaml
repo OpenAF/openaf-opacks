@@ -1,0 +1,5 @@
+artifacts:
+  - id      : avro-tools
+    group   : org.apache.avro
+#  - id      : hadoop-common
+#    group   : org.apache.hadoop
