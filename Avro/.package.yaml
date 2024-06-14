@@ -22,6 +22,7 @@ dependencies:
   openaf: '>=20240318'
 files:
 - .maven.yaml
+- .package.yaml
 - avro-1.11.3.jar
 - avro-compiler-1.11.3.jar
 - avro-mapred-1.11.3.jar
@@ -41,7 +42,6 @@ files:
 - velocity-engine-core-2.3.jar
 - xz-1.9.jar
 - zstd-jni-1.5.5-5.jar
-- .package.yaml
 filesHash:
   .maven.yaml: f18b8e6aeef9fec3c32793e4c055e8d69c876c6f
   avro-1.11.3.jar: 02b463409b373bff9ece09f54a43d42da5cea55a
