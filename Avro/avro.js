@@ -33,6 +33,19 @@ Avro.prototype.loadFile = function(aFile) {
 
 /**
  * <odoc>
+ * <key>Avro.loadStream(aStream) : Avro</key>
+ * Loads an Avro file from aStream.
+ * </odoc>
+ */
+Avro.prototype.loadStream = function(aStream) {
+    if (isDef(this._is)) this._is.close()
+    this._is = aStream
+    this._sr = new Packages.org.apache.avro.file.DataFileStream(this._is, new Packages.org.apache.avro.generic.GenericDatumReader())
+    return this
+}
+
+/**
+ * <odoc>
  * <key>Avro.close()</key>
  * Closes the current Avro reader and input stream.
  * </odoc>
@@ -75,13 +88,16 @@ Avro.prototype.getStats = function() {
         this._sr.nextBlock()
     }
 
-    this.close()
-
-    return {
-        count: _c,
-        size: _s,
-        fileSize: _fileSize
+    var _r = {
+        blockCount: _c,
+        sizeInBytes: _s,
+        avgSizePerBlockInBytes: Math.round(_s / _c),
+        codec: this._sr.getMetaString("avro.codec"),
+        fileSizeInBytes: _fileSize
     }
+
+    this.close()
+    return _r
 }
 
 Avro.prototype.getSchema = function() {
