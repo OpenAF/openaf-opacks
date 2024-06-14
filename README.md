@@ -9,6 +9,7 @@
   |**AWS**|<img src=".github/badges/AWS.svg"><br>Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.|
   |**AsciiMo**|<img src=".github/badges/AsciiMo.svg"><br>Wrapper around AsciiMo/Figlet to produce ascii based banners.|
   |**Asciidoc**|<img src=".github/badges/Asciidoc.svg"><br>Provides a wrapper around asciidoctor.js enabling conversion to HTML|
+  |**Avro**|<img src=".github/badges/Avro.svg"><br>Provides a wrapper around handling Avro files.|
   |**Badgen**|<img src=".github/badges/Badgen.svg"><br>The Badgen library to generate badge like SVG rewritten for OpenAF|
   |**Bench**|<img src=".github/badges/Bench.svg"><br>A collection of benchmark performance tests|
   |**BouncyCastle**|<img src=".github/badges/BouncyCastle.svg"><br>Extra Java BouncyCastle crypto algorithms.|
