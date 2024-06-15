@@ -48,12 +48,12 @@ filesHash:
   avro-1.11.3.jar: 02b463409b373bff9ece09f54a43d42da5cea55a
   avro-compiler-1.11.3.jar: a01bc4a0806253ea57c722444fee63dfd6b96519
   avro-mapred-1.11.3.jar: 924bfef364238ff6befb4b511028e295801da721
-  avro.js: ece6f6da9a3c2aa422d1a061d3072ff0483ed2f9
+  avro.js: 1456b7ea668b16b27372efcfdd3e4accd682e8d2
   commons-text-1.10.0.jar: 3363381aef8cef2dbc1023b3e3a9433b08b64e01
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   javax.servlet-api-3.1.0.jar: 3cd63d075497751784b2fa84be59432f4905bf7c
   jopt-simple-5.0.4.jar: 4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c
-  oafp_Avro.js: 683fef90b80026d5b2fbd26143b11884ec9b3f2e
+  oafp_Avro.js: fa9fc727e2adf62c36908e9879a7aae88eeec0e1
   reload4j-1.2.25.jar: 45921e383a1001c2a599fc4c6cf59af80cdd1cf1
   samples/twitter.snappy.avro: 6ef77337320c2cce2abe3e8e498f54c1f128414e
   samples/userdata5.avro: 109d360501a60877c09dd682686051de5dee7bae

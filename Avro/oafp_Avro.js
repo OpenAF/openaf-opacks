@@ -28,16 +28,21 @@
             
                         _$o(_r, options)
                     } else {
-                        _exit(-1, "Avro is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
+                        oafp._exit(-1, "Avro is only support with 'file' or 'cmd' defined. Please provide a file=... or a cmd=...")
                     }
                 }
-            } ]/*,
-            output        : [ { 
-                type: "test", 
-                fn: (r, options) => {
-                    $o({ test: 'test output' }, options)
-                }
             } ],
+            output        : [ { 
+                type: "avro", 
+                fn: (r, options) => {
+                    if (isUnDef(params.avrofile)) oafp._exit(-1, "Please provide an 'avrofile' parameter.")
+
+                    loadLib("avro.js")
+                    var avro = new Avro()
+                    avro.fromArray(params.avrofile, r, params.avrocodec, isDef(params.avroschema) ? oafp._fromJSSLON(params.avroschema) : __)
+                    avro.close()
+                }
+            } ]/*,
             transform     : [ { 
                 type: "test", 
                 fn: (r) => {
@@ -67,6 +72,29 @@ List of options to use when _in=avro_:
 | inavrometa  | Boolean | Returns the Avro metadata as a map |
 | inavroschema | Boolean | Returns the Avro schema |
 
+---
+
+## ⬆️  Avro output types
+
+Extra output formats added by the test lib:
+
+| Output format | Description |
+|---------------|-------------|
+| avro          | Writes an Avro file |
+
+---
+
+### 🧾 Avro output options
+
+List of options to use when _out=avro_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| avrofile | String | The Avro filename to create | 
+| avrocodec  | String | One of the following options: snappy, bzip2, deflate, xz or zstandard |
+| avroschema | Map | A JSON/SLON string to force the schema to use. |
+
+> Example of a schema: avroschema="(type: record, name: my-record, fields: [(name: id, type: int) | (name: value, type: string)])"
 `
         }
 

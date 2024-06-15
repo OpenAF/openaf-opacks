@@ -58,6 +58,12 @@ Avro.prototype.close = function() {
     this._fi = __
 }
 
+/**
+ * <odoc>
+ * <key>Avro.getMeta() : Map</key>
+ * Returns a map with the metadata from the Avro file.
+ * </odoc>
+ */
 Avro.prototype.getMeta = function() {
     if (this._sr == __) throw "No stream reader loaded. Please use loadFile first."
 
@@ -100,6 +106,12 @@ Avro.prototype.getStats = function() {
     return _r
 }
 
+/**
+ * <odoc>
+ * <key>Avro.getSchema() : Map</key>
+ * Returns the Avro schema as a JSON object.
+ * </odoc>
+ */
 Avro.prototype.getSchema = function() {
     if (this._sr == __) throw "No stream reader loaded. Please use loadFile first."
     return jsonParse(this._sr.getSchema().toString(true))
@@ -120,6 +132,118 @@ Avro.prototype.forEach = function(aFn, dontConvert) {
     }
     
     this.close()
+}
+
+/**
+ * <odoc>
+ * <key>Avro.fromArray(aFile, aArray, codecToUse, aSchema)</key>
+ * Given an aArray of records, aFile, an optional codecToUse (snappy, bzip2, deflate, xz, zstandard) and an optional aSchema (if not provided it will be generated from the first record) this function will create an Avro file.
+ * Example:\
+ * \
+ * var avro = new Avro()\
+ * avro.fromArray("test.avro", [\
+ *    { name: "John", age: 30 },\
+ *    { name: "Jane", age: 25 }\
+ * ], "snappy")\
+ * \
+ * The above example will create a file "test.avro" with two records.\
+ * If you want to use a specific schema you can provide it as the last parameter.\
+ * If you want to use a specific codec you can provide it as the third parameter.\
+ * </odoc>
+ */
+Avro.prototype.fromArray = function(aFile, aArray, codecToUse, aSchema) {
+    _$(aFile, "file").isString().$_()
+    _$(aArray, "array").isArray().$_()
+    codecToUse = _$(codecToUse, "codecToUse").oneOf(["snappy", "bzip2", "deflate", "xz", "zstandard"]).isString().default("snappy")
+
+    // Generate schema
+    if (isUnDef(aSchema)) {
+        aSchema = {
+            type: 'record',
+            name: 'record',
+            fields: []
+        }
+
+        Object.keys(aArray[0]).forEach(k => {
+            var jsType = descType(aArray[0][k])
+            var avroType
+
+            switch(jsType) {
+            case "string":
+                avroType = "string"
+                break
+            case "number":
+                avroType = "double"
+                break
+            case "boolean":
+                avroType = "boolean"
+                break
+            case "bytearray":
+                avroType = "bytes"
+                break
+            case "array":
+                avroType = "array"
+                break
+            case "map":
+                avroType = "map"
+                break
+            default:
+                avroType = "string"
+                break
+            }
+
+            aSchema.fields.push({
+                name: k,
+                type: [ "null", avroType ]
+            })
+        })
+    }
+
+    // Create writer
+    var schema = new Packages.org.apache.avro.Schema.Parser().parse(stringify(aSchema))
+    var dataFileWriter = new Packages.org.apache.avro.file.DataFileWriter(new Packages.org.apache.avro.specific.SpecificDatumWriter(schema))
+
+    if (isDef(codecToUse)) {
+        switch(codecToUse) {
+        case "bzip2":
+            dataFileWriter.setCodec(Packages.org.apache.avro.file.CodecFactory.bzip2Codec())
+            break
+        case "deflate":
+            dataFileWriter.setCodec(Packages.org.apache.avro.file.CodecFactory.deflateCodec(9))
+            break
+        case "xz":
+            dataFileWriter.setCodec(Packages.org.apache.avro.file.CodecFactory.xzCodec(9))
+            break
+        case "zstandard":
+            dataFileWriter.setCodec(Packages.org.apache.avro.file.CodecFactory.zstandardCodec(22))
+            break
+        case "snappy":
+            dataFileWriter.setCodec(Packages.org.apache.avro.file.CodecFactory.snappyCodec())
+            break
+        }
+    }
+
+    dataFileWriter.create(schema, new java.io.File("test.avro"))
+
+    // Write records
+    aArray.forEach(r => {
+        var record = new Packages.org.apache.avro.generic.GenericData.Record(schema)
+        Object.keys(r).forEach(k => {
+            var recordType = $from(aSchema.fields).equals("name", k).at(0).type
+            if (!isArray(recordType)) recordType = [ recordType ]
+            
+            if (recordType.indexOf("double") >= 0) {
+                record.put(k, Number(r[k]))
+            } else if (recordType.indexOf("boolean") >= 0) {
+                record.put(k, Boolean(r[k]))
+            } else {
+                record.put(k, r[k])
+            }
+        })
+        dataFileWriter.append(record)
+    })
+
+    dataFileWriter.close()
 }
 
 /**
