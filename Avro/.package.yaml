@@ -23,6 +23,7 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - avro-1.11.3.jar
 - avro-compiler-1.11.3.jar
 - avro-mapred-1.11.3.jar
@@ -45,6 +46,7 @@ files:
 - zstd-jni-1.5.5-5.jar
 filesHash:
   .maven.yaml: f18b8e6aeef9fec3c32793e4c055e8d69c876c6f
+  README.md: ede87352949985f5268f910fe1ac08cd86e908f7
   avro-1.11.3.jar: 02b463409b373bff9ece09f54a43d42da5cea55a
   avro-compiler-1.11.3.jar: a01bc4a0806253ea57c722444fee63dfd6b96519
   avro-mapred-1.11.3.jar: 924bfef364238ff6befb4b511028e295801da721
