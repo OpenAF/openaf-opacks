@@ -17,7 +17,7 @@ name: Avro
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240617'
+version: '20240618'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -50,7 +50,7 @@ filesHash:
   avro-1.11.3.jar: 02b463409b373bff9ece09f54a43d42da5cea55a
   avro-compiler-1.11.3.jar: a01bc4a0806253ea57c722444fee63dfd6b96519
   avro-mapred-1.11.3.jar: 924bfef364238ff6befb4b511028e295801da721
-  avro.js: 1456b7ea668b16b27372efcfdd3e4accd682e8d2
+  avro.js: 2955a60b554855cad108368528762dfb7f85ec95
   commons-text-1.10.0.jar: 3363381aef8cef2dbc1023b3e3a9433b08b64e01
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   javax.servlet-api-3.1.0.jar: 3cd63d075497751784b2fa84be59432f4905bf7c

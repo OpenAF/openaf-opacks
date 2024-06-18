@@ -223,7 +223,7 @@ Avro.prototype.fromArray = function(aFile, aArray, codecToUse, aSchema) {
         }
     }
 
-    dataFileWriter.create(schema, new java.io.File("test.avro"))
+    dataFileWriter.create(schema, new java.io.File(aFile))
 
     // Write records
     aArray.forEach(r => {
@@ -237,7 +237,7 @@ Avro.prototype.fromArray = function(aFile, aArray, codecToUse, aSchema) {
             } else if (recordType.indexOf("boolean") >= 0) {
                 record.put(k, Boolean(r[k]))
             } else {
-                record.put(k, r[k])
+                record.put(k, String(isDate(r[k]) ? r[k].toISOString() : r[k]))
             }
         })
         dataFileWriter.append(record)
