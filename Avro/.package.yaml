@@ -17,7 +17,7 @@ name: Avro
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240614'
+version: '20240617'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -32,7 +32,7 @@ files:
 - javax.annotation-api-1.3.2.jar
 - javax.servlet-api-3.1.0.jar
 - jopt-simple-5.0.4.jar
-- oafp_Avro.js
+- oafp_avro.js
 - reload4j-1.2.25.jar
 - samples/twitter.snappy.avro
 - samples/userdata5.avro
@@ -55,7 +55,7 @@ filesHash:
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   javax.servlet-api-3.1.0.jar: 3cd63d075497751784b2fa84be59432f4905bf7c
   jopt-simple-5.0.4.jar: 4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c
-  oafp_Avro.js: fa9fc727e2adf62c36908e9879a7aae88eeec0e1
+  oafp_avro.js: fa9fc727e2adf62c36908e9879a7aae88eeec0e1
   reload4j-1.2.25.jar: 45921e383a1001c2a599fc4c6cf59af80cdd1cf1
   samples/twitter.snappy.avro: 6ef77337320c2cce2abe3e8e498f54c1f128414e
   samples/userdata5.avro: 109d360501a60877c09dd682686051de5dee7bae
