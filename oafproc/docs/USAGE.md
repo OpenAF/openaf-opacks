@@ -78,6 +78,7 @@ List of data input types that can be auto-detected (through the file extension o
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
+| sh | Executes a shell command returning stdout, stderr and exitcode as a map |
 | slon | A SLON format (auto-detected) |
 | sql | One or more SQLs statements to AST (Abstract Syntax Tree) or beautified SQL |
 | toml | TOML format |
@@ -251,6 +252,24 @@ List of options to use when _in=rawhex_:
 | Option | Type | Description |
 |--------|------|-------------|
 | inrawhexline | Number | Number of hexadecimal characters per returned array line | 
+
+---
+
+### 🧾 SH input options
+
+List of options to use when _in=sh_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inshformat | String | The format to parse stdout and stderr between raw, yaml or json (default) |
+
+The input data map can be composed of:
+
+* cmd (mandatory string/array) - the command to execute
+* envs (map) - a series of environment variables to use
+* envsall (boolean) - if true all existing environment variables will also be included
+* prefix (string) - if defined will output to the console stdout/stderr with the provided prefix
+* pwd (string) - the command path working directory
 
 ---
 

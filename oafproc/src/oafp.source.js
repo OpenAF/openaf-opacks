@@ -1841,6 +1841,30 @@ var _inputFns = new Map([
             _exit(-1, "oafp input data needs to be a map or an array.")
         }
     }],
+    ["sh", (_res, options) => {
+        _showTmpMsg()
+        var _r
+        _res = _fromJSSLON(_res)
+        if (isString(_res)) {
+            _r = $sh(_res).get(0)
+        } else {
+            if (!isMap(_res)) _exit(-1, "For in=sh the input data needs to a string or a map")
+            var _s = $sh()
+            if (isUnDef(_res.cmd)) _exit(-1, "For in=sh the input data needs to a string or a map with the a 'cmd'")
+
+            _s = _s.sh(_res.cmd)
+            if (isDef(_res.envs))   _s = _s.envs(_res.envs, _res.envsall)
+            if (isDef(_res.prefix)) _s = _s.prefix(_res.prefix)
+            if (isDef(_res.pwd))    _s = _s.pwd(_res.pwd)
+            switch(params.inshformat) {
+            case 'raw' : _r = _s.get(0); break
+            case 'yaml': _r = _s.getYaml(0); break
+            case 'json':
+            default    : _r = _s.getJson(0)
+            }
+        }
+        _$o(_r, options)
+    }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
         params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
