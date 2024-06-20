@@ -1411,6 +1411,11 @@ var _inputFns = new Map([
         if (isDef(__pm._list)) _res = __pm._list
         _$o(_res, options) 
     }],
+    ["key", (_res, options) => {
+        _showTmpMsg()
+        if (!isString(_res)) _exit(-1, "key is only supported with a string.")
+        _$o($get(_res), options)
+    }],
     ["jsonschema", (_res, options) => {
         _showTmpMsg()
         var _s = jsonParse(_res, __, __, true)

@@ -135,6 +135,6 @@ filesHash:
   docs/FILTERS.md: 59d86cab3d81c81dff0a41ce2cce1216a429d2dd
   docs/TEMPLATE.md: 7577084d6212eec69bf6feb22bd0e105ae33fe8c
   docs/USAGE.md: db500012de48129e654e68c1982cf5d1a9bedf2a
-  oafp.js: 21d77d3c59dbc4d0dadf82374bd4e825ae612547
+  oafp.js: 5e6cc4473e047db61c49a521484603d2a405172f
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 5931e0484e55bfe221825ad8fa5feccbc54050db
+  src/oafp.source.js: 598afa401fe29d8f37a0dad1282a23b4826940f9
