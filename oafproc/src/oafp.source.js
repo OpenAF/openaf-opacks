@@ -218,6 +218,7 @@ const _chartPathParse = (r, frmt, prefix, isStatic) => {
 const _print = (m) => {
     if ("undefined" !== typeof m) {
         if ("undefined" === typeof params.outfile) {
+            if (toBoolean(params.loopcls)) cls()
             print(m)
         } else {
             if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
@@ -2257,8 +2258,6 @@ if (isNumber(params.loop)) {
             if (isDef(params.outfile)) {
                 global.__oafp_streams[params.outfile].close()
                 global.__oafp_streams[params.outfile] = io.writeFileStream(params.outfile, toBoolean(params.outfileappend))
-            } else {
-                cls()
             }
         }
         _run()
