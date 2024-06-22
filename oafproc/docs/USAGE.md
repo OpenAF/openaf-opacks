@@ -74,6 +74,7 @@ List of data input types that can be auto-detected (through the file extension o
 | md | A Markdown format |
 | mdtable | A Markdown table format |
 | ndjson | A NDJSON format |
+| oaf | Takes an OpenAF scripting code to execute and use the result as input |
 | oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |

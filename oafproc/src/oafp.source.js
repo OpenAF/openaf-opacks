@@ -1191,12 +1191,13 @@ var _outputFns = new Map([
     }],
     ["chart", (r, options) => {
         if (isUnDef(params.chart)) _exit(-1, "For out=chart you need to provide a chart=\"<units> [<path[:color][:legend]>...]\"")
-        if (isUnDef(splitBySepWithEnc)) _exit(-1, "Output=chart is not supported in this version of OpenAF")
+        if (isUnDef(splitBySepWithEnc)) _exit(-1, "output=chart is not supported in this version of OpenAF")
 
         let fmt = _chartPathParse(r, params.chart)
         if (fmt.length > 0) {
+            var _out = printChart("oafp " + fmt)
             if (toBoolean(params.chartcls)) cls()
-            _print(printChart("oafp " + fmt))
+            _print(_out)
         }
 
     }],
@@ -1809,6 +1810,12 @@ var _inputFns = new Map([
         var _r
         _showTmpMsg()
         _r = af.fromBytes2String(io.gunzip(af.fromBase64(_res, true)))
+        _$o(_r, options)
+    }],
+    ["oaf", (_res, options) => {
+        if (!isString(_res)) _exit(-1, "oaf is only supported with a string.")
+        _showTmpMsg()
+        var _r = af.eval(_res)
         _$o(_r, options)
     }],
     ["oafp", (_res, options) => {
