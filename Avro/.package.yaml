@@ -17,7 +17,7 @@ name: Avro
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240618'
+version: '20240625'
 dependencies:
   openaf: '>=20240318'
 files:

@@ -1,7 +1,8 @@
 ;(function() {
     exports.oafplib = function(params, _$o, $o, oafp) {
         var _r = {
-            fileExtensions: [ { ext: ".avro", type: "avro" } ],
+            fileExtensions: [ { ext: ".avro", type: "avro" },
+                              { ext: ".avroSnappy", type: "avro" } ],
             input         : [ { 
                 type: "avro", 
                 fn: (r, options) => {
