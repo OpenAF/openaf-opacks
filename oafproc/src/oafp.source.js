@@ -1030,7 +1030,7 @@ var _outputFns = new Map([
             ow.template.addConditionalHelpers()
             ow.template.addOpenAFHelpers()
             ow.template.addFormatHelpers()
-            if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For out=handlebars you need to provide a template=someFile.hbs or templatepath=...")
+            if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For out=template you need to provide a template=someFile.hbs or templatepath=...")
             params.templatedata = _$(params.templatedata, "templatedata").isString().default("@")
             _print($t( isUnDef(params.template) ? $path(params.__origr, params.templatepath) : io.readFileString(params.template), $path(r, params.templatedata) ) )
         }
@@ -1925,6 +1925,44 @@ var _inputFns = new Map([
         if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
         _$o(res.getModels(), options)
     }],
+    ["ls", (_res, options) => {
+        _showTmpMsg()
+        if (isString(_res)) {
+            var _r
+            var isPosix = toBoolean(params.lsposix)
+
+            if (isDef(params.file)) _res = params.file
+
+            var _i = io.fileExists(_res), _f
+            if (_i) _f = io.fileInfo(_res)
+            if (_i && _f.isFile) {
+                var ext = isDef(params.lsext) ? params.lsext :_f.filename.replace(/^.*\./, '').toLowerCase()
+                switch(ext) {
+                case "tgz":
+                case "gz":
+                    _r = io.listFilesTAR(_res, true)
+                    break
+                case "tar":
+                    _r = io.listFilesTAR(_res)
+                    break
+                case "jar":
+                case "zip":
+                default   :
+                    plugin("ZIP")
+                    _r = $m4a((new ZIP()).list(_res))
+                }
+            } else {
+                if (toBoolean(params.lsrecursive)) {
+                    _r = listFilesRecursive(_res, isPosix)
+                } else {
+                    _r = io.listFiles(_res, isPosix).files
+                }
+            }
+            _$o(_r, options)
+        } else {
+            _exit(-1, "ls is only supported with a string.")
+        }
+    }],  
     ["toml", (_res, options) => {
         _showTmpMsg()
         if (isUnDef(af.fromTOML)) _exit(-1, "TOML support not found.")

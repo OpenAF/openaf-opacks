@@ -71,6 +71,7 @@ List of data input types that can be auto-detected (through the file extension o
 | lines | A given string/text to be processed line by line |
 | llm | A large language model input (uses 'llmenv' or 'llmoptions') |
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
+| ls | Returns a list of files and folders for a given directory path or zip or tar or tgz file |
 | md | A Markdown format |
 | mdtable | A Markdown table format |
 | ndjson | A NDJSON format |
@@ -232,6 +233,18 @@ List of options to use when _in=lines_:
 | linesjoin | Boolean | If true it will return an array with each processed line |
 | linesvisual | Boolean | If true it will try to determine header and column position from spaces and tabs |
 | linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
+
+---
+
+### 🧾 LS input options
+
+List of options to use when _in=ls_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| lsext | String | Forces the file format parsing of the provided path or file (between zip, tar, tgz) |
+| lsrecursive | Boolean | Will list all files and folders recursively (for folders) |
+| lsposix | Boolean | Tries to add extra posix data if available (for ZIP files) |
 
 ---
 
