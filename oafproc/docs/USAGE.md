@@ -68,6 +68,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ini | INI/Properties format |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
+| jwt | Decodes or verifies a JSON Web Token (JWT) |
 | lines | A given string/text to be processed line by line |
 | llm | A large language model input (uses 'llmenv' or 'llmoptions') |
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
@@ -147,6 +148,7 @@ List of available formats to use with the _output_ option:
 | html | An HTML format |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
+| jwt | Signs and encodes data into a JSON Web Token (JWT) |
 | log | If input has Logstash compatible fields outputs a human-readable log |
 | map | A rectangle map format |
 | md | A Markdown format |
@@ -221,6 +223,20 @@ List of options to use when _in=json_:
 |--------|------|-------------|
 | jsondesc | Boolean | If true the output will be a list of JSON paths of the original json.  |
 | jsonprefix | String | Given the 'jsondesc=true' output list you can use each to filter big json files by prefix. |
+
+---
+
+### 🧾 JWT input options
+
+List of options to use when _in=jwt_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| injwtverify | Boolean | If true the boolean entry '__verified' will be added to the result. |
+| injwtsecret | String | A string secret for using HS256, HS384 or HS512 depending on secret size used to verify. |
+| injwtpubkey | String | A public key file used to verify (might require specifying the injwtalg). |
+| injwtalg | String | Specifies the algorithm used to verify the JWT (HS* or RSA by default). Depends on available algorithms on the current JVM. |
+| injwtraw | Boolean | If true it won't try to convert Unix epoch timestamps to dates. |
 
 ---
 
@@ -522,6 +538,30 @@ eval $(oafp -v out=envs)
 echo Using OpenAF version: $_OAFP_openaf_version - $_OAFP_openaf_distribution
 echo On the operating system: $_OAFP_os_name
 ```
+
+---
+
+### 🧾 JWT output options
+
+List of options to use when _out=jwt_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| jwtsecret | String | A string secret for using HS256, HS384 or HS512 depending on secret size used to sign the JWT. |
+| jwtprivkey | String | A private key file used to sign (might require specifying the jwtalg). |
+| jwtalg | String | Specifies the algorithm used to sign the JWT (HS* or RSA by default). Depends on available algorithms on the current JVM. |
+
+The data map to sign can have the following entries:
+
+  * audience (String)
+  * claims (Map)
+  * expiration (Date)
+  * headers (Map)
+  * issuer (String)
+  * id (String)
+  * issuedAt (Daterrrr)
+  * notBefore (Date)
+  * subject (String)
 
 ---
 

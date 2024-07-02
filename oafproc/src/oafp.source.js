@@ -1085,6 +1085,23 @@ var _outputFns = new Map([
 
         _print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
     }],
+    ["jwt", (r, options) => {
+        if (isMap(r)) {
+            if (isUnDef(params.jwtsecret) && isUnDef(params.jwtprivkey)) _exit(-1, "For out=jwt you need to provide a jwtsecret or a jwtprivkey")
+            //if (isDef(params.jwtalg)) _exit(-1, "For out=jwt you need to provide a jwtalg")
+            ow.loadServer()
+            
+            if (isDef(params.jwtprivkey)) {
+                ow.loadJava()
+                var c = new ow.java.cipher()
+                _print(ow.server.jwt.sign(c.readKey4File(params.jwtprivkey, true, params.jwtalg), r))
+            } else {
+                _print(ow.server.jwt.sign(params.jwtsecret, r))
+            }
+        } else {
+            _exit(-1, "For out=jwt input needs to be a map.")
+        }
+    }],   
     ["grid" , (r, options) => {
         if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
         let _f = _fromJSSLON(_$(params.grid, "grid").isString().$_())
@@ -1615,6 +1632,36 @@ var _inputFns = new Map([
             _r = ini.loadFile(params.file).get()
         } else {
             _r = ini.load(r).get()
+        }
+        _$o(_r, options)
+    }],
+    ["jwt", (r, options) => {
+        ow.loadServer()
+        var _r, verify
+        if (toBoolean(params.injwtverify)) {
+            if (isUnDef(params.injwtsecret) && isUnDef(params.injwtpubkey)) _exit(-1, "injwtsecret or injwtpubkey is not defined.")
+            try {
+                if (isDef(params.injwtpubkey)) {
+                    ow.loadJava()
+                    var c = new ow.java.cipher()
+                    _r = ow.server.jwt.verify(c.readKey4File(params.injwtpubkey, false, params.injwtalg), r)
+                } else {
+                    ow.server.jwt.verify(params.injwtsecret, r)
+                }
+                verify = true
+            } catch(e) {
+                if (isDef(e.javaException)) printErr(e.javaException.getMessage())
+                verify = false
+            }
+        } 
+
+        _r = ow.server.jwt.decode(r)
+        if (isDef(verify)) _r.__verified = verify
+        if (!toBoolean(params.injwtraw) && isDef(_r) && isMap(_r.claims)) {
+            if (isDef(_r.claims.exp)) _r.claims.exp = new Date(_r.claims.exp * 1000)
+            if (isDef(_r.claims.iat)) _r.claims.iat = new Date(_r.claims.iat * 1000)
+            if (isDef(_r.claims.nbf)) _r.claims.nbf = new Date(_r.claims.nbf * 1000)
+            
         }
         _$o(_r, options)
     }],
