@@ -425,6 +425,10 @@ const _fileExtensions = new Map([
   [
     ".toml",
     "toml"
+  ],
+  [
+    ".jwt",
+    "jwt"
   ]
 ])
 // --- add extra _fileExtensions here ---
@@ -1644,9 +1648,9 @@ var _inputFns = new Map([
                 if (isDef(params.injwtpubkey)) {
                     ow.loadJava()
                     var c = new ow.java.cipher()
-                    _r = ow.server.jwt.verify(c.readKey4File(params.injwtpubkey, false, params.injwtalg), r)
+                    _r = ow.server.jwt.verify(c.readKey4File(params.injwtpubkey, false, params.injwtalg), r.trim())
                 } else {
-                    ow.server.jwt.verify(params.injwtsecret, r)
+                    ow.server.jwt.verify(params.injwtsecret, r.trim())
                 }
                 verify = true
             } catch(e) {

@@ -68,7 +68,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ini | INI/Properties format |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
-| jwt | Decodes or verifies a JSON Web Token (JWT) |
+| jwt | Decodes and/or verifies a JSON Web Token (JWT) |
 | lines | A given string/text to be processed line by line |
 | llm | A large language model input (uses 'llmenv' or 'llmoptions') |
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
@@ -148,7 +148,7 @@ List of available formats to use with the _output_ option:
 | html | An HTML format |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
-| jwt | Signs and encodes data into a JSON Web Token (JWT) |
+| jwt | Signs map data into a JSON Web Token (JWT) |
 | log | If input has Logstash compatible fields outputs a human-readable log |
 | map | A rectangle map format |
 | md | A Markdown format |
