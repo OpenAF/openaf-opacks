@@ -606,6 +606,16 @@ List of options to use when _out=log_:
 
 ---
 
+### 🧾 MD output options
+
+List of options to use when _out=md_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| mdtemplate | Boolean | If true will apply a template output without any input data |
+
+---
+
 ### 🧾 OpenMetrics output options
 
 List of options to use when _out=openmetrics_:
@@ -651,6 +661,7 @@ List of options to use when _out=template_:
 | template | String | A file path to a HandleBars' template |
 | templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
 | templatedata | String | If defined the template data will be retrieved from the provided path |
+| 
 
 ---
 

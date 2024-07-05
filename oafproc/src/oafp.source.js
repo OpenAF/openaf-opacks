@@ -958,6 +958,9 @@ var _outputFns = new Map([
     ["table", (r, options) => {
         _o$o(r, options)
     }],
+    ["md", (r, options) => {
+        _o$o((toBoolean(params.mdtemplate) ? $t(r) : r), options)
+    }],
     ["log", (r, options) => {
         if (isString(r) && toBoolean(params.logprintall)) {
             _print(r.replace(/\n$/, ""))
