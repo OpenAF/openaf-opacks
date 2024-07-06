@@ -1495,6 +1495,7 @@ var _inputFns = new Map([
                 _linesvisual_header = [], lastPos = 0
                 if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = " \\s+"
                 r.split(new RegExp(params.linesvisualsepre)).forEach(h => {
+                    if (h.trim().length == 0) return
                     _linesvisual_header.push(h)
                     let _mr = r.substring(lastPos).match(new RegExp(ow.format.escapeRE(h) + "(" + params.linesvisualsepre + "|$)"))
                     if (!isNull(_mr) && isDef(_mr.index)) {
