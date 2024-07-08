@@ -28,5 +28,5 @@ files:
 - oafp_dockerregistry.js
 filesHash:
   .odoc.db: c19f70dcfa0da8e992a11cfa41d78f3cedbd0f65
-  dockerRegistry.js: 5d4bf3bd50517978279d9f7603c930649886fd38
-  oafp_dockerregistry.js: d3f4b4baf841e42d610c19653d52f2fba3805cb0
+  dockerRegistry.js: 79dffb5fc4f539e609d298820c843a628e5797c4
+  oafp_dockerregistry.js: d78d8dac832790b0159302d0041c25cbd8b2d615

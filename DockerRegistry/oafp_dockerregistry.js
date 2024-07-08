@@ -25,6 +25,17 @@
                     var dr = new DockerRegistry(aURL, aLogin, aPass)
                     _$o(dr.listTags(r), options)
                 }
+            }, {
+                type: "registrymanifest",
+                fn: (r, options) => {
+                    oafp._showTmpMsg()
+                    aURL = params.inregistryurl
+                    aLogin = params.inregistrylogin
+                    aPass = params.inregistrypass
+
+                    var dr = new DockerRegistry(aURL, aLogin, aPass)
+                    _$o(dr.getImage(r), options)
+                }
             } ],
             output        : [ ],
             transform     : [ ],
@@ -39,6 +50,7 @@ Extra input types added by the test lib:
 |------------|-------------|
 | registryrepos | Registry repository list (usually only available for private registries) |
 | registrytags | Registry repository tags list |
+| registrymanifest | Registry repository tag image manifest |
 
 ---
 
@@ -63,7 +75,22 @@ List of options to use when _in=registrytags_:
 | inregistryurl  | String | The docker container registry compatible http/https URL (e.g. http://registry.local:5000) |
 | inregistrylogin  | String | The registry login (if needed) |
 | inregistrypass  | String | The registry password (if needed) |
-| inregistryrepo  | String | The repository name to list the tags |
+
+> **Note:** The repository name is passed as the input value.
+
+---
+
+## 🧾 RegistryManifest input options
+
+List of options to use when _in=registrymanifest_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inregistryurl  | String | The docker container registry compatible http/https URL (e.g. http://registry.local:5000) |
+| inregistrylogin  | String | The registry login (if needed) |
+| inregistrypass  | String | The registry password (if needed) |
+
+> **Note:** The repository name is passed as the input value.
 
 `
         }

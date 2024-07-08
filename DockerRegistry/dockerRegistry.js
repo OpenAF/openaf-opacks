@@ -6,9 +6,11 @@
  * </odoc>
  */
 var DockerRegistry = function(aURL, aLogin, aPass) {
-   this._restparams = { requestHeaders: { Accept: "*/*" } }
    this._dockerhub = "https://registry.hub.docker.com/v2/repositories"
 
+   ow.loadObj()
+   this._h = new ow.obj.http()
+   this._restparams = { httpClient: this._h } 
    this._url = _$(aURL, "aURL").isString().default(this._dockerhub)
    var url = (new java.net.URL(this._url));
 
@@ -45,7 +47,7 @@ DockerRegistry.prototype._getToken = function() {
    var _token = $rest().get(this._url + "/token")
    if (isMap(_token) && isDef(_token.token)) {
       _token = _token.token
-      this._restparams.requestHeaders = merge(this._restparams.requestHeaders, { Authorization: "Bearer " + _token })
+      this._restparams.requestHeaders = { Authorization: "Bearer " + _token }
    }
 }
 
@@ -149,14 +151,34 @@ DockerRegistry.prototype.getManifest = function(aImage, aReference, shouldParseV
    aReference = _$(aReference, "aReference").isString().$_();
    shouldParseV1Compatibility = _$(shouldParseV1Compatibility, "shouldParseV1Compatibility").isBoolean().default(true);
 
-   // Get version 1 info
-   //var res = $rest(merge(this._restparams, { requestHeaders: { Accept: "application/vnd.oci.image.index.v1+json" } })).get(this._url + "/v2/" + aImage + "/manifests/" + aReference)
-   // Get version 2 info
-   var res2 = $rest(merge(this._restparams, { requestHeaders: { Accept: "application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.index.v1+json" } }))
-             .get(this._url + "/v2/" + aImage + "/manifests/" + aReference)
+   // Get OCI image index
+   var heads
+   var res = $rest(merge(this._restparams, { requestHeaders: { Accept: "application/vnd.oci.image.index.v1+json" } }))
+             .get(this._url + "/v2/" + aImage + "/manifests/" + aReference);
+   heads = this._h.responseHeaders()
+   if (isDef(heads["docker-content-digest"])) {
+      res.dockerContentDigest = heads["docker-content-digest"]
+   }
+
+   // Get Docker v2 schema 2
+   var res2 = $rest(merge(this._restparams, { requestHeaders: { Accept: "application/vnd.docker.distribution.manifest.v2+json" } }))
+             .get(this._url + "/v2/" + aImage + "/manifests/" + aReference);
+   heads = this._h.responseHeaders()
+   if (isDef(heads["docker-content-digest"])) {
+      res2.dockerContentDigest = heads["docker-content-digest"]
+   }
+
+   var res3 = {}
+   if (isDef(res2.config) && isDef(res2.config.digest)) {
+      res3 = $rest().get(this._url + "/v2/" + aImage + "/blobs/" + res2.config.digest)
+      heads = this._h.responseHeaders()
+      if (isDef(heads["docker-content-digest"])) {
+         res3.dockerContentDigest = heads["docker-content-digest"]
+      }
+   }
 
    // Parse JSON on history.v1Compatibility if it exists
-   /*if (shouldParseV1Compatibility && isDef(res) && isDef(res.history)) {
+   if (shouldParseV1Compatibility && isDef(res) && isDef(res.history)) {
       res.history = res.history.map(r => {
          if (isString(r.v1Compatibility)) {
             r.v1Compatibility = jsonParse(r.v1Compatibility);
@@ -164,15 +186,15 @@ DockerRegistry.prototype.getManifest = function(aImage, aReference, shouldParseV
    
          return r;
       });
-   }*/
+   }
 
    // Result clean up
-   delete res2.schemaVersion2
-   //delete res2.schemaVersion;
+   if (isDef(res.schemaVersion)) delete res.schemaVersion
+   if (isDef(res2.schemaVersion))delete res2.schemaVersion
+   if (isDef(res3.schemaVersion))delete res3.schemaVersion
 
-   //return merge(res, res2);
-   return res2
-}
+   return merge((isDef(res.error) ? {} : res), merge((isDef(res2.error) ? {} : res2), (isDef(res3.error) ? {} : res3)))
+};
 
 /**
  * <odoc>
@@ -233,13 +255,11 @@ DockerRegistry.prototype.imageExists = function(aImage, aTag) {
  * to enable the delete function (REGISTRY_STORAGE_DELETE_ENABLED environment variable)
  * </odoc>
  */
-DockerRegistry.prototype.deleteManifest = function(aImage, aReference, aType) {
+DockerRegistry.prototype.deleteManifest = function(aImage, aReference) {
    aImage = _$(aImage, "aImage").isString().$_();
    aReference = _$(aReference, "aReference").isString().$_();
-   aType = _$(aType, "aType").isString().default("application/vnd.docker.distribution.manifest.v2+json")
 
-   //return $rest(merge(this._restparams, { requestHeaders: { Accept: aType } }))
-   return $rest(this._restparams)
+   return $rest(merge(this._restparams, { requestHeaders: { Accept: "*/*" } }))
           .delete(this._url + "/v2/" + aImage + "/manifests/" + aReference)
 }
 
@@ -260,16 +280,12 @@ DockerRegistry.prototype.deleteImage = function(aImage, aTag) {
       }
       
       var res = this.getImage(aImage, aTag)
-      if (isDef(res.manifests) && res.manifests.length > 0) {
-         var _res = []
-         res.manifests.forEach(r => {
-            _res.push(this.deleteManifest(aImage, r.digest, r.mediaType))
-         })
-         return _res
+      if (isDef(res.dockerContentDigest)) {
+         return this.deleteManifest(aImage, res.dockerContentDigest)
       }
-      /*if (isDef(res.config) && isDef(res.config.digest)) {
-         aTag = res.config.digest;
-      }*/
+      if (isDef(res.config) && isDef(res.config.digest)) {
+         return this.deleteManifest(aImage, res.config.digest)
+      }
    }
 
    return this.deleteManifest(aImage, aTag)
