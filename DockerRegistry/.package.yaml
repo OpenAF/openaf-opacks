@@ -18,13 +18,15 @@ name: DockerRegistry
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240124'
+version: '20240707'
 dependencies:
   openaf: '>=20211229'
 files:
 - .odoc.db
 - .package.yaml
 - dockerRegistry.js
+- oafp_dockerregistry.js
 filesHash:
   .odoc.db: c19f70dcfa0da8e992a11cfa41d78f3cedbd0f65
-  dockerRegistry.js: 6e61c9221429e16c9b970fc1507169111c4c9bda
+  dockerRegistry.js: 5d4bf3bd50517978279d9f7603c930649886fd38
+  oafp_dockerregistry.js: d3f4b4baf841e42d610c19653d52f2fba3805cb0
