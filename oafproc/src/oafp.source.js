@@ -2198,6 +2198,23 @@ if (isDef(params.outfile)) {
         global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
 }
 
+// Check chs
+if (isString(params.chs)) {
+    var _chs = af.fromJSSLON(params.chs)
+    if (!isArray(_chs)) _chs = [_chs]
+    _chs.forEach(ch => {
+        if (isMap(ch)) {
+            if (isString(ch.name) && isString(ch.type)) {
+                $ch(ch.name).create(ch.type, ch.options)
+            } else {
+                _exit(-1, "ERROR: chs must have a name and a type.")
+            }
+        } else {
+            _exit(-1, "ERROR: chs must be an object or array of objects with name and a type")
+        }
+    })
+}
+
 var _run = () => {
     if (_version) {
         _res = showVersion()

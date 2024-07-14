@@ -110,6 +110,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | not_null(any) | base | Returns the non-null value between the provided fields | [].not_null(a,b) |
 | now(diff) | 20240302 | Returns the current unix timestamp number with a negative diff (or positive for dates in the future) |
 | nvl(field, value) | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
+| progress(value, max, min, size, indicator, space) | 20240712 | Returns a progress string to represent a value, between a max and a min, using an indicator char and space chars within a size limit | { val: v, p: progress(v, 100, 0, 10, __, __) } |
 | replace(str, 're', 'flags', 'replaceText') | 20240209 | Equivalent to Javascript's replace function that given a string will search for a regular expression, with the optional flags, a replace with the provided text | replace('This is a test', ' a', 'i', ' not a') |
 | reverse(array) | base | Reverse the provided array | "reverse(@)" |
 | search_keys(arr, 'text') | all | Returns an array of entries where 'text' was found as part of an object property. | search_keys(files, 'filename') |

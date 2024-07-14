@@ -33,6 +33,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | urlmethod | If 'url' is provided defines the http method to use if different from GET | 
 | urlparams | If 'url' is provided extra parameters (equivalent to OpenAF's $rest) can be provided in JSON/SLON |
 | urldata | If 'url' is provided a JSON/SLON/text data can be provided | 
+| chs | A JSON/SLON map or array composed of an OpenAF channel 'name', 'type' and optional 'options' |
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
 | libs | Comma delimited list of installed OpenAF's oPacks to consider to extend oafp's inputs, transformations and outputs | 
