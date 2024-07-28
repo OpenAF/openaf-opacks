@@ -857,3 +857,309 @@ S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFun
 S3.prototype.getObj = function() {
     return this.s3;
 };
+
+ow.loadCh()
+/**
+* <odoc>
+* <key>ow.ch.types.s3</key>
+* The s3 channel OpenAF implementation is similar to type "file" where instead of keeping a JSON or YAML file
+* in the local filesystem it's kept on a S3 bucket. The creation options are:\
+* \
+*    - s3url       (String) The S3 URL to use\
+*    - s3bucket    (String) The S3 bucket name\
+*    - s3accessKey (String) The S3 access key\
+*    - s3secretKey (String) The S3 secret key\
+*    - s3object    (String)  The s3 complete path to a JSON or YAML object to use\
+*    - yaml        (Boolean) Use YAML instead of JSON (defaults to false)\
+*    - compact     (Boolean) If JSON and compact = true the JSON format will be compacted (defaults to false or shouldCompress option)\
+*    - multipart   (Boolean) If YAML and multipart = true the YAML file will be multipart\
+*    - key         (String)  If a key contains "key" it will be replaced by the "key" value\
+*    - multipath   (Boolean) Supports string keys with paths (e.g. ow.obj.setPath) (defaults to false)\
+*    - lock        (String)  If defined the filepath to a dummy file for a local filesystem lock while accessing the file\
+*    - gzip        (Boolean) If true the output file will be gzip (defaults to false)\
+* \
+* </odoc>
+*/
+ow.ch.__types.s3 = {
+    __channels: {},
+    __l: (m) => (isString(m.lock) ? $flock(m.lock).lock() : __),
+    __ul: (m) => (isString(m.lock) ? $flock(m.lock).unlock() : __),
+    __r: (m) => {
+        var r = {}
+        if (!io.fileExists(m._tmp)) {
+            m._tmp = io.createTempFile("tmp-", ".s3")
+        }
+
+        try {
+            m._s3.getObject(m.s3bucket, m.s3object, m._tmp)
+        } catch(e) {
+            if (String(e).indexOf("Object does not exist" >= 0)) {
+                try {
+                    m._s3.putObject(m.s3bucket, m.s3object, m._tmp)
+                } catch(e2) {
+                    logErr("Error creating object: " + e)
+                    throw e
+                }
+            } else {
+                logErr("Error getting object: " + e)
+                throw e
+            }
+        }
+        if (m.yaml) {
+            if (m.gzip) {
+                try {
+                    var is = io.readFileGzipStream(m._tmp)
+                    r = af.fromYAML(af.fromInputStream2String(is))
+                    if (m.multipart && isDef(m.key)) r = $a4m(r, m.key)
+                    is.close()
+                } catch(e) {
+                    if (String(e).indexOf("java.io.EOFException") < 0) throw e	
+                }
+            } else {
+                r = io.readFileYAML(m._tmp)
+            }
+        } else {
+            if (m.gzip) {
+                try {
+                    var is = io.readFileGzipStream(m._tmp)
+                    r = jsonParse(af.fromInputStream2String(is), true)
+                    is.close()
+                } catch(e) {
+                    if (String(e).indexOf("java.io.EOFException") < 0) throw e	
+                }
+            } else {
+                r = io.readFileJSON(m._tmp)
+            }
+        }
+
+        if (!isMap(r)) r = {};
+        return r;
+    },
+    __w: (m, o) => {
+        if (!io.fileExists(m._tmp)) {
+            m._tmp = io.createTempFile("tmp-", ".s3")
+        }
+        if (m.yaml) {
+            if (m.gzip) {
+                var os = io.writeFileGzipStream(m._tmp)
+                ioStreamWrite(os, af.toYAML((m.multipart && isDef(m.key) ? $m4a(o, m.key) : o), m.multipart))
+                os.close()
+            } else {
+                io.writeFileYAML(m._tmp, (m.multipart && isDef(m.key) ? $m4a(o, m.key) : o), m.multipart)
+            }
+        } else {
+            if (m.gzip) {
+                var os = io.writeFileGzipStream(m._tmp)
+                ioStreamWrite(os, stringify(o, __, m.compact ? "" : __))
+                os.close()
+            } else {
+                io.writeFileJSON(m._tmp, o, m.compact ? "" : __)
+            }
+        }
+        try {
+            m._s3.putObject(m.s3bucket, m.s3object, m._tmp)
+        } catch(e) {
+            logErr("Error putting object: " + e)
+            throw e
+        }
+    },
+    create       : function(aName, shouldCompress, options) {
+        ow.loadObj();
+        options = _$(options).isMap().default({});
+        this.__channels[aName] = {};
+        this.__channels[aName].compact   = _$(options.compact, "options.compact").isBoolean().default(shouldCompress);
+        this.__channels[aName].s3object    = _$(options.s3object, "options.s3object").isString().$_();
+        this.__channels[aName].s3url     = _$(options.s3url, "options.s3url").isString().default(__)
+        this.__channels[aName].s3bucket  = _$(options.s3bucket, "options.s3bucket").isString().$_()
+        this.__channels[aName].s3accessKey = _$(options.s3accessKey, "options.s3accessKey").isString().default(__)
+        this.__channels[aName].s3secretKey = _$(options.s3secretKey, "options.s3secretKey").isString().default(__)
+        this.__channels[aName].s3region    = _$(options.s3region, "options.s3region").isString().default(__)
+        this.__channels[aName].s3ignoreCert = _$(options.s3ignoreCert, "options.s3ignoreCert").isBoolean().default(false)
+        this.__channels[aName].yaml      = _$(options.yaml, "options.yaml").isBoolean().default(false);
+        this.__channels[aName].multipart = _$(options.multipart, "options.multipart").isBoolean().default(false);
+        this.__channels[aName].multipath = _$(options.multipath, "options.multipath").isBoolean().default(false);
+        this.__channels[aName].key       = _$(options.key, "options.key").isString().default(__);
+        this.__channels[aName].lock      = _$(options.lock, "options.lock").isString().default(__);
+        this.__channels[aName].gzip      = _$(options.gzip, "options.gzip").isBoolean().default(false)
+
+        this.__channels[aName]._s3 = new S3(this.__channels[aName].s3url, this.__channels[aName].s3accessKey, this.__channels[aName].s3secretKey, this.__channels[aName].s3region, __, this.__channels[aName].s3ignoreCert)
+        this.__channels[aName]._tmp = io.createTempFile("tmp-", ".s3")
+    },
+    destroy      : function(aName) {
+        io.rm(this.__channels[aName]._tmp)
+        this.__channels[aName]._s3.close()
+        delete this.__channels[aName]
+    },
+    size         : function(aName) {
+        var s;
+        this.__l(this.__channels[aName]);
+        try {
+            s = Object.keys(this.__r(this.__channels[aName])).length;
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        
+        return s;
+    },
+    forEach      : function(aName, aFunction) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        Object.keys(m).forEach(k => {
+            try { aFunction(k, m[k]) } catch(e) {};
+        });
+    },
+    getAll      : function(aName, full) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        return Object.values(m);
+    },
+    getKeys      : function(aName, full) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        return Object.keys(m).map(k => jsonParse(k));
+    },
+    getSortedKeys: function(aName, full) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        var res = Object.keys(m).map(k => jsonParse(k)); 
+        return res;	
+    },
+    getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
+        var res;
+        res = this.get(aName, aK);
+        if ($stream([res]).anyMatch(aMatch)) {
+            return this.set(aName, aK, aV, aTimestamp);
+        }
+        return __;
+    },
+    set          : function(aName, aK, aV, aTimestamp) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+            if (isMap(aK) && isDef(aK[this.__channels[aName].key])) aK = { key: aK[this.__channels[aName].key] };
+            var id = isDef(aK.key)   ? aK.key   : stringify(sortMapKeys(aK), __, "");
+            if (isString(id) && id.indexOf(".") > 0 && this.__channels[aName].multipath) {
+                ow.obj.setPath(m, id, isDef(aV.value) ? aV.value : aV);
+            } else {
+                m[id]  = isDef(aV.value) ? aV.value : aV;
+            }
+            this.__w(this.__channels[aName], m);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        
+        return aK;
+    },
+    setAll       : function(aName, aKs, aVs, aTimestamp) {
+        ow.loadObj();
+
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+            for(var i in aVs) {
+                var aK = ow.obj.filterKeys(aKs, aVs[i]), aV = aVs[i]
+
+                if (isMap(aK) && isDef(aK[this.__channels[aName].key])) aK = { key: aK[this.__channels[aName].key] };
+                var id = isDef(aK.key)   ? aK.key   : stringify(sortMapKeys(aK), __, "");
+                if (isString(id) && id.indexOf(".") > 0 && this.__channels[aName].multipath) {
+                    ow.obj.setPath(m, id, isDef(aV.value) ? aV.value : aV);
+                } else {
+                    m[id] = isDef(aV.value) ? aV.value : aV;
+                }
+            }
+            this.__w(this.__channels[aName], m);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+    },
+    unsetAll     : function(aName, aKs, aVs, aTimestamp) {
+        ow.loadObj();
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+            for(var i in aVs) {
+                var aK = ow.obj.filterKeys(aKs, aVs[i]), aV = aVs[i]
+                
+                if (isMap(aK) && isDef(aK[this.__channels[aName].key])) aK = { key: aK[this.__channels[aName].key] };
+                var id = isDef(aK.key)   ? aK.key   : stringify(sortMapKeys(aK), __, "");
+                delete m[id];
+                if (isString(id) && id.indexOf(".") > 0 && this.__channels[aName].multipath) {
+                    ow.obj.setPath(m, id, __);
+                } else {
+                    delete m[id];
+                }
+            }
+            this.__w(this.__channels[aName], m);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+    },		
+    get          : function(aName, aK) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+        if (isMap(aK) && isDef(aK[this.__channels[aName].key])) aK = { key: aK[this.__channels[aName].key] };
+        var id = isDef(aK.key)   ? aK.key   : stringify(sortMapKeys(aK), __, "");
+        if (isString(id) && id.indexOf(".") > 0 && this.__channels[aName].multipath) {
+            return ow.obj.getPath(m, id);
+        } else {
+            return m[id];
+        }
+    },
+    pop          : function(aName) {
+        var elems = this.getSortedKeys(aName);
+        var elem = elems[elems.length - 1];
+        return elem;
+    },
+    shift        : function(aName) {
+        var elems = this.getSortedKeys(aName); 
+        var elem = elems[0];
+        return elem;
+    },
+    unset        : function(aName, aK, aTimestamp) {
+        var m;
+        this.__l(this.__channels[aName]);
+        try {
+            m = this.__r(this.__channels[aName]);
+            if (isMap(aK) && isDef(aK[this.__channels[aName].key])) aK = { key: aK[this.__channels[aName].key] };
+            var id = isDef(aK.key)   ? aK.key   : stringify(sortMapKeys(aK), __, "");
+            delete m[id];
+            if (isString(id) && id.indexOf(".") > 0 && this.__channels[aName].multipath) {
+                ow.obj.setPath(m, id, __);
+            } else {
+                delete m[id];
+            }
+            this.__w(this.__channels[aName], m);
+        } finally {
+            this.__ul(this.__channels[aName]);
+        }
+    }
+}
+

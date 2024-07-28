@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240625'
+version: '20240727'
 dependencies:
   OpenAF: '>=20230704'
 files:
@@ -51,7 +51,7 @@ files:
 - snappy-java-1.1.10.5.jar
 filesHash:
   .maven.yaml: f24d18b492d9088c8d109a5917233b0808f724e9
-  .odoc.db: f7e246944c84d676c2e0d29e460fd54bf4838d50
+  .odoc.db: 7a0580d241d5665da40aecae9e5f719223f46061
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
@@ -72,7 +72,7 @@ filesHash:
   okio-jvm-3.6.0.jar: 5600569133b7bdefe1daf9ec7f4abeb6d13e1786
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: 0b8ab52d4d05961731f32b4699c310ad1b818d5e
+  s3.js: ca0f0521b4f12efd2e87a563ef493b04bc52bb01
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.5.jar: ac605269f3598506196e469f1fb0d7ed5c55059e
