@@ -256,5 +256,5 @@ jobs:
       with:
         dist: t8
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ JDBCs" title="Update\ JDBC\ oPacks" bodyFile=/tmp/output.out'
+        args: 'message="Update\ JDBCs" paths="jdbc-" title="Update\ JDBC\ oPacks" bodyFile=/tmp/output.out'
         
