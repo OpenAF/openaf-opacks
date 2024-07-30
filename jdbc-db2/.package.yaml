@@ -20,10 +20,10 @@ version: '20240730'
 dependencies:
   openaf: '>=20240318'
 files:
+- .package.yaml
 - LICENSES.txt
 - jcc-11.5.9.0.jar
 - jdbc-db2.js
-- .package.yaml
 filesHash:
   LICENSES.txt: 43b0509d602f7d5bdf4e555e228c1e963f708481
   jcc-11.5.9.0.jar: 3aa914029632e1ea8752954ef088aac56f9da309
