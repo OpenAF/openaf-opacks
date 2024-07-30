@@ -100,4 +100,3 @@
   |**plugin-SVN**|<img src=".github/badges/plugin-SVN.svg"><br>OpenAF plugin to access SVN repositories.|
   |**plugin-XLS**|<img src=".github/badges/plugin-XLS.svg"><br>OpenAF plugin to create and modify XLS and DOC files.|
   |**rocksdb**|<img src=".github/badges/rocksdb.svg"><br>OpenAF channels wrapper and utilities for RocksDB|
-  

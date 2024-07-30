@@ -80,6 +80,7 @@ jobs:
         $from(io.listFiles(".").files)
         .equals("isDirectory", true)
         .notEquals("filename", ".git")
+        .notEquals("filename", ".github")
         .sort("filename")
         .select()
       );
