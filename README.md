@@ -87,6 +87,7 @@
   |**jdbc-postgresql**|<img src=".github/badges/jdbc-postgresql.svg"><br>Wrapper for JDBC drivers of postgresql|
   |**jdbc-presto**|<img src=".github/badges/jdbc-presto.svg"><br>Wrapper for JDBC drivers of presto|
   |**jdbc-sqlite**|<img src=".github/badges/jdbc-sqlite.svg"><br>Wrapper for JDBC drivers of sqlite|
+  |**jdbc-sqlserver**|<img src=".github/badges/jdbc-sqlserver.svg"><br>Wrapper for JDBC drivers of sqlserver|
   |**jdbc-trino**|<img src=".github/badges/jdbc-trino.svg"><br>Wrapper for JDBC drivers of trino|
   |**jdbc-yugabytedb**|<img src=".github/badges/jdbc-yugabytedb.svg"><br>Wrapper for JDBC drivers of yugabytedb|
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
@@ -100,4 +101,3 @@
   |**plugin-XLS**|<img src=".github/badges/plugin-XLS.svg"><br>OpenAF plugin to create and modify XLS and DOC files.|
   |**rocksdb**|<img src=".github/badges/rocksdb.svg"><br>OpenAF channels wrapper and utilities for RocksDB|
   
-  |**jdbc-sqlserver**|<img src=".github/badges/jdbc-sqlserver.svg"><br>Wrapper for JDBC drivers of sqlserver|
