@@ -237,14 +237,15 @@ jobs:
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
       with:
-        key : oaf-stable
+        key : oaf-t8
         path: /tmp/oaf
 
     # ----
     # JDBC
     - name: Run JDBC
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v
       with:
+        dist: t8
         script: |
           $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true").prefix("jdbc").get(0)
 
@@ -253,6 +254,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: openaf/ojob-action@v4
       with:
+        dist: t8
         ojob: 'ojob.io/git/hub/checkIn'
         args: 'message="Update\ JDBCs" title="Update\ JDBC\ oPacks" bodyFile=/tmp/output.out'
         
