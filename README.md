@@ -69,6 +69,26 @@
   |**etcd3**|<img src=".github/badges/etcd3.svg"><br>Wrapper to access etcd3 functionality as a client|
   |**inBrowser**|<img src=".github/badges/inBrowser.svg"><br>Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.|
   |**initd**|<img src=".github/badges/initd.svg"><br>Creates initd scripts to use with the openaf&#x27;s --daemon command line option.|
+  |**jdbc-couchbase**|<img src=".github/badges/jdbc-couchbase.svg"><br>Wrapper for JDBC drivers of couchbase|
+  |**jdbc-couchbaseanalytics**|<img src=".github/badges/jdbc-couchbaseanalytics.svg"><br>Wrapper for JDBC drivers of couchbaseanalytics|
+  |**jdbc-csv**|<img src=".github/badges/jdbc-csv.svg"><br>Wrapper for JDBC drivers of csv|
+  |**jdbc-db2**|<img src=".github/badges/jdbc-db2.svg"><br>Wrapper for JDBC drivers of db2|
+  |**jdbc-drill**|<img src=".github/badges/jdbc-drill.svg"><br>Wrapper for JDBC drivers of drill|
+  |**jdbc-duckdb**|<img src=".github/badges/jdbc-duckdb.svg"><br>Wrapper for JDBC drivers of duckdb|
+  |**jdbc-h2**|<img src=".github/badges/jdbc-h2.svg"><br>Wrapper for JDBC drivers of h2|
+  |**jdbc-hsqldb**|<img src=".github/badges/jdbc-hsqldb.svg"><br>Wrapper for JDBC drivers of hsqldb|
+  |**jdbc-mariadb**|<img src=".github/badges/jdbc-mariadb.svg"><br>Wrapper for JDBC drivers of mariadb|
+  |**jdbc-mdb**|<img src=".github/badges/jdbc-mdb.svg"><br>Wrapper for JDBC drivers of mdb|
+  |**jdbc-mysql**|<img src=".github/badges/jdbc-mysql.svg"><br>Wrapper for JDBC drivers of mysql|
+  |**jdbc-odbc**|<img src=".github/badges/jdbc-odbc.svg"><br>Wrapper for JDBC drivers of odbc|
+  |**jdbc-opendistro**|<img src=".github/badges/jdbc-opendistro.svg"><br>Wrapper for JDBC drivers of opendistro|
+  |**jdbc-oracle**|<img src=".github/badges/jdbc-oracle.svg"><br>Wrapper for JDBC drivers of oracle|
+  |**jdbc-paradox**|<img src=".github/badges/jdbc-paradox.svg"><br>Wrapper for JDBC drivers of paradox|
+  |**jdbc-postgresql**|<img src=".github/badges/jdbc-postgresql.svg"><br>Wrapper for JDBC drivers of postgresql|
+  |**jdbc-presto**|<img src=".github/badges/jdbc-presto.svg"><br>Wrapper for JDBC drivers of presto|
+  |**jdbc-sqlite**|<img src=".github/badges/jdbc-sqlite.svg"><br>Wrapper for JDBC drivers of sqlite|
+  |**jdbc-trino**|<img src=".github/badges/jdbc-trino.svg"><br>Wrapper for JDBC drivers of trino|
+  |**jdbc-yugabytedb**|<img src=".github/badges/jdbc-yugabytedb.svg"><br>Wrapper for JDBC drivers of yugabytedb|
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
   |**oJobIO**|<img src=".github/badges/oJobIO.svg"><br>Service to provide easy-to-access oJobs for daily routines.|
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
@@ -80,3 +100,4 @@
   |**plugin-XLS**|<img src=".github/badges/plugin-XLS.svg"><br>OpenAF plugin to create and modify XLS and DOC files.|
   |**rocksdb**|<img src=".github/badges/rocksdb.svg"><br>OpenAF channels wrapper and utilities for RocksDB|
   
+  |**jdbc-sqlserver**|<img src=".github/badges/jdbc-sqlserver.svg"><br>Wrapper for JDBC drivers of sqlserver|
