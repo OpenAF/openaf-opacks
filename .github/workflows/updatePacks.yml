@@ -246,7 +246,7 @@ jobs:
       uses: openaf/ojob-action@v4
       with:
         script: |
-          $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list -json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true")
+          $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true")
           .exec()
 
     - name: Commit JDBC
