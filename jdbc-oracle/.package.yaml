@@ -25,6 +25,6 @@ files:
 - jdbc-oracle.js
 - ojdbc8-23.4.0.24.05.jar
 filesHash:
-  LICENSES.txt: 41f3dbc0180b5c195941e0c4295729659bed4409
+  LICENSES.txt: 98dd674e4bc052a3c2abedb7314067c5fac462ba
   jdbc-oracle.js: 25acc28ce88e897154135224c91ddbea37bca01e
   ojdbc8-23.4.0.24.05.jar: 7b80db96f6e8d5d26a7a13bcf282a5433e898348

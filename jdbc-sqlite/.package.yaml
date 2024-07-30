@@ -24,7 +24,9 @@ files:
 - LICENSES.txt
 - jdbc-sqlite.js
 - sqlite-jdbc-3.46.0.0.jar
+- sqlite-jdbc-3.46.0.1.jar
 filesHash:
-  LICENSES.txt: 2aab4e7743f2ede393c59cbe19167c9324161f25
+  LICENSES.txt: 4c2e9ad18fb65b53b1138a92a9263431ae883aa6
   jdbc-sqlite.js: 422313634ed7164995df1635f62c4166b8089250
   sqlite-jdbc-3.46.0.0.jar: aa79a7b3fd17b70ca7cb4cc894d5c8488c60aabe
+  sqlite-jdbc-3.46.0.1.jar: 87d40ab74e922a0e672ed782fa73f51a358e81f6
