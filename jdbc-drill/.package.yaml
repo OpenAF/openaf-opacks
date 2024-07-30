@@ -20,9 +20,9 @@ version: '20240730'
 dependencies:
   openaf: '>=20240318'
 files:
+- .package.yaml
 - drill-jdbc-all-1.21.2.jar
 - jdbc-drill.js
-- .package.yaml
 filesHash:
   drill-jdbc-all-1.21.2.jar: 8ed25f2d29934b38a2371953ea71d2bbc360bafb
   jdbc-drill.js: 23e6a2e27956f192c95ffacf794211cafec8311a
