@@ -20,9 +20,9 @@ version: '20240730'
 dependencies:
   openaf: '>=20240318'
 files:
+- .package.yaml
 - jdbc-presto.js
 - presto-jdbc-0.288.jar
-- .package.yaml
 filesHash:
   jdbc-presto.js: e544435371509525d8c8df53ea1a56dc3d827edb
   presto-jdbc-0.288.jar: 1e523d666fc50482ea19173a3f46b18d6cc2ee69
