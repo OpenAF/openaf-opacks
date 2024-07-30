@@ -225,4 +225,35 @@ jobs:
       with:
         ojob: 'ojob.io/git/hub/checkIn'
         args: 'message="Update\ RocksDB" paths="rocksdb/" title="Update\ RocksDB\ oPack" bodyFile=/tmp/output.out'
-        dist: t8
+
+  update-jdbc:
+    runs-on    : ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps      :
+    - uses: actions/checkout@v3
+
+    - name: Cache OpenAF runtime
+      uses: actions/cache@v3
+      with:
+        key : oaf-stable
+        path: /tmp/oaf
+
+    # ----
+    # JDBC
+    - name: Run JDBC
+      uses: openaf/ojob-action@v4
+      with:
+        script: |
+          $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list -json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true")
+          .exec()
+
+    - name: Commit JDBC
+      env :
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: openaf/ojob-action@v4
+      with:
+        ojob: 'ojob.io/git/hub/checkIn'
+        args: 'message="Update\ JDBCs" title="Update\ JDBC\ oPacks" bodyFile=/tmp/output.out'
+        
