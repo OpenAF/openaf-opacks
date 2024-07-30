@@ -1,0 +1,6 @@
+mariadb-java-client-3.4.1.jar:
+  name: LGPL-2.1
+  version: 3.4.1
+  changed from original: false
+  comments: ''
+  license: ''

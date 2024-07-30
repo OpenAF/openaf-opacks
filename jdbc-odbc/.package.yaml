@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://www.oracle.com/database/technologies/maven-central-guide.html. To use it just: loadLib(\"jdbc-odbc.js\"); var db = new DB(\"jdbc:odbc:{{db}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- odbc
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of odbc
+name: jdbc-odbc
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jdbc-odbc.js
+- ojdbc8-23.4.0.24.05.jar
+- .package.yaml
+filesHash:
+  LICENSES.txt: 1e2cf4b5c9b6daa00c0d0c57dcee80ac626bf305
+  jdbc-odbc.js: 53f00e30b1075b89e793e3d8c1bcb09288898c8d
+  ojdbc8-23.4.0.24.05.jar: 7b80db96f6e8d5d26a7a13bcf282a5433e898348

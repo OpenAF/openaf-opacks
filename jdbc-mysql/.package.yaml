@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://dev.mysql.com/doc/connector-j/en/connector-j-reference-jdbc-url-format.html. To use it just: loadLib(\"jdbc-mysql.js\"); var db = new DB(\"jdbc:mysql://{{host}}:{{port}}/{{database}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- mysql
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of mysql
+name: jdbc-mysql
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jdbc-mysql.js
+- mysql-connector-j-9.0.0.jar
+- .package.yaml
+filesHash:
+  LICENSES.txt: 2180341763a7027dc36606eecf9c41dfcd30ec90
+  jdbc-mysql.js: 9fe06f159e87c01c3b38d10d99d701c2ad82737f
+  mysql-connector-j-9.0.0.jar: 6fc50f53a8e364ad82886588a4b55d1f7460e6a5

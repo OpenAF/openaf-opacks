@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check http://hsqldb.org/doc/2.0/guide/dataaccess-chapt.html#dac_jdbc_overview. To use it just: loadLib(\"jdbc-hsqldb.js\"); var db = new DB(\"jdbc:hsqldb:{{file}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- hsqldb
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of hsqldb
+name: jdbc-hsqldb
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- hsqldb-2.7.3.jar
+- jdbc-hsqldb.js
+- .package.yaml
+filesHash:
+  LICENSES.txt: 0d41c9a8e0490c4cde54b52d545aca79ade4e076
+  hsqldb-2.7.3.jar: 85b49338b36f3051d217295596cf92beb92e4bfb
+  jdbc-hsqldb.js: 0e9c20d6b418f1c8a84220d70c94f4646eb956b3
