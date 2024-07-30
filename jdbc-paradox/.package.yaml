@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://github.com/leonhad/paradoxdriver. To use it just: loadLib(\"jdbc-paradox.js\"); var db = new DB(\"jdbc:paradox:{{path}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- paradox
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of paradox
+name: jdbc-paradox
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jdbc-paradox.js
+- paradoxdriver-1.6.1.jar
+- .package.yaml
+filesHash:
+  LICENSES.txt: 074c04812a229ef628db56d010644f339a26a557
+  jdbc-paradox.js: c67d64d75291ebae3e2c0f31c91ff973a8f0f1bf
+  paradoxdriver-1.6.1.jar: 91af94c940f55931034f1dd3e82726328939d26f

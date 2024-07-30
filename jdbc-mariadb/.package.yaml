@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://mariadb.com/kb/en/about-mariadb-connector-j. To use it just: loadLib(\"jdbc-mariadb.js\"); var db = new DB(\"jdbc:mariadb://{{host}}:{{port}}/{{database}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- mariadb
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of mariadb
+name: jdbc-mariadb
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jdbc-mariadb.js
+- mariadb-java-client-3.4.1.jar
+- .package.yaml
+filesHash:
+  LICENSES.txt: 4552e396d88e647a190fb0f2926a362b77c03ccf
+  jdbc-mariadb.js: aaeac058daddb2884ccf5a3b4cf1d5a2f11970f2
+  mariadb-java-client-3.4.1.jar: 7599bff3a38ae943d8e055848b3fe943772b12c9

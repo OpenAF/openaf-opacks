@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://github.com/yugabyte/jdbc-yugabytedb. To use it just: loadLib(\"jdbc-yugabytedb.js\"); var db = new DB(\"jdbc:postgresql://{{host}}:{{port}}/{{database}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- yugabytedb
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of yugabytedb
+name: jdbc-yugabytedb
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jdbc-yugabytedb-42.3.5-yb-6.jar
+- jdbc-yugabytedb.js
+- .package.yaml
+filesHash:
+  LICENSES.txt: 601855764627b9bce7fd26f10593149010089000
+  jdbc-yugabytedb-42.3.5-yb-6.jar: 6371afebbc78cb0510d33f3a82e340c916046294
+  jdbc-yugabytedb.js: 19faaaa5093b34cae6f3566fa150833fac334473

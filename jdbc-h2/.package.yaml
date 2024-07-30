@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check http://www.h2database.com/html/cheatSheet.html. To use it just: loadLib(\"jdbc-h2.js\"); var db = new DB(\"jdbc:h2:{{file}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- h2
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of h2
+name: jdbc-h2
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- h2-2.3.230.jar
+- jdbc-h2.js
+- .package.yaml
+filesHash:
+  LICENSES.txt: a726e6d4f9159f11b4d755a05cfab418fc86ca12
+  h2-2.3.230.jar: 13d72595560f0f9c93260cbeaecda9d688a40fd1
+  jdbc-h2.js: 0de9c23c3c1b74b0f6430b85c4c5bd7f1be0eb2d

@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://www.ibm.com/docs/en/db2/11.5?topic=cdsudidsdjs-url-format-data-server-driver-jdbc-sqlj-type-4-connectivity. To use it just: loadLib(\"jdbc-db2.js\"); var db = new DB(\"jdbc:db2://{{server}}:{{port}}/{{database}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- db2
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of db2
+name: jdbc-db2
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20240730'
+dependencies:
+  openaf: '>=20240318'
+files:
+- LICENSES.txt
+- jcc-11.5.9.0.jar
+- jdbc-db2.js
+- .package.yaml
+filesHash:
+  LICENSES.txt: 43b0509d602f7d5bdf4e555e228c1e963f708481
+  jcc-11.5.9.0.jar: 3aa914029632e1ea8752954ef088aac56f9da309
+  jdbc-db2.js: 94579487ff3e381f0f662b2f1e772d900f6ffa4f
