@@ -20,10 +20,10 @@ version: '20240730'
 dependencies:
   openaf: '>=20240318'
 files:
+- .package.yaml
 - LICENSES.txt
 - couchbase-jdbc-driver-1.0.5.jar
 - jdbc-couchbaseanalytics.js
-- .package.yaml
 filesHash:
   LICENSES.txt: 7b3144cffdebb99b5ed88c004d2a9b179ddfe93a
   couchbase-jdbc-driver-1.0.5.jar: 45ae8d4ae5d03ab281520d9601543d9d722dac3f
