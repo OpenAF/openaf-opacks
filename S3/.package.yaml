@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240727'
+version: '20240804'
 dependencies:
   OpenAF: '>=20230704'
 files:
@@ -72,7 +72,7 @@ filesHash:
   okio-jvm-3.6.0.jar: 5600569133b7bdefe1daf9ec7f4abeb6d13e1786
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: ca0f0521b4f12efd2e87a563ef493b04bc52bb01
+  s3.js: 5a25e495483fec0643d1ae8dcb80858ee68bc23d
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.5.jar: ac605269f3598506196e469f1fb0d7ed5c55059e
