@@ -16,7 +16,7 @@ name: jdbc-sqlserver
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240730'
+version: '20240806'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -25,6 +25,6 @@ files:
 - jdbc-sqlserver.js
 - mssql-jdbc-9.2.1.jre8.jar
 filesHash:
-  LICENSES.txt: 1a4fc9e43b93e525b37716b28d1682e00e598725
+  LICENSES.txt: 27d86e434076bf693ee7b87910777d2042527025
   jdbc-sqlserver.js: ea86cc1c300da8ec1da074c03b39f0f5adfbe8a3
   mssql-jdbc-9.2.1.jre8.jar: e3e9a62d3a38f9697c4704abbf578e236a3e9a7b
