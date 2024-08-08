@@ -91,37 +91,60 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
 
    if (isUnDef(this.accessKey)) {
       var o;
-      if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
-         o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
-      } else {
-         if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
-            o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+      if (isDef(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))) {
+         var _token = io.readFileString(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))
+         var _res = $rest({urlEncode:true}).post("https://sts." + getEnv("AWS_REGION") + ".amazonaws.com/", {
+            Action: "AssumeRoleWithWebIdentity",
+            DurationSeconds: 3600,
+            RoleArn: getEnv("AWS_ROLE_ARN"),
+            RoleSessionName: "my-session",
+            WebIdentityToken: _token,
+            Version: "2011-06-15"
+         })
+         _res = af.fromXML2Obj(_res)
+         if (isDef(_res.AssumeRoleWithWebIdentityResponse) && isDef(_res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult)) {
+            o = {
+               AccessKeyId: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.AccessKeyId,
+               SecretAccessKey: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SecretAccessKey,
+               Token: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SessionToken
+            }
          } else {
-            var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
-            if (isDef(_cf)) {
-               o = {}
-               if (io.fileExists(_cf)) {
-                  io.readFileString(_cf)
-                  .split("\n")
-                  .filter(r => r.trim().match(/^aws_(access_|secret_)/))
-                  .forEach(r => {
-                     var ar = r.split("=").map(s => s.trim());
-                     if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
-                     if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
-                     if (ar[0] == "aws_session_token") o.Token = ar[1]
-                  })
-               } else {
-                  // Fallback to IMDS
-                  var _cred = this._imds()
-                  if (isMap(_cred)) {
-                     o.AccessKeyId     = _cred.accessKey
-                     o.SecretAccessKey = _cred.secretKey
-                     o.Token           = _cred.token
+            throw af.toSLON(_res)
+         }
+      } else {
+         if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
+            o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+         } else {
+            if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
+               o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+            } else {
+               var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
+               if (isDef(_cf)) {
+                  o = {}
+                  if (io.fileExists(_cf)) {
+                     io.readFileString(_cf)
+                     .split("\n")
+                     .filter(r => r.trim().match(/^aws_(access_|secret_)/))
+                     .forEach(r => {
+                        var ar = r.split("=").map(s => s.trim());
+                        if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
+                        if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
+                        if (ar[0] == "aws_session_token") o.Token = ar[1]
+                     })
+                  } else {
+                     // Fallback to IMDS
+                     var _cred = this._imds()
+                     if (isMap(_cred)) {
+                        o.AccessKeyId     = _cred.accessKey
+                        o.SecretAccessKey = _cred.secretKey
+                        o.Token           = _cred.token
+                     }
                   }
                }
             }
          }
       }
+
       this.accessKey = o.AccessKeyId;
       this.secretKey = o.SecretAccessKey;
       this.stoken    = o.Token;
