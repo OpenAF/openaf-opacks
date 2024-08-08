@@ -66,7 +66,7 @@ filesHash:
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: bd51e42b92051f06482c74d2842f9643e4278dbf
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
-  aws_core.js: f6ce1f26ec27654cb355ed4a358d5122cfe8be71
+  aws_core.js: 456e5e418e10e4c89585938e1a08255cddb5a228
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: a1c02a89f0af3a3693fadc8e2a1bd28a1d06a4ae
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
