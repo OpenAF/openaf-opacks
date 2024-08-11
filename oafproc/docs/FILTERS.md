@@ -72,6 +72,8 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | delete(map, 'field') | all | Remove a field from the provided map | delete(data, 'timestamp')  |
 | div(a, b) | 20240217 | Divides two numbers.  | div(6, 2) |
 | ends_with(string, array) | base | Returns true if a field has the provided suffix | files[?ends_with(filename, '.jar')] |
+| env(string) | 20240812 | Retrieves a environment variable value | env('PATH') |
+| envs(regex) | 20240812 | Retrieves an array of name and values of environment variables | envs('^STR_.+$') |
 | flat_map(x) | all | Returns a flat, one level, version of the provided map. | flat_map(data) |
 | floor(number) | base | Returns the greatest integer that is equal or greater than a specific numeric field value | [].floor(y) |
 | format(x, 'format') | 20240209 | OpenAF's function $f (similar to printf) with type conversion | format(to_number(`123.12`), '%05.0f') |

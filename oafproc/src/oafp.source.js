@@ -2254,10 +2254,12 @@ var _run = () => {
                             _res = stringify(_r, __, "")
                         } else {
                             _res = io.readFileString(params.file)
+                            if (toBoolean(params._shebang)) _res = _res.replace(/^#!.*\n/, "")
                         }
                     }
                 } else {
                     _res = io.readFileString(params.file)
+                    if (toBoolean(params._shebang)) _res = _res.replace(/^#!.*\n/, "")
                 }
             }
         } else {
