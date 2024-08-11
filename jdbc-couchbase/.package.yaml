@@ -16,14 +16,14 @@ name: jdbc-couchbase
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240730'
+version: '20240811'
 dependencies:
   openaf: '>=20240318'
 files:
-- .package.yaml
 - LICENSES.txt
 - jdbc-couchbase.js
 - jdbc-n1ql-1.0-BETA.jar
+- .package.yaml
 filesHash:
   LICENSES.txt: 42259df0133f9b95ae4974c9369ad32a3a0da4a9
   jdbc-couchbase.js: 44277a5f275054e79ea68f2fa4aef1d52b33596a
