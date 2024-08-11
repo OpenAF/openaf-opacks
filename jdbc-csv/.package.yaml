@@ -16,14 +16,14 @@ name: jdbc-csv
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240730'
+version: '20240811'
 dependencies:
   openaf: '>=20240318'
 files:
-- .package.yaml
 - LICENSES.txt
 - jdbc-csv.js
 - jdbc-driver-csv-1.2.0.jar
+- .package.yaml
 filesHash:
   LICENSES.txt: 30b4aabc57afbeffcb86c6c49b994cd940c22a75
   jdbc-csv.js: c2585c7546b0e093ebdfb4b24239af423dd3b4cd
