@@ -20,10 +20,10 @@ version: '20240811'
 dependencies:
   openaf: '>=20240318'
 files:
+- .package.yaml
 - LICENSES.txt
 - hsqldb-2.7.3.jar
 - jdbc-hsqldb.js
-- .package.yaml
 filesHash:
   LICENSES.txt: 0d41c9a8e0490c4cde54b52d545aca79ade4e076
   hsqldb-2.7.3.jar: 85b49338b36f3051d217295596cf92beb92e4bfb
