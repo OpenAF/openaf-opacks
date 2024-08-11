@@ -247,7 +247,7 @@ jobs:
       with:
         dist: t8
         script: |
-          $sh("rm jdbc-*").exec()
+          $sh("rm -rf jdbc-*").exec()
           $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true").prefix("jdbc").get(0)
 
     - name: Commit JDBC
