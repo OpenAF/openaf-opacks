@@ -16,14 +16,14 @@ name: jdbc-opendistro
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240811'
+version: '20240813'
 dependencies:
   openaf: '>=20240318'
 files:
-- .package.yaml
 - LICENSES.txt
 - jdbc-opendistro.js
 - opensearch-sql-jdbc-1.4.0.1.jar
+- .package.yaml
 filesHash:
   LICENSES.txt: 9da0663603a45d35a3da2cceaeda24058ca59af8
   jdbc-opendistro.js: 09f54b5b0d05fa01e0450309d4749bb843dc963a
