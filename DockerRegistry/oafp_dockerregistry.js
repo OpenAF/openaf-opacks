@@ -12,7 +12,18 @@
                     aPass = params.inregistrypass
 
                     var dr = new DockerRegistry(aURL, aLogin, aPass)
-                    _$o(dr.listRepositories(), options)
+                    if (toBoolean(params.inregistrytags)) {
+                        _$o($path(dr.listRepositories().map(repo => {
+                            var tags = dr.listTags(repo).tags
+                            if (isArray(tags)) {
+                                return tags.map(tag => ({ repo: repo, tag: tag }) )
+                            } else {
+                                return ({ repo: repo, tags: __ })
+                            }
+                        }), "[][]"), options)
+                    } else {
+                        _$o(dr.listRepositories(), options)
+                    }
                 }
             }, {
                 type: "registrytags",
@@ -63,6 +74,7 @@ List of options to use when _in=registryrepos_:
 | inregistryurl  | String | The docker container registry compatible http/https URL (e.g. http://registry.local:5000) |
 | inregistrylogin  | String | The registry login (if needed) |
 | inregistrypass  | String | The registry password (if needed) |
+| inregistrytags  | Boolean | If true, will also list the tags for each repository |
 
 ---
 
