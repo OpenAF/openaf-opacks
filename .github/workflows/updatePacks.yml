@@ -12,7 +12,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -67,7 +67,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -121,7 +121,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -176,7 +176,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -232,10 +232,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key : oaf-t8
         path: /tmp/oaf
@@ -251,7 +251,22 @@ jobs:
           .starts("filepath", "./jdbc-")
           .notEquals("filename", ".package.yaml")
           .select(r => io.rm(r.filepath))
+
           $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true").prefix("jdbc").get(0)
+
+          $from( 
+            $sql( 
+              $sh("git status --porcelain").get(0).stdout
+              .split("\n").filter(r => r.match(".. jdbc-")).map(r => 
+                $path(r.replace(/^.. /,"").split("/"), "{ pack: [0], file: [1]}") 
+              ), 
+              'select "pack", count(1) "c" where "file" <> \'LICENSES.txt\' group by "pack"'
+            ) 
+          ).equals("c", 1).select(r => 
+            $sh("git restore " + r.pack + "/.package.yaml")
+            .sh("git restore " + r.pack + "/LICENSES.txt")
+            .exec()
+          )
 
     - name: Commit JDBC
       env :
