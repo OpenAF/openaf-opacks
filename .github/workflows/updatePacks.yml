@@ -261,10 +261,7 @@ jobs:
               ), 
               "select \"pack\", count(1) \"c\" where \"file\" <> \'LICENSES.txt\' group by \"pack\""
             ) 
-          ).equals("c", 1).select(r => 
-            $sh("git restore " + r.pack)
-            .exec()
-          )
+          ).equals("c", 1).select(r => $sh("git restore " + r.pack).exec() )
 
     - name: Commit JDBC
       env :
