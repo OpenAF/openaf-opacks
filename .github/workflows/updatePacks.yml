@@ -256,8 +256,7 @@ jobs:
 
           $from( 
             $sql( 
-              $sh("git status --porcelain").get(0).stdout
-              .split("\n").filter(r => r.match(".. jdbc-")).map(r => 
+              $sh("git status --porcelain").get(0).stdout.split("\n").filter(r => r.match(".. jdbc-")).map(r => 
                 $path(r.replace(/^.. /,"").split("/"), "{ pack: [0], file: [1]}") 
               ), 
               'select "pack", count(1) "c" where "file" <> \'LICENSES.txt\' group by "pack"'
