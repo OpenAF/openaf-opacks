@@ -1,0 +1,3 @@
+artifacts:
+  - id      : sshd-core
+    group   : org.apache.sshd

@@ -1,0 +1,39 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- ssh
+- server
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/SSHd.opack
+description: A SSH server implementation
+name: SSHd
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20240818'
+dependencies:
+  openaf: '>=20240812'
+files:
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- jcl-over-slf4j-1.7.32.jar
+- slf4j-api-1.7.32.jar
+- sshd-common-2.13.2.jar
+- sshd-core-2.13.2.jar
+- sshd.js
+filesHash:
+  .maven.yaml: db21e355fc891a9c59c44cd9d29687cfbbd51773
+  .odoc.db: ecd7de8dc9745773432c8be38394f0b732963baa
+  jcl-over-slf4j-1.7.32.jar: 32c060250bcc5282cdbc1fd7008c12eb4ebad00e
+  slf4j-api-1.7.32.jar: cdcff33940d9f2de763bc41ea05a0be5941176c3
+  sshd-common-2.13.2.jar: dc9be542599fdfe446371d39a65a8d643533aeba
+  sshd-core-2.13.2.jar: f2bd9ead479126cbbaa1fda906e1c3b5caddac5c
+  sshd.js: 6c388bdd6f87da422f6ff2da4ae1391c1c61f10f
