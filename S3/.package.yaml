@@ -18,9 +18,9 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240804'
+version: '20240819'
 dependencies:
-  OpenAF: '>=20230704'
+  OpenAF: '>=20230812'
 files:
 - .maven.yaml
 - .odoc.db
@@ -35,14 +35,11 @@ files:
 - guava-33.0.0-jre.jar
 - j2objc-annotations-2.8.jar
 - jsr305-3.0.2.jar
-- kotlin-stdlib-1.8.21.jar
 - kotlin-stdlib-common-1.9.10.jar
 - kotlin-stdlib-jdk7-1.8.21.jar
 - kotlin-stdlib-jdk8-1.8.21.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.5.11.jar
-- okio-3.6.0.jar
-- okio-jvm-3.6.0.jar
+- minio-8.5.12.jar
 - s3-ojob-test.yaml
 - s3-test.yaml
 - s3.js
@@ -50,7 +47,7 @@ files:
 - simple-xml-safe-2.7.1.jar
 - snappy-java-1.1.10.5.jar
 filesHash:
-  .maven.yaml: f24d18b492d9088c8d109a5917233b0808f724e9
+  .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
   .odoc.db: 7a0580d241d5665da40aecae9e5f719223f46061
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
@@ -62,14 +59,11 @@ filesHash:
   guava-33.0.0-jre.jar: 161ba27964a62f241533807a46b8711b13c1d94b
   j2objc-annotations-2.8.jar: c85270e307e7b822f1086b93689124b89768e273
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
-  kotlin-stdlib-1.8.21.jar: 43d50ab85bc7587adfe3dda3dbe579e5f8d51265
   kotlin-stdlib-common-1.9.10.jar: dafaf2c27f27c09220cee312df10917d9a5d97ce
   kotlin-stdlib-jdk7-1.8.21.jar: 7473b8cd3c0ef9932345baf569bc398e8a717046
   kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.5.11.jar: d44981b15b8e5b5582f2e28edaf8b579f9da014d
-  okio-3.6.0.jar: 8bf9683c80762d7dd47db12b68e99abea2a7ae05
-  okio-jvm-3.6.0.jar: 5600569133b7bdefe1daf9ec7f4abeb6d13e1786
+  minio-8.5.12.jar: 669d478e02466dcc9d7a9180d37756f3554c55bb
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
   s3.js: 5a25e495483fec0643d1ae8dcb80858ee68bc23d
