@@ -57,6 +57,7 @@
   |**Rust**|<img src=".github/badges/Rust.svg"><br>A simple wrapper for oJob Rust language support.|
   |**S3**|<img src=".github/badges/S3.svg"><br>Wrapper to access S3 compatible object storages as a client.|
   |**SQLDeveloperUtils**|<img src=".github/badges/SQLDeveloperUtils.svg"><br>Provides utilities for SQLDeveloper version &gt;&#x3D; 4 (like encrypt and decrypt SQLDeveloper passwords)|
+  |**SSHd**|<img src=".github/badges/SSHd.svg"><br>A SSH server implementation|
   |**ScaleWay**|<img src=".github/badges/ScaleWay.svg"><br>Wrapper around ScaleWay API|
   |**SerializedObjects**|<img src=".github/badges/SerializedObjects.svg"><br>Package to Serialize and Unserialize Java Objects|
   |**SocksServer**|<img src=".github/badges/SocksServer.svg"><br>Provides a wrapper around a Java SocksServer implementation|
