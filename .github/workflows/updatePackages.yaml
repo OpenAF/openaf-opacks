@@ -12,7 +12,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -21,7 +21,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run updatePacks
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'updatePacks.yaml'
         dist: t8
@@ -29,8 +29,8 @@ jobs:
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/contentIn'
-        args: 'message="Update\ packs\ {{date}}/{{time}}" title="Update\ packs"'
+        args: "message=\"Update packs {{date}}/{{time}}\" title=\"Update packs\" branch=\"${{ github.ref_name }}\""
         dist: t8

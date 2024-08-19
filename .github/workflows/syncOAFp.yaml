@@ -66,7 +66,7 @@ jobs:
 
     # -----------------------
     - name: Build openaf/oafp
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -99,11 +99,11 @@ jobs:
 
     # -------------
     - name: Checkin
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         ojob: ojob.io/git/hub/contentIn
         ## Change the following arguments as needed (see https://ojob.io/git/hub/contentIn.md)
-        args: 'message="Automated oafp sync" branchPrefix="auto/" title="Automated oafp sync PR" paths="oafproc"'
+        args: "message=\"Automated oafp sync\" branchPrefix=\"auto/\" title=\"Automated oafp sync PR\" paths=\"oafproc\" branch=\"${{ github.ref_name }}\""
         dist: t8

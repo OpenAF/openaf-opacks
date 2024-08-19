@@ -12,7 +12,7 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache OpenAF runtime
       uses: actions/cache@v3
@@ -21,7 +21,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run genREADME
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'genREADME.yaml'
         dist: nightly
@@ -29,17 +29,17 @@ jobs:
     - name: Commit changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/contentIn'
-        args: 'message="README\ changes\ {{date}}/{{time}}" title="Badge changes" paths="README.md"'
+        args: "message=\"README changes {{date}}/{{time}}\" title=\"Badge changes\" paths=\"README.md\" branch=\"${{ github.ref_name }}\""
         dist: nightly
         
     - name: Commit badges changes
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/contentIn'
-        args: 'message="Badge\ changes\ {{date}}/{{time}}" title="Badge changes" paths=".github/badges/"'
+        args: "message=\"Badge changes {{date}}/{{time}}\" title=\"Badge changes\" paths=\".github/badges/\" branch=\"${{ github.ref_name }}\""
         dist: nightly

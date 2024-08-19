@@ -23,7 +23,7 @@ jobs:
     # -----------
     # GooglePhone
     - name: Run GooglePhone
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         script: |
           // Run update ojob
@@ -55,10 +55,10 @@ jobs:
     - name: Commit changes GooglePhoneNumber
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ GooglePhone" paths="GooglePhoneNumber/" title="Update\ GooglePhone\ oPack" bodyFile=/tmp/output.out'
+        args: "message=\"Update GooglePhone\" paths=\"GooglePhoneNumber/\" title=\"Update GooglePhone oPack\" bodyFile=/tmp/output.out"
         dist: t8
 
   update-googlecompiler:
@@ -78,7 +78,7 @@ jobs:
     # --------------
     # GoogleCompiler
     - name: Run GoogleCompiler
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         script: |
           // Run update ojob
@@ -109,10 +109,10 @@ jobs:
     - name: Commit GoogleCompiler
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ GoogleCompiler" paths="GoogleCompiler/" title="Update\ GoogleCompiler\ oPack" bodyFile=/tmp/output.out'
+        args: "message=\"Update GoogleCompiler\" paths=\"GoogleCompiler/\" title=\"Update GoogleCompiler oPack\" bodyFile=/tmp/output.out"
         dist: t8
 
   update-bouncycastle:
@@ -130,7 +130,7 @@ jobs:
         path: /tmp/oaf
     
     - name: Run BouncyCastle
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         script: |
           // Run update ojob
@@ -164,10 +164,10 @@ jobs:
     - name: Commit BouncyCastle
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ BouncyCastle" paths="BouncyCastle/" title="Update\ BouncyCastle\ oPack" bodyFile=/tmp/output.out'
+        args: "message=\"Update BouncyCastle\" paths=\"BouncyCastle/\" title=\"Update BouncyCastle oPack\" bodyFile=/tmp/output.out"
         dist: t8
 
   update-rocksdb:
@@ -187,7 +187,7 @@ jobs:
     # -------
     # RocksDB
     - name: Run RocksDB
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         script: |
           // Run update ojob
@@ -221,10 +221,10 @@ jobs:
     - name: Commit RocksDB
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         ojob: 'ojob.io/git/hub/checkIn'
-        args: 'message="Update\ RocksDB" paths="rocksdb/" title="Update\ RocksDB\ oPack" bodyFile=/tmp/output.out'
+        args: "message=\"Update RocksDB\" paths=\"rocksdb/\" title=\"Update RocksDB oPack\" bodyFile=/tmp/output.out"
 
   update-jdbc:
     runs-on    : ubuntu-latest
@@ -243,7 +243,7 @@ jobs:
     # ----
     # JDBC
     - name: Run JDBC
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         dist: t8
         script: |
@@ -266,7 +266,7 @@ jobs:
     - name: Commit JDBC
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v4
+      uses: openaf/ojob-action@v5
       with:
         dist: t8
         ojob: 'ojob.io/git/hub/checkIn'
