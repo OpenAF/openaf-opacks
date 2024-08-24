@@ -42,6 +42,22 @@ b775ad480764│k3d-k3s-default-serverlb│running│ghcr.io/k3d-io/k3d-proxy:5.6
 [#3 rows]
 ```
 
+### ASK: Interactively ask questions
+
+**Command:**
+```bash
+oafp in=ask 
+[
+    (name: simple, prompt: "What is your name? ", type: question) |
+    (name: secret, prompt: "Write a secret word: ", type: secret) |
+    (name: option, prompt: "Which color you like best? ", type: choose, options: [ "blue" | "green" | "red" ]) |
+    (name: multiple, prompt: "Choose the numbers you like more: ", type: multiple, options: [ "One" | "Two" | "Three" ], output: index, max: 2) |
+    (name: char, prompt: "Did you like this? (Y/N)", type: char, options: YNyn)
+]
+```
+
+The resull will be an array with 'name' and the corresponding 'answer'.
+
 ## 🥈 Medium
 
 ### FILTER PATH: Kubectl get pods formatting

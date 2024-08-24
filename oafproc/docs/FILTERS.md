@@ -92,6 +92,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | getc(name) | 20240428 | Returns the current value of a counter name user with inc/dec | [].{ idx: inc('my_counter'), code: concat('c', get('my_counter')), name: name} |
 | group(arr, 'field') | all | Given an array will return a new array grouping the entries for each value of the provided field | group(files, 'isDirectory') |
 | group_by(arr, 'field1,field2') | all | Given ar array will return a multi-level array grouping entries for each value of the provided fields (comma delimited) | group_by(files, 'isFile, permissions') |
+| if(cond, then, else) | 20240828 | Returns 'then' or 'else' depending on the boolean result of 'cond' | if(answer=='n','Hupps...','GREAT!') |
 | inc(name) | 20240428 | Increments the counter 'name' provided returning the counter value | [].{ id: inc('my_counter'), title: title } | 
 | index_of(str, 'search') | 20240209 | Given a string will return the first index where the word 'search' occurs | index_of('This is a test', 'test') |
 | insert(obj, 'field', value) | 20240302 | Adds a 'field' with the corresponding value to the object. |

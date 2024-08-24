@@ -60,6 +60,7 @@ List of data input types that can be auto-detected (through the file extension o
 
 | Input type | Description |
 |------------|-------------|
+| ask | Interactively asks questions to an user (using JSON/SLON for OpenAF's askStruct) |
 | base64 | A base64 text format |
 | ch | An OpenAF channel format |
 | csv | A CSV format (auto-detected) |
@@ -150,6 +151,7 @@ List of available formats to use with the _output_ option:
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
 | jwt | Signs map data into a JSON Web Token (JWT) |
+| lines | Given an array of strings prints each line |
 | log | If input has Logstash compatible fields outputs a human-readable log |
 | map | A rectangle map format |
 | md | A Markdown format |
@@ -262,6 +264,16 @@ List of options to use when _in=ls_:
 | lsext | String | Forces the file format parsing of the provided path or file (between zip, tar, tgz) |
 | lsrecursive | Boolean | Will list all files and folders recursively (for folders) |
 | lsposix | Boolean | Tries to add extra posix data if available (for ZIP files) |
+
+---
+
+### 🧾 MDTable input options
+
+List of options to use when _in=mdtable_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inmdtablejoin | Boolean | Scans an entire markdown input for tables and returns an array with the data of each markdown table |
 
 ---
 
@@ -428,7 +440,7 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 | Option | Type | Description |
 |--------|------|-------------|
 | llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
-| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answersm, 'url' for the ollama type or 'key' for openai type | 
+| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type | 
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
 
