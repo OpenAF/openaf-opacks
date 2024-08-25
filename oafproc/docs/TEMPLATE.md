@@ -56,6 +56,7 @@ Here are some of the available helpers:
 | $m2a            | shortcut to the OpenAF's $m2a function     | 
 | $m4a            | shortcut to the OpenAF's $m4a function       |
 | $pass           | shows an empty string                      |
+| $p              | shows the provided literal                  |
 | $sline          | shortcut to the OpenAF's format withSideLine |
 | $set            | block set of a provided key                  |
 | $concat         | concatenates all arguments as a single value |
