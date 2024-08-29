@@ -197,7 +197,7 @@ jobs:
   - Prepare output
   - Get oJob-commons
   exec: |
-    listFilesRecursive("ojobs").forEach(r => {
+    $from(listFilesRecursive("ojobs")).sort("-isDirectory").select(r => {
       try {
        var _t = "_tmp" + r.filepath.replace(/^ojobs\//, "/")
        if (io.fileExists(_t) && r.isFile) {
