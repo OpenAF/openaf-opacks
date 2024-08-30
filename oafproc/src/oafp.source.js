@@ -2143,7 +2143,7 @@ if (isDef(_drev)) {
         _dr = true
     }
 }
-if (_dr) __con.getTerminal().settings.set("sane")
+if (_dr && isDef(__con)) __con.getTerminal().settings.set("sane")
 
 // Check for OpenAF's sec buckets
 
