@@ -137,10 +137,10 @@ const _$o = (r, options, lineByLine) => {
     if (isDef(params.outkey))    r = $$({}).set(params.outkey, r)
 
     _clearTmpMsg()
+    if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "tree")
     if (_outputFns.has(nOptions.__format)) {
         _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
-        if (isUnDef(nOptions.__format)) nOptions.__format = "tree"
         _o$o(r, nOptions, __)
     }
 }
