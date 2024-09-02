@@ -962,6 +962,45 @@ var _outputFns = new Map([
     ["table", (r, options) => {
         _o$o(r, options)
     }],
+    ["json", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["yaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["cyaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["cjson", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["slon", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["cslon", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["ctree", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["tree", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["res", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["key", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["text", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["csv", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["map", (r, options) => {
+        _o$o(r, options)
+    }],
     ["md", (r, options) => {
         _o$o((toBoolean(params.mdtemplate) ? $t(r) : r), options)
     }],

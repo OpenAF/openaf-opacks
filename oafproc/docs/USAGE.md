@@ -143,6 +143,7 @@ List of available formats to use with the _output_ option:
 | csv | A CSV format (only for list outputs) |
 | ctable | A table-like forcely colored format (only for list outputs) |
 | ctree | A tree-like forcely colored format |
+| cyaml | An YAML colored format |
 | db | Output to a JDBC database |
 | envs | Tries to output the input data as OS environment variables setting commands |
 | gb64json | Equivalent to out=base64 and base64gzip=true |
@@ -151,6 +152,7 @@ List of available formats to use with the _output_ option:
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
 | jwt | Signs map data into a JSON Web Token (JWT) |
+| key | Stores data into an OpenAF global (used inside OpenAF) |
 | lines | Given an array of strings prints each line |
 | log | If input has Logstash compatible fields outputs a human-readable log |
 | map | A rectangle map format |
@@ -163,12 +165,14 @@ List of available formats to use with the _output_ option:
 | prettyjson | A JSON format with spacing |
 | pxml | Tries to output the input data into pretty xml |
 | raw | Tries to output the internal representation (string or json) of the input transformed data |
+| res | Outputs data to an OpenAF global 'res' (used in oJobs) | 
 | schart | A static line-chart like chart (for a fixed list/array of values) |
 | slon | A SLON format |
 | sql | Outputs a series of SQL statements for an input list/array data |
 | stable | A table-like format with separation (only for list outputs) |
 | table | A table-like format without size constraints (only for list outputs) |
 | template | A Handlebars template format |
+| text | A string text format |
 | toml | A TOML format (arrays will have outkey=list) |
 | tree | A tree-like format |
 | xls | A XLSx output format |
