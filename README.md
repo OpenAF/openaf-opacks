@@ -35,6 +35,7 @@
   |**IMEICheck**|<img src=".github/badges/IMEICheck.svg"><br>Enables the checking of IMEIs for checksum validity and tries also to determine the equipment brand from a public database|
   |**InstallCert**|<img src=".github/badges/InstallCert.svg"><br>Easy local installation of SSL certificates.|
   |**Jira**|<img src=".github/badges/Jira.svg"><br>Wrapper for the JIRA REST API|
+  |**Jsoup**|<img src=".github/badges/Jsoup.svg"><br>Simple wrapper around the Java Jsoup library|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
   |**MDB**|<img src=".github/badges/MDB.svg"><br>Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
