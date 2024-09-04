@@ -1,0 +1,31 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- jsoup
+- html
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Jsoup.opack
+description: Simple wrapper around the Java Jsoup library
+name: Jsoup
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20240903'
+dependencies:
+  OpenAF: '>=20240812'
+files:
+- .maven.yaml
+- .package.yaml
+- jsoup-1.18.1.jar
+- jsoup.js
+filesHash:
+  .maven.yaml: 635be83192b53f99b4808d754f10932a5fa4e60d
+  jsoup-1.18.1.jar: cb7cd991d47b44101cbe4655dec611cdc01f8a02
+  jsoup.js: 2b0a05d6ab1e800959916344396c65138eaf8c9e
