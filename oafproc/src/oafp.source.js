@@ -1089,7 +1089,19 @@ var _outputFns = new Map([
             ow.template.addFormatHelpers()
             if (isUnDef(params.template) && isUnDef(params.templatepath)) _exit(-1, "For out=template you need to provide a template=someFile.hbs or templatepath=...")
             params.templatedata = _$(params.templatedata, "templatedata").isString().default("@")
-            _print($t( isUnDef(params.template) ? $path(params.__origr, params.templatepath) : io.readFileString(params.template), $path(r, params.templatedata) ) )
+            
+            var tmpl
+            if (isDef(params.template)) {
+                if (toBoolean(params.templatetmpl)) {
+                    tmpl = params.template
+                } else {
+                    tmpl = io.readFileString(params.template)
+                }
+            } else {
+                tmpl = $path(params.__origr, params.templatepath)
+            }
+            //_print($t( isUnDef(params.template) ? $path(params.__origr, params.templatepath) : ( isDef(params.templatetmpl) ? params.templatetmpl : io.readFileString(params.template) ), $path(r, params.templatedata) ) )
+            _print($t(tmpl, $path(r, params.templatedata)))
         }
     }],
     ["openmetrics", (r, options) => {
@@ -1226,6 +1238,12 @@ var _outputFns = new Map([
     }],
     ["cmd", (r, options) => {
         if (!isString(params.outcmd)) _exit(-1, "For out=cmd you need to provide a outcmd=\"...\"")
+        if (toBoolean(params.outcmdtmpl)) {
+            ow.loadTemplate()
+            ow.template.addConditionalHelpers()
+            ow.template.addOpenAFHelpers()
+            ow.template.addFormatHelpers()
+        }
 
         let _exe = data => {
             var _s, _d = isString(data) ? data : stringify(data, __, "")
@@ -1233,6 +1251,8 @@ var _outputFns = new Map([
                 try {
                 _s = $sh(params.outcmd.replace(/([^\\]?){}/g, "$1"+_d)).get(0)
                 } catch(e) {sprintErr(e)}
+            } else if (toBoolean(params.outcmdtmpl)) {
+                _s = $sh($t(params.outcmd, data)).get(0)
             } else {
                 _s = $sh(params.outcmd, _d).get(0)
             }
@@ -1252,9 +1272,15 @@ var _outputFns = new Map([
                 if (toBoolean(params.outcmdseq)) {
                     r.forEach(_exe)
                 } else {
-                    parallel4Array(r, _r => {
-                        _exe(_r)
-                    })
+                    if (isDef(pForEach)) {
+                        pForEach(r, _r => {
+                            _exe(_r)
+                        })
+                    } else {
+                        parallel4Array(r, _r => {
+                            _exe(_r)
+                        })
+                    }
                 }
             }
         } else {

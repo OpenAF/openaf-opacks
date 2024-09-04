@@ -509,6 +509,7 @@ List of options to use when _out=cmd_:
 | outcmdseq | Boolean | If true and if input is an array the commands will be executed in sequence |
 | outcmdnl | Boolean | If true each command execution output will be appended with a new-line |
 | outcmdparam | Boolean | If true the input entry will be replaced on the 'outcmd' where '{}' is found |
+| outcmdtmpl | Boolean | If true the input entry will be considered as an HandleBars' template |
 
 > If input is an array, without outcmdjoin=true, each entry will result in a command execution in parallel
 
@@ -675,9 +676,10 @@ List of options to use when _out=template_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| template | String | A file path to a HandleBars' template |
+| template | String | A file path to a HandleBars' template or a string template definition if 'templatetmpl' is true |
 | templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
 | templatedata | String | If defined the template data will be retrieved from the provided path |
+| templatetmpl | String | If true the 'template' will be interpreted as the template defintion instead of a file path |
 
 ---
 
