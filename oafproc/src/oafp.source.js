@@ -160,6 +160,7 @@ const _fromJSSLON = aString => {
 	if (!isString(aString) || aString == "" || isNull(aString)) return ""
 
 	aString = aString.trim()
+    if (isDef(af.fromJSSLON)) return af.fromJSSLON(aString)
 	if (aString.startsWith("{")) {
 		return jsonParse(aString, __, __, true)
 	} else {
@@ -1891,6 +1892,7 @@ var _inputFns = new Map([
     ["csv", (_res, options) => {
         var _r
         _showTmpMsg()
+        if (isUnDef(params.inputcsv) && isDef(params.incsv)) params.inputcsv = params.incsv
         if (isDef(params.file) || isDef(params.cmd)) {
             var is = isDef(params.cmd) ? af.fromBytes2InputStream(_runCmd2Bytes(params.cmd)) : io.readFileStream(params.file)
             _r = $csv(params.inputcsv).fromInStream(is).toOutArray()
@@ -2049,7 +2051,7 @@ var _inputFns = new Map([
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
         _showTmpMsg()
-        var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
+        var res = $llm(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv))
         if (isDef(params.llmconversation) && io.fileExists(params.llmconversation)) 
             res.getGPT().setConversation( io.readFileJSON(params.llmconversation) )
         let __res
@@ -2085,7 +2087,7 @@ var _inputFns = new Map([
 
         _showTmpMsg()
 
-        var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv))
+        var res = $llm(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv))
         if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
         _$o(res.getModels(), options)
     }],
