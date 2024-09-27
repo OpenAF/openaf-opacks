@@ -90,8 +90,8 @@ SocksServer.prototype.getNetFilter = function(ipFilters, hostFilters) {
             if (isUnDef(hfilters) || hfilters.length == 0) 
                 go2 = go
             else {
-                if (isUnDef(filters) || filters.length == 0) 
-                    go2 = true
+                //if (isUnDef(filters) || filters.length == 0) 
+                //    go2 = true
                 var _p = String(aSource).split("/")
                 for (let h of hfilters) {
                     if (go2) break
