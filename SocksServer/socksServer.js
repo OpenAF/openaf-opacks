@@ -90,12 +90,14 @@ SocksServer.prototype.getNetFilter = function(ipFilters, hostFilters) {
             if (isUnDef(hfilters) || hfilters.length == 0) 
                 go2 = go
             else {
-                //if (isUnDef(filters) || filters.length == 0) 
-                //    go2 = true
-                var _p = String(aSource).split("/")
-                for (let h of hfilters) {
-                    if (go2) break
-                    if (_p[0].endsWith(h)) go2 = true
+                if (isDef(filters) && filters.length > 0 && !go) {
+                    go2 = false
+                } else {
+                    var _p = String(aSource).split("/")
+                    for (let h of hfilters) {
+                        if (go2) break
+                        if (_p[0].endsWith(h)) go2 = true
+                    }
                 }
             }
 
