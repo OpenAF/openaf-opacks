@@ -1,6 +1,6 @@
-var params = processExpr(" ")
+var _params = processExpr(" ")
 // Author : Nuno Aguiar
-const oafp = (params) => {
+const oafp = params => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
 // Ensure params are interpreted as lower case
@@ -545,7 +545,7 @@ var _transformFns = {
     "diff": _r => {
         var _d = _fromJSSLON(params.diff)
         if (isMap(_d)) {
-            if (!((isDef(_d.filea) && isDef(_d.fileb)) || (isDef(_d.a) && isDef(_d.b)))) _exit(-1, "diff.a path and diff.b path are required.")
+            if (!((isDef(_d.a) && isDef(_d.b)))) _exit(-1, "diff.a path and diff.b path are required.")
 
             loadDiff() 
             let _d1 = $path(_r, _d.a), _d2 = $path(_r, _d.b), _dt = __
@@ -904,6 +904,49 @@ var _transformFns = {
                 return _nr
             else
                 return _r
+        }
+    },
+    "set": _r => {
+        var _d = _fromJSSLON(params.set)
+
+        if (!isMap(_d) && isUnDef(_d.a) && isUnDef(_d.b)) _exit(-1, "set.a path and set.b path are required.")
+        if (isUnDef(pForEach)) _exit(-1, "This version of OpenAF does not support the set transform")
+        if (!isString(_d.a)) _exit(-1, "set.a path is not a string.")
+        if (!isString(_d.b)) _exit(-1, "set.b path is not a string.")
+
+        let _d1 = $path(_r, _d.a), _d2 = $path(_r, _d.b)
+        if (!isArray(_d1)) _exit(-1, "set.a path result is not an array.")
+        if (!isArray(_d2)) _exit(-1, "set.b path result is not an array.")
+
+        let toOrdStr, toOrdStrs
+        if (isString(params.setkeys)) {
+            ow.loadObj()
+            var _ks = params.setkeys.split(",").map(r => r.trim())
+            toOrdStr  = r => stringify(isObject(r) ? sortMapKeys(ow.obj.filterKeys(_ks, r), true) : r, __, "")
+            toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
+        } else {
+            toOrdStr  = r => stringify(isObject(r) ? sortMapKeys(r, true) : r, __, "")
+            toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
+        }
+
+        switch(params.setop) {
+        case "union"    :
+            let ca = new Set(toOrdStrs(_d1))
+            return _d1.concat(_d2.filter(r => !ca.has(toOrdStr(r))))
+        case "diffa"    :
+            let cb2 = new Set(toOrdStrs(_d2))
+            return _d1.filter(r => !cb2.has(toOrdStr(r)))
+        case "diffb"    :
+            let cb3 = new Set(toOrdStrs(_d1))
+            return _d2.filter(r => !cb3.has(toOrdStr(r)))
+        case "diffab"  :
+            let cb4 = new Set(toOrdStrs(_d1))
+            let cb5 = new Set(toOrdStrs(_d2))
+            return _d1.filter(r => !cb5.has(toOrdStr(r))).concat(_d2.filter(r => !cb4.has(toOrdStr(r))))
+        case "intersect":
+        default         :
+            let cb1 = new Set(toOrdStrs(_d2))
+            return _d1.filter(r => cb1.has(toOrdStr(r)))
         }
     }
 }
@@ -1986,7 +2029,7 @@ var _inputFns = new Map([
         _$o(_r, options)
     }],
     ["oafp", (_res, options) => {
-        params.__inception = true
+        //params.__inception = true
         var _r = _fromJSSLON(_res)
         var id = "_oafp_key_" + genUUID()
         if (isMap(_r)) {
@@ -1998,24 +2041,26 @@ var _inputFns = new Map([
             $unset(id)
             _$o(_d, options)
         } else if (isArray(_r)) {
-            ow.loadObj()
             $set(id, true)
-            var _out = new ow.obj.syncArray()
-            var _p = _r.map((r, i) => {
+            var _out = pForEach(_r, (__r, i) => {
                 var sid = id + "_" + String(i)
-                r.out         = "key"
-                r.__key       = sid
-                r.__inception = true
-                return $do(() => {
-                    oafp(r)
-                    _out.add($get(sid))
+                __r.out         = "key"
+                __r.__key       = sid
+                __r.__inception = true
+                //return $do(() => {
+                var _rr
+                try {
+                    oafp(__r)
+                    _rr = $get(sid)
                     $unset(sid)
-                }).catch(e => {
+                } catch(e) {
                     sprintErr(e)
-                })
+                } finally {
+                    return _rr
+                }
             })
-            $doWait($doAll(_p))
-            _$o(_out.toArray(), options)
+            //$doWait($doAll(_p))
+            _$o(_out, options)
         } else {
             _exit(-1, "oafp input data needs to be a map or an array.")
         }
@@ -2493,4 +2538,4 @@ if (isNumber(params.loop)) {
 // Close streams
 if (isDef(global.__oafp_streams)) Object.keys(global.__oafp_streams).forEach(s => global.__oafp_streams[s].s.close())
 }
-oafp(params)
+oafp(_params)
