@@ -123,6 +123,7 @@ These options will change the parsed input data included any filters provided.
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
+| set | String | Performs set operations (intersection by default) over an 'a' and 'b' path to an array defined in a JSON/SLON map |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
 
@@ -462,6 +463,18 @@ List of options to use when _regression=..._:
 | regressionforecast | String | Optional path to an array of x values for which to forecast the corresponding y |
 
 > Example: ```oafp data="[1,2,3]" regression=linear regressionforecast="from_slon('[4|5]')" out=ctable```
+
+---
+
+### 🧾 Set transform options
+
+List of options to use when _set=..._:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symetric difference) and 'intersect' (default) |
+
+> Example: ```set="(a: old, b: new)" setop=diffb```
 
 ---
 
