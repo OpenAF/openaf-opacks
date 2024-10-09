@@ -61,6 +61,8 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | abs(number) | base | The absolute value of a numeric field | [].{y:abs(y)} |
 | add(number, number) | 20240217 | Adds two numbers  | add(1, 2) |
 | amerge(x, y) | 20240215 | OpenAF's merge with support for arrays | amerge([], from_slon('(stamp:123)')) |
+| assign(obj, objPath, value) | 20241010 | Given an 'obj' will try to set the object path objPath to value | assign([?id='12']|[0], 'status', 'valid') |
+| assignp(path, objPath, value) | 20241010 | Given a path will try to set the object path objPath to value | assignp('[?id='12']', 'status', 'valid') |
 | avg(arrayNumber) | base | The average value of an array of numeric fields | avg([].y) |
 | ceil(number) | base | Returns the smallest integer that is equal or less than a specific numeric field value | [].ceil(y) |
 | ch(name, op, arg1, args2) | 20240801 | Wrapper for OpenAF's channel functions over a 'name' channel, an 'op' operation between get, set, unset, size, getAll, getKeys, unsetAll; depending on the 'op', 'arg1' and 'arg2' can be provided with values as objects or JSON/SLON | ch('a', 'set', 'a', 'abc').ch('a', 'get', 'a', __) |
