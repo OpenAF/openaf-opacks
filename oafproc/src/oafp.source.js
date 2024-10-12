@@ -1064,7 +1064,7 @@ var _outputFns = new Map([
                 }, _lt)
                 _arr.forEach(_r => {
                     if (isMap(_r)) {
-                        let d = (isDef(_r["@timestamp"]) ? _r["@timestamp"] : __)
+                        let d = (isDef(_r["@timestamp"]) && isString(_r["@timestamp"]) ? _r["@timestamp"] : __)
                         let l = (isDef(_r.level) ? _r.level : __)
                         let m = (isDef(_r.message) ? _r.message : __)
                         let lineC
@@ -2453,13 +2453,18 @@ var _run = () => {
                         if (params.input != "pm") {
                             _res = []
                             io.pipeLn(r => {
-                                if (isDef(_inputLineFns[params.type])) {
-                                    if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                                try {
+                                    if (isDef(_inputLineFns[params.type])) {
+                                        if (_inputLineFns[params.type](_transform(r), clone(options))) {
+                                            _res.push(r)
+                                        }
+                                    } else { 
                                         _res.push(r)
                                     }
-                                } else { 
-                                    _res.push(r)
+                                } catch(ipl) {
+                                    printErr("ERROR: " + ipl)
                                 }
+
                                 return false
                             })
                             _res = _res.join('\n')
