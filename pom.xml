@@ -8,6 +8,11 @@
 
     <dependencies>
         <dependency>
+            <artifactId>sshd-core</artifactId>
+            <groupId>org.apache.sshd</groupId>
+            <version>2.13.2</version>
+        </dependency>
+        <dependency>
             <artifactId>avro-tools</artifactId>
             <groupId>org.apache.avro</groupId>
             <version>1.12.0</version>
