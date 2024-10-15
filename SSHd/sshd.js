@@ -10,7 +10,7 @@ var SSHd = function(aPort) {
    this.port = _$(aPort, "aPort").isNumber().default(22)
 
    this.sshd = new Packages.org.apache.sshd.server.SshServer.setUpDefaultServer()
-   this.sshd.setPort(2244)
+   this.sshd.setPort(this.port)
    this.sshd.setKeyPairProvider(new Packages.org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider())
    this.sshd.setPasswordAuthenticator(new Packages.org.apache.sshd.server.auth.password.StaticPasswordAuthenticator(true))
    this.sshd.setPublickeyAuthenticator(new Packages.org.apache.sshd.server.config.keys.DefaultAuthorizedKeysAuthenticator(true))
