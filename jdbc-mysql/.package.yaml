@@ -16,15 +16,15 @@ name: jdbc-mysql
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240811'
+version: '20241016'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-mysql.js
-- mysql-connector-j-9.0.0.jar
+- mysql-connector-j-9.1.0.jar
 filesHash:
-  LICENSES.txt: 2180341763a7027dc36606eecf9c41dfcd30ec90
+  LICENSES.txt: 2e1ceec83c7966866d3ba69538f38f11f676c5fc
   jdbc-mysql.js: 9fe06f159e87c01c3b38d10d99d701c2ad82737f
-  mysql-connector-j-9.0.0.jar: 6fc50f53a8e364ad82886588a4b55d1f7460e6a5
+  mysql-connector-j-9.1.0.jar: 005fb1d513278e1a9767dfa80ea9d8d7ee909f1a
