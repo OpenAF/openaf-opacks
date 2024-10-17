@@ -2207,30 +2207,45 @@ else
 if (isArray(params.libs)) {
     params.libs.forEach(lib => {
         try {
-            var _req = require("oafp_" + lib + ".js")
-            if (isDef(_req.oafplib)) {
-                var res = _req.oafplib(clone(params), _$o, _o$o, {
-                    _runCmd2Bytes: _runCmd2Bytes,
-                    _fromJSSLON: _fromJSSLON,
-                    _msg: _msg,
-                    _showTmpMsg: _showTmpMsg,
-                    _clearTmpMsg: _clearTmpMsg,
-                    _chartPathParse: _chartPathParse,
-                    _exit: _exit,
-                    _print: _print,
-                    _o$o: _o$o
-                })
-                if (isMap(res)) {
-                    if (isArray(res.fileExtensions))      res.fileExtensions.forEach(r => _addSrcFileExtensions(r.ext, r.type))
-                    if (isArray(res.fileExtensionsNoMem)) res.fileExtensionsNoMem.forEach(r => _addSrcFileExtensionsNoMem(r.ext))
-                    if (isArray(res.input))               res.input.forEach(r => _addSrcInputFns(r.type, r.fn))
-                    if (isArray(res.inputLine))           res.inputLine.forEach(r => _addSrcInputLineFns(r.type, r.fn))
-                    if (isArray(res.transform))           res.transform.forEach(r => _addSrcTransformFns(r.type, r.fn))
-                    if (isArray(res.output))              res.output.forEach(r => _addSrcOutputFns(r.type, r.fn))
-                    if (isString(res.help))               _oafhelp_libs[lib.toLowerCase()] = res.help
+            if (lib.startsWith("@")) {
+                if (/^\@([^\/]+)\/(.+)\.js$/.test(lib)) {
+                    var _ar = lib.match(/^\@([^\/]+)\/(.+)\.js$/)
+                    var _path = getOPackPath(_ar[1])
+                    var _file = _path + "/" + _ar[2] + ".js"
+                    if (io.fileExists(_file)) {
+                        loadLib(_file)
+                    } else {
+                        _exit(-1, "ERROR: Library '" + lib + "' not found.")
+                    }
+                } else {
+                    _exit(-1, "ERROR: Library '" + lib + "' does not have the correct format (@oPack/library.js).")
                 }
             } else {
-                printErr("WARN: Library '" + lib + "' does not have oafplib.")
+                var _req = require("oafp_" + lib + ".js")
+                if (isDef(_req.oafplib)) {
+                    var res = _req.oafplib(clone(params), _$o, _o$o, {
+                        _runCmd2Bytes: _runCmd2Bytes,
+                        _fromJSSLON: _fromJSSLON,
+                        _msg: _msg,
+                        _showTmpMsg: _showTmpMsg,
+                        _clearTmpMsg: _clearTmpMsg,
+                        _chartPathParse: _chartPathParse,
+                        _exit: _exit,
+                        _print: _print,
+                        _o$o: _o$o
+                    })
+                    if (isMap(res)) {
+                        if (isArray(res.fileExtensions))      res.fileExtensions.forEach(r => _addSrcFileExtensions(r.ext, r.type))
+                        if (isArray(res.fileExtensionsNoMem)) res.fileExtensionsNoMem.forEach(r => _addSrcFileExtensionsNoMem(r.ext))
+                        if (isArray(res.input))               res.input.forEach(r => _addSrcInputFns(r.type, r.fn))
+                        if (isArray(res.inputLine))           res.inputLine.forEach(r => _addSrcInputLineFns(r.type, r.fn))
+                        if (isArray(res.transform))           res.transform.forEach(r => _addSrcTransformFns(r.type, r.fn))
+                        if (isArray(res.output))              res.output.forEach(r => _addSrcOutputFns(r.type, r.fn))
+                        if (isString(res.help))               _oafhelp_libs[lib.toLowerCase()] = res.help
+                    }
+                } else {
+                    printErr("WARN: Library '" + lib + "' does not have oafplib.")
+                }
             }
         } catch(e) {
             printErr("WARN: Library '" + lib + "' error: " + e)
