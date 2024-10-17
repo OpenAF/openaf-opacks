@@ -1108,10 +1108,11 @@ ow.ch.__types.s3 = {
             this.__ul(this.__channels[aName]);
         }
         Object.keys(m).forEach(k => {
+	    var _k = jsonParse(k)
             if (this.__channels[aName].multifile) {
-                try { aFunction(k, this.__rf(this.__channels[aName], k)) } catch(e) {}
+                try { aFunction(_k, this.__rf(this.__channels[aName], _k)) } catch(e) {}
             } else {
-                try { aFunction(k, m[k]) } catch(e) {}
+                try { aFunction(_k, m[_k]) } catch(e) {}
             }
         });
     },
@@ -1121,7 +1122,7 @@ ow.ch.__types.s3 = {
         try {
             m  = this.__r(this.__channels[aName])
             if (this.__channels[aName].multifile) {
-                mv = Object.keys(m).map(k => this.__rf(this.__ch, jsonParse(k)))
+                mv = Object.keys(m).map(k => this.__rf(this.__channels[aName], jsonParse(k)))
             } 
         } finally {
             this.__ul(this.__channels[aName]);
