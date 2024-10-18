@@ -51,7 +51,7 @@ jobs:
       classpath.push(getOpenAFJar());
       var sources = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.java')].filepath");
       var sep = java.io.File.pathSeparator;
-      sh(["javac", "-source", "1.8", "-target", "1.8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources), void 0, void 0, true, args.outputDir, true);
+      sh(["javac", "--release", "8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources), void 0, void 0, true, args.outputDir, true);
  
   ####################### 
   - name: Prepare GIT jar
@@ -62,10 +62,11 @@ jobs:
     exec: |
       plugin("ZIP");
       var zip = new ZIP();
-      var classes = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.class')].filepath");
+      var classes = $path(listFilesRecursive(io.fileInfo(args.outputDir + "/src").canonicalPath), "[?ends_with(filename, '.class')].filepath");
+      sprint(classes)
       classes.forEach((afile) => {
-        log("Packing " + afile.replace(args.outputDir + "/src/", "") + "...");
-        zip.streamPutFileStream(args.outputDir + "/plugin-git.jar", afile.replace(args.outputDir + "/src/", ""), io.readFileStream(afile));
+        log("Packing " + afile.replace(io.fileInfo(args.outputDir + "/src").canonicalPath, "") + "...");
+        zip.streamPutFileStream(args.outputDir + "/plugin-git.jar", afile.replace(io.fileInfo(args.outputDir + "/src").canonicalPath, ""), io.readFileStream(afile));
       });
 
   ####################
