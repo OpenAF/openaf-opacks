@@ -29,8 +29,6 @@ files:
 - api-common-2.38.0.jar
 - auto-value-annotations-1.11.0.jar
 - checker-qual-3.47.0.jar
-- commons-codec-1.17.1.jar
-- commons-logging-1.2.jar
 - conscrypt-openjdk-uber-2.5.2.jar
 - detector-resources-support-0.32.0.jar
 - error_prone_annotations-2.33.0.jar
@@ -74,10 +72,8 @@ files:
 - grpc-stub-1.67.1.jar
 - grpc-util-1.67.1.jar
 - grpc-xds-1.67.1.jar
-- gson-2.11.0.jar
 - guava-33.3.1-jre.jar
 - j2objc-annotations-3.0.0.jar
-- jackson-core-2.18.0.jar
 - javax.annotation-api-1.3.2.jar
 - jsr305-3.0.2.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
@@ -104,7 +100,6 @@ files:
 - protobuf-java-util-3.25.5.jar
 - re2j-1.7.jar
 - shared-resourcemapping-0.32.0.jar
-- slf4j-api-2.0.9.jar
 - threetenbp-1.7.0.jar
 filesHash:
   .maven.yaml: f0b45d6ed3970513249dd2987d5039c0b2277517
@@ -113,8 +108,6 @@ filesHash:
   api-common-2.38.0.jar: 6d0bf6cd35a9f9caa196a0d5844c24288f1d53bb
   auto-value-annotations-1.11.0.jar: f0d047931d07cfbc6fa4079854f181ff62891d6f
   checker-qual-3.47.0.jar: 2b3cbe34a6af46bb3692aac208caa4f55cd28584
-  commons-codec-1.17.1.jar: 973638b7149d333563584137ebf13a691bb60579
-  commons-logging-1.2.jar: 4bfc12adfe4842bf07b657f0369c4cb522955686
   conscrypt-openjdk-uber-2.5.2.jar: d858f142ea189c62771c505a6548d8606ac098fe
   detector-resources-support-0.32.0.jar: 5b3340c991cf7793ee42d5a2e46192a466e94c3f
   error_prone_annotations-2.33.0.jar: 8da89b78563865aa950961ae898f8ea0fb4e1d64
@@ -158,10 +151,8 @@ filesHash:
   grpc-stub-1.67.1.jar: d035e33a23045b8cffc3e9c96f5f9a0a6ad9d1c5
   grpc-util-1.67.1.jar: 6d0608ab58365deb080980c3c32230be644c3110
   grpc-xds-1.67.1.jar: 2bb94b8f1c4560b52abe4830b75f692a8da7da09
-  gson-2.11.0.jar: 527175ca6d81050b53bdd4c457a6d6e017626b0e
   guava-33.3.1-jre.jar: 852f8b363da0111e819460021ca693cacca3e8db
   j2objc-annotations-3.0.0.jar: 7399e65dd7e9ff3404f4535b2f017093bdb134c7
-  jackson-core-2.18.0.jar: 65e8ead7de5d8f7a53e296c363bea3182f21f925
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
@@ -188,5 +179,4 @@ filesHash:
   protobuf-java-util-3.25.5.jar: 38cc5ce479603e36466feda2a9f1dfdb2210ef00
   re2j-1.7.jar: 2949632c1b4acce0d7784f28e3152e9cf3c2ec7a
   shared-resourcemapping-0.32.0.jar: 6c03ac9ddcc9566a9a5713f3e6234b4643f970b4
-  slf4j-api-2.0.9.jar: 7cf2726fdcfbc8610f9a71fb3ed639871f315340
   threetenbp-1.7.0.jar: 8703e893440e550295aa358281db468625bc9a05
