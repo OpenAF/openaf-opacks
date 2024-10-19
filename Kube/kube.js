@@ -37,6 +37,12 @@ var $kube = function(aMap) {
 			_r._k.close()
 			return res
 		},
+		scale: (aType, aName, aValue, aNS) => {
+			aNS = _$(aNS, "aNS").isString().default(_r._ns)
+			_r._k.scale(aNS, aType, aName, aValue)
+			_r._k.close()
+			return __
+		},
 		exec : (aPodName, aCmd, aTimeout, doSH, aContainer) => {
 			aTimeout = _$(aTimeout, "timeout").isNumber().default(_r._to)
 			var res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
@@ -176,6 +182,35 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 Kube.prototype.close = function() {
   	this.client.close();
 };
+
+/**
+ * <odoc>
+ * <key>Kube.scale(aNamespace, aType, aName, aValue)</key>
+ * Tries to scale aType (deploy, statefulset, daemonset, replicaset) on aNamespace with aName to aValue.
+ * </odoc>
+ */
+Kube.prototype.scale = function(aNamespace, aType, aName, aValue) {
+	var c = this.client.inNamespace(aNamespace)
+	
+	switch(aType.toLowerCase()) {
+	case "deploy"     :
+		c = c.apps().deployments()
+		break
+	case "statefulset":
+		c = c.apps().statefulSets()
+		break
+	case "daemonset"  :
+		c = c.apps().daemonSets()
+		break
+	case "replicaset" :
+		c = c.apps().replicaSets()
+		break
+	default	          :
+		throw "Unknown type: " + aType
+	}
+	if (isDef(aName)) c = c.withName(aName)
+	c.scale(aValue)
+}
 
 /**
  * <odoc>

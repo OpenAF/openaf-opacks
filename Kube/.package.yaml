@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241001'
+version: '20241018'
 dependencies:
   OpenAF: '>=20240812'
 files:
@@ -62,12 +62,12 @@ files:
 - zjsonpatch-0.3.0.jar
 filesHash:
   .maven.yaml: 0de8ecb5b53f93334a1b4a9ad29ce63f69b5f0f8
-  .odoc.db: 4200cf9af204a8761739822dee3a070e36d2fcd2
+  .odoc.db: 5d636293f5d57455a1e633e5f7f41058162a1885
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
   jackson-dataformat-yaml-2.17.1.jar: b4c7b8a9ea3f398116a75c146b982b22afebc4ee
   jackson-datatype-jsr310-2.17.1.jar: 0969b0c3cb8c75d759e9a6c585c44c9b9f3a4f75
-  kube.js: e03ae41021f6aac1024016a3c29740c472941cde
+  kube.js: 0c1ed5ab0dcb5cc66eac6ad364e5754c159686bf
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-6.13.4.jar: 2aa2fc58356cdcea1c9c23b0f4a58eaf147b973c
   kubernetes-client-api-6.13.4.jar: 5bcbb03deb72dc59ae8f504207cb85b212b6e3f8
