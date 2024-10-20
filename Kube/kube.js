@@ -193,6 +193,7 @@ Kube.prototype.scale = function(aNamespace, aType, aName, aValue) {
 	var c = this.client.inNamespace(aNamespace)
 	
 	switch(aType.toLowerCase()) {
+	case "deployment" :
 	case "deploy"     :
 		c = c.apps().deployments()
 		break
@@ -210,6 +211,96 @@ Kube.prototype.scale = function(aNamespace, aType, aName, aValue) {
 	}
 	if (isDef(aName)) c = c.withName(aName)
 	c.scale(aValue)
+}
+
+/**
+ * <odoc>
+ * <key>Kube.scaleWithDeps(aNamespace, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) : Number</key>
+ * Tries to scale a set of deployments and/or statefulsets on aNamespace based on the provided anArrayScaleWithDeps. Each element of the array should be a map with the following
+ * structure: { ns: "namespace", t: "deploy", n: "name", r: replicas, id: "id", d: [ "id1", "id2" ] }. If scaleDown is true it will scale down instead of up. The aTimeout
+ * defines the maximum time to wait for all dependencies to be met and the aScanWait defines the time to wait between scans. Returns the number of elements that were scaled.
+ * </odoc>
+ */
+Kube.prototype.scaleWithDeps = function(aNamespace, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) {
+	aNamespace = _$(aNamespace, "aNamespace").isString().default("default")
+	aScaleDown = _$(scaleDown, "scaleDown").isBoolean().default(false)
+	aTimeout   = _$(aTimeout, "aTimeout").isNumber().default(1000 * 60 * 30) // 30 minutes default
+	aScanWait  = _$(aScanWait, "aScanWait").isNumber().default(1000 * 1) // 1 second default
+
+	// Check array and assign defaults
+	anArrayScaleWithDeps.forEach(_s => {
+		// If string assign a default map
+		if (isString(_s)) _s = { ns: aNamespace, t: "deploy", n: _s, id: aNamespace + "::" + _s }
+		// If entry is a valid map
+		if (isMap(_s)) {
+			// Check types and assign defaults
+			_s.ns = _$(_s.ns, "ns").isString().default(aNamespace)
+			_s.t  = _$(_s.t, "t").isString().default("deploy")
+			_s.r  = _$(_s.r, "r").isNumber().default(1)
+			_$(_s.n, "n").isString().$_()
+			_s.id = _$(_s.id, "id").isString().default(_s.ns + "::" + _s.n)
+			if (isString(_s.d)) _s.d = [ _s.d ]
+			_s.d = _$(_s.d, "d").isArray().default([])
+			_s.d = _s.d.map(_d => {
+				if (isString(_d) && _d.indexOf("::") < 0) _d = aNamespace + "::" + _d
+				return _d
+			})
+		}
+	})
+
+	// Scan function to determine current state
+	var _scan = () => {
+		var _n = {}, res = {}
+		// Scan each element of the array to determine if it's ready or not
+		anArrayScaleWithDeps.forEach(_s => {
+			// For the given namespace if there isn't a list of deployments and statefulsets, get them
+			if (isUnDef(_n[_s.ns])) _n[_s.ns] = this.getDeployments(_s.ns).concat(this.getStatefulSets(_s.ns))
+
+			// Find the element on the list
+			var kind = (_s.t == "deploy") ? "Deployment" : "StatefulSet"
+			var _elem = $from(_n[_s.ns]).equals("Metadata.Name", _s.n).equals("Kind", kind).at(0)
+			if (isDef(_elem)) {
+				// If found and replicas are greater than 0 and ready replicas are greater than 0, mark as ready
+				if (isDef(_elem.Status)) {
+					if (_elem.Status.Replicas > 0 && _elem.Status.ReadyReplicas > 0)
+						res[_s.id] = true
+					else
+						res[_s.id] = false
+				} else {
+					res[_s.id] = false
+				}
+			} else {
+				res[_s.id] = false
+			}
+		})
+		return res
+	}
+
+	// Scale function to scale the elements when dependencies are met
+	var _scale = (scanResult) => {
+		anArrayScaleWithDeps.forEach(_s => {
+			if (isString(_s.d)) _s.d = [ _s.d ]
+			if (isArray(_s.d)) {
+				var shouldScale = true
+				_s.d.forEach(_d => {
+					if (scaleDown && isDef(scanResult[_d]) && scanResult[_d] == true) shouldScale = false
+					if (!scaleDown && isDef(scanResult[_d]) && scanResult[_d] == false) shouldScale = false
+				})
+				if (shouldScale) this.scale(_s.ns, _s.t, _s.n, scaleDown ? 0 : _s.r)
+			}
+		})
+	}
+
+	// Main loop
+	var init = now(), scanResult = _scan(), done = false
+	do {
+		_scale(scanResult)
+		scanResult = _scan()
+		if ($from(scanResult).equals(scaleDown).count() == 0) done = true
+		if (!done) sleep(aScanWait, true)
+	} while(!done && (now() - init) < aTimeout)
+
+	return scanResult
 }
 
 /**

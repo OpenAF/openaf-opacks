@@ -67,7 +67,7 @@ filesHash:
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
   jackson-dataformat-yaml-2.17.1.jar: b4c7b8a9ea3f398116a75c146b982b22afebc4ee
   jackson-datatype-jsr310-2.17.1.jar: 0969b0c3cb8c75d759e9a6c585c44c9b9f3a4f75
-  kube.js: 0c1ed5ab0dcb5cc66eac6ad364e5754c159686bf
+  kube.js: e50d4cf59db5235ef3c2a0ff9be7b1b28b43410a
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-6.13.4.jar: 2aa2fc58356cdcea1c9c23b0f4a58eaf147b973c
   kubernetes-client-api-6.13.4.jar: 5bcbb03deb72dc59ae8f504207cb85b212b6e3f8
