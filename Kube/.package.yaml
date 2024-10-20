@@ -62,7 +62,7 @@ files:
 - zjsonpatch-0.3.0.jar
 filesHash:
   .maven.yaml: 0de8ecb5b53f93334a1b4a9ad29ce63f69b5f0f8
-  .odoc.db: 5d636293f5d57455a1e633e5f7f41058162a1885
+  .odoc.db: 80d4efa20e4e246ac56a18b04f56f2bd1bead5c3
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
   jackson-dataformat-yaml-2.17.1.jar: b4c7b8a9ea3f398116a75c146b982b22afebc4ee
