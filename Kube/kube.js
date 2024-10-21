@@ -71,6 +71,16 @@ var $kube = function(aMap) {
 			var res = _r._k.getLog(aNS, aPodName, aContainer, aStream)
 			_r._k.close()
 			return res
+		},
+		scale: (aType, aName, aValue) => {
+			_r._k.scale(_r._ns, aType, aName, aValue)
+			_r._k.close()
+			return __
+		},
+		scaleWithDeps: (anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) => {
+			var res = _r._k.scaleWithDeps(_r._ns, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait)
+			_r._k.close()
+			return res
 		}
 	};
 
