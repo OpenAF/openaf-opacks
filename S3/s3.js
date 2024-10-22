@@ -1026,7 +1026,6 @@ ow.ch.__types.s3 = {
         } else {
             if (m.gzip) {
                 var os = io.writeFileGzipStream(_tmpf)
-                lprint(v, true)
                 ioStreamWrite(os, stringify(v, __, m.compact ? "" : __))
                 os.close()
             } else {
