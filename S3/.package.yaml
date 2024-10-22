@@ -66,7 +66,7 @@ filesHash:
   minio-8.5.12.jar: 669d478e02466dcc9d7a9180d37756f3554c55bb
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: 1aead57f8d7924981fddcb5a031c99adea95303e
+  s3.js: 8dd0d4d72fff919eb476a21dd6df313cc81f07ba
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.5.jar: ac605269f3598506196e469f1fb0d7ed5c55059e
