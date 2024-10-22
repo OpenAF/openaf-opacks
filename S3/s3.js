@@ -860,30 +860,30 @@ S3.prototype.getObj = function() {
 
 ow.loadCh()
 /**
-* <odoc>
-* <key>ow.ch.types.s3</key>
-* The s3 channel OpenAF implementation is similar to type "file" where instead of keeping a JSON or YAML file
-* in the local filesystem it's kept on a S3 bucket. The creation options are:\
-* \
-*    - s3url       (String)  The S3 URL to use\
-*    - s3bucket    (String)  The S3 bucket name\
-*    - s3accessKey (String)  The S3 access key\
-*    - s3secretKey (String)  The S3 secret key\
-*    - s3object    (String)  The s3 complete path to a JSON or YAML object to use (if multifile is false)\
-*    - s3prefix    (String)  The s3 prefix to use to store JSON or YAML objects to use (if multifile is true)\
-*    - yaml        (Boolean) Use YAML instead of JSON (defaults to false)\
-*    - compact     (Boolean) If JSON and compact = true the JSON format will be compacted (defaults to false or shouldCompress option)\
-*    - multifile   (Boolean) If true instead of keeping values in one file it will be kept in multiple files (*)\
-*    - multipart   (Boolean) If YAML and multipart = true the YAML file will be multipart\
-*    - key         (String)  If a key contains "key" it will be replaced by the "key" value\
-*    - multipath   (Boolean) Supports string keys with paths (e.g. ow.obj.setPath) (defaults to false)\
-*    - lock        (String)  If defined the filepath to a dummy file for a local filesystem lock while accessing the file\
-*    - gzip        (Boolean) If true the output file will be gzip (defaults to false)\
-* \
-* (*) - Be aware that althought there is a very small probability of collision between the unique id (sha-512) for filenames it still exists\
-* \
-* </odoc>
-*/
+  * <odoc>
+  * <key>ow.ch.types.s3</key>
+  * The s3 channel OpenAF implementation is similar to type "file" where instead of keeping a JSON or YAML file
+  * in the local filesystem it's kept on a S3 bucket. The creation options are:\
+  * \
+  *    - s3url       (String)  The S3 URL to use\
+  *    - s3bucket    (String)  The S3 bucket name\
+  *    - s3accessKey (String)  The S3 access key\
+  *    - s3secretKey (String)  The S3 secret key\
+  *    - s3object    (String)  The s3 complete path to a JSON or YAML object to use (if multifile is false)\
+  *    - s3prefix    (String)  The s3 prefix to use to store JSON or YAML objects to use (if multifile is true)\
+  *    - yaml        (Boolean) Use YAML instead of JSON (defaults to false)\
+  *    - compact     (Boolean) If JSON and compact = true the JSON format will be compacted (defaults to false or shouldCompress option)\
+  *    - multifile   (Boolean) If true instead of keeping values in one file it will be kept in multiple files (*)\
+  *    - multipart   (Boolean) If YAML and multipart = true the YAML file will be multipart\
+  *    - key         (String)  If a key contains "key" it will be replaced by the "key" value\
+  *    - multipath   (Boolean) Supports string keys with paths (e.g. ow.obj.setPath) (defaults to false)\
+  *    - lock        (String)  If defined the filepath to a dummy file for a local filesystem lock while accessing the file\
+  *    - gzip        (Boolean) If true the output file will be gzip (defaults to false)\
+  * \
+  * (*) - Be aware that althought there is a very small probability of collision between the unique id (sha-512) for filenames it still exists\
+  * \
+  * </odoc>
+  */
 ow.ch.__types.s3 = {
     __channels: {},
     __l: (m) => (isString(m.lock) ? $flock(m.lock).lock() : __),
