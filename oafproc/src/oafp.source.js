@@ -3,6 +3,9 @@ var _params = processExpr(" ")
 const oafp = params => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
+// Process secBuckets
+if (isDef($sec().procMap)) params = $sec().procMap(params)
+
 // Ensure params are interpreted as lower case
 Object.keys(params).forEach(pk => {
     if (params[pk].length > 0) {
@@ -1367,7 +1370,7 @@ var _outputFns = new Map([
             if (params.ch.type == "remote") {
                 $ch("oafp::outdata").createRemote(params.ch.url)
             } else {
-                $ch("oafp::outdata").create(params.ch.type, params.ch.options)
+                $ch("oafp::outdata").create(params.ch.type, isDef($sec().procMap) ? $sec().procMap(params.ch.options) : params.ch.options)
             }
 
             if (toBoolean(params.chunset)) {
@@ -1856,7 +1859,7 @@ var _inputFns = new Map([
             if (params.inch.type == "remote") {
                 $ch("oafp::indata").createRemote(params.inch.url)
             } else {
-                $ch("oafp::indata").create(params.inch.type, params.inch.options)
+                $ch("oafp::indata").create(params.inch.type, isDef($sec().procMap) ? $sec().procMap(params.inch.options) : params.inch.options) 
             }
 
             var _r = _fromJSSLON(r)
