@@ -82,14 +82,19 @@ SSHd.prototype.setPublickeyAuthenticator = function(aFunc) {
 
 /**
  * <odoc>
- * <key>SSHd.setShellFactory(aShellFactory)</key>
- * Sets aShellFactory as the shell factory. Example:\
+ * <key>SSHd.setCommandFactory(aCommandFactory)</key>
+ * Sets aCommandFactory as the command factory. Example:\
  * \
  * var sshd = new SSHd(2222)\
- * sshd.setShellFactory(new org.apache.sshd.server.command.ProcessShellFactory("/bin/sh", "-i"))\
+ * sshd.setCommandFactory({ createShell: () => { return function(session) { sprint(session.getUsername()); return (new org.apache.sshd.server.command.ProcessShellFactory("/bin/sh", "-i")).create(); } } })\
  * \
  * </odoc>
  */
+SSHd.prototype.setCommandFactory = function(aShellFactory) {
+   this.sshd.setCommandFactory(aShellFactory)
+   this._checkList.shell = true
+}
+
 SSHd.prototype.setShellFactory = function(aShellFactory) {
    this.sshd.setShellFactory(aShellFactory)
    this._checkList.shell = true
@@ -97,13 +102,11 @@ SSHd.prototype.setShellFactory = function(aShellFactory) {
 
 /**
  * <odoc>
- * <key>SSHd.setShellFactoryCmd(aCommand, aArgs)</key>
+ * <key>SSHd.setShellFactoryCmd(aCommand, aArgs)</key>lç
  * Sets aCommand and aArgs as the shell factory. Example:\
  * \
  * var sshd = new SSHd(2222)\
  * sshd.setShellFactoryCmd("/bin/sh", "-i")\
- * \
- * sshd.setShellFactory({ createShell: () => { return function(session) { sprint(session.getUsername()); return (new org.apache.sshd.server.command.ProcessShellFactory("/bin/sh", "-i")).create(); } } })\
  * \
  * </odoc>
  */
