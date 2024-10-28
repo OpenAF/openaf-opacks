@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241021'
+version: '20241027'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -28,45 +28,45 @@ files:
 - .precompile
 - README.md
 - annotations-13.0.jar
-- bcprov-jdk18on-1.78.jar
-- checker-qual-3.41.0.jar
-- error_prone_annotations-2.23.0.jar
+- bcprov-jdk18on-1.78.1.jar
+- checker-qual-3.43.0.jar
+- error_prone_annotations-2.28.0.jar
 - failureaccess-1.0.2.jar
-- guava-33.0.0-jre.jar
-- j2objc-annotations-2.8.jar
+- guava-33.3.1-jre.jar
+- j2objc-annotations-3.0.0.jar
 - jsr305-3.0.2.jar
 - kotlin-stdlib-common-1.9.10.jar
 - kotlin-stdlib-jdk7-1.8.21.jar
 - kotlin-stdlib-jdk8-1.8.21.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.5.12.jar
+- minio-8.5.13.jar
 - s3-ojob-test.yaml
 - s3-test.yaml
 - s3.js
 - s3.yaml
 - simple-xml-safe-2.7.1.jar
-- snappy-java-1.1.10.5.jar
+- snappy-java-1.1.10.7.jar
 filesHash:
   .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
   .odoc.db: 1dffa95699f05e893be587e1fca839ba5d90a3a7
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
-  bcprov-jdk18on-1.78.jar: 619aafb92dc0b4c6cc4cf86c487ca48ee2d67a8e
-  checker-qual-3.41.0.jar: 08be6df7f1e9bccb19f8f351b3651f0bac2f5e0c
-  error_prone_annotations-2.23.0.jar: 43a27853b6c7d54893e0b1997c2c778c347179eb
+  bcprov-jdk18on-1.78.1.jar: 39e9e45359e20998eb79c1828751f94a818d25f8
+  checker-qual-3.43.0.jar: 9425eee39e56b116d2b998b7c2cebcbd11a3c98b
+  error_prone_annotations-2.28.0.jar: 59fc00087ce372de42e394d2c789295dff2d19f0
   failureaccess-1.0.2.jar: c4a06a64e650562f30b7bf9aaec1bfed43aca12b
-  guava-33.0.0-jre.jar: 161ba27964a62f241533807a46b8711b13c1d94b
-  j2objc-annotations-2.8.jar: c85270e307e7b822f1086b93689124b89768e273
+  guava-33.3.1-jre.jar: 852f8b363da0111e819460021ca693cacca3e8db
+  j2objc-annotations-3.0.0.jar: 7399e65dd7e9ff3404f4535b2f017093bdb134c7
   jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
   kotlin-stdlib-common-1.9.10.jar: dafaf2c27f27c09220cee312df10917d9a5d97ce
   kotlin-stdlib-jdk7-1.8.21.jar: 7473b8cd3c0ef9932345baf569bc398e8a717046
   kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.5.12.jar: 669d478e02466dcc9d7a9180d37756f3554c55bb
+  minio-8.5.13.jar: f896b18193287b08e0070b09c0a5b13ca2ea61f9
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
   s3.js: 8dd0d4d72fff919eb476a21dd6df313cc81f07ba
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
-  snappy-java-1.1.10.5.jar: ac605269f3598506196e469f1fb0d7ed5c55059e
+  snappy-java-1.1.10.7.jar: 3049f95640f4625a945cfab85715f603fa4c8f80
