@@ -1276,6 +1276,7 @@ var _outputFns = new Map([
 
         if (isUnDef(params.envsprefix)) params.envsprefix = "_OAFP_"
         params.envsprefix = String(params.envsprefix)
+        if (toBoolean(params.envsnoprefix)) params.envsprefix = ""
 
         var out = new Set()
         for (var k in res) {

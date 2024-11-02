@@ -560,6 +560,7 @@ List of options to use when _out=envs_:
 |--------|------|-------------|
 | envscmd | String | If defined will output the provided command to set each environment variable (defaults to 'export' or 'set' in Windows) |
 | envsprefix | String | If defined uses the provided prefix for each environment variable key (defaults to '_OAFP_') |
+| envsnoprefix | Boolean | Boolean flag to indicate that no envsprefix should be used (defaults to false) |
 
 Example of a shell script using 'out=envs': 
 
@@ -569,6 +570,8 @@ eval $(oafp -v out=envs)
 echo Using OpenAF version: $_OAFP_openaf_version - $_OAFP_openaf_distribution
 echo On the operating system: $_OAFP_os_name
 ```
+
+> Setting envsprefix="" won't result in an empty prefix. Use envsnoprefix=true instead.
 
 ---
 
@@ -758,3 +761,5 @@ oafp examples=kubernetes::
 | help=template | Provides more details regarding the use of "output=template" |
 | help=examples | Provide several examples |
 | help=readme | Returns this document |
+
+> You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands
