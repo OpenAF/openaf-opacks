@@ -16,15 +16,15 @@ name: jdbc-hsqldb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240811'
+version: '20241103'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- hsqldb-2.7.3.jar
+- hsqldb-2.7.4.jar
 - jdbc-hsqldb.js
 filesHash:
-  LICENSES.txt: 0d41c9a8e0490c4cde54b52d545aca79ade4e076
-  hsqldb-2.7.3.jar: 85b49338b36f3051d217295596cf92beb92e4bfb
+  LICENSES.txt: 2f4b6baa1ba3550e561a65f53673058d13ef3c65
+  hsqldb-2.7.4.jar: 4aad3c109b5b04927d3bc663bf13535f830401ce
   jdbc-hsqldb.js: 0e9c20d6b418f1c8a84220d70c94f4646eb956b3
