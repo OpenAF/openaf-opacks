@@ -9,21 +9,21 @@ loadLib("aws_core.js");
 
   /**
   * <odoc>
-  * <key>AWS.DYNAMO_getCh(aRegion, aTable, aChName) : Channel</key>
+  * <key>AWS.DYNAMO_getCh(aRegion, aTable, aChName, extraOptions) : Channel</key>
   * Creates aChName (defaults to aTable) to access a Dynamo aTable on aRegion.
   * </odoc>
   */
- AWS.prototype.DYNAMO_getCh = function(aRegion, aTable, aChName) {
+ AWS.prototype.DYNAMO_getCh = function(aRegion, aTable, aChName, extraOptions) {
     aRegion = _$(aRegion).isString().default(this.region);
     _$(aTable).$_("Please provide a table.");
  
     aChName = _$(aChName).isString().default(aTable);
-    $ch(aChName).create(1, "dynamo", {
+    $ch(aChName).create(1, "dynamo", merge({
        accessKey: this.accessKey,
        secretKey: this.secretKey,
        tableName: aTable,
        region: aRegion
-    });
+    }, extraOptions))
  
     return $ch(aChName);
  };
@@ -415,6 +415,7 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
        options.secretKey = _$(options.secretKey).default(__) //$_("Please provide a secretKey.");
        _$(options.tableName).$_("Please provide a table name.");
        options.region = _$(options.region).default(getEnv("AWS_DEFAULT_REGION"));
+       options.setUpdate = _$(options.setUpdate).isBoolean().default(false)
  
        ow.loadObj();
        options.aws = new AWS(options.accessKey, options.secretKey);
@@ -457,19 +458,46 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
          var keys = Object.keys(aMap);
          for(var ii in keys) {
             var kk = conditions.length;
-            conditions.push(keys[ii] + " = :v" + kk);
-            keysV[":v" + kk] = aMap[keys[ii]];
+            conditions.push(keys[ii] + " = :v" + keys[ii])
+            keysV[":v" + keys[ii]] = aMap[keys[ii]]
          }
       };
 
       addKeysAndConditions(aMatch);
       addKeysAndConditions(aK);
 
-      return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV, conditions.join(" and "), keysV);
+      if (options.setUpdate) {
+         var _r = options.aws.DYNAMO_UpdateItem(
+            options.region, 
+            options.tableName, 
+            aK, 
+            "SET " + Object.keys(aV).map((k) => { return k + " = :v" + k; }).join(", "),
+            conditions.join(" and "), 
+            merge(keysV, Object.keys(aV).reduce((acc, k) => { acc[":v" + k] = aV[k]; return acc; }, {})),
+            __, 
+            "ALL_NEW")
+         if (isMap(_r) && isDef(_r.Attributes)) return _r.Attributes; else return _r
+      } else {
+         return options.aws.DYNAMO_PutItem(options.region, options.tableName, merge(aK, aV), conditions.join(" and "), keysV)
+      }  
+      // return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV, conditions.join(" and "), keysV);
     },
     set          : function(aName, aK, aV, aTimestamp) {
        var options = this.__channels[aName];
-       return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV);
+       if (options.setUpdate) {
+         var _r = options.aws.DYNAMO_UpdateItem(
+            options.region, 
+            options.tableName, 
+            aK, 
+            "SET " + Object.keys(aV).map((k) => { return k + " = :v" + k; }).join(", "),
+            __, 
+            Object.keys(aV).reduce((acc, k) => { acc[":v" + k] = aV[k]; return acc; }, {}),
+            __, 
+            "ALL_NEW")
+         if (isMap(_r) && isDef(_r.Attributes)) return _r.Attributes; else return _r
+       } else {
+         return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV)
+       }
     },
     setAll       : function(aName, aKs, aVs, aTimestamp) {
        ow.loadObj();
