@@ -11,15 +11,16 @@ bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
+  backurl: ''
   url: https://openaf.io/opacks/jexer.opack
 description: Wrapper for the Jexer library
 name: jexer
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20241110
+version: '20241110'
 dependencies:
-  openaf: '>=20240812'
+  OpenAF: '>=20240812'
 files:
 - .maven.yaml
 - .package.yaml
