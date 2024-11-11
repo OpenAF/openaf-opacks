@@ -22,9 +22,9 @@ dependencies:
   openaf: '>=20240812'
 files:
 - .maven.yaml
+- .package.yaml
 - jexer-1.6.0.jar
 - jexer.js
-- .package.yaml
 filesHash:
   .maven.yaml: 4fe804232e760ba1925f354a1ff7dc799da3c2f4
   jexer-1.6.0.jar: a19bd86ebd164d86523c79e3b188251846c56750
