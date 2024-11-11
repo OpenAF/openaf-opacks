@@ -1,0 +1,3 @@
+artifacts:
+  - id      : lanterna
+    group   : com.googlecode.lanterna

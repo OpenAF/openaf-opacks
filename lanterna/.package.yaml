@@ -1,0 +1,32 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- lanterna
+- TUI
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: ''
+  url: https://openaf.io/opacks/lanterna.opack
+description: Wrapper for the Java Lanterna library
+name: lanterna
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20241111'
+dependencies:
+  OpenAF: '>=20240812'
+files:
+- .maven.yaml
+- .package.yaml
+- lanterna-3.2.0-alpha1.jar
+- test.js
+filesHash:
+  .maven.yaml: 77ad46f6f6f26237e09b8fee4a1d3a1dbe500a3c
+  lanterna-3.2.0-alpha1.jar: eec36a4aa2f6b163e2daffe470f6754b299c5614
+  test.js: e756aa804ab136548533a018de839175f521bae5
