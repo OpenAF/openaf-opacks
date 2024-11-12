@@ -1917,16 +1917,16 @@ var _inputFns = new Map([
             _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
         }
         
-        params.xlssheet        = _$(params.xlssheet, "xlssheet").isString().default(0)
-        params.xlsevalformulas = toBoolean(_$(params.xlsevalformulas, "xlsevalformulas").isString().default(true))
-        params.xlscol          = _$(params.xlscol, "xlscol").isString().default("A")
-        params.xlsrow          = _$(params.xlsrow, "xlsrow").isString().default(1)
+        params.inxlssheet        = _$(params.inxlssheet || params.xlssheet, "xlssheet").isString().default(0)
+        params.inxlsevalformulas = toBoolean(_$(params.inxlsevalformulas || params.xlsevalformulas, "xlsevalformulas").isString().default(true))
+        params.inxlscol          = _$(params.inxlscol || params.xlscol, "xlscol").isString().default("A")
+        params.inxlsrow          = _$(params.inxlsrow || params.xlsrow, "xlsrow").isString().default(1)
 
         plugin("XLS")
         if (isDef(params.file) || isDef(params.cmd)) {
             var xls = new XLS(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file)
-            var sheet = xls.getSheet(params.xlssheet)
-            var _r = xls.getTable(sheet, params.xlsevalformulas, params.xlscol, params.xlsrow)
+            var sheet = xls.getSheet(params.inxlssheet)
+            var _r = xls.getTable(sheet, params.inxlsevalformulas, params.inxlscol, params.inxlsrow)
             xls.close()
             if (isDef(_r) && isMap(_r)) _r = _r.table
 

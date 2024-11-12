@@ -347,10 +347,10 @@ List of options to use when _in=xls_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| xlssheet | String | The name of sheet to consider (default to the first sheet) |
-| xlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
-| xlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
-| xlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
+| inxlssheet | String | The name of sheet to consider (default to the first sheet) |
+| inxlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
+| inxlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
+| inxlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
 
 ### 🧾 XML input options
 
@@ -449,6 +449,8 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
 
+> Tip: Use the 'getlist=' optional transform to automatically filter list of data from LLMs prompt responses if relevant.
+
 ---
 
 ### 🧾 Regression transform options
@@ -503,7 +505,7 @@ List of options to use when _out=chart_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". The 'unit' used should be either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. The 'path' is equivalent to the 'path=' jmespath filter (quotes should be used for non-basic 'path' expressions; and '@' should be used for the current value). The 'color' should be one of the basic color names. The 'legend' should be the label of the value (in quotes if includes spaces) |
 | chartcls | Boolean | If true the screen will be cleared for each execution |
 
 Example: 
@@ -625,7 +627,7 @@ List of options to use when _out=html_:
 |--------|------|-------------|
 | htmlcompact | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will have a visual compact width format |
 | htmlpart | Boolean | Boolean flag that if true and the input data is a string or markdown the generated html will be partial and not the complete file |
-| htmlopen | Boolean | Boolean that if false won't try to open the output contents in a browser (defaults to true) |
+| htmlopen | Boolean | Boolean that if false won't try to open the output contents in a browser (defaults to true). To use outfile= you need to set htmlopen=false. |
 | htmlwait | Number | Amount of ms, when htmlopen=true, to wait for the system browser to open an render the html output | 
 
 ---
