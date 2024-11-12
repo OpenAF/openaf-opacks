@@ -93,6 +93,7 @@
   |**jdbc-trino**|<img src=".github/badges/jdbc-trino.svg"><br>Wrapper for JDBC drivers of trino|
   |**jdbc-yugabytedb**|<img src=".github/badges/jdbc-yugabytedb.svg"><br>Wrapper for JDBC drivers of yugabytedb|
   |**jexer**|<img src=".github/badges/jexer.svg"><br>Wrapper for the Jexer library|
+  |**lanterna**|<img src=".github/badges/lanterna.svg"><br>Wrapper for the Java Lanterna library|
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
   |**oJobIO**|<img src=".github/badges/oJobIO.svg"><br>Service to provide easy-to-access oJobs for daily routines.|
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
