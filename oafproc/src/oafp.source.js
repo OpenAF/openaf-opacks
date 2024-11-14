@@ -951,6 +951,12 @@ var _transformFns = {
             let cb1 = new Set(toOrdStrs(_d2))
             return _d1.filter(r => cb1.has(toOrdStr(r)))
         }
+    },
+    "forcearray": _r => {
+        if (isMap(_r))
+            return [ _r ]
+        else
+            return _r
     }
 }
 // --- add extra _transformFns here ---

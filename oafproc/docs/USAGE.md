@@ -108,6 +108,7 @@ These options will change the parsed input data included any filters provided.
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
+| forcearray | Boolean | If true and if the input is map it will force it to be an array with that map as the only element |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
@@ -200,7 +201,9 @@ List of options to use when _in=ch_:
 | inchall | Boolean | A boolean flag to determine if the input map will be used for a getAll query |
 
 > Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
-> Example of optiosn provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+> Example of options provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+
+> You can use sBuckets variables (e.g. secKey, secRepo, secBucket, secPass, secMainPass, secFile) on the 'options' map to fill it.
 
 ---
 
@@ -497,6 +500,8 @@ List of options to use when _out=ch_:
 > Example of options provided in JSON: ch="{type:'mvs',options:{file:'data.db'}}"
 > Example of optiosn provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
 
+> You can use sBuckets variables (e.g. secKey, secRepo, secBucket, secPass, secMainPass, secFile) on the 'options' map to fill it.
+
 ---
 
 ### 🧾 Chart output options
@@ -712,6 +717,24 @@ List of options to use when _out=xls_:
 | xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
 | xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
 | xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
+
+---
+
+## 🔐 sBuckets
+
+To use OpenAF's sBuckets to retrieve secrets you can use the following parameters or environment variables:
+
+| Parameter | Env variable | Description |
+|-----------|--------------|-------------|
+| secRepo | OAFP_SECREPO | sBucket repository |
+| secBucket | OAFP_SECBUCKET | sBucket bucket name |
+| secPass | OAFP_SECPASS | sBucket bucket password |
+| secMainPass | OAFP_SECMAINPASS | sBucket repository password |
+| secFile | OAFP_SECFILE | Optional sBucket file source |
+| secEnv | n/a | A boolean flag to use environment variables as sBuckets |
+| secKey | n/a | The mandatory sBucket bucket key to use |
+
+> Check more in https://docs.openaf.io/docs/concepts/sBuckets
 
 ---
 
