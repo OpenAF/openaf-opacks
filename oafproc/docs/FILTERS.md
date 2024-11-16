@@ -119,7 +119,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | now(diff) | 20240302 | Returns the current unix timestamp number with a negative diff (or positive for dates in the future) |
 | nvl(field, value) | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
 | oafp(str) | 20240812 | Executes an oafp (inception) with the provided map in JSON or SLON string format | oafp('(file:data.json)') |
-| opath(str) | 20240801 | Inception function to ahver other path filters in 'str' applied over the original object before current transformations | files[].{ name: filename, path: opath('originalPath') } | 
+| opath(str) | 20240801 | Inception function to go over other path filters in 'str' applied over the original object before current transformations | files[].{ name: filename, path: opath('originalPath') } | 
 | path(obj, str) | 20240801 | Inception function to have other path filters in 'str' applied over 'obj' | path(@, 'filename') |
 | progress(value, max, min, size, indicator, space) | 20240712 | Returns a progress string to represent a value, between a max and a min, using an indicator char and space chars within a size limit | { val: v, p: progress(v, 100, 0, 10, __, __) } |
 | range(size) | 20240502 | Produces an array with exactly 'size' members from 1 to 'size' | range(`15`) |
