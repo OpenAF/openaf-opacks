@@ -59,9 +59,11 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
 
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
-  create: aOptions => {
+  create: _p => {
+    if (isDef(_p) && isNumber(_p.timeout)) __flags.HTTP_CON_TIMEOUT = _p.timeout
+    
     ow.loadObj()
-    aOptions = _$(aOptions, "aOptions").isMap().$_()
+    aOptions = _$(_p.options, "aOptions").isMap().$_()
     aOptions.params = _$(aOptions.params, "aOptions.params").isMap().default({})
     //aOptions.timeout = _$(aOptions.timeout, "aOptions.timeout").isNumber().default(5 * 60000)
     aOptions.model = _$(aOptions.model, "aOptions.model").isString().default("amazon.titan-text-express-v1")
@@ -109,9 +111,9 @@ ow.ai.__gpttypes.bedrock = {
 
         if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
 
-        var aInput = { inputText: msgs.join("; "), textGenerationConfig: merge({
+        var aInput = merge({ inputText: msgs.join("; "), textGenerationConfig: {
           temperature: aTemperature
-        }, aOptions.params) }
+        } }, aOptions.params)
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
 
