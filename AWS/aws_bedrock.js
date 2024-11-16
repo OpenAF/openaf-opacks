@@ -104,6 +104,11 @@ ow.ai.__gpttypes.bedrock = {
         aTemperature = _$(aTemperature, "aTemperature").isNumber().default(_temperature)
         aJsonFlag = _$(aJsonFlag, "aJsonFlag").isBoolean().default(false)
 
+        aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
+        aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
+        aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
+        aOptions.jsonFlag  = _$(toBoolean(aOptions.jsonFlag) || aJsonFlag, "aOptions.jsonFlag").isBoolean().default(false)
+
         var msgs = []
         if (isString(aPrompt)) aPrompt = [ aPrompt ]
         aPrompt = _r.conversation.concat(aPrompt)
@@ -111,9 +116,6 @@ ow.ai.__gpttypes.bedrock = {
 
         if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
 
-        aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
-        aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
-        aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
         var _m = {}
         $$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
         $$(_m).set(aOptions.tempKey, aTemperature)
