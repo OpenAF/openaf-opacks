@@ -61,7 +61,7 @@ ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
     if (isDef(_p) && isNumber(_p.timeout)) __flags.HTTP_CON_TIMEOUT = _p.timeout
-    
+
     ow.loadObj()
     aOptions = _$(_p.options, "aOptions").isMap().$_()
     aOptions.params = _$(aOptions.params, "aOptions.params").isMap().default({})
@@ -111,9 +111,14 @@ ow.ai.__gpttypes.bedrock = {
 
         if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
 
-        var aInput = merge({ inputText: msgs.join("; "), textGenerationConfig: {
-          temperature: aTemperature
-        } }, aOptions.params)
+        aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
+        aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
+        aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
+        var _m = {}
+        $$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
+        $$(_m).set(aOptions.tempKey, aTemperature)
+    
+        var aInput = merge(_m, aOptions.params)
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
 
