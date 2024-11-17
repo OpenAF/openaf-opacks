@@ -957,6 +957,17 @@ var _transformFns = {
             return [ _r ]
         else
             return _r
+    },
+    "spacekeys": _r => {
+        if (isMap(_r)) {
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (aK.indexOf(" ") >= 0) {
+                    aO[aK.replace(/ /g, params.spacekeys || "_")] = aV
+                    delete aO[aK]
+                }
+            })
+        }
+        return _r
     }
 }
 // --- add extra _transformFns here ---

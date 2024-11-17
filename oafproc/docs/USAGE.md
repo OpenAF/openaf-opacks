@@ -126,6 +126,7 @@ These options will change the parsed input data included any filters provided.
 | searchvalues | String | Will return am map with only values that match the provided string |
 | set | String | Performs set operations (intersection by default) over an 'a' and 'b' path to an array defined in a JSON/SLON map |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
+| spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
 
 ---
