@@ -1489,10 +1489,11 @@ var _outputFns = new Map([
         _print(r.map(_parseVal).join("\n"))
     }],
     ["xml", (r, options) => {
-        _o$o(r, options)
+        //_o$o(r, options)
+        _print(af.fromObj2XML(r, true, params.outxmlprefix))
     }],
     ["pxml", (r, options) => {
-        var _r = af.fromObj2XML(r, true)
+        var _r = af.fromObj2XML(r, true, params.pxmlprefix)
         _print('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' + new XMLList(_r))
     }],
     ["xls", (r, options) => {

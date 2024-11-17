@@ -657,6 +657,16 @@ List of options to use when _out=md_:
 
 ---
 
+### 🧾 PXML output options
+
+List of options to use when _out=pxml_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| pxmlprefix | String | A prefix added to all XML tags |
+
+---
+
 ### 🧾 OpenMetrics output options
 
 List of options to use when _out=openmetrics_:
@@ -717,6 +727,16 @@ List of options to use when _out=xls_:
 | xlsformat | String | A SLON or JSON string with the formatting of the output file (e.g. (bold: true, borderBottom: "medium", borderBottomColor: "red")) |
 | xlsopen | Boolean | If false it won't try to open the OS's Excel-compatible application (defaults to true) |
 | xlsopenwait | Number | The amount of time, in ms, to keep the temporary file for the OS's Excel-compatible application to start and open the file |
+
+---
+
+### 🧾 XML output options
+
+List of options to use when _out=xml_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| outxmlprefix | String | A prefix added to all XML tags |
 
 ---
 

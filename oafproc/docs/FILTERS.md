@@ -119,6 +119,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | now(diff) | 20240302 | Returns the current unix timestamp number with a negative diff (or positive for dates in the future) |
 | nvl(field, value) | 20240216 | Returns the provided value in case a field value is undefined or null | nvl(nullField, 'n/a') |
 | oafp(str) | 20240812 | Executes an oafp (inception) with the provided map in JSON or SLON string format | oafp('(file:data.json)') |
+| ojob(file, jsslon) | 20241116 | Executes a 'file' oJob, with 'jsslon' as args, returning the output (if ow.ojob.output is used) | ojob('ojob.io/echo', obj) |
 | opath(str) | 20240801 | Inception function to go over other path filters in 'str' applied over the original object before current transformations | files[].{ name: filename, path: opath('originalPath') } | 
 | path(obj, str) | 20240801 | Inception function to have other path filters in 'str' applied over 'obj' | path(@, 'filename') |
 | progress(value, max, min, size, indicator, space) | 20240712 | Returns a progress string to represent a value, between a max and a min, using an indicator char and space chars within a size limit | { val: v, p: progress(v, 100, 0, 10, __, __) } |
@@ -130,6 +131,10 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | search_values(arr, 'text') | all | Returns an array of entries where 'text' was found as part of an object property value. | search_values(files, '.git') |
 | set(obj, path) | 20240305 | Given an object will set the value to a name that it's equal to it's path | set(@, 'version').packages[].{ name: name, parentVersion: get('version') } |
 | setp(obj, path, name) | 20240305 | Given an object will set the value to a name given the provided path | set(@, 'version', 'ver').packages[].{ name: name, parentVersion: get('ver') } |
+| sh(cmd, stdin) | 20241116 | Executes a shell command with a stdin. Returns stdout, stderr, exitcode, cmd and in. | sh('cat', '123').stdout |
+| sh_json(cmd, stdin) | 20241116 | Executes a shell command with a stdin. Parses json returning stdout, stderr, exitcode, cmd and in. | sh('cmd', out).stdout |
+| sh_jsslon(cmd, stdin) | 20241116 | Executes a shell command with a stdin. Parses jsslon returning stdout, stderr, exitcode, cmd and in. | sh('cmd', out).stdout |
+| sh_yaml(cmd, stdin) | 20241116 | Executes a shell command with a stdin. Parses yaml output returning stdout, stderr, exitcode, cmd and in. | sh('cmd', out).stdout |
 | sort(array) | base | Sorts the provided array | "sort(@)" |
 | sort_by(array, expression) | base | Sorts the provided array by the provided expression | sort_by(files[], &size) |
 | split(str, 'sep') | 20240209 | Equivalent to the split Javascript's function for a string given a separator | split(@, '\n') |
