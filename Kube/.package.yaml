@@ -27,9 +27,6 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- jackson-annotations-2.17.1.jar
-- jackson-core-2.17.1.jar
-- jackson-databind-2.17.1.jar
 - jackson-dataformat-yaml-2.17.1.jar
 - jackson-datatype-jsr310-2.17.1.jar
 - kube.js
@@ -60,9 +57,6 @@ files:
 - kubernetes-model-scheduling-6.13.4.jar
 - kubernetes-model-storageclass-6.13.4.jar
 - logging-interceptor-3.12.12.jar
-- okhttp-3.12.12.jar
-- okio-1.15.0.jar
-- slf4j-api-2.0.13.jar
 - snakeyaml-2.2.jar
 - snakeyaml-engine-2.7.jar
 - zjsonpatch-0.3.0.jar
@@ -71,9 +65,6 @@ filesHash:
   .odoc.db: 80d4efa20e4e246ac56a18b04f56f2bd1bead5c3
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
-  jackson-annotations-2.17.1.jar: fca7ef6192c9ad05d07bc50da991bf937a84af3a
-  jackson-core-2.17.1.jar: 5e52a11644cd59a28ef79f02bddc2cc3bab45edb
-  jackson-databind-2.17.1.jar: 0524dcbcccdde7d45a679dfc333e4763feb09079
   jackson-dataformat-yaml-2.17.1.jar: b4c7b8a9ea3f398116a75c146b982b22afebc4ee
   jackson-datatype-jsr310-2.17.1.jar: 0969b0c3cb8c75d759e9a6c585c44c9b9f3a4f75
   kube.js: 2b6a9e048292b494da4324321737c740473bdd87
@@ -104,9 +95,6 @@ filesHash:
   kubernetes-model-scheduling-6.13.4.jar: 0f9aa492f4cd8cb243126e2cd13f84c0fd8ef477
   kubernetes-model-storageclass-6.13.4.jar: 75d3331fbf04d9491649b6606c7997476ba83dfc
   logging-interceptor-3.12.12.jar: d952189f6abb148ff72aab246aa8c28cf99b469f
-  okhttp-3.12.12.jar: d3e1ce1d2b3119adf270b2d00d947beb03fe3321
-  okio-1.15.0.jar: bc28b5a964c8f5721eb58ee3f3c47a9bcbf4f4d8
-  slf4j-api-2.0.13.jar: 80229737f704b121a318bba5d5deacbcf395bc77
   snakeyaml-2.2.jar: 3af797a25458550a16bf89acc8e4ab2b7f2bfce0
   snakeyaml-engine-2.7.jar: 5213e62e87e62ac009d80aeb64c8240075bf078a
   zjsonpatch-0.3.0.jar: d3ebf0f291297649b4c8dc3ecc81d2eddedc100d
