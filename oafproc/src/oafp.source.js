@@ -2285,6 +2285,7 @@ params.format = _$(params.format, "format").isString().default(__)
 __initializeCon()
 var _dr = !String(java.lang.System.getProperty("os.name")).match(/Windows/)
 var _drev = getEnv("OAFP_RESET")
+var _cs = getEnv("OAFP_CODESET")
 if (isDef(_drev)) {
     if (toBoolean(_drev)) {
         _dr = false
@@ -2446,12 +2447,12 @@ var _run = () => {
                             var _r = io.readStreamJSON(params.file, path => path.substring(2).startsWith(params.jsonprefix))
                             _res = stringify(_r, __, "")
                         } else {
-                            _res = io.readFileString(params.file)
+                            _res = io.readFileString(params.file, _cs)
                             if (toBoolean(params._shebang)) _res = _res.replace(/^#!.*\n/, "")
                         }
                     }
                 } else {
-                    _res = io.readFileString(params.file)
+                    _res = io.readFileString(params.file, _cs)
                     if (toBoolean(params._shebang)) _res = _res.replace(/^#!.*\n/, "")
                 }
             }

@@ -52,6 +52,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > Use 'OAFP_RESET=true' to forces to reset the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
 
+> Use 'OAFP_CODESET=UTF-16' to force reading files in a different codeset (e.g. UTF-16) different from the default UTF-8.
+
 ---
 
 ## ⬇️  Input types
