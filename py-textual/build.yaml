@@ -1,0 +1,69 @@
+# Author: Nuno Aguiar
+help:
+  text   : Wrapper around python's textual package.
+
+todo:
+- Clear folders
+- Create python venv
+- Install textual
+- Package textual
+- Delete python venv
+
+ojob:
+  opacks      :
+  - openaf: 20241120
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+        
+
+jobs:
+# --------------------
+- name : Clear folders
+  lang : shell
+  exec : |
+    rm -rf textual
+    rm -rf textual.zip
+
+# -------------------------
+- name : Create python venv
+  lang : shell
+  exec : |
+    if command -v python3 &>/dev/null; then
+      python3 -m venv textual
+    elif command -v python &>/dev/null; then
+      python -m venv textual
+    else
+      echo "Python 3 is not installed."
+      exit 1
+    fi
+
+# ----------------------
+- name : Install textual
+  lang : shell
+  typeArgs:
+    shellPrefix: pip
+  exec : |
+    source textual/bin/activate
+    pip install textual
+    deactivate
+
+# ----------------------
+- name : Package textual
+  exec : |
+    var dir = io.listFiles("textual/lib").files.filter(r => r.filename.startsWith("python3."))
+    if (dir.length == 0) {
+      printErr("Could not find python3.x folder in textual/lib")
+      exit(-1, true)
+    } else {
+      dir = dir[0]
+      listFilesRecursive(dir.filepath + "/site-packages").forEach(f => {
+        if (f.isDirectory && f.filename.startsWith("pip")) io.rm(f.filepath)
+      })
+      io.zip(dir.filepath + "/site-packages", "textual.zip")
+    }
+
+# -------------------------
+- name : Delete python venv
+  lang : shell
+  exec : |
+    rm -rf textual

@@ -1,0 +1,52 @@
+# Author: Nuno Aguiar
+help:
+  text   : Setup a python virtual enviroment with textual 
+
+todo:
+- Check for python 3
+- Create a python venv
+- Copying textual
+
+ojob:
+  opacks      :
+  - openaf: 20241120
+  catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  logToConsole: true   # to change when finished
+        
+
+jobs:
+# -------------------------
+- name : Check for python 3
+  exec : |
+    var r = $sh("python3 -V").get(0)
+    global._pybin = "python3"
+    if (r.exitcode != 0) {
+      r = $sh("python -V").get(0)
+      global._pybin = "python"
+    }
+    if (r.exitcode == 0) {
+      // Checking version
+      if (!r.stdout.trim().startsWith("Python 3")) 
+        throw "Python doesn't seem to be Python 3"
+    } else {
+      throw "Couldn't find python installed"
+    }
+
+# ---------------------------
+- name : Create a python venv
+  exec : |
+    global._pyenvdir = (getOPackPath("py-textual") || ".") + "/textual"
+    $sh(global._pybin + " -m venv " + global._pyenvdir)
+    .prefix("python")
+    .get()
+
+# ----------------------
+- name : Copying textual
+  exec : |
+    var dir = io.listFiles("textual/lib").files.filter(r => r.filename.startsWith("python3."))
+    if (dir.length == 0) {
+      printErr("Could not find python3.x folder in textual/lib")
+      exit(-1, true)
+    } else {
+      io.unzip((getOPackPath("py-textual") || ".") + "/textual.zip", dir[0].canonicalPath + "/site-packages")
+    }

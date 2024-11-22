@@ -1,0 +1,33 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- python
+- textual
+- tui
+- ui
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/py-textual.opack
+description: Wrapper for deploying Python Textual package in a Python virtual environment.
+name: py-textual
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20241121'
+dependencies:
+  openaf: '>=20241120'
+files:
+- .package.yaml
+- build.yaml
+- setup.yaml
+- textual.zip
+filesHash:
+  build.yaml: e40104c83630b22e50f5049d61b0728a53265af1
+  setup.yaml: fb99c50f7e3f182c4695855426c244820b77d84c
+  textual.zip: 34a238772d77833e14065eb1ab8d446df88f5535
