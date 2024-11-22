@@ -312,7 +312,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
    //var content_type = 'application/x-amz-json-1.0';
    var content_type = _$(aContentType).isString().default(void 0);
 
-   var can_uri = aURI;
+   var can_uri = encodeURI(aURI);
    var can_querystring = aRequestParams; // must be sorted by name
    //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
    var can_headers = (isDef(content_type) && content_type.length > 0 ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + (altGet ? "" : "x-amz-date:" + amzdate + "\n");

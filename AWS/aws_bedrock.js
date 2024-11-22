@@ -43,13 +43,13 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
   _$(aModelId, "aModelId").isString().$_()
   _$(aInput, "aInput").$_()
 
-  var uri = "/model/" + aModelId + "/invoke"
-  var aURL = "https://bedrock-runtime." + aRegion + ".amazonaws.com" + uri 
+  var uri = "/model/" + encodeURIComponent(aModelId) + "/invoke"
+  var aURL = "https://bedrock-runtime." + aRegion + ".amazonaws.com/model/" + encodeURIComponent(aModelId) + "/invoke"
   var url = new java.net.URL(aURL)
   var aHost = String(url.getHost())
   var aURI = String(url.getPath())
 
-  if (isString(aInput)) aInput = { "prompt": aInput }
+  //if (isString(aInput)) aInput = { "prompt": aInput }
 
   var res = this.postURLEncoded(aURL, uri, __, aInput, "bedrock", aHost, aRegion, __, __, 'application/json', true)
   if (isDef(res.error)) return res
@@ -104,25 +104,46 @@ ow.ai.__gpttypes.bedrock = {
         aTemperature = _$(aTemperature, "aTemperature").isNumber().default(_temperature)
         aJsonFlag = _$(aJsonFlag, "aJsonFlag").isBoolean().default(false)
 
-        aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
-        aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
-        aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
+        //aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
+        //aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
+        //aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
         aOptions.jsonFlag  = _$(toBoolean(aOptions.jsonFlag) || aJsonFlag, "aOptions.jsonFlag").isBoolean().default(false)
 
-        var msgs = []
-        if (isString(aPrompt)) aPrompt = [ aPrompt ]
-        aPrompt = _r.conversation.concat(aPrompt)
-        msgs = aPrompt.map(c => isMap(c) ? c.content : c)
+        //var msgs = []
+        //if (isString(aPrompt)) aPrompt = [ aPrompt ]
+        //aPrompt = _r.conversation.concat(aPrompt)
+        //msgs = aPrompt.map(c => isMap(c) ? c.content : c)
 
-        if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
+        //if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
+        if (aJsonFlag) aPrompt += ". answer in json."
 
         var _m = {}
-        $$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
-        $$(_m).set(aOptions.tempKey, aTemperature)
+        
+        if (aModel.indexOf("amazon.") >= 0) {
+          _m = {
+            "inputText": aPrompt,
+            "textGenerationConfig": {
+              "temperature": aTemperature
+            }
+          }
+        } else if (aModel.indexOf("meta.") >= 0) {
+	        //var msgs = []
+          //msgs = _r.conversation.concat({role: "user", content: aPrompt })
+          _m = {
+	          "prompt": aPrompt,
+	          "temperature": aTemperature
+	        }
+        }
+        //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
+        //$$(_m).set(aOptions.tempKey, aTemperature)
     
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
+
         var aInput = merge(_m, aOptions.params)
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
+        if (isDef(res.generation)) return res.generation
 
         if (aJsonFlag) {
           _r.conversation.push(res)
