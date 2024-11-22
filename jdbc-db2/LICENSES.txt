@@ -1,7 +1,7 @@
-jcc-11.5.9.0.jar:
+jcc-12.1.0.0.jar:
   name: International Program License Agreement (IPLA)
-  url: https://www.ibm.com/support/customer/csol/terms/?ref=L-AJVM-KLN94L-01-11-2023-zz-en
-  version: 11.5.9.0
+  url: https://www.ibm.com/support/customer/csol/terms/?ref=L-DCUA-QQ54XG-01-10-2024-zz-en
+  version: 12.1.0.0
   changed from original: false
   comments: You can use this JDBC driver for Java applications that access the Db2 LUW database server
   license: |-
@@ -41,15 +41,55 @@ jcc-11.5.9.0.jar:
         
         
         
+            /* Disable Dynatrace */
+            function disableDynatraceRum()
+            {
+                console.log("disable Dynatrace Rum if set")
+           
+                    // disable Dynatrace RUM
+                    try {
+                        dtrum.disable();
+                    } catch (error) {}
+                    // remove cookie
+                    try {
+                        document.cookie = "dtCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "dtPC=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "dtSa=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "dtLatC=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "rxVisitor=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "rxvisitid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "rxvt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+                    try {
+                        document.cookie = "dtsrNOSR=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=ibm.com";
+                    } catch (error) {}
+
+           }
+
+            
+           disableDynatraceRum();
+           
 
             window._ibmAnalytics = {
                 "settings": {
-                    "name": "IBMTerms",
+                    "name": "XXXX",
                     "isSpa": true,
                     "tealiumProfileName": "ibm-web-app"
                 },
                 "onLoad": [
-                    ["ibmStats.pageview", []]
+                    ["ibmStats.pageview", []] 
                 ]
             };
 

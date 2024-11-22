@@ -16,15 +16,15 @@ name: jdbc-mariadb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20241026'
+version: '20241122'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-mariadb.js
-- mariadb-java-client-3.5.0.jar
+- mariadb-java-client-3.5.1.jar
 filesHash:
-  LICENSES.txt: 2224d7532c9f62d8c644c08a85ce33ec9f020a25
+  LICENSES.txt: 3ad75d09f143bee3f7b09ca346003b1b658ed048
   jdbc-mariadb.js: aaeac058daddb2884ccf5a3b4cf1d5a2f11970f2
-  mariadb-java-client-3.5.0.jar: d2d3efc63cbe656d073884ee30d39eb312903a2c
+  mariadb-java-client-3.5.1.jar: 1151269d76927b782351eaa15e981c56abc7717f
