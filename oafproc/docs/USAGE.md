@@ -263,6 +263,7 @@ List of options to use when _in=lines_:
 | linesjoin | Boolean | If true it will return an array with each processed line |
 | linesvisual | Boolean | If true it will try to determine header and column position from spaces and tabs |
 | linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
+| linesvisualheadsep | Boolean | If true will try to process the second line as header separator aiding on column position determination (if linesvisualsepre is not defined it will default to '\\s+') |
 
 ---
 

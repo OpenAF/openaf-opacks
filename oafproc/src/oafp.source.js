@@ -1615,6 +1615,11 @@ var _inputFns = new Map([
         let _linesvisual_header = __
         let _linesvisual_header_pos = []
 
+        params.linesvisualheadsep = toBoolean(_$(params.linesvisualheadsep, "linesvisualheadsep").isString().default(__))
+        let _headTitles = false
+        let _headSep    = false
+        if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = (params.linesvisualheadsep ? "\\s+" : " \\s+")
+
         let _visualProc = r => {
             // Replace tabs with spaces with the right tab stops
             r = r.split('\n').map(line => {
@@ -1633,19 +1638,28 @@ var _inputFns = new Map([
                 return endL
             }).join('\n')
             // If the header is not defined, then the first line is the header
-            if (isUnDef(_linesvisual_header)) {
-                _linesvisual_header = [], lastPos = 0
-                if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = " \\s+"
-                r.split(new RegExp(params.linesvisualsepre)).forEach(h => {
+            if (!_headTitles || !_headSep) {
+                if (!_headTitles) _linesvisual_header = []
+                r.split(new RegExp(params.linesvisualsepre)).reduce((lastPos, h) => {
                     if (h.trim().length == 0) return
-                    _linesvisual_header.push(h)
-                    let _mr = r.substring(lastPos).match(new RegExp(ow.format.escapeRE(h) + "(" + params.linesvisualsepre + "|$)"))
-                    if (!isNull(_mr) && isDef(_mr.index)) {
-                        _linesvisual_header_pos.push(lastPos + _mr.index)
-                        lastPos = _mr.index
-                    } else
-                        _exit(-1, "Problem with linesvisual to find header positioning.")
-                })
+                    if (!_headTitles) _linesvisual_header.push(h)
+                    if ((!params.linesvisualheadsep && !_headTitles) || (_headTitles && params.linesvisualheadsep && !_headSep)) {
+                        let _mr = r.substring(lastPos).match(new RegExp(ow.format.escapeRE(h) + "(" + params.linesvisualsepre + "|$)"))
+                        if (!isNull(_mr) && isDef(_mr.index)) {
+                            _linesvisual_header_pos.push(lastPos + _mr.index)
+                            lastPos = _mr[0].length
+                        } else {
+                            _exit(-1, "Problem with linesvisual to find header positioning.")
+                        }
+                    }
+                    return lastPos
+                }, 0)
+                if (!_headTitles) {
+                    _headTitles = true
+                    if (!params.linesvisualheadsep) _headSep = true
+                } else if (params.linesvisualheadsep && !_headSep) {
+                    _headSep = true
+                }
                 return __
             } else {
                 var _l = {}
