@@ -1647,7 +1647,7 @@ var _inputFns = new Map([
                         let _mr = r.substring(lastPos).match(new RegExp(ow.format.escapeRE(h) + "(" + params.linesvisualsepre + "|$)"))
                         if (!isNull(_mr) && isDef(_mr.index)) {
                             _linesvisual_header_pos.push(lastPos + _mr.index)
-                            lastPos = _mr[0].length
+                            lastPos += _mr[0].length
                         } else {
                             _exit(-1, "Problem with linesvisual to find header positioning.")
                         }
