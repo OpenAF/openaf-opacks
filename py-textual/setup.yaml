@@ -18,8 +18,14 @@ jobs:
 # -------------------------
 - name : Check for python 3
   exec : |
-    var r = $sh("python3 -V").get(0)
-    global._pybin = "python3"
+    var _pybin
+    if (isUnDef(getEnv("OAF_PYTHON")) && ow.format.isWindows()) {
+      _pybin = "py"
+    } else {
+      _pybin = _$(getEnv("OAF_PYTHON"), "OAF_PYTHON").isString().default("python3")
+    }
+    var r = $sh(_pybin + " -V").get(0)
+    global._pybin = _pybin
     if (r.exitcode != 0) {
       r = $sh("python -V").get(0)
       global._pybin = "python"
@@ -43,10 +49,10 @@ jobs:
 # ----------------------
 - name : Copying textual
   exec : |
-    var dir = io.listFiles("textual/lib").files.filter(r => r.filename.startsWith("python3."))
+    var dir = io.listFiles("textual/lib").files.filter(r => r.filename.startsWith("python3.") || r.filename == "site-packages")
     if (dir.length == 0) {
       printErr("Could not find python3.x folder in textual/lib")
       exit(-1, true)
     } else {
-      io.unzip((getOPackPath("py-textual") || ".") + "/textual.zip", dir[0].canonicalPath + "/site-packages")
+      io.unzip((getOPackPath("py-textual") || ".") + "/textual.zip", dir[0].canonicalPath + (dir[0].filename == "site-packages" ? "" : "/site-packages"))
     }

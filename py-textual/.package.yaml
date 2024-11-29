@@ -19,7 +19,7 @@ name: py-textual
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241121'
+version: '20241128'
 dependencies:
   openaf: '>=20241120'
 files:
@@ -29,5 +29,5 @@ files:
 - textual.zip
 filesHash:
   build.yaml: e40104c83630b22e50f5049d61b0728a53265af1
-  setup.yaml: fb99c50f7e3f182c4695855426c244820b77d84c
-  textual.zip: 34a238772d77833e14065eb1ab8d446df88f5535
+  setup.yaml: 8c65dafb2ace60fd8b1630ee8390c8429e67fb62
+  textual.zip: 7d8816b750074b5e320430a3b5df81c1605ce1cd
