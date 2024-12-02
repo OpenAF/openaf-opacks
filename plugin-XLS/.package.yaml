@@ -18,7 +18,7 @@ name: plugin-XLS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241001'
+version: '20241201'
 dependencies:
   openaf: '>=20230812'
 files:
