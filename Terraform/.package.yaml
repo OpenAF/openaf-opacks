@@ -18,7 +18,7 @@ name: Terraform
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241017'
+version: '20241201'
 dependencies:
   OpenAF: '>=20240318'
 files:
@@ -27,7 +27,7 @@ files:
 - .package.yaml
 - .precompile
 - hcl.js
-- hcl4j-0.9.4.jar
+- hcl4j-0.9.7.jar
 - oafp_Terraform.js
 - src/hcl.peg
 - terraform.js
@@ -36,7 +36,7 @@ filesHash:
   .odoc.db: 295bc1d3e733d4a942d8beb633319c790e0588cc
   .precompile: da588afc4e62a756bbee5a4b4b086c2d989efea6
   hcl.js: 9e5698715d29ff573f957b3ec43c4008f16f8a5c
-  hcl4j-0.9.4.jar: 412e49a8fbbdf8efb4b7c26b7016d68842035168
+  hcl4j-0.9.7.jar: bcf7e3ce406322d05b7b27ac5f10286d535f2404
   oafp_Terraform.js: 06e4671fc6f4cf8d77b4cabe502e42874865099c
   src/hcl.peg: d7f4d617bbc5165fb154a3707ae335f346b4f833
   terraform.js: a65687db77c1cb8d8e8f257843fefc27ad7082d4
