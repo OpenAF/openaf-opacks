@@ -29,8 +29,8 @@ files:
 - SparseBitSet-1.3.jar
 - compile.yaml
 - curvesapi-1.08.jar
-- log4j-api-2.24.1.jar
-- log4j-core-2.24.1.jar
+- log4j-api-2.24.2.jar
+- log4j-core-2.24.2.jar
 - plugin-xls.jar
 - poi-5.3.0.jar
 - poi-excelant-5.3.0.jar
@@ -43,17 +43,17 @@ files:
 - tests/autoTestAll.DOC.yaml
 - tests/autoTestAll.XLS.js
 - tests/autoTestAll.XLS.yaml
-- xmlbeans-5.2.1.jar
+- xmlbeans-5.2.2.jar
 filesHash:
-  .maven.yaml: 54583b1c3fb3910921113da5b1c9f28cb96487cf
-  .odoc.db: 94a19b3374a7271d952f1cf119b2244fb821874f
-  LICENSES.txt: 88d28bee7110fc9a5879f9be537f992efedcbdfd
+  .maven.yaml: cb556c5f96cf819da941f77e444509941f70c102
+  .odoc.db: e92519ff71a472fff9c0c902e1f30d5fb6cec638
+  LICENSES.txt: 16040ef1e0787026248090068a5dd4bfeef8f5a7
   SparseBitSet-1.3.jar: 533eac055afe3d5f614ea95e333afd6c2bde8f26
   compile.yaml: 15cde2e46f140bf10e61303b72bbd2d803e8b897
   curvesapi-1.08.jar: 3d3d36568154059825089b289dcfca481fe44e2c
-  log4j-api-2.24.1.jar: 7ebeb12c20606373005af4232cd0ecca72613dda
-  log4j-core-2.24.1.jar: c85285146f28d8c8962384f786e2dff04172fb43
-  plugin-xls.jar: 4a0111233fe086617cf2fc594811e0a38baa30c1
+  log4j-api-2.24.2.jar: daf49ee71f2664c3ff57412e4b43061e61a28596
+  log4j-core-2.24.2.jar: 9ba3a51ed9d80254b382dea521467de51797ac04
+  plugin-xls.jar: 0535c095ae82a43dfc37e56e87bdd325f7040367
   poi-5.3.0.jar: 0a26d24e85a2440d7b76d2ddd187abb0ee7c056e
   poi-excelant-5.3.0.jar: c2fa1dddbd52c654fd3a7c24460c9504fdec7498
   poi-ooxml-5.3.0.jar: 55e5ecb93bd06ff70857d514b3607ae22866806c
@@ -65,4 +65,4 @@ filesHash:
   tests/autoTestAll.DOC.yaml: b423211694d2f92ab40eadb5eced03da6aa94ef0
   tests/autoTestAll.XLS.js: d187ea75619f7615f9ca411c51cdb216b663a487
   tests/autoTestAll.XLS.yaml: 8178f14a7f5fb165c1817e906f99d191c8ea3b8d
-  xmlbeans-5.2.1.jar: e16ddf17fe181c202b097e0dcc0ee2fed91cb7da
+  xmlbeans-5.2.2.jar: 586ffe10ae9864e19e85c24bd060790a70586f72
