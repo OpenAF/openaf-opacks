@@ -70,6 +70,7 @@ List of data input types that can be auto-detected (through the file extension o
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
+| javagc | The Java GC log lines text format |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
 | jwt | Decodes and/or verifies a JSON Web Token (JWT) |
@@ -123,6 +124,7 @@ These options will change the parsed input data included any filters provided.
 | normalize | String | A JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
 | removedups | Boolean | If true will try to remove duplicates from an array |
+| removeempty | Boolean | If true will remove array/list entries that are either null or undefined |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
@@ -226,6 +228,16 @@ List of options to use when _in=db_ (SQL query):
 > JDBC oracle: jdbc:oracle:thin:@[host]:[port]:[database]
 > JDBC postgreSQL: jdbc:postgresql://[host]:[port]/[database]
 > JDBC H2: jdbc:h2:[file]   
+
+---
+
+### 🧾 JavaGC input options
+
+List of options to use when _in=javagc_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| javagcjoin | Boolean | If true it will return an array with each processed line. |
 
 ---
 
