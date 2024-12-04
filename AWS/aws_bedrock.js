@@ -119,13 +119,23 @@ ow.ai.__gpttypes.bedrock = {
 
         var _m = {}
         
-        if (aModel.indexOf("amazon.") >= 0) {
+        if (aModel.indexOf("amazon.titan-") >= 0) {
           _m = {
             "inputText": aPrompt,
             "textGenerationConfig": {
               "temperature": aTemperature
             }
           }
+        } else if (aModel.indexOf("amazon.nova-") >= 0) {
+          _m = {
+            messages: _r.conversation.concat({role: "user", content: [ { text: aPrompt } ] }).filter(m => m.role == "user"),
+            schemaVersion: "messages-v1",
+            system: _r.conversation.filter(m => m.role == "system").map(m => ({ text : m.content })),
+            inferenceConfig: {
+              temperature: aTemperature
+            }
+          }
+          if (_m.system.length == 0) delete _m.system
         } else if (aModel.indexOf("meta.") >= 0) {
 	        //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
@@ -137,6 +147,7 @@ ow.ai.__gpttypes.bedrock = {
         //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
         //$$(_m).set(aOptions.tempKey, aTemperature)
     
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
 
@@ -144,6 +155,10 @@ ow.ai.__gpttypes.bedrock = {
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
+        if (isDef(res.output) && isDef(res.output.message) && isArray(res.output.message.content)) {
+          _r.conversation = _r.conversation.concat(res.output.message.content)
+          return (isDef(res.output.message.content[0]) && isString(res.output.message.content[0].text) ? res.output.message.content[0].text : res.output.message.content)
+        }
 
         if (aJsonFlag) {
           _r.conversation.push(res)
