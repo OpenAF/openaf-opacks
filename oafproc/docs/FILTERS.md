@@ -64,6 +64,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | assign(obj, objPath, value) | 20241010 | Given an 'obj' will try to set the object path objPath to value | assign([?id='12']|[0], 'status', 'valid') |
 | assignp(path, objPath, value) | 20241010 | Given a path will try to set the object path objPath to value | assignp('[?id='12']', 'status', 'valid') |
 | avg(arrayNumber) | base | The average value of an array of numeric fields | avg([].y) |
+| at(idx) | 20241205 | Returns the array index entry | [].at(5) |
 | ceil(number) | base | Returns the smallest integer that is equal or less than a specific numeric field value | [].ceil(y) |
 | ch(name, op, arg1, args2) | 20240801 | Wrapper for OpenAF's channel functions over a 'name' channel, an 'op' operation between get, set, unset, size, getAll, getKeys, unsetAll; depending on the 'op', 'arg1' and 'arg2' can be provided with values as objects or JSON/SLON | ch('a', 'set', 'a', 'abc').ch('a', 'get', 'a', __) |
 | concat(x, y) | 20240209 | Concats arrays or strings | concat('abc', '123') |
@@ -85,6 +86,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_datef(date, 'format') | 20240228 | Converts a date type into a string given a 'format' (equivalent to OpenAF's ow.format.fromDate) | from_datef(to_datef('20240202', 'yyyyMMdd'), 'yyyy') |
 | from_json(str) | 20240215 | Converts a json string representation into an object | from_json('{a:123}')" |
 | from_ms(x, 'format') | 20240209 | Shortcut for OpenAF's ow.format.elapsedTime4ms function. The format is represented as a SLON/JSON string | from_ms(`12000`,'(abrev:true)') |
+| from_numSpace(str, sep) | 20241207 | Tries to convert a string number with thousands separators back to a number | from_numSpace('123 456', ' ') |
 | from_siAbbr(x) | 20240209 | Given a string with SI numeric abbreviation will convert it to the absolute value | from_siAbbr('100m') |
 | from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
@@ -123,6 +125,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | opath(str) | 20240801 | Inception function to go over other path filters in 'str' applied over the original object before current transformations | files[].{ name: filename, path: opath('originalPath') } | 
 | path(obj, str) | 20240801 | Inception function to have other path filters in 'str' applied over 'obj' | path(@, 'filename') |
 | progress(value, max, min, size, indicator, space) | 20240712 | Returns a progress string to represent a value, between a max and a min, using an indicator char and space chars within a size limit | { val: v, p: progress(v, 100, 0, 10, __, __) } |
+| random(min, max) | 20241205 | Returns a random number between a minimum and maximum limit | random(0, 100) |
 | range(size) | 20240502 | Produces an array with exactly 'size' members from 1 to 'size' | range(`15`) |
 | ranges(size, start, step) | 20240502 | Produces an array with exactly 'size' members starting in 'start' and adding 'step' for the next member | ranges(`15`,`8`,`2`) |
 | replace(str, 're', 'flags', 'replaceText') | 20240209 | Equivalent to Javascript's replace function that given a string will search for a regular expression, with the optional flags, a replace with the provided text | replace('This is a test', ' a', 'i', ' not a') |
@@ -144,6 +147,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | sql_format(sql, format) | 20240528 | Returns a beautified SQL with optional 'format' options map in json/slon. Options: indent (str); uppercase (bool); linesBetweenQueries (num); maxColumnLength (int); skipWhitespaceNearBlockParentheses (bool); language (str) | sql_format(sql, '(uppercase: true)') |
 | sort_semver(arrayVersions) | 20240605 | Sorts an array of strings with semantic versioning (e.g. 1.2.3) | sort_semver(@) |
 | sort_by_semver(arrayMaps, stringExp) | 20240605 | Sorts and array of maps where a string represents a semantic version (e.g. 1.2.3) | sort_by_semver([], 'version') |
+| srandom(min, max) | 20241205 | Returns a secure random number between a minimum and maximum limit | srandom(0, 100) |
 | sub(a, b) | 20240217 | Substracts two numbers | sub(`2`, `2`) |
 | substring(str, ini, end) | all | Given a string will return a sub-string starting on the initial index until the ending index | substring(@, index_of('test'), 5) |
 | sum(array) | base | Sums the numberic field of a provided array | sum(files[].size) |
@@ -164,6 +168,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | to_ms(date) | 20240810 | Converts a date field into a number of ms | to_ms(createDate) |
 | to_numAbbr(num) | 20240209 | Given an absolute number will return a string with SI abbreviation | to_numAbbr(`12345678`) |
 | to_number(any) | base | Transforms any input into a number | to_number(`123`) |
+| to_numSpace(num, space) | 20241207 | Transforms a number input to a string with thousands separator 'space' | to_numSpace(123456, ',') |
 | to_slon(obj) | 20240215 | Given an object will return the SLON representation of it. | to_slon(@) |
 | to_string(any) | base | Transforms any input into a string | to_string(`123`) |
 | to_toml(obj) | 20240502 | Given an object outputs a TOML format string if possible | to_toml(@) |

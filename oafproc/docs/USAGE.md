@@ -122,6 +122,7 @@ These options will change the parsed input data included any filters provided.
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
 | normalize | String | A JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
+| numformat | String | For all number values applies a java.util.Formatter format (e.g. %,d) |
 | regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
 | removedups | Boolean | If true will try to remove duplicates from an array |
 | removeempty | Boolean | If true will remove array/list entries that are either null or undefined |

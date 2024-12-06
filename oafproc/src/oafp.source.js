@@ -1048,6 +1048,14 @@ var _transformFns = {
             })
         }
         return _r
+    },
+    "numformat": _r => {
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (isTNumber(aV) && isString(params.numformat)) {
+                aO[aK] = $ft(params.numformat, aV)
+            }
+        })
+        return _r
     }
 }
 // --- add extra _transformFns here ---
@@ -1257,7 +1265,7 @@ var _outputFns = new Map([
                 if (line.indexOf(",_id=\"") >= 0) line = line.replace(/,_id=\"\d+\"}/, "}")
                 if (line.indexOf("_id=\"") >= 0) line = line.replace(/,_id=\"\d+\",/, ",")
                 return line
-            }).join("\n")
+            }).filter(l => l.length > 0).join("\n")
             _print(_out)
         } else {
             _exit(-1, "For out=openmetrics input needs to be an array or map.")
