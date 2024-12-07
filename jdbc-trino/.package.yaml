@@ -16,13 +16,13 @@ name: jdbc-trino
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20241128'
+version: '20241207'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - jdbc-trino.js
-- trino-jdbc-466.jar
+- trino-jdbc-467.jar
 filesHash:
   jdbc-trino.js: d999b9980ca0b49bee364479c751a8adc49bdeca
-  trino-jdbc-466.jar: bedf6045fcb0de615b888ca122d30abd67ddea43
+  trino-jdbc-467.jar: da2e290bf579cbb4c664285b29ad456f813f3075
