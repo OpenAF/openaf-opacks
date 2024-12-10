@@ -2147,19 +2147,17 @@ var _inputFns = new Map([
             try {
                 let regexes = [
                     // JDK 8 Allocation Failure (adjusted to handle multiline events)
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
+                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
                     // JDK 8 style regexes
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\]/,
-                    /([^ ]+) (\d+\.\d+): \[Full GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] \[ParOldGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), \[Metaspace: (\d+K)->(\d+K)\(.*?\)\], (\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintTenuringDistribution
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
+                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\]/,
                     // JDK 8 with +PrintHeapAtGC
-                    /([^ ]+) (\d+\.\d+): \[Full GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] \[ParOldGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), \[Metaspace: (\d+K)->(\d+K)\(.*?\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
+                    /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
+                    // JDK 8 with +PrintHeapAtGC and +PrintTenuringDistribution
+                    /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\]/,
+                    // JDK 8 with +PrintTenuringDistribution
+                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
                     // JDK 9+ style regexes
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc(?:,\w+)?\]\s*GC\((\d+)\)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc(?:,\w+)?\]\s*GC\((\d+)\)\s*(.*?)\s*Heap:\s*(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s*Metaspace:\s*(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s*(\d+\.\d+)ms/,
                     /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc,\w+\]\s*GC\((\d+)\)\s*(.*?)\s*Heap:\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*Metaspace:\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
                     /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/,
                     // JDK 9+ Allocation Failure
                     /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
@@ -2181,7 +2179,6 @@ var _inputFns = new Map([
                                     result.timestamp = ow.format.toDate(head, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                                 }
                             })
-                            //result.index = index
                             result.gcId = parseInt(match[2])
                             result.gcType = match[3].trim()
                             if (result.gcType == "") result.gcType = "none"
@@ -2214,51 +2211,42 @@ var _inputFns = new Map([
                             }
                         } else {
                             // JDK 8 style parsing
-                            //result.index = index
-                            result.timestamp = ow.format.toDate(match[1], "yyyy-MMdd'T'HH:mm:ss.SSSZ")
+                            result.index = index
+                            result.timestamp = ow.format.toDate(match[1], "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                             result.sinceStart = parseFloat(match[2])
-                            result.gcType = match[3]
-                            result.durationSecs = parseFloat(match[match.length - 1])
+                            result.gcType = match[3] + " " + match[4]
 
-                            if (index === 0 || index === 6) {
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                if (index === 6 && _event.includes("Allocation Failure")) {
-                                    result.gcCause = "Allocation Failure"
+                            //print(index)
+                            //cprint(match)
+                            if (index <= 4) {
+                                let idx = 5
+                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                result.PSYoungGenTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+
+                                if (index == 2 || index == 3) {
+                                    result.ParOldGenBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                    result.ParOldGenAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                    result.ParOldGenTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
                                 }
-                            } else if (index === 1 || index === 3) {
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.ParOldGenBeforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.ParOldGenAfterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[9] + "B")
-                                result.metaspaceBeforeGC = ow.format.fromBytesAbbreviation(match[10] + "B")
-                                result.metaspaceAfterGC = ow.format.fromBytesAbbreviation(match[11] + "B")
-                            } else if (index === 2) {
-                                // Match for GC with +PrintTenuringDistribution
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.userTime = parseFloat(match[8])
-                                result.sysTime = parseFloat(match[9])
-                                result.realTime = parseFloat(match[10])
-                            } else if (index === 6) {
-                                // Adjusted Allocation Failure parsing
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                result.durationSecs = parseFloat(match[9])
-                                if (match[10]) {
-                                    result.userTime = parseFloat(match[10])
-                                    result.sysTime = parseFloat(match[11])
-                                    result.realTime = parseFloat(match[12])
+
+                                result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                result.heapAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                result.heapTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+
+                                if (index == 2 || index == 3) {
+                                    result.metaBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                    result.metaAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                    result.metaTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
                                 }
-                                result.gcCause = "Allocation Failure"
+
+                                result.durationSecs = parseFloat(match[idx++])
+
+                                if (index == 0 || index == 2 || index == 4) {
+                                    result.userTime = parseFloat(match[idx++])
+                                    result.sysTime = parseFloat(match[idx++])
+                                    result.realTime = parseFloat(match[idx++])
+                                }
                             }
                         }
                         return result
