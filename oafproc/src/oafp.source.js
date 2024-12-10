@@ -2171,6 +2171,7 @@ var _inputFns = new Map([
 
                         if (_event.startsWith('[')) {
                             // JDK 9+ style parsing
+                            //result.index = index
                             var heads = match[1].split("][")
                             heads.forEach(head => {
                                 if (head.match(/^\d+\.\d+s$/)) {
@@ -2211,7 +2212,7 @@ var _inputFns = new Map([
                             }
                         } else {
                             // JDK 8 style parsing
-                            result.index = index
+                            //result.index = index
                             result.timestamp = ow.format.toDate(match[1], "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                             result.sinceStart = parseFloat(match[2])
                             result.gcType = match[3] + " " + match[4]
