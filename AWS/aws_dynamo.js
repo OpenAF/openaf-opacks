@@ -86,6 +86,9 @@ loadLib("aws_core.js");
   * <key>AWS.DYNAMO_CreateTable(aRegion, aTableName, attrDefs, keySchema, globalSecondaryIdxs, localSecondaryIdxs, tags)</key>
   * Tries to create a DynamoDB aTableName in aRegion with the provided attributeDefinitions and optional keySchema, globalSecondaryIdxs, localSecondaryIdxs and tags.
   * Please check more details in https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_CreateTable.html.
+  * \
+  * Example for local:\
+  *    aws.DYNAMO_CreateTable("local", "xyz", [{AttributeName: "ID", AttributeType: "S"}], [{AttributeName: "ID", KeyType: "HASH"},{AttributeName: "VAL",KeyType:"RANGE"}])
   * </odoc>
   */
  AWS.prototype.DYNAMO_CreateTable = function(aRegion, tableName, attrDefs, keySchema, globalSecondaryIdxs, localSecondaryIdxs, tags) {
@@ -264,7 +267,7 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
       ExpressionAttributeNames: aAttributeNames,
       ReturnValues: returnValues
    };
-
+   
    var res = this.postURLEncoded(aURL, aURI, "", params, "dynamodb", aHost, aRegion, {
       "X-Amz-Target": "DynamoDB_20120810.UpdateItem"
    }, void 0, "application/json");
@@ -450,30 +453,50 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
        return this.getKeys(aName, full);
     },
     getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
-      var options = this.__channels[aName];
-      var conditions = [], keysV = {};
-      _$(aMatch, "match").isMap().$_();
+      var options = this.__channels[aName]
+      var conditions = [], keysV = {}
+      _$(aMatch, "match").isMap().$_()
+      if (isNumber(aTimestamp)) aTimestamp = { ts: aTimestamp }
+      aTimestamp = _$(aTimestamp).isMap().default({})
 
       var addKeysAndConditions = (aMap) => {
-         var keys = Object.keys(aMap);
+         var keys = Object.keys(aMap)
          for(var ii in keys) {
-            var kk = conditions.length;
+            var kk = conditions.length
             conditions.push(keys[ii] + " = :v" + keys[ii])
             keysV[":v" + keys[ii]] = aMap[keys[ii]]
          }
-      };
+      }
 
-      addKeysAndConditions(aMatch);
-      addKeysAndConditions(aK);
+      addKeysAndConditions(aMatch)
+      addKeysAndConditions(aK)
 
-      if (options.setUpdate) {
+      if (aTimestamp.setUpdate || (isUnDef(aTimestamp.setUpdate) && options.setUpdate)) {
+         var _fnK = o => {
+            var _r = []
+            traverse(o, (aK, aV, aP, aO) => {
+               if (!isObject(aV)) {
+                  _r.push((aP + (isNumber(aK) ? "[" + aK + "]" : "." + aK)).replace(/^\./, "") + " = :v" + (aP + aK).replace(/\./g, "_"))
+               }
+            })
+            return "SET " + _r.join(", ")
+         }
+         var _fnV = o => {
+            var _r = {}
+            traverse(o, (aK, aV, aP, aO) => {
+               if (!isObject(aV)) {
+                  _r[":v" + (aP + aK).replace(/\./g, "_")] = aV
+               }
+            })
+            return _r
+         }
          var _r = options.aws.DYNAMO_UpdateItem(
             options.region, 
             options.tableName, 
             aK, 
-            "SET " + Object.keys(aV).map((k) => { return k + " = :v" + k; }).join(", "),
+            _fnK(aV),
             conditions.join(" and "), 
-            merge(keysV, Object.keys(aV).reduce((acc, k) => { acc[":v" + k] = aV[k]; return acc; }, {})),
+            merge(keysV, _fnV(aV)),
             __, 
             "ALL_NEW")
          if (isMap(_r) && isDef(_r.Attributes)) return _r.Attributes; else return _r
@@ -483,15 +506,35 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
       // return options.aws.DYNAMO_PutItem(options.region, options.tableName, aV, conditions.join(" and "), keysV);
     },
     set          : function(aName, aK, aV, aTimestamp) {
-       var options = this.__channels[aName];
-       if (options.setUpdate) {
+       var options = this.__channels[aName]
+       if (isNumber(aTimestamp)) aTimestamp = { ts: aTimestamp }
+       aTimestamp = _$(aTimestamp).isMap().default({})
+       if (aTimestamp.setUpdate || (isUnDef(aTimestamp.setUpdate) && options.setUpdate)) {
+         var _fnK = o => {
+            var _r = []
+            traverse(o, (aK, aV, aP, aO) => {
+               if (!isObject(aV)) {
+                  _r.push((aP + (isNumber(aK) ? "[" + aK + "]" : "." + aK)).replace(/^\./, "") + " = :v" + (aP + aK).replace(/\./g, "_"))
+               }
+            })
+            return "SET " + _r.join(", ")
+         }
+         var _fnV = o => {
+            var _r = {}
+            traverse(o, (aK, aV, aP, aO) => {
+               if (!isObject(aV)) {
+                  _r[":v" + (aP + aK).replace(/\./g, "_")] = aV
+               }
+            })
+            return _r
+         }
          var _r = options.aws.DYNAMO_UpdateItem(
             options.region, 
             options.tableName, 
             aK, 
-            "SET " + Object.keys(aV).map((k) => { return k + " = :v" + k; }).join(", "),
+            _fnK(aV),
             __, 
-            Object.keys(aV).reduce((acc, k) => { acc[":v" + k] = aV[k]; return acc; }, {}),
+            _fnV(aV),
             __, 
             "ALL_NEW")
          if (isMap(_r) && isDef(_r.Attributes)) return _r.Attributes; else return _r
