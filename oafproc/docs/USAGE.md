@@ -469,6 +469,8 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
 
+> OpenAF sBuckets are supported in llmoptions. You can set any of the enviroment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
+
 > Tip: Use the 'getlist=' optional transform to automatically filter list of data from LLMs prompt responses if relevant.
 
 ---
