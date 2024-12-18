@@ -397,10 +397,10 @@ params.in = params.type
 params.input = params.type
 
 // Check if file is provided
-if (isUnDef(params.file) && isUnDef(params.cmd)) {
+if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "undefined" == typeof params.data && "undefined" == typeof params.url) {
     let _found = __
     for (let key in params) {
-        if (params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
+        if ("undefined" == typeof _found && params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
             _found = key
             break;
         }
