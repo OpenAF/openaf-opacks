@@ -1,7 +1,7 @@
-paradoxdriver-1.6.2.jar:
+paradoxdriver-1.6.3.jar:
   name: GNU GPL v3
   url: https://www.gnu.org/licenses/gpl.html
-  version: 1.6.2
+  version: 1.6.3
   changed from original: false
   comments: ''
   license: |-
@@ -37,25 +37,38 @@ paradoxdriver-1.6.2.jar:
 
 
 
+    #fundraiser { direction: ltr; }
+
+
+
+
+
+
+
+
     Skip to main text
 
 
+      
+        Come build a better world with us!
+        Please don't scroll past
+          this. We've been building a better world with free software since 1985.
+          Today, we ask for your support. Only with your help can the FSF continue
+          to be the cornerstone of a more just digital society! Donate to help us
+          reach the goal of USD $400,000
+          by Dec 31.
+        Donate
+        
+        
+      
+      
+        $205,517
+        
+        $400,000
+        
+        
+      
 
-
-     
-      
-      
-      
-      
-      
-       Free Software Supporter:
-      
-      
-      
-     
-
-
-    JOIN&nbsp;THE&nbsp;FSF
 
 
 
@@ -68,11 +81,10 @@ paradoxdriver-1.6.2.jar:
 
 
 
-
+     
       
       
      
-    end search button -->
 
      
       
