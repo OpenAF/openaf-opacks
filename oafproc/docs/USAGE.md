@@ -369,6 +369,7 @@ List of options to use when _in=xls_:
 |--------|------|-------------|
 | inxlssheet | String | The name of sheet to consider (default to the first sheet) |
 | inxlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
+| inxlsdesc | Boolean | If true, instead of retrieving data, either a list of sheet names will be returned, or, if inxlssheet is provided, a table with '___' of empty cells and '###' for non-empty cells will be returned |
 | inxlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
 | inxlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
 

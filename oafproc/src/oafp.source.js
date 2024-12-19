@@ -2137,18 +2137,54 @@ var _inputFns = new Map([
             _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
         }
         
+        plugin("XLS")
+        let _xlsdss = false, _xlsds = false
+        params.inxlsdesc = toBoolean( _$(params.inxlsdesc, "inxlsdesc").isString().default(false) )
+        if (params.inxlsdesc) {
+            if (isUnDef(params.inxlssheet)) {
+                _xlsds = true
+            } else {
+                _xlsdss = true
+            }
+        }
+
         params.inxlssheet        = _$(params.inxlssheet || params.xlssheet, "xlssheet").isString().default(0)
         params.inxlsevalformulas = toBoolean(_$(params.inxlsevalformulas || params.xlsevalformulas, "xlsevalformulas").isString().default(true))
         params.inxlscol          = _$(params.inxlscol || params.xlscol, "xlscol").isString().default("A")
         params.inxlsrow          = _$(params.inxlsrow || params.xlsrow, "xlsrow").isString().default(1)
 
-        plugin("XLS")
         if (isDef(params.file) || isDef(params.cmd)) {
             var xls = new XLS(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file)
-            var sheet = xls.getSheet(params.inxlssheet)
-            var _r = xls.getTable(sheet, params.inxlsevalformulas, params.inxlscol, params.inxlsrow)
+
+            if (_xlsds) {
+                _r = xls.getSheetNames()
+            } else {
+                var sheet = xls.getSheet(params.inxlssheet)
+                if (_xlsdss) {
+                    var _vls = xls.getCellValues(sheet, false)
+                    var cols = []
+                    Object.keys(_vls).forEach(r => {
+                        var _c = Object.keys(_vls[r])
+                        if (_c.length > cols.length) cols = _c
+                    })
+
+                    _r = []
+                    var _rr = Object.keys(_vls).map(r => {
+                        var __r = { " ": r }
+                        cols.forEach(_c => __r[_c] = isNull(_vls[r][_c]) || _vls[r][_c].type == "BLANK" ? "___" : "###" )
+                        _r.push(__r)
+                    })
+
+                    if (isUnDef(params.format) && isUnDef(options.__format)) {
+                        params.format = "ctable"
+                        options.__format = "ctable"
+                    }
+                } else {
+                    var _r = xls.getTable(sheet, params.inxlsevalformulas, params.inxlscol, params.inxlsrow)
+                    if (isDef(_r) && isMap(_r)) _r = _r.table
+                }
+            }
             xls.close()
-            if (isDef(_r) && isMap(_r)) _r = _r.table
 
             _$o(_r, options)
         } else {
