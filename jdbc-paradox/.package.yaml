@@ -16,15 +16,15 @@ name: jdbc-paradox
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240811'
+version: '20241219'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-paradox.js
-- paradoxdriver-1.6.2.jar
+- paradoxdriver-1.6.3.jar
 filesHash:
-  LICENSES.txt: 9e1e1e178d607956d00dfa49e1687dc353a97d75
+  LICENSES.txt: 585e06dd22e3dba8c20b87bab561e31766fe15eb
   jdbc-paradox.js: c67d64d75291ebae3e2c0f31c91ff973a8f0f1bf
-  paradoxdriver-1.6.2.jar: dc356367f3f67ccd27794a4af810a3fa87faaef8
+  paradoxdriver-1.6.3.jar: 1a0fb85afc8bbfcd6f454f30893d7dfa2fdc3506
