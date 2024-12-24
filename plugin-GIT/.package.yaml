@@ -38,7 +38,7 @@ filesHash:
   JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
   compile.yaml: 8d07ec5ca4c092ce77ab110690572055965e6b69
   org.eclipse.jgit-7.1.0.202411261347-r.jar: 67609d333b8ba11d5b3a509aca72c1c8ef72e17e
-  plugin-git.jar: 47ce04488c91c044bd13fa4e227f72f481028468
+  plugin-git.jar: 913a86a73714107b2ba3d7b293d41772c407ea6e
   slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14
   src/openaf/plugins/GIT.class: eadedbec7d2244b6c62439c09876720dd246c7f0
   src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11
