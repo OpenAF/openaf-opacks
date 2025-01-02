@@ -31,7 +31,7 @@ AWS.prototype.ECR_ListImages = function(aRegion, aRepoName, params) {
 
     var res
     if (isDef(_res) && isDef(_res.nextToken)) {
-       res = _res.imageIds.concat(this.ECR_ListImages(aRegion, merge(params, { nextToken: _res.nextToken })))
+       res = _res.imageIds.concat(this.ECR_ListImages(aRegion, aRepoName, merge(params, { nextToken: _res.nextToken })))
     } else {
        res = _res
     }
