@@ -101,6 +101,9 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
             WebIdentityToken: _token,
             Version: "2011-06-15"
          })
+         if (isMap(_res) && isDef(_res.error)) {
+            throw af.toSLON( af.fromXML2Obj(_res.error.response) )
+         }
          _res = af.fromXML2Obj(_res)
          if (isDef(_res.AssumeRoleWithWebIdentityResponse) && isDef(_res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult)) {
             o = {
