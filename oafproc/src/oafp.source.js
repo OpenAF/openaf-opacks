@@ -408,6 +408,9 @@ if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "un
     params.file = _found
 }
 
+params.debug = toBoolean(params.debug)
+if (isDef(params["-debug"])) params.debug = true
+
 // Verify the data param
 if ("[object Object]" == Object.prototype.toString.call(params.data)) {
     params.data = stringify(params.data, __, "")
@@ -473,7 +476,7 @@ const _addSrcFileExtensions = (ext, type) => {
     if (!_fileExtensions.has(ext)) {
         _fileExtensions.set(ext, type)
     } else {
-        printErr("WARN: Extension '" + ext + "' already exists.")
+        if (params.debug) printErr("WARN: Extension '" + ext + "' already exists.")
     }
 }
 
@@ -487,7 +490,7 @@ const _addSrcFileExtensionsNoMem = ext => {
     if (!_inputNoMem.has(ext)) {
         _inputNoMem.add(ext)
     } else {
-        printErr("WARN: Extension '" + ext + "' already exists.")
+        if (params.debug) printErr("WARN: Extension '" + ext + "' already exists.")
     }
 }
 
@@ -680,7 +683,7 @@ const _addSrcInputLineFns = (type, fn) => {
     if (isUnDef(_inputLinesFns[type])) {
         _inputLineFns[type] = fn
     } else {
-        printErr("WARN: Input type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Input type '" + type + "' already exists.")
     }
 }
 
@@ -1163,7 +1166,7 @@ const _addSrcTransformFns = (type, fn) => {
     if (isUnDef(_transformFns[type])) {
         _transformFns[type] = fn
     } else {
-        printErr("WARN: Transform '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Transform '" + type + "' already exists.")
     }
 }
 
@@ -1751,7 +1754,7 @@ const _addSrcOutputFns = (type, fn) => {
     if (!_outputFns.has(type)) {
         _outputFns.set(type, fn)
     } else {
-        printErr("WARN: Output type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Output type '" + type + "' already exists.")
     }
 }
 
@@ -2474,7 +2477,7 @@ var _inputFns = new Map([
                 } finally {
                     return _rr
                 }
-            })
+            }, __, isDef(params.inoafpseq) ? toBoolean(params.inoafpseq) : __)
             //$doWait($doAll(_p))
             _$o(_out, options)
         } else {
@@ -2609,7 +2612,7 @@ const _addSrcInputFns = (type, fn) => {
     if (!_inputFns.has(type)) {
         _inputFns.set(type, fn)
     } else {
-        printErr("WARN: Input type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Input type '" + type + "' already exists.")
     }
 }
 
@@ -2738,7 +2741,7 @@ if (isDef(params.csv)) {
 
 // Check version
 var _version = false
-if (params["-v"] == "" || (isString(params.version) && params.version.length > 0)) {
+if (params["-v"] == "" || toBoolean(params.version)) {
     _version = true
     showVersion()
 }
@@ -2877,6 +2880,9 @@ var _run = () => {
                         case "delete":
                             _res = $rest(_hp).delete(params.url, _hd)
                             break
+                        case "head":
+                            _res = $rest(_hp).head(params.url, _hd)
+                            break
                         default:
                             _res = $rest(_hp).get(params.url)
                         }
@@ -2952,7 +2958,7 @@ var _run = () => {
 }
 
 // Verify debug
-if (isDef(params["-debug"])) {
+if (params.debug) {
     //__initializeCon()
     printErr("DEBUG: " + colorify(params))
 }

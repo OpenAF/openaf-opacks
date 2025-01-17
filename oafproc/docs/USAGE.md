@@ -82,7 +82,7 @@ List of data input types that can be auto-detected (through the file extension o
 | mdtable | A Markdown table format |
 | ndjson | A NDJSON format |
 | oaf | Takes an OpenAF scripting code to execute and use the result as input |
-| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
+| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
