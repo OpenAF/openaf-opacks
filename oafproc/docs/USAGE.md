@@ -70,7 +70,9 @@ List of data input types that can be auto-detected (through the file extension o
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
+| javas | Tries to list java processes running locally (javainception=true to include itself) |
 | javagc | The Java GC log lines text format |
+| jmx | Uses Java JMX to retrieve data from another Java process |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
 | jwt | Decodes and/or verifies a JSON Web Token (JWT) |
@@ -239,6 +241,30 @@ List of options to use when _in=javagc_:
 | Option | Type | Description |
 |--------|------|-------------|
 | javagcjoin | Boolean | If true it will return an array with each processed line. |
+
+---
+
+### 🧾 JMX input options
+
+List of options to use when _in=jmx_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| jmxpid | Number | The local java process pid to connect to if 'jmxurl' is not provided. |
+| jmxurl | String | The JMX URL to connect to if 'jmxpid' is not provided. |
+| jmxuser | String | The JMX user to use if JMX URL was provided. |
+| jmxpass | String | The JMX password to use if JMX URL was provided. |
+| jmxprovider | String | The JMX provider Java class if JMX URL was provided. |
+| jmxop | String | The operation to perform (see below for options) |
+
+Options available to use with 'jmxop':
+
+| Op | Description |
+|----|-------------|
+| all | Tries to retrieve all JMX data available. |
+| domains | Retrieves just a list of JMX domains available. |
+| query | Performs a JMX query from the input data provided (e.g. java.lang:*) |
+| get | Retrieves a specific JMX object (e.g. java.lang:type=Memory) |
 
 ---
 

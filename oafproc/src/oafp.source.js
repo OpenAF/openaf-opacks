@@ -2555,6 +2555,41 @@ var _inputFns = new Map([
         if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
         _$o(res.getModels(), options)
     }],
+    ["javas", (_res, options) => {
+        params.javasinception = toBoolean(params.javasinception)
+        _showTmpMsg()
+        plugin("JMX")
+        var jmx = new JMX()
+        var _r = jmx.getLocals().Locals
+        if (!params.javasinception) {
+            _r = _r.filter(r => r.id != getPid())
+        }
+        _$o(_r, options)
+    }],
+    ["jmx", (_res, options) => {
+        params.jmxop = _$(params.jmxop, "jmxop").oneOf(["all","get","query","domains"]).default("all")
+        if (isUnDef(params.jmxurl) && isUnDef(params.jmxpid)) _exit(-1, "jmxurl or jmxpid is not defined.")
+        
+        _showTmpMsg()
+        plugin("JMX")
+        ow.loadJava()
+        let jmx
+        if (isUnDef(params.jmxurl)) {
+            ow.loadServer()
+            jmx = new ow.java.JMX((new JMX()).attach2Local(params.jmxpid).URL)
+        } else {
+            jmx = new ow.java.JMX(params.jmxurl, params.jmxuser, params.jmxpass, params.jmxprovider)
+        }
+        let _r
+        switch(params.jmxop) {
+        case "domains": _r = jmx.getDomains(); break
+        case "query"  : if (isString(_res)) _r = jmx.queryNames(_res); else _exit(-1, "Input needs to be a JMX query string (e.g. java.lang:*)"); break
+        case "get"    : if (isString(_res)) _r = jmx.getObject(_res); else _exit(-1, "Input needs to be a JMX object name (e.g. java.lang:type=Memory)"); break
+        default       :
+        case "all"    : _r = jmx.getAll(); break
+        }
+        _$o(_r, options)
+    }],
     ["ls", (_res, options) => {
         _showTmpMsg()
         if (isString(_res)) {
