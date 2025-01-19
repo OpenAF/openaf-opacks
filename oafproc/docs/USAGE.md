@@ -90,6 +90,7 @@ List of data input types that can be auto-detected (through the file extension o
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
 | sh | Executes a shell command returning stdout, stderr and exitcode as a map |
 | slon | A SLON format (auto-detected) |
+| snmp | A SNMP device source |
 | sql | One or more SQLs statements to AST (Abstract Syntax Tree) or beautified SQL |
 | toml | TOML format |
 | xls | A XLSx compatible file (requires file=abc.xlsx) |
@@ -364,6 +365,39 @@ The input data map can be composed of:
 * envsall (boolean) - if true all existing environment variables will also be included
 * prefix (string) - if defined will output to the console stdout/stderr with the provided prefix
 * pwd (string) - the command path working directory
+
+---
+
+### 🧾 SNMP input options
+
+List of options to use when _in=snmp_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| insnmp | String | A SNMP address in the form 'udp://1.2.3.4/161' |
+| insnmpcommunity | String | The SNMP community to use (default 'public') |
+| insnmptimeout | Number | The timeout to wait for a reply |
+| insnmpretries | Number | Number of retries in case of failure |
+| insnmpversion | Number | Version of the SNMP server (e.g. 2, 3) |
+| insnmpsec     | String | A JSON/SLON representation of security attributes (see below) |
+
+The input data can be either:
+
+  * A single string with an OID
+  * Multiple lines each with just an OID
+  * An array of OID strings
+  * A map with OID string values
+
+The 'insnmpsec' (in case of version 3 or newer) entry should be a JSON/SLON map with:
+
+| Entry | Description |
+|-------|-------------|
+| securityName | The security name to use |
+| authProtocol | One of: HMAC128SHA224, HMAC192SHA256, HMAC256SHA384, HMAC384SHA512, MD5, SHA |
+| privProtocol | One of: 3DES, AES128, AES192, AES256, DES |
+| authPassphrase | The authorization passphrase to use |
+| privPassphrase | The private passphrase to use |
+| engineId | The engine id in hexadecimal format |
 
 ---
 

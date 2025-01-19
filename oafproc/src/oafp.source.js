@@ -2590,6 +2590,46 @@ var _inputFns = new Map([
         }
         _$o(_r, options)
     }],
+    ["snmp", (_res, options) => {
+        _$(params.insnmp, "insnmp").isString().$_()
+        params.insnmpcommunity = _$(params.insnmpcommunity, "insnmpcommunity").isString().default("public")
+        params.insnmptimeout = _$(params.insnmptimeout, "insnmptimeout").isNumber().default(__)
+        params.insnmpretries = _$(params.insnmpretries, "insnmpretries").isNumber().default(__)
+        params.insnmpversion = _$(params.insnmpversion, "insnmpversion").isString().default(__)
+        params.insnmpsec = _fromJSSLON(_$(params.insnmpsec, "insnmpsec").isString().default(__))
+        _showTmpMsg()
+        plugin("SNMP")
+        var snmp = new SNMP(params.insnmp, params.insnmpcommunity, params.insnmptimeout, params.insnmpversion, params.insnmpsec)
+        let _r = {}, _i = _fromJSSLON(_res)
+        if (isString(_i)) {
+            var _p = _i.split("\n").map(p => p.trim()).filter(p => p.length > 0)
+            if (_p.length == 1) {
+                _r = snmp.get(_res)
+                if (isMap(_r)) _r = _r[_res]
+            } else {
+                _r = pForEach(_p, p => {
+                    var _r = snmp.get(p)
+                    if (isMap(_r)) _r = _r[p]
+                    return _r
+                })
+            }
+        } else {
+            let _ism = isMap(_i)
+            ow.loadObj()
+            var _fn = _oid => snmp.get(_oid)[_oid]
+            if (_ism) {
+                let _ac = []
+                _r = _i
+                traverse(_r, (aK, aV, aP, aO) => {
+                    if (isString(aV)) _ac.push({ o: aO, k: aK, v: aV })
+                })
+                pForEach(_ac, ac => ac.o[ac.k] = _fn(ac.v))
+            } else {
+                _r = pForEach(_i, a => _fn(a))
+            }
+        }
+        _$o(_r, options)
+    }],
     ["ls", (_res, options) => {
         _showTmpMsg()
         if (isString(_res)) {
