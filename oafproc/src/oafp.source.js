@@ -1159,6 +1159,64 @@ var _transformFns = {
             }
         })
         return _r
+    },
+    "xjs": _r => {
+        if (isString(params.xjs)) {
+            if (io.fileExists(params.xjs)) {
+                var _t = io.readFileString(params.xjs)
+                if (isString(_t)) {
+                    var _f = new Function("args", _t + "; return args")
+                    return _f(_r)
+                }
+            }
+        }
+        return _r
+    },
+    "xpy": _r => {
+        if (isString(params.xpy)) {
+            if (io.fileExists(params.xpy)) {
+                let __r = $py(params.xpy, { args: _r}, ["args"])
+                $pyStop()
+                return __r
+            }
+        }
+        return _r
+    },
+    "xfn": _r => {
+        if (isString(params.xfn)) {
+            var _f = new Function("args", "return " + params.xfn)
+            return _f(_r)
+        }
+    },
+    "xrjs": _r => {
+        if (isString(params.xrjs) && isArray(_r)) {
+            if (io.fileExists(params.xrjs)) {
+                let _t = io.readFileString(params.xrjs)
+                if (isString(_t)) {
+                    let _f = new Function("args", _t + "; return args")
+                    return pForEach(_r, _f)
+                }
+            }
+        }
+        return _r
+    },
+    "xrpy": _r => {
+        if (isString(params.xrpy) && isArray(_r)) {
+            if (io.fileExists(params.xrpy)) {
+                $pyStart()
+                let __r = pForEach(_r, r => $py(params.xrpy, { args: r}, ["args"]) )
+                $pyStop()
+                return __r
+            }
+        }
+        return _r
+    },
+    "xrfn": _r => {
+        if (isString(params.xrfn) && isArray(_r)) {
+            let _f = new Function("args", "return " + params.xrfn)
+            return pForEach(_r, _f)
+        }
+        return _r
     }
 }
 // --- add extra _transformFns here ---

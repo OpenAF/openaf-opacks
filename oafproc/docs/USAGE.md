@@ -136,6 +136,12 @@ These options will change the parsed input data included any filters provided.
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
+| xjs | String | A .js file with function code manipulating an input 'args'. Returns the transformed 'args' variable. |
+| xpy | String | A .py file with Python function code manipulating an input 'args'. Returns the transformed 'args' variable. |
+| xfn | String | A javascript code, receiving input as 'args' and return it's code evaluation. |
+| xrjs | String | A .js file with function code to manipulate each input array record as 'args'. Returns the transformed 'args' record. |
+| xrpy | String | A .py file with function code to manipulate each input array record as 'args'. Returns the transformed 'args' record. |
+| xrfn | String | A javascript code, receiving each input array record as 'args' and return it's code evaluation. |
 
 ---
 
