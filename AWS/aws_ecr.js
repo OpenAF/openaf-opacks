@@ -171,7 +171,7 @@ AWS.prototype.ECR_BatchDeleteImage = function(aRegion, aRepoName, aImageTag, par
       "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.BatchDeleteImage"
    }, __, "application/x-amz-json-1.1")
 
-   if (isDef(_res) && isArray(_res.images) && _res.images.length > 0) return _res.images[0]
+   if (isDef(_res) && isArray(_res.imageIds) && _res.imageIds.length > 0) return _res.imageIds[0]
 
    return _res
 }
