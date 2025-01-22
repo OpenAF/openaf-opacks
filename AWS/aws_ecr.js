@@ -107,10 +107,10 @@ AWS.prototype.ECR_DescribeRepositories = function(aRegion, params) {
 
 /**
  * <odoc>
- * <key>AWS.ECR_GetRepositoryPolicy(aRegion, aRepoName) : Map</key>
- * Get the repository policy for aRepoName on aRegion.\
+ * <key>AWS.ECR_BatchGetImage(aRegion, aRepoName, aImageTag, params) : Map</key>
+ * Gets detailed information for an aImageTag from aRepoName on aRegion. Optionally you can provide extra params.\
  * \
- * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_GetRepositoryPolicy.html\
+ * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_BatchGetImage.html\
  * \
  * </odoc>
  */
@@ -139,6 +139,39 @@ AWS.prototype.ECR_BatchGetImage = function(aRegion, aRepoName, aImageTag, params
    }, __, "application/x-amz-json-1.1")
 
    if (isDef(_res) && isArray(_res.images) && _res.images.length > 0) return _res.images[0]
+
+   return _res
+}
+
+/**
+ * <odoc>
+ * <key>AWS.ECR_BatchDeleteImage(aRegion, aRepoName, aImageTag, params) : Map</key>
+ * Deletes an aImageTag from aRepoName on aRegion. Optionally you can provide extra params.\
+ * \
+ * Refer to: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_BatchDeleteImage.html\
+ * \
+ * </odoc>
+ */
+AWS.prototype.ECR_BatchDeleteImage = function(aRegion, aRepoName, aImageTag, params) {
+   var aURL
+   aRegion   = _$(aRegion, "aRegion").isString().default(this.region)
+   params    = _$(params, "params").isMap().default({})
+   aRepoName = _$(aRepoName, "aRepoName").isString().$_()
+   aImageTag = _$(aImageTag, "aImageTag").isString().$_()
+
+   aURL = "https://ecr." + aRegion + ".amazonaws.com/"
+   var url = new java.net.URL(aURL)
+   var aHost = String(url.getHost())
+   var aURI = String(url.getPath())
+
+   params.repositoryName      = aRepoName
+   params.imageIds            = [ { imageTag: aImageTag } ]
+
+   var _res = this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.BatchDeleteImage"
+   }, __, "application/x-amz-json-1.1")
+
+   if (isDef(_res) && isArray(_res.imageIds) && _res.imageIds.length > 0) return _res.imageIds[0]
 
    return _res
 }
