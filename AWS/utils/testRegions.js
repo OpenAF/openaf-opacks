@@ -9,6 +9,7 @@ var regions = {
     "us-west-1": "US-West (California)",
     "us-west-2": "US-West (Oregon)",
     "ca-central-1": "Canada (Central)",
+    "ca-west-1": "Canada (Calgary)",
     "eu-west-1": "Europe (Ireland)",
     "eu-west-2": "Europe (London)",
     "eu-central-1": "Europe (Frankfurt)",
@@ -29,12 +30,14 @@ var regions = {
     "ap-southeast-3": "Asia Pacific (Jakarta)",
     "ap-southeast-4": "Asia Pacific (Melbourne)",
     "ap-northeast-1": "Asia Pacific (Tokyo)",
+    "mx-central-1": "Central (Mexico)",
     "sa-east-1": "South America (Sao Paulo)",
     "af-south-1": "Africa (Cape Town)",
     "cn-north-1": "China (Beijing)",
     "cn-northwest-1": "China (Ningxia)",
     "us-gov-east-1": "AWS GovCloud (US-East)",
-    "us-gov-west-1": "AWS GovCloud (US)"
+    "us-gov-west-1": "AWS GovCloud (US)",
+    "il-central-1": "Israel (Tel Aviv)"
   };
 
 // Tests the socket latency to a specific aHost, aPort given an optional aTimeout (default to 2500)
