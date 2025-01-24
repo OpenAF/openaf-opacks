@@ -112,6 +112,9 @@ These options will change the parsed input data included any filters provided.
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
+| field2byte | String | A comma delimited list of fields whose value should be converted to a byte abbreviation |
+| field2date | String | A comma delimited list of fields whose value should be converted to date values |
+| field2si | String | A comma delimited list of fields whose value should be converted to a SI abbreviation |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
 | forcearray | Boolean | If true and if the input is map it will force it to be an array with that map as the only element |
@@ -136,6 +139,7 @@ These options will change the parsed input data included any filters provided.
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
+| val2icon | Boolean | If true will transform undefined, null and boolean values to emoticons |
 | xjs | String | A .js file with function code manipulating an input 'args'. Returns the transformed 'args' variable. |
 | xpy | String | A .py file with Python function code manipulating an input 'args'. Returns the transformed 'args' variable. |
 | xfn | String | A javascript code, receiving input as 'args' and return it's code evaluation. |

@@ -1217,7 +1217,50 @@ var _transformFns = {
             return pForEach(_r, _f)
         }
         return _r
+    },
+    "val2icon": _r => {
+        if (toBoolean(params.val2icon)) {
+            ow.loadFormat()
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (isUnDef(aV) || isNull(aV)) {
+                    aO[aK] = "🕳️"
+                } else {
+                    if (isBoolean(aV)) {
+                        aO[aK] = aV ? "✅" : "❌"
+                    }
+                }
+            })
+        }
+        return _r
+    },
+    "field2date": _r => {
+        let _lst = params.field2date.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV) && aV > 0) {
+                try { aO[aK] = new Date(aV) } catch(e) {}
+            }
+        })
+        return _r
+    },
+    "field2si": _r => {
+        let _lst = params.field2si.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV)) {
+                aO[aK] = ow.format.toAbbreviation(aV)
+            }
+        })
+        return _r
+    },
+    "field2byte": _r => {
+        let _lst = params.field2byte.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV)) {
+                aO[aK] = ow.format.toBytesAbbreviation(aV)
+            }
+        })
+        return _r
     }
+
 }
 // --- add extra _transformFns here ---
 const _addSrcTransformFns = (type, fn) => {
