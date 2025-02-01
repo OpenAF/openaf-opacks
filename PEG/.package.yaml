@@ -60,7 +60,7 @@ filesHash:
   grammars/json.pegjs: 9d5ce0bfabb4ebc58d131878f9015416f233899e
   grammars/nlinq.pegjs: e10687527864e639dacf12508944bdb847e0ff04
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
-  grammars/slon.pegjs: d79c71632bc54c0d548cf442401dd47822fa4e93
+  grammars/slon.pegjs: 3cffb9a817a63968f1850845967e4891752e33fb
   grammars/sql.pegjs: 65a34f3b289e50cbcc5e4b7bba1b3cf11be49cda
   lib/peggy.min.js: 865cef369e6b0de24b6dd59dc9815287fcf56e51
   lib/peggy.min.js.orig: cc51eeb3da071654411106db9a0f13873be23cf8
