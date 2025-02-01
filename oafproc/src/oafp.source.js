@@ -1219,14 +1219,24 @@ var _transformFns = {
         return _r
     },
     "val2icon": _r => {
-        if (toBoolean(params.val2icon)) {
+        let _t = {
+            d: [ "🕳️", "✅", "❌" ],
+            s: [ "╍", "✓", "✕" ]
+        }
+        if (isDef(params.val2icon)) {
+            var th
+            switch(params.val2icon) {
+            case "simple": th = _t.s; break
+            default      :
+            case "default": th = _t.d; break
+            }
             ow.loadFormat()
             traverse(_r, (aK, aV, aP, aO) => {
                 if (isUnDef(aV) || isNull(aV)) {
-                    aO[aK] = "🕳️"
+                    aO[aK] = th[0]
                 } else {
                     if (isBoolean(aV)) {
-                        aO[aK] = aV ? "✅" : "❌"
+                        aO[aK] = aV ? th[1] : th[2]
                     }
                 }
             })

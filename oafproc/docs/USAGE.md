@@ -139,7 +139,7 @@ These options will change the parsed input data included any filters provided.
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
-| val2icon | Boolean | If true will transform undefined, null and boolean values to emoticons |
+| val2icon | String | If defined will transform undefined, null and boolean values to emoticons (values can be 'default' or 'simple') |
 | xjs | String | A .js file with function code manipulating an input 'args'. Returns the transformed 'args' variable. |
 | xpy | String | A .py file with Python function code manipulating an input 'args'. Returns the transformed 'args' variable. |
 | xfn | String | A javascript code, receiving input as 'args' and return it's code evaluation. |
