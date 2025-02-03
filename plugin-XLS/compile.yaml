@@ -67,9 +67,16 @@ jobs:
       io.rm(args.outputDir + "/plugin-xls.jar");
       var classpath = $path(io.listFilenames(args.outputDir), "[?ends_with(@, '.jar')]");
       classpath.push(getOpenAFJar());
-      var sources = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.java')].filepath");
+      
+      __flags.ALTERNATIVES.listFilesRecursive=false
+      var _lst = listFilesRecursive(args.outputDir + "/src")
+      log("Identified #" + _lst.length + " files in src folder...")
+      var sources = $path(_lst, "[?ends_with(filename, '.java')].filepath")
       var sep = java.io.File.pathSeparator;
-      sh(["javac", "-source", "1.8", "-target", "1.8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources), void 0, void 0, true, args.outputDir, true);
+      log("Identified #" + sources.length + " sources and #" + classpath.length + " jars...")
+      $sh(["javac", "-source", "1.8", "-target", "1.8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources))
+      .pwd(args.outputDir)
+      .exec()
  
   ####################### 
   - name: Prepare XLS jar
@@ -80,7 +87,10 @@ jobs:
     exec: |
       plugin("ZIP");
       var zip = new ZIP();
-      var classes = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.class')].filepath");
+      __flags.ALTERNATIVES.listFilesRecursive=false
+      var _lst = listFilesRecursive(args.outputDir + "/src")
+      log("Identified #" + _lst.length + " files in src folder...")
+      var classes = $path(_lst, "[?ends_with(filename, '.class')].filepath");
       classes.forEach((afile) => {
         log("Packing " + afile.replace(args.outputDir + "/src/", "") + "...");
         zip.streamPutFileStream(args.outputDir + "/plugin-xls.jar", afile.replace(args.outputDir + "/src/", ""), io.readFileStream(afile));

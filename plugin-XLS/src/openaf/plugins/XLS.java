@@ -972,7 +972,19 @@ public class XLS extends ScriptableObject {
 				int numberColumns = 0;
 				
 				for(int x = ignoreX; x < (na.size() + ignoreX); x++) {
-					NativeObject no = (NativeObject) na.get(x - ignoreX);
+					Object _o = na.get(x - ignoreX);
+					NativeObject no = null;
+					if (_o instanceof NativeObject) {
+						no = (NativeObject) na.get(x - ignoreX);
+					} else {
+						if (_o instanceof org.mozilla.javascript.ConsString) {
+							NativeObject converted = (NativeObject) AFCmdBase.jse.newObject(AFCmdBase.jse.getGlobalscope());
+							converted.put("value", converted, _o.toString());
+							no = converted;
+						} else {
+							no = (NativeObject) AFCmdBase.jse.newObject(AFCmdBase.jse.getGlobalscope());
+						}
+					}
 					numberColumns = no.keySet().size();
 					
 					// Header
