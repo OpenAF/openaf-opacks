@@ -30,7 +30,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241210'
+version: '20250123'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -55,23 +55,24 @@ files:
 - aws_pi.js
 - aws_rds.js
 - aws_route53.js
+- aws_secrets.js
 - aws_sqs.js
 - aws_sts.js
 - oafp_aws.js
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 900fbc28e20dff4e16576b2c59c033e97b46a49d
+  .odoc.db: f4a4497760ed13f9e0af9b090342ca1d09b7ae12
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: ef2b67f8b77547f58bff5b1dbd4654beefa66a41
+  aws.js: abaca340a8f28caf6dc516ee1f5d1348f7678fcd
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: f712d992cabc9b45146a5560a7a714b92f220508
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
-  aws_core.js: 09f16c2354ef2aefa407d3d15d636f52d7804425
+  aws_core.js: 2d26df09c66ba9a8e8d24a20a2a3af5d17d4730c
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
-  aws_ecr.js: 2dafc75c6a122eab4e1302816479b5222ca78747
+  aws_ecr.js: a2785d66d06e45e0d61911d23f815019a771141b
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
   aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
@@ -79,10 +80,11 @@ filesHash:
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
-  aws_rds.js: 15518551361378139b152192e479ef764d741e70
+  aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
+  aws_secrets.js: 795911b083b4cf497c2bd85f7049eb6b9cb1b1e6
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
-  oafp_aws.js: 5ef19584f8463179709665287d2dd3d6e7101d11
+  oafp_aws.js: 5c1c3088ab11e329b067922cd2bc877b5dca36aa
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  utils/testRegions.js: 4270af4475148191ca82c370d9cc3670708bef85
+  utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9

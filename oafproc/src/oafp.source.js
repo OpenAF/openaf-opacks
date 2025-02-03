@@ -238,6 +238,35 @@ const _o$o = (a, b, c) => {
         if (isDef(_s)) _print(_s)
     }
 }
+const _getSec = (aM, aPath) => {
+	aM = _$(aM).isMap().default({})
+	if (isDef(aM.secKey)) {
+		aMap = clone(aM)
+		
+		aMap.secRepo     = _$(aMap.secRepo).default(getEnv("OAFP_SECREPO"))
+		aMap.secBucket   = _$(aMap.secBucket).default(getEnv("OAFP_SECBUCKET"))
+		aMap.secPass     = _$(aMap.secPass).default(getEnv("OAFP_SECPASS"))
+		aMap.secMainPass = _$(aMap.secMainPass).default(getEnv("OAFP_SECMAINPASS"))
+		aMap.secFile     = _$(aMap.secFile).default(getEnv("OAFP_SECFILE"))
+		
+		var s = $sec(aMap.secRepo, aMap.secBucket, aMap.secPass, aMap.secMainPass, aMap.secFile).get(aMap.secKey)
+
+		delete aMap.secRepo
+		delete aMap.secBucket
+		delete aMap.secPass
+		delete aMap.secMainPass
+		delete aMap.secFile
+		delete aMap.secKey
+
+		if (isDef(aPath)) {
+			return $$(aMap).set(aPath, merge($$(aMap).get(aPath), s))
+		} else {
+			return merge(aMap, s)
+		}
+	} else {
+		return aM
+	}
+}
 const _msg = "(processing data...)"
 const _showTmpMsg  = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl(_$(msg).default(_msg)) } 
 const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
@@ -368,16 +397,19 @@ params.in = params.type
 params.input = params.type
 
 // Check if file is provided
-if (isUnDef(params.file) && isUnDef(params.cmd)) {
+if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "undefined" == typeof params.data && "undefined" == typeof params.url) {
     let _found = __
     for (let key in params) {
-        if (params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
+        if ("undefined" == typeof _found && params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
             _found = key
             break;
         }
     }
     params.file = _found
 }
+
+params.debug = toBoolean(params.debug)
+if (isDef(params["-debug"])) params.debug = true
 
 // Verify the data param
 if ("[object Object]" == Object.prototype.toString.call(params.data)) {
@@ -444,7 +476,7 @@ const _addSrcFileExtensions = (ext, type) => {
     if (!_fileExtensions.has(ext)) {
         _fileExtensions.set(ext, type)
     } else {
-        printErr("WARN: Extension '" + ext + "' already exists.")
+        if (params.debug) printErr("WARN: Extension '" + ext + "' already exists.")
     }
 }
 
@@ -458,7 +490,7 @@ const _addSrcFileExtensionsNoMem = ext => {
     if (!_inputNoMem.has(ext)) {
         _inputNoMem.add(ext)
     } else {
-        printErr("WARN: Extension '" + ext + "' already exists.")
+        if (params.debug) printErr("WARN: Extension '" + ext + "' already exists.")
     }
 }
 
@@ -651,7 +683,7 @@ const _addSrcInputLineFns = (type, fn) => {
     if (isUnDef(_inputLinesFns[type])) {
         _inputLineFns[type] = fn
     } else {
-        printErr("WARN: Input type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Input type '" + type + "' already exists.")
     }
 }
 
@@ -924,7 +956,7 @@ var _transformFns = {
             params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
             params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
 
-            var res = $llm(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv) )
+            var res = $llm( _getSec(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv)) )
             if (isDef(params.llmconversation) && io.fileExists(params.llmconversation)) 
                 res.getGPT().setConversation(io.readFileJSON(params.llmconversation))
             var type = "json", shouldStr = true
@@ -1127,14 +1159,125 @@ var _transformFns = {
             }
         })
         return _r
+    },
+    "xjs": _r => {
+        if (isString(params.xjs)) {
+            if (io.fileExists(params.xjs)) {
+                var _t = io.readFileString(params.xjs)
+                if (isString(_t)) {
+                    var _f = new Function("args", _t + "; return args")
+                    return _f(_r)
+                }
+            }
+        }
+        return _r
+    },
+    "xpy": _r => {
+        if (isString(params.xpy)) {
+            if (io.fileExists(params.xpy)) {
+                let __r = $py(params.xpy, { args: _r}, ["args"])
+                $pyStop()
+                return __r
+            }
+        }
+        return _r
+    },
+    "xfn": _r => {
+        if (isString(params.xfn)) {
+            var _f = new Function("args", "return " + params.xfn)
+            return _f(_r)
+        }
+    },
+    "xrjs": _r => {
+        if (isString(params.xrjs) && isArray(_r)) {
+            if (io.fileExists(params.xrjs)) {
+                let _t = io.readFileString(params.xrjs)
+                if (isString(_t)) {
+                    let _f = new Function("args", _t + "; return args")
+                    return pForEach(_r, _f)
+                }
+            }
+        }
+        return _r
+    },
+    "xrpy": _r => {
+        if (isString(params.xrpy) && isArray(_r)) {
+            if (io.fileExists(params.xrpy)) {
+                $pyStart()
+                let __r = pForEach(_r, r => $py(params.xrpy, { args: r}, ["args"]) )
+                $pyStop()
+                return __r
+            }
+        }
+        return _r
+    },
+    "xrfn": _r => {
+        if (isString(params.xrfn) && isArray(_r)) {
+            let _f = new Function("args", "return " + params.xrfn)
+            return pForEach(_r, _f)
+        }
+        return _r
+    },
+    "val2icon": _r => {
+        let _t = {
+            d: [ "🕳️", "✅", "❌" ],
+            s: [ "╍", "✓", "✕" ]
+        }
+        if (isDef(params.val2icon)) {
+            var th
+            switch(params.val2icon) {
+            case "simple": th = _t.s; break
+            default      :
+            case "default": th = _t.d; break
+            }
+            ow.loadFormat()
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (isUnDef(aV) || isNull(aV)) {
+                    aO[aK] = th[0]
+                } else {
+                    if (isBoolean(aV)) {
+                        aO[aK] = aV ? th[1] : th[2]
+                    }
+                }
+            })
+        }
+        return _r
+    },
+    "field2date": _r => {
+        let _lst = params.field2date.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV) && aV > 0) {
+                try { aO[aK] = new Date(aV) } catch(e) {}
+            }
+        })
+        return _r
+    },
+    "field2si": _r => {
+        let _lst = params.field2si.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV)) {
+                aO[aK] = ow.format.toAbbreviation(aV)
+            }
+        })
+        return _r
+    },
+    "field2byte": _r => {
+        let _lst = params.field2byte.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV)) {
+                aO[aK] = ow.format.toBytesAbbreviation(aV)
+            }
+        })
+        return _r
     }
+
 }
 // --- add extra _transformFns here ---
 const _addSrcTransformFns = (type, fn) => {
     if (isUnDef(_transformFns[type])) {
         _transformFns[type] = fn
     } else {
-        printErr("WARN: Transform '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Transform '" + type + "' already exists.")
     }
 }
 
@@ -1722,7 +1865,7 @@ const _addSrcOutputFns = (type, fn) => {
     if (!_outputFns.has(type)) {
         _outputFns.set(type, fn)
     } else {
-        printErr("WARN: Output type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Output type '" + type + "' already exists.")
     }
 }
 
@@ -2108,18 +2251,54 @@ var _inputFns = new Map([
             _exit(-1, "plugin-XLS not found. You need to install it to use the XLS output (opack install plugin-XLS)")
         }
         
+        plugin("XLS")
+        let _xlsdss = false, _xlsds = false
+        params.inxlsdesc = toBoolean( _$(params.inxlsdesc, "inxlsdesc").isString().default(false) )
+        if (params.inxlsdesc) {
+            if (isUnDef(params.inxlssheet)) {
+                _xlsds = true
+            } else {
+                _xlsdss = true
+            }
+        }
+
         params.inxlssheet        = _$(params.inxlssheet || params.xlssheet, "xlssheet").isString().default(0)
         params.inxlsevalformulas = toBoolean(_$(params.inxlsevalformulas || params.xlsevalformulas, "xlsevalformulas").isString().default(true))
         params.inxlscol          = _$(params.inxlscol || params.xlscol, "xlscol").isString().default("A")
         params.inxlsrow          = _$(params.inxlsrow || params.xlsrow, "xlsrow").isString().default(1)
 
-        plugin("XLS")
         if (isDef(params.file) || isDef(params.cmd)) {
             var xls = new XLS(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file)
-            var sheet = xls.getSheet(params.inxlssheet)
-            var _r = xls.getTable(sheet, params.inxlsevalformulas, params.inxlscol, params.inxlsrow)
+
+            if (_xlsds) {
+                _r = xls.getSheetNames()
+            } else {
+                var sheet = xls.getSheet(params.inxlssheet)
+                if (_xlsdss) {
+                    var _vls = xls.getCellValues(sheet, false)
+                    var cols = []
+                    Object.keys(_vls).forEach(r => {
+                        var _c = Object.keys(_vls[r])
+                        if (_c.length > cols.length) cols = _c
+                    })
+
+                    _r = []
+                    var _rr = Object.keys(_vls).map(r => {
+                        var __r = { " ": r }
+                        cols.forEach(_c => __r[_c] = isNull(_vls[r][_c]) || _vls[r][_c].type == "BLANK" ? "___" : "###" )
+                        _r.push(__r)
+                    })
+
+                    if (isUnDef(params.format) && isUnDef(options.__format)) {
+                        params.format = "ctable"
+                        options.__format = "ctable"
+                    }
+                } else {
+                    var _r = xls.getTable(sheet, params.inxlsevalformulas, params.inxlscol, params.inxlsrow)
+                    if (isDef(_r) && isMap(_r)) _r = _r.table
+                }
+            }
             xls.close()
-            if (isDef(_r) && isMap(_r)) _r = _r.table
 
             _$o(_r, options)
         } else {
@@ -2409,7 +2588,7 @@ var _inputFns = new Map([
                 } finally {
                     return _rr
                 }
-            })
+            }, __, isDef(params.inoafpseq) ? toBoolean(params.inoafpseq) : __)
             //$doWait($doAll(_p))
             _$o(_out, options)
         } else {
@@ -2447,7 +2626,7 @@ var _inputFns = new Map([
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
         _showTmpMsg()
-        var res = $llm(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv))
+        var res = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )
         if (isDef(params.llmconversation) && io.fileExists(params.llmconversation)) 
             res.getGPT().setConversation( io.readFileJSON(params.llmconversation) )
         let __res
@@ -2483,9 +2662,84 @@ var _inputFns = new Map([
 
         _showTmpMsg()
 
-        var res = $llm(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv))
+        var res = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )
         if (isUnDef(res.getModels)) _exit(-1, "OpenAF support for llm model listing API not found.")
         _$o(res.getModels(), options)
+    }],
+    ["javas", (_res, options) => {
+        params.javasinception = toBoolean(params.javasinception)
+        _showTmpMsg()
+        plugin("JMX")
+        var jmx = new JMX()
+        var _r = jmx.getLocals().Locals
+        if (!params.javasinception) {
+            _r = _r.filter(r => r.id != getPid())
+        }
+        _$o(_r, options)
+    }],
+    ["jmx", (_res, options) => {
+        params.jmxop = _$(params.jmxop, "jmxop").oneOf(["all","get","query","domains"]).default("all")
+        if (isUnDef(params.jmxurl) && isUnDef(params.jmxpid)) _exit(-1, "jmxurl or jmxpid is not defined.")
+        
+        _showTmpMsg()
+        plugin("JMX")
+        ow.loadJava()
+        let jmx
+        if (isUnDef(params.jmxurl)) {
+            ow.loadServer()
+            jmx = new ow.java.JMX((new JMX()).attach2Local(params.jmxpid).URL)
+        } else {
+            jmx = new ow.java.JMX(params.jmxurl, params.jmxuser, params.jmxpass, params.jmxprovider)
+        }
+        let _r
+        switch(params.jmxop) {
+        case "domains": _r = jmx.getDomains(); break
+        case "query"  : if (isString(_res)) _r = jmx.queryNames(_res); else _exit(-1, "Input needs to be a JMX query string (e.g. java.lang:*)"); break
+        case "get"    : if (isString(_res)) _r = jmx.getObject(_res); else _exit(-1, "Input needs to be a JMX object name (e.g. java.lang:type=Memory)"); break
+        default       :
+        case "all"    : _r = jmx.getAll(); break
+        }
+        _$o(_r, options)
+    }],
+    ["snmp", (_res, options) => {
+        _$(params.insnmp, "insnmp").isString().$_()
+        params.insnmpcommunity = _$(params.insnmpcommunity, "insnmpcommunity").isString().default("public")
+        params.insnmptimeout = _$(params.insnmptimeout, "insnmptimeout").isNumber().default(__)
+        params.insnmpretries = _$(params.insnmpretries, "insnmpretries").isNumber().default(__)
+        params.insnmpversion = _$(params.insnmpversion, "insnmpversion").isString().default(__)
+        params.insnmpsec = _fromJSSLON(_$(params.insnmpsec, "insnmpsec").isString().default(__))
+        _showTmpMsg()
+        plugin("SNMP")
+        var snmp = new SNMP(params.insnmp, params.insnmpcommunity, params.insnmptimeout, params.insnmpversion, params.insnmpsec)
+        let _r = {}, _i = _fromJSSLON(_res)
+        if (isString(_i)) {
+            var _p = _i.split("\n").map(p => p.trim()).filter(p => p.length > 0)
+            if (_p.length == 1) {
+                _r = snmp.get(_res)
+                if (isMap(_r)) _r = _r[_res]
+            } else {
+                _r = pForEach(_p, p => {
+                    var _r = snmp.get(p)
+                    if (isMap(_r)) _r = _r[p]
+                    return _r
+                })
+            }
+        } else {
+            let _ism = isMap(_i)
+            ow.loadObj()
+            var _fn = _oid => snmp.get(_oid)[_oid]
+            if (_ism) {
+                let _ac = []
+                _r = _i
+                traverse(_r, (aK, aV, aP, aO) => {
+                    if (isString(aV)) _ac.push({ o: aO, k: aK, v: aV })
+                })
+                pForEach(_ac, ac => ac.o[ac.k] = _fn(ac.v))
+            } else {
+                _r = pForEach(_i, a => _fn(a))
+            }
+        }
+        _$o(_r, options)
     }],
     ["ls", (_res, options) => {
         _showTmpMsg()
@@ -2544,7 +2798,7 @@ const _addSrcInputFns = (type, fn) => {
     if (!_inputFns.has(type)) {
         _inputFns.set(type, fn)
     } else {
-        printErr("WARN: Input type '" + type + "' already exists.")
+        if (params.debug) printErr("WARN: Input type '" + type + "' already exists.")
     }
 }
 
@@ -2673,7 +2927,7 @@ if (isDef(params.csv)) {
 
 // Check version
 var _version = false
-if (params["-v"] == "" || (isString(params.version) && params.version.length > 0)) {
+if (params["-v"] == "" || toBoolean(params.version)) {
     _version = true
     showVersion()
 }
@@ -2812,6 +3066,9 @@ var _run = () => {
                         case "delete":
                             _res = $rest(_hp).delete(params.url, _hd)
                             break
+                        case "head":
+                            _res = $rest(_hp).head(params.url, _hd)
+                            break
                         default:
                             _res = $rest(_hp).get(params.url)
                         }
@@ -2887,7 +3144,7 @@ var _run = () => {
 }
 
 // Verify debug
-if (isDef(params["-debug"])) {
+if (params.debug) {
     //__initializeCon()
     printErr("DEBUG: " + colorify(params))
 }

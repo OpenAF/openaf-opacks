@@ -70,7 +70,9 @@ List of data input types that can be auto-detected (through the file extension o
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
+| javas | Tries to list java processes running locally (javainception=true to include itself) |
 | javagc | The Java GC log lines text format |
+| jmx | Uses Java JMX to retrieve data from another Java process |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
 | jwt | Decodes and/or verifies a JSON Web Token (JWT) |
@@ -82,12 +84,13 @@ List of data input types that can be auto-detected (through the file extension o
 | mdtable | A Markdown table format |
 | ndjson | A NDJSON format |
 | oaf | Takes an OpenAF scripting code to execute and use the result as input |
-| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes) |
+| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
 | sh | Executes a shell command returning stdout, stderr and exitcode as a map |
 | slon | A SLON format (auto-detected) |
+| snmp | A SNMP device source |
 | sql | One or more SQLs statements to AST (Abstract Syntax Tree) or beautified SQL |
 | toml | TOML format |
 | xls | A XLSx compatible file (requires file=abc.xlsx) |
@@ -109,6 +112,9 @@ These options will change the parsed input data included any filters provided.
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
+| field2byte | String | A comma delimited list of fields whose value should be converted to a byte abbreviation |
+| field2date | String | A comma delimited list of fields whose value should be converted to date values |
+| field2si | String | A comma delimited list of fields whose value should be converted to a SI abbreviation |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
 | forcearray | Boolean | If true and if the input is map it will force it to be an array with that map as the only element |
@@ -133,6 +139,13 @@ These options will change the parsed input data included any filters provided.
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
 | spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
+| val2icon | String | If defined will transform undefined, null and boolean values to emoticons (values can be 'default' or 'simple') |
+| xjs | String | A .js file with function code manipulating an input 'args'. Returns the transformed 'args' variable. |
+| xpy | String | A .py file with Python function code manipulating an input 'args'. Returns the transformed 'args' variable. |
+| xfn | String | A javascript code, receiving input as 'args' and return it's code evaluation. |
+| xrjs | String | A .js file with function code to manipulate each input array record as 'args'. Returns the transformed 'args' record. |
+| xrpy | String | A .py file with function code to manipulate each input array record as 'args'. Returns the transformed 'args' record. |
+| xrfn | String | A javascript code, receiving each input array record as 'args' and return it's code evaluation. |
 
 ---
 
@@ -242,6 +255,30 @@ List of options to use when _in=javagc_:
 
 ---
 
+### 🧾 JMX input options
+
+List of options to use when _in=jmx_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| jmxpid | Number | The local java process pid to connect to if 'jmxurl' is not provided. |
+| jmxurl | String | The JMX URL to connect to if 'jmxpid' is not provided. |
+| jmxuser | String | The JMX user to use if JMX URL was provided. |
+| jmxpass | String | The JMX password to use if JMX URL was provided. |
+| jmxprovider | String | The JMX provider Java class if JMX URL was provided. |
+| jmxop | String | The operation to perform (see below for options) |
+
+Options available to use with 'jmxop':
+
+| Op | Description |
+|----|-------------|
+| all | Tries to retrieve all JMX data available. |
+| domains | Retrieves just a list of JMX domains available. |
+| query | Performs a JMX query from the input data provided (e.g. java.lang:*) |
+| get | Retrieves a specific JMX object (e.g. java.lang:type=Memory) |
+
+---
+
 ### 🧾 JSON input options
 
 List of options to use when _in=json_:
@@ -341,6 +378,39 @@ The input data map can be composed of:
 
 ---
 
+### 🧾 SNMP input options
+
+List of options to use when _in=snmp_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| insnmp | String | A SNMP address in the form 'udp://1.2.3.4/161' |
+| insnmpcommunity | String | The SNMP community to use (default 'public') |
+| insnmptimeout | Number | The timeout to wait for a reply |
+| insnmpretries | Number | Number of retries in case of failure |
+| insnmpversion | Number | Version of the SNMP server (e.g. 2, 3) |
+| insnmpsec     | String | A JSON/SLON representation of security attributes (see below) |
+
+The input data can be either:
+
+  * A single string with an OID
+  * Multiple lines each with just an OID
+  * An array of OID strings
+  * A map with OID string values
+
+The 'insnmpsec' (in case of version 3 or newer) entry should be a JSON/SLON map with:
+
+| Entry | Description |
+|-------|-------------|
+| securityName | The security name to use |
+| authProtocol | One of: HMAC128SHA224, HMAC192SHA256, HMAC256SHA384, HMAC384SHA512, MD5, SHA |
+| privProtocol | One of: 3DES, AES128, AES192, AES256, DES |
+| authPassphrase | The authorization passphrase to use |
+| privPassphrase | The private passphrase to use |
+| engineId | The engine id in hexadecimal format |
+
+---
+
 ### 🧾 SQL input options
 
 List of options to use when _in=sql_:
@@ -369,6 +439,7 @@ List of options to use when _in=xls_:
 |--------|------|-------------|
 | inxlssheet | String | The name of sheet to consider (default to the first sheet) |
 | inxlsevalformulas | Boolean | If false the existing formulas won't be evaluated (defaults to true) |
+| inxlsdesc | Boolean | If true, instead of retrieving data, either a list of sheet names will be returned, or, if inxlssheet is provided, a table with '___' of empty cells and '###' for non-empty cells will be returned |
 | inxlscol | String | The column on the sheet where a table should be detected (e.g. "A") |
 | inxlsrow | Number | The row on the sheet where a table should be detected (e.g. 1) |
 
@@ -468,6 +539,8 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 | llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type | 
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
+
+> OpenAF sBuckets are supported in llmoptions. You can set any of the enviroment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
 
 > Tip: Use the 'getlist=' optional transform to automatically filter list of data from LLMs prompt responses if relevant.
 

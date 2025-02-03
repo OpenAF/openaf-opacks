@@ -76,7 +76,7 @@ datetime
 // Number
 
 number "number"
-  = minus? int frac? exp? { return parseFloat(text()) }
+  = minus? int frac? exp? &([ \t\n\r\[\]\(\):,\|] / !.) { return parseFloat(text()) }
 
 decimal_point
   = "."
@@ -110,7 +110,7 @@ zero
 string "string"
   = quotation_mark chars:char* quotation_mark { return chars.join("") }
   / quotation_mark_single chars:char* quotation_mark_single { return chars.join("") }
-  / chars:charpart+ { return chars.join("") }
+  / chars:charpart+ { return chars.join("").trim() }
 
 charpart
   = [^\:\(\)\,]

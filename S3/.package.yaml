@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241201'
+version: '20250119'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -39,7 +39,7 @@ files:
 - kotlin-stdlib-jdk7-1.8.21.jar
 - kotlin-stdlib-jdk8-1.8.21.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.5.14.jar
+- minio-8.5.17.jar
 - s3-ojob-test.yaml
 - s3-test.yaml
 - s3.js
@@ -63,7 +63,7 @@ filesHash:
   kotlin-stdlib-jdk7-1.8.21.jar: 7473b8cd3c0ef9932345baf569bc398e8a717046
   kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.5.14.jar: 8fa61866c302f393d98ff0a5eac950180f068296
+  minio-8.5.17.jar: f93c9b595c490456ce685eeaf4ae62ab0e8bc90e
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
   s3.js: 8dd0d4d72fff919eb476a21dd6df313cc81f07ba
