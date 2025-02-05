@@ -13,7 +13,7 @@ expression
   = head:transform tail:("." @expression)?
     { if (isNull(tail)) tail = {}
       if (isUnDef(tail.transform)) tail.transform = []
-      tail.transform.push(head)
+      tail.transform.unshift(head)
       return tail }
   / head:where tail:("." @expression)?
     { if (isNull(tail)) tail = {}
@@ -86,7 +86,7 @@ charselect
   = "mselect" / "removed" / "select" / "define"
 
 chartransform
-  = "ignoreCase" / "skipTake" / "useCase" / "toDate" / "limit" / "tail" / "head" / "take" / "skip" / "sort" / "detach"
+  = "ignoreCase" / "skipTake" / "useCase" / "toDate" / "limit" / "tail" / "head" / "take" / "skip" / "attachBy" / "sort" / "detach"
 
 charselector
   =  "averageBy" / "distinct" / "average" / "groupBy" / "countBy" / "reverse" / "group"  / "first" / "maxBy" / "sumBy" / "minBy" / "count" / "last" / "none" / "all" / "any" / "min" / "max" / "sum" / "at"

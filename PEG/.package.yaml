@@ -20,7 +20,7 @@ name: PEG
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250131'
+version: '20250204'
 dependencies:
   openaf: '>=20230325'
 files:
