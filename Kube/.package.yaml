@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250204'
+version: '20250205'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -85,7 +85,7 @@ filesHash:
   jackson-dataformat-yaml-2.18.2.jar: d000e13505d1cf564371516fa3d5b8769a779dc9
   jackson-datatype-jsr310-2.18.2.jar: 7b6ff96adf421f4c6edbd694e797dd8fe434510a
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
-  kube.js: 2b6a9e048292b494da4324321737c740473bdd87
+  kube.js: 9fa8644d14dfe614668021e95f6b641cc57e1a3d
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-7.1.0.jar: 98df70c87c814757aaac35a0d1b6d1263807df02
   kubernetes-client-api-7.1.0.jar: 0ba50759e72d919438a90fb9f9bf6d422a30ab7e

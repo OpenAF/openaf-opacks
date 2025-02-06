@@ -15,71 +15,117 @@ var $kube = function(aMap) {
 			return _r
 		},
 		getNS: () => {
-			var res = _r._k.getNamespaces(true)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getNamespaces(true)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		get  : (aKind, aName, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.getObject(aNS, aKind, aName)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getObject(aNS, aKind, aName)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		apply: (aStream, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.apply(aNS, aStream)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.apply(aNS, aStream)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		delete: (aStream, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.delete(aNS, aStream)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.delete(aNS, aStream)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		scale: (aType, aName, aValue, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			_r._k.scale(aNS, aType, aName, aValue)
-			_r._k.close()
+			try {
+				_r._k.scale(aNS, aType, aName, aValue)
+			} finally {
+				_r._k.close()
+			}
 			return __
 		},
 		exec : (aPodName, aCmd, aTimeout, doSH, aContainer) => {
 			aTimeout = _$(aTimeout, "timeout").isNumber().default(_r._to)
-			var res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		events: aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.getEvents(aNS)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getEvents(aNS)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		getPodsMetrics: aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.getPodsMetrics(aNS)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getPodsMetrics(aNS)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		getNodesMetrics: () => {
-			var res = _r._k.getNodesMetrics()
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getNodesMetrics()
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		getLog: (aNS, aPodName, aContainer, aStream) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k.getLog(aNS, aPodName, aContainer, aStream)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.getLog(aNS, aPodName, aContainer, aStream)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		},
 		scale: (aType, aName, aValue) => {
-			_r._k.scale(_r._ns, aType, aName, aValue)
-			_r._k.close()
+			try {
+				_r._k.scale(_r._ns, aType, aName, aValue)
+			} finally {
+				_r._k.close()
+			}
 			return __
 		},
 		scaleWithDeps: (anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) => {
-			var res = _r._k.scaleWithDeps(_r._ns, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k.scaleWithDeps(_r._ns, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		}
 	};
@@ -111,14 +157,22 @@ var $kube = function(aMap) {
 	  { ab: "EP",     fn: "getEndpoints"   } ].forEach(m => {
 		_r["get" + m.ab] = aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k[m.fn](aNS)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k[m.fn](aNS)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		}
 		_r["getF" + m.ab] = aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res = _r._k[m.fn](aNS, true)
-			_r._k.close()
+			var res
+			try {
+				res = _r._k[m.fn](aNS, true)
+			} finally {
+				_r._k.close()
+			}
 			return res
 		}
 		_r[m.fn] = _r["get" + m.ab]
