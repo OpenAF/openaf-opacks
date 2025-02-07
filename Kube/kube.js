@@ -1,7 +1,26 @@
 var $kube = function(aMap) {
 	aMap = _$(aMap, "aMap").isMap().default({})
 
+	if (isUnDef(global.__kube__)) {
+		ow.loadObj()
+		global.__kube__ = new ow.obj.syncMap()
+	}
+	
+	var fnC = m => {
+		var _id = stringify(sortMapKeys(m), __, "")
+		var _k
+		_k = global.__kube__.get(_id)
+		if (isNull(_k) || isUnDef(_k) || (isDef(_k) && _k.isClosed)) {
+			_k = new Kube(m.url, m.user, m.pass, m.wstimeout, m.token)
+			global.__kube__.put(_id, _k)
+		}
+		return _k
+	}
+
 	var _r = {
+		close: () => {
+			_r._k.close()
+		},
 		getObj: () => {
 			return _r
 		},
@@ -14,120 +33,46 @@ var $kube = function(aMap) {
 			_r._to = aTimeout
 			return _r
 		},
-		getNS: () => {
-			var res
-			try {
-				res = _r._k.getNamespaces(true)
-			} finally {
-				_r._k.close()
-			}
-			return res
-		},
+		getNS: () => _r._k.getNamespaces(true),
 		get  : (aKind, aName, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.getObject(aNS, aKind, aName)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k.getObject(aNS, aKind, aName)
 		},
 		apply: (aStream, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.apply(aNS, aStream)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k.apply(aNS, aStream)
 		},
 		delete: (aStream, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.delete(aNS, aStream)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k.delete(aNS, aStream)
 		},
 		scale: (aType, aName, aValue, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			try {
-				_r._k.scale(aNS, aType, aName, aValue)
-			} finally {
-				_r._k.close()
-			}
+			_r._k.scale(aNS, aType, aName, aValue)
 			return __
 		},
 		exec : (aPodName, aCmd, aTimeout, doSH, aContainer) => {
 			aTimeout = _$(aTimeout, "timeout").isNumber().default(_r._to)
-			var res
-			try {
-				res = _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return  _r._k.exec(_r._ns, aPodName, aCmd, aTimeout, doSH, aContainer)
 		},
 		events: aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.getEvents(aNS)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return  _r._k.getEvents(aNS)
 		},
 		getPodsMetrics: aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.getPodsMetrics(aNS)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return  _r._k.getPodsMetrics(aNS)
 		},
-		getNodesMetrics: () => {
-			var res
-			try {
-				res = _r._k.getNodesMetrics()
-			} finally {
-				_r._k.close()
-			}
-			return res
-		},
+		getNodesMetrics: () => _r._k.getNodesMetrics(),
 		getLog: (aNS, aPodName, aContainer, aStream) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k.getLog(aNS, aPodName, aContainer, aStream)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k.getLog(aNS, aPodName, aContainer, aStream)
 		},
 		scale: (aType, aName, aValue) => {
-			try {
-				_r._k.scale(_r._ns, aType, aName, aValue)
-			} finally {
-				_r._k.close()
-			}
+			_r._k.scale(_r._ns, aType, aName, aValue)
 			return __
 		},
-		scaleWithDeps: (anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) => {
-			var res
-			try {
-				res = _r._k.scaleWithDeps(_r._ns, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait)
-			} finally {
-				_r._k.close()
-			}
-			return res
-		}
+		scaleWithDeps: (anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) => _r._k.scaleWithDeps(_r._ns, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait)
 	};
 
 	[ { ab: "STS",    fn: "getStatefulSets" },
@@ -157,29 +102,18 @@ var $kube = function(aMap) {
 	  { ab: "EP",     fn: "getEndpoints"   } ].forEach(m => {
 		_r["get" + m.ab] = aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k[m.fn](aNS)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k[m.fn](aNS)
 		}
 		_r["getF" + m.ab] = aNS => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
-			var res
-			try {
-				res = _r._k[m.fn](aNS, true)
-			} finally {
-				_r._k.close()
-			}
-			return res
+			return _r._k[m.fn](aNS, true)
 		}
 		_r[m.fn] = _r["get" + m.ab]
 		_r[m.fn + "Full"] = _r["getF" + m.ab]
 	})
 
-	_r._k = new Kube(aMap.url, aMap.user, aMap.pass, aMap.wstimeout, aMap.token)
+	//_r._k = new Kube(aMap.url, aMap.user, aMap.pass, aMap.wstimeout, aMap.token)
+	_r._k = fnC(aMap)
 	_r._ns = "default"
 
 	return _r
@@ -197,7 +131,8 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 	this.url = aURLorFile; 
 	this.user = aUser;
 	this.pass = aPass;
-	
+	this.isClosed = true;
+
 	loadExternalJars(getOPackPath("Kube") || ".")
 	if (isDef(getOPackPath("BouncyCastle"))) loadExternalJars(getOPackPath("BouncyCastle"))
 
@@ -241,10 +176,12 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 	}
 
 	this.client = new Packages.io.fabric8.kubernetes.client.DefaultKubernetesClient(this.config);
+	this.isClosed = false
 };
 
 Kube.prototype.close = function() {
   	this.client.close();
+	this.isClosed = true
 };
 
 /**
