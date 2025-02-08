@@ -82,7 +82,8 @@ List of data input types that can be auto-detected (through the file extension o
 | ls | Returns a list of files and folders for a given directory path or zip or tar or tgz file |
 | md | A Markdown format |
 | mdtable | A Markdown table format |
-| ndjson | A NDJSON format |
+| ndjson | A NDJSON (new-line delimited JSON) format |
+| ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code to execute and use the result as input |
 | oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
@@ -180,7 +181,8 @@ List of available formats to use with the _output_ option:
 | md | A Markdown format |
 | mdtable | A Markdown table format (only for list outputs) |
 | mdyaml | A multi document YAML format (only for list outputs) |
-| ndjson | A NDJSON format |
+| ndjson | A NDJSON (new-line delimited JSON) format |
+| ndslon | A NDSLON (new-line delimited SLON) format |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
 | pjson | A JSON format with spacing (equivalent to prettyjson) |
 | prettyjson | A JSON format with spacing |
@@ -347,6 +349,17 @@ List of options to use when _in=ndjson_:
 |--------|------|-------------|
 | ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
 | ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
+
+---
+
+### 🧾 ndSLON input options
+
+List of options to use when _in=ndslon_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| ndslonjoin | Boolean | If true will join the ndslon records to build an output array |
+| ndslonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter slon records on a ndslon) |
 
 ---
 
