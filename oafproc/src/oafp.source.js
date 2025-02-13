@@ -912,6 +912,7 @@ var _transformFns = {
     },
     "correcttypes"  : _r => {
         if (toBoolean(params.correcttypes) && isObject(_r)) {
+            ow.loadFormat()
             traverse(_r, (aK, aV, aP, aO) => {
                 switch(descType(aV)) {
                 case "number": if (isString(aV)) aO[aK] = Number(aV); break
@@ -919,7 +920,11 @@ var _transformFns = {
                     // String boolean
                     if (aV.trim().toLowerCase() == "true" || aV.trim().toLowerCase() == "false") { aO[aK] = toBoolean(aV); break }
                     // String ISO date
-                    if (aV.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)) { aO[aK] = new Date(aV); break }
+                    if (isDef(ow.format.fromISODate)) {
+                        if (aV.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\d+Z$/)) { aO[aK] = ow.format.fromISODate(aV); break }
+                    } else {
+                        if (aV.trim().match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)) { aO[aK] = new Date(aV); break }
+                    }
                     // String date
                     if (aV.trim().match(/^\d{4}-\d{2}-\d{2}$/)) { aO[aK] = new Date(aV); break }
                     // String time with seconds
@@ -1273,7 +1278,7 @@ var _transformFns = {
         let _lst = params.field2date.split(",").map(r => r.trim())
         traverse(_r, (aK, aV, aP, aO) => {
             if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV) && aV > 0) {
-                try { aO[aK] = new Date(aV) } catch(e) {}
+                try { aO[aK] = ow.format.fromISODate(aV) } catch(e) {}
             }
         })
         return _r
@@ -2413,6 +2418,110 @@ var _inputFns = new Map([
         } else {
             _r = $csv(params.inputcsv).fromInString( _res ).toOutArray()
         }
+        _$o(_r, options)
+    }],
+    ["javathread", (_res, options) => {
+        var lines
+        _showTmpMsg()
+        if (isDef(params.javathreadpid)) {
+            ow.loadJava()
+            try {
+                lines = ow.java.jcmd(params.javathreadpid, "Thread.print")
+                lines = lines.split("\n").filter(l => l.startsWith("\""))
+            } catch(e) {
+                _exit(-1, "Error getting Java thread dump: " + e.message)
+            }
+        } else {
+            if (isString(_res)) {
+                lines = _res.split("\n")
+            } else {
+                _exit(-1, "javathreads is only supported with a raw input or javathreadpid=.")
+            }
+        }
+
+        // TODO: remove after OpenAF stable > 20240212
+        var fnFromTimeAbbr = aStr => {	
+            _$(aStr, "aStr").isString().$_()
+
+            var ars = aStr.trim().match(/[\d\.]+[a-zA-Z]+/g), res = 0;
+            if (!isArray(ars) || ars.length === 0) return parseFloat(aStr);
+            for (var i in ars) {
+                var ar = ars[i].match(/(\d+(?:\.\d+)?)\s*([a-zA-Z]+)/);
+                if (isArray(ar) && ar.length > 0) {
+                    var v = Number(ar[1])
+                    var u = String(ar[2])
+        
+                    var _u = {
+                        "ms": 1,
+                        "s": 1000,
+                        "m": 60 * 1000,
+                        "h": 60 * 60 * 1000,
+                        "d": 24 * 60 * 60 * 1000,
+                        "w": 7 * 24 * 60 * 60 * 1000,
+                        "M": 30 * 24 * 60 * 60 * 1000,
+                        "y": 365 * 24 * 60 * 60 * 1000
+                    }
+                    if (isDef(_u[u])) {
+                        res += v * _u[u]
+                    } else {
+                        res += v
+                    }
+                }
+            }
+        
+            return res
+        }
+
+        var fnJavaTrans = (v, tA) => {
+            if (v === null) return ""
+            if (v === undefined) return ""
+            if (isBoolean(v)) return Boolean(v)
+            if (isNumber(v)) return Number(v)
+            if (tA) return fnFromTimeAbbr(String(v))
+            return String(v)
+        }
+        ow.loadFormat()
+
+        var _r = []
+        lines.forEach(line => {
+            if (line.startsWith("\"")) {
+                var pt = java.util.regex.Pattern.compile("^\\\"(?<threadName>[^\"]+)\\\"" +
+                            "(?:\\s+#(?<threadId>\\d+))?" +
+                            "(?:\\s+\\[(?<threadIndex>\\d+)\\])?" +
+                            "(?:\\s+(?<daemon>daemon))?" +
+                            "(?:\\s+prio=(?<prio>\\d+))?" +
+                            "\\s+os_prio=(?<osPrio>\\d+)" +
+                            "(?:\\s+cpu=(?<cpu>[0-9.]+ms))?" +
+                            "(?:\\s+elapsed=(?<elapsed>[0-9.]+s))?" +
+                            "(?:\\s+tid=(?<tid>0x[a-fA-F0-9]+))?" +
+                            "(?:\\s+nid=(?<nid>0x[a-fA-F0-9]+|\\d+|\\S+))?" +
+                            "(?:\\s+(?<state>.*?))?" +
+                            "(?:\\s+\\[(?<address>[^\\]]+)\\])?" +
+                            "\\s*$")
+
+                var mt = pt.matcher(line)
+                if (mt.find()) {
+                    var m = {
+                        threadGroup: fnJavaTrans(mt.group("threadName")).replace(/[^a-zA-z]?\d+$/, ""),
+                        threadName : fnJavaTrans(mt.group("threadName")),
+                        threadId   : fnJavaTrans(mt.group("threadId")),  
+                        threadIndex: fnJavaTrans(mt.group("threadIndex")), 
+                        daemon     : fnJavaTrans(mt.group("daemon")),
+                        prio       : fnJavaTrans(mt.group("prio")),
+                        osPrio     : fnJavaTrans(mt.group("osPrio")),    
+                        cpu_ms     : fnJavaTrans(mt.group("cpu"), true),
+                        elapsed_ms : fnJavaTrans(mt.group("elapsed"), true),  
+                        tid        : fnJavaTrans(mt.group("tid")),         
+                        nid        : fnJavaTrans(mt.group("nid")),         
+                        state      : fnJavaTrans(mt.group("state")),       
+                        address    : fnJavaTrans(mt.group("address"))
+                    }
+                    _r.push(m)
+                } else {
+                    _r.push({ error: "Could not parse line: " + line })
+                }
+            }
+        })
         _$o(_r, options)
     }],
     ["javagc", (_res, options) => {
