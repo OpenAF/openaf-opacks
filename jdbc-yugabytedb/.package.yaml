@@ -16,15 +16,15 @@ name: jdbc-yugabytedb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20241207'
+version: '20250213'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- jdbc-yugabytedb-42.7.3-yb-2.jar
+- jdbc-yugabytedb-42.7.3-yb-3.jar
 - jdbc-yugabytedb.js
 filesHash:
-  LICENSES.txt: 3b5a20b851cdab262333b668e94d01bfe33ace16
-  jdbc-yugabytedb-42.7.3-yb-2.jar: 4ac3f66071dea6cc29c0b65b41fc62835bc8768c
+  LICENSES.txt: f7eab0e958801f143e3a4ba05fa8d4e386b2022e
+  jdbc-yugabytedb-42.7.3-yb-3.jar: 6ba8b39541d823d2434916abda10cbc26f2a0071
   jdbc-yugabytedb.js: 19faaaa5093b34cae6f3566fa150833fac334473
