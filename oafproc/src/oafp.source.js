@@ -1278,7 +1278,7 @@ var _transformFns = {
         let _lst = params.field2date.split(",").map(r => r.trim())
         traverse(_r, (aK, aV, aP, aO) => {
             if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV) && aV > 0) {
-                try { aO[aK] = ow.format.fromISODate(aV) } catch(e) {}
+                try { aO[aK] = isString(aV) ? ow.format.fromISODate(aV) : new Date(aV) } catch(e) { printErr(e) }
             }
         })
         return _r
@@ -2323,11 +2323,58 @@ var _inputFns = new Map([
                     _$o({ affectedRows: _r }, options)
                     _db.commit()
                 } else {
-                    var _r = _db.q(r)
-                    if (isMap(_r) && isArray(_r.results)) {
-                        _$o(_r.results, options)
-                    } else {
-                        _exit(-1, "Invalid DB result: " + stringify(_r))
+                    if (toBoolean(params.indbstream)) {
+                        var _rs = _db.qsRS(r)
+                        try {
+                            while(_rs.next()) {
+                                var _r = {}
+                                for (var i = 1; i <= _rs.getMetaData().getColumnCount(); i++) {
+                                    var _v = _rs.getObject(i)
+                                    switch(_rs.getMetaData().getColumnType(i)) {
+                                    case java.sql.Types.BIGINT:
+                                    case java.sql.Types.INTEGER:
+                                    case java.sql.Types.TINYINT:
+                                    case java.sql.Types.SMALLINT:
+                                    case java.sql.Types.NUMERIC:
+                                        _v = Number(_v)
+                                        break
+                                    case java.sql.Types.DOUBLE:
+                                    case java.sql.Types.FLOAT:
+                                    case java.sql.Types.REAL:
+                                    case java.sql.Types.DECIMAL:
+                                        _v = Number(_v)
+                                        break
+                                    case java.sql.Types.BOOLEAN:
+                                        _v = Boolean(_v)
+                                        break
+                                    case java.sql.Types.TIME:
+                                    case java.sql.Types.DATE:
+                                    case java.sql.Types.TIMESTAMP:
+                                        _v = new Date(_v.getTime())
+                                        break
+                                    case java.sql.Types.NULL:
+                                        _v = null
+                                        break
+                                    default:
+                                        _v = String(_v)
+                                    }
+                                    _r[_rs.getMetaData().getColumnName(i)] = _v
+                                }
+                                _$o(_r, options)
+                            }
+                        } catch(e) {
+                            _exit(-1, "Error streaming SQL: " + e.message)
+                        } finally {
+                            _db.closeStatement(r)
+                            _rs.close()
+                        }
+                    } else {
+                        var _r = _db.q(r)
+                        if (isMap(_r) && isArray(_r.results)) {
+                            _$o(_r.results, options)
+                        } else {
+                            _exit(-1, "Invalid DB result: " + stringify(_r))
+                        }
                     }
                 }
             } catch(edb) {
