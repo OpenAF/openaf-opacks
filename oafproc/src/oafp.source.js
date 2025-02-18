@@ -140,7 +140,7 @@ const _$o = (r, options, lineByLine) => {
     if (isDef(params.outkey))    r = $$({}).set(params.outkey, r)
 
     _clearTmpMsg()
-    if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "tree")
+    if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "mtree")
     if (_outputFns.has(nOptions.__format)) {
         _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
@@ -1381,6 +1381,14 @@ var _outputFns = new Map([
         _o$o(r, options)
     }],
     ["tree", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["mtree", (r, options) => {
+        if (typeof __flags.TREE.mono == "undefined") options.__format = "ctree"
+        _o$o(r, options)
+    }],
+    ["btree", (r, options) => {
+        if (typeof __flags.TREE.mono == "undefined") options.__format = "btree"
         _o$o(r, options)
     }],
     ["res", (r, options) => {
