@@ -72,10 +72,10 @@ files:
 - netty-transport-native-unix-common-4.1.118.Final.jar
 - snakeyaml-2.3.jar
 - snakeyaml-engine-2.9.jar
-- vertx-auth-common-4.5.12.jar
-- vertx-core-4.5.12.jar
-- vertx-web-client-4.5.12.jar
-- vertx-web-common-4.5.12.jar
+- vertx-auth-common-4.5.13.jar
+- vertx-core-4.5.13.jar
+- vertx-web-client-4.5.13.jar
+- vertx-web-common-4.5.13.jar
 - zjsonpatch-7.1.0.jar
 filesHash:
   .maven.yaml: 0de8ecb5b53f93334a1b4a9ad29ce63f69b5f0f8
@@ -127,8 +127,8 @@ filesHash:
   netty-transport-native-unix-common-4.1.118.Final.jar: 9da25a94e6a0edac90da0bc7894e5a54efcb866b
   snakeyaml-2.3.jar: 936b36210e27320f920536f695cf1af210c44586
   snakeyaml-engine-2.9.jar: 71b61db4fe4f9c85842ef577295599eb5f0410fb
-  vertx-auth-common-4.5.12.jar: b2232cc524ca8ef91369b7d95a471e01e8bbbdf5
-  vertx-core-4.5.12.jar: 136c6e8a345d2d5da5018bebd3b23272aa498ee7
-  vertx-web-client-4.5.12.jar: d93fe72c2959f0b82feffd69b8e67c683c76f8b9
-  vertx-web-common-4.5.12.jar: 569317bc892721f3d51a03bc8dc6dfca605bce19
+  vertx-auth-common-4.5.13.jar: 4f40a552d3341d2f4c37d201dc49267b69642a95
+  vertx-core-4.5.13.jar: 263cbaaa757a6adc2edc426c51c3e8698ebd9314
+  vertx-web-client-4.5.13.jar: 8437b3eb36365d330b077fe70ba6909c464f402e
+  vertx-web-common-4.5.13.jar: fa5362b266d979259be1062358a7cd9b7602320b
   zjsonpatch-7.1.0.jar: 71e949f5696d195f6873a277ba10b157b73cd873
