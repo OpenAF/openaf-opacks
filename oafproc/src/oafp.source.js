@@ -1423,18 +1423,21 @@ var _outputFns = new Map([
                     warnLevel : "YELLOW",
                     timestamp : "BOLD"
                 }, _lt)
+                var _ltctimestamp  = ansiColor(_lt.timestamp, "").replace("\u001b[m", "")
+                var _ltcerrorlevel = ansiColor(_lt.errorLevel, "").replace("\u001b[m", "")
+                var _ltcwarnlevel  = ansiColor(_lt.warnLevel, "").replace("\u001b[m", "")
                 _arr.forEach(_r => {
                     if (isMap(_r)) {
                         let d = (isDef(_r["@timestamp"]) && isString(_r["@timestamp"]) ? _r["@timestamp"] : __)
                         let l = (isDef(_r.level) ? _r.level : __)
                         let m = (isDef(_r.message) ? _r.message : __)
-                        let lineC
+                        let lineC = ""
                         if (isDef(l)) {
-                            if (l.toLowerCase().indexOf("err") >= 0)  lineC = _lt.errorLevel
-                            if (l.toLowerCase().indexOf("warn") >= 0) lineC = _lt.warnLevel
+                            if (l.toLowerCase().indexOf("err") >= 0)  lineC = _ltcerrorlevel
+                            if (l.toLowerCase().indexOf("warn") >= 0) lineC = _ltcwarnlevel
                         }
                         if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
-                        if (isDef(m) || isDef(d)) _print(ansiColor(_lt.timestamp, d) + (isDef(l) ? " | " + ansiColor(lineC, l) : "") + " | " + ansiColor(lineC, m))
+                        if (isDef(m) || isDef(d)) _print([_ltctimestamp, d, (isDef(l) ? "\u001b[m | " + lineC + l : ""), "\u001b[m | ", lineC, m, "\u001b[m"].join("") )
                     }
                 })
             }
