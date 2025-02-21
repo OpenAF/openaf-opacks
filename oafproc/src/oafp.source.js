@@ -227,7 +227,12 @@ const _print = (m) => {
         } else {
             if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
             if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
-                ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (toBoolean(params.outfileappend) ? "\n" : ""))
+                var _ofa = toBoolean(params.outfileappend)
+                if (_ofa) {
+                    ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (_ofa ? "\n" : ""))
+                } else {
+                    io.writeFileBytes(params.outfile, isString(m) ? af.fromString2Bytes(m) : m)
+                }
             }
         }
     }
@@ -3230,7 +3235,7 @@ var _res = "", noFurtherOutput = false
 // Check for output streams
 if (isDef(params.outfile)) {
     if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
-    if ("undefined" === typeof global.__oafp_streams[params.outfile])
+    if ("undefined" === typeof global.__oafp_streams[params.outfile] && toBoolean(params.outfileappend))
         global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
 }
 
