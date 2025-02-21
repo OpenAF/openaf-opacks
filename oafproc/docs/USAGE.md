@@ -86,7 +86,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code to execute and use the result as input |
-| oafp | Takes a JSON/SLON map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
+| oafp | Takes a JSON/SLON/YAML map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |
@@ -224,6 +224,8 @@ List of options to use when _in=ch_:
 
 > Example of options provided in JSON: inch="{type:'mvs',options:{file:'data.db'}}"
 > Example of options provided in SLON: inch="(type: remote, url: 'http://some.host:1234/chname')"
+
+The input data can be JSON/SLON/YAML and will be used for the 'get' or 'getAll' query.
 
 > You can use sBuckets variables (e.g. secKey, secRepo, secBucket, secPass, secMainPass, secFile) on the 'options' map to fill it.
 
@@ -397,7 +399,7 @@ List of options to use when _in=sh_:
 |--------|------|-------------|
 | inshformat | String | The format to parse stdout and stderr between raw, yaml or json (default) |
 
-The input data map can be composed of:
+The input data JSON/SLON/YAML map can be composed of:
 
 * cmd (mandatory string/array) - the command to execute
 * envs (map) - a series of environment variables to use
@@ -424,8 +426,8 @@ The input data can be either:
 
   * A single string with an OID
   * Multiple lines each with just an OID
-  * An array of OID strings
-  * A map with OID string values
+  * A JSON/SLON/YAML array of OID strings
+  * A JSON/SLON/YAML map with OID string values
 
 The 'insnmpsec' (in case of version 3 or newer) entry should be a JSON/SLON map with:
 
