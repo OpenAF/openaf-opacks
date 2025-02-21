@@ -37,6 +37,8 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
 | libs | Comma delimited list of installed OpenAF's oPacks to consider to extend oafp's inputs, transformations and outputs | 
+| pipe | A JSON/SLON/YAML map for recursive call of oafp similar to using unix pipes (useful with -f) |
+| -f | Enables to provide a JSON/SLON/YAML file with all the oafp parameters as a map |
 | -examples | Will access an internet based list of oafp examples and list them |
 | examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
 | version | Alternative way to change the input to a map with the tool's version |

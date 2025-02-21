@@ -6,17 +6,6 @@ if (isUnDef(params) || isDef(params.____ojob)) return
 // Process secBuckets
 if (isDef($sec().procMap)) params = $sec().procMap(params)
 
-// Ensure params are interpreted as lower case
-Object.keys(params).forEach(pk => {
-    if (params[pk].length > 0) {
-        var npk = pk.toLowerCase()
-        if (pk != npk && isUnDef(params[npk])) {
-            params[npk] = params[pk]
-            delete params[pk]
-        }
-    }
-})
-
 // --- Util functions
 // Util functions
 const _transform = r => {
@@ -229,7 +218,15 @@ const _print = (m) => {
     if ("undefined" !== typeof m) {
         if ("undefined" === typeof params.outfile) {
             if (toBoolean(params.loopcls)) cls()
-            print(m)
+            if (isDef(params.pipe)) {
+                var _m = isMap(params.pipe) ? params.pipe : _fromJSSLON(params.pipe, true)
+                if (isMap(_m)) {
+                    _m.data = m
+                    oafp(_m)
+                }
+            } else {
+                print(m)
+            }
         } else {
             if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
             if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
@@ -283,6 +280,46 @@ const _showTmpMsg  = msg => { if (params.out != 'grid' && !params.__inception &&
 const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
 
 // ---
+
+// Process params
+// Check if file is provided
+if (Object.keys(params).indexOf("-f") >= 0) {
+    let _l = Object.keys(params).length
+    var _i = Object.keys(params).indexOf("-f")
+    if (_l > _i + 1) {
+        if (Object.keys(params)[_i + 1].length > 0) {
+            params.paramsfile = Object.keys(params)[_i + 1]
+            delete params[params.paramsfile]
+        }
+    }
+    delete params["-f"]
+}
+if (isDef(params.paramsfile)) {
+    if (io.fileExists(params.paramsfile)) {
+        var _args = io.readFileString(params.paramsfile)
+        if (isString(_args)) {
+            // Check if it is a JSON/SLON/YAML
+            _margs = _fromJSSLON(_args, true)
+            if (isMap(_margs)) {
+                // Set the params if not already set
+                Object.keys(_margs).forEach(k => {
+                    if (isUnDef(params[k])) params[k] = _margs[k]
+                })
+            }
+        }
+    }
+}
+
+// Ensure params are interpreted as lower case
+Object.keys(params).forEach(pk => {
+    if (params[pk].length > 0) {
+        var npk = pk.toLowerCase()
+        if (pk != npk && isUnDef(params[npk])) {
+            params[npk] = params[pk]
+            delete params[pk]
+        }
+    }
+})
 
 // Exit function
 const _exit = (code, msg) => {
