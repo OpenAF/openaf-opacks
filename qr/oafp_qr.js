@@ -108,7 +108,7 @@
                     if (isDef(params.qrfile)) {
                         qr.write2File(_qr, params.qrfile, params.qrwidth, params.qrheight, params.qrformat)
                     } else {
-                        _exit(-1, "Only file output is supported (use qrfile=)")
+                        oafp._exit(-1, "Only file output is supported (use qrfile=)")
                     }
                 }
             } ],
