@@ -147,6 +147,20 @@ Extra output formats added by the QR lib:
 | Output format | Description |
 |---------------|-------------|
 | qr            | Output a QR text or picture |
+
+---
+
+### 🧾 QR output options
+
+List of options to use when _out=qr_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| qrfile | string | Output file name |
+| qrwidth | number | Width in pixels |
+| qrheight | number | Height in pixels |
+| qrformat | string | File format (png, jpg, gif) |
+
 `
         }
 
