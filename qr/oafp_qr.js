@@ -87,7 +87,7 @@
                         _qr = qr.genEmailString(_m.address, _m.cclist, _m.subject, _m.body)
                         break
                     case "contact":
-                        _qr = qr.genContactString(_m.type, { name: _m.name, company: _m.company, title: _m.title, tel: _m.tel, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo })
+                        _qr = qr.genContactString(_m.cardType, { name: _m.name, company: _m.company, title: _m.title, tel: _m.tel, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo })
                         break
                     case "cal":
                         _qr = qr.genCalString(_m.name, _m.beginDate, _m.endDate, _m.location, _m.description)
