@@ -87,7 +87,7 @@
                         _qr = qr.genEmailString(_m.address, _m.cclist, _m.subject, _m.body)
                         break
                     case "contact":
-                        _qr = qr.genContactString(_m.type, { name: _m.name, company: _m.company, title: _m.title, tel: _m.tel, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo })
+                        _qr = qr.genContactString(_m.cardType, { name: _m.name, company: _m.company, title: _m.title, tel: _m.tel, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo })
                         break
                     case "cal":
                         _qr = qr.genCalString(_m.name, _m.beginDate, _m.endDate, _m.location, _m.description)
@@ -108,7 +108,7 @@
                     if (isDef(params.qrfile)) {
                         qr.write2File(_qr, params.qrfile, params.qrwidth, params.qrheight, params.qrformat)
                     } else {
-                        _exit(-1, "Only file output is supported (use qrfile=)")
+                        oafp._exit(-1, "Only file output is supported (use qrfile=)")
                     }
                 }
             } ],
@@ -147,6 +147,20 @@ Extra output formats added by the QR lib:
 | Output format | Description |
 |---------------|-------------|
 | qr            | Output a QR text or picture |
+
+---
+
+### 🧾 QR output options
+
+List of options to use when _out=qr_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| qrfile | string | Output file name |
+| qrwidth | number | Width in pixels |
+| qrheight | number | Height in pixels |
+| qrformat | string | File format (png, jpg, gif) |
+
 `
         }
 
