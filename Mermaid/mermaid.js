@@ -7,10 +7,15 @@ ow.server.httpd.customLibs["mermaid.js"] = function(aHTTPd) {
 }
 
 let htmlExtras = [
-    "<script src=\"/js/mermaid.js\"></script>",
-    "<script>mermaid.initialize({ startOnLoad: true })</script>"
+    { t: "`mermaid", e: '<script src=\"/js/mermaid.js\"></script>"' },
+    { t: "`mermaid", e: '"<script>mermaid.initialize({ startOnLoad: true })</script>"' }
 ].forEach(l => {
-    if (ow.template.__mdHTMLExtras.indexOf(l) < 0) ow.template.__mdHTMLExtras.push(l)
+    if (isDef(ow.template.__mdHTMLTExtras)) {
+        if ($from(ow.template.__mdHTMLTExtras).equals("t", l.t).equals("e", l.e).none())
+            ow.template.__mdHTMLTExtras.push(l)
+    } else {
+        if (ow.template.__mdHTMLExtras.indexOf(l.e) < 0) ow.template.__mdHTMLExtras.push(l.e)
+    }
 })
 
 if (isDef(ow.template.__srcPath)) ow.template.__srcPath["/js/mermaid.js"] = (getOPackPath("Mermaid") || ".") + "/lib/mermaid.min.js"
