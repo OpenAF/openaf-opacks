@@ -42,7 +42,7 @@ filesHash:
   lib/core-3.5.3.jar: ca1349214a356cd7958651b2d5a0e1f3811a9c4b
   lib/jai-imageio-core-1.4.0.jar: fb6d79b929556362a241b2f65a04e538062f0077
   lib/javase-3.5.3.jar: 55d93bb3ffee425a7be56cd6ff572fb64ac84593
-  oafp_qr.js: 0f70f53b3550fb4f388a946a3809d83ac45ca489
+  oafp_qr.js: 69790cf3a2234308847b7cfb5dd28b01c558927d
   qr.js: 79931628007963980262f8f2e8e77a6fd62f0c82
   tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af
   tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
