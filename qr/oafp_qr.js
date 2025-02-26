@@ -150,7 +150,7 @@ Extra input types added by the QR lib:
 Use with _in=qr_:
 
 \`\`\`
-oafp libs=qr in=qr data="my-qr-png"
+oafp libs=qr in=qr data="my-qr.png"
 \`\`\`
 
 ---
