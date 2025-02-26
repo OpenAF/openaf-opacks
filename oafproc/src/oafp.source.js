@@ -6,17 +6,6 @@ if (isUnDef(params) || isDef(params.____ojob)) return
 // Process secBuckets
 if (isDef($sec().procMap)) params = $sec().procMap(params)
 
-// Ensure params are interpreted as lower case
-Object.keys(params).forEach(pk => {
-    if (params[pk].length > 0) {
-        var npk = pk.toLowerCase()
-        if (pk != npk && isUnDef(params[npk])) {
-            params[npk] = params[pk]
-            delete params[pk]
-        }
-    }
-})
-
 // --- Util functions
 // Util functions
 const _transform = r => {
@@ -140,7 +129,7 @@ const _$o = (r, options, lineByLine) => {
     if (isDef(params.outkey))    r = $$({}).set(params.outkey, r)
 
     _clearTmpMsg()
-    if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "tree")
+    if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "mtree")
     if (_outputFns.has(nOptions.__format)) {
         _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
@@ -159,16 +148,22 @@ const _runCmd2Bytes = (cmd, toStr) => {
     .get()
     return toStr ? af.fromBytes2String(data) : data
 }
-const _fromJSSLON = aString => {
+const _fromJSSLON = (aString, checkYAML) => {
 	if (!isString(aString) || aString == "" || isNull(aString)) return ""
 
 	aString = aString.trim()
-    if (isDef(af.fromJSSLON)) return af.fromJSSLON(aString)
-	if (aString.startsWith("{")) {
-		return jsonParse(aString, __, __, true)
-	} else {
-		return af.fromSLON(aString)
-	}
+    var _r
+    if (isDef(af.fromJSSLON)) _r = af.fromJSSLON(aString)
+    if (isUnDef(_r)) {
+        if (aString.startsWith("{")) {
+            _r = jsonParse(aString, __, __, true)
+        } else {
+            _r = af.fromSLON(aString)
+        }
+    } else {
+        if (isString(_r) && checkYAML) _r = af.fromYAML(_r)
+    }
+    return _r
 }
 const _chartPathParse = (r, frmt, prefix, isStatic) => {
     prefix = _$(prefix).isString().default("_oafp_fn_")
@@ -223,11 +218,24 @@ const _print = (m) => {
     if ("undefined" !== typeof m) {
         if ("undefined" === typeof params.outfile) {
             if (toBoolean(params.loopcls)) cls()
-            print(m)
+            if (isDef(params.pipe)) {
+                var _m = isMap(params.pipe) ? params.pipe : _fromJSSLON(params.pipe, true)
+                if (isMap(_m)) {
+                    _m.data = m
+                    oafp(_m)
+                }
+            } else {
+                print(m)
+            }
         } else {
             if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
             if ("undefined" !== typeof global.__oafp_streams[params.outfile]) {
-                ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (toBoolean(params.outfileappend) ? "\n" : ""))
+                var _ofa = toBoolean(params.outfileappend)
+                if (_ofa) {
+                    ioStreamWrite(global.__oafp_streams[params.outfile].s, m + (_ofa ? "\n" : ""))
+                } else {
+                    io.writeFileBytes(params.outfile, isString(m) ? af.fromString2Bytes(m) : m)
+                }
             }
         }
     }
@@ -272,6 +280,46 @@ const _showTmpMsg  = msg => { if (params.out != 'grid' && !params.__inception &&
 const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception && !toBoolean(params.loopcls) && !toBoolean(params.chartcls)) printErrnl("\r" + " ".repeat(_$(msg).default(_msg).length) + "\r") }
 
 // ---
+
+// Process params
+// Check if file is provided
+if (Object.keys(params).indexOf("-f") >= 0) {
+    let _l = Object.keys(params).length
+    var _i = Object.keys(params).indexOf("-f")
+    if (_l > _i + 1) {
+        if (Object.keys(params)[_i + 1].length > 0) {
+            params.paramsfile = Object.keys(params)[_i + 1]
+            delete params[params.paramsfile]
+        }
+    }
+    delete params["-f"]
+}
+if (isDef(params.paramsfile)) {
+    if (io.fileExists(params.paramsfile)) {
+        var _args = io.readFileString(params.paramsfile)
+        if (isString(_args)) {
+            // Check if it is a JSON/SLON/YAML
+            _margs = _fromJSSLON(_args, true)
+            if (isMap(_margs)) {
+                // Set the params if not already set
+                Object.keys(_margs).forEach(k => {
+                    if (isUnDef(params[k])) params[k] = _margs[k]
+                })
+            }
+        }
+    }
+}
+
+// Ensure params are interpreted as lower case
+Object.keys(params).forEach(pk => {
+    if (params[pk].length > 0) {
+        var npk = pk.toLowerCase()
+        if (pk != npk && isUnDef(params[npk])) {
+            params[npk] = params[pk]
+            delete params[pk]
+        }
+    }
+})
 
 // Exit function
 const _exit = (code, msg) => {
@@ -1156,10 +1204,16 @@ var _transformFns = {
         case "diffb"    :
             let cb3 = new Set(toOrdStrs(_d1))
             return _d2.filter(r => !cb3.has(toOrdStr(r)))
-        case "diffab"  :
+        case "diffab"   :
             let cb4 = new Set(toOrdStrs(_d1))
             let cb5 = new Set(toOrdStrs(_d2))
             return _d1.filter(r => !cb5.has(toOrdStr(r))).concat(_d2.filter(r => !cb4.has(toOrdStr(r))))
+        case "diff"     :
+            let cb6 = new Set(toOrdStrs(_d1))
+            let cb7 = new Set(toOrdStrs(_d2))
+            return            _d1.map(r => Object.assign({ '*': cb7.has(toOrdStr(r)) ? __ : "a" }, r))
+                      .concat(_d2.map(r => Object.assign({ '*': cb6.has(toOrdStr(r)) ? __ : "b" }, r)))
+                      .filter(r => isDef(r['*']))
         case "intersect":
         default         :
             let cb1 = new Set(toOrdStrs(_d2))
@@ -1278,7 +1332,7 @@ var _transformFns = {
         let _lst = params.field2date.split(",").map(r => r.trim())
         traverse(_r, (aK, aV, aP, aO) => {
             if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isNumber(aV) && aV > 0) {
-                try { aO[aK] = ow.format.fromISODate(aV) } catch(e) {}
+                try { aO[aK] = isString(aV) ? ow.format.fromISODate(aV) : new Date(aV) } catch(e) { printErr(e) }
             }
         })
         return _r
@@ -1383,6 +1437,14 @@ var _outputFns = new Map([
     ["tree", (r, options) => {
         _o$o(r, options)
     }],
+    ["mtree", (r, options) => {
+        if (typeof __flags.TREE.mono == "undefined") options.__format = "ctree"
+        _o$o(r, options)
+    }],
+    ["btree", (r, options) => {
+        if (typeof __flags.TREE.mono == "undefined") options.__format = "btree"
+        _o$o(r, options)
+    }],
     ["res", (r, options) => {
         _o$o(r, options)
     }],
@@ -1415,18 +1477,21 @@ var _outputFns = new Map([
                     warnLevel : "YELLOW",
                     timestamp : "BOLD"
                 }, _lt)
+                var _ltctimestamp  = ansiColor(_lt.timestamp, "").replace("\u001b[m", "")
+                var _ltcerrorlevel = ansiColor(_lt.errorLevel, "").replace("\u001b[m", "")
+                var _ltcwarnlevel  = ansiColor(_lt.warnLevel, "").replace("\u001b[m", "")
                 _arr.forEach(_r => {
                     if (isMap(_r)) {
                         let d = (isDef(_r["@timestamp"]) && isString(_r["@timestamp"]) ? _r["@timestamp"] : __)
                         let l = (isDef(_r.level) ? _r.level : __)
                         let m = (isDef(_r.message) ? _r.message : __)
-                        let lineC
+                        let lineC = ""
                         if (isDef(l)) {
-                            if (l.toLowerCase().indexOf("err") >= 0)  lineC = _lt.errorLevel
-                            if (l.toLowerCase().indexOf("warn") >= 0) lineC = _lt.warnLevel
+                            if (l.toLowerCase().indexOf("err") >= 0)  lineC = _ltcerrorlevel
+                            if (l.toLowerCase().indexOf("warn") >= 0) lineC = _ltcwarnlevel
                         }
                         if (isDef(d) && d.length > 24) d = d.substring(0, 23) + "Z"
-                        if (isDef(m) || isDef(d)) _print(ansiColor(_lt.timestamp, d) + (isDef(l) ? " | " + ansiColor(lineC, l) : "") + " | " + ansiColor(lineC, m))
+                        if (isDef(m) || isDef(d)) _print([_ltctimestamp, d, (isDef(l) ? "\u001b[m | " + lineC + l : ""), "\u001b[m | ", lineC, m, "\u001b[m"].join("") )
                     }
                 })
             }
@@ -2298,7 +2363,7 @@ var _inputFns = new Map([
                 $ch("oafp::indata").create(params.inch.type, isDef($sec().procMap) ? $sec().procMap(params.inch.options) : params.inch.options) 
             }
 
-            var _r = _fromJSSLON(r)
+            var _r = _fromJSSLON(r, true)
             if (toBoolean(params.inchall) || r.trim().length == 0) {
                 _$o($ch("oafp::indata").getAll(isMap(_r) ? _r : __), options)
             } else {
@@ -2323,11 +2388,58 @@ var _inputFns = new Map([
                     _$o({ affectedRows: _r }, options)
                     _db.commit()
                 } else {
-                    var _r = _db.q(r)
-                    if (isMap(_r) && isArray(_r.results)) {
-                        _$o(_r.results, options)
-                    } else {
-                        _exit(-1, "Invalid DB result: " + stringify(_r))
+                    if (toBoolean(params.indbstream)) {
+                        var _rs = _db.qsRS(r)
+                        try {
+                            while(_rs.next()) {
+                                var _r = {}
+                                for (var i = 1; i <= _rs.getMetaData().getColumnCount(); i++) {
+                                    var _v = _rs.getObject(i)
+                                    switch(_rs.getMetaData().getColumnType(i)) {
+                                    case java.sql.Types.BIGINT:
+                                    case java.sql.Types.INTEGER:
+                                    case java.sql.Types.TINYINT:
+                                    case java.sql.Types.SMALLINT:
+                                    case java.sql.Types.NUMERIC:
+                                        _v = Number(_v)
+                                        break
+                                    case java.sql.Types.DOUBLE:
+                                    case java.sql.Types.FLOAT:
+                                    case java.sql.Types.REAL:
+                                    case java.sql.Types.DECIMAL:
+                                        _v = Number(_v)
+                                        break
+                                    case java.sql.Types.BOOLEAN:
+                                        _v = Boolean(_v)
+                                        break
+                                    case java.sql.Types.TIME:
+                                    case java.sql.Types.DATE:
+                                    case java.sql.Types.TIMESTAMP:
+                                        _v = new Date(_v.getTime())
+                                        break
+                                    case java.sql.Types.NULL:
+                                        _v = null
+                                        break
+                                    default:
+                                        _v = String(_v)
+                                    }
+                                    _r[_rs.getMetaData().getColumnName(i)] = _v
+                                }
+                                _$o(_r, options)
+                            }
+                        } catch(e) {
+                            _exit(-1, "Error streaming SQL: " + e.message)
+                        } finally {
+                            _db.closeStatement(r)
+                            _rs.close()
+                        }
+                    } else {
+                        var _r = _db.q(r)
+                        if (isMap(_r) && isArray(_r.results)) {
+                            _$o(_r.results, options)
+                        } else {
+                            _exit(-1, "Invalid DB result: " + stringify(_r))
+                        }
                     }
                 }
             } catch(edb) {
@@ -2764,8 +2876,8 @@ var _inputFns = new Map([
         _$o(_r, options)
     }],
     ["oafp", (_res, options) => {
-        //params.__inception = true
-        var _r = _fromJSSLON(_res)
+        // Detects if input is YAML of JSON/SLON
+        var _r = _fromJSSLON(_res, true)
         var id = "_oafp_key_" + genUUID()
         if (isMap(_r)) {
             _r.out         = "key"
@@ -2803,7 +2915,7 @@ var _inputFns = new Map([
     ["sh", (_res, options) => {
         _showTmpMsg()
         var _r
-        _res = _fromJSSLON(_res)
+        _res = _fromJSSLON(_res, true)
         if (isString(_res)) {
             _r = $sh(_res).get(0)
         } else {
@@ -2916,7 +3028,7 @@ var _inputFns = new Map([
         _showTmpMsg()
         plugin("SNMP")
         var snmp = new SNMP(params.insnmp, params.insnmpcommunity, params.insnmptimeout, params.insnmpversion, params.insnmpsec)
-        let _r = {}, _i = _fromJSSLON(_res)
+        let _r = {}, _i = _fromJSSLON(_res, true)
         if (isString(_i)) {
             var _p = _i.split("\n").map(p => p.trim()).filter(p => p.length > 0)
             if (_p.length == 1) {
@@ -3172,7 +3284,7 @@ var _res = "", noFurtherOutput = false
 // Check for output streams
 if (isDef(params.outfile)) {
     if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
-    if ("undefined" === typeof global.__oafp_streams[params.outfile])
+    if ("undefined" === typeof global.__oafp_streams[params.outfile] && toBoolean(params.outfileappend))
         global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
 }
 
