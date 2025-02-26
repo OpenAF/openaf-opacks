@@ -600,9 +600,10 @@ List of options to use when _set=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symetric difference) and 'intersect' (default) |
+| setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symetric difference), 'diff' and 'intersect' (default) |
 
 > Example: ```set="(a: old, b: new)" setop=diffb```
+> 'setop=diff' will add an extra column '*' to identify if a line only exists in 'a' or in 'b'
 
 ---
 
