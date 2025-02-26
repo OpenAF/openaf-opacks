@@ -1856,11 +1856,11 @@ arithmetic_comparison_operator
   = ">=" / ">" / "<=" / "<>" / "<" / "=" / "!="
 
 is_op_right
-  = KW_IS __ right:additive_expr {
-      return { op: 'IS', right: right };
-    }
-  / (KW_IS __ KW_NOT) __ right:additive_expr {
+  = (KW_IS __ KW_NOT) __ right:additive_expr {
       return { op: 'IS NOT', right: right };
+  }
+  / KW_IS __ right:additive_expr {
+      return { op: 'IS', right: right };
   }
 
 between_op_right

@@ -20,7 +20,7 @@ name: PEG
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250204'
+version: '20250216'
 dependencies:
   openaf: '>=20230325'
 files:
@@ -61,7 +61,7 @@ filesHash:
   grammars/nlinq.pegjs: f8acc42c546528ee0e12e4bb522e7c43dae5a719
   grammars/semver.pegjs: 0c62fdc83d3841d6eb932348ed540a51e982203e
   grammars/slon.pegjs: 3cffb9a817a63968f1850845967e4891752e33fb
-  grammars/sql.pegjs: 65a34f3b289e50cbcc5e4b7bba1b3cf11be49cda
+  grammars/sql.pegjs: 62c1e92ce966e39b087112768f79f7b5db05de76
   lib/peggy.min.js: 865cef369e6b0de24b6dd59dc9815287fcf56e51
   lib/peggy.min.js.orig: cc51eeb3da071654411106db9a0f13873be23cf8
   peg.js: 666beebe1de7f1ff2b18d49f698b33fba53ec181
