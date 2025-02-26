@@ -295,17 +295,22 @@ if (Object.keys(params).indexOf("-f") >= 0) {
     delete params["-f"]
 }
 if (isDef(params.paramsfile)) {
-    if (io.fileExists(params.paramsfile)) {
-        var _args = io.readFileString(params.paramsfile)
-        if (isString(_args)) {
-            // Check if it is a JSON/SLON/YAML
-            _margs = _fromJSSLON(_args, true)
-            if (isMap(_margs)) {
-                // Set the params if not already set
-                Object.keys(_margs).forEach(k => {
-                    if (isUnDef(params[k])) params[k] = _margs[k]
-                })
-            }
+    var _args
+    if (params.paramsfile == "-") {
+        var _r = []
+        io.pipeLn(r => { _r.push(r); return false })
+        _args = _r.join("\n")
+    } else if (io.fileExists(params.paramsfile)) {
+        _args = io.readFileString(params.paramsfile)
+    }
+    if (isString(_args)) {
+        // Check if it is a JSON/SLON/YAML
+        _margs = _fromJSSLON(_args, true)
+        if (isMap(_margs)) {
+            // Set the params if not already set
+            Object.keys(_margs).forEach(k => {
+                if (isUnDef(params[k])) params[k] = _margs[k]
+            })
         }
     }
 }
