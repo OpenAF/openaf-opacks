@@ -64,6 +64,7 @@ var $kube = function(aMap) {
 			return  _r._k.getPodsMetrics(aNS)
 		},
 		getNodesMetrics: () => _r._k.getNodesMetrics(),
+		getNodeMetrics: node => _r._k.getNodeMetrics(node),
 		getLog: (aNS, aPodName, aContainer, aStream) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
 			return _r._k.getLog(aNS, aPodName, aContainer, aStream)
