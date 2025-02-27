@@ -149,6 +149,7 @@ const _runCmd2Bytes = (cmd, toStr) => {
     return toStr ? af.fromBytes2String(data) : data
 }
 const _fromJSSLON = (aString, checkYAML) => {
+    if ("[object Object]" == Object.prototype.toString.call(aString) || Array.isArray(aString)) return aString
 	if (!isString(aString) || aString == "" || isNull(aString)) return ""
 
 	aString = aString.trim()
@@ -465,7 +466,7 @@ params.debug = toBoolean(params.debug)
 if (isDef(params["-debug"])) params.debug = true
 
 // Verify the data param
-if ("[object Object]" == Object.prototype.toString.call(params.data)) {
+if ("[object Object]" == Object.prototype.toString.call(params.data) || Array.isArray(params.data)) {
     params.data = stringify(params.data, __, "")
 }
 
