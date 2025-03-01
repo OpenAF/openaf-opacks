@@ -237,6 +237,8 @@ const _print = (m) => {
                 } else {
                     io.writeFileBytes(params.outfile, isString(m) ? af.fromString2Bytes(m) : m)
                 }
+            } else {
+                io.writeFileBytes(params.outfile, isString(m) ? af.fromString2Bytes(m) : m)
             }
         }
     }
@@ -3471,7 +3473,7 @@ if (params.debug) {
 if (isNumber(params.loop)) {
     while(1) {
         if (toBoolean(params.loopcls)) {
-            if (isDef(params.outfile)) {
+            if (isDef(params.outfile) && isDef(global.__oafp_streams[params.outfile])) {
                 global.__oafp_streams[params.outfile].close()
                 global.__oafp_streams[params.outfile] = io.writeFileStream(params.outfile, toBoolean(params.outfileappend))
             }
