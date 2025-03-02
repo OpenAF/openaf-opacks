@@ -7,8 +7,8 @@ ow.server.httpd.customLibs["mermaid.js"] = function(aHTTPd) {
 }
 
 let htmlExtras = [
-    { t: "`mermaid", e: '<script src=\"/js/mermaid.js\"></script>"' },
-    { t: "`mermaid", e: '"<script>mermaid.initialize({ startOnLoad: true })</script>"' }
+    { t: "`mermaid", e: '<script src=\"/js/mermaid.js\"></script>' },
+    { t: "`mermaid", e: '<script>mermaid.initialize({ startOnLoad: true })</script>' }
 ].forEach(l => {
     if (isDef(ow.template.__mdHTMLTExtras)) {
         if ($from(ow.template.__mdHTMLTExtras).equals("t", l.t).equals("e", l.e).none())
