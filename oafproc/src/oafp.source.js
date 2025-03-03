@@ -1400,7 +1400,7 @@ var _outputFns = new Map([
             html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact),__,params.htmldark))
             html = html.replace("<html>", "<html><meta charset=\"utf-8\">")
         } else {
-            let _res = ow.template.html.parseMap(r, true)
+            let _res = ow.template.html.parseMap(r, __, true)
             html = "<html><meta charset=\"utf-8\"><style>" + _res.css + "</style><body" + (params.htmldark ? " class=\"njsmap_dark\"" : "") + ">" + _res.out + "</body></html>"
         }
         if (params.htmlopen) {
