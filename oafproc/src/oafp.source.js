@@ -1395,12 +1395,13 @@ var _outputFns = new Map([
         if (params.htmlopen) tmpf = io.createTempFile("oafp_", ".html")
 
         ow.loadTemplate()
+        params.htmldark = toBoolean(_$(params.htmldark, "htmldark").isString().default("false"))
         if (isString(r)) {
-            html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact)))
+            html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact),__,params.htmldark))
             html = html.replace("<html>", "<html><meta charset=\"utf-8\">")
         } else {
             let _res = ow.template.html.parseMap(r, true)
-            html = "<html><meta charset=\"utf-8\"><style>" + _res.css + "</style><body>" + _res.out + "</body></html>"
+            html = "<html><meta charset=\"utf-8\"><style>" + _res.css + "</style><body" + (params.htmldark ? " class=\"njsmap_dark\"" : "") + ">" + _res.out + "</body></html>"
         }
         if (params.htmlopen) {
             io.writeFileString(tmpf, html)
