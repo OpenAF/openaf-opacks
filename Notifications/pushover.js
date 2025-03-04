@@ -18,10 +18,12 @@ var Pushover = function(anAPIToken) {
  */
 Pushover.prototype.send = function(aUserId, aMessage) {
     if (isString(aMessage) && aMessage.length > 0) {
-        var h = new HTTP();
+        /*var h = new HTTP();
         var res = h.exec("https://api.pushover.net/1/messages.json", "POST", "token=" + this.token + "&user=" + aUserId + "&message=" + encodeURI(aMessage));
         if (isDef(res.response)) res.response = jsonParse(res.response);
-        return res;
+        return res;*/
+        var res = $rest("https://api.pushover.net/1/messages.json", { token: this.token, user: aUserId, message: aMessage})
+        return res
     } else {
         throw "You need to provide a message. Received: " + aMessage;
     }
