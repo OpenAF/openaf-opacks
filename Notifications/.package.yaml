@@ -40,5 +40,5 @@ filesHash:
   msteams.js: c1b24936bbd2898a6d59dea3dcdd644e44213d39
   notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
   notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
-  pushover.js: 54cf6ee854e1120cef4586cb417c9fc3b5affd1d
+  pushover.js: 3001716d312e7d5bc9a3ed56f290f9d420b6e2ed
   slack.js: 92dbc7f3934e7da1e40c3643d06a89e38b01a9c1
