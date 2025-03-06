@@ -118,10 +118,12 @@ const _$o = (r, options, lineByLine) => {
         else
             r = _$f(r, nOptions)
     } else {
-        if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
-            r = _$f(jsonParse(r, __, __, true), nOptions)
-        } else {
-            r = _$f(r, nOptions)
+        if ((isDef(params.in) && params.in != "raw") || isUnDef(params.in)) {
+            if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
+                r = _$f(jsonParse(r, __, __, true), nOptions)
+            } else {
+                r = _$f(r, nOptions)
+            }
         }
     }
 
@@ -1510,7 +1512,7 @@ var _outputFns = new Map([
         if (isString(r))
             _print(r)
         else
-            _print(stringify(r))
+            _print(stringify(r,__,""))
     }],
     ["lines", (r, options) => {
         if (isArray(r)) {
