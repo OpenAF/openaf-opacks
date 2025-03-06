@@ -8,7 +8,7 @@
                 type: "qr",
                 fn: (r, options) => {
                     var qr = new QR()
-                    var _m = qr.read4File(r)
+                    var _m = String(qr.read4File(r))
                     _$o(_m, options)
                 }
             },{ 
