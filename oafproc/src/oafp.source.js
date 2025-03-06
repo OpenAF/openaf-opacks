@@ -119,7 +119,9 @@ const _$o = (r, options, lineByLine) => {
             r = _$f(r, nOptions)
     } else {
         if ((isDef(params.in) && params.in != "raw") || isUnDef(params.in)) {
-            if (r.trim().startsWith("{") && r.trim().endsWith("}")) {
+            const _tr = r.trim()
+            if ((_tr.startsWith("{") && _tr.endsWith("}")) || 
+                (_tr.startsWith("[") && _tr.endsWith("]") && /^\[\s*\{/.test(_tr))) {
                 r = _$f(jsonParse(r, __, __, true), nOptions)
             } else {
                 r = _$f(r, nOptions)
