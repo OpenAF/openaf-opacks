@@ -22,6 +22,7 @@ jobs:
         browse   : browse
         default  : default
         logo     : logo
+        restrict : restrict
   help : 
    text   : Provides a HTTP S3 objects browse definition. 
    expects:
@@ -51,6 +52,7 @@ jobs:
       browse   : toBoolean.isBoolean.default(true)
       default  : isString.default(__)
       logo     : isString.default("/fonts/openaf_small.png")
+      restrict : isString.default(__)
   args : 
    execURI   : |
       var shouldBrowse = global.__MHTTPD[String(port) + uri].BROWSE
@@ -60,6 +62,7 @@ jobs:
       var fdefault     = global.__MHTTPD[String(port) + uri].DEFAULT
       var s3           = global.__MHTTPD[String(port) + uri].S3
       var bucket       = global.__MHTTPD[String(port) + uri].BUCKET
+      var restrict     = global.__MHTTPD[String(port) + uri].RESTRICT
 
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
@@ -69,7 +72,18 @@ jobs:
 
       var lst
       try { 
+         // List and restrict
          lst = s3.listObjects(bucket, (puri == "/" ? "" : puri).replace(/^\//, ""))
+         if (isDef(restrict)) {
+            lst = lst.filter(f => f.filename.match(new RegExp(restrict.join("|"))))
+         }
+
+         // If not listed check if puri is restricted
+         if (lst.length == 0 && isDef(restrict)) {
+            if (puri != "/" && puri != "" && !puri.replace(/^\//, "").match(new RegExp(restrict.join("|")))) {
+              return server.reply(ow.template.parseMD2HTML("## Restricted access\n\nYou do not have access to this folder.\n", true), "text/html", 403)
+            }
+         }
       } catch(e) {
          logErr(e)
          return server.replyOKHTML("")
@@ -106,25 +120,26 @@ jobs:
           } else {
               var ext = String(furi).replace(/^.*\./, "")
               var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
-              var fnLang = lang => {
+              var fnLang = (lang, puri) => {
                 ow.loadTemplate()
-                return server.reply( ow.template.parseMD2HTML("## " + request.uri.replace(/^\//, "") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
+                return server.reply( ow.template.parseMD2HTML("## " + puri + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
               }
               switch(ext) {
               case "md"  : return fn()
               case "yml" :
-              case "yaml": return fnLang("yaml")
-              case "sh"  : return fnLang("sh")
-              case "css" : return fnLang("css")
-              case "sh"  : return fnLang("sh")
-              case "js"  : return fnLang("js")
-              case "java": return fnLang("java")
-              case "py"  : return fnLang("python")
-              case "toml": return fnLang("toml")
-              case "hbs" : return fnLang("handlebars")
+              case "yaml": return fnLang("yaml", puri)
+              case "sh"  : return fnLang("sh", puri)
+              case "css" : return fnLang("css", puri)
+              case "sh"  : return fnLang("sh", puri)
+              case "js"  : return fnLang("js", puri)
+              case "java": return fnLang("java", puri)
+              case "py"  : return fnLang("python", puri)
+              case "toml": return fnLang("toml", puri)
+              case "hbs" : return fnLang("handlebars", puri)
+              case "log" : return fnLang("text", puri)
               case "json":
                 if (request.params.parse == "false") {
-                  return fnLang("json")
+                  return fnLang("json", puri)
                 } else {
                   var _d = jsonParse( af.fromInputStream2String( s3.getObjectStream(bucket, furi.replace(/^\//, "")) ) )
                   if (isMap(_d) || isArray(_d))
@@ -136,9 +151,11 @@ jobs:
                 if (isDef(getOPackPath("Asciidoc"))) {
                   loadLib("asciidoc.js")
                   return ow.server.httpd.replyAsciidoc(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
-                }              
+                }
               default: 
-                return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
+                return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri, __, __, {
+                  "Content-Type": ow.server.httpd.getMimeType(furi)
+                })
               }
           }
         }
@@ -164,13 +181,16 @@ jobs:
       args.uri  = _$(args.uri).isString().default("/")
       args.path = _$(args.path).isString().default(".")
 
+      if (isDef(args.restrict)) args.restrict = args.restrict.split(",").map((r) => r.trim())
+
       global.__MHTTPD = _$(global.__MHTTPD).isMap().default({})
       global.__MHTTPD[String(args.port) + args.uri] = {
-        BROWSE : args.browse,
-        PATH   : String( (new java.io.File( args.path )).getCanonicalPath() ),
-        TMPLB  : ow.template.execCompiled(ow.template.compile(templ)),
-        TMPLH  : ow.template.execCompiled(ow.template.compile(temph)),
-        DEFAULT: args.default,
-        S3     : new S3(args.url, args.accessKey, args.secret, args.region),
-        BUCKET : args.bucket
+        BROWSE  : args.browse,
+        PATH    : String( (new java.io.File( args.path )).getCanonicalPath() ),
+        TMPLB   : ow.template.execCompiled(ow.template.compile(templ)),
+        TMPLH   : ow.template.execCompiled(ow.template.compile(temph)),
+        DEFAULT : args.default,
+        S3      : new S3(args.url, args.accessKey, args.secret, args.region),
+        BUCKET  : args.bucket,
+        RESTRICT: args.restrict
       }
