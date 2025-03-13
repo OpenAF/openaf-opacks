@@ -20,17 +20,18 @@ keywords:
 - organizations
 - sqs
 - bedrock
+- secrets
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
   url: https://openaf.io/opacks/AWS.opack
-description: Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO and SQS functions.
+description: Simplified and light AWS API calls to avoid including the heavy AWS Java SDK. Currently supports some Lambda, RDS, ECS, IAM, DYNAMO, SQS and other functions.
 name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250123'
+version: '20250312'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -62,7 +63,7 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: f4a4497760ed13f9e0af9b090342ca1d09b7ae12
+  .odoc.db: b44520afcb0e056d875db4d788b79fcb52328758
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: abaca340a8f28caf6dc516ee1f5d1348f7678fcd
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
@@ -82,7 +83,7 @@ filesHash:
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
-  aws_secrets.js: 795911b083b4cf497c2bd85f7049eb6b9cb1b1e6
+  aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
   oafp_aws.js: 5c1c3088ab11e329b067922cd2bc877b5dca36aa
