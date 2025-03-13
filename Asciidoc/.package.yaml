@@ -17,7 +17,7 @@ name: Asciidoc
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20210209'
+version: '20250312'
 dependencies:
   openaf: '>=20211229'
 files:
@@ -30,7 +30,7 @@ files:
 - lib/highlight.min.js
 filesHash:
   README.adoc: 766d2d19895de790486da3305fee574fb60b550d
-  asciidoc.js: f721369c34c9fbef1f6212ccc49c20cb5c8b5a55
+  asciidoc.js: fdc741a2e0e79230d7579f2c7868989bd346f36d
   lib/asciidoctor.css: 720f4b4c8c7b89b92d6327ae1359c1943f8ad288
   lib/asciidoctor.min.js: c659cbfa6ed0082fc6429cb2cce7a2e1c9434b6b
   lib/highlight.css: 9dafcb6d23472adb90f9c9f55bd9dbd590392953
