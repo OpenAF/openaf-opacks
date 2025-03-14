@@ -62,7 +62,7 @@ ow.ch.__types.awssecrets = {
       var _res = this.__channels[aName]._aws.SECRETS_GetSecret(getEnv("AWS_REGION"), aK.sbucket)
       if (isDef(_res) && isDef(_res.SecretString)) {
         return {
-            SecretString: _res.SecretString
+            SecretString: af.fromJSSLON(_res.SecretString)
         }
       } else {
         throw `Secret for ${aK.sbucket} could to be retrieved (${af.toSLON(_res)})`
