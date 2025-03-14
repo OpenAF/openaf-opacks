@@ -89,6 +89,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code to execute and use the result as input |
 | oafp | Takes a JSON/SLON/YAML map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
+| ojob | Takes a JSON/SLON/YAML map input with a 'ojob' string and a 'args' map parameter |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
 | raw | Passes the input directly to transforms and output |
 | rawhex | Tries to read the input char by char converting into lines with the hexadecimal representation |

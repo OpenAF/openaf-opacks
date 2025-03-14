@@ -2925,6 +2925,25 @@ var _inputFns = new Map([
             _exit(-1, "oafp input data needs to be a map or an array.")
         }
     }],
+    ["ojob", (_res, options) => {
+        var _oj = _fromJSSLON(_res, true)
+        if (isString(_oj)) {
+            _oj = { ojob: _oj, args: {} }
+        }
+        _$(_oj.ojob, "ojob").isString().$_()
+        _oj.args = _$( _oj.args, "args").isMap().default({})
+
+        _showTmpMsg()
+
+        var _id = genUUID()
+        _oj.args.__format = "key"
+        _oj.args.__key    = _id
+        oJobRunFile(_oj.ojob, _oj.args)
+        var _r = $get(_id)
+        delete _r.__format
+        delete _r.__key
+        _$o($get(_id), options)
+    }],
     ["sh", (_res, options) => {
         _showTmpMsg()
         var _r
