@@ -72,7 +72,7 @@ filesHash:
   ojobs/list.yaml: 8d544f456de900e72f0777415086537c586ef81a
   ojobs/map.yaml: 6b3963f2be74011ceeb9f00aa4de55f928d63962
   ojobs/pipe.yaml: 5420a6e76dfc988b111f68859a6eaf225c6e90ce
-  rebuild.hbs: 11b0f6c3d909557fc49d51daff0594d7868e0399
+  rebuild.hbs: 3addab4c11ebaa7102333fadaf3a64081ae60cc0
   rebuild.yaml: 0470ab4f87366d12a7f3b81fbca4a3b5394e603b
   server.yaml: d830d18791ab3c5606f8c5997a24504b64734051
   setupOJobIO.yaml: e6f404c4607607e34a0a122655359bf57aa06039

@@ -46,7 +46,7 @@ jobs:
       .select();
 
       ow.oJob.output(lst, args);
-    } else {
+    } else {
       plugin("Console");
       var o = args.init.l.map(r => r.replace(/^{{proto}}:\/\/{{url}}\//g, "").replace(/\.ya?ml$/, "").replace(/\.json$/, ""));
 
@@ -90,7 +90,20 @@ jobs:
         var hcmd = [];
   
         if (isDef(ow.oJob.askOnHelp)) {
-          print(repeat(con.getConsoleReader().getTerminal().getWidth(), "─"))
+          print(ansiColor("FAINT", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")))
+
+          if (isString(cmd)) {
+            if (cmd.startsWith("_local/")) {
+              ow.oJob.__file = hd + cmd.replace(/^_local\//, "/ojobs/")
+            } else {
+              if (cmd.startsWith("_global/")) {
+                ow.oJob.__file = __flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/")
+              } else {
+                ow.oJob.__file = ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd
+              } 
+            }
+          }
+
           var _r = ow.oJob.askOnHelp(oj.help)
 
           if (isDef(_r)) {
