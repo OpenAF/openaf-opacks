@@ -89,35 +89,44 @@ jobs:
            
         var hcmd = [];
   
-        var h = $from(oj.jobs).equals("name", "Help").at(0)
-        if (isUnDef(h) && isDef(oj.help)) h = oj
-        if (isDef(h) && isDef(h.help) && isDef(h.help.text)) {
-           print("\n" + ansiColor("BOLD", "Job description:\n") + ansiColor("ITALIC", "\"" + h.help.text + "\""));
-        }
-        if (isDef(h) && isDef(h.help) && isDef(h.help.expects)) {
-           print("\n" + ansiColor("ITALIC", "Please fill out the job arguments (no value entered is equivalent to not providing the argument):") );
-           h.help.expects.forEach(r => {
-              print("\n  \"" + r.desc + "\"");
-              var tmp = String(con.readLinePrompt("  (" + ansiColor("BOLD", r.name) + "): "));
-              if (tmp != "") {
-                 args[r.name] = tmp;
-                 hcmd.push(r.name + "=" + tmp);
-              }
-           });
-        }
- 
-        print("");
-        if (cmd.startsWith("_local/")) {
-          print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + hd + cmd.replace(/^_local\//, "/ojobs/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
-        } else {
-          if (cmd.startsWith("_global/")) {
-            print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + __flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
-          } else {
-            print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+        if (isDef(ow.oJob.askOnHelp)) {
+          print(repeat(con.getConsoleReader().getTerminal().getWidth(), "─"))
+          var _r = ow.oJob.askOnHelp(oj.help)
+
+          if (isDef(_r)) {
+            args = merge(args, _r)
           }
+        } else {
+          var h = $from(oj.jobs).equals("name", "Help").at(0)
+          if (isUnDef(h) && isDef(oj.help)) h = oj
+          if (isDef(h) && isDef(h.help) && isDef(h.help.text)) {
+            print("\n" + ansiColor("BOLD", "Job description:\n") + ansiColor("ITALIC", "\"" + h.help.text + "\""));
+          }
+          if (isDef(h) && isDef(h.help) && isDef(h.help.expects)) {
+            print("\n" + ansiColor("ITALIC", "Please fill out the job arguments (no value entered is equivalent to not providing the argument):") );
+            h.help.expects.forEach(r => {
+                print("\n  \"" + r.desc + "\"");
+                var tmp = String(con.readLinePrompt("  (" + ansiColor("BOLD", r.name) + "): "));
+                if (tmp != "") {
+                  args[r.name] = tmp;
+                  hcmd.push(r.name + "=" + tmp);
+                }
+            });
+          }
+          
+          print("");
+          if (cmd.startsWith("_local/")) {
+            print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + hd + cmd.replace(/^_local\//, "/ojobs/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
+          } else {
+            if (cmd.startsWith("_global/")) {
+              print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + __flags.OJOB_LOCALPATH + cmd.replace(/^_global\//, "/") + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n")
+            } else {
+              print(ansiColor("ITALIC", "Executing the equivalent command to:") + "\n'" + ansiColor("GREEN", "$ ojob " + ("{{proto}}".toLowerCase() != "https" ? "http://" : "") + "{{url}}/" + cmd + (hcmd.length > 0 ? " " : "") + hcmd.join(" ")) + "'\n");
+            }
+          }
+          print(ansiColor("BOLD", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")));
+          print("");
         }
-        print(ansiColor("BOLD", repeat(con.getConsoleReader().getTerminal().getWidth(), "─")));
-        print("");
 
         var res = oJobRun(oj, args, now());
 
