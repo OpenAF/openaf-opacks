@@ -75,6 +75,7 @@ List of data input types that can be auto-detected (through the file extension o
 | javas | Tries to list java processes running locally (javainception=true to include itself) |
 | javagc | The Java GC log lines text format |
 | javathread | The Java Thread stack dump lines text format |
+| jfr | The Java Flight Recorder format |
 | jmx | Uses Java JMX to retrieve data from another Java process |
 | json | A JSON format (auto-detected) |
 | jsonschema | Given a JSON schema format tries to generate sample data for it |
@@ -275,6 +276,16 @@ List of options to use when _in=javathread_:
 > (*) This requires running openaf/oafp with a Java JDK. Keep in mind that it will interrupt the target application to dump the necessary data.
 
 > You can extract the input text data by executing ```kill -3 pid```
+
+---
+
+### 🧾 JFR input options
+
+List of options to use when _in=jfr_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| jfrjoin | Boolean | If true will join the JFR records to build an output array |
 
 ---
 
