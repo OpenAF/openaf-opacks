@@ -23,6 +23,7 @@ jobs:
         default  : default
         logo     : logo
         restrict : restrict
+        incURI   : incURI
   help : 
    text   : Provides a HTTP S3 objects browse definition. 
    expects:
@@ -38,7 +39,10 @@ jobs:
      desc: (String) The markdown or html filename to consider default (e.g. index.md)
    - name: logo
      desc: (String) The logo to include on the top right corner
-   - name: 
+   - name: restrict
+     desc: (String) A comma separated list of regular expressions to restrict the access to the files
+   - name: incURI
+     desc: (Boolean) If true includes the URI in the breadcrumbs
   check:
     in:
       url      : isString
@@ -53,8 +57,9 @@ jobs:
       default  : isString.default(__)
       logo     : isString.default("/fonts/openaf_small.png")
       restrict : isString.default(__)
+      incURI   : toBoolean.isBoolean.default(false)
   args : 
-   execURI   : |
+   execURI   : | #js
       var shouldBrowse = global.__MHTTPD[String(port) + uri].BROWSE
       var path         = global.__MHTTPD[String(port) + uri].PATH
       var tmplb        = global.__MHTTPD[String(port) + uri].TMPLB
@@ -63,7 +68,7 @@ jobs:
       var s3           = global.__MHTTPD[String(port) + uri].S3
       var bucket       = global.__MHTTPD[String(port) + uri].BUCKET
       var restrict     = global.__MHTTPD[String(port) + uri].RESTRICT
-
+      
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
       var furi = String((new java.io.File(new java.io.File(String((new java.io.File(path + "/" + puri)).getCanonicalFile()).replace(/\\+/g, "/")))))
@@ -81,12 +86,12 @@ jobs:
          // If not listed check if puri is restricted
          if (lst.length == 0 && isDef(restrict)) {
             if (puri != "/" && puri != "" && !puri.replace(/^\//, "").match(new RegExp(restrict.join("|")))) {
-              return server.reply(ow.template.parseMD2HTML("## Restricted access\n\nYou do not have access to this folder.\n", true), "text/html", 403)
+              return server.reply(ow.template.parseMD2HTML("## Restricted access\n\nYou do not have access to this folder.\n", true))
             }
          }
       } catch(e) {
          logErr(e)
-         return server.replyOKHTML("")
+         return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
       }
 
       try {
@@ -160,29 +165,54 @@ jobs:
           }
         }
       } catch(eg) {
-        logErr(eg)
-        return server.replyOKHTML("")
+        logErr(af.toSLON(request) + " | " + eg)
+        return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
       }
 
       if (shouldBrowse)
          return server.replyOKHTML(ow.template.parseMD2HTML(content, true))
       else
-         return server.replyOKHTML("")
+         return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
 
-  exec : |
+  exec : | #js
       ow.loadTemplate(); ow.loadFormat()
       ow.template.addHelper("encodeURI", encodeURI)
       
       loadLib("s3.js")
 
-      var temph = _$(args.templateHead).isString().default("## {{puri}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
-      var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
-
       args.uri  = _$(args.uri).isString().default("/")
       args.path = _$(args.path).isString().default(".")
 
-      if (isDef(args.restrict)) args.restrict = args.restrict.split(",").map((r) => r.trim())
+      ow.template.addHelper("escapeMDTable", str => str.replace(/\|/g, "\\|"))
+      ow.template.addHelper("buildBreadcrumbs", path => {
+        // Remove any leading or trailing slashes and split into segments.
+        const trimmedPath = path.replace(/^\/|\/$/g, '')
+        const segments = trimmedPath ? trimmedPath.split('/') : []
+        
+        // Start with the clickable root.
+        let html = `<a href="${args.uri}" title="Navigate to root">${args.incURI ? args.uri.replace(/\/*$/, "/") : "/"}</a>`
+        
+        let currentPath = args.uri
+        segments.forEach((segment, index) => {
+          currentPath += "/" + segment  // Build up the path.
+          // Add separator before each segment.
+          if (index > 0) html += '/'
+          
+          // If it's the last segment (current location), show as plain text.
+          if (index === segments.length - 1) {
+            html += `<span>${segment}</span>`
+          } else {
+            html += `<a href="${currentPath}/" title="Navigate to ${currentPath}/">${segment}</a>`
+          }
+        })
 
+        return html
+      })
+
+      var temph = _$(args.templateHead).isString().default("## {{{buildBreadcrumbs puri}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
+      var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
+
+      if (isDef(args.restrict)) args.restrict = args.restrict.split(",").map((r) => r.trim())
       global.__MHTTPD = _$(global.__MHTTPD).isMap().default({})
       global.__MHTTPD[String(args.port) + args.uri] = {
         BROWSE  : args.browse,
