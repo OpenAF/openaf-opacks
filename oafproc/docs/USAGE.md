@@ -286,6 +286,7 @@ List of options to use when _in=jfr_:
 | Option | Type | Description |
 |--------|------|-------------|
 | jfrjoin | Boolean | If true will join the JFR records to build an output array |
+| jfrdesc | Boolean | If true it will include a __desc_ entry with the JFR event description |
 
 ---
 

@@ -2877,6 +2877,7 @@ var _inputFns = new Map([
         if (isUnDef(ow.java.parseJFR)) _exit(-1, "jfr not available.")
 
         if (!isBoolean(params.jfrjoin)) params.jfrjoin = toBoolean(_$(params.jfrjoin, "jfrjoin").isString().default(__))
+        if (!isBoolean(params.jfrdesc)) params.jfrdesc = toBoolean(_$(params.jfrdesc, "jfrdesc").isString().default(__))
         
         _showTmpMsg()
         var _r
@@ -2891,9 +2892,9 @@ var _inputFns = new Map([
         }
 
         if (params.jfrjoin) {
-            _$o(ow.java.parseJFR(_res), options)
+            _$o(ow.java.parseJFR(_res, __, params.jfrdesc), options)
         } else {
-            ow.java.parseJFR(_res, event => _$o(event, options))
+            ow.java.parseJFR(_res, event => _$o(event, options), params.jfrdesc)
         }
     }],
     ["rawhex", (_res, options) => {
