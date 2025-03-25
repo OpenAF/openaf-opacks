@@ -68,7 +68,9 @@ jobs:
       var s3           = global.__MHTTPD[String(port) + uri].S3
       var bucket       = global.__MHTTPD[String(port) + uri].BUCKET
       var restrict     = global.__MHTTPD[String(port) + uri].RESTRICT
-      
+      var incuri       = global.__MHTTPD[String(port) + uri].INCURI
+      var origuri      = global.__MHTTPD[String(port) + uri].URI
+
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
       var furi = String((new java.io.File(new java.io.File(String((new java.io.File(path + "/" + puri)).getCanonicalFile()).replace(/\\+/g, "/")))))
@@ -127,7 +129,10 @@ jobs:
               var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
               var fnLang = (lang, puri) => {
                 ow.loadTemplate()
-                return server.reply( ow.template.parseMD2HTML("## " + puri + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
+               var _displayURI = uri.replace(/\/$/, "")
+               if (!incuri) _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
+               _displayURI += puri
+                return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
               }
               switch(ext) {
               case "md"  : return fn()
@@ -173,7 +178,7 @@ jobs:
          return server.replyOKHTML(ow.template.parseMD2HTML(content, true))
       else
          return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
-
+     
   exec : | #js
       ow.loadTemplate(); ow.loadFormat()
       ow.template.addHelper("encodeURI", encodeURI)
@@ -184,15 +189,19 @@ jobs:
       args.path = _$(args.path).isString().default(".")
 
       ow.template.addHelper("escapeMDTable", str => str.replace(/\|/g, "\\|"))
-      ow.template.addHelper("buildBreadcrumbs", path => {
+      ow.template.addHelper("s3-buildBreadcrumbs", (path, _uri, _incURI) => {
         // Remove any leading or trailing slashes and split into segments.
         const trimmedPath = path.replace(/^\/|\/$/g, '')
         const segments = trimmedPath ? trimmedPath.split('/') : []
         
         // Start with the clickable root.
-        let html = `<a href="${args.uri}" title="Navigate to root">${args.incURI ? args.uri.replace(/\/*$/, "/") : "/"}</a>`
+        let html = ""
+        if (_incURI) 
+          html = `<a href="/" title="Navigate to root">🏡</a> <a href="${_uri}" title="Navigate to main">${_uri.replace(/^\/*|\/*$/, "")}/</a>`
+        else 
+          html = `<a href="${_uri}" title="Navigate to root">/</a>`
         
-        let currentPath = args.uri
+        let currentPath = _uri
         segments.forEach((segment, index) => {
           currentPath += "/" + segment  // Build up the path.
           // Add separator before each segment.
@@ -209,7 +218,7 @@ jobs:
         return html
       })
 
-      var temph = _$(args.templateHead).isString().default("## {{{buildBreadcrumbs puri}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
+      var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
       var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
 
       if (isDef(args.restrict)) args.restrict = args.restrict.split(",").map((r) => r.trim())
@@ -219,6 +228,8 @@ jobs:
         PATH    : String( (new java.io.File( args.path )).getCanonicalPath() ),
         TMPLB   : ow.template.execCompiled(ow.template.compile(templ)),
         TMPLH   : ow.template.execCompiled(ow.template.compile(temph)),
+        INCURI  : args.incURI,
+        URI     : args.uri,
         DEFAULT : args.default,
         S3      : new S3(args.url, args.accessKey, args.secret, args.region),
         BUCKET  : args.bucket,
