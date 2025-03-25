@@ -19,11 +19,9 @@ const _transform = r => {
 const _$f = (r, options) => {
     params.__origr = r
 
-    if (!Array.isArray(r)) r = [ r ]
-
     // Input filters
     if (options.__ifrom) {
-        r = $from(r).query(af.fromNLinq(options.__ifrom.trim()))
+        r = $from(isArray(r) ? r : [ r ]).query(af.fromNLinq(options.__ifrom.trim()))
         delete options.__ifrom
     }
     if (options.__isql) {
@@ -62,18 +60,15 @@ const _$f = (r, options) => {
         delete options.__path
     }
 
-    if (!Array.isArray(params.__origr) && Array.isArray(r) && r.length <= 1) r = r[0]
+    //if (!Array.isArray(params.__origr) && Array.isArray(r) && r.length <= 1) r = r[0]
 
     // Transforms
     if (isString(r)) return _transform(r)
     r = _transform(r)
 
-    var __origr2 = r
-    if (!Array.isArray(r)) r = [ r ]
-
     // Output filters
     if (options.__from) {
-        r = $from(r).query(af.fromNLinq(options.__from.trim()))
+        r = $from(isArray(r) ? r : [ r ]).query(af.fromNLinq(options.__from.trim()))
         delete options.__from
     }
     if (options.__sql) {
@@ -111,7 +106,7 @@ const _$f = (r, options) => {
         delete options.__opath
     }
     
-    if (!Array.isArray(__origr2) && Array.isArray(r) && r.length <= 1) r = r[0]
+    //if (!Array.isArray(__origr2) && Array.isArray(r) && r.length <= 1) r = r[0]
     return r
 }
 const _$o = (r, options, lineByLine) => {
