@@ -1,6 +1,6 @@
 include:
 - oJobHTTPd.yaml
-
+ 
 jobs:
 - name : HTTP S3 Browse
   deps :
@@ -24,6 +24,7 @@ jobs:
         logo     : logo
         restrict : restrict
         incURI   : incURI
+        cache    : cache
   help : 
    text   : Provides a HTTP S3 objects browse definition. 
    expects:
@@ -40,9 +41,11 @@ jobs:
    - name: logo
      desc: (String) The logo to include on the top right corner
    - name: restrict
-     desc: (String) A comma separated list of regular expressions to restrict the access to the files
+     desc: (String/Array) A regular expression (or list) that if matched won't be listed
    - name: incURI
      desc: (Boolean) If true includes the URI in the breadcrumbs
+   - name: cache
+     desc: (Number) The cache time in ms for the S3 object lists
   check:
     in:
       url      : isString
@@ -56,8 +59,9 @@ jobs:
       browse   : toBoolean.isBoolean.default(true)
       default  : isString.default(__)
       logo     : isString.default("/fonts/openaf_small.png")
-      restrict : isString.default(__)
+      restrict : default(__)
       incURI   : toBoolean.isBoolean.default(false)
+      cache    : toNumber.isNumber.default(__)
   args : 
    execURI   : | #js
       var shouldBrowse = global.__MHTTPD[String(port) + uri].BROWSE
@@ -68,8 +72,9 @@ jobs:
       var s3           = global.__MHTTPD[String(port) + uri].S3
       var bucket       = global.__MHTTPD[String(port) + uri].BUCKET
       var restrict     = global.__MHTTPD[String(port) + uri].RESTRICT
-      var incuri       = global.__MHTTPD[String(port) + uri].INCURI
+      var incURI       = global.__MHTTPD[String(port) + uri].INCURI
       var origuri      = global.__MHTTPD[String(port) + uri].URI
+      var cache        = global.__MHTTPD[String(port) + uri].CACHE
 
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
@@ -77,17 +82,24 @@ jobs:
 
       if (!puri.endsWith("/")) puri += "/"
 
-      var lst
+      var lst, origLst
       try { 
          // List and restrict
-         lst = s3.listObjects(bucket, (puri == "/" ? "" : puri).replace(/^\//, ""))
+         if (isDef(cache)) {
+            lst = $cache(cache).get({ puri: (puri == "/" ? "" : puri).replace(/^\//, "") })
+         } else {
+            lst = s3.listObjects(bucket, (puri == "/" ? "" : puri).replace(/^\//, ""))
+         }
+         
+         origLst = lst
          if (isDef(restrict)) {
-            lst = lst.filter(f => f.filename.match(new RegExp(restrict.join("|"))))
+            if (isString(restrict)) restrict = [ restrict ]
+            lst = lst.filter(f => restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
          }
 
          // If not listed check if puri is restricted
-         if (lst.length == 0 && isDef(restrict)) {
-            if (puri != "/" && puri != "" && !puri.replace(/^\//, "").match(new RegExp(restrict.join("|")))) {
+         if (lst.length == 0 && isDef(restrict) && origLst.length != lst.length) {
+            if (puri != "/" && puri != "") {
               return server.reply(ow.template.parseMD2HTML("## Restricted access\n\nYou do not have access to this folder.\n", true))
             }
          }
@@ -97,7 +109,7 @@ jobs:
       }
 
       try {
-        if (lst.length > 0) { 
+        if (origLst.length > 0) { 
           if (isDef(fdefault) && $from(lst).equals("filepath", rfuri + "/" + fdefault).any()) {
               return (fdefault.endsWith(".md") ? 
                       ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, puri), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, puri), uri, request.uri + "/" + fdefault))
@@ -109,7 +121,8 @@ jobs:
                 if (puri != "/" && puri != "") 
                   content += "|  | __[..](<" + uri + puri.replace(/[^\/]+\/$/, "") + ">)__ | | |\n"
 
-                var theList = $from(lst).sort("-isDirectory", "filename").select((f) => {
+                var theList = $from(lst).sort("-isDirectory", "filename").select(f => {
+                  if (f.filename.endsWith("/")) f.filename = f.filename.substr(0, f.filename.length-1)
                   return merge(f, {
                     fLastModified: isDef(f.lastModified) ? ow.format.fromDate(new Date(f.lastModified), 'yyyy-MM-dd HH:mm:ss') : "",
                     fSize        : ow.format.toBytesAbbreviation(f.size),
@@ -129,9 +142,9 @@ jobs:
               var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
               var fnLang = (lang, puri) => {
                 ow.loadTemplate()
-               var _displayURI = uri.replace(/\/$/, "")
-               if (!incuri) _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
-               _displayURI += puri
+                var _displayURI = uri.replace(/\/$/, "")
+                if (!incURI) _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
+                _displayURI += puri
                 return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
               }
               switch(ext) {
@@ -205,7 +218,7 @@ jobs:
         segments.forEach((segment, index) => {
           currentPath += "/" + segment  // Build up the path.
           // Add separator before each segment.
-          if (index > 0) html += '/'
+          if (index > 0) html += ' / '
           
           // If it's the last segment (current location), show as plain text.
           if (index === segments.length - 1) {
@@ -218,10 +231,26 @@ jobs:
         return html
       })
 
+      args.logo = _$(args.logo, "logo").isString().default("/fonts/openaf_small.png")
+
       var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
       var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
 
-      if (isDef(args.restrict)) args.restrict = args.restrict.split(",").map((r) => r.trim())
+      var _cache, s3
+      var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+      if (isNumber(args.cache)) {
+        _cache = "__oJobS3_" + md5(args.url + args.bucket)
+        log("Creating cache " + _cache + "...")
+        $cache(_cache)
+        .ttl(args.cache)
+        .fn(k => {
+          log("  cache get " + af.toSLON(k)) 
+          var _r = s3.listObjects(args.bucket, k.puri)
+          return _r
+        })
+        .create()
+      }
+
       global.__MHTTPD = _$(global.__MHTTPD).isMap().default({})
       global.__MHTTPD[String(args.port) + args.uri] = {
         BROWSE  : args.browse,
@@ -231,7 +260,8 @@ jobs:
         INCURI  : args.incURI,
         URI     : args.uri,
         DEFAULT : args.default,
-        S3      : new S3(args.url, args.accessKey, args.secret, args.region),
+        S3      : s3,
         BUCKET  : args.bucket,
-        RESTRICT: args.restrict
+        RESTRICT: args.restrict,
+        CACHE   : _cache
       }
