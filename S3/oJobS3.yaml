@@ -210,7 +210,7 @@ jobs:
         // Start with the clickable root.
         let html = ""
         if (_incURI) 
-          html = `<a href="/" title="Navigate to root"> / </a> <a href="${_uri}" title="Navigate to main">${_uri.replace(/^\/*|\/*$/, "")}/</a>`
+          html = `<a href="/" title="Navigate to root"> / </a> <a href="${_uri}" title="Navigate to main">${_uri.replace(/^\/*|\/*$/, "")} / </a>`
         else 
           html = `<a href="${_uri}" title="Navigate to root"> / </a>`
         
