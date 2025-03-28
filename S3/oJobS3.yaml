@@ -25,6 +25,7 @@ jobs:
         restrict : restrict
         incURI   : incURI
         cache    : cache
+        sortTab  : sortTab
   help : 
    text   : Provides a HTTP S3 objects browse definition. 
    expects:
@@ -46,6 +47,8 @@ jobs:
      desc: (Boolean) If true includes the URI in the breadcrumbs
    - name: cache
      desc: (Number) The cache time in ms for the S3 object lists
+   - name: sortTab
+     desc: (Boolean) If true includes the table sorting script (OpenAF >= 20250402)
   check:
     in:
       url      : isString
@@ -62,6 +65,7 @@ jobs:
       restrict : default(__)
       incURI   : toBoolean.isBoolean.default(false)
       cache    : toNumber.isNumber.default(__)
+      sortTab  : toBoolean.isBoolean.default(false)
   args : 
    execURI   : | #js
       var shouldBrowse = global.__MHTTPD[String(port) + uri].BROWSE
@@ -75,6 +79,7 @@ jobs:
       var incURI       = global.__MHTTPD[String(port) + uri].INCURI
       var origuri      = global.__MHTTPD[String(port) + uri].URI
       var cache        = global.__MHTTPD[String(port) + uri].CACHE
+      var sortTab      = global.__MHTTPD[String(port) + uri].SORTTAB
 
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
@@ -187,6 +192,9 @@ jobs:
         return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
       }
 
+      print(`sortTab = ${sortTab}`)
+      if (sortTab) content += "<script src=\"/js/mdtablesort.js\"></script>\n"
+
       if (shouldBrowse)
          return server.replyOKHTML(ow.template.parseMD2HTML(content, true))
       else
@@ -263,5 +271,6 @@ jobs:
         S3      : s3,
         BUCKET  : args.bucket,
         RESTRICT: args.restrict,
-        CACHE   : _cache
+        CACHE   : _cache,
+        SORTTAB : args.sortTab
       }
