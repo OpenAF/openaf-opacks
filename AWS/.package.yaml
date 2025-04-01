@@ -68,7 +68,7 @@ files:
 filesHash:
   .odoc.db: 86dfc0d46a31ccab9783e3ec0fa648d1c6e7a5a7
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: abaca340a8f28caf6dc516ee1f5d1348f7678fcd
+  aws.js: 88e8cafc0c75def9c55742c383424a98e862be52
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: f712d992cabc9b45146a5560a7a714b92f220508
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
