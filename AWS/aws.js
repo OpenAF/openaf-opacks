@@ -20,3 +20,4 @@ loadLib("aws_athena.js");
 loadLib("aws_route53.js")
 loadLib("aws_bedrock.js")
 loadLib("aws_secrets.js")
+loadLib("aws_cognito.js")
