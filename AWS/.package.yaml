@@ -21,6 +21,7 @@ keywords:
 - sqs
 - bedrock
 - secrets
+- cognito
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
@@ -31,7 +32,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250313'
+version: '20250331'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -42,6 +43,7 @@ files:
 - aws_athena.js
 - aws_bedrock.js
 - aws_cloudwatch.js
+- aws_cognito.js
 - aws_core.js
 - aws_cost.js
 - aws_dynamo.js
@@ -64,12 +66,13 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: bc3679e5eafb65f4a28d1f893db2f8d5db34af0d
+  .odoc.db: 86dfc0d46a31ccab9783e3ec0fa648d1c6e7a5a7
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: abaca340a8f28caf6dc516ee1f5d1348f7678fcd
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: f712d992cabc9b45146a5560a7a714b92f220508
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
+  aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
   aws_core.js: 2d26df09c66ba9a8e8d24a20a2a3af5d17d4730c
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
