@@ -58,7 +58,7 @@ jobs:
       region   : isString.default(__)
       port     : toNumber.isNumber.default(8091)
       uri      : isString.default("/")
-      path     : isString.default("/")
+      path     : isString.default("")
       browse   : toBoolean.isBoolean.default(true)
       default  : isString.default(__)
       logo     : isString.default("/fonts/openaf_small.png")
@@ -83,7 +83,7 @@ jobs:
 
       var content = ""
       var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
-      var furi = String((new java.io.File(new java.io.File(String((new java.io.File(path + "/" + puri)).getCanonicalFile()).replace(/\\+/g, "/")))))
+      var furi = String(puri).replace(/\\+/g, "/")
 
       if (!puri.endsWith("/")) puri += "/"
 
@@ -93,9 +93,9 @@ jobs:
          if (isDef(cache)) {
             lst = $cache(cache).get({ puri: (puri == "/" ? "" : puri).replace(/^\//, "") })
          } else {
-            lst = s3.listObjects(bucket, (puri == "/" ? "" : puri).replace(/^\//, ""))
+            lst = s3.listObjects(bucket, path + (puri == "/" ? "" : puri).replace(/^\//, ""))
          }
-         
+
          origLst = lst
          if (isDef(restrict)) {
             if (isString(restrict)) restrict = [ restrict ]
@@ -117,7 +117,7 @@ jobs:
         if (origLst.length > 0) { 
           if (isDef(fdefault) && $from(lst).equals("filepath", rfuri + "/" + fdefault).any()) {
               return (fdefault.endsWith(".md") ? 
-                      ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, puri), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, puri), uri, request.uri + "/" + fdefault))
+                      ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, path + puri), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + puri), uri, request.uri + "/" + fdefault))
           } else {
               if (shouldBrowse) { 
                 content += tmplh({ puri: (puri == "" ? "/" : puri) })
@@ -141,16 +141,30 @@ jobs:
           }
         } else {
           if (request.params.raw == "true") {
-              return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
+              return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
           } else {
               var ext = String(furi).replace(/^.*\./, "")
-              var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
+              var _downloadcode = `<span><script>
+                function downloadText(aFile) {
+                  var selectedText = document.querySelectorAll("pre")[0].innerText
+                  const blob = new Blob([selectedText], { type: "text/plain" })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement("a")
+                  a.href = url
+                  a.download = aFile
+                  document.body.appendChild(a)
+                  a.click()
+                  document.body.removeChild(a)
+                  URL.revokeObjectURL(url)
+                }
+              </script></span>`
+              var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
               var fnLang = (lang, puri) => {
                 ow.loadTemplate()
                 var _displayURI = uri.replace(/\/$/, "")
                 if (!incURI) _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
                 _displayURI += puri
-                return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, furi.replace(/^\//, ""))) + "\n```\n", true, true), "text/html", 200)
+                return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span><span onclick=\"downloadText('" + puri.replace(/\/?$/,"").substr(puri.replace(/\/?$/,"").lastIndexOf("/")+1) + "')\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&darr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, path + furi.replace(/^\//, ""))) + "\n```\n" + _downloadcode, true, true), "text/html", 200)
               }
               switch(ext) {
               case "md"  : return fn()
@@ -169,7 +183,7 @@ jobs:
                 if (request.params.parse == "false") {
                   return fnLang("json", puri)
                 } else {
-                  var _d = jsonParse( af.fromInputStream2String( s3.getObjectStream(bucket, furi.replace(/^\//, "")) ) )
+                  var _d = jsonParse( af.fromInputStream2String( s3.getObjectStream(bucket, path + furi.replace(/^\//, "")) ) )
                   if (isMap(_d) || isArray(_d))
                     return ow.server.httpd.replyJSMap(server, _d)
                   else
@@ -178,10 +192,10 @@ jobs:
               case "adoc":
                 if (isDef(getOPackPath("Asciidoc"))) {
                   loadLib("asciidoc.js")
-                  return ow.server.httpd.replyAsciidoc(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri)
+                  return ow.server.httpd.replyAsciidoc(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
                 }
               default: 
-                return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, furi.replace(/^\//, "")), uri, request.uri, __, __, {
+                return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri, __, __, {
                   "Content-Type": ow.server.httpd.getMimeType(furi)
                 })
               }
@@ -253,16 +267,21 @@ jobs:
         .ttl(args.cache)
         .fn(k => {
           log("  cache get " + af.toSLON(k)) 
-          var _r = s3.listObjects(args.bucket, k.puri)
+          var _r = s3.listObjects(args.bucket, args.path + k.puri)
           return _r
         })
         .create()
       }
 
+      if (isDef(args.path) && args.path.length > 0) {
+        if (isUnDef(args.restrict)) args.restrict = []
+        args.restrict.push("^(?!" + args.path.replace(/^\//, "") + ").*")
+      }
+
       global.__MHTTPD = _$(global.__MHTTPD).isMap().default({})
       global.__MHTTPD[String(args.port) + args.uri] = {
         BROWSE  : args.browse,
-        PATH    : String( (new java.io.File( args.path )).getCanonicalPath() ),
+        PATH    : String(args.path),
         TMPLB   : ow.template.execCompiled(ow.template.compile(templ)),
         TMPLH   : ow.template.execCompiled(ow.template.compile(temph)),
         INCURI  : args.incURI,
