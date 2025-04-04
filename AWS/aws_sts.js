@@ -67,7 +67,7 @@ AWS.prototype.assumeRole = function(aRoleARN, aRoleSession, aDurationSecs) {
     if (isDef(o.AssumeRoleResult)) o = o.AssumeRoleResult
     if (isDef(o.Credentials)) o = o.Credentials
     if (isDef(o.AccessKeyId)) {
-        return new AWS(o.AssumeRoleResult.Credentials.AccessKeyId, o.AssumeRoleResult.Credentials.SecretAccessKey, o.AssumeRoleResult.Credentials.SessionToken)
+        return new AWS(o.AccessKeyId, o.SecretAccessKey, o.SessionToken)
     } else {
         throw new Error("Invalid response from AWS STS AssumeRole: " + JSON.stringify(o))
     }
