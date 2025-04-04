@@ -162,7 +162,7 @@ jobs:
               var fnLang = (lang, puri) => {
                 ow.loadTemplate()
                 var _displayURI = uri.replace(/\/$/, "")
-                if (!incURI) _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
+                _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
                 _displayURI += puri
                 return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&larr;</span><span onclick=\"downloadText('" + puri.replace(/\/?$/,"").substr(puri.replace(/\/?$/,"").lastIndexOf("/")+1) + "')\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\">&darr;</span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, path + furi.replace(/^\//, ""))) + "\n```\n" + _downloadcode, true, true), "text/html", 200)
               }
@@ -206,7 +206,6 @@ jobs:
         return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
       }
 
-      print(`sortTab = ${sortTab}`)
       if (sortTab) content += "<script src=\"/js/mdtablesort.js\"></script>\n"
 
       if (shouldBrowse)
