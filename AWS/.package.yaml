@@ -32,7 +32,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250331'
+version: '20250403'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -66,7 +66,7 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 86dfc0d46a31ccab9783e3ec0fa648d1c6e7a5a7
+  .odoc.db: 190cdb355005944276fc56fb0db1f8ff5cecf18d
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 88e8cafc0c75def9c55742c383424a98e862be52
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
@@ -90,7 +90,7 @@ filesHash:
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
-  aws_sts.js: b9a56a70ac95a4fe6e05b15729d9a2c337231e30
+  aws_sts.js: 399c42147f87e7e450a2541bfb0917496b0498bb
   oafp_aws.js: 5c1c3088ab11e329b067922cd2bc877b5dca36aa
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9
