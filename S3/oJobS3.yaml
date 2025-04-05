@@ -126,7 +126,7 @@ jobs:
                 if (puri != "/" && puri != "") 
                   content += "| <span style=\"color: #a0a0a0;\">&larrhk;</span> | __[..](<" + uri + puri.replace(/[^\/]+\/$/, "") + ">)__ | | |\n"
 
-                var theList = $from(lst).sort("-isDirectory", "filename").select(f => {
+                var theList = $from(lst).sort("-isDirectory", "filename").notEquals("filepath", "/").select(f => {
                   if (f.filename.endsWith("/")) f.filename = f.filename.substr(0, f.filename.length-1)
                   return merge(f, {
                     fLastModified: isDef(f.lastModified) ? ow.format.fromDate(new Date(f.lastModified), 'yyyy-MM-dd HH:mm:ss') : "",
