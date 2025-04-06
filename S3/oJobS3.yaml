@@ -124,7 +124,7 @@ jobs:
                 content += "|   | Filename | Last modified | Size | Size in bytes |\n"
                 content += "|---|----------|:--------------|-----:|--------------:|\n"
                 if (puri != "/" && puri != "") 
-                  content += "| <span style=\"color: #a0a0a0;\">&larrhk;</span> | __[..](<" + uri + puri.replace(/[^\/]+\/$/, "") + ">)__ | | |\n"
+                  content += "| <span style=\"color: #a0a0a0;\">&#8598;</span> | __[..](<" + uri + puri.replace(/[^\/]+\/$/, "") + ">)__ | | |\n"
 
                 var theList = $from(lst).sort("-isDirectory", "filename").notEquals("filepath", "/").select(f => {
                   if (f.filename.endsWith("/")) f.filename = f.filename.substr(0, f.filename.length-1)
@@ -255,7 +255,7 @@ jobs:
       args.logo = _$(args.logo, "logo").isString().default("/fonts/openaf_small.png")
 
       var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
-      var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}<span style=\"color: #a0a0a0;\">&rarrhk;</span>{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
+      var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}<span style=\"color: #a0a0a0;\">&#8600;</span>{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
 
       var _cache, s3
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
