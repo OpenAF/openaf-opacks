@@ -302,6 +302,10 @@ const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception &&
 
 // Process params
 // Check if file is provided
+var bkprms
+if (isDef(params.loop)) {
+    if (isDef(bkprms)) params = clone(bkprms); else bkprms = clone(params)
+}
 if (Object.keys(params).indexOf("-f") >= 0) {
     let _l = Object.keys(params).length
     var _i = Object.keys(params).indexOf("-f")
