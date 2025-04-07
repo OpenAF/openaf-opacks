@@ -1673,7 +1673,7 @@ var _outputFns = new Map([
     }],   
     ["grid" , (r, options) => {
         if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
-        let _f = _fromJSSLON(_$(params.grid, "grid").or().isString().isMap().$_())
+        let _f = _fromJSSLON(_$(params.grid, "grid").or().isString().isMap().isArray().$_())
 
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
             _f.forEach((y, yi) => {
