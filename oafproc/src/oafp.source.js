@@ -800,7 +800,7 @@ var _transformFns = {
     "cmlt"    : r => {
         if (toBoolean(params.cmlt)) {
             var _r = (isArray(r) ? r : [ r ])
-            params.cmltch = _$(params.cmltch, "cmltch").default("(type: simple)")
+            params.cmltch = _$(params.cmltch, "cmltch").or().isString().isMap().default("(type: simple)")
             let cmltch = _fromJSSLON(params.cmltch)
             if (isMap(cmltch)) {
                 if (isUnDef(cmltch.type)) _exit(-1, "cmltch.type is not defined.")
@@ -831,7 +831,7 @@ var _transformFns = {
             let _d1 = $path(_r, _d.a), _d2 = $path(_r, _d.b), _dt = __
             if (toBoolean(params.color)) {
                 if (isUnDef(params.difftheme) && isDef(getEnv("OAFP_DIFFTHEME"))) params.difftheme = getEnv("OAFP_DIFFTHEME")
-                _dt = _fromJSSLON(_$(params.difftheme, "difftheme").isString().default(""))
+                _dt = _fromJSSLON(_$(params.difftheme, "difftheme").or().isString().isMap().default(""))
                 _dt = merge({
                     added  : "GREEN",
                     removed: "RED",
@@ -1106,7 +1106,7 @@ var _transformFns = {
             ow.loadAI()
             var rg = ow.ai.regression()
             let regressionpath    = _$(params.regressionpath, "regressionpath").isString().default("@")
-            let regressionoptions = _fromJSSLON(_$(params.regressionoptions, "regressionoptions").isString().default("{order:2,precision:5}"))
+            let regressionoptions = _fromJSSLON(_$(params.regressionoptions, "regressionoptions").or().isString().isMap().default("{order:2,precision:5}"))
             let _data = $path(_r, regressionpath)
             if (isArray(_data)) {
                 if (isString(params.regressionx)) {
@@ -1147,7 +1147,7 @@ var _transformFns = {
         return _r
     },
     "normalize": _r => {
-        if (isString(params.normalize)) {
+        if (isString(params.normalize) || isMap(params.normalize)) {
             var _s = _fromJSSLON(params.normalize)
             if (isMap(_s)) {
                 ow.loadAI()
@@ -1161,7 +1161,7 @@ var _transformFns = {
         }
     },
     "denormalize": _r => {
-        if (isString(params.denormalize)) {
+        if (isString(params.denormalize) || isMap(params.denormalize)) {
             var _s = _fromJSSLON(params.denormalize)
             if (isMap(_s)) {
                 ow.loadAI()
@@ -1673,7 +1673,7 @@ var _outputFns = new Map([
     }],   
     ["grid" , (r, options) => {
         if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
-        let _f = _fromJSSLON(_$(params.grid, "grid").isString().$_())
+        let _f = _fromJSSLON(_$(params.grid, "grid").or().isString().isMap().$_())
 
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
             _f.forEach((y, yi) => {
@@ -1973,7 +1973,7 @@ var _outputFns = new Map([
   
             var xls = new XLS(isDef(origFile) && io.fileExists(origFile) ? origFile : __)
             var sheet = xls.getSheet(_$(params.xlssheet, "xlssheet").isString().default("data"))
-            params.xlsformat = _$(params.xlsformat, "xlsformat").isString().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
+            params.xlsformat = _$(params.xlsformat, "xlsformat").or().isString().isMap().default("(bold: true, borderBottom: \"medium\", borderBottomColor: \"red\")")
             params.xlsformat = _fromJSSLON(params.xlsformat)
             ow.format.xls.setTable(xls, sheet, "A", 1, ar, __, params.xlsformat)
             xls.writeFile(params.xlsfile)
@@ -2304,7 +2304,7 @@ var _inputFns = new Map([
     }],
     ["ask", (_res, options) => {
         var _d = []
-        _res = af.fromJSSLON(_res)
+        _res = _fromJSSLON(_res)
         if (isDef(askStruct) && isArray(_res)) {
             __conConsole = true
             __con.getTerminal().settings.set("-icanon min 1 -echo")
@@ -3011,7 +3011,7 @@ var _inputFns = new Map([
     }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
-        params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+        params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
         if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
@@ -3046,7 +3046,7 @@ var _inputFns = new Map([
     }],
     ["llmmodels", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
-        params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+        params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
         if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
@@ -3097,7 +3097,7 @@ var _inputFns = new Map([
         params.insnmptimeout = _$(params.insnmptimeout, "insnmptimeout").isNumber().default(__)
         params.insnmpretries = _$(params.insnmpretries, "insnmpretries").isNumber().default(__)
         params.insnmpversion = _$(params.insnmpversion, "insnmpversion").isString().default(__)
-        params.insnmpsec = _fromJSSLON(_$(params.insnmpsec, "insnmpsec").isString().default(__))
+        params.insnmpsec = _fromJSSLON(_$(params.insnmpsec, "insnmpsec").or().isString().isMap().default(__))
         _showTmpMsg()
         plugin("SNMP")
         var snmp = new SNMP(params.insnmp, params.insnmpcommunity, params.insnmptimeout, params.insnmpversion, params.insnmpsec)
@@ -3362,7 +3362,7 @@ if (isDef(params.outfile)) {
 }
 
 // Check chs
-if (isString(params.chs)) {
+if (isString(params.chs) || isMap(params.chs)) {
     var _chs = af.fromJSSLON(params.chs)
     if (!isArray(_chs)) _chs = [_chs]
     _chs.forEach(ch => {
@@ -3437,7 +3437,7 @@ var _run = () => {
                 } else {
                     if (isDef(params.url)) {
                         params.urlmethod = _$(params.urlmethod, "urlmethod").isString().default("GET")
-                        let _hp = _fromJSSLON(_$(params.urlparams).isString().default("{}"))
+                        let _hp = _fromJSSLON(_$(params.urlparams).or().isString().isMap().default("{}"))
 
                         let _hd
                         if (isDef(params.urldata)) _hd = _fromJSSLON(params.urldata)
