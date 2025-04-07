@@ -32,7 +32,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250403'
+version: '20250407'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -43,6 +43,7 @@ files:
 - aws_athena.js
 - aws_bedrock.js
 - aws_cloudwatch.js
+- aws_codeartifact.js
 - aws_cognito.js
 - aws_core.js
 - aws_cost.js
@@ -66,12 +67,13 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 190cdb355005944276fc56fb0db1f8ff5cecf18d
+  .odoc.db: e0ccd565ce5602e78e095ababeecabca79504201
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: 88e8cafc0c75def9c55742c383424a98e862be52
+  aws.js: aa5136e50400756b4bee9f45b741818db58f446b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: f712d992cabc9b45146a5560a7a714b92f220508
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
+  aws_codeartifact.js: 244d92452e54bb9374eadbf34fc63924ff0009a8
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
   aws_core.js: 2d26df09c66ba9a8e8d24a20a2a3af5d17d4730c
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
