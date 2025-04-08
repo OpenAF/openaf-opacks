@@ -121,6 +121,7 @@ These options will change the parsed input data included any filters provided.
 | field2byte | String | A comma delimited list of fields whose value should be converted to a byte abbreviation |
 | field2date | String | A comma delimited list of fields whose value should be converted to date values |
 | field2si | String | A comma delimited list of fields whose value should be converted to a SI abbreviation |
+| field4map | Boolean | A comma delimited list of fields whose value should be converted from JSON/SLON string representation to a map |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
 | forcearray | Boolean | If true and if the input is map it will force it to be an array with that map as the only element |

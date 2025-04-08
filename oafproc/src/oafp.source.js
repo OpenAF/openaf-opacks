@@ -1386,6 +1386,15 @@ var _transformFns = {
             }
         })
         return _r
+    },
+    "field4map": _r => {
+        let _lst = params.field4map.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && isString(aV)) {
+                aO[aK] = _fromJSSLON(aV)
+            }
+        })
+        return _r
     }
 
 }
@@ -3549,6 +3558,8 @@ if (isNumber(params.loop)) {
         }
         _run()
         sleep(params.loop * 1000, true)
+        // Ensure params have a fresh copy
+        if (isDef(bkprms)) params = clone(bkprms)
     }
 } else {
     _run()
