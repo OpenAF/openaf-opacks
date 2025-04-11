@@ -318,12 +318,15 @@ jobs:
         incURI   : incURI
         cache    : cache
         sortTab  : sortTab
+        options  : options
   exec : | #js
-    args.options = {
+    args.options = merge(args.options, {
       showURI: args.incURI,
       sortTab: args.sortTab,
-      footer : "---\n> INTERNAL\n"
-    }
+      logo   : args.logo,
+      browse : args.browse,
+      default: args.default
+    })
 
     load("s3.js")
     var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
