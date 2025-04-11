@@ -1,7 +1,9 @@
 include:
 - oJobHTTPd.yaml
+- oJobBrowse.yaml
  
 jobs:
+# ---------------------
 - name : HTTP S3 Browse
   deps :
   - HTTP Start Server
@@ -292,3 +294,133 @@ jobs:
         CACHE   : _cache,
         SORTTAB : args.sortTab
       }
+
+# -----------------------
+- name : HTTP Browse - s3
+  to   : HTTP Browse generic
+  typeArgs:
+    noLog   : false 
+    shortcut:
+      name  : S3Browse
+      keyArg: port
+      args  : 
+        url      : url
+        bucket   : bucket
+        accessKey: accessKey
+        secret   : secret
+        region   : region
+        uri      : uri
+        path     : path
+        browse   : browse
+        default  : default
+        logo     : logo
+        restrict : restrict
+        incURI   : incURI
+        cache    : cache
+        sortTab  : sortTab
+  exec : | #js
+    args.options = {
+      showURI: args.incURI,
+      sortTab: args.sortTab,
+      footer : "---\n> INTERNAL\n"
+    }
+
+    load("s3.js")
+    var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
+
+    args.fns = {
+      getList: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+
+        var lst, origLst
+        var _s3p = options.parentPath + puri
+        _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
+        _s3p = _s3p.replace(/^\//, "")
+
+        if (isDef(args.cache)) {
+          _cache = "__oJobS3_" + md5(args.url + args.bucket)
+          lst = $cache(_cache).get({ puri: _s3p })
+        } else {
+          lst = s3.listObjects(args.bucket, _s3p)
+        }
+        origLst = lst
+        if (isDef(args.restrict)) {
+          if (isString(args.restrict)) args.restrict = [ args.restrict ]
+          lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
+        }
+
+        if (origLst.length > 0) {
+          return {
+            isList: true,
+            fields: [ "Object", "Last modified", "Size", "Size in bytes" ],
+            alignFields: [ "left", "left", "right", "right" ],
+            key: [ "Object" ],
+            list: lst.filter(r => r.filename != "/").map(f => {
+              var _f = f.filename.replace(/\/$/, "").replace(new RegExp("^.+/"), "")
+              if (isDef(args.path)) _f = _f.replace(new RegExp("^" + args.path), "")
+              return {
+                isDirectory: f.isDirectory,
+                values: {
+                  Object: _f,
+                  "Last modified": isUnDef(f.lastModified) ? "" : ow.format.fromDate(new Date(f.lastModified), "yyyy-MM-dd HH:mm:ss"),
+                  Size: f.isFile ? ow.format.toBytesAbbreviation(f.size) : "",
+                  "Size in bytes": f.isFile ? f.size : ""
+                }
+              }
+            }),
+          }
+        } else {
+          return { isFile: true }
+        }
+      },
+      getObj: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+
+        var ext = String(puri).replace(/^.*\./, "")
+        puri = puri.replace(/^\//, "")
+
+        if (isDef(args.restrict)) {
+          if (isString(args.restrict)) args.restrict = [ args.restrict ]
+          var _go = true
+          if (args.restrict.length > 0) {
+            _go = args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(puri)), true)
+          }
+          if (!_go) return { data: "no content", type: "md" }
+        }
+
+        switch(ext) {
+        case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "md" }
+        case "yml" :
+        case "yaml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "yaml" }
+        case "css" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "css" }
+        case "sh"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "sh" }
+        case "js"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "js" }
+        case "java": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "java" }
+        case "py"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "python" }
+        case "toml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "toml" }
+        case "hbs" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "handlebars" }
+        case "json": return { data: jsonParse(af.fromInputStream2String(s3.getObjectStream(args.bucket, puri))), type: "json" }  
+        case "adoc": return { stream: s3.getObjectStream(args.bucket, puri), type: "asciidoc" }            
+        default:
+          return { stream: s3.getObjectStream(args.bucket, puri) }
+        }
+      },
+      init  : () => {
+        var _cache
+        
+        if (isNumber(args.cache)) {
+          _cache = "__oJobS3_" + md5(args.url + args.bucket)
+          log("Creating cache " + _cache + "...")
+          $cache(_cache)
+          .ttl(args.cache)
+          .fn(k => {
+            log("  cache get " + af.toSLON(k)) 
+            var _r = s3.listObjects(args.bucket, args.path + k.puri)
+            return _r
+          })
+          .create()
+        }
+      }
+    }
