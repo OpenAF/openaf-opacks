@@ -1,0 +1,211 @@
+include:
+- oJobHTTPd.yaml
+- oJobBrowse.yaml
+
+# ojob:
+#   daemon: true
+#   opacks:
+#   - oJob-common
+#   - AWS
+#   loadLibs:
+#   - aws.js
+
+# todo:
+# - (httpdStart): 12345
+#   ((mapLibs )): true
+# - (ECRBrowse ): 12345
+#   ((uri     )): /abc
+#   ((region  )): eu-west-1
+#   ((sortTab )): true
+#   ((incURI  )): true
+#   ((options )):
+#     usePull : true
+#     registry: "registry.abc.com"
+
+jobs:
+# ------------------------
+- name : HTTP Browse - ecr
+  to   : HTTP Browse generic
+  typeArgs:
+    noLog   : false 
+    shortcut:
+      name  : ECRBrowse
+      keyArg: port
+      args  : 
+        accessKey: accessKey
+        secret   : secret
+        token    : token
+        region   : region
+        uri      : uri
+        path     : path
+        browse   : browse
+        logo     : logo
+        restrict : restrict
+        incURI   : incURI
+        cache    : cache
+        sortTab  : sortTab
+        options  : options
+  exec : | #js
+    args.options = merge(args.options, {
+      showURI : args.incURI,
+      sortTab : args.sortTab,
+      logo    : args.logo,
+      browse  : args.browse,
+      default : args.default
+    })
+
+    load("s3.js")
+    var aws = new AWS(args.accessKey, args.secret, args.token)
+    if (isDef(args.assumeRole)) {
+      log("Assuming role " + args.assumeRole + "...")
+      aws = aws.assumeRole(args.assumeRole)
+    }
+
+    args.fns = {
+      init   : () => {
+        $cache("ecr-imgs")
+        .ttl(1 * 60000)
+        .byDefault(true, __)
+        .fn(k => {
+          log(`Cache ECR image ${k.image}...`)
+          return aws.ECR_DescribeImages(args.region, k.image)
+        })
+        .create()
+
+        $cache("ecr-repo")
+        .ttl(1 * 60000)
+        .fn(k => {
+          var lst = aws.ECR_DescribeRepositories(args.region)
+          var lstParent = []
+          $from(lst)
+          .sort("repositoryName")
+          .select(r => {
+            if (isDef(r.repositoryName)) {
+              var parts = r.repositoryName.split("/")
+              for(var i = 0; i < parts.length; i++) {
+                var parent = parts.slice(0, i + 1).join("/")
+                if ($from(lstParent).equals("name", parent).equals("level", i+1).none()) {
+                  lstParent.push({ name: parent, isParent: parent != r.repositoryName, level: i+1 })
+                }
+              }
+            }
+          })
+
+          return { lst: lst, lstParent: lstParent }
+        })
+        .create()
+      },
+      getList: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+
+        // Root level
+        var _r = $cache("ecr-repo").get({})
+        var lst = _r.lst, lstParent = _r.lstParent
+
+        // Determine level from puri
+        var level = puri.split("/").filter(r => r.length > 0).length
+
+        if (puri.length > 0 && $from(lstParent).starts("name", puri).none()) {
+          // Not found
+          return { isFile: false }
+        } else {
+          if ($from(lstParent).equals("isParent", false).equals("name", puri).any()) {
+            // File
+            return { isFile: true }
+          }
+
+          var _fields  = options.usePull ? [ "Repository Name", "# images", "# tags", "Last Push", "Last Pull" ] : [ "Repository Name", "# images", "# tags", "Last Push" ]
+          var _aFields = options.usePull ? [ "left", "right", "right", "left", "left" ] : [ "left", "right", "right", "left" ]
+
+          return {
+            isList: true,
+            fields: _fields,
+            alignFields: _aFields,
+            key   : [ "Repository Name" ],
+            list  : $from(lstParent).equals("level", level + 1).starts("name", puri + (level > 0 ? "/" : "")).pselect(f => {
+              var c = f.isParent ? $from(lstParent).greater("level" ,level).starts("name", f.name + "/").count() : 0
+              var img, lastPush = 0, lastPull = 0
+              if (!f.isParent) {
+                var img = $cache("ecr-imgs").get({ image: f.name })
+                if (isDef(img)) {
+                  lastPush = img.reduce((aP, aC) => Math.max(aP, isDef(aC.imagePushedAt) ? aC.imagePushedAt : 0), 0)
+                  lastPull = img.reduce((aP, aC) => Math.max(aP, isDef(aC.lastRecordedPullTime) ? aC.lastRecordedPullTime : 0), 0)
+                }
+              }
+              return {
+                isDirectory: f.isParent,
+                values     : {
+                  "Repository Name": f.name.replace(new RegExp("^" + puri + "/?"), "") + (f.isParent ? "/" : ""),
+                  "# images"       : c == 0 ? "" : c,
+                  "# tags"         : isUnDef(img) || f.isParent ? "" : img.reduce((aP, aC) => aP + (isDef(aC.imageTags) ? aC.imageTags.length : 0), 0),
+                  "Last Push"      : lastPush > 0 ? new Date(lastPush * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : "",
+                  "Last Pull"      : lastPull > 0 ? new Date(lastPull * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                }
+              }
+            })
+          }
+        }
+      },
+      getObj: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+
+        var img, ini = now(), content = ""
+        do {
+          img = $cache("ecr-imgs").get({ image: puri })
+          sleep(100, true)
+        } while(isUnDef(img) && now() - ini < 3500)
+
+        if (isUnDef(img))
+          content = "**Problem retrieving image data**"
+        else {
+          var reg = _$(options.registry).default("")
+          if (reg.length > 0) reg += "/"
+
+          data = "\n"
+          data += "## Contents\n\n"
+          data += "* [🏷️ Details per tag](#🏷️-details-per-tag)\n"
+          data += "* [💾 How to retrieve each](#💾-how-to-retrieve-each)\n"
+          data += "* [🔎 Digests per tag](#🔎-digests-per-tag)\n"
+          data += "\n---\n"
+
+          data += "### 🏷️ Details per tag\n\n"
+          data += options.usePull ? "| Tag | Pushed at | Last Pull | Size | Size in bytes |\n" : "| Tag | Pushed at | Size | Size in bytes |\n"
+          data += options.usePull ? "|:---:|:---|:---|----:|----:|\n" : "|:---:|:---|----:|----:|\n"
+          $from(img).sort("-imagePushedAt").select(i => {
+            if (options.usePull)
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} | \n`
+            else
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} | \n`
+          })
+
+          data += "\n---\n\n### 💾 How to retrieve each\n\n"
+          data += "| Tag | Digest | Reference |\n"
+          data += "|:---:|---|---|\n"
+          $from(img).sort("-imagePushedAt").select(i => {
+            if (isDef(i.imageTags)) {
+              for(var j = 0; j < i.imageTags.length; j++) {
+                data += `| ${i.imageTags[j]} | ${i.imageDigest} | \`\`\`${reg}${puri}:${i.imageTags[j]}\`\`\` |\n`
+              }
+            } else {
+              data += `|  | ${i.imageDigest} | \`\`\`${reg}${puri}:${i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)}\`\`\` |\n`
+            }
+          })
+          
+          data += "\n---\n\n### 🔎 Digests per tag\n\n"
+          data += "| Tag | Digest | Manifest Type | Artifact Type |\n"
+          data += "|:---:|:---|:---|:---|\n"
+          $from(img).sort("-imagePushedAt").select(i => {
+            data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | \`${i.imageDigest}\` | ${i.imageManifestMediaType} | ${isDef(i.artifactMediaType) ? i.artifactMediaType : ""} |\n`
+          })
+        }
+
+        if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
+
+        return {
+          data: data,
+          type: "raw"
+        }
+      }
+    }
