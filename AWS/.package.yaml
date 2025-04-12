@@ -22,6 +22,7 @@ keywords:
 - bedrock
 - secrets
 - cognito
+- browse
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
@@ -32,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250407'
+version: '20250411'
 dependencies:
   OpenAF: '>=20211229'
 files:
