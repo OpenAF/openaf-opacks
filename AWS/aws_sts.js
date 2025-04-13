@@ -67,8 +67,31 @@ AWS.prototype.assumeRole = function(aRoleARN, aRoleSession, aDurationSecs) {
     if (isDef(o.AssumeRoleResult)) o = o.AssumeRoleResult
     if (isDef(o.Credentials)) o = o.Credentials
     if (isDef(o.AccessKeyId)) {
-        return new AWS(o.AccessKeyId, o.SecretAccessKey, o.SessionToken)
+        var newaws = new AWS(o.AccessKeyId, o.SecretAccessKey, o.SessionToken)
+        newaws.assumeRoleExp = (new Date(o.AssumeRoleResult.Credentials.Expiration)).getTime()
+        return newaws
     } else {
         throw new Error("Invalid response from AWS STS AssumeRole: " + JSON.stringify(o))
+    }
+}
+
+/**
+ * <odoc>
+ * <key>AWS.checkAssumeRole() : Boolean</key>
+ * Checks if the current AWS object has a valid session token.
+ * If the session token is expired, it returns true.
+ * If it is still valid, it returns false.
+ * </odoc>
+ */
+AWS.prototype.checkAssumeRole = function() {
+    if (isDef(this.assumeRoleExp)) {
+        var now = new Date().getTime()
+        if (now > this.assumeRoleExp) {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        return false
     }
 }
