@@ -63,12 +63,13 @@ AWS.prototype.STS_AssumeRole = function(aRegion, aRoleARN, aRoleSession, aDurati
  * </odoc>
  */
 AWS.prototype.assumeRole = function(aRoleARN, aRoleSession, aDurationSecs) {
-    var o = this.STS_AssumeRole(this.region, aRoleARN, aRoleSession, aDurationSecs)
+    var orig = this.STS_AssumeRole(this.region, aRoleARN, aRoleSession, aDurationSecs)
+    var o = orig
     if (isDef(o.AssumeRoleResult)) o = o.AssumeRoleResult
     if (isDef(o.Credentials)) o = o.Credentials
     if (isDef(o.AccessKeyId)) {
         var newaws = new AWS(o.AccessKeyId, o.SecretAccessKey, o.SessionToken)
-        newaws.assumeRoleExp = (new Date(o.AssumeRoleResult.Credentials.Expiration)).getTime()
+        newaws.assumeRoleExp = (new Date(orig.AssumeRoleResult.Credentials.Expiration)).getTime()
         return newaws
     } else {
         throw new Error("Invalid response from AWS STS AssumeRole: " + JSON.stringify(o))

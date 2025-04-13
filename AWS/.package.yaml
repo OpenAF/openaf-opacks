@@ -94,7 +94,7 @@ filesHash:
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
-  aws_sts.js: 58db28298e578d8fec6a7c5993e179dce1f60f3a
+  aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
   oJobECR.yaml: 9715afab148adf0cd6ff93187b09ac9112d104f3
   oafp_aws.js: 5c1c3088ab11e329b067922cd2bc877b5dca36aa
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
