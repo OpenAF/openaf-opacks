@@ -55,7 +55,7 @@ jobs:
       default : args.default
     })
 
-    load("s3.js")
+    loadLib("aws.js")
     var aws = new AWS(args.accessKey, args.secret, args.token)
     if (isDef(args.assumeRole)) {
       log("Assuming role " + args.assumeRole + "...")
