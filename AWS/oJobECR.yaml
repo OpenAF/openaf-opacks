@@ -65,7 +65,7 @@ jobs:
     args.fns = {
       init   : () => {
         $cache("ecr-imgs")
-        .ttl(1 * 60000)
+        .ttl(args.cache)
         .byDefault(true, __)
         .fn(k => {
           if (isDef(args.restrict)) {
@@ -96,7 +96,7 @@ jobs:
         .create()
 
         $cache("ecr-repo")
-        .ttl(1 * 60000)
+        .ttl(args.cache)
         .fn(k => {
           if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
             aws = new AWS(args.accessKey, args.secret, args.token)
