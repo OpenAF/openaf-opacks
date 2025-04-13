@@ -222,7 +222,7 @@ jobs:
       loadLib("s3.js")
 
       args.uri  = _$(args.uri).isString().default("/")
-      args.path = _$(args.path).isString().default(".")
+      args.path = _$(args.path).isString().default("")
 
       ow.template.addHelper("escapeMDTable", str => str.replace(/\|/g, "\\|"))
       ow.template.addHelper("s3-buildBreadcrumbs", (path, _uri, _incURI) => {
@@ -341,6 +341,7 @@ jobs:
         _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
         _s3p = _s3p.replace(/^\//, "")
 
+        print(`_s3p = ${_s3p}`)
         if (isDef(args.cache)) {
           _cache = "__oJobS3_" + md5(args.url + args.bucket)
           lst = $cache(_cache).get({ puri: _s3p })
@@ -361,7 +362,7 @@ jobs:
             key: [ "Object" ],
             list: lst.filter(r => r.filename != "/").map(f => {
               var _f = f.filename.replace(/\/$/, "").replace(new RegExp("^.+/"), "")
-              if (isDef(args.path)) _f = _f.replace(new RegExp("^" + args.path), "")
+              if (isDef(options.parentPath)) _f = _f.replace(new RegExp("^" + options.parentPath), "")
               return {
                 isDirectory: f.isDirectory,
                 values: {
@@ -393,21 +394,22 @@ jobs:
           if (!_go) return { data: "no content", type: "md" }
         }
 
+        print("--> " + options.parentPath + puri)
         switch(ext) {
-        case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "md" }
+        case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "md" }
         case "yml" :
-        case "yaml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "yaml" }
-        case "css" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "css" }
-        case "sh"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "sh" }
-        case "js"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "js" }
-        case "java": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "java" }
-        case "py"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "python" }
-        case "toml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "toml" }
-        case "hbs" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, puri)), type: "handlebars" }
-        case "json": return { data: jsonParse(af.fromInputStream2String(s3.getObjectStream(args.bucket, puri))), type: "json" }  
-        case "adoc": return { stream: s3.getObjectStream(args.bucket, puri), type: "asciidoc" }            
+        case "yaml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "yaml" }
+        case "css" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "css" }
+        case "sh"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "sh" }
+        case "js"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "js" }
+        case "java": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "java" }
+        case "py"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "python" }
+        case "toml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "toml" }
+        case "hbs" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "handlebars" }
+        case "json": return { data: jsonParse(af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri))), type: "json" }  
+        case "adoc": return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri), type: "asciidoc" }            
         default:
-          return { stream: s3.getObjectStream(args.bucket, puri) }
+          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
         }
       },
       init  : () => {
@@ -420,7 +422,7 @@ jobs:
           .ttl(args.cache)
           .fn(k => {
             log("  cache get " + af.toSLON(k)) 
-            var _r = s3.listObjects(args.bucket, args.path + k.puri)
+            var _r = s3.listObjects(args.bucket, k.puri)
             return _r
           })
           .create()
