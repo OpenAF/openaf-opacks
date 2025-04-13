@@ -32,19 +32,20 @@ jobs:
       name  : ECRBrowse
       keyArg: port
       args  : 
-        accessKey: accessKey
-        secret   : secret
-        token    : token
-        region   : region
-        uri      : uri
-        path     : path
-        browse   : browse
-        logo     : logo
-        restrict : restrict
-        incURI   : incURI
-        cache    : cache
-        sortTab  : sortTab
-        options  : options
+        accessKey : accessKey
+        secret    : secret
+        token     : token
+        region    : region
+        assumeRole: assumeRole
+        uri       : uri
+        path      : path
+        browse    : browse
+        logo      : logo
+        restrict  : restrict
+        incURI    : incURI
+        cache     : cache
+        sortTab   : sortTab
+        options   : options
   exec : | #js
     args.options = merge(args.options, {
       showURI : args.incURI,
