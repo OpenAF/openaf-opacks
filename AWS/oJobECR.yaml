@@ -22,7 +22,6 @@ include:
 #     usePull : true
 #     registry: "registry.abc.com"
 
-
 jobs:
 # ------------------------
 - name : HTTP Browse - ecr
@@ -74,7 +73,6 @@ jobs:
               logWarn("Skip image " + k.image + " because it matches a restrict filter")
               return __
             }
-            lst = lst.filter(f => restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.repositoryName)), true))
           }
           log(`Cache ECR image ${k.image}...`)
           return aws.ECR_DescribeImages(args.region, k.image)
@@ -167,14 +165,14 @@ jobs:
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
 
-        var img, ini = now(), content = ""
+        var img, ini = now(), data = ""
         do {
           img = $cache("ecr-imgs").get({ image: puri })
           sleep(100, true)
         } while(isUnDef(img) && now() - ini < 3500)
 
         if (isUnDef(img))
-          content = "**Problem retrieving image data**"
+          data = "**Problem retrieving image data**"
         else {
           var reg = _$(options.registry).default("")
           if (reg.length > 0) reg += "/"
