@@ -385,6 +385,10 @@ jobs:
         var ext = String(puri).replace(/^.*\./, "")
         puri = puri.replace(/^\//, "")
 
+        if (request.params.raw == "true") {
+          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
+        }
+
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
           var _go = true
