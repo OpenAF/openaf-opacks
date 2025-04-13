@@ -76,7 +76,17 @@ jobs:
             }
           }
           log(`Cache ECR image ${k.image}...`)
-          return aws.ECR_DescribeImages(args.region, k.image)
+          try {
+            var _r = aws.ECR_DescribeImages(args.region, k.image)
+            if (isDef(_r) && isDef(_r.error)) {
+              sprintErr(_r)
+              throw new Error(af.fromSLON(_r.error))
+            }
+            return _r
+          } catch (ee) {
+            logWarn("Error retrieving image " + k.image + ": " + ee.message)
+            throw new Error(ee)
+          }
         })
         .create()
 
@@ -182,33 +192,49 @@ jobs:
           data += "## Contents\n\n"
           data += "* [🏷️ Details per tag](#🏷️-details-per-tag)\n"
           data += "* [💾 How to retrieve each](#💾-how-to-retrieve-each)\n"
-          data += "* [🔎 Digests per tag](#🔎-digests-per-tag)\n"
+          data += "* [🔎 Manifest and artifact types per tag](#🔎-manifest-and-artifact-types-per-tag)\n"
           data += "\n---\n"
 
           data += "### 🏷️ Details per tag\n\n"
-          data += options.usePull ? "| Tag | Pushed at | Last Pull | Size | Size in bytes |\n" : "| Tag | Pushed at | Size | Size in bytes |\n"
-          data += options.usePull ? "|:---:|:---|:---|----:|----:|\n" : "|:---:|:---|----:|----:|\n"
-          $from(img).sort("-imagePushedAt").select(i => {
+          data += options.usePull ? "| Tag | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Pushed at | Size | Size in bytes |\n"
+          data += options.usePull ? "|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---|----:|----:|\n"
+          $from(img).sort("-imagePushedAt").select(i => { 
+            var _ref = isDef(i.imageTags) ? reg + puri + ":" + i.imageTags[0] : reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
             if (options.usePull)
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} | \n`
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
             else
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} | \n`
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
           })
 
           data += "\n---\n\n### 💾 How to retrieve each\n\n"
-          data += "| Tag | Digest | Reference |\n"
+          if (isDef(options.refLink)) {
+            data += "> **Note:** Click on the corresponding link, on the 'To retrieve' column, to get instructions on how to pull the image.\n\n"
+          }
+          data += "| Tag | Digest | To retrieve |\n"
           data += "|:---:|---|---|\n"
           $from(img).sort("-imagePushedAt").select(i => {
             if (isDef(i.imageTags)) {
               for(var j = 0; j < i.imageTags.length; j++) {
-                data += `| ${i.imageTags[j]} | ${i.imageDigest} | \`\`\`${reg}${puri}:${i.imageTags[j]}\`\`\` |\n`
+                var _ret = reg + puri + ":" + i.imageTags[j]
+                if (isDef(options.refLink)) {
+                  _ret = "[" + _ret + "](<" + $t(options.refLink, { image: _ret, type: i.artifactMediaType }) + ">)"
+                } else {
+                  _ret = "\`\`\`" + _ret + "\`\`\`"
+                }
+                data += `| ${i.imageTags[j]} | \`\`\`${i.imageDigest}\`\`\` | ${_ret} |\n`
               }
             } else {
-              data += `|  | ${i.imageDigest} | \`\`\`${reg}${puri}:${i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)}\`\`\` |\n`
+              var _ret = reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
+              if (isDef(options.refLink)) {
+                _ret = "[" + _ret + "](<" + $t(options.refLink, { image: _ret, type: i.artifactMediaType }) + ">)"
+              } else {
+                _ret = "\`\`\`" + _ret + "\`\`\`"
+              }
+              data += `|  | \`\`\`${i.imageDigest}\`\`\` | ${_ret} |\n`
             }
           })
           
-          data += "\n---\n\n### 🔎 Digests per tag\n\n"
+          data += "\n---\n\n### 🔎 Manifest and artifact types per tag\n\n"
           data += "| Tag | Digest | Manifest Type | Artifact Type |\n"
           data += "|:---:|:---|:---|:---|\n"
           $from(img).sort("-imagePushedAt").select(i => {
