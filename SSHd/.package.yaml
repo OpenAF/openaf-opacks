@@ -25,15 +25,13 @@ files:
 - .odoc.db
 - .package.yaml
 - jcl-over-slf4j-1.7.36.jar
-- slf4j-api-1.7.36.jar
-- sshd-common-2.14.0.jar
-- sshd-core-2.14.0.jar
+- sshd-common-2.15.0.jar
+- sshd-core-2.15.0.jar
 - sshd.js
 filesHash:
   .maven.yaml: db21e355fc891a9c59c44cd9d29687cfbbd51773
   .odoc.db: 88d56dd8174b836f3d33d3c897d0553588c64dd4
   jcl-over-slf4j-1.7.36.jar: d877e195a05aca4a2f1ad2ff14bfec1393af4b5e
-  slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14
-  sshd-common-2.14.0.jar: 88809fb144f8c48270806ea42a416c6af9330439
-  sshd-core-2.14.0.jar: 0e5202d2dd0c9c4e7c7fb621e3542cb27a7d24b7
+  sshd-common-2.15.0.jar: c3a4140b543d5e419d57809562fec297ffea46f5
+  sshd-core-2.15.0.jar: bc6ff14b0dddfaec40063b86871774d65a771eaa
   sshd.js: e259c0eb5ad9cafee480cd36143605f1c2670ef0
