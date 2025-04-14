@@ -27,16 +27,16 @@ files:
 - .package.yaml
 - JavaEWAH-1.2.3.jar
 - compile.yaml
-- org.eclipse.jgit-7.1.0.202411261347-r.jar
+- org.eclipse.jgit-7.2.0.202503040940-r.jar
 - plugin-git.jar
 - src/openaf/plugins/GIT.class
 - src/openaf/plugins/GIT.java
 filesHash:
-  .maven.yaml: bfe11eeb31886ff2fcf3bb39933dc23c79abc928
-  .odoc.db: 72569470a11eecc486fb06bc6f33463400025855
+  .maven.yaml: a655041263283a09534178f9b7f8dafcacb2c312
+  .odoc.db: bc44827c8f55b7d76e0114abf89acf601225fad7
   JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
   compile.yaml: 8d07ec5ca4c092ce77ab110690572055965e6b69
-  org.eclipse.jgit-7.1.0.202411261347-r.jar: 67609d333b8ba11d5b3a509aca72c1c8ef72e17e
-  plugin-git.jar: f3903872307ab59c50d1188bf3151ada64fb4d92
+  org.eclipse.jgit-7.2.0.202503040940-r.jar: 8d9379845e9d37b58b187abbab2f7a6b63b59f65
+  plugin-git.jar: 4fa16add35beaf4b282122756360c943040bb259
   src/openaf/plugins/GIT.class: eadedbec7d2244b6c62439c09876720dd246c7f0
   src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11
