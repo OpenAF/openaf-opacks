@@ -234,7 +234,7 @@ jobs:
                 data += `| ${i.imageTags[j]} | \`\`\`${i.imageDigest}\`\`\` | ${_ret} |\n`
               }
             } else {
-              var _ret = reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
+              var _ret = reg + puri + "@" + i.imageDigest
               if (isDef(options.refLink)) {
                 _ret = "[" + _ret + "](<" + $t(options.refLink, { image: _ret, type: i.artifactMediaType }) + ">)"
               } else {
