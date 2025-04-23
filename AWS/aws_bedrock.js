@@ -143,6 +143,11 @@ ow.ai.__gpttypes.bedrock = {
 	          "prompt": aPrompt,
 	          "temperature": aTemperature
 	        }
+        } else {
+          _m = {
+              "prompt": aPrompt,
+              "temperature": aTemperature
+          }
         }
         //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
         //$$(_m).set(aOptions.tempKey, aTemperature)
