@@ -88,7 +88,7 @@ List of data input types that can be auto-detected (through the file extension o
 | mdtable | A Markdown table format |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
-| oaf | Takes an OpenAF scripting code to execute and use the result as input |
+| oaf | Takes an OpenAF scripting code or OpenAF scripting file to execute and use the result as input |
 | oafp | Takes a JSON/SLON/YAML map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | ojob | Takes a JSON/SLON/YAML map input with a 'ojob' string and a 'args' map parameter |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
@@ -136,6 +136,7 @@ These options will change the parsed input data included any filters provided.
 | merge | Boolean | If input is a list/array of maps will merge each element into one map |
 | normalize | String | A JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | numformat | String | For all number values applies a java.util.Formatter format (e.g. %,d) |
+| oaf | String | An OpenAF scripting code or OpenAF scripting file to execute taking input as 'data' and returning the transformed data |
 | regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
 | removedups | Boolean | If true will try to remove duplicates from an array |
 | removeempty | Boolean | If true will remove array/list entries that are either null or undefined |
@@ -190,6 +191,7 @@ List of available formats to use with the _output_ option:
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
+| oaf | An OpenAF scripting code or OpenAF scripting file (together with 'outoaf') to execute taking input transformed as 'data' |
 | pjson | A JSON format with spacing (equivalent to prettyjson) |
 | prettyjson | A JSON format with spacing |
 | pxml | Tries to output the input data into pretty xml |

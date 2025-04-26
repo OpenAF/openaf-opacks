@@ -1395,8 +1395,22 @@ var _transformFns = {
             }
         })
         return _r
+    },
+    "oaf": _r => {
+        if (isString(params.oaf)) {
+            let _t
+            if (io.fileExists(params.oaf)) {
+                _t = io.readFileString(params.oaf)
+            } else {
+                _t = params.oaf
+            }
+            if (isString(_t)) {
+                let _f = new Function("data", _t + ";return data")
+                return _f(_r)
+            }
+        }
+        return _r
     }
-
 }
 // --- add extra _transformFns here ---
 const _addSrcTransformFns = (type, fn) => {
@@ -2002,6 +2016,21 @@ var _outputFns = new Map([
                     $sh("open " + params.xlsfile).exec()
                     if (tempFile) sleep(params.xlsopenwait, true)
                 } 
+            }
+        }
+    }],
+    ["oaf", (r, options) => {
+        if (isUnDef(params.outoaf)) _exit(-1, "For out=oaf you need to provide a outoaf=...")
+        if (isString(params.outoaf)) {
+            let _t
+            if (io.fileExists(params.outoaf)) {
+                _t = io.readFileString(params.outoaf)
+            } else {
+                _t = params.outoaf
+            }
+            if (isString(_t)) {
+                let _f = new Function("data", _t)
+                _f(r)
             }
         }
     }]
@@ -2939,7 +2968,19 @@ var _inputFns = new Map([
     ["oaf", (_res, options) => {
         if (!isString(_res)) _exit(-1, "oaf is only supported with a string.")
         _showTmpMsg()
-        var _r = af.eval(_res)
+        var _r
+        if (isString(_res)) {
+            let _t
+            if (io.fileExists(_res)) {
+                _t = io.readFileString(_res)
+            } else {
+                _t = _res
+            }
+            if (isString(_t)) {
+                let _f = new Function("var data;" + _t + ";return data")
+                _r = _f()
+            }
+        }
         _$o(_r, options)
     }],
     ["oafp", (_res, options) => {
@@ -2958,15 +2999,21 @@ var _inputFns = new Map([
             $set(id, true)
             var _out = pForEach(_r, (__r, i) => {
                 var sid = id + "_" + String(i)
-                __r.out         = "key"
-                __r.__key       = sid
-                __r.__inception = true
+                var _ok = false
+                if (isUnDef(__r.out)) {
+                    __r.out         = "key"
+                    __r.__key       = sid
+                    __r.__inception = true
+                    _ok = true
+                }
                 //return $do(() => {
                 var _rr
                 try {
                     oafp(__r)
-                    _rr = $get(sid)
-                    $unset(sid)
+                    if (_ok) {
+                        _rr = $get(sid)
+                        $unset(sid)
+                    }
                 } catch(e) {
                     sprintErr(e)
                 } finally {
