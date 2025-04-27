@@ -290,3 +290,110 @@ DockerRegistry.prototype.deleteImage = function(aImage, aTag) {
 
    return this.deleteManifest(aImage, aTag)
 }
+
+ow.loadServer()
+if (isDef(ow.server.httpd.browse)) {
+   ow.loadFormat()
+   ow.loadTemplate()
+   ow.template.addOpenAFHelpers()
+   ow.template.addFormatHelpers()
+   ow.template.addConditionalHelpers()
+
+   ow.server.httpd.browse.dockerregistry = function(aURI, aOptions) {
+      _$(aURI, "uri").isString().$_()
+      aOptions = _$(aOptions, "options").isMap().default({})
+      aOptions = ow.server.httpd.browse.files(aURI, aOptions)
+      aOptions.ttl = _$(aOptions.ttl, "ttl").isNumber().default(5 * 60 * 1000)
+
+      var dr = new DockerRegistry(aOptions.url, aOptions.login, aOptions.pass)
+      const _id = genUUID()
+
+      $cache("__hB_dockerregistry_" + _id)
+      .ttl(aOptions.ttl)
+      .fn(k => {
+         var dr = new DockerRegistry(aOptions.url, aOptions.login, aOptions.pass)
+         var lst = dr.listRepositories()
+         var _r = []
+         lst.forEach(r => {
+            var tags = dr.listTags(r)
+            if (isDef(tags) && isArray(tags.tags)) {
+               tags.tags.forEach(t => {
+                  var manif = dr.getManifest(r, t)
+                  if (isUnDef(manif.error)) {
+                     _r.push({
+                        name: r + ":" + t,
+                        image: r,
+                        tag: t,
+                        arch: manif.architecture,
+                        mediaType: manif.mediaType,
+                        created: isDef(manif.created) ? ow.format.fromISODate(String(manif.created)) : __,
+                        os: manif.os,
+                        size: (isUnDef(manif.layers) || manif.layers.length <= 0 ? __ : $from(manif.layers).sum("size"))
+                     })
+                  }
+               })
+            }
+         })
+         return _r
+      })
+      .create()
+
+      return merge(aOptions, {
+         _fns: {
+            getList: (request, options) => {
+               const uri = request.uri
+               var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/$/, "")
+         
+               var lst = $cache("__hB_dockerregistry_" + _id).get({})
+
+               if ($from(lst).equals("image", puri).none()) {
+                  var _lst = $from( $from(lst).starts("image", puri).select(r => r.image.replace(new RegExp("^" + puri + "/*([^/]+).*"), "$1")) ).distinct().sort()
+                  return {
+                     isList     : true,
+                     fields     : [ "Repository Name", "# images", "# tags" ],
+                     alignFields: [ "left", "right", "right" ],
+                     key        : "Repository Name",
+                     list       : _lst.map(s => ({
+                        isDirectory: true,
+                        values     : {
+                           "Repository Name": s,
+                           "# images"       : $from(lst).starts("image", (puri == "" ? "" : puri + "/") + s).distinct("image").length,
+                           "# tags"         : $from(lst).starts("image", (puri == "" ? "" : puri + "/") + s).distinct("tag").length
+                        }
+                     }))
+                  }
+               } else {
+                  return { isFile: true }
+               }
+            },
+            getObj: (request, options) => {
+               const uri = request.uri
+               var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+         
+               var lst = $cache("__hB_dockerregistry_" + _id).get({})
+
+               if ($from(lst).equals("image", puri).any()) {
+                  var md = `### 🏷️ Tags
+   | Tag | Architecture | OS | Media Type | Last push | Time ago | Size | Size in bytes|
+   |-----|--------------|----|------------|---------|----------|------|--------------|
+   {{#each this}}
+   | {{tag}} | {{arch}} | {{os}} | {{mediaType}} | {{#if created}}{{owFormat_fromDate created 'yyyy-MM-dd HH:mm:ss'}}{{/if}} | {{#if created}}{{owFormat_timeago created false}}{{/if}} | {{#if size}}{{owFormat_toBytesAbbreviation size}}{{/if}} | {{size}} |
+   {{/each}}
+   `
+                  md = $t(md, $from(lst).equals("image", puri).select())
+                  if (options.sortTab) md += "<script src=\"/js/mdtablesort.js\"></script>"
+                  return {
+                     data: md,
+                     type: "raw"
+                  }
+               } else {
+                  return {
+                     data: "nothing",
+                     type: "md"
+                  }
+               }
+            }
+         }
+      })
+   }
+}
