@@ -21,7 +21,7 @@ jobs:
         path: /tmp/oaf
 
     - name: Run updatePacks
-      uses: openaf/ojob-action@v5
+      uses: openaf/ojob-action@v7
       with:
         ojob: 'updatePacks.yaml'
         dist: t8
