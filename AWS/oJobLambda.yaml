@@ -1,0 +1,128 @@
+include:
+- oJobHTTPd.yaml
+
+jobs:
+# ------------------------
+- name   : HTTP AWS Lambda
+  to     : HTTP Service
+  typeArgs:
+    noLog: false
+    shortcut:
+      name  : httpdAWSLambda
+      keyArg: port
+      args  :
+        uri       : uri
+        region    : region
+        lambda    : lambda
+        params    : params
+        version   : version
+        assumeRole: assumeRole
+        accessKey : accessKey
+        secret    : secret
+        token     : token
+        cache     : cache
+        debug     : debug
+  help   :
+    text   : Adds a HTTP service to call AWS Lambda functions and return the result.
+    expects:
+    - name: port
+      desc: The port to listen on.
+    - name: uri
+      desc: The URI to listen on.
+    - name: region
+      desc: The AWS region to use.
+    - name: lambda
+      desc: The AWS Lambda function to call.
+    - name: params
+      desc: The parameters to pass to the Lambda function.
+    - name: version
+      desc: The version of the Lambda function to call.
+    - name: assumeRole
+      desc: The role to assume when calling the Lambda function.
+    - name: accessKey
+      desc: The AWS access key to use.
+    - name: secret
+      desc: The AWS secret key to use.
+    - name: token
+      desc: The AWS token to use.
+    - name: cache
+      desc: The cache time to use.
+    - name: debug
+      desc: Whether to enable debug mode.
+  check  :
+    in:
+      port      : toNumber.isNumber.default(8091)
+      uri       : isString.default("/")
+      region    : isString.default("us-east-1")
+      lambda    : isString
+      params    : isMap.default({})
+      version   : isString.default(__)
+      assumeRole: isString.default(__)
+      accessKey : isString.default(__)
+      secret    : isString.default(__)
+      token     : isString.default(__)
+      cache     : toNumber.isNumber.default(__)
+      debug     : toBoolean.isBoolean.default(false)
+  args:
+    execURI: | #js
+      var _res = {
+        body: "",
+        statusCode: 200
+      }
+      try {
+        log(af.toCSLON(request))
+        _res = $cache("ojob-httpd-aws").get(request)
+        log(af.toCSLON(_res))
+      } catch(e) {
+        $err(e)
+        return ow.server.httpd.reply("Internal error!", 500)
+      } finally {
+        return ow.server.httpd.reply(_res.body, _res.statusCode, _res.mimeType, _res.headers)
+      }
+  exec   : | #js
+    loadLib("aws.js")
+
+    var aws = new AWS(args.accessKey, args.secret, args.token)
+    if (isDef(args.assumeRole)) {
+      log("Assuming role " + args.assumeRole + "...")
+      aws = aws.assumeRole(args.assumeRole)
+    }
+
+    $cache("ojob-httpd-aws")
+    .ttl(args.cache)
+    .fn(k => {
+      if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
+        aws = new AWS(args.accessKey, args.secret, args.token)
+        log("Assuming role " + args.assumeRole + "...")
+        aws = aws.assumeRole(args.assumeRole)
+      }
+
+      delete k.params["NanoHttpd.QUERY_STRING"]
+      var _r = _$(args.params).isMap().default({})
+      _r = merge(_r, {
+        resource             : k.uri,
+        path                 : k.uri,
+        httpMethod           : k.method,
+        headers              : k.header,
+        queryStringParameters: k.params
+      })
+
+      try {
+        return aws.LAMBDA_Invoke(args.region, args.lambda, _r, args.version)
+      } catch (e) {
+        $err(e)
+        return { body: "Internal error!", statusCode: 500 }
+      }
+    })
+    .create()
+
+#todo:
+#- (httpdStart    ): 17878
+#- (httpdAWSLambda): 17878
+#  ((region      )): eu-west-1
+#  ((lambda      )): echo
+#  ((debug       )): true
+
+#ojob:
+#  daemon: true
+#  catch : printErrnl("[" + job.name + "] " + $err(exception, false, true, job.exec))
