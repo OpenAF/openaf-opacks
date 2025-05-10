@@ -26,21 +26,19 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
-- commons-pool2-2.12.0.jar
-- error_prone_annotations-2.27.0.jar
-- gson-2.11.0.jar
-- jedis-5.2.0.jar
-- json-20240303.jar
+- commons-pool2-2.12.1.jar
+- error_prone_annotations-2.36.0.jar
+- jedis-6.0.0.jar
+- json-20250107.jar
+- redis-authx-core-0.1.1-beta2.jar
 - redis.js
-- slf4j-api-1.7.36.jar
 filesHash:
-  .maven.yaml: c96031b4edab3ac2bfc70fd0ed4c670fa57bbae5
+  .maven.yaml: cde7432b43bd7b74c09fc93b052c9d3d39f1451b
   .odoc.db: d302c765935d8e69f979ce0989295982ecff1e94
   .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
-  commons-pool2-2.12.0.jar: 458563f69fbdaebf7daadfe10dc3a22e42a7de50
-  error_prone_annotations-2.27.0.jar: 91b2c29d8a6148b5e2e4930f070d4840e2e48e34
-  gson-2.11.0.jar: 527175ca6d81050b53bdd4c457a6d6e017626b0e
-  jedis-5.2.0.jar: a3e3905dcc06a48738783883d13f43873df22e31
-  json-20240303.jar: 0ebb88e8fb5122b7506d5cf1d69f1ccdb790d22a
+  commons-pool2-2.12.1.jar: e5c7b6c9f5a4b59be2bba213fbec70b413376fc1
+  error_prone_annotations-2.36.0.jar: 227d4d4957ccc3dc5761bd897e3a0ee587e750a7
+  jedis-6.0.0.jar: e8733dd989ba3ddfb0f5e03f020c9cafc488f6c9
+  json-20250107.jar: a1b5f0b5a1ce018b93a691c57ffc7d141b3a10f1
+  redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
   redis.js: c31a2c25d453cacfb0763485c37e3c8d253d82e7
-  slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14

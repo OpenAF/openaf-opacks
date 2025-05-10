@@ -1,5 +1,4 @@
 artifacts:
   - id      : jedis 
     group   : redis.clients
-    version : 5.2.0
 
