@@ -36,7 +36,7 @@ jobs:
           printErr(res.stderr)
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n")
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
           print("Changes: ")
           cprint(changes)
 
@@ -95,7 +95,7 @@ jobs:
           printErr(res.stderr)
 
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n")
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
           print("Changes: ")
           cprint(changes)
 
@@ -155,7 +155,7 @@ jobs:
           printErr(res.stderr)
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n")
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
           print("Changes: ")
           cprint(changes)
 
@@ -217,7 +217,7 @@ jobs:
           printErr(res.stderr)
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n")
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
           print("Changes: ")
           cprint(changes)
 
