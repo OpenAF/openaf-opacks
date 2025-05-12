@@ -99,12 +99,16 @@ jobs:
 
       delete k.params["NanoHttpd.QUERY_STRING"]
       var _r = _$(args.params).isMap().default({})
+
+      if (isDef(k.files) && isDef(k.files.postData)) _r.body = k.files.postData
+
       _r = merge(_r, {
         resource             : k.uri,
         path                 : k.uri,
         httpMethod           : k.method,
         headers              : k.header,
-        queryStringParameters: k.params
+        queryStringParameters: k.params,
+        pathParameters       : k.params
       })
 
       try {
@@ -116,13 +120,14 @@ jobs:
     })
     .create()
 
-#todo:
-#- (httpdStart    ): 17878
-#- (httpdAWSLambda): 17878
-#  ((region      )): eu-west-1
-#  ((lambda      )): echo
-#  ((debug       )): true
+# todo:
+# - (httpdStart    ): 17878
+# - (httpdAWSLambda): 17878
+#   ((region      )): eu-west-1
+#   ((lambda      )): echo
+#   ((debug       )): true
+#   ((uri         )): "/echo"
 
-#ojob:
+# ojob:
 #  daemon: true
 #  catch : printErrnl("[" + job.name + "] " + $err(exception, false, true, job.exec))
