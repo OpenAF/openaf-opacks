@@ -35,7 +35,7 @@ jobs:
           print(res.stdout)
           printErr(res.stderr)
           
-          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+          if ($sh("git status --porcelain").get(0).stdout.trim().split("\n").length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
 
@@ -89,7 +89,7 @@ jobs:
           print(res.stdout)
           printErr(res.stderr)
           
-          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+          if ($sh("git status --porcelain").get(0).stdout.trim().split("\n").length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of GoogleCompiler oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
 
@@ -144,7 +144,7 @@ jobs:
           print(res.stdout)
           printErr(res.stderr)
           
-          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+          if ($sh("git status --porcelain").get(0).stdout.trim().split("\n").length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of BouncyCastle oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
 
@@ -201,7 +201,7 @@ jobs:
           print(res.stdout)
           printErr(res.stderr)
           
-          if ($sh("git status --porcelain").get(0).stdout.trim() != "") {
+          if ($sh("git status --porcelain").get(0).stdout.trim().split("\n").length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of RocksDB oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
 
