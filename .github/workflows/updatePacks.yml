@@ -54,6 +54,8 @@ jobs:
             .pwd("GooglePhoneNumber")
             .prefix("opack")
             .get()
+          } else {
+            io.writeFileString("/tmp/output.out", "")
           }
         dist: t8
 
@@ -113,6 +115,8 @@ jobs:
             .pwd("GoogleCompiler")
             .prefix("opack")
             .get()
+          } else {
+            io.writeFileString("/tmp/output.out", "")
           }
         dist: t8
 
@@ -173,6 +177,8 @@ jobs:
             .pwd("BouncyCastle")
             .prefix("opack")
             .get()
+          } else {
+            io.writeFileString("/tmp/output.out", "")
           }
         dist: t8
 
@@ -235,6 +241,8 @@ jobs:
             .pwd("rocksdb")
             .prefix("opack")
             .get()
+          } else {
+            io.writeFileString("/tmp/output.out", "")
           }
         dist: t8
 
