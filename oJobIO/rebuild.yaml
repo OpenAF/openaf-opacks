@@ -30,9 +30,6 @@ ojob:
   - oJob-common
   - plugin-GIT
 
-include:
-- ojob.json
-
 jobs:
 # --------------------
 - name: Prepare output
