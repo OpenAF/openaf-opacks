@@ -301,6 +301,14 @@ const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception &&
 // ---
 
 // Process params
+ow.loadFormat()
+
+params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
+params.out = params.format
+params.output = params.format
+params.in = params.type
+params.input = params.type
+
 // Check if file is provided
 var bkprms
 if (isDef(params.loop)) {
@@ -340,7 +348,7 @@ if (isDef(params.paramsfile)) {
 
 // Ensure params are interpreted as lower case
 Object.keys(params).forEach(pk => {
-    if (params[pk].length > 0) {
+    if (typeof params[pk] == "string" && params[pk].length > 0) {
         var npk = pk.toLowerCase()
         if (pk != npk && isUnDef(params[npk])) {
             params[npk] = params[pk]
@@ -463,14 +471,6 @@ const showVersion = () => {
     }
     return stringify(_v, __, "")
 }
-
-ow.loadFormat()
-
-params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
-params.out = params.format
-params.output = params.format
-params.in = params.type
-params.input = params.type
 
 // Check if file is provided
 if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "undefined" == typeof params.data && "undefined" == typeof params.url) {
