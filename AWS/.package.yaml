@@ -33,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250509'
+version: '20250512'
 dependencies:
   OpenAF: '>=20211229'
 files:
@@ -97,7 +97,7 @@ filesHash:
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
   oJobECR.yaml: 5f2985fb360623bb09f5d527a3e693bab919d1d4
-  oJobLambda.yaml: e1d4e4d82aeeaa80ed22f916fc836a7bd30bfcd4
+  oJobLambda.yaml: 657010746d922a6e4b278684afc18ae50472e68d
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9
