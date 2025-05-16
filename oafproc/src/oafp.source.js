@@ -303,11 +303,14 @@ const _clearTmpMsg = msg => { if (params.out != 'grid' && !params.__inception &&
 // Process params
 ow.loadFormat()
 
-params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
-params.out = params.format
-params.output = params.format
-params.in = params.type
-params.input = params.type
+var procParams = () => {
+    params.format = params.output || params.format || params.out, params.type = params.input || params.type || params.in
+    params.out = params.format
+    params.output = params.format
+    params.in = params.type
+    params.input = params.type
+}
+procParams()
 
 // Check if file is provided
 var bkprms
@@ -345,6 +348,8 @@ if (isDef(params.paramsfile)) {
         }
     }
 }
+
+procParams()
 
 // Ensure params are interpreted as lower case
 Object.keys(params).forEach(pk => {
