@@ -70,9 +70,7 @@ jobs:
         statusCode: 200
       }
       try {
-        log(af.toCSLON(request))
         _res = $cache("ojob-httpd-aws").get(request)
-        log(af.toCSLON(_res))
       } catch(e) {
         $err(e)
         return ow.server.httpd.reply("Internal error!", 500)
@@ -114,7 +112,14 @@ jobs:
       })
 
       try {
-        return aws.LAMBDA_Invoke(args.region, args.lambda, _r, args.version)
+        if (args.debug) {
+          log("AWS Lambda function " + args.lambda + " in region " + args.region + ", request: " + af.toCSLON(_r))
+        }
+        var _res = aws.LAMBDA_Invoke(args.region, args.lambda, _r, args.version)
+        if (args.debug) {
+          log("AWS Lambda function " + args.lambda + " in region " + args.region + ", response: " + af.toCSLON(_res))
+        }
+        return _res
       } catch (e) {
         $err(e)
         return { body: "Internal error!", statusCode: 500 }
