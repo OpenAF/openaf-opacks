@@ -57,6 +57,8 @@ jobs:
           } else {
             io.writeFileString("/tmp/output.out", "")
           }
+
+          io.rm(".github/action/oaf-action-setup")
         dist: t8
 
     - name: Commit changes GooglePhoneNumber
@@ -118,6 +120,7 @@ jobs:
           } else {
             io.writeFileString("/tmp/output.out", "")
           }
+          io.rm(".github/action/oaf-action-setup")
         dist: t8
 
     - name: Commit GoogleCompiler
@@ -180,6 +183,7 @@ jobs:
           } else {
             io.writeFileString("/tmp/output.out", "")
           }
+          io.rm(".github/action/oaf-action-setup")
         dist: t8
 
     - name: Commit BouncyCastle
@@ -244,6 +248,7 @@ jobs:
           } else {
             io.writeFileString("/tmp/output.out", "")
           }
+          io.rm(".github/action/oaf-action-setup")
         dist: t8
 
     - name: Commit RocksDB
@@ -290,6 +295,7 @@ jobs:
               "select \"pack\", count(1) \"c\" where \"file\" <> '\''LICENSES.txt'\'' group by \"pack\""
             ) 
           ).equals("c", 1).select(r => $sh("git restore " + r.pack).exec() )
+          io.rm(".github/action/oaf-action-setup")
 
     - name: Commit JDBC
       env :
