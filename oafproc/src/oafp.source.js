@@ -487,6 +487,7 @@ if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "un
         }
     }
     params.file = _found
+    if (isDef(bkprms)) bkprms.file = _found
 }
 
 params.debug = toBoolean(params.debug)
