@@ -2510,12 +2510,41 @@ var _inputFns = new Map([
                             _db.closeStatement(r)
                             _rs.close()
                         }
-                    } else {
-                        var _r = _db.q(r)
-                        if (isMap(_r) && isArray(_r.results)) {
-                            _$o(_r.results, options)
+                    } else {
+                        if (toBoolean(params.indbdesc)) {
+                            var _r = _db.qsRS(r)
+                            var _o = []
+                            try {
+                                for(let i = 1; i <= _r.getMetaData().getColumnCount(); i++) {
+                                    _o.push({
+                                        name: _r.getMetaData().getColumnName(i),
+                                        type: _r.getMetaData().getColumnTypeName(i),
+                                        size: _r.getMetaData().getColumnDisplaySize(i),
+                                        nullable: _r.getMetaData().isNullable(i) == 1,
+                                        autoIncrement: _r.getMetaData().isAutoIncrement(i),
+                                        precision: _r.getMetaData().getPrecision(i),
+                                        scale: _r.getMetaData().getScale(i),
+                                        table: _r.getMetaData().getTableName(i),
+                                        schema: _r.getMetaData().getSchemaName(i),
+                                        catalog: _r.getMetaData().getCatalogName(i),
+                                        columnType: _r.getMetaData().getColumnType(i)
+                                    })
+                                }
+                                _$o(_o, options)
+                            } catch(e) {
+                                _exit(-1, "Error getting SQL description: " + e.message)
+                            } finally {
+                                _db.closeStatement(r)
+                                _r.close()
+                            }
+
                         } else {
-                            _exit(-1, "Invalid DB result: " + stringify(_r))
+                            var _r = _db.q(r)
+                            if (isMap(_r) && isArray(_r.results)) {
+                                _$o(_r.results, options)
+                            } else {
+                                _exit(-1, "Invalid DB result: " + stringify(_r))
+                            }
                         }
                     }
                 }
