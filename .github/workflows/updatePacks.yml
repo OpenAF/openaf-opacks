@@ -41,6 +41,7 @@ jobs:
           cprint(changes)
 
           io.rm(".github/action/oaf-action-setup")
+          io.rm(".github/action")
           if (changes.length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of GooglePhone oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
@@ -103,6 +104,7 @@ jobs:
           cprint(changes)
 
           io.rm(".github/action/oaf-action-setup")
+          io.rm(".github/action")
           if (changes.length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of GoogleCompiler oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
@@ -166,6 +168,7 @@ jobs:
           cprint(changes)
 
           io.rm(".github/action/oaf-action-setup")
+          io.rm(".github/action")
           if (changes.length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of BouncyCastle oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
@@ -231,6 +234,7 @@ jobs:
           cprint(changes)
 
           io.rm(".github/action/oaf-action-setup")
+          io.rm(".github/action")
           if (changes.length > 0) {
             // Store results
             io.writeFileString("/tmp/output.out", "Automatic bump of RocksDB oPack\n\n````\n" + res.stdout + "\n" + res.stderr + "\n````")
@@ -287,6 +291,7 @@ jobs:
           $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true").prefix("jdbc").get(0)
 
           io.rm(".github/action/oaf-action-setup")
+          io.rm(".github/action")
           $from( 
             $sql( 
               $sh("git status --porcelain").get(0).stdout.split("\n").filter(r => r.match(".. jdbc-")).map(r => 
