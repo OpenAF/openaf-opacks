@@ -18,7 +18,7 @@ name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250518'
+version: '20250526'
 dependencies:
   openaf: '>=20221216'
 files:
