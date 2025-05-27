@@ -77,8 +77,8 @@ jobs:
           }
           log(`Cache ECR image ${k.image}...`)
           try {
+            aws = new AWS(args.accessKey, args.secret, args.token)
             if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
-              aws = new AWS(args.accessKey, args.secret, args.token)
               log("Assuming role " + args.assumeRole + "...")
               aws = aws.assumeRole(args.assumeRole)
             }
