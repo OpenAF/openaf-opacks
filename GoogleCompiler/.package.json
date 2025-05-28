@@ -26,7 +26,7 @@
   "main": "main.js",
   "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
-  "version": "20250417",
+  "version": "20250528",
   "dependencies": {},
   "files": [
     ".maven.yaml",
