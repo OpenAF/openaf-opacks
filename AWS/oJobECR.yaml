@@ -77,12 +77,12 @@ jobs:
           }
           log(`Cache ECR image ${k.image}...`)
           try {
-            aws = new AWS(args.accessKey, args.secret, args.token)
-            if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
+            var _aws = new AWS(args.accessKey, args.secret, args.token)
+            if (isDef(args.assumeRole)) {
               log("Assuming role " + args.assumeRole + "...")
-              aws = aws.assumeRole(args.assumeRole)
+              _aws = _aws.assumeRole(args.assumeRole)
             }
-            var _r = aws.ECR_DescribeImages(args.region, k.image)
+            var _r = _aws.ECR_DescribeImages(args.region, k.image)
             if (isDef(_r) && isDef(_r.error)) {
               sprintErr(_r)
               throw new Error(af.fromSLON(_r.error))
@@ -98,12 +98,12 @@ jobs:
         $cache("ecr-repo")
         .ttl(args.cache)
         .fn(k => {
-          aws = new AWS(args.accessKey, args.secret, args.token)
-          if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
+          var _aws = new AWS(args.accessKey, args.secret, args.token)
+          if (isDef(args.assumeRole)) {
             log("Assuming role " + args.assumeRole + "...")
-            aws = aws.assumeRole(args.assumeRole)
+            _aws = _aws.assumeRole(args.assumeRole)
           }
-          var lst = aws.ECR_DescribeRepositories(args.region)
+          var lst = _aws.ECR_DescribeRepositories(args.region)
           var lstParent = []
 
           // Apply restrict
