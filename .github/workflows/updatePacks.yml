@@ -37,7 +37,7 @@ jobs:
           io.rm(".github/action")
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/") && r.length > 0)
           print("Changes: ")
           cprint(changes)
 
@@ -99,7 +99,7 @@ jobs:
           io.rm(".github/action")
 
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/") && r.length > 0)
           print("Changes: ")
           cprint(changes)
 
@@ -162,7 +162,7 @@ jobs:
           io.rm(".github/action")
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/") && r.length > 0)
           print("Changes: ")
           cprint(changes)
 
@@ -227,7 +227,7 @@ jobs:
           io.rm(".github/action")
           
           // List changes
-          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/"))
+          var changes = $sh("git status --porcelain").get(0).stdout.trim().split("\n").filter(r => !r.endsWith(" .github/action/") && r.length > 0)
           print("Changes: ")
           cprint(changes)
 
@@ -289,7 +289,7 @@ jobs:
           io.rm(".github/action")
           $from( 
             $sql( 
-              $sh("git status --porcelain").get(0).stdout.split("\n").filter(r => r.match(".. jdbc-")).map(r => 
+              $sh("git status --porcelain").get(0).stdout.split("\n").filter(r => r.match(".. jdbc-") && !r.endsWith(" .github/action/") && r.length > 0).map(r => 
                 $path(r.replace(/^.. /,"").split("/"), "{ pack: [0], file: [1]}") 
               ), 
               "select \"pack\", count(1) \"c\" where \"file\" <> '\''LICENSES.txt'\'' group by \"pack\""
