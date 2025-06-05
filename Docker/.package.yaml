@@ -17,7 +17,7 @@ name: Docker
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230422'
+version: '20250604'
 dependencies:
   openaf: '>=20211229'
   DockerRegistry: '>=20230508'
@@ -53,7 +53,7 @@ filesHash:
   .odoc.db: 27f658edb007cd50d76b15c39faddd18f2436ffa
   .precompile: 50f1497451674055d9bcb80190944413f7cede6f
   README.md: 9364282b1df9dfbf607e9a8d2bf6950982fd0f83
-  docker.js: c7aa54380d5a1bf1adaf7e459040217b07c572a8
+  docker.js: 5a7dcb5616612df4d83795c533606e99a06dfb38
   docker.yaml: 84d21f6bb997cd91e52dff46d4de115247fe1c2e
   lib/.maven.yaml: c44ba1e0b8ecb79581305ab8344fae4b2f0da8b5
   lib/asm-5.0.3.jar: dcc2193db20e19e1feca8b1240dbbc4e190824fa

@@ -551,7 +551,7 @@ Docker.prototype.runOJob = function(args) {
          Labels          : args.labels,
          StopSignal      : args.stopSignal,
          StopTimeout     : args.stopTimeout,
-         HostConfig      : args.hostConfig,
+         HostConfig      : merge(args.hostConfig, { Binds: args.binds }),
          NetworkingConfig: args.networkingConfig
    }, args.name);
    this.start(container.Id);
@@ -688,7 +688,7 @@ Docker.prototype.runContainer = function(args) {
          Labels          : args.labels,
          StopSignal      : args.stopSignal,
          StopTimeout     : args.stopTimeout,
-         HostConfig      : args.hostConfig,
+         HostConfig      : merge(args.hostConfig, { Binds: args.binds }),
          NetworkingConfig: args.networkingConfig         
    }, args.name);
    this.start(container.Id);
