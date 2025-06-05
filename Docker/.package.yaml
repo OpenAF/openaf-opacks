@@ -12,7 +12,7 @@ bugs:
 repository:
   type: http
   url: https://openaf.io/opacks/Docker.opack
-description: A wrapper to access the amihaiemil/docker-java-api api to access a docker client.
+description: A wrapper to access the docker-java API to communicate with Docker.
 name: Docker
 main: ''
 mainJob: ''
@@ -35,7 +35,6 @@ files:
 - lib/asm-tree-5.0.3.jar
 - lib/asm-util-5.0.3.jar
 - lib/commons-codec-1.10.jar
-- lib/docker-java-api-0.0.13.jar
 - lib/httpclient-4.5.14.jar
 - lib/httpcore-4.4.16.jar
 - lib/javax.json-1.1.4.jar
@@ -62,7 +61,6 @@ filesHash:
   lib/asm-tree-5.0.3.jar: 287749b48ba7162fb67c93a026d690b29f410bed
   lib/asm-util-5.0.3.jar: 1512e5571325854b05fb1efce1db75fcced54389
   lib/commons-codec-1.10.jar: 4b95f4897fa13f2cd904aee711aeafc0c5295cd8
-  lib/docker-java-api-0.0.13.jar: 8ccec02617c99476e3c755810052402c6088a5d4
   lib/httpclient-4.5.14.jar: 1194890e6f56ec29177673f2f12d0b8e627dec98
   lib/httpcore-4.4.16.jar: 51cf043c87253c9f58b539c9f7e44c8894223850
   lib/javax.json-1.1.4.jar: 943f240a509d3c70b448a55c6735591ecbd37c88

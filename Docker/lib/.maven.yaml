@@ -1,5 +1,8 @@
 artifacts:
-- group: com.amihaiemil.web
-  id: docker-java-api
-  version: 0.0.13
+  - group  : com.github.docker-java
+    id     : docker-java
+    version: 3.5.1
+  - group  : org.slf4j
+    id     : slf4j-simple
+    version: 1.7.30
 

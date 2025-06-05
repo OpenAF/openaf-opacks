@@ -2,7 +2,7 @@
 var path = getOPackPath("Docker") || String((new java.io.File("")).getAbsolutePath()).replace(/\\/g, "/");
 loadExternalJars(path + "/lib");
 
-// Wrapper for https://github.com/amihaiemil/docker-java-api
+// Wrapper using https://github.com/docker-java/docker-java
 //
 
 /**
@@ -15,25 +15,57 @@ loadExternalJars(path + "/lib");
 var Docker = function(aRemote, authC) {
    this.remote = aRemote;
 
-   if (isUnDef(this.remote)) {
-      this.docker = new Packages.com.amihaiemil.docker.UnixDocker(new java.io.File("/var/run/docker.sock"));
-   } else {
-      if (isUnDef(authC)) {
-         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote));
-      } else {
-         this.docker = new Packages.com.amihaiemil.docker.TcpDocker(new java.net.URI(aRemote), authC);
-      }
-   }
+   var DefaultDockerClientConfig = Packages.com.github.dockerjava.core.DefaultDockerClientConfig;
+   var JerseyDockerHttpClient    = Packages.com.github.dockerjava.jaxrs.JerseyDockerHttpClient;
+   var DockerClientImpl         = Packages.com.github.dockerjava.core.DockerClientImpl;
+   var URI                      = Packages.java.net.URI;
 
+   if (isUnDef(this.remote)) this.remote = "unix:///var/run/docker.sock";
+
+   this.config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                     .withDockerHost(this.remote)
+                     .build();
+
+   this.httpClient = new JerseyDockerHttpClient.Builder()
+                        .dockerHost(new URI(this.config.getDockerHost()))
+                        .sslConfig(this.config.getSSLConfig())
+                        .build();
+
+   this.docker = new DockerClientImpl(this.config, this.httpClient);
    this._useCmdForLogs = false;
 };
 
 Docker.prototype.__buildObj = function(aObj) {
-   return (new Packages.javax.json.Json.createReader(new java.io.StringReader(stringify(aObj, void 0, "")))).readObject();
+   var mapper = Packages.com.github.dockerjava.core.DefaultObjectMapperHolder.INSTANCE.getObjectMapper();
+   return mapper.readValue(stringify(aObj, void 0, ""), Packages.java.lang.Object.class);
 };
 
 Docker.prototype.__buildArray = function(aObj) {
-   return (new Packages.javax.json.Json.createReader(new java.io.StringReader(stringify(aObj, void 0, "")))).readArray();
+   var mapper = Packages.com.github.dockerjava.core.DefaultObjectMapperHolder.INSTANCE.getObjectMapper();
+   return mapper.readValue(stringify(aObj, void 0, ""), Packages.java.lang.Object.class);
+};
+
+Docker.prototype.__request = function(method, path, body) {
+   var Request = Packages.com.github.dockerjava.transport.DockerHttpClient.Request;
+   var Method = Packages.com.github.dockerjava.transport.DockerHttpClient.Request.Method;
+   var req = Request.builder()
+                    .method(Method.valueOf(String(method)))
+                    .path(path);
+   if (isDef(body)) {
+       var mapper = Packages.com.github.dockerjava.core.DefaultObjectMapperHolder.INSTANCE.getObjectMapper();
+       var bytes = mapper.writeValueAsBytes(body);
+       req = req.bodyBytes(bytes);
+   }
+   var resp = this.httpClient.execute(req.build());
+   var is = resp.getBody();
+   var out = "";
+   if (is != null) {
+       var scanner = new Packages.java.util.Scanner(is).useDelimiter("\\A");
+       out = scanner.hasNext() ? scanner.next() : "";
+       scanner.close();
+   }
+   resp.close();
+   return out;
 };
 
 /**
@@ -43,13 +75,8 @@ Docker.prototype.__buildArray = function(aObj) {
  * </odoc>
  */
 Docker.prototype.getContainers = function() {
-   var r = [];
-   var o = this.docker.containers().all();
-   while(o.hasNext()) {
-      r.push(jsonParse(o.next().toString()));
-   }
-
-   return r;
+   var res = this.__request("GET", "/containers/json?all=1");
+   return jsonParse(res);
 };
 
 /**
@@ -59,13 +86,8 @@ Docker.prototype.getContainers = function() {
  * </odoc>
  */
 Docker.prototype.getNetworks = function() {
-   var r = []
-   var o = this.docker.networks().iterator()
-   while(o.hasNext()) {
-      r.push(jsonParse(o.next().toString()))
-   }
-
-   return r
+   var res = this.__request("GET", "/networks");
+   return jsonParse(res);
 }
 
 /**
@@ -75,13 +97,8 @@ Docker.prototype.getNetworks = function() {
  * </odoc>
  */
  Docker.prototype.getVolumes = function() {
-   var r = []
-   var o = this.docker.volumes().iterator()
-   while(o.hasNext()) {
-      r.push(jsonParse(o.next().toString()))
-   }
-
-   return r
+   var res = this.__request("GET", "/volumes");
+   return jsonParse(res).Volumes;
 }
 
 
@@ -102,7 +119,7 @@ Docker.prototype.getObj = function() {
  * </odoc>
  */
 Docker.prototype.ping = function() {
-   return this.docker.ping();
+   return this.__request("GET", "/_ping") == "OK";
 };
 
 /**
@@ -112,7 +129,7 @@ Docker.prototype.ping = function() {
  * </odoc>
  */
 Docker.prototype.getDiskUsage = function() {
-   return jsonParse(this.docker.system().diskUsage());
+   return jsonParse(this.__request("GET", "/system/df"));
 };
 
 /**
@@ -122,7 +139,7 @@ Docker.prototype.getDiskUsage = function() {
  * </odoc>
  */
 Docker.prototype.getVersion = function() {
-   return jsonParse(this.docker.version());
+   return jsonParse(this.__request("GET", "/version"));
 };
 
 /**
@@ -132,11 +149,9 @@ Docker.prototype.getVersion = function() {
  * </odoc>
  */
 Docker.prototype.inspect = function(aId) {
-   var res = this.getContainer(aId);
-   if (isUnDef(res)) 
-      return void 0;
-   else
-      return jsonParse(String(res.inspect()));
+   var res = this.__request("GET", "/containers/" + aId + "/json");
+   if (res === "") return void 0;
+   return jsonParse(res);
 };
 
 /**
@@ -146,14 +161,7 @@ Docker.prototype.inspect = function(aId) {
  * </odoc>
  */
 Docker.prototype.getImages = function() {
-   var r = [];
-
-   var ii = this.docker.images().iterator();
-   while(ii.hasNext()) {
-      r.push(jsonParse(ii.next()));
-   }
-
-   return r;
+   return jsonParse(this.__request("GET", "/images/json"));
 };
 
 /**
@@ -174,8 +182,8 @@ Docker.prototype.listImages = function() {
  */
 Docker.prototype.pull = function(aImage, aTag) {
    aTag = _$(aTag).isString().default("latest");
-
-   return jsonParse(this.docker.images().pull(aImage, aTag));
+   var res = this.__request("POST", "/images/create?fromImage=" + aImage + "&tag=" + aTag);
+   return res;
 };
 
 /**
@@ -185,7 +193,7 @@ Docker.prototype.pull = function(aImage, aTag) {
  * </odoc>
  */
 Docker.prototype.prune = function() {
-   return this.docker.images().prune();
+   return jsonParse(this.__request("POST", "/images/prune"));
 };
 
 /**
@@ -199,11 +207,9 @@ Docker.prototype.prune = function() {
  * </odoc>
  */
 Docker.prototype.containerCreate = function(aContainer, aName) {
-   if (isDef(aName) && isString(aName)) {
-      return this.docker.containers().create(aName, this.__buildObj(aContainer));
-   } else {
-      return this.docker.containers().create(this.__buildObj(aContainer));
-   }
+   var nameQ = isDef(aName) ? ("?name=" + aName) : "";
+   var body = this.__buildObj(aContainer);
+   return jsonParse(this.__request("POST", "/containers/create" + nameQ, body));
 };
 
 /**
@@ -214,7 +220,7 @@ Docker.prototype.containerCreate = function(aContainer, aName) {
  * </odoc>
  */
 Docker.prototype.create = function(aContainer, aName) {
-   return jsonParse(this.containerCreate(aContainer, aName));
+   return this.containerCreate(aContainer, aName);
 };
 
 /**
@@ -224,13 +230,7 @@ Docker.prototype.create = function(aContainer, aName) {
  * </odoc>
  */
 Docker.prototype.getContainer = function(aId) {
-   var o = this.docker.containers().all();
-   while(o.hasNext()) {
-      var c = o.next();
-      if (c.containerId() == aId) return c;
-   }
-
-   return void 0;
+   return this.inspect(aId);
 };
 
 /**
@@ -240,11 +240,7 @@ Docker.prototype.getContainer = function(aId) {
  * </odoc>
  */
 Docker.prototype.getInfo = function(aId) {
-   var res = this.getContainer(aId);
-   if (isUnDef(res)) 
-      return void 0;
-   else
-      return jsonParse(String(res));
+   return this.inspect(aId);
 };
 
 /**
@@ -254,9 +250,7 @@ Docker.prototype.getInfo = function(aId) {
  * </odoc>
  */
 Docker.prototype.start = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   c.start();
+   this.__request("POST", "/containers/" + aId + "/start");
 };
 
 /**
@@ -266,9 +260,7 @@ Docker.prototype.start = function(aId) {
  * </odoc>
  */
 Docker.prototype.stop = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   c.stop();
+   this.__request("POST", "/containers/" + aId + "/stop");
 };
 
 /**
@@ -278,9 +270,7 @@ Docker.prototype.stop = function(aId) {
  * </odoc>
  */
 Docker.prototype.restart = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   c.restart();
+   this.__request("POST", "/containers/" + aId + "/restart");
 };
 
 /**
@@ -290,9 +280,8 @@ Docker.prototype.restart = function(aId) {
  * </odoc>
  */
 Docker.prototype.waitForNotRunning = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   return c.waitOn("not-running");
+   var res = this.__request("POST", "/containers/" + aId + "/wait?condition=not-running");
+   return jsonParse(res).StatusCode;
 };
 
 /**
@@ -302,9 +291,8 @@ Docker.prototype.waitForNotRunning = function(aId) {
  * </odoc>
  */
 Docker.prototype.waitForNextExit = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   return c.waitOn("next-exit");
+   var res = this.__request("POST", "/containers/" + aId + "/wait?condition=next-exit");
+   return jsonParse(res).StatusCode;
 };
 
 /**
@@ -314,9 +302,8 @@ Docker.prototype.waitForNextExit = function(aId) {
  * </odoc>
  */
 Docker.prototype.waitForRemoved = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   return c.waitOn("removed");
+   var res = this.__request("POST", "/containers/" + aId + "/wait?condition=removed");
+   return jsonParse(res).StatusCode;
 };
 
 /**
@@ -326,9 +313,7 @@ Docker.prototype.waitForRemoved = function(aId) {
  * </odoc>
  */
 Docker.prototype.kill = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   c.kill();
+   this.__request("POST", "/containers/" + aId + "/kill");
 };
 
 /**
@@ -338,9 +323,7 @@ Docker.prototype.kill = function(aId) {
  * </odoc>
  */
 Docker.prototype.remove = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) throw("Container " + aId + " not found.");
-   c.remove();
+   this.__request("DELETE", "/containers/" + aId);
 };
 
 /**
@@ -350,9 +333,7 @@ Docker.prototype.remove = function(aId) {
  * </odoc>
  */
 Docker.prototype.containerLogs = function(aId) {
-   var c = this.getContainer(aId);
-   if (isUnDef(c)) return void 0;
-   return c.logs();
+   return this.__request("GET", "/containers/" + aId + "/logs?stdout=1&stderr=1");
 };
 
 /**
@@ -362,19 +343,15 @@ Docker.prototype.containerLogs = function(aId) {
  * </odoc>
  */
 Docker.prototype.logs = function(aId, aPrefix) {
-   var c = this.getContainer(aId);
    aPrefix = _$(aPrefix, "prefix").isString().default("");
-
-   if (isDef(c)) {
-      var o = String(c.logs().fetch()).split(/\n/);
-      var r = "";
-      for(var ii in o) {
-         r += aPrefix + o[ii] + "\n";
-      }
-      return r.substring(0, r.length-1); 
-   } else {
-      return void 0;
+   var res = this.__request("GET", "/containers/" + aId + "/logs?stdout=1&stderr=1");
+   if (isUnDef(res)) return void 0;
+   var o = String(res).split(/\n/);
+   var r = "";
+   for(var ii in o) {
+      r += aPrefix + o[ii] + "\n";
    }
+   return r.substring(0, r.length-1);
 };
 
 /**
