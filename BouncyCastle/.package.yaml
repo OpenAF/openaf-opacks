@@ -17,17 +17,17 @@ name: BouncyCastle
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250115'
+version: '20250606'
 dependencies:
   openaf: '>=20211229'
 files:
 - .maven.yaml
 - .package.yaml
-- bcpkix-jdk18on-1.80.jar
-- bcprov-jdk18on-1.80.jar
-- bcutil-jdk18on-1.80.jar
+- bcpkix-jdk18on-1.81.jar
+- bcprov-jdk18on-1.81.jar
+- bcutil-jdk18on-1.81.jar
 filesHash:
   .maven.yaml: cab9eff302f7c91ef98ca0493c190c81e60c8a50
-  bcpkix-jdk18on-1.80.jar: 5277dfaaef2e92ce1d802499599a0ca7488f86e6
-  bcprov-jdk18on-1.80.jar: e22100b41042decf09cab914a5af8d2c57b5ac4a
-  bcutil-jdk18on-1.80.jar: b95726d1d49a0c65010c59a3e6640311d951bfd1
+  bcpkix-jdk18on-1.81.jar: 819fd6f5d170c8b8bf8c5acc73816e9c36574042
+  bcprov-jdk18on-1.81.jar: d17c094daef57dbd80af71687a475aa6df7cbe54
+  bcutil-jdk18on-1.81.jar: e2dd79395ab435094142b6aba219f35adcba0f01
