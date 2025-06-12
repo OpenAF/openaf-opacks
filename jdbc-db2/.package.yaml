@@ -16,15 +16,15 @@ name: jdbc-db2
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20241122'
+version: '20250612'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- jcc-12.1.0.0.jar
+- jcc-12.1.2.0.jar
 - jdbc-db2.js
 filesHash:
-  LICENSES.txt: baff22508b4782268255ba7499abe2383f6c439d
-  jcc-12.1.0.0.jar: 698e98dc690b5af9fce88e1dd6405a256edc5e30
+  LICENSES.txt: 8e8eb08336d4331210d2d6d4822111ad97ca7e93
+  jcc-12.1.2.0.jar: cf922cae1ae721b96185265268290c6a876112ea
   jdbc-db2.js: 94579487ff3e381f0f662b2f1e772d900f6ffa4f
