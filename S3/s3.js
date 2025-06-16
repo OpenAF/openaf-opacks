@@ -329,8 +329,13 @@ S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap,
     Object.keys(aMetaMap).forEach(k => {
         hmm.put(k, aMetaMap[k]);
     });
-    var pos = Packages.io.minio.PutObjectArgs.builder().bucket(aBucket).object(aObjectName).stream(aStream, aStream.available(), -1).userMetadata(hmm);
-    if (isDef(aContentType) && aContentType != null) pos = pos.contentType(aContentType);
+    var pos = Packages.io.minio.PutObjectArgs.builder().bucket(aBucket).object(aObjectName).stream(aStream, aStream instanceof Packages.io.minio.GetObjectResponse ? aStream.headers().get("Content-Length") : aStream.available(), -1).userMetadata(hmm)
+    if (isDef(aContentType) && aContentType != null) 
+        pos = pos.contentType(aContentType)
+    else if (aStream instanceof Packages.io.minio.GetObjectResponse) {      
+        pos = pos.contentType(aStream.headers().get("Content-Type"))
+    }
+
     this.s3.putObject(pos.build());
     //this.s3.putObject(aBucket, aObjectName, aStream, aStream.available(), af.toJavaMap(aMetaMap), null, aContentType);
 };
