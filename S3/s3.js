@@ -133,19 +133,21 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
     while (itr.hasNext()) { 
         var item = itr.next().get();
         var stat = {};
+        var _f = String(item.objectName())
         if (needFull) {
-            var _stat = this.s3.statObject(Packages.io.minio.StatObjectArgs.builder().bucket(aBucket).object(String(item.objectName())).build());
+            var _stat = this.s3.statObject(Packages.io.minio.StatObjectArgs.builder().bucket(aBucket).object(_f).build())
             stat.contentType = _stat.contentType();
         }
-        var isDir = item.isDir() || (String(item.objectName()).endsWith("/"));
+        var isDir = item.isDir() || (_f.endsWith("/"))
+        
         res.push({
             isDirectory: isDir,
             isFile: !isDir,
             isLatest: item.isLatest(),
-            filename: String(item.objectName()), 
-            filepath: String(item.objectName()),
-            canonicalPath: String(item.objectName()),
-            lastModified: (item.objectName().endsWith("/") ? void 0 : Number(new Date(item.lastModified().toString()).getTime())),
+            filename: _f, 
+            filepath: _f,
+            canonicalPath: _f,
+            lastModified: (_f.endsWith("/") ? void 0 : Number(new Date(item.lastModified().toString()).getTime())),
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
