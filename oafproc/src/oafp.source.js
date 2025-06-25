@@ -265,6 +265,69 @@ const _o$o = (a, b, c) => {
         if (isDef(_s)) _print(_s)
     }
 }
+
+// Parallel execution initialization
+const _parInit = () => {
+    return {
+        _resC: $atomic(),
+        _nc  : getNumberOfCores(),
+        times: $atomic(),
+        execs: $atomic(0, "long"),
+        _opar: (isDef(params.parallel) && toBoolean(params.parallel)) || String(getEnv("OAFP_PARALLEL")).toLowerCase() == "true",
+        _par : false,
+        _ts  : []
+    }
+}
+
+// Parallel execution check
+const _parCheck = _par => {
+    // If execution time per call is too low, go sequential
+    if ( _par._opar && _par._nc >= 3 ) {
+        if ( ((_par.times.get() / _par.execs.get() ) / 1000000) < __flags.PFOREACH.seq_thrs_ms || __getThreadPools().active / getNumberOfCores() > __flags.PFOREACH.seq_ratio) {
+            _par._par = true
+        } else {
+            _par._par = false
+        }
+    }
+
+    return _par
+}
+
+// Parallel execution done
+const _parDone = _par => {
+	var tries = 0
+	do {
+		$doWait($doAll(_par._ts))
+		if (_par._resC.get() > 0) sleep(__getThreadPools().queued * __flags.PFOREACH.waitms, true)
+		tries++
+	} while(_par._resC.get() > 0 && tries < 100)
+}
+
+// Parallel execution
+const _parExec = (_par, fn) => {
+    var init = nowNano(), _e
+    if (_par._par) {
+        _par._ts.push($do(() => {
+            _par._resC.inc()
+            return fn(_par.execs.inc())
+        }).then(() => {
+            return _par._resC.dec()
+        }).catch(e => {
+            _e = e
+        }))
+        if (isDef(_e)) throw _e
+    } else {
+        fn(_par.execs.inc())
+    }
+    _par.times.getAdd(nowNano() - init)
+
+	// Cool down and go sequential if too many threads
+    var _tpstats = __getThreadPools()
+    if (_tpstats.queued > _tpstats.poolSize / __flags.PFOREACH.threads_thrs) {
+        $doWait(_par._ts.pop())
+    }
+}
+
 const _getSec = (aM, aPath) => {
 	aM = _$(aM).isMap().default({})
 	if (isDef(aM.secKey)) {
@@ -309,6 +372,9 @@ var procParams = () => {
     params.output = params.format
     params.in = params.type
     params.input = params.type
+    if (isUnDef(params._id)) {
+        params._id = genUUID()
+    }
 }
 procParams()
 
@@ -574,7 +640,9 @@ const _addSrcFileExtensions = (ext, type) => {
 var _inputNoMem = new Set([
   "csv",
   "ndjson",
-  "ndslon"
+  "ndslon",
+  "lines",
+  "dsv"
 ])
 // --- add extra _inputNoMem here ---
 const _addSrcFileExtensionsNoMem = ext => {
@@ -785,6 +853,92 @@ var _inputLineFns = {
             }
             _$o(af.fromSLON(String(r)), options, true)
             noFurtherOutput = true
+        } else {
+            return true
+        }
+    },
+    "dsv": (r, options) => {
+        if (isUnDef(params.indsvsep)) params.indsvsep = ","
+        if (isUnDef(params.indsvsepre)) params.indsvsepre = __
+        if (isUnDef(params.indsvquote)) params.indsvquote = "\""
+        if (isUnDef(params.indsvescape)) params.indsvescape = "\\"
+        if (isUnDef(params.indsvcomment)) params.indsvcomment = "#"
+        if (isUnDef(params.indsvheader)) params.indsvheader = true
+        if (isUnDef(params.indsvtrim)) params.indsvtrim = true
+        if (isUnDef(params.indsvjoin)) params.indsvjoin = false
+        if (isUnDef(params.indsvfields)) params.indsvfields = __
+
+        if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
+        if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
+
+        var _dsvmap = rs => {
+            var _r = {}
+            params.indsvfields.forEach((f, i) => {
+                _r[f] = rs[i]
+            })
+            return _r
+        }
+
+        var _dsvproc = rs => {
+            if (isUnDef(rs) || rs.length == 0) return __
+
+            if (toBoolean(params.indsvheader)) {
+                if (isUnDef(params.indsvfields)) {
+                    if (isUnDef(params.indsvsepre)) {
+                        params.indsvfields = rs.trim().split(params.indsvsep)
+                    } else {
+                        params.indsvfields = rs.trim().split(new RegExp(params.indsvsepre))
+                    }
+                    params.indsvfields = params.indsvfields.map(f => {
+                        if (params.indsvtrim) f = f.trim()
+                        if (params.indsvquote && f.startsWith(params.indsvquote) && f.endsWith(params.indsvquote)) {
+                            f = f.substring(1, f.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            f = f.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return f
+                    })
+                    return __
+                }
+            }
+
+            var _r = {}
+            if (isString(rs)) {
+                if (isUnDef(params.indsvsepre)) {
+                    _r = pForEach(rs.split(params.indsvsep), s => {
+                        if (params.indsvtrim) s = s.trim()
+                        if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
+                            s = s.substring(1, s.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return s
+                    })
+                } else {
+                    _r = pForEach(rs.split(new RegExp(params.indsvsepre)), s => {
+                        if (params.indsvtrim) s = s.trim()
+                        if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
+                            s = s.substring(1, s.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return s
+                    })
+                }
+                return _dsvmap(_r)
+            }
+        }
+
+        if (!params.indsvjoin) {
+            r = String(r)
+            if (r.length > 0 && r.trim().substring(0, 1) != params.indsvcomment) {
+                var _rs = _dsvproc(r)
+                if (isDef(_rs)) _$o(_rs, options, true)
+                return true
+            }
         } else {
             return true
         }
@@ -2039,6 +2193,73 @@ var _outputFns = new Map([
                 _f(r)
             }
         }
+    }],
+    ["dsv", (r, options) => {
+        if (isUnDef(params.dsvsep))     params.dsvsep = ","
+        if (isUnDef(params.dsvquote))   params.dsvquote = '\\"'
+        if (isUnDef(params.dsvfields))  params.dsvfields = __
+        if (isUnDef(params.dsvuseslon)) params.dsvuseslon = false
+        if (isUnDef(params.dsvnl))      params.dsvnl = "\n"
+        if (isUnDef(params.dsvheader))  params.dsvheader = true
+
+        if (isDef(params.dsvfields)) params.dsvfields = String(params.dsvfields).split(",")
+
+        if (isMap(r)) {
+            r = [ r ]
+        }
+        if (isArray(r)) {
+            var _out = []
+            if (toBoolean(params.dsvheader) && isArray(r) && r.length > 0) {
+                if (isDef(params.dsvfields) && isArray(params.dsvfields)) {
+                    _out.push(params.dsvfields.map(f => {
+                        if (isString(f)) {
+                            f = f.replace(/"/g, '""')
+                            f = `"${f}"`
+                        } else if (isNull(f)) {
+                            f = ""
+                        }
+                        return f
+                    }))
+                } else {
+                    _out.push(Object.keys(r[0]).map(f => {
+                        if (isString(f)) {
+                            f = f.replace(/"/g, '""')
+                            f = `"${f}"`
+                        } else if (isNull(f)) {
+                            f = ""
+                        }
+                        return f
+                    }))
+                }
+                if (params.dsvnl.length > 0) _out.push(params.dsvnl)
+            }
+            if (!isArray(params.dsvfields)) params.dsvfields = __
+
+            r.forEach((row, i) => {
+                if (i > 0) _out.push(params.dsvnl)
+                var _row = pForEach(isDef(params.dsvfields) ? params.dsvfields : Object.keys(row), k => {
+                    var v = row[k]
+                    if (isString(v)) {
+                        v = v.replace(/"/g, '""')
+                        v = `"${v}"`
+                    } else if (isNull(v)) {
+                        v = ""
+                    } else if (isArray(v) || isMap(v)) {
+                        v = params.dsvuseslon ? af.toSLON(v) : stringify(v, __, "")
+                        v = v.replace(/"/g, params.dsvquote)
+                        v = `"${v}"`
+                    }
+                    return v
+                })
+                _out.push(_row.join(params.dsvsep))
+            })
+            if (params.dsvnl.length > 0 && _out.length > 0 && _out[_out.length - 1] != params.dsvnl && r.length > 1) {
+                _out.push(params.dsvnl)
+            }
+        } else {
+            _exit(-1, "For out=dsv, input needs to be an array or map.")
+        }
+        _print(_out.join(""))
     }]
 ])
 
@@ -2186,17 +2407,22 @@ var _inputFns = new Map([
                 }
             }
 
+            var _p = _parInit()
             ioStreamReadLines(_stream, r => {
-                // If linesvisual=true then the first line is the header and the space position of
-                // each header title determines the column position for the remaining lines
+                _parExec(_p, () => {
+                    // If linesvisual=true then the first line is the header and the space position of
+                    // each header title determines the column position for the remaining lines
 
-                if (toBoolean(params.linesvisual)) {
-                    var _r = _visualProc(r)
-                    if (isDef(_r)) _$o(_r, clone(options), true)
-                } else {
-                    _$o(r, clone(options), true)
-                }
+                    if (toBoolean(params.linesvisual)) {
+                        var _r = _visualProc(r)
+                        if (isDef(_r)) _$o(_r, clone(options), true)
+                    } else {
+                        _$o(r, clone(options), true)
+                    }
+                })
+                _p = _parCheck(_p)
             })
+            _parDone(_p)
             _stream.close()
         }
     }],
@@ -2249,9 +2475,12 @@ var _inputFns = new Map([
                 }
             }
 
+            var _p = _parInit()
             ioStreamReadLines(_stream, r => {
-                _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) )
+                _parExec(_p, () => _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) ) )
+                _p = _parCheck(_p)
             })
+            _parDone(_p)
             _stream.close()
         }
         if (noOut) _clearTmpMsg()
@@ -2267,7 +2496,7 @@ var _inputFns = new Map([
                 if (r.length != 0 && !r.trim().endsWith(")")) { global.__ndslonbuf += r.trim(); return }
                 if (global.__ndslonbuf.length > 0) { r = global.__ndslonbuf + r; global.__ndslonbuf = __ }
             }
-            if (r.length == 0 || r.length > 0 && r.trim().substring(0, 1) != "{") { 
+            if (r.length == 0 || r.length > 0 && r.trim().substring(0, 1) != "(") { 
                 noOut = false
                 fn(r)
                 global.__ndslonbuf = __
@@ -2305,9 +2534,132 @@ var _inputFns = new Map([
                 }
             }
 
+            var _p = _parInit()
             ioStreamReadLines(_stream, r => {
-                _ndslonline(r, line => _$o(af.fromSLON(line), clone(options), true) )
+                _parExec(_p, () => _ndslonline(r, line => _$o(af.fromSLON(line), clone(options), true) ) )
+                _p = _parCheck(_p)
             })
+            _parDone(_p)
+            _stream.close()
+        }
+        if (noOut) _clearTmpMsg()
+    }],
+    ["dsv", (_res, options) => {
+        _showTmpMsg()
+        if (isUnDef(params.indsvsep)) params.indsvsep = ","
+        if (isUnDef(params.indsvsepre)) params.indsvsepre = __
+        if (isUnDef(params.indsvquote)) params.indsvquote = "\""
+        if (isUnDef(params.indsvescape)) params.indsvescape = "\\"
+        if (isUnDef(params.indsvcomment)) params.indsvcomment = "#"
+        if (isUnDef(params.indsvheader)) params.indsvheader = true
+        if (isUnDef(params.indsvtrim)) params.indsvtrim = true
+        if (isUnDef(params.indsvjoin)) params.indsvjoin = false
+        if (isUnDef(params.indsvfields)) params.indsvfields = __
+
+        if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
+        if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
+        var _dsvmap = r => {
+            var _r = {}
+            params.indsvfields.forEach((f, i) => {
+                _r[f] = r[i]
+            })
+            return _r
+        }
+
+        var _dsvproc = r => {
+            if (isUnDef(r) || r.length == 0) return {}
+
+            if (toBoolean(params.indsvheader)) {
+                if (isUnDef(params.indsvfields)) {
+                    if (isUnDef(params.indsvsepre)) {
+                        params.indsvfields = r.trim().split(params.indsvsep)
+                    } else {
+                        params.indsvfields = r.trim().split(new RegExp(params.indsvsepre))
+                    }
+                    params.indsvfields = params.indsvfields.map(f => {
+                        if (params.indsvtrim) f = f.trim()
+                        if (params.indsvquote && f.startsWith(params.indsvquote) && f.endsWith(params.indsvquote)) {
+                            f = f.substring(1, f.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            f = f.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return f
+                    })
+                    return __
+                }
+            }
+
+            var _r = {}
+            if (isString(r)) {
+                if (isUnDef(params.indsvsepre)) {
+                    _r = pForEach(r.split(params.indsvsep), s => {
+                        if (params.indsvtrim) s = s.trim()
+                        if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
+                            s = s.substring(1, s.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return s
+                    })
+                } else {
+                    _r = pForEach(r.split(new RegExp(params.indsvsepre)), s => {
+                        if (params.indsvtrim) s = s.trim()
+                        if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
+                            s = s.substring(1, s.length - 1)
+                        }
+                        if (params.indsvescape) {
+                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                        }
+                        return s
+                    })
+                }
+                return _dsvmap(_r)
+            }
+        }
+                
+        var noOut = true
+        if (params.indsvjoin) {
+            if (isDef(params.file) && isUnDef(params.cmd)) {
+                _res = io.readFileString(params.file)
+            }
+            if (isDef(params.cmd)) {
+                _res = _runCmd2Bytes(params.cmd, true)
+            }
+
+            _$o( _res.split(/\r?\n/).map(r => {
+                if (isUnDef(r) || r.length == 0) return __
+                if (r.trim().startsWith(params.indsvcomment)) return __
+                return _dsvproc(r)
+            }).filter(r => isDef(r)), options)
+        } else {
+            var _stream
+            if (isDef(params.file) && isUnDef(params.cmd)) {
+                _stream = io.readFileStream(params.file)
+            } else {
+                if (isDef(params.cmd)) {
+                    _stream = af.fromBytes2InputStream(_runCmd2Bytes(params.cmd))
+                } else {
+                    _stream = af.fromString2InputStream(_res)
+                }
+            }
+
+            var _p = _parInit()
+            ioStreamReadLines(_stream, r => {
+                if (isUnDef(r) || r.length == 0) return
+                if (r.trim().startsWith(params.indsvcomment)) return
+                _parExec(_p, () => {
+                    if (isString(r)) {
+                        var _dsv = _dsvproc(r)
+                        if (isDef(_dsv)) _$o(_dsv, clone(options), true)
+                    }
+                    return true
+                })
+                _p = _parCheck(_p)
+                return false
+            })
+            _parDone(_p)
             _stream.close()
         }
         if (noOut) _clearTmpMsg()
@@ -3557,21 +3909,31 @@ var _run = () => {
                     } else {
                         if (params.input != "pm") {
                             _res = []
+                            //var _resC = $atomic(), _par = false, _opar = isDef(params.parallel) && toBoolean(params.parallel), _sres, _nc = getNumberOfCores(), times = $atomic(), execs = $atomic()
+                            var _p = _parInit()
+                            ow.loadObj()
+                            _p._sres = new ow.obj.syncArray()
                             io.pipeLn(r => {
                                 try {
-                                    if (isDef(_inputLineFns[params.type])) {
-                                        if (_inputLineFns[params.type](_transform(r), clone(options))) {
-                                            _res.push(r)
+                                    _parExec(_p, part => {
+                                        if (isDef(_inputLineFns[params.type])) {
+                                            if (_inputLineFns[params.type](_transform(r), merge(clone(options), { part: part }))) {
+                                                _p._sres.add(r)
+                                            }
+                                        } else { 
+                                            _p._sres.add(r)
                                         }
-                                    } else { 
-                                        _res.push(r)
-                                    }
+                                        return false
+                                    })
                                 } catch(ipl) {
                                     printErr("ERROR: " + ipl)
                                 }
+                                _p = _parCheck(_p)
 
                                 return false
                             })
+                            _parDone(_p)
+                            _res = _res.concat(_p._sres.toArray())
                             _res = _res.join('\n')
                         }
                     }

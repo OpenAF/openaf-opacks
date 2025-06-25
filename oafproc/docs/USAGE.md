@@ -27,6 +27,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | outkey | If defined the map/list output will be prefix with the provided key |
 | outfile | If defined all output will be written to the provided file |
 | outfileappend | If 'true' and outfile=true the output will be appended on the provided file |
+| parallel | If 'true' and input supports parallel processing it will try to process the input in parallel disregarding input order |
 | pause  | If 'true' will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |
@@ -259,6 +260,26 @@ List of options to use when _in=db_ (SQL query):
 
 ---
 
+### 🧾 DSV input options
+
+List of options to use when _in=dsv_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| indsvsep | String | The separator to use (default is ',') |
+| indsvsepre | String | The regular expression to use as separator |
+| indsvquote | String | The quote character to use (default is '"') |
+| indsvescape | String | The escape character to use for double-quotes |
+| indsvcomment | String | The comment character to use (default is '#') |
+| indsvheader | Boolean | If true will try to use the first line as header (default is true) |
+| indsvtrim | Boolean | If true will trim all values (default is true) |
+| indsvjoin | Boolean | If true it will return an array with each processed line |
+| indsvfields | String | Comma separated list of fields to use as header (overrides indsvheader) |
+
+> Support parallel=true if indsvjoin=false or not defined
+
+---
+
 ### 🧾 JavaGC input options
 
 List of options to use when _in=javagc_:
@@ -354,6 +375,8 @@ List of options to use when _in=lines_:
 | linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
 | linesvisualheadsep | Boolean | If true will try to process the second line as header separator aiding on column position determination (if linesvisualsepre is not defined it will default to '\\s+') |
 
+> Supports parallel=true if linesjoin=false or not defined
+
 ---
 
 ### 🧾 LS input options
@@ -387,6 +410,8 @@ List of options to use when _in=ndjson_:
 | ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
 | ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
 
+> Supports parallel=true if ndjsonjoin=false or not defined
+
 ---
 
 ### 🧾 ndSLON input options
@@ -397,6 +422,8 @@ List of options to use when _in=ndslon_:
 |--------|------|-------------|
 | ndslonjoin | Boolean | If true will join the ndslon records to build an output array |
 | ndslonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter slon records on a ndslon) |
+
+> Supports parallel=true if ndslonjoin=false or not defined
 
 ---
 
@@ -697,6 +724,21 @@ List of options to use when _out=db_:
 > JDBC oracle: jdbc:oracle:thin:@[host]:[port]:[database]
 > JDBC postgreSQL: jdbc:postgresql://[host]:[port]/[database]
 > JDBC H2: jdbc:h2:[file]   
+
+---
+
+### 🧾 DSV output options
+
+List of options to use when _out=dsv_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| dsvsep | String | The separator to use (default is ',') |
+| dsvquote | String | The quote character to use (default is '"') |
+| dsvfields | String | Comma separated list of fields to use as header (overrides dsvheader) |
+| dsvuseslon | Boolean | If true the output of value objects will be in SLON format (default is false) |
+| dsvheader | Boolean | If true will try to output the first line as header (default is true) |
+| dsvnl | String | Newline sequence to use (default is '\n') |
 
 ---
 
