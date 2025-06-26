@@ -74,7 +74,7 @@ jobs:
       var sources = $path(_lst, "[?ends_with(filename, '.java')].filepath")
       var sep = java.io.File.pathSeparator;
       log("Identified #" + sources.length + " sources and #" + classpath.length + " jars...")
-      $sh(["javac", "-source", "1.8", "-target", "1.8", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources))
+      $sh(["javac", "-source", "21", "-target", "21", "-Xlint:deprecation", "-cp", classpath.join(sep) ].concat(sources))
       .pwd(args.outputDir)
       .exec()
  
