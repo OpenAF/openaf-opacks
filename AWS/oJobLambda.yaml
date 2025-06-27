@@ -67,7 +67,7 @@ jobs:
         statusCode: 200
       }
       try {
-        _res = global.ojobHttpdAWS(clone(request))
+        _res = global.__ojobHttpdAWS[request.uri](clone(request))
       } catch(e) {
         $err(e)
         return ow.server.httpd.reply("Internal error!", 500)
@@ -83,7 +83,8 @@ jobs:
       aws = aws.assumeRole(args.assumeRole)
     }
 
-    global.ojobHttpdAWS = k => {
+    if (isUnDef(global.__ojobHttpdAWS)) global.__ojobHttpdAWS = {}
+    global.__ojobHttpdAWS[args.uri] = k => {
       if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
         aws = new AWS(args.accessKey, args.secret, args.token)
         log("Assuming role " + args.assumeRole + "...")
