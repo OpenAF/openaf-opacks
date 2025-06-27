@@ -70,7 +70,7 @@ jobs:
         statusCode: 200
       }
       try {
-        _res = $cache("ojob-httpd-aws").get(request)
+        _res = $cache("ojob-httpd-aws").get(clone(request))
       } catch(e) {
         $err(e)
         return ow.server.httpd.reply("Internal error!", 500)
