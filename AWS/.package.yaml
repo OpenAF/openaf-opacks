@@ -97,7 +97,7 @@ filesHash:
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
   oJobECR.yaml: 913a0bdee24cb380199e8d7aad6b21f459f7648a
-  oJobLambda.yaml: 8299fe1aa364f1cdd246400014e9475f11ae29a2
+  oJobLambda.yaml: 441511cf58d4b67543c07fadbc4a6c2130f4a147
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9
