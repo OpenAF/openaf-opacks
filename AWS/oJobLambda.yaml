@@ -84,17 +84,18 @@ jobs:
     }
 
     if (isUnDef(global.__ojobHttpdAWS)) global.__ojobHttpdAWS = {}
-    global.__ojobHttpdAWS[args.uri] = k => {
-      if (isDef(args.assumeRole) && aws.checkAssumeRole()) {
-        aws = new AWS(args.accessKey, args.secret, args.token)
-        log("Assuming role " + args.assumeRole + "...")
-        aws = aws.assumeRole(args.assumeRole)
+    var _args = clone(args)
+    global.__ojobHttpdAWS[_args.uri] = k => {
+      if (isDef(_args.assumeRole) && aws.checkAssumeRole()) {
+        aws = new AWS(_args.accessKey, _args.secret, _args.token)
+        log("Assuming role " + _args.assumeRole + "...")
+        aws = aws.assumeRole(_args.assumeRole)
       } else {
-        aws = new AWS(args.accessKey, args.secret, args.token)
+        aws = new AWS(_args.accessKey, _args.secret, _args.token)
       }
 
       delete k.params["NanoHttpd.QUERY_STRING"]
-      var _r = _$(args.params).isMap().default({})
+      var _r = _$(_args.params).isMap().default({})
 
       if (isDef(k.files) && isDef(k.files.postData)) _r.body = k.files.postData
 
@@ -108,12 +109,12 @@ jobs:
       })
 
       try {
-        if (args.debug) {
-          log("AWS Lambda function " + args.lambda + " in region " + args.region + ", request: " + af.toCSLON(_r))
+        if (_args.debug) {
+          log("AWS Lambda function " + _args.lambda + " in region " + _args.region + ", request: " + af.toCSLON(_r))
         }
-        var _res = aws.LAMBDA_Invoke(args.region, args.lambda, _r, args.version)
-        if (args.debug) {
-          log("AWS Lambda function " + args.lambda + " in region " + args.region + ", response: " + af.toCSLON(_res))
+        var _res = aws.LAMBDA_Invoke(_args.region, _args.lambda, _r, _args.version)
+        if (_args.debug) {
+          log("AWS Lambda function " + _args.lambda + " in region " + _args.region + ", response: " + af.toCSLON(_res))
         }
         return _res
       } catch (e) {
