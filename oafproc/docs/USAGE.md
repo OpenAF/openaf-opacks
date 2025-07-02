@@ -87,6 +87,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ls | Returns a list of files and folders for a given directory path or zip or tar or tgz file |
 | md | A Markdown format |
 | mdtable | A Markdown table format |
+| mdcode | A Markdown code blocks format |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code or OpenAF scripting file to execute and use the result as input |
