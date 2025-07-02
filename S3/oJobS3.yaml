@@ -96,6 +96,7 @@ jobs:
             lst = $cache(cache).get({ puri: (puri == "/" ? "" : puri).replace(/^\//, "") })
          } else {
             lst = s3.listObjects(bucket, path + (puri == "/" ? "" : puri).replace(/^\//, ""))
+            if ((puri == "/" ? "" : puri).replace(/^\//, "").length > 1) lst = lst.filter(r => r.filename != (puri == "/" ? "" : puri).replace(/^\//, ""))
          }
 
          origLst = lst
@@ -269,6 +270,7 @@ jobs:
         .fn(k => {
           log("  cache get " + af.toSLON(k)) 
           var _r = s3.listObjects(args.bucket, args.path + k.puri)
+          if (k.puri.length > 1) _r = _r.filter(r => r.filename != k.puri)
           return _r
         })
         .create()
@@ -341,12 +343,13 @@ jobs:
         _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
         _s3p = _s3p.replace(/^\//, "")
 
-        print(`_s3p = ${_s3p}`)
+        //print(`_s3p = ${_s3p}`)
         if (isDef(args.cache)) {
           _cache = "__oJobS3_" + md5(args.url + args.bucket)
           lst = $cache(_cache).get({ puri: _s3p })
         } else {
           lst = s3.listObjects(args.bucket, _s3p)
+          if (_s3p.length > 1) lst = lst.filter(r => r.filename != _s3p)
         }
         origLst = lst
         if (isDef(args.restrict)) {
@@ -427,6 +430,7 @@ jobs:
           .fn(k => {
             log("  cache get " + af.toSLON(k)) 
             var _r = s3.listObjects(args.bucket, k.puri)
+            if (k.puri.length > 1) _r = _r.filter(r => r.filename != k.puri)
             return _r
           })
           .create()

@@ -23,7 +23,7 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertChe
         this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).httpClient(this.httpClient)
         if (aURL.indexOf(".amazonaws.com") > 0) {
             var providers = new Packages.io.minio.credentials.ChainedProvider(
-                new Packages.io.minio.credentials.AwsConfigProvider( _$(getEnv("AWS_SHARED_CREDENTIALS_FILE")).default(String(java.lang.System.getProperty("user.home"))+".aws/credentials"), _$(getEnv("AWS_PROFILE")).default("default")), 
+                new Packages.io.minio.credentials.AwsConfigProvider( _$(getEnv("AWS_SHARED_CREDENTIALS_FILE")).default(String(java.lang.System.getProperty("user.home"))+"/.aws/credentials"), _$(getEnv("AWS_PROFILE")).default("default")), 
                 new Packages.io.minio.credentials.IamAwsProvider(null, null), 
                 new Packages.io.minio.credentials.AwsEnvironmentProvider() )
             this.s3 = this.s3.credentialsProvider(providers)

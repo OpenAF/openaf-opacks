@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250615'
+version: '20250701'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -65,10 +65,10 @@ filesHash:
   kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
   minio-8.5.17.jar: f93c9b595c490456ce685eeaf4ae62ab0e8bc90e
-  oJobS3.yaml: 86b71d32061a7fdf688859a068d007e9545272db
+  oJobS3.yaml: c786f0c1f01d0853e2e9496ae5a14cffdaaa6ea7
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: d9d5c2534f88fe76798509ad7b5e08c45817ccb3
+  s3.js: d5b5780553d3326cf61727a34eff61b019e23db7
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.7.jar: 3049f95640f4625a945cfab85715f603fa4c8f80
