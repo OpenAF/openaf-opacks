@@ -72,7 +72,6 @@
   |**etcd3**|<img src=".github/badges/etcd3.svg"><br>Wrapper to access etcd3 functionality as a client|
   |**inBrowser**|<img src=".github/badges/inBrowser.svg"><br>Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.|
   |**initd**|<img src=".github/badges/initd.svg"><br>Creates initd scripts to use with the openaf&#x27;s --daemon command line option.|
-  |**jdbc-couchbase**|<img src=".github/badges/jdbc-couchbase.svg"><br>Wrapper for JDBC drivers of couchbase|
   |**jdbc-couchbaseanalytics**|<img src=".github/badges/jdbc-couchbaseanalytics.svg"><br>Wrapper for JDBC drivers of couchbaseanalytics|
   |**jdbc-csv**|<img src=".github/badges/jdbc-csv.svg"><br>Wrapper for JDBC drivers of csv|
   |**jdbc-db2**|<img src=".github/badges/jdbc-db2.svg"><br>Wrapper for JDBC drivers of db2|
@@ -90,7 +89,6 @@
   |**jdbc-postgresql**|<img src=".github/badges/jdbc-postgresql.svg"><br>Wrapper for JDBC drivers of postgresql|
   |**jdbc-presto**|<img src=".github/badges/jdbc-presto.svg"><br>Wrapper for JDBC drivers of presto|
   |**jdbc-sqlite**|<img src=".github/badges/jdbc-sqlite.svg"><br>Wrapper for JDBC drivers of sqlite|
-  |**jdbc-sqlserver**|<img src=".github/badges/jdbc-sqlserver.svg"><br>Wrapper for JDBC drivers of sqlserver|
   |**jdbc-trino**|<img src=".github/badges/jdbc-trino.svg"><br>Wrapper for JDBC drivers of trino|
   |**jdbc-yugabytedb**|<img src=".github/badges/jdbc-yugabytedb.svg"><br>Wrapper for JDBC drivers of yugabytedb|
   |**jexer**|<img src=".github/badges/jexer.svg"><br>Wrapper for the Jexer library|
