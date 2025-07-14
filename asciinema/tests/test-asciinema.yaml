@@ -1,0 +1,25 @@
+include:
+- oJobBrowse.yaml
+
+ojob:
+  daemon  : true
+  opacks  :
+  - oJob-common
+  loadLibs:
+  - ../asciinema.js
+
+todo:
+- (httpdStart ): 17878
+  ((mapLibs  )): true
+- (httpdRedirect): 17878
+  ((uri        )): /
+  ((targetURI  )): /f
+- (httpdBrowse): 17878
+  ((uri      )): /f
+  ((path     )): .
+  ((browse   )): true
+  ((incURI   )): true
+- (httpdBrowse): 17878
+  ((uri      )): /recs
+  ((path     )): recs
+  ((browse   )): false

@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- asciinema
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/asciinema.opack
+description: Asciinema wrapper for use with OpenAF HTTPd server
+name: asciinema
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20250713'
+dependencies:
+  openaf: '>=20250713'
+files:
+- .package.yaml
+- asciinema.js
+- libs/asciinema-emb-player.js
+- libs/asciinema-player.min.css
+- libs/asciinema-player.min.js
+- tests/recs/test.cast
+- tests/test-asciinema.yaml
+- tests/test.md
+filesHash:
+  asciinema.js: 001caa2c7eb8bfb5ba0c8c5ccdf3f00031d82f22
+  libs/asciinema-emb-player.js: 0c375a1327eb0f7eeb99c5cac1d7a824505ab997
+  libs/asciinema-player.min.css: 0136b53c3263bceedee0543fdb02933e690e912e
+  libs/asciinema-player.min.js: 6ddd5e88beb61f116cb9445698108ffc4abf8f5f
+  tests/recs/test.cast: 5da0f7ec3a35d12b1175c6c3eb2fe08fb5524dd0
+  tests/test-asciinema.yaml: ca09e01c3602db6abd20cb21a0ef2756c09f2a9d
+  tests/test.md: 4567884a64602044d0cf071b5501af7324aa2895
