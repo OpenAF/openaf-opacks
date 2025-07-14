@@ -22,6 +22,7 @@ dependencies:
 files:
 - .package.yaml
 - asciinema.js
+- libs/LICENSE
 - libs/asciinema-emb-player.js
 - libs/asciinema-player.min.css
 - libs/asciinema-player.min.js
@@ -30,6 +31,7 @@ files:
 - tests/test.md
 filesHash:
   asciinema.js: 001caa2c7eb8bfb5ba0c8c5ccdf3f00031d82f22
+  libs/LICENSE: 8624bcdae55baeef00cd11d5dfcfa60f68710a02
   libs/asciinema-emb-player.js: 0c375a1327eb0f7eeb99c5cac1d7a824505ab997
   libs/asciinema-player.min.css: 0136b53c3263bceedee0543fdb02933e690e912e
   libs/asciinema-player.min.js: 6ddd5e88beb61f116cb9445698108ffc4abf8f5f
