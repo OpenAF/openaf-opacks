@@ -16,7 +16,7 @@ name: jdbc-sqlserver
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20250714'
+version: '20250715'
 dependencies:
   openaf: '>=20240318'
 files:
