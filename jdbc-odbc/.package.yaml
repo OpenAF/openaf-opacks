@@ -16,15 +16,15 @@ name: jdbc-odbc
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20250507'
+version: '20250730'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-odbc.js
-- ojdbc8-23.8.0.25.04.jar
+- ojdbc8-23.9.0.25.07.jar
 filesHash:
-  LICENSES.txt: 3b9f7b8bfdbabc784ef5c6e6fe74a2ee78e3ecd7
+  LICENSES.txt: b79cd7a00fd479b33c28a5ba01b682e98aad4553
   jdbc-odbc.js: 53f00e30b1075b89e793e3d8c1bcb09288898c8d
-  ojdbc8-23.8.0.25.04.jar: ccb2cb450ba1bc41a6373f2a50357b24c0eb6e49
+  ojdbc8-23.9.0.25.07.jar: 0f04adb90d90ac55b8edde797d98fec7024c92ec
