@@ -74,6 +74,54 @@ AWS.prototype._imds = function() {
    }
 }
 
+AWS.prototype._credentialsFile = function() {
+   var _cred = __
+   ow.loadJava()
+   var ini = new ow.java.ini()
+   var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
+   var _profile = _$(getEnv("AWS_PROFILE")).isString().default("default")
+   if (io.fileExists(_cf)) {
+      var allCreds = ini.loadFile(_cf).get()
+      if (isMap(allCreds) && isDef(allCreds[_profile])) {
+         _cred = allCreds[_profile]
+      } else if (isMap(allCreds) && isDef(allCreds.default)) {
+         _cred = allCreds.default
+      } else {
+         _cred = __
+      }
+   }
+   return _cred
+}
+
+AWS.prototype._credentialProcess = function() {
+   var _cred = __
+   ow.loadJava()
+   var ini = new ow.java.ini()
+   var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/config"
+   var _data = ini.loadFile(_cf).get()
+
+   var _profile = _$(getEnv("AWS_PROFILE")).isString().default("default")
+   if (_profile != "default") _profile = "profile " + _profile
+
+   if (isDef(_data[_profile]) && isDef(_data[_profile].credential_process)) {
+      var _cmd = _data[_profile].credential_process
+      if (isString(_cmd) && _cmd.length > 0) {
+         try {
+            var _res = $sh(_cmd).get(0).stdout
+            if (isString(_res)) {
+               _cred = jsonParse(_res)
+            } else {
+               throw "Invalid response from credential_process: " + af.toSLON(_res)
+            }
+         } catch(e) {
+            throw "Problem trying to execute credential_process: " + String(e)
+         }
+      }
+   }
+
+   return _cred
+}
+
 /**
  * <odoc>
  * <key>AWS.connect(aAccessKey, aSecretKey, aSessionToken, aRegion)</key>
@@ -89,58 +137,76 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
    if (isUnDef(this.secretKey) && isDef(getEnv("AWS_SECRET_ACCESS_KEY"))) this.secretKey = String(getEnv("AWS_SECRET_ACCESS_KEY"));
    if (isUnDef(this.stoken) && isDef(getEnv("AWS_SESSION_TOKEN"))) this.stoken = String(getEnv("AWS_SESSION_TOKEN"));
 
+   var o
    if (isUnDef(this.accessKey)) {
-      var o;
-      if (isDef(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))) {
-         var _token = io.readFileString(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))
-         var _res = $rest({urlEncode:true}).post("https://sts." + getEnv("AWS_REGION") + ".amazonaws.com/", {
-            Action: "AssumeRoleWithWebIdentity",
-            DurationSeconds: 3600,
-            RoleArn: getEnv("AWS_ROLE_ARN"),
-            RoleSessionName: "my-session",
-            WebIdentityToken: _token,
-            Version: "2011-06-15"
-         })
-         if (isMap(_res) && isDef(_res.error)) {
-            throw af.toSLON( af.fromXML2Obj(_res.error.response) )
-         }
-         _res = af.fromXML2Obj(_res)
-         if (isDef(_res.AssumeRoleWithWebIdentityResponse) && isDef(_res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult)) {
-            o = {
-               AccessKeyId: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.AccessKeyId,
-               SecretAccessKey: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SecretAccessKey,
-               Token: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SessionToken
-            }
-         } else {
-            throw af.toSLON(_res)
+      // Try credentials file
+      var _cred = this._credentialsFile()
+      if (isMap(_cred) && isDef(_cred.aws_access_key_id) && isDef(_cred.aws_secret_access_key)) {
+         o = {
+            AccessKeyId: _cred.aws_access_key_id,
+            SecretAccessKey: _cred.aws_secret_access_key,
+            Token: isDef(_cred.aws_session_token) ? _cred.aws_session_token : __
          }
       } else {
-         if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
-            o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
-         } else {
-            if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
-               o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+         // Try profile
+         var _cred = this._credentialProcess()
+         if (isMap(_cred) && isDef(_cred.AccessKeyId) && isDef(_cred.SecretAccessKey)) {
+            o = {
+                  AccessKeyId: _cred.AccessKeyId,
+               SecretAccessKey: _cred.SecretAccessKey,
+               Token: isDef(_cred.SessionToken) ? _cred.SessionToken : __
+            }
+         } else if (isDef(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))) {
+            var _token = io.readFileString(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))
+            var _res = $rest({urlEncode:true}).post("https://sts." + getEnv("AWS_REGION") + ".amazonaws.com/", {
+               Action: "AssumeRoleWithWebIdentity",
+               DurationSeconds: 3600,
+               RoleArn: getEnv("AWS_ROLE_ARN"),
+               RoleSessionName: "my-session",
+               WebIdentityToken: _token,
+               Version: "2011-06-15"
+            })
+            if (isMap(_res) && isDef(_res.error)) {
+               throw af.toSLON( af.fromXML2Obj(_res.error.response) )
+            }
+            _res = af.fromXML2Obj(_res)
+            if (isDef(_res.AssumeRoleWithWebIdentityResponse) && isDef(_res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult)) {
+               o = {
+                  AccessKeyId: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.AccessKeyId,
+                  SecretAccessKey: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SecretAccessKey,
+                  Token: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SessionToken
+               }
             } else {
-               var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
-               if (isDef(_cf)) {
-                  o = {}
-                  if (io.fileExists(_cf)) {
-                     io.readFileString(_cf)
-                     .split("\n")
-                     .filter(r => r.trim().match(/^aws_(access_|secret_)/))
-                     .forEach(r => {
-                        var ar = r.split("=").map(s => s.trim());
-                        if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
-                        if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
-                        if (ar[0] == "aws_session_token") o.Token = ar[1]
-                     })
-                  } else {
-                     // Fallback to IMDS
-                     var _cred = this._imds()
-                     if (isMap(_cred)) {
-                        o.AccessKeyId     = _cred.accessKey
-                        o.SecretAccessKey = _cred.secretKey
-                        o.Token           = _cred.token
+               throw af.toSLON(_res)
+            }
+         } else {
+            if (isDef(getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN"))) {
+               o = $rest({requestHeaders: { Authorization: getEnv("AWS_CONTAINER_AUTHORIZATION_TOKEN") }}).get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+            } else {
+               if (isDef(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"))) {
+                  o = $rest().get(getEnv("AWS_CONTAINER_CREDENTIALS_FULL_URI"));
+               } else {
+                  var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/credentials"
+                  if (isDef(_cf)) {
+                     o = {}
+                     if (io.fileExists(_cf)) {
+                        io.readFileString(_cf)
+                        .split("\n")
+                        .filter(r => r.trim().match(/^aws_(access_|secret_)/))
+                        .forEach(r => {
+                           var ar = r.split("=").map(s => s.trim());
+                           if (ar[0] == "aws_access_key_id") o.AccessKeyId = ar[1]
+                           if (ar[0] == "aws_secret_access_key") o.SecretAccessKey = ar[1]
+                           if (ar[0] == "aws_session_token") o.Token = ar[1]
+                        })
+                     } else {
+                        // Fallback to IMDS
+                        var _cred = this._imds()
+                        if (isMap(_cred)) {
+                           o.AccessKeyId     = _cred.accessKey
+                           o.SecretAccessKey = _cred.secretKey
+                           o.Token           = _cred.token
+                        }
                      }
                   }
                }
