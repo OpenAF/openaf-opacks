@@ -203,12 +203,12 @@ SocksServer.prototype._turnaround = function(aAtomic, aTurnAtomic) {
 
 /**
  * <odoc>
- * <key>SocksServer.start(aPort, aCallback)</key>
+ * <key>SocksServer.start(aPort, aCallback, aSocketFactory)</key>
  * Starts a socks server on aPort (no encryption of traffic). Repeated calls will create
  * other socks server.
  * </odoc>
  */
-SocksServer.prototype.start = function(aPort, aCallback) {
+SocksServer.prototype.start = function(aPort, aCallback, aSocketFactory) {
     aPort = _$(aPort).isNumber().default(1080)
 
     if (isUnDef(this._server)) {
@@ -220,9 +220,9 @@ SocksServer.prototype.start = function(aPort, aCallback) {
     ow.metrics.add("SocksServer-" + aPort, () => this.getMetrics())
 
     if (isDef(aCallback)) {
-        return this._server.start(aPort, aCallback)
+        return isDef(aSocketFactory) ? this._server.start(aPort, aSocketFactory, aCallback): this._server.start(aPort, aCallback)
     } else {
-        return this._server.start(aPort)
+        return isDef(aSocketFactory) ? this._server.start(aPort, aSocketFactory): this._server.start(aPort)
     }
 }
 
@@ -234,6 +234,10 @@ SocksServer.prototype.start = function(aPort, aCallback) {
  */
 SocksServer.prototype.stop = function() {
     this._server.stop()
+    if (isDef(this._channel)) {
+        this._channel.disconnect()
+        this._channel = __
+    }
 }
 
 /**
@@ -809,4 +813,73 @@ SocksServer.prototype.asnIndexASN2IP = function(aASN, _aidx) {
     _$(_aidx, "_aidx").isArray().$_()
 
     return _aidx.find(r => r.a == aASN)
+}
+
+SocksServer.prototype.getSSHSocketFactory = function(aSSHSession) {
+    // Returns a javax.net.SocketFactory that creates sockets over SSH
+    this._chnumber = $atomic(0, "long")
+    var parent = this
+    return new JavaAdapter(Packages.javax.net.SocketFactory, {
+        createSocket: function(aRemoteHost, aRemotePort) {
+            var channel = null
+            var localOut = null, remoteIn = null, remoteOut = null, localIn = null
+            try {
+                while(parent._chnumber.get() >= 1000) {
+                    sleep(100, true)
+                }
+                channel = aSSHSession.openChannel("direct-tcpip")
+                parent._chnumber.inc()
+                channel.setHost(aRemoteHost)
+                channel.setPort(aRemotePort)
+                // Use PipedInputStream/PipedOutputStream directly
+                localOut = new java.io.PipedOutputStream()
+                remoteIn = new java.io.PipedInputStream(localOut, 65536)
+                remoteOut = new java.io.PipedOutputStream()
+                localIn = new java.io.PipedInputStream(remoteOut, 65536)
+
+                channel.setInputStream(remoteIn)
+                channel.setOutputStream(remoteOut)
+                channel.connect()
+
+                // Do not store channel on parent, keep it local for thread safety
+                return new JavaAdapter(java.net.Socket, {
+                    _closed: false,
+                    getPort: function() {
+                        return aRemotePort
+                    },
+                    getInetAddress: function() {
+                        return java.net.InetAddress.getByName(aRemoteHost)
+                    },
+                    getInputStream: function() {
+                        return localIn
+                    },
+                    getOutputStream: function() {
+                        return localOut
+                    },
+                    isClosed: function() {
+                        return this._closed
+                    },
+                    isConnected: function() {
+                        return true && !this._closed
+                    },
+                    close: function() {
+                        // Ensure all resources are closed properly
+                        try {
+                            if (channel) channel.disconnect()
+                            this._closed = true
+                            parent._chnumber.dec()
+                        } catch(e) {}
+                        try { if (localIn) localIn.close() } catch(e) {}
+                        try { if (localOut) localOut.close() } catch(e) {}
+                        try { if (remoteIn) remoteIn.close() } catch(e) {}
+                        try { if (remoteOut) remoteOut.close() } catch(e) {}
+                    }
+                })
+            } catch(e) {
+                $err(e)
+                // Avoid expensive stack trace logging, just throw
+                throw new Error("Failed to open SSH channel to " + aRemoteHost + ":" + aRemotePort)
+            }
+        }
+    });
 }
