@@ -98,6 +98,7 @@ AWS.prototype._credentialProcess = function() {
    ow.loadJava()
    var ini = new ow.java.ini()
    var _cf = ow.format.getUserHome().replace(/\\/g, "/") + "/.aws/config"
+   if (!io.fileExists(_cf)) return __
    var _data = ini.loadFile(_cf).get()
 
    var _profile = _$(getEnv("AWS_PROFILE")).isString().default("default")
