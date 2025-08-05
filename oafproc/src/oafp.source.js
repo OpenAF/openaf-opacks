@@ -1745,12 +1745,13 @@ var _outputFns = new Map([
         if (isDef(params.rawasciiend) && !isNumber(params.rawasciiend)) _exit(-1, "rawasciiend must be a number")
 
         var _s = String(r).split("\n")
+        var _slo = _s.length
         var _extraLine = 0
-        if (isNumber(params.rawasciistart) && params.rawasciistart > 0 && params.rawasciistart <= _s.length) {
+        if (isNumber(params.rawasciistart) && params.rawasciistart > 0 && params.rawasciistart <= _slo) {
             _s = _s.slice(params.rawasciistart - 1)
             _extraLine = Number(params.rawasciistart - 1)
         }
-        if (isNumber(params.rawasciiend) && params.rawasciiend > 0 && params.rawasciiend < _s.length) {
+        if (isNumber(params.rawasciiend) && params.rawasciiend > 0 && params.rawasciiend < _slo) {
             _s = _s.slice(0, params.rawasciiend - (isNumber(params.rawasciistart - 1) ? params.rawasciistart - 1 : 0))
         }
         var _t

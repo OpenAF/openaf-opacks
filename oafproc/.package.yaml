@@ -133,6 +133,6 @@ filesHash:
   docs/FILTERS.md: acc28ceee78b0d1f4994211c43c782b2a0e898df
   docs/TEMPLATE.md: 95593ed3dfd869465b7d46438cabdb2a4d8f1e06
   docs/USAGE.md: 8d3ac1bfe4c31b446c9b82e5b4ecd1e0f6c40758
-  oafp.js: 5abe8a1bfeac7c035cea1789b6fed6863df3deef
+  oafp.js: a375323f806801d51764dfb844233785146826c6
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: a700e90c1c2b163bb10fb23e6aac12f5f1826f28
+  src/oafp.source.js: c114eaf801bd75576d7f6e7c4fa1708f3c25c29f
