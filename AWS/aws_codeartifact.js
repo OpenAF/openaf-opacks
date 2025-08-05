@@ -5,7 +5,7 @@ loadLib("aws_core.js");
 
 /**
  * <odoc>
- * <key>AWS.prototype.CODEARTIFACT_ListDomains(aRegion) : array</key>
+ * <key>AWS.CODEARTIFACT_ListDomains(aRegion) : array</key>
  * Given a region, returns a list of domains in the account.
  * </odoc>
  */
@@ -32,7 +32,7 @@ AWS.prototype.CODEARTIFACT_ListDomains = function(aRegion) {
 
 /**
  * <odoc>
- * <key>AWS.prototype.CODEARTIFACT_ListRepositories(aRegion, aRepositoryPrefix) : array</key>
+ * <key>AWS.CODEARTIFACT_ListRepositories(aRegion, aRepositoryPrefix) : array</key>
  * Given a region and a repository prefix, returns a list of repositories in the account.
  * If no prefix is given, all repositories are returned.
  * </odoc>
@@ -61,7 +61,7 @@ AWS.prototype.CODEARTIFACT_ListRepositories = function(aRegion, aRepositoryPrefi
 
 /**
  * <odoc>
- * <key>AWS.prototype.CODEARTIFACT_ListPackages(aRegion, aRepository, aDomain, aFormat) : array</key>
+ * <key>AWS.CODEARTIFACT_ListPackages(aRegion, aRepository, aDomain, aFormat) : array</key>
  * Given a region, a repository, a domain and a format, returns a list of packages in the account.
  * If no format is given, all packages are returned.
  * If no repository is given, all packages are returned.
@@ -94,7 +94,7 @@ AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain
 
 /**
  * <odoc>
- * <key>AWS.prototype.CODEARTIFACT_ListPackageVersions(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage) : array</key>
+ * <key>AWS.CODEARTIFACT_ListPackageVersions(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage) : array</key>
  * Given a region, a repository, a domain, a format, a namespace and a package, returns a list of package versions in the account.
  * If no format is given, all packages are returned.
  * If no repository is given, all packages are returned.
@@ -129,7 +129,7 @@ AWS.prototype.CODEARTIFACT_ListPackageVersions = function(aRegion, aRepository, 
 
 /**
  * <odoc>
- * <key>AWS.prototype.CODEARTIFACT_ListPackageVersionAssets(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion) : array</key>
+ * <key>AWS.CODEARTIFACT_ListPackageVersionAssets(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion) : array</key>
  * Given a region, a repository, a domain, a format, a namespace and a package version, returns a list of package version assets in the account.
  * If no format is given, all packages are returned.
  * If no repository is given, all packages are returned.
