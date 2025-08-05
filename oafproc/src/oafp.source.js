@@ -138,6 +138,8 @@ const _$o = (r, options, lineByLine) => {
             } else {
                 r = _$f(r, nOptions)
             }
+        } else {
+            r = _transform(r)
         }
     }
 
@@ -373,7 +375,7 @@ var procParams = () => {
     params.in = params.type
     params.input = params.type
     if (isUnDef(params._id)) {
-        params._id = genUUID()
+        params._id = nowNano()
     }
 }
 procParams()
@@ -556,7 +558,7 @@ if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "un
     if (isDef(bkprms)) bkprms.file = _found
 }
 
-params.debug = toBoolean(params.debug)
+if (typeof params.debug !== "undefined") params.debug = toBoolean(params.debug)
 if (isDef(params["-debug"])) params.debug = true
 
 // Verify the data param
@@ -805,8 +807,6 @@ var _inputLineFns = {
                 _exit(-2, "Error parsing Java GC log: " + e)
             }
         }
-
-        ow.loadFormat()
 
         global.__javagc_buffer += r
         var _res = _procLine(r)
@@ -1152,7 +1152,6 @@ var _transformFns = {
     },
     "correcttypes"  : _r => {
         if (toBoolean(params.correcttypes) && isObject(_r)) {
-            ow.loadFormat()
             traverse(_r, (aK, aV, aP, aO) => {
                 switch(descType(aV)) {
                 case "number": if (isString(aV)) aO[aK] = Number(aV); break
@@ -1226,30 +1225,33 @@ var _transformFns = {
         if (isString(params.llmprompt)) {
             params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
             params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
+            if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+                _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
             var res = $llm( _getSec(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv)) )
             if (isDef(params.llmconversation) && io.fileExists(params.llmconversation)) 
                 res.getGPT().setConversation(io.readFileJSON(params.llmconversation))
             var type = "json", shouldStr = true
-            if (isString(params.input)) {
-                if (params.input == "md") {
+            if (isString(params.in)) {
+                if (params.in == "md") {
                     type = "markdown"
                     shouldStr = false
                 }
-                if (params.input == "mdtable") {
+                if (params.in == "mdtable") {
                     type = "markdown table"
                     shouldStr = false
                 }
-                if (params.input == "hsperf") type = "java hsperf file"
-                if (params.input == "raw") {
+                if (params.in == "hsperf") type = "java hsperf file"
+                if (params.in == "raw") {
                     type = "raw"
                     shouldStr = false
                 }
             }
             
             res = res.withContext(shouldStr ? stringify(_r,__,true) : _r, (isDef(params.llmcontext) ? params.llmcontext : `${type} input data`))
-            if (isString(params.output)) {
-                if (params.output == "md" || params.output == "mdtable" || params.output == "raw") {
+            if (isString(params.out)) {
+                if (params.out == "md" || params.out == "mdtable" || params.out == "raw") {
+                    cprint(res.getGPT().getConversation())
                     let _res = res.prompt(params.llmprompt)
                     if (isDef(params.llmconversation)) io.writeFileJSON( params.llmconversation, res.getGPT().getConversation(), "" )
                     return _res
@@ -1507,7 +1509,7 @@ var _transformFns = {
             default      :
             case "default": th = _t.d; break
             }
-            ow.loadFormat()
+
             traverse(_r, (aK, aV, aP, aO) => {
                 if (isUnDef(aV) || isNull(aV)) {
                     aO[aK] = th[0]
@@ -1554,6 +1556,31 @@ var _transformFns = {
                 aO[aK] = _fromJSSLON(aV)
             }
         })
+        return _r
+    },
+    "field2str": _r => {
+        let _lst = params.field2str.split(",").map(r => r.trim())
+        traverse(_r, (aK, aV, aP, aO) => {
+            if (_lst.indexOf(aP.length > 0 && !aP.startsWith("[") ? aP.substring(1) + "." + aK : aK) >= 0 && !isString(aV)) {
+                aO[aK] = isMap(aO[aK]) || isArray(aO[aK]) ? af.toSLON(aO[aK]) : String(aO[aK])
+            }
+        })
+        return _r
+    },
+    "allstrings": _r => {
+        if (toBoolean(params.allstrings)) {
+            traverse(_r, (aK, aV, aP, aO) => {
+                if (isDef(aV) && !isString(aV)) {
+                    if (isNumber(aV)) {
+                        aO[aK] = String(aV)
+                    } else if (isBoolean(aV)) {
+                        aO[aK] = String(aV)
+                    } else if (isNull(aV)) {
+                        aO[aK] = ""
+                    }
+                }
+            })
+        }
         return _r
     },
     "oaf": _r => {
@@ -1713,11 +1740,52 @@ var _outputFns = new Map([
             }
         }
     }],
+    ["rawascii", (r, options) => {
+        if (isDef(params.rawasciistart) && !isNumber(params.rawasciistart)) _exit(-1, "rawasciistart must be a number")
+        if (isDef(params.rawasciiend) && !isNumber(params.rawasciiend)) _exit(-1, "rawasciiend must be a number")
+
+        var _s = String(r).split("\n")
+        var _extraLine = 0
+        if (isNumber(params.rawasciistart) && params.rawasciistart > 0 && params.rawasciistart <= _s.length) {
+            _s = _s.slice(params.rawasciistart - 1)
+            _extraLine = Number(params.rawasciistart - 1)
+        }
+        if (isNumber(params.rawasciiend) && params.rawasciiend > 0 && params.rawasciiend < _s.length) {
+            _s = _s.slice(0, params.rawasciiend - (isNumber(params.rawasciistart - 1) ? params.rawasciistart - 1 : 0))
+        }
+        var _t
+        if (!toBoolean(params.rawasciinovisual)) {
+            _t = pForEach(_s, (_r, i) => {
+                // replace non-visual characters by their hex representation
+                _r = _r.replace(/[\x00-\x08\x0A-\x1F\x80-\xFF]/g, (c) => {
+                    return ansiColor("FG(8),UNDERLINE", "\\u{" + c.charCodeAt(0).toString(16).padStart(2, '0') + "}")
+                })
+                // replace above FF characters by their hex representation
+                _r = _r.replace(/[\u0100-\uFFFF]/g, (c) => {
+                    return ansiColor("FG(8),UNDERLINE", "\\u{" + c.charCodeAt(0).toString(16).padStart(4, '0') + "}")
+                })
+                // replace CR, LF, TAB and SPACE by their visual representation
+                _r = _r.replace(/$/, ansiColor("RED", "␊")).replace(/\r/, ansiColor("RED", "␍"))
+                _r = _r.replace(/\t/, ansiColor("FG(8)", "→→→→")).replace(/ /g, ansiColor("FG(8)", "·"))
+                return _r
+            })
+        } else {
+            _t = _s
+        }
+
+        if (toBoolean(params.rawasciinolinenum)) {
+            _print(_t.map(l => l).join("\n"))
+        } else {
+            var sep = ansiColor("FG(8)", "│"), maxl = "%" + String(_t.length).length + ".0f"
+            _print(_t.map((l, i) => [ansiColor("FG(8)", $f(maxl, Number(i+1) + _extraLine)), sep, l].join("")).join("\n"))
+        }
+    }],
     ["raw", (r, options) => {
-        if (isString(r))
+        if (isString(r)) {
             _print(r)
-        else
+        } else {
             _print(stringify(r,__,""))
+        }
     }],
     ["lines", (r, options) => {
         if (isArray(r)) {
@@ -2080,12 +2148,15 @@ var _outputFns = new Map([
             _db.usArray(_sqlH, vals, params.dbbatchsize)
         } catch(dbe) {
             if (isDef(_db)) _db.rollback()
-            printErr(dbe)
             _exit(-1, "Error connecting to the database: " + dbe)
         } finally {
-            if (isDef(_db)) {
-                _db.commit()
-                _db.close()
+            try {
+                if (isDef(_db)) {
+                    _db.commit()
+                    _db.close()
+                }
+            } catch(ee) {
+                _exit(-1, "Error closing the database connection: " + ee)
             }
         }
     }],
@@ -2869,6 +2940,7 @@ var _inputFns = new Map([
                 if (isDef(params.indblib)) loadLib("jdbc-" + params.indblib + ".js")
                 _db = new DB(params.indbjdbc, params.indbuser, params.indbpass, params.indbtimeout)
                 _db.convertDates(true)
+                if (toBoolean(params.indbautocommit)) _db.setAutoCommit(true)
                 if (toBoolean(params.indbexec)) {
                     var _r = _db.u(r)
                     _$o({ affectedRows: _r }, options)
@@ -3107,7 +3179,6 @@ var _inputFns = new Map([
             if (tA) return fnFromTimeAbbr(String(v))
             return String(v)
         }
-        ow.loadFormat()
 
         var _r = []
         lines.forEach(line => {
@@ -3269,7 +3340,6 @@ var _inputFns = new Map([
                 _exit(-2, "Error parsing Java GC log: " + e)
             }
         }
-        ow.loadFormat()
 
         _showTmpMsg()
         if (isString(_res)) {
@@ -3531,7 +3601,7 @@ var _inputFns = new Map([
             else if (io.fileExists(params.llmimage))
                 img = af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))
         } 
-        if (params.output == "md" || params.output == "mdtable" || params.output == "raw") {
+        if (params.out == "md" || params.out == "mdtable" || params.out == "raw") {
             __res = isDef(img) ? res.promptImage(_res, img) : res.prompt(_res)
         } else {
             if (isDef(img)) {
@@ -3542,7 +3612,7 @@ var _inputFns = new Map([
         }
         if (isDef(params.llmconversation)) {
             var _conv = res.getGPT().getConversation()
-            _conv.push({ role: "assistant", content: stringify(__res, __, "") })
+            //_conv.push({ role: "assistant", content: stringify(__res, __, "") })
             io.writeFileJSON( params.llmconversation, _conv, "" )
         }
 
@@ -3766,7 +3836,7 @@ var _cs = getEnv("OAFP_CODESET")
 if (isDef(_drev)) {
     if (toBoolean(_drev)) {
         _dr = false
-    } else {
+    } else {
         _dr = true
     }
 }
@@ -3859,7 +3929,7 @@ if (params["-examples"] == "" || (isString(params.examples) && params.examples.l
 var _res = "", noFurtherOutput = false
 
 // Check for output streams
-if (isDef(params.outfile)) {
+if (typeof params.outfile !== "undefined") {
     if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
     if ("undefined" === typeof global.__oafp_streams[params.outfile] && toBoolean(params.outfileappend))
         global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
@@ -3890,7 +3960,7 @@ var _run = () => {
         params.jsonprefix = _$(params.jsonprefix, "jsonprefix").isString().default(__)
         params.jsondesc   = toBoolean(_$(params.jsondesc, "jsondesc").default("false"))
 
-        if (isDef(params.insecure) && toBoolean(params.insecure)) {
+        if (typeof params.insecure !== "undefined" && toBoolean(params.insecure)) {
             ow.loadJava().setIgnoreSSLDomains()
         }
 
@@ -3933,7 +4003,7 @@ var _run = () => {
             if (params.jsondesc) _exit(-1, "ERROR: jsondesc only available for file input.")
             if (params.jsonprefix) _exit(-1, "ERROR: jsonprefix only available for file input.")
 
-            if (isDef(params.cmd)) {
+            if (typeof params.cmd !== "undefined") {
                 _res = _runCmd2Bytes(params.cmd, true)
             } else {
                 if (isString(params.data)) {
@@ -4066,6 +4136,6 @@ if (isNumber(params.loop)) {
 }
 
 // Close streams
-if (isDef(global.__oafp_streams)) Object.keys(global.__oafp_streams).forEach(s => global.__oafp_streams[s].s.close())
+if (typeof global.__oafp_streams !== "undefined") Object.keys(global.__oafp_streams).forEach(s => global.__oafp_streams[s].s.close())
 }
 oafp(_params)

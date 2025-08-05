@@ -60,6 +60,7 @@ Here are some of the available helpers:
 | $sline          | shortcut to the OpenAF's format withSideLine |
 | $set            | block set of a provided key                  |
 | $concat         | concatenates all arguments as a single value |
+| $nl             | outputs a new line character         |
 | $__             | returns an undefined value            |
 
 ## 🤨 Conditional helpers

@@ -6,6 +6,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > If a _file_ or _file=somefile_ or _file=zipfile::somefile_ is not provided the input will be expected to be provided through stdin/pipe.
 > Options are expected to be provided as _option=value_. Check the lists below for all the available options.
+> Use `-v` or `in="?"` and `out="?"` to discover supported inputs, transforms and outputs.
 
 ## Main options:
 
@@ -13,18 +14,21 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 |--------|-------------|
 | -h     | Show this document |
 | help   | Alternative way to show this document or others (e.g. filters, template) |
-| file   | The file to parse (if not provide stdin is used) |
+| file   | The file to parse (if not provided stdin is used) |
 | cmd    | Alternative to file and stdin to execute a command (e.g. kubectl, docker) to get the file contents |
 | data   | Alternative to file, stdin and cmd to provide data input |
 | out    | The output format (default: ctree) |
 | in     | The input type (if not provided it will try to be auto-detected) |
+| ifrom | An OpenAF nLinq expression to filter input data |
+| isql | A SQL expression to filter input data |
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
+| opath | A JMESPath expression to filter output data |
 | sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | sqlfiltertables | A JSON/SLON array composed of 'table' name and 'path' to each table's data to be used with the sqlfilter |
 | path   | A JMESPath expression to filter output |
 | csv    | If type=csv, the CSV options to use | 
-| outkey | If defined the map/list output will be prefix with the provided key |
+| outkey | If defined the map/list output will be prefixed with the provided key |
 | outfile | If defined all output will be written to the provided file |
 | outfileappend | If 'true' and outfile=true the output will be appended on the provided file |
 | parallel | If 'true' and input supports parallel processing it will try to process the input in parallel disregarding input order |
@@ -34,6 +38,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | urlmethod | If 'url' is provided defines the http method to use if different from GET | 
 | urlparams | If 'url' is provided extra parameters (equivalent to OpenAF's $rest) can be provided in JSON/SLON |
 | urldata | If 'url' is provided a JSON/SLON/text data can be provided | 
+| insecure | If true will ignore SSL/TLS certificate validation |
 | chs | A JSON/SLON map or array composed of an OpenAF channel 'name', 'type' and optional 'options' |
 | loop   | If defined will loop the processing by the number of seconds provided |
 | loopcls | If 'true' and loop is defined it will clear the screen (or file) on each loop cycle |
@@ -44,6 +49,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
 | version | Alternative way to change the input to a map with the tool's version |
 | -v | Changes the input to a map with the tool's version info |
+| debug | If true prints debugging messages |
 
 > Filter options apply in the following order: _path_, _from_ and _sql_.
 
@@ -53,7 +59,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 > _sqlfilterstable_ assumes and forces _sqlfilter=advanced_
 
-> Use 'OAFP_RESET=true' to forces to reset the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
+> Use 'OAFP_RESET=true' to force resetting the terminal before waiting for input or displaying an output (use this if you experience terminal related issues)
 
 > Use 'OAFP_CODESET=UTF-16' to force reading files in a different codeset (e.g. UTF-16) different from the default UTF-8.
 
@@ -61,7 +67,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 
 ## ⬇️  Input types
 
-List of data input types that can be auto-detected (through the file extension or through it's contents). You can always override it be using the _input_ option:
+List of data input types that can be auto-detected (through the file extension or through its contents). You can always override it by using the _in_ option:
 
 | Input type | Description |
 |------------|-------------|
@@ -116,6 +122,7 @@ These options will change the parsed input data included any filters provided.
 | arraytomap | Boolean | If true will try to convert the input array to a map (see arraytomapkey, arraytomapkeepkey) |
 | arraytomapkeepkey | Boolean | If true and arraytomap=true the defined arraytomapkey won't be removed from each map |
 | arraytomapkey | String | For arraytomap=true defines the name of the map property that will be each element key (see arraytomapkeepkey) |
+| allstrings | Boolean | If true will try to convert all values to strings |
 | cmlt | Boolean | If true will accumulate the input values into an output array (useful with loop) |
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
@@ -123,10 +130,11 @@ These options will change the parsed input data included any filters provided.
 | field2byte | String | A comma delimited list of fields whose value should be converted to a byte abbreviation |
 | field2date | String | A comma delimited list of fields whose value should be converted to date values |
 | field2si | String | A comma delimited list of fields whose value should be converted to a SI abbreviation |
+| field2str | String | A comma delimited list of fields whose value should be converted to a string representation |
 | field4map | Boolean | A comma delimited list of fields whose value should be converted from JSON/SLON string representation to a map |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
 | getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
-| forcearray | Boolean | If true and if the input is map it will force it to be an array with that map as the only element |
+| forcearray | Boolean | If true and if the input is a map it will force it to be an array with that map as the only element |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
@@ -147,7 +155,7 @@ These options will change the parsed input data included any filters provided.
 | searchvalues | String | Will return am map with only values that match the provided string |
 | set | String | Performs set operations (intersection by default) over an 'a' and 'b' path to an array defined in a JSON/SLON map |
 | sortmapkeys | Boolean | If true the resulting map keys will be sorted |
-| spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful to xml output) |
+| spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful for XML output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
 | val2icon | String | If defined will transform undefined, null and boolean values to emoticons (values can be 'default' or 'simple') |
 | xjs | String | A .js file with function code manipulating an input 'args'. Returns the transformed 'args' variable. |
@@ -167,7 +175,7 @@ List of available formats to use with the _output_ option:
 |---------------|-------------|
 | base64 | A base64 text format |
 | ch | An OpenAF channel format |
-| chart | A line-chart like chart (usefull together with 'loop') |
+| chart | A line-chart style chart (useful together with 'loop') |
 | cjson | A JSON forcely colored format |
 | cmd | Executes a command for each input data entry |
 | cslon | A SLON format forcely colored |
@@ -178,7 +186,7 @@ List of available formats to use with the _output_ option:
 | db | Output to a JDBC database |
 | envs | Tries to output the input data as OS environment variables setting commands |
 | gb64json | Equivalent to out=base64 and base64gzip=true |
-| grid | A multiple output ascii grid (usefull together with 'loop') |
+| grid | A multiple output ascii grid (useful together with 'loop') |
 | html | An HTML format |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
@@ -198,6 +206,7 @@ List of available formats to use with the _output_ option:
 | prettyjson | A JSON format with spacing |
 | pxml | Tries to output the input data into pretty xml |
 | raw | Tries to output the internal representation (string or json) of the input transformed data |
+| rawascii | Outputs text data line by line with visual representation of non-visual characters |
 | res | Outputs data to an OpenAF global 'res' (used in oJobs) | 
 | schart | A static line-chart like chart (for a fixed list/array of values) |
 | slon | A SLON format |
@@ -253,6 +262,7 @@ List of options to use when _in=db_ (SQL query):
 | indblib | String | Use a JDBC driver oPack generated by ojob.io/db/getDriver |
 | indbstream | Boolean | If true the output will be processed record by record |
 | indbexec | Boolean | If true the input SQL is not a query but a DML statement | 
+| indbautocommit | Boolean | If true the input SQL will be executed with autocommit enabled |
 | indbdesc | Boolean | If true the output will be a list of column names and types (use 'LIMIT 1' for faster results) |
 
 > JDBC oracle: jdbc:oracle:thin:@[host]:[port]:[database]
@@ -594,14 +604,14 @@ List of options to use when _diff=..._:
 | diffwords | Boolean | If true and the input is text based will perform the diff at the word level | 
 | diffwordswithspace | Boolean | If true and the input is text based will perform the diff at the word + spaces level |
 | difflines | Boolean | If true and the input is text based will perform the diff at the lines level |
-| diffsentences | Boolean | If true and the input is text based will perfom the diff at the sentence level |
+| diffsentences | Boolean | If true and the input is text based will perform the diff at the sentence level |
 | diffchars | Boolean | If true and the input is text based will perform the diff at the char level |
 
 > 'difftheme' example: "(added: GREEN, removed: RED, common: FAINT, linenum: ITALIC, linediv: FAINT, linesep: ':')"
 
-> If color=true a visual colored diff will be output insted of an array of differences
+> If color=true a visual colored diff will be output instead of an array of differences
 
-> If both inputs are array based and color=false (or not provided) the comparition will be performed at the array elements level
+> If both inputs are array based and color=false (or not provided) the comparison will be performed at the array elements level
 
 > The contents of 'difftheme' can also be provided through the 'OAFP_DIFFTHEME' environment variable
 
@@ -618,9 +628,10 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
 
-> OpenAF sBuckets are supported in llmoptions. You can set any of the enviroment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
+> OpenAF sBuckets are supported in llmoptions. You can set any of the environment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
 
 > Tip: Use the 'getlist=' optional transform to automatically filter list of data from LLMs prompt responses if relevant.
+> Example: `OAFP_MODEL="(type:ollama,model:llama3)" oafp llmprompt="hello world"`
 
 ---
 
@@ -645,7 +656,7 @@ List of options to use when _set=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symetric difference), 'diff' and 'intersect' (default) |
+| setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symmetric difference), 'diff' and 'intersect' (default) |
 
 > Example: ```set="(a: old, b: new)" setop=diffb```
 > 'setop=diff' will add an extra column '*' to identify if a line only exists in 'a' or in 'b'
@@ -667,7 +678,7 @@ List of options to use when _out=ch_:
 | chunset | Boolean | If true the input data will be used to unset data on the output channel instead of set |
 
 > Example of options provided in JSON: ch="{type:'mvs',options:{file:'data.db'}}"
-> Example of optiosn provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
+> Example of options provided in SLON: ch="(type: remote, url: 'http://some.host:1234/chname')"
 
 > You can use sBuckets variables (e.g. secKey, secRepo, secBucket, secPass, secMainPass, secFile) on the 'options' map to fill it.
 
@@ -852,6 +863,19 @@ List of options to use when _out=pxml_:
 
 ---
 
+### 🧾 RAWASCII output options
+
+List of options to use when _out=rawascii_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| rawasciistart | Number | Starting line number to display |
+| rawasciiend | Number | Ending line number to display |
+| rawasciinovisual | Boolean | If true, non-visual characters won't be replaced by their visual representation |
+| rawasciinolinenum | Boolean | If true, line numbers won't be displayed |
+
+---
+
 ### 🧾 OpenMetrics output options
 
 List of options to use when _out=openmetrics_:
@@ -897,7 +921,7 @@ List of options to use when _out=template_:
 | template | String | A file path to a HandleBars' template or a string template definition if 'templatetmpl' is true |
 | templatepath | String | If 'template' is not provided a path to the template definition (pre-transformation) |
 | templatedata | String | If defined the template data will be retrieved from the provided path |
-| templatetmpl | String | If true the 'template' will be interpreted as the template defintion instead of a file path |
+| templatetmpl | String | If true the 'template' will be interpreted as the template definition instead of a file path |
 
 ---
 
@@ -962,6 +986,9 @@ oafp file=someFile.md input=md
 
 # table with the latest news from Google
 curl -s -L https://blog.google/rss | oafp path="rss.channel.item" sql="select title, pubDate" output=ctable
+
+# ask an LLM model to summarise some text
+echo "A very long text to be summarized" | oafp llmprompt="summarize this" llmoptions="(type: ollama, model: llama3)"
 ```
 
 ```bash
@@ -979,6 +1006,21 @@ oafp examples=kubectl
 oafp examples=openaf::oafp
 # list examples for category 'kubernetes'
 oafp examples=kubernetes::
+
+# yaml options input to link to oafp executions
+echo '
+data:
+  set:
+  - 1
+  - 2
+  - 3
+path: "set[].{ x: @ }"
+out : json
+pipe:
+  isql : |
+    SELECT sum("x") "SUM"
+  opath: "[0].SUM"
+' | oafp -f -
 ```
 
 ---

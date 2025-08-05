@@ -1,5 +1,15 @@
 # OpenAF processor examples
 
+Below is a list of examples. You can check for more examples in https://docs.openaf.io/docs/guides/oafp/oafp-examples.html or by executing:
+
+```bash
+oafp -examples
+# OR by keywords
+oafp examples=llm
+# OR by category
+oafp examples=AWS::
+```
+
 ## 🥉 Basic
 
 ### OUTPUT JSON: Creating ndjson file from json files
