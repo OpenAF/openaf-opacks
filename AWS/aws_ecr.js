@@ -257,7 +257,7 @@ AWS.prototype.ECR_BatchDeleteImage = function(aRegion, aRepoName, aImageTag, par
    } else if (isString(aImageTag)) {
       params.imageIds = [ { imageTag: aImageTag } ]
    } else {
-      throw new Error("aImageTag must be a string or an array of image objects")
+      throw new Error("aImageTag must be a string or an array of objects with imageTag or imageDigest properties")
    }
 
    return this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
