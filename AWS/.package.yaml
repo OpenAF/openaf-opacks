@@ -82,7 +82,7 @@ filesHash:
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
-  aws_ecr.js: b65cd1ff0754c0d05bd05ca08bd138fb5fa5e5ba
+  aws_ecr.js: 2b43a16a474aba6ca8a9a89de526648eb239fffe
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
   aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
