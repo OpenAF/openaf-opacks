@@ -251,8 +251,21 @@ AWS.prototype.ECR_BatchDeleteImage = function(aRegion, aRepoName, aImageTag, par
 
    params.repositoryName = aRepoName
 
-   // If aImageTag is an array, use it directly (assumes properly formatted); otherwise, wrap as [{ imageTag: aImageTag }]
+   // If aImageTag is an array, validate each element; otherwise, wrap as [{ imageTag: aImageTag }]
    if (isArray(aImageTag)) {
+      // Validate each element in the array
+      for (var i = 0; i < aImageTag.length; i++) {
+         var tagObj = aImageTag[i];
+         if (
+            !isMap(tagObj) ||
+            (
+               !(isDef(tagObj.imageTag) && isString(tagObj.imageTag)) &&
+               !(isDef(tagObj.imageDigest) && isString(tagObj.imageDigest))
+            )
+         ) {
+            throw new Error("Each element in aImageTag array must be an object with either an imageTag or imageDigest string property. Invalid element at index " + i + ": " + stringify(tagObj));
+         }
+      }
       params.imageIds = aImageTag
    } else if (isString(aImageTag)) {
       params.imageIds = [ { imageTag: aImageTag } ]
