@@ -1,4 +1,4 @@
-// Author: Nuno Aguiar
+// Author: Nuno Aguiar, Helder Marques
 // ECR
 
 loadLib("aws_core.js");
@@ -229,4 +229,51 @@ AWS.prototype.ECR_GetAuthorizationToken = function(aRegion) {
    if (isDef(_res) && isDef(_res.authorizationData)) {
       return _res.authorizationData[0]
    }  
+}
+
+/**
+ * <odoc>
+ * <key>AWS.ECR_BatchDeleteImage(Region, aRepoName, aImageTag, params)</key>
+ * Deletes a single or multiple (if an array) aImageTag from aRepoName on aRegion. 
+ * Optionally you can provide extra params.
+ * </odoc>
+ */
+AWS.prototype.ECR_BatchDeleteImage = function(aRegion, aRepoName, aImageTag, params) {
+   var aURL
+   aRegion   = _$(aRegion, "aRegion").isString().default(this.region)
+   params    = _$(params, "params").isMap().default({})
+   aRepoName = _$(aRepoName, "aRepoName").isString().$_()
+
+   aURL = "https://ecr." + aRegion + ".amazonaws.com/"
+   var url = new java.net.URL(aURL)
+   var aHost = String(url.getHost())
+   var aURI = String(url.getPath())
+
+   params.repositoryName = aRepoName
+
+   // If aImageTag is an array, validate each element; otherwise, wrap as [{ imageTag: aImageTag }]
+   if (isArray(aImageTag)) {
+      // Validate each element in the array
+      for (var i = 0; i < aImageTag.length; i++) {
+         var tagObj = aImageTag[i];
+         if (
+            !isMap(tagObj) ||
+            (
+               !(isDef(tagObj.imageTag) && isString(tagObj.imageTag)) &&
+               !(isDef(tagObj.imageDigest) && isString(tagObj.imageDigest))
+            )
+         ) {
+            throw new Error("Each element in aImageTag array must be an object with either an imageTag or imageDigest string property. Invalid element at index " + i + ": " + stringify(tagObj));
+         }
+      }
+      params.imageIds = aImageTag
+   } else if (isString(aImageTag)) {
+      params.imageIds = [ { imageTag: aImageTag } ]
+   } else {
+      throw new Error("aImageTag must be a string or an array of objects with imageTag or imageDigest properties")
+   }
+
+   return this.postURLEncoded(aURL, aURI, "", params, "ecr", aHost, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.BatchDeleteImage"
+   }, __, "application/x-amz-json-1.1")
 }
