@@ -1757,7 +1757,7 @@ var _outputFns = new Map([
         }
         var _t
         const _tabsize = params.rawasciitab
-        const cReset = "\u001b[m", fg8Underline = "\u001b[4m\u001b[38;5;8m", cFg8 = "\u001b[38;5;8m", cRed = "\u001b[31m"
+        const cReset = "\u001b[m", fg4Underline = "\u001b[4m\u001b[38;5;4m", cFg8 = "\u001b[38;5;8m", cRed = "\u001b[31m", cYellow = "\u001b[4m\u001b[33m"
         const rNV = /[\x00-\x08\x0A-\x1F\x80-\xFF]/g, 
               rFF = /[\u0100-\uFFFF]/g,
               rEnd = /$/,
@@ -1771,11 +1771,11 @@ var _outputFns = new Map([
                 }
                 // replace non-visual characters by their hex representation
                 _r = _r.replace(rNV, c => {
-                    return [ fg8Underline, "\\u{" + c.charCodeAt(0).toString(16).padStart(2, '0') + "}", cReset ].join("")
+                    return [ fg4Underline, "\\u" + c.charCodeAt(0).toString(16).padStart(2, '0').toUpperCase(), cReset ].join("")
                 })
                 // replace above FF characters by their hex representation
                 _r = _r.replace(rFF, c => {
-                    return [ fg8Underline, "\\u{" + c.charCodeAt(0).toString(16).padStart(4, '0') + "}", cReset ].join("")
+                    return [ cYellow, "\\u" + c.charCodeAt(0).toString(16).padStart(4, '0').toUpperCase(), cReset ].join("")
                 })
                 // replace CR, LF, TAB and SPACE by their visual representation
                 if (i < _s.length - 1) _r = _r.replace(rEnd, [cRed, "␊", cReset].join(""))
@@ -1785,7 +1785,7 @@ var _outputFns = new Map([
                 _r = _r.replace(rTab, (match, offset) => {
                     const spaces = _tabsize - ((offset + accSpace) % _tabsize)
                     accSpace += spaces - 1
-                    return [ cFg8, (spaces > 2 ? "┈".repeat(spaces - 1) : ""),  "→"].join("")
+                    return [ cFg8, (spaces > 2 ? "┈".repeat(spaces - 1) : ""),  "→", cReset].join("")
                 }).replace(rSp, [cFg8, "·", cReset].join(""))
                 return _r
             }).filter(r => typeof r !== "undefined")
