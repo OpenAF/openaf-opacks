@@ -1743,8 +1743,9 @@ var _outputFns = new Map([
     ["rawascii", (r, options) => {
         if (isDef(params.rawasciistart) && !isNumber(params.rawasciistart)) _exit(-1, "rawasciistart must be a number")
         if (isDef(params.rawasciiend) && !isNumber(params.rawasciiend)) _exit(-1, "rawasciiend must be a number")
+        if (isUnDef(params.rawasciitab) || !isNumber(params.rawasciitab)) params.rawasciitab = 8
 
-        var _s = String(r).split("\n")
+        var _s = String(r).split("\x0A")
         var _slo = _s.length
         var _extraLine = 0
         if (isNumber(params.rawasciistart) && params.rawasciistart > 0 && params.rawasciistart <= _slo) {
@@ -1755,21 +1756,39 @@ var _outputFns = new Map([
             _s = _s.slice(0, params.rawasciiend - (isNumber(params.rawasciistart - 1) ? params.rawasciistart - 1 : 0))
         }
         var _t
+        const _tabsize = params.rawasciitab
+        const cReset = "\u001b[m", fg8Underline = "\u001b[4m\u001b[38;5;8m", cFg8 = "\u001b[38;5;8m", cRed = "\u001b[31m"
+        const rNV = /[\x00-\x08\x0A-\x1F\x80-\xFF]/g, 
+              rFF = /[\u0100-\uFFFF]/g,
+              rEnd = /$/,
+              rTab = /\t/g,
+              rCR = /\r/g,
+              rSp = / /g
         if (!toBoolean(params.rawasciinovisual)) {
             _t = pForEach(_s, (_r, i) => {
+                if (_r == "") {
+                    return i == _s.length - 1 ? __ : [cRed, "␊", cReset].join("")
+                }
                 // replace non-visual characters by their hex representation
-                _r = _r.replace(/[\x00-\x08\x0A-\x1F\x80-\xFF]/g, (c) => {
-                    return ansiColor("FG(8),UNDERLINE", "\\u{" + c.charCodeAt(0).toString(16).padStart(2, '0') + "}")
+                _r = _r.replace(rNV, c => {
+                    return [ fg8Underline, "\\u{" + c.charCodeAt(0).toString(16).padStart(2, '0') + "}", cReset ].join("")
                 })
                 // replace above FF characters by their hex representation
-                _r = _r.replace(/[\u0100-\uFFFF]/g, (c) => {
-                    return ansiColor("FG(8),UNDERLINE", "\\u{" + c.charCodeAt(0).toString(16).padStart(4, '0') + "}")
+                _r = _r.replace(rFF, c => {
+                    return [ fg8Underline, "\\u{" + c.charCodeAt(0).toString(16).padStart(4, '0') + "}", cReset ].join("")
                 })
                 // replace CR, LF, TAB and SPACE by their visual representation
-                _r = _r.replace(/$/, ansiColor("RED", "␊")).replace(/\r/, ansiColor("RED", "␍"))
-                _r = _r.replace(/\t/, ansiColor("FG(8)", "→→→→")).replace(/ /g, ansiColor("FG(8)", "·"))
+                if (i < _s.length - 1) _r = _r.replace(rEnd, [cRed, "␊", cReset].join(""))
+                _r = _r.replace(rCR, [cRed, "␍", cReset].join(""))
+                // Replace tab (\t) with the correct number of spaces (assuming tab stop every 8 chars)
+                var accSpace = 0
+                _r = _r.replace(rTab, (match, offset) => {
+                    const spaces = _tabsize - ((offset + accSpace) % _tabsize)
+                    accSpace += spaces - 1
+                    return [ cFg8, (spaces > 2 ? "┈".repeat(spaces - 1) : ""),  "→"].join("")
+                }).replace(rSp, [cFg8, "·", cReset].join(""))
                 return _r
-            })
+            }).filter(r => typeof r !== "undefined")
         } else {
             _t = _s
         }
@@ -1777,8 +1796,8 @@ var _outputFns = new Map([
         if (toBoolean(params.rawasciinolinenum)) {
             _print(_t.map(l => l).join("\n"))
         } else {
-            var sep = ansiColor("FG(8)", "│"), maxl = "%" + String(_t.length).length + ".0f"
-            _print(_t.map((l, i) => [ansiColor("FG(8)", $f(maxl, Number(i+1) + _extraLine)), sep, l].join("")).join("\n"))
+            const sep = [cFg8, "│", cReset].join(""), maxl = "%" + String(_t.length).length + ".0f"
+            _print(_t.map((l, i) => [cFg8, $f(maxl, Number(i+1) + _extraLine), cReset, sep, l].join("")).join("\n"))
         }
     }],
     ["raw", (r, options) => {

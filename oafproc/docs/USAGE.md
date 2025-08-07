@@ -871,6 +871,7 @@ List of options to use when _out=rawascii_:
 |--------|------|-------------|
 | rawasciistart | Number | Starting line number to display |
 | rawasciiend | Number | Ending line number to display |
+| rawasciitab | Number | Tab size for tab character visualization (defaults to 8) |
 | rawasciinovisual | Boolean | If true, non-visual characters won't be replaced by their visual representation |
 | rawasciinolinenum | Boolean | If true, line numbers won't be displayed |
 
