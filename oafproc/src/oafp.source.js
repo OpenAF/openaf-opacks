@@ -3245,110 +3245,126 @@ var _inputFns = new Map([
     ["javagc", (_res, options) => {
         if (!isBoolean(params.javagcjoin)) params.javagcjoin = toBoolean(_$(params.javagcjoin, "javagcjoin").isString().default(__))
 
+        // Pre-compile regex patterns for performance (moved outside hot path)
+        const regexes = [
+            // JDK 8 Allocation Failure (adjusted to handle multiline events)
+            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
+            // JDK 8 style regexes
+            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\]/,
+            // JDK 8 with +PrintHeapAtGC
+            /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
+            // JDK 8 with +PrintHeapAtGC and +PrintTenuringDistribution
+            /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\]/,
+            // JDK 8 with +PrintTenuringDistribution
+            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
+            // JDK 8 Generic GC logs (simple format)
+            /(\d+\.\d+): \[(GC|Full GC) \((.*?)\)\s+(\d+K)->(\d+K)\((\d+K)\), (\d+\.\d+) secs\]/,
+            // JDK 9+ style regexes
+            /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
+            /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/,
+            // JDK 9+ Allocation Failure
+            /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
+        ]
+
+        // Pre-compile patterns for head parsing
+        const timePattern = /^\d+\.\d+s$/
+        const timestampPattern = /\d{4}-\d{2}-\d{2}T/
+
+        // Helper function to avoid repeated string concatenation
+        const fromBytesAbbr = val => isDef(val) ? ow.format.fromBytesAbbreviation(val + "B") : __
+
         let _procLine = _event => {
             try {
-                let regexes = [
-                    // JDK 8 Allocation Failure (adjusted to handle multiline events)
-                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
-                    // JDK 8 style regexes
-                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintHeapAtGC
-                    /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintHeapAtGC and +PrintTenuringDistribution
-                    /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintTenuringDistribution
-                    /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-                    // JDK 9+ style regexes
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/,
-                    // JDK 9+ Allocation Failure
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
-                ]
 
                 for (let index = 0; index < regexes.length; index++) {
-                    let regex = regexes[index]
-                    let match = _event.match(regex)
+                    let match = _event.match(regexes[index])
                     if (match) {
                         let result = {}
 
-                        if (_event.startsWith('[')) {
+                        if (_event.charCodeAt(0) === 91) { // '[' char - faster than startsWith
                             // JDK 9+ style parsing
-                            //result.index = index
                             var heads = match[1].split("][")
-                            heads.forEach(head => {
-                                if (head.match(/^\d+\.\d+s$/)) {
-                                    result.sinceStart = parseFloat(head.replace(/s$/, ""))
-                                } else if (head.match(/\d{4}-\d{2}-\d{2}T/)) {
+                            for (let i = 0; i < heads.length; i++) {
+                                let head = heads[i]
+                                if (timePattern.test(head)) {
+                                    result.sinceStart = parseFloat(head.slice(0, -1)) // faster than replace
+                                } else if (timestampPattern.test(head)) {
                                     result.timestamp = ow.format.toDate(head, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                                 }
-                            })
+                            }
                             result.gcId = parseInt(match[2])
-                            result.gcType = match[3].trim()
-                            if (result.gcType == "") result.gcType = "none"
+                            result.gcType = match[3].trim() || "none"
                             result.durationSecs = parseFloat(match[match.length - 1]) / 1000 // convert ms to secs
 
                             if (index === 5) {
                                 // Match for GC pause with heap info
-                                result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.heapAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.heapTotal = ow.format.fromBytesAbbreviation(match[6] + "B")
+                                result.heapBeforeGC = fromBytesAbbr(match[4])
+                                result.heapAfterGC = fromBytesAbbr(match[5])
+                                result.heapTotal = fromBytesAbbr(match[6])
                             } else if (index > 5) {
                                 if (index == 6) {
-                                    result.metaUsedBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                    result.metaTotalBeforeGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                    result.metaUsedAfterGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                    result.metaTotalAfterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                    result.nonClassUsedBeforeGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                    result.nonClassTotalBeforeGC = ow.format.fromBytesAbbreviation(match[9] + "B")
-                                    result.nonClassUsedAfterGC = ow.format.fromBytesAbbreviation(match[10] + "B")
-                                    result.nonClassTotalAfterGC = ow.format.fromBytesAbbreviation(match[11] + "B")
-                                    result.classUsedBeforeGC = ow.format.fromBytesAbbreviation(match[12] + "B")
-                                    result.classTotalBeforeGC = ow.format.fromBytesAbbreviation(match[13] + "B")
-                                    result.classUsedAfterGC = ow.format.fromBytesAbbreviation(match[14] + "B")
-                                    result.classTotalAfterGC = ow.format.fromBytesAbbreviation(match[15] + "B")
+                                    result.metaUsedBeforeGC = fromBytesAbbr(match[4])
+                                    result.metaTotalBeforeGC = fromBytesAbbr(match[5])
+                                    result.metaUsedAfterGC = fromBytesAbbr(match[6])
+                                    result.metaTotalAfterGC = fromBytesAbbr(match[7])
+                                    result.nonClassUsedBeforeGC = fromBytesAbbr(match[8])
+                                    result.nonClassTotalBeforeGC = fromBytesAbbr(match[9])
+                                    result.nonClassUsedAfterGC = fromBytesAbbr(match[10])
+                                    result.nonClassTotalAfterGC = fromBytesAbbr(match[11])
+                                    result.classUsedBeforeGC = fromBytesAbbr(match[12])
+                                    result.classTotalBeforeGC = fromBytesAbbr(match[13])
+                                    result.classUsedAfterGC = fromBytesAbbr(match[14])
+                                    result.classTotalAfterGC = fromBytesAbbr(match[15])
                                 } else {
-                                    result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                    result.heapAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                    result.heapTotal = ow.format.fromBytesAbbreviation(match[6] + "B")
+                                    result.heapBeforeGC = fromBytesAbbr(match[4])
+                                    result.heapAfterGC = fromBytesAbbr(match[5])
+                                    result.heapTotal = fromBytesAbbr(match[6])
                                 }
                             }
                         } else {
                             // JDK 8 style parsing
-                            //result.index = index
-                            result.timestamp = ow.format.toDate(match[1], "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                            result.sinceStart = parseFloat(match[2])
-                            result.gcType = match[3] + " " + match[4]
+                            if (index == 5) {
+                                // JDK 8 Generic GC logs (simple format)
+                                result.sinceStart = parseFloat(match[1])
+                                result.gcType = match[2] + " " + match[3]
+                                result.heapBeforeGC = fromBytesAbbr(match[4])
+                                result.heapAfterGC = fromBytesAbbr(match[5])
+                                result.heapTotal = fromBytesAbbr(match[6])
+                                result.durationSecs = parseFloat(match[7])
+                            } else {
+                                result.timestamp = ow.format.toDate(match[1], "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                                result.sinceStart = parseFloat(match[2])
+                                result.gcType = match[3] + " " + match[4]
 
-                            //print(index)
-                            //cprint(match)
-                            if (index <= 4) {
-                                let idx = 5
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                result.PSYoungGenTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                if (index <= 4) {
+                                    let idx = 5
+                                    result.PSYoungGenBeforeGC = fromBytesAbbr(match[idx++])
+                                    result.PSYoungGenAfterGC = fromBytesAbbr(match[idx++])
+                                    result.PSYoungGenTotal = fromBytesAbbr(match[idx++])
 
-                                if (index == 2 || index == 3) {
-                                    result.ParOldGenBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                    result.ParOldGenAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                    result.ParOldGenTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                }
+                                    if (index == 2 || index == 3) {
+                                        result.ParOldGenBeforeGC = fromBytesAbbr(match[idx++])
+                                        result.ParOldGenAfterGC = fromBytesAbbr(match[idx++])
+                                        result.ParOldGenTotal = fromBytesAbbr(match[idx++])
+                                    }
 
-                                result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                result.heapAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                result.heapTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
+                                    result.heapBeforeGC = fromBytesAbbr(match[idx++])
+                                    result.heapAfterGC = fromBytesAbbr(match[idx++])
+                                    result.heapTotal = fromBytesAbbr(match[idx++])
 
-                                if (index == 2 || index == 3) {
-                                    result.metaBeforeGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                    result.metaAfterGC = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                    result.metaTotal = ow.format.fromBytesAbbreviation(match[idx++] + "B")
-                                }
+                                    if (index == 2 || index == 3) {
+                                        result.metaBeforeGC = fromBytesAbbr(match[idx++])
+                                        result.metaAfterGC = fromBytesAbbr(match[idx++])
+                                        result.metaTotal = fromBytesAbbr(match[idx++])
+                                    }
 
-                                result.durationSecs = parseFloat(match[idx++])
+                                    result.durationSecs = parseFloat(match[idx++])
 
-                                if (index == 0 || index == 2 || index == 4) {
-                                    result.userTime = parseFloat(match[idx++])
-                                    result.sysTime = parseFloat(match[idx++])
-                                    result.realTime = parseFloat(match[idx++])
+                                    if (index == 0 || index == 2 || index == 4) {
+                                        result.userTime = parseFloat(match[idx++])
+                                        result.sysTime = parseFloat(match[idx++])
+                                        result.realTime = parseFloat(match[idx++])
+                                    }
                                 }
                             }
                         }
@@ -3364,34 +3380,48 @@ var _inputFns = new Map([
         _showTmpMsg()
         if (isString(_res)) {
             let lines = _res.split("\n")
-            let gcStartPattern = /^(\[\d+|\d{4}-\d{2}-\d{2}T)/ // Matches lines starting with '[\d+' or a timestamp
+            let gcStartPattern = /^(\[?\d+|\d{4}-\d{2}-\d{2}T)/ // Matches lines starting with '[\d+' or a timestamp
 
             let gcEvents = []
-            let currentEvent = []
+            let currentEvent = ""
+            let hasCurrentEvent = false
 
-            for (let line of lines) {
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i]
                 if (gcStartPattern.test(line)) {
                     // New GC event detected
-                    if (currentEvent.length > 0) {
-                        gcEvents.push(currentEvent.join("\n"))
+                    if (hasCurrentEvent) {
+                        gcEvents.push(currentEvent)
                     }
-                    currentEvent = [line]
+                    currentEvent = line
+                    hasCurrentEvent = true
                 } else {
                     // Continuation of the current GC event
-                    currentEvent.push(line)
+                    if (hasCurrentEvent) {
+                        currentEvent += "\n" + line
+                    }
                 }
             }
             // Add the last GC event
-            if (currentEvent.length > 0) {
-                gcEvents.push(currentEvent.join("\n"))
+            if (hasCurrentEvent) {
+                gcEvents.push(currentEvent)
             }
 
-            let results = gcEvents.map(_procLine).filter(r => isMap(r))
+            // Process events and filter valid results in one pass
+            let results = []
+            for (let i = 0; i < gcEvents.length; i++) {
+                let result = _procLine(gcEvents[i])
+                if (isMap(result)) {
+                    results.push(result)
+                }
+            }
 
             if (params.javagcjoin) {
                 _$o(results, options, true)
             } else {
-                results.forEach(result => _$o(result, options, true))
+                for (let i = 0; i < results.length; i++) {
+                    _$o(results[i], options, true)
+                }
             }
         } else {
             _exit(-1, "javagc is only supported with a string input.")
@@ -3777,6 +3807,7 @@ var _inputFns = new Map([
         _$o(jsonParse(_res, __, __, isString(_res)), options)
     }]
 ])
+
 // --- add extra _inputFns here ---
 const _addSrcInputFns = (type, fn) => {
     if (!_inputFns.has(type)) {
