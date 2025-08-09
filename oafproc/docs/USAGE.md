@@ -200,6 +200,7 @@ List of available formats to use with the _output_ option:
 | mdyaml | A multi document YAML format (only for list outputs) |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
+| ndcslon | A NDSLON (new-line delimited SLON) format forcely colored |
 | openmetrics | Converts a map or list to OpenMetrics/Prometheus compatible format |
 | oaf | An OpenAF scripting code or OpenAF scripting file (together with 'outoaf') to execute taking input transformed as 'data' |
 | pjson | A JSON format with spacing (equivalent to prettyjson) |

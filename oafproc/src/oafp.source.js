@@ -1907,6 +1907,15 @@ var _outputFns = new Map([
             _o$o(r, options)
         }
     }],
+    ["ndcslon", (r, options) => {
+        if (isArray(r)) {
+            r.forEach(_r => _print(af.toCSLON(_r)))
+        } else if (isMap(r)) {
+            _print(af.toCSLON(r))
+        } else {
+            _o$o(r, options)
+        }
+    }],
     ["base64", (r, options) => {
         var _o = ""
         if (isString(r))
