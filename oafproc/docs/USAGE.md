@@ -182,6 +182,8 @@ List of available formats to use with the _output_ option:
 | csv | A CSV format (only for list outputs) |
 | ctable | A table-like forcely colored format (only for list outputs) |
 | ctree | A tree-like forcely colored format |
+| clkyaml | A Kubernetes YAML without new-lines colored format |
+| ckyaml | A Kubernetes YAML colored format |
 | cyaml | An YAML colored format |
 | db | Output to a JDBC database |
 | envs | Tries to output the input data as OS environment variables setting commands |
@@ -192,6 +194,8 @@ List of available formats to use with the _output_ option:
 | json | A JSON format without spacing |
 | jwt | Signs map data into a JSON Web Token (JWT) |
 | key | Stores data into an OpenAF global (used inside OpenAF) |
+| kyaml | A Kubernetes YAML format |
+| lkyaml | A Kubernetes YAML format without new-lines |
 | lines | Given an array of strings prints each line |
 | log | If input has Logstash compatible fields outputs a human-readable log |
 | map | A rectangle map format |

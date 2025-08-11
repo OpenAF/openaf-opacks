@@ -1665,6 +1665,18 @@ var _outputFns = new Map([
     ["cyaml", (r, options) => {
         _o$o(r, options)
     }],
+    ["kyaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["ckyaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["lkyaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["clkyaml", (r, options) => {
+        _o$o(r, options)
+    }],
     ["cjson", (r, options) => {
         _o$o(r, options)
     }],
