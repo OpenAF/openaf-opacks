@@ -18,7 +18,7 @@ name: Badgen
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230612'
+version: '20250812'
 dependencies:
   openaf: '>=20230325'
 files:
@@ -27,6 +27,7 @@ files:
 - README.md
 - badgen.js
 - badgen.yaml
+- oafp_Badgen.js
 - svgs/nattrmon.svg
 - svgs/nattrmon_grey.svg
 - svgs/openaf.svg
@@ -36,6 +37,7 @@ filesHash:
   README.md: ea592402dd209dab6bd3ec804377a5a5a0b5e752
   badgen.js: 14f0786db90f107091c2fc1abc34838a34ae8aff
   badgen.yaml: a48c57d1c253db666a14e00902c305d80b4f2000
+  oafp_Badgen.js: f8455e3479c4cef2829ab5a8376e095ff6574590
   svgs/nattrmon.svg: 1b028dd1d7e5ba9ebdf55848fd920d7fe54e8218
   svgs/nattrmon_grey.svg: afc7ddf94357fbf6b40556410b6783f20f272d90
   svgs/openaf.svg: 515e3749b46f3547f1f050d93eb0cadb2613c931
