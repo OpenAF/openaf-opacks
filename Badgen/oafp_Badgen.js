@@ -46,10 +46,16 @@ List of expected input data:
 | label | String | The label text to use |
 | status | String | The status text to use |
 | color | String | The color name or RGB for the status background |
-| style | String | A choice between 'classical' (default) and 'flat' |
+| style | String | A choice between 'classic' (default), 'flat' and 'rounded' |
 | icon | String | The result of badgen.fromSVG for the intended icon |
 | iconWidth | Number | The total width of the provided icon (defaults to 18) |
 | labelColor | String | The color name or RGB for the label background color |
+| textColor | String | Override the text color (default fff) |
+| transparent | Boolean | If true draws only an outline / border (no fill) |
+| borderColor | String | Outline color (defaults to main color) |
+| scale | Number | Scale factor (default 1) |
+| shadow | Boolean | Toggle subtle text shadow (default true) |
+| borderStyle | String | 'solid','dash','dot','dashdot' or custom dasharray (e.g. "5 10") |
 
 Possible color values:
 
