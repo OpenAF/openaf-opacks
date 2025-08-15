@@ -75,6 +75,7 @@ ow.ai.__gpttypes.bedrock = {
     var _temperature = aOptions.temperature
     var _r = {
       conversation: [],
+      tools: {},
       getConversation: () => {
         return _r.conversation
       },
@@ -82,8 +83,20 @@ ow.ai.__gpttypes.bedrock = {
         if (isArray(aConversation)) _r.conversation = aConversation
         return _r
       },
-      prompt: (aPrompt, aModel, aTemperature, aJsonFlag) => {
-        var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag)
+      setTool: (aName, aDesc, aParams, aFn) => {
+        _r.tools[aName] = {
+          type: "function",
+          function: {
+            name: aName,
+            description: aDesc,
+            parameters: aParams
+          },
+          fn: aFn
+        }
+        return _r
+      },
+      prompt: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
+        var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
         if (isDef(__r) && isArray(__r.results) && __r.results.length > 0) {
             if (__r.results[0].completionReason == "FINISH") {
                return __r.results[0].outputText.trim()
@@ -98,16 +111,21 @@ ow.ai.__gpttypes.bedrock = {
       promptImage: (aPrompt, aImage, aDetailLevel, aRole, aModel, aTemperature, aJsonFlag) => {
         throw "Not implemented yet"
       },
-      rawPrompt: (aPrompt, aModel, aTemperature, aJsonFlag) => {
-        aPrompt = _$(aPrompt, "aPrompt").isString().$_()
+      rawPrompt: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
+        aPrompt = _$(aPrompt, "aPrompt").default("")
         aModel = _$(aModel, "aModel").isString().default(_model)
         aTemperature = _$(aTemperature, "aTemperature").isNumber().default(_temperature)
         aJsonFlag = _$(aJsonFlag, "aJsonFlag").isBoolean().default(false)
 
+        var cv = []
+
+        // aTools can be an array of tool objects or undefined (use _r.tools)
+        var toolsToUse = isDef(aTools) ? (isArray(aTools) ? aTools : []) : Object.values(_r.tools)
+
         //aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
         //aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
         //aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
-        aOptions.jsonFlag  = _$(toBoolean(aOptions.jsonFlag) || aJsonFlag, "aOptions.jsonFlag").isBoolean().default(false)
+        aOptions.jsonFlag = _$(toBoolean(aOptions.jsonFlag) || aJsonFlag, "aOptions.jsonFlag").isBoolean().default(false)
 
         //var msgs = []
         //if (isString(aPrompt)) aPrompt = [ aPrompt ]
@@ -118,7 +136,7 @@ ow.ai.__gpttypes.bedrock = {
         if (aJsonFlag) aPrompt += ". answer in json."
 
         var _m = {}
-        
+
         if (aModel.indexOf("amazon.titan-") >= 0) {
           _m = {
             "inputText": aPrompt,
@@ -127,31 +145,65 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
         } else if (aModel.indexOf("amazon.nova-") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: [{ text: aPrompt }] })
+          }
+
+          // Normalize every message into the shape Nova expects: { role, content: [ { text } ] } (or keep existing array content)
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: m.role,
+            content: Array.isArray(m.content) ? m.content : [{ text: m.content }]
+          }))
+
+          _r.conversation = normalized // Update the conversation with the normalized messages
+
           _m = {
-            messages: _r.conversation.concat({role: "user", content: [ { text: aPrompt } ] }).filter(m => m.role == "user"),
+            messages: normalized.filter(r => r.role != "system"),
             schemaVersion: "messages-v1",
-            system: _r.conversation.filter(m => m.role == "system").map(m => ({ text : m.content })),
+            system: _r.conversation.filter(m => m.role == "system").map(m => ({ text: m.content.map(s => s.text).join("") })),
             inferenceConfig: {
               temperature: aTemperature
             }
           }
           if (_m.system.length == 0) delete _m.system
+
+          // Add tool configuration for Nova models
+          if (toolsToUse.length > 0) {
+            var toolConfig = []
+            toolsToUse.forEach(tool => {
+              if (isDef(tool) && isDef(tool.function)) {
+                toolConfig.push({
+                  toolSpec: {
+                    name: tool.function.name,
+                    description: tool.function.description,
+                    inputSchema: {
+                      json: tool.function.parameters
+                    }
+                  }
+                })
+              }
+            })
+            if (toolConfig.length > 0) {
+              _m.toolConfig = { tools: toolConfig }
+            }
+          }
         } else if (aModel.indexOf("meta.") >= 0) {
-	        //var msgs = []
+          //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
           _m = {
-	          "prompt": aPrompt,
-	          "temperature": aTemperature
-	        }
+            "prompt": aPrompt,
+            "temperature": aTemperature
+          }
         } else {
           _m = {
-              "prompt": aPrompt,
-              "temperature": aTemperature
+            "prompt": aPrompt,
+            "temperature": aTemperature
           }
         }
         //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
         //$$(_m).set(aOptions.tempKey, aTemperature)
-    
+
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
@@ -160,16 +212,108 @@ ow.ai.__gpttypes.bedrock = {
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
-        if (isDef(res.output) && isDef(res.output.message) && isArray(res.output.message.content)) {
-          _r.conversation = _r.conversation.concat(res.output.message.content)
-          return (isDef(res.output.message.content[0]) && isString(res.output.message.content[0].text) ? res.output.message.content[0].text : res.output.message.content)
+
+        // Handle Nova-like structured output with messages
+        if (isDef(res.output) && isDef(res.output.message)) {
+          var messages = Array.isArray(res.output.message) ? res.output.message : [res.output.message]
+          for (var mi = 0; mi < messages.length; mi++) {
+            var msg = messages[mi]
+            // keep conversation updated
+            _r.conversation.push(msg)
+
+            // If message contains an array of content parts, iterate
+            if (isArray(msg.content)) {
+              for (var ci = 0; ci < msg.content.length; ci++) {
+                var content = msg.content[ci]
+                try {
+                  // Tool call handling (preserve previous behavior)
+                  if (isDef(content.toolUse)) {
+                    var toolName = content.toolUse.name
+                    var toolInput = content.toolUse.input
+                    var toolCallId = content.toolUse.toolUseId
+
+                    // Find tool (from passed tools or internal tools)
+                    var tool = toolsToUse.find(t => t.function && t.function.name === toolName) || _r.tools[toolName]
+                    if (isDef(tool) && isDef(tool.fn)) {
+                      try {
+                        var toolResult = tool.fn(toolInput)
+                        var _tR = {
+                          role: "user",
+                          content: [{
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [!isObject(toolResult) ? {
+                                text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
+                              } : {
+                                json: toolResult
+                              }],
+                              status: "success"
+                            }
+                          }]
+                        }
+                        _r.conversation.push(_tR)
+
+                        // Continue conversation with tool result (recursive)
+                        var _res = _r.rawPrompt(_r.conversation, aModel, aTemperature, aJsonFlag, aTools)
+                        cv.push(_res)
+                        return _res
+                      } catch (e) {
+                        _r.conversation.push({
+                          role: "user",
+                          content: [{
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [{
+                                text: "Error executing tool: " + e.message
+                              }],
+                              status: "error"
+                            }
+                          }]
+                        })
+                      }
+                    }
+                  } else {
+                    // Only collect assistant text responses
+                    if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
+                      if (isString(content)) {
+                        cv.push(content)
+                      } else if (isMap(content)) {
+                        if (isDef(content.text)) {
+                          cv.push(content.text)
+                        } else if (isDef(content.json)) {
+                          cv.push(JSON.stringify(content.json))
+                        } else {
+                          cv.push(JSON.stringify(content))
+                        }
+                      } else {
+                        cv.push(String(content))
+                      }
+                    }
+                  }
+                } catch (ee) { $err(ee) }
+              }
+            } else {
+              // If content is not an array, and role is assistant, append its string form
+              if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
+                cv.push(String(msg.content))
+              }
+            }
+          }
+        } else if (isDef(res.outputText)) {
+          // Some models return outputText / text fields
+          cv.push(String(res.outputText))
+          _r.conversation.push({ role: "assistant", content: res.outputText })
+        } else if (isString(res)) {
+          cv.push(res)
+        } else if (isMap(res) && isDef(res.output) && isString(res.output)) {
+          cv.push(res.output)
         }
 
         if (aJsonFlag) {
           _r.conversation.push(res)
           return res
         } else {
-          return res
+          return cv.length > 0 ? cv.join("") : __
         }
       },
       rawImgGen: (aPrompt, aModel) => {
@@ -192,7 +336,8 @@ ow.ai.__gpttypes.bedrock = {
         return _r
       },
       addSystemPrompt: (aPrompt) => {
-        _r.conversation.push({ role: "system", content: aPrompt })
+        if (_r.conversation.filter(r => r.role == "system" && r.content == aPrompt).length == 0)
+          _r.conversation.push({ role: "system", content: aPrompt })
         return _r
       },
       cleanPrompt: () => {
