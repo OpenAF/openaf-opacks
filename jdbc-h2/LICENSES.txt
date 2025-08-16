@@ -1,5 +1,0 @@
-h2-2.3.232.jar:
-  version: 2.3.232
-  changed from original: false
-  comments: ''
-  license: ''
