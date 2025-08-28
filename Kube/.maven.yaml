@@ -5,3 +5,21 @@ artifacts:
 #- id     : bcpkix-jdk18on
 #  group  : org.bouncycastle
 #  version: "1.77"
+- group  : io.netty
+  id     : netty-codec-http2
+  version: 4.1.124.Final
+- group  : io.netty
+  id     : netty-common
+  version: 4.1.124.Final
+- group  : io.netty
+  id     : netty-codec-dns
+  version: 4.1.124.Final
+- group  : io.netty
+  id     : netty-codec-socks
+  version: 4.1.124.Final
+- group  : io.netty
+  id     : netty-handler-proxy
+  version: 4.1.124.Final
+- group  : io.netty
+  id     : netty-resolver-dns
+  version: 4.1.124.Final

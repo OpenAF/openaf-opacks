@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250509'
+version: '20250827'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -56,19 +56,19 @@ files:
 - kubernetes-model-resource-7.3.1.jar
 - kubernetes-model-scheduling-7.3.1.jar
 - kubernetes-model-storageclass-7.3.1.jar
-- netty-buffer-4.1.118.Final.jar
-- netty-codec-4.1.118.Final.jar
-- netty-codec-dns-4.1.118.Final.jar
-- netty-codec-http-4.1.118.Final.jar
-- netty-codec-http2-4.1.118.Final.jar
-- netty-codec-socks-4.1.118.Final.jar
-- netty-common-4.1.118.Final.jar
-- netty-handler-4.1.118.Final.jar
-- netty-handler-proxy-4.1.118.Final.jar
-- netty-resolver-4.1.118.Final.jar
-- netty-resolver-dns-4.1.118.Final.jar
-- netty-transport-4.1.118.Final.jar
-- netty-transport-native-unix-common-4.1.118.Final.jar
+- netty-buffer-4.1.124.Final.jar
+- netty-codec-4.1.124.Final.jar
+- netty-codec-dns-4.1.124.Final.jar
+- netty-codec-http-4.1.124.Final.jar
+- netty-codec-http2-4.1.124.Final.jar
+- netty-codec-socks-4.1.124.Final.jar
+- netty-common-4.1.124.Final.jar
+- netty-handler-4.1.124.Final.jar
+- netty-handler-proxy-4.1.124.Final.jar
+- netty-resolver-4.1.124.Final.jar
+- netty-resolver-dns-4.1.124.Final.jar
+- netty-transport-4.1.124.Final.jar
+- netty-transport-native-unix-common-4.1.124.Final.jar
 - snakeyaml-2.4.jar
 - snakeyaml-engine-2.9.jar
 - vertx-auth-common-4.5.14.jar
@@ -77,13 +77,13 @@ files:
 - vertx-web-common-4.5.14.jar
 - zjsonpatch-7.3.1.jar
 filesHash:
-  .maven.yaml: 0de8ecb5b53f93334a1b4a9ad29ce63f69b5f0f8
+  .maven.yaml: 345c8adcceccee0c21515be12dea124058c9406e
   .odoc.db: 80d4efa20e4e246ac56a18b04f56f2bd1bead5c3
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: d5933d10cd6602ddf46c106258cc215e7feca8ef
   jackson-dataformat-yaml-2.19.0.jar: 2d735ab4ecebf5c2bf248d4036fd4ba6d73d0cc1
   jackson-datatype-jsr310-2.19.0.jar: 4c98a2fa8b35b5ffe102438f747f7b526619fde7
-  kube.js: b8316b898bcda873a0576016c4c9ca4e10fc6521
+  kube.js: 5fadf71dc7335ade0e7eb16e36907ba20a8a2762
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
   kubernetes-client-7.3.1.jar: 3427e5b489cba107d0cea3c9515e8943bcc86312
   kubernetes-client-api-7.3.1.jar: a84625bde8727c1fe40da25d2167ef5c4647d6c4
@@ -110,19 +110,19 @@ filesHash:
   kubernetes-model-resource-7.3.1.jar: 302f2c82c473bb957c46dc11dc1491258f98eaf3
   kubernetes-model-scheduling-7.3.1.jar: 41c731664e426757801fb78f39ef956d3c6ab708
   kubernetes-model-storageclass-7.3.1.jar: 19db992964d367af20e480cda565964dada6734a
-  netty-buffer-4.1.118.Final.jar: 7022990af1e0d449f9d5322035899745e19735c5
-  netty-codec-4.1.118.Final.jar: 307f665c08ce57333121de4f460479fc0c3c94d4
-  netty-codec-dns-4.1.118.Final.jar: 0e04bf6679ab5e1bedae12047c4e049887476993
-  netty-codec-http-4.1.118.Final.jar: eda08a71294afe78c779b85fd696bc13491507a8
-  netty-codec-http2-4.1.118.Final.jar: e3c35c0685ec9e84c4f84b79feea7c9d185a08d3
-  netty-codec-socks-4.1.118.Final.jar: 488a67579f062bba2d2d20ce46f9bb28a68b0875
-  netty-common-4.1.118.Final.jar: 4bb0f9899146484fa89f7b9bc27389d5b8e2ecde
-  netty-handler-4.1.118.Final.jar: 30ebb05b6b0fb071dbfcf713017c4a767a97bb9b
-  netty-handler-proxy-4.1.118.Final.jar: 28d6c41b72df614e09440ae0bed53a43fbcfbe27
-  netty-resolver-4.1.118.Final.jar: 28c378c19c1779eca1104b400452627f3ebc4aea
-  netty-resolver-dns-4.1.118.Final.jar: ff5bfb643ccc5a809c4c21b10167b8d214ceaeeb
-  netty-transport-4.1.118.Final.jar: 5a27232e5d08218722d94ca14f0b1b4576e7711c
-  netty-transport-native-unix-common-4.1.118.Final.jar: 9da25a94e6a0edac90da0bc7894e5a54efcb866b
+  netty-buffer-4.1.124.Final.jar: 1e9c299dc908e801b4e041bef1b81cfe0ca0038c
+  netty-codec-4.1.124.Final.jar: 081e66a1586b6ae4f810f297d2b050c968a11658
+  netty-codec-dns-4.1.124.Final.jar: ecfc4946066df549ecce8b9cec999e4b1526c8f2
+  netty-codec-http-4.1.124.Final.jar: 57d4a06c3241f153410ffec292004fbba87b9695
+  netty-codec-http2-4.1.124.Final.jar: 24f9b9afacb3d79c176d10424890ebd4457ceaf7
+  netty-codec-socks-4.1.124.Final.jar: fc2ee1c4e0d88804c1d058da8b3a4d483b1a2754
+  netty-common-4.1.124.Final.jar: 46f22130821ee796e347b90693f61d7fc4b2e8a6
+  netty-handler-4.1.124.Final.jar: 13abbd2534e08e60b42829900d2a5d10b9417129
+  netty-handler-proxy-4.1.124.Final.jar: ae6a6cee393435f59634f2f96fa88f671dac90e0
+  netty-resolver-4.1.124.Final.jar: 85758b8fd2e75bce01423298592401bf649a5e31
+  netty-resolver-dns-4.1.124.Final.jar: e8a87f24b00128b931ee18cac08a3be745dc84ce
+  netty-transport-4.1.124.Final.jar: ce4f80c96f32d51659e142237c3ffbc678765e4e
+  netty-transport-native-unix-common-4.1.124.Final.jar: 06df613f0356d4de02574507754afb33874a7336
   snakeyaml-2.4.jar: e0666b825b796f85521f02360e77f4c92c5a7a07
   snakeyaml-engine-2.9.jar: 71b61db4fe4f9c85842ef577295599eb5f0410fb
   vertx-auth-common-4.5.14.jar: 90156adfe69487c3b4b4d3fc5f6b190c7db33f68
