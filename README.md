@@ -69,6 +69,7 @@
   |**UnixPAM**|<img src=".github/badges/UnixPAM.svg"><br>Provides UNIX PAM based authentication|
   |**XChart**|<img src=".github/badges/XChart.svg"><br>Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |**asciinema**|<img src=".github/badges/asciinema.svg"><br>Asciinema wrapper for use with OpenAF HTTPd server|
+  |**cq**|<img src=".github/badges/cq.svg"><br>A Chronicle Queue&#x27;s OpenAF wrapper.|
   |**etcd3**|<img src=".github/badges/etcd3.svg"><br>Wrapper to access etcd3 functionality as a client|
   |**inBrowser**|<img src=".github/badges/inBrowser.svg"><br>Provides a mini browser editor intended to use from openaf-console to edit objects or perform show/watch in a browser window.|
   |**initd**|<img src=".github/badges/initd.svg"><br>Creates initd scripts to use with the openaf&#x27;s --daemon command line option.|
