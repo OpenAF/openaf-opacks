@@ -1,0 +1,63 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- Chronicle
+- Queue
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/cq.opack
+description: A Chronicle Queue's OpenAF wrapper.
+name: cq
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20250830'
+dependencies:
+  openaf: '>=20250725'
+files:
+- .maven.yaml
+- .package.yaml
+- affinity-3.27ea1.jar
+- asm-9.2.jar
+- chronicle-analytics-2.27ea1.jar
+- chronicle-bytes-2.27ea6.jar
+- chronicle-core-2.27ea7.jar
+- chronicle-queue-5.27ea8.jar
+- chronicle-threads-2.27ea2.jar
+- chronicle-wire-2.27ea8.jar
+- compiler-2.27ea2.jar
+- cq.js
+- jffi-1.3.12-native.jar
+- jffi-1.3.12.jar
+- jnr-a64asm-1.0.0.jar
+- jnr-constants-0.10.4.jar
+- jnr-ffi-2.2.15.jar
+- jnr-x86asm-1.0.2.jar
+- oafp_cq.js
+- posix-2.27ea2.jar
+filesHash:
+  .maven.yaml: 53fe996e1e2db2f0e0e1062d06a29877d8cc0490
+  affinity-3.27ea1.jar: 2c033e31cdbc31b144b5225964c0fac1fbadb96d
+  asm-9.2.jar: 81a03f76019c67362299c40e0ba13405f5467bff
+  chronicle-analytics-2.27ea1.jar: 98a3e8d4d9ec35cc7cc68e78cc9e5cce3bfaa012
+  chronicle-bytes-2.27ea6.jar: 479dc809de75dd9e98c8140fa762a0c2394b8ed2
+  chronicle-core-2.27ea7.jar: db7595a4021ebb2485a84218ad21b677361b4642
+  chronicle-queue-5.27ea8.jar: 71b2b28a46a89fc2f1a0f199830c54cd7d9a48cb
+  chronicle-threads-2.27ea2.jar: 0dd7bc2482351a102f2d56cb78d4209f80732efa
+  chronicle-wire-2.27ea8.jar: b78c2484e704624c6949c83854dc0839d4719c06
+  compiler-2.27ea2.jar: d6022ef12a01c1e0380d554cda0fc1badb18e29f
+  cq.js: 1cb5d88a78b67bdd5b7c26fb1a67d2b95c7d0c04
+  jffi-1.3.12-native.jar: ebd0e45f447d80c16fbf2a82ff0253de28837b41
+  jffi-1.3.12.jar: a439d46fb5d5d9539f16db7d574c7aafb952874a
+  jnr-a64asm-1.0.0.jar: 0a1cb8dbe71b5a6a0288043c3ba3ca64545be165
+  jnr-constants-0.10.4.jar: 09f6f23763bf40ea7b56391791f574174914430a
+  jnr-ffi-2.2.15.jar: fa3c32f463423469de314b03a157d5f1f7476ec0
+  jnr-x86asm-1.0.2.jar: 006936bbd6c5b235665d87bd450f5e13b52d4b48
+  oafp_cq.js: faa0cf8b83a8a7f551d54dbd5462acd5141e341b
+  posix-2.27ea2.jar: 965dd188c4ba54d5759a7cfbc37d38ec0afa60c1
