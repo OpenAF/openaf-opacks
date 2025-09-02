@@ -1,6 +1,6 @@
 // Author: Nuno Aguiar
 
-loadExternalJars(getOPackPath("CQ") || ".")
+loadExternalJars(getOPackPath("cq") || ".")
 
 /**
  * <odoc>

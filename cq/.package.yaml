@@ -3,7 +3,25 @@ scripts:
   preerase: ''
   posterase: ''
   preinstall: ''
-  postinstall: ''
+  postinstall: |-
+    var _args = [
+      "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
+      "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+      "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED",
+      "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+      "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED",
+      "--add-opens=java.base/java.lang=ALL-UNNAMED",
+      "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+      "--add-opens=java.base/java.io=ALL-UNNAMED",
+      "--add-opens=java.base/java.util=ALL-UNNAMED"
+    ]
+
+    var _old = io.readFileString(getOpenAFPath() + ".openaf-javaargs").split(/\s+/)
+    _old.forEach(arg => {
+      if (!_args.includes(arg)) _args.push(arg)
+    })
+
+    restartOpenAF(["--install", "args=" + _old.join(" ")])
 keywords:
 - Chronicle
 - Queue
@@ -17,9 +35,9 @@ name: cq
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250830'
+version: '20250901'
 dependencies:
-  openaf: '>=20250725'
+  openaf: '>=20250901'
 files:
 - .maven.yaml
 - .package.yaml
@@ -52,7 +70,7 @@ filesHash:
   chronicle-threads-2.27ea2.jar: 0dd7bc2482351a102f2d56cb78d4209f80732efa
   chronicle-wire-2.27ea8.jar: b78c2484e704624c6949c83854dc0839d4719c06
   compiler-2.27ea2.jar: d6022ef12a01c1e0380d554cda0fc1badb18e29f
-  cq.js: 154b880d20bacd4b072e48d4dd79d30d50878b85
+  cq.js: 3dd4c93fb11c9fd33cc90788c204be49e284b3bc
   jffi-1.3.12-native.jar: ebd0e45f447d80c16fbf2a82ff0253de28837b41
   jffi-1.3.12.jar: a439d46fb5d5d9539f16db7d574c7aafb952874a
   jnr-a64asm-1.0.0.jar: 0a1cb8dbe71b5a6a0288043c3ba3ca64545be165
