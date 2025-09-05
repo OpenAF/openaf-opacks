@@ -94,6 +94,7 @@ List of data input types that can be auto-detected (through the file extension o
 | md | A Markdown format |
 | mdtable | A Markdown table format |
 | mdcode | A Markdown code blocks format |
+| mcp | A Model Context Protocol (MCP) input |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code or OpenAF scripting file to execute and use the result as input |
@@ -414,6 +415,35 @@ List of options to use when _in=mdtable_:
 | Option | Type | Description |
 |--------|------|-------------|
 | inmdtablejoin | Boolean | Scans an entire markdown input for tables and returns an array with the data of each markdown table |
+
+---
+
+### 🧾 MCP input options
+
+List of options to use when _in=mcp_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inmcptoolslist | Boolean | If true will list all available MCP tools |
+| inmcplistprompts | Boolean | If true will list all available MCP prompts |
+
+> When not using the list options, the input data should be a JSON/SLON/YAML map with the following properties:
+
+**Required (if not listing):**
+* '__tool__' (string) - The name of the MCP tool to call
+* '__params__' (map) - Parameters/arguments to pass to the tool
+
+**MCP connection:**
+* '__type__' (string) - Connection type: "stdio" for local process or "remote" for HTTP server (default: "stdio")
+* '__url__' (string) - Required for remote servers - the MCP server endpoint URL
+* '__timeout__' (number) - Timeout in milliseconds for operations (default: 60000)
+* '__cmd__' (string) - Required for stdio type - the command to launch the MCP server
+* '__options__' (map) - Additional options passed to underlying JSON-RPC client
+* '__debug__' (boolean) - Enable debug output showing JSON-RPC messages (default: false)
+* '__strict__' (boolean) - Enable strict MCP protocol compliance (default: true)
+* '__clientInfo__' (map) - Client information sent during initialization (default: {name: "OpenAF MCP Client", version: "1.0.0"})
+
+> For stdio type connections, the 'cmd' field is required. For remote type connections, the 'url' field is required.
 
 ---
 

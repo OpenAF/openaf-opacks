@@ -3814,6 +3814,29 @@ var _inputFns = new Map([
             _exit(-1, "ls is only supported with a string.")
         }
     }],  
+    ["mcp", (_res, options) => {
+        _showTmpMsg()
+        if (isUnDef($mcp)) _exit(-1, "mcp support not found.")
+        var _mres = _fromJSSLON(_res, true)
+        var _m = $mcp(_mres)
+        _m = _m.initialize()
+
+        var _r
+        if (toBoolean(params.inmcptoolslist)) {
+            _r = _m.listTools()
+            if (isMap(_r) && isDef(_r.tools)) _r = _r.tools
+        } else if (toBoolean(params.inmcplistprompts)) {
+            _r = _m.listPrompts()
+            if (isMap(_r) && isDef(_r.prompts)) _r = _r.prompts
+        } else {
+            if (isUnDef(_mres.tool)) _exit(-1, "For in=mcp a tool needs to be defined.")
+            if (isUnDef(_mres.params)) _mres.params = {}
+            
+            _r = _m.callTool(_mres.tool, _mres.params)
+        }
+        _m.destroy()
+        _$o(_r, options)
+    }],
     ["toml", (_res, options) => {
         _showTmpMsg()
         if (isUnDef(af.fromTOML)) _exit(-1, "TOML support not found.")
