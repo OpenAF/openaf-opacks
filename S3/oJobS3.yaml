@@ -136,7 +136,7 @@ jobs:
                     fSize        : ow.format.toBytesAbbreviation(f.size),
                     puri         : puri,
                     uri          : uri,
-                    filename     : f.filename.substr(f.filename.substr(0, f.filename.length-1).lastIndexOf("/") + 1)
+                    filename     : f.filename.substr(f.filename.substr(0, f.filename.length-1).lastIndexOf("/") + 1).replace(/\+/g, "%2B")
                   })
                 })
                 content += tmplb(theList)
