@@ -30,7 +30,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>6.0.0</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>7.3.1</version>
+            <version>7.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>v20250528</version>
+            <version>v20250820</version>
         </dependency>
         <dependency>
             <groupId>com.ibm.etcd</groupId>
