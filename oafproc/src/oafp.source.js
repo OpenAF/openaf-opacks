@@ -3657,6 +3657,9 @@ var _inputFns = new Map([
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
         params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
+        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
+            params.llmenv = "OAF_MODEL"
+        }
         if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
