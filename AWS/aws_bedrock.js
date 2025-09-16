@@ -188,6 +188,50 @@ ow.ai.__gpttypes.bedrock = {
               _m.toolConfig = { tools: toolConfig }
             }
           }
+        } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: [{ type: "text", text: aPrompt }] })
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: m.role,
+            content: Array.isArray(m.content)
+              ? m.content.map(c => {
+                  if (isMap(c)) {
+                    if (isDef(c.toolResult)) {
+                      return {
+                        type: "tool_result",
+                        tool_use_id: c.toolResult.toolUseId || c.toolResult.tool_use_id,
+                        content: c.toolResult.content
+                      }
+                    }
+                    if (isDef(c.type) && c.type != "text") return c
+                    return { type: c.type || "text", text: c.text }
+                  }
+                  return { type: "text", text: c }
+                })
+              : [{ type: "text", text: m.content }]
+          }))
+
+          _r.conversation = normalized
+
+          _m = {
+            anthropic_version: "bedrock-2023-05-31",
+            messages: normalized.filter(r => r.role != "system"),
+            temperature: aTemperature
+          }
+
+          var sysMsgs = normalized.filter(m => m.role == "system").map(m => m.content.map(s => s.text).join(""))
+          if (sysMsgs.length > 0) _m.system = sysMsgs.join("\n")
+
+          if (toolsToUse.length > 0) {
+            _m.tools = toolsToUse.filter(tool => isDef(tool) && isDef(tool.function)).map(tool => ({
+              name: tool.function.name,
+              description: tool.function.description,
+              input_schema: tool.function.parameters
+            }))
+          }
         } else if (aModel.indexOf("meta.") >= 0) {
           //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
@@ -213,7 +257,11 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
 
-        // Handle Nova-like structured output with messages
+        if (isArray(res.content)) {
+          res = { output: { message: { role: res.role || "assistant", content: res.content } } }
+        }
+
+        // Handle structured output with messages (Nova/Claude)
         if (isDef(res.output) && isDef(res.output.message)) {
           var messages = Array.isArray(res.output.message) ? res.output.message : [res.output.message]
           for (var mi = 0; mi < messages.length; mi++) {
@@ -227,29 +275,48 @@ ow.ai.__gpttypes.bedrock = {
                 var content = msg.content[ci]
                 try {
                   // Tool call handling (preserve previous behavior)
-                  if (isDef(content.toolUse)) {
-                    var toolName = content.toolUse.name
-                    var toolInput = content.toolUse.input
-                    var toolCallId = content.toolUse.toolUseId
+                  if (isDef(content.toolUse) || content.type == "tool_use") {
+                    var _toolUse = content.toolUse || content
+                    var toolName = _toolUse.name
+                    var toolInput = _toolUse.input
+                    var toolCallId = _toolUse.toolUseId || _toolUse.id
 
                     // Find tool (from passed tools or internal tools)
                     var tool = toolsToUse.find(t => t.function && t.function.name === toolName) || _r.tools[toolName]
                     if (isDef(tool) && isDef(tool.fn)) {
                       try {
                         var toolResult = tool.fn(toolInput)
-                        var _tR = {
-                          role: "user",
-                          content: [{
-                            toolResult: {
-                              toolUseId: toolCallId,
+                        var _tR
+                        if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                          _tR = {
+                            role: "user",
+                            content: [{
+                              type: "tool_result",
+                              tool_use_id: toolCallId,
                               content: [!isObject(toolResult) ? {
+                                type: "text",
                                 text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
                               } : {
+                                type: "json",
                                 json: toolResult
-                              }],
-                              status: "success"
-                            }
-                          }]
+                              }]
+                            }]
+                          }
+                        } else {
+                          _tR = {
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [!isObject(toolResult) ? {
+                                  text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
+                                } : {
+                                  json: toolResult
+                                }],
+                                status: "success"
+                              }
+                            }]
+                          }
                         }
                         _r.conversation.push(_tR)
 
@@ -258,18 +325,32 @@ ow.ai.__gpttypes.bedrock = {
                         cv.push(_res)
                         return _res
                       } catch (e) {
-                        _r.conversation.push({
-                          role: "user",
-                          content: [{
-                            toolResult: {
-                              toolUseId: toolCallId,
+                        if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                          _r.conversation.push({
+                            role: "user",
+                            content: [{
+                              type: "tool_result",
+                              tool_use_id: toolCallId,
                               content: [{
+                                type: "text",
                                 text: "Error executing tool: " + e.message
-                              }],
-                              status: "error"
-                            }
-                          }]
-                        })
+                              }]
+                            }]
+                          })
+                        } else {
+                          _r.conversation.push({
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [{
+                                  text: "Error executing tool: " + e.message
+                                }],
+                                status: "error"
+                              }
+                            }]
+                          })
+                        }
                       }
                     }
                   } else {
