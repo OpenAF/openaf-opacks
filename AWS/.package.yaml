@@ -33,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250814'
+version: '20250916'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -74,7 +74,7 @@ filesHash:
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: aa5136e50400756b4bee9f45b741818db58f446b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_bedrock.js: bd07aa4e2d003a0e73ff5f7a5e9fce6032ff4c2f
+  aws_bedrock.js: 374122fbad90e0b654c7b986413f3af4e058b785
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: 587612d67ce6cd966951b94e226927b07e783714
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
@@ -100,4 +100,4 @@ filesHash:
   oJobLambda.yaml: 6ef6b94742883b6979476ec31bbc7bd40683cc76
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9
+  utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9

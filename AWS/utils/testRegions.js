@@ -37,7 +37,8 @@ var regions = {
     "cn-northwest-1": "China (Ningxia)",
     "us-gov-east-1": "AWS GovCloud (US-East)",
     "us-gov-west-1": "AWS GovCloud (US)",
-    "il-central-1": "Israel (Tel Aviv)"
+    "il-central-1": "Israel (Tel Aviv)",
+    "ap-southeast-6": "Asia Pacific (New Zealand)"
   };
 
 // Tests the socket latency to a specific aHost, aPort given an optional aTimeout (default to 2500)
