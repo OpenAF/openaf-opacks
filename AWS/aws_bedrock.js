@@ -232,6 +232,70 @@ ow.ai.__gpttypes.bedrock = {
               input_schema: tool.function.parameters
             }))
           }
+        } else if (aModel.indexOf("mistral.") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: aPrompt })
+          }
+
+          var toText = function(content) {
+            if (isUnDef(content)) return ""
+            if (isString(content)) return content
+            if (isArray(content)) return content.map(toText).join("")
+            if (isMap(content)) {
+              if (isDef(content.text)) return content.text
+              if (isDef(content.generated_text)) return toText(content.generated_text)
+              if (isDef(content.outputText)) return toText(content.outputText)
+              if (isDef(content.output_text)) return toText(content.output_text)
+              if (isDef(content.value)) return isString(content.value) ? content.value : JSON.stringify(content.value)
+              if (isDef(content.json)) return isString(content.json) ? content.json : JSON.stringify(content.json)
+              if (isDef(content.content)) return toText(content.content)
+              if (isDef(content.toolResult) && isDef(content.toolResult.content)) return toText(content.toolResult.content)
+              if (isDef(content.toolResult)) return JSON.stringify(content.toolResult)
+              if (isDef(content.toolUse)) return "[tool_use:" + (content.toolUse.name || "") + "]"
+              if (isDef(content.type) && content.type == "text" && isDef(content.data)) return toText(content.data)
+              if (isDef(content.type) && isDef(content.message)) return toText(content.message)
+              return JSON.stringify(content)
+            }
+            return String(content)
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: String(m.role).toLowerCase(),
+            content: toText(m.content)
+          }))
+
+          _r.conversation = normalized
+
+          var systemPrompts = normalized.filter(m => m.role == "system").map(m => m.content).join("\n").trim()
+          var chatMessages = normalized.filter(m => m.role == "user" || m.role == "assistant")
+
+          var promptSegments = []
+          var firstUser = true
+          for (var mi = 0; mi < chatMessages.length; mi++) {
+            var message = chatMessages[mi]
+            if (message.role == "user") {
+              if (firstUser) {
+                var instParts = []
+                if (systemPrompts.length > 0) instParts.push("<<SYS>>\n" + systemPrompts + "\n<</SYS>>")
+                instParts.push(message.content)
+                promptSegments.push("<s>[INST] " + instParts.join("\n\n") + " [/INST]")
+                firstUser = false
+              } else {
+                promptSegments.push("<s>[INST] " + message.content + " [/INST]")
+              }
+            } else if (message.role == "assistant") {
+              promptSegments.push(" " + message.content + " </s>")
+            }
+          }
+
+          var promptText = promptSegments.join("").trim()
+          if (promptText.length == 0) promptText = toText(aPrompt)
+
+          _m = {
+            "prompt": promptText,
+            "temperature": aTemperature
+          }
         } else if (aModel.indexOf("meta.") >= 0) {
           //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
@@ -256,6 +320,57 @@ ow.ai.__gpttypes.bedrock = {
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
+
+        if (isArray(res.outputs)) {
+          var mistralTexts = []
+          var collectText = function(part) {
+            if (isUnDef(part)) return
+            if (isString(part)) {
+              if (String(part).length > 0) mistralTexts.push(String(part))
+            } else if (isArray(part)) {
+              part.forEach(collectText)
+            } else if (isMap(part)) {
+              if (isDef(part.text)) {
+                collectText(part.text)
+              } else if (isDef(part.generated_text)) {
+                collectText(part.generated_text)
+              } else if (isDef(part.outputText)) {
+                collectText(part.outputText)
+              } else if (isDef(part.output_text)) {
+                collectText(part.output_text)
+              } else if (isDef(part.value)) {
+                collectText(part.value)
+              } else if (isDef(part.json)) {
+                collectText(isString(part.json) ? part.json : JSON.stringify(part.json))
+              } else if (isDef(part.content)) {
+                collectText(part.content)
+              } else if (isDef(part.message)) {
+                collectText(part.message)
+              }
+            }
+          }
+
+          res.outputs.forEach(o => {
+            if (isDef(o.text)) collectText(o.text)
+            if (isDef(o.content)) collectText(o.content)
+            if (isDef(o.generated_text)) collectText(o.generated_text)
+            if (isDef(o.outputText)) collectText(o.outputText)
+            if (isDef(o.output_text)) collectText(o.output_text)
+          })
+
+          if (mistralTexts.length == 0 && isDef(res.generated_text)) collectText(res.generated_text)
+
+          if (mistralTexts.length > 0) {
+            var uniqueTexts = []
+            mistralTexts.forEach(text => {
+              if (uniqueTexts.indexOf(text) < 0) uniqueTexts.push(text)
+            })
+            uniqueTexts.forEach(text => {
+              cv.push(text)
+              _r.conversation.push({ role: "assistant", content: text })
+            })
+          }
+        }
 
         if (isArray(res.content)) {
           res = { output: { message: { role: res.role || "assistant", content: res.content } } }
