@@ -35,7 +35,7 @@ name: cq
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250901'
+version: '20250918'
 dependencies:
   openaf: '>=20250901'
 files:
@@ -44,11 +44,11 @@ files:
 - affinity-3.27ea1.jar
 - asm-9.2.jar
 - chronicle-analytics-2.27ea1.jar
-- chronicle-bytes-2.27ea6.jar
+- chronicle-bytes-2.27ea7.jar
 - chronicle-core-2.27ea7.jar
-- chronicle-queue-5.27ea8.jar
-- chronicle-threads-2.27ea2.jar
-- chronicle-wire-2.27ea8.jar
+- chronicle-queue-5.27ea9.jar
+- chronicle-threads-2.27ea3.jar
+- chronicle-wire-2.27ea12.jar
 - compiler-2.27ea2.jar
 - cq.js
 - jffi-1.3.12-native.jar
@@ -64,11 +64,11 @@ filesHash:
   affinity-3.27ea1.jar: 2c033e31cdbc31b144b5225964c0fac1fbadb96d
   asm-9.2.jar: 81a03f76019c67362299c40e0ba13405f5467bff
   chronicle-analytics-2.27ea1.jar: 98a3e8d4d9ec35cc7cc68e78cc9e5cce3bfaa012
-  chronicle-bytes-2.27ea6.jar: 479dc809de75dd9e98c8140fa762a0c2394b8ed2
+  chronicle-bytes-2.27ea7.jar: c0260df18ed0bf952b48544abe8960c4f7801596
   chronicle-core-2.27ea7.jar: db7595a4021ebb2485a84218ad21b677361b4642
-  chronicle-queue-5.27ea8.jar: 71b2b28a46a89fc2f1a0f199830c54cd7d9a48cb
-  chronicle-threads-2.27ea2.jar: 0dd7bc2482351a102f2d56cb78d4209f80732efa
-  chronicle-wire-2.27ea8.jar: b78c2484e704624c6949c83854dc0839d4719c06
+  chronicle-queue-5.27ea9.jar: 9c198bb6e913499760a0537a299abe38c9a7dc56
+  chronicle-threads-2.27ea3.jar: adcecac66024a75322f6ced6760f2627a2934df3
+  chronicle-wire-2.27ea12.jar: 1ea0a1d625be37aa9a8d7965cf3169b749447ece
   compiler-2.27ea2.jar: d6022ef12a01c1e0380d554cda0fc1badb18e29f
   cq.js: 3dd4c93fb11c9fd33cc90788c204be49e284b3bc
   jffi-1.3.12-native.jar: ebd0e45f447d80c16fbf2a82ff0253de28837b41

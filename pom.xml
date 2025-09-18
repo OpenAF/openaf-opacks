@@ -200,7 +200,7 @@
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>chronicle-queue</artifactId>
-            <version>5.27ea8</version>
+            <version>5.27ea9</version>
         </dependency>
     </dependencies>
 </project>
