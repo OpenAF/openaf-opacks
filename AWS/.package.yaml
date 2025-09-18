@@ -33,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250917'
+version: '20250918'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -60,6 +60,7 @@ files:
 - aws_pi.js
 - aws_rds.js
 - aws_route53.js
+- aws_scheduler.js
 - aws_secrets.js
 - aws_secrets_sec.js
 - aws_sqs.js
@@ -70,9 +71,9 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: fb5a2aa8dc30f8d0bf556a320914c19220fc461a
+  .odoc.db: c9652e4618585b8895f4d24671ba318ad145e2f9
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: aa5136e50400756b4bee9f45b741818db58f446b
+  aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: 4bb39fdc641af3bf4b66526e5555a23e9f0322e2
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
@@ -92,6 +93,7 @@ filesHash:
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
+  aws_scheduler.js: f741e27d96325c1f839ce535a6ffc5b8b0c2c6d9
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
