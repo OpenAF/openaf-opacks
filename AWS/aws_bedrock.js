@@ -315,8 +315,9 @@ ow.ai.__gpttypes.bedrock = {
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
-
+ 
         var aInput = merge(_m, aOptions.params)
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
@@ -541,6 +542,7 @@ ow.ai.__gpttypes.bedrock = {
         return _r
       },
       getModels: () => {
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         var res = aws.BEDROCK_ListFoundationalModels(aOptions.region)
         return res
       },
