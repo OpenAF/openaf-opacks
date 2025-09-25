@@ -56,7 +56,7 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
 
   return res
 }
-
+ 
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
@@ -73,6 +73,59 @@ ow.ai.__gpttypes.bedrock = {
     var aws = new AWS()
     var _model = aOptions.model
     var _temperature = aOptions.temperature
+    var _lastStats = __
+    var _resetStats = () => { _lastStats = __ }
+    var _captureStats = (aResponse, aModelName) => {
+      if (!isMap(aResponse)) {
+        _lastStats = __
+        return _lastStats
+      }
+
+      var stats = { vendor: "bedrock" }
+      var modelName = isString(aModelName) ? aModelName : _model
+      if (isString(modelName)) stats.model = modelName
+
+      // Handle different Bedrock model response formats
+      if (isDef(aResponse.usage)) {
+        var tokens = {}
+        if (isDef(aResponse.usage.inputTokens)) tokens.prompt = aResponse.usage.inputTokens
+        if (isDef(aResponse.usage.outputTokens)) tokens.completion = aResponse.usage.outputTokens
+        if (isDef(aResponse.usage.totalTokens)) tokens.total = aResponse.usage.totalTokens
+        // Also handle alternative token field names
+        if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
+        if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
+        if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
+        if (Object.keys(tokens).length > 0) stats.tokens = tokens
+        stats.usage = aResponse.usage
+      }
+
+      // Handle stop reasons
+      if (isString(aResponse.stop_reason)) stats.stopReason = aResponse.stop_reason
+      if (isString(aResponse.stopReason)) stats.stopReason = aResponse.stopReason
+      
+      // Handle results array finish reasons (Titan models)
+      if (isArray(aResponse.results)) {
+        var finishReasons = aResponse.results
+          .filter(r => isDef(r) && isDef(r.completionReason))
+          .map(r => r.completionReason)
+        if (finishReasons.length > 0) stats.finishReasons = finishReasons
+      }
+
+      // Handle output message structure (Nova/Claude models)
+      if (isDef(aResponse.output) && isDef(aResponse.output.message)) {
+        if (isString(aResponse.output.message.role)) stats.role = aResponse.output.message.role
+        if (isArray(aResponse.output.message.content)) {
+          var contentTypes = aResponse.output.message.content
+            .filter(c => isMap(c) && isString(c.type))
+            .map(c => c.type)
+          if (contentTypes.length > 0) stats.contentTypes = contentTypes
+        }
+      }
+
+      if (Object.keys(stats).filter(k => k != "vendor").length == 0) stats = __
+      _lastStats = stats
+      return _lastStats
+    }
     var _r = {
       conversation: [],
       tools: {},
@@ -83,6 +136,7 @@ ow.ai.__gpttypes.bedrock = {
         if (isArray(aConversation)) _r.conversation = aConversation
         return _r
       },
+      getLastStats: () => _lastStats,
       setTool: (aName, aDesc, aParams, aFn) => {
         _r.tools[aName] = {
           type: "function",
@@ -319,6 +373,7 @@ ow.ai.__gpttypes.bedrock = {
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
+        _captureStats(res, aModel)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
 
@@ -512,6 +567,14 @@ ow.ai.__gpttypes.bedrock = {
         } else {
           return cv.length > 0 ? cv.join("") : __
         }
+      },
+      promptWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
+        var response = _r.prompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
+        return { response: response, stats: _r.getLastStats() }
+      },
+      rawPromptWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
+        var response = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, aTools)
+        return { response: response, stats: _r.getLastStats() }
       },
       rawImgGen: (aPrompt, aModel) => {
         throw "Not implemented yet"
