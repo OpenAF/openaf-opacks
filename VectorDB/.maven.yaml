@@ -1,0 +1,3 @@
+artifacts:
+- group  : org.apache.lucene
+  id     : lucene-analysis-common
