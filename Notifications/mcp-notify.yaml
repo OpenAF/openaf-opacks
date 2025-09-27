@@ -1,0 +1,89 @@
+# Author: Nuno Aguiar
+help:
+  text   : A STDIO MCP notification server (Pushover)
+  expects: 
+  - name     : pushoverkey
+    desc     : Pushover API Key
+    example  : "abc123"
+    mandatory: true
+  - name     : userid
+    desc     : Pushover User Key
+    example  : "def456"
+    mandatory: true
+  - name     : onport
+    desc     : If defined starts a MCP server on the provided port
+    example  : "8888"
+    mandatory: false
+
+todo:
+- Init
+- (if    ): "isDef(args.onport)"
+  ((then)):
+  - (httpdMCP): &MCPSERVER
+      serverInfo:
+        name   : mini-a-notification
+        title  : OpenAF mini-a MCP notification server
+        version: 1.0.0
+    ((fnsMeta)): &MCPFNSMETA
+      sendNotification:
+        name       : sendNotification
+        description: Sends a notification via Pushover.
+        inputSchema:
+          type      : object
+          properties:
+            message:
+              type        : string
+              description : Message to send
+          required: [ message ]
+        annotations:
+          title         : sendNotification
+          readOnlyHint  : true
+          idempotentHint: true
+    ((fns    )): &MCPFNS
+      sendNotification  : Send notification
+  ((else)):
+  - (stdioMCP ): *MCPSERVER
+    ((fnsMeta)): *MCPFNSMETA
+    ((fns    )): *MCPFNS
+
+ojob:
+  opacks      :
+  - openaf     : 20250915
+  - oJob-common: 20250914
+  - Notifications
+  catch       : printErrnl("[" + job.name + "] "); $err(exception, __, __, job.exec)
+  logToConsole: false   # to change when finished
+  argsFromEnvs: true
+  daemon      : true
+  loadLibs    :
+  - pushover.js
+        
+include:
+- oJobMCP.yaml
+
+jobs:
+# -----------
+- name : Init
+  check:
+    in:
+      pushoverkey: isString
+      userid     : isString
+  exec : | #js
+    global.pushoverkey = args.pushoverkey
+    global.userid      = args.userid
+
+# ------------------------
+- name : Send notification
+  check:
+    in:
+      message    : isString
+  exec : | #js
+    var po
+    try {
+      po = new Pushover(global.pushoverkey)
+      var _r = po.send(global.userid, args.message)
+      return "Notification sent (" + JSON.stringify(_r) + ")"
+    } catch(e) {
+      logErr("Error sending Pushover notification: " + e.toString())
+      return "[ERROR] Couldn't send notification."
+    }

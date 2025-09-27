@@ -768,6 +768,7 @@ Kube.prototype.getLog = function(aNamespace, aPodName, aContainer, aStream) {
  * </odoc>
  */
 Kube.prototype.getNodeMetrics = function(aNode) {
+	_$(aNode, "aNode").isString().$_()
     return jsonParse(this.client.raw(this.client.getMasterUrl() + "api/v1/nodes/" + aNode + "/proxy/stats/summary"), true)
 }
 

@@ -1,0 +1,3 @@
+artifacts:
+- id     : chronicle-queue
+  group  : net.openhft

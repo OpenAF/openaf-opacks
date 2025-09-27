@@ -56,7 +56,7 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
 
   return res
 }
-
+ 
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
@@ -73,6 +73,59 @@ ow.ai.__gpttypes.bedrock = {
     var aws = new AWS()
     var _model = aOptions.model
     var _temperature = aOptions.temperature
+    var _lastStats = __
+    var _resetStats = () => { _lastStats = __ }
+    var _captureStats = (aResponse, aModelName) => {
+      if (!isMap(aResponse)) {
+        _lastStats = __
+        return _lastStats
+      }
+
+      var stats = { vendor: "bedrock" }
+      var modelName = isString(aModelName) ? aModelName : _model
+      if (isString(modelName)) stats.model = modelName
+
+      // Handle different Bedrock model response formats
+      if (isDef(aResponse.usage)) {
+        var tokens = {}
+        if (isDef(aResponse.usage.inputTokens)) tokens.prompt = aResponse.usage.inputTokens
+        if (isDef(aResponse.usage.outputTokens)) tokens.completion = aResponse.usage.outputTokens
+        if (isDef(aResponse.usage.totalTokens)) tokens.total = aResponse.usage.totalTokens
+        // Also handle alternative token field names
+        if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
+        if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
+        if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
+        if (Object.keys(tokens).length > 0) stats.tokens = tokens
+        stats.usage = aResponse.usage
+      }
+
+      // Handle stop reasons
+      if (isString(aResponse.stop_reason)) stats.stopReason = aResponse.stop_reason
+      if (isString(aResponse.stopReason)) stats.stopReason = aResponse.stopReason
+      
+      // Handle results array finish reasons (Titan models)
+      if (isArray(aResponse.results)) {
+        var finishReasons = aResponse.results
+          .filter(r => isDef(r) && isDef(r.completionReason))
+          .map(r => r.completionReason)
+        if (finishReasons.length > 0) stats.finishReasons = finishReasons
+      }
+
+      // Handle output message structure (Nova/Claude models)
+      if (isDef(aResponse.output) && isDef(aResponse.output.message)) {
+        if (isString(aResponse.output.message.role)) stats.role = aResponse.output.message.role
+        if (isArray(aResponse.output.message.content)) {
+          var contentTypes = aResponse.output.message.content
+            .filter(c => isMap(c) && isString(c.type))
+            .map(c => c.type)
+          if (contentTypes.length > 0) stats.contentTypes = contentTypes
+        }
+      }
+
+      if (Object.keys(stats).filter(k => k != "vendor").length == 0) stats = __
+      _lastStats = stats
+      return _lastStats
+    }
     var _r = {
       conversation: [],
       tools: {},
@@ -83,6 +136,7 @@ ow.ai.__gpttypes.bedrock = {
         if (isArray(aConversation)) _r.conversation = aConversation
         return _r
       },
+      getLastStats: () => _lastStats,
       setTool: (aName, aDesc, aParams, aFn) => {
         _r.tools[aName] = {
           type: "function",
@@ -188,6 +242,114 @@ ow.ai.__gpttypes.bedrock = {
               _m.toolConfig = { tools: toolConfig }
             }
           }
+        } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: [{ type: "text", text: aPrompt }] })
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: m.role,
+            content: Array.isArray(m.content)
+              ? m.content.map(c => {
+                  if (isMap(c)) {
+                    if (isDef(c.toolResult)) {
+                      return {
+                        type: "tool_result",
+                        tool_use_id: c.toolResult.toolUseId || c.toolResult.tool_use_id,
+                        content: c.toolResult.content
+                      }
+                    }
+                    if (isDef(c.type) && c.type != "text") return c
+                    return { type: c.type || "text", text: c.text }
+                  }
+                  return { type: "text", text: c }
+                })
+              : [{ type: "text", text: m.content }]
+          }))
+
+          _r.conversation = normalized
+
+          _m = {
+            anthropic_version: "bedrock-2023-05-31",
+            messages: normalized.filter(r => r.role != "system"),
+            temperature: aTemperature
+          }
+
+          var sysMsgs = normalized.filter(m => m.role == "system").map(m => m.content.map(s => s.text).join(""))
+          if (sysMsgs.length > 0) _m.system = sysMsgs.join("\n")
+
+          if (toolsToUse.length > 0) {
+            _m.tools = toolsToUse.filter(tool => isDef(tool) && isDef(tool.function)).map(tool => ({
+              name: tool.function.name,
+              description: tool.function.description,
+              input_schema: tool.function.parameters
+            }))
+          }
+        } else if (aModel.indexOf("mistral.") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: aPrompt })
+          }
+
+          var toText = function(content) {
+            if (isUnDef(content)) return ""
+            if (isString(content)) return content
+            if (isArray(content)) return content.map(toText).join("")
+            if (isMap(content)) {
+              if (isDef(content.text)) return content.text
+              if (isDef(content.generated_text)) return toText(content.generated_text)
+              if (isDef(content.outputText)) return toText(content.outputText)
+              if (isDef(content.output_text)) return toText(content.output_text)
+              if (isDef(content.value)) return isString(content.value) ? content.value : JSON.stringify(content.value)
+              if (isDef(content.json)) return isString(content.json) ? content.json : JSON.stringify(content.json)
+              if (isDef(content.content)) return toText(content.content)
+              if (isDef(content.toolResult) && isDef(content.toolResult.content)) return toText(content.toolResult.content)
+              if (isDef(content.toolResult)) return JSON.stringify(content.toolResult)
+              if (isDef(content.toolUse)) return "[tool_use:" + (content.toolUse.name || "") + "]"
+              if (isDef(content.type) && content.type == "text" && isDef(content.data)) return toText(content.data)
+              if (isDef(content.type) && isDef(content.message)) return toText(content.message)
+              return JSON.stringify(content)
+            }
+            return String(content)
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: String(m.role).toLowerCase(),
+            content: toText(m.content)
+          }))
+
+          _r.conversation = normalized
+
+          var systemPrompts = normalized.filter(m => m.role == "system").map(m => m.content).join("\n").trim()
+          var chatMessages = normalized.filter(m => m.role == "user" || m.role == "assistant")
+
+          var promptSegments = []
+          var firstUser = true
+          for (var mi = 0; mi < chatMessages.length; mi++) {
+            var message = chatMessages[mi]
+            if (message.role == "user") {
+              if (firstUser) {
+                var instParts = []
+                if (systemPrompts.length > 0) instParts.push("<<SYS>>\n" + systemPrompts + "\n<</SYS>>")
+                instParts.push(message.content)
+                promptSegments.push("<s>[INST] " + instParts.join("\n\n") + " [/INST]")
+                firstUser = false
+              } else {
+                promptSegments.push("<s>[INST] " + message.content + " [/INST]")
+              }
+            } else if (message.role == "assistant") {
+              promptSegments.push(" " + message.content + " </s>")
+            }
+          }
+
+          var promptText = promptSegments.join("").trim()
+          if (promptText.length == 0) promptText = toText(aPrompt)
+
+          _m = {
+            "prompt": promptText,
+            "temperature": aTemperature
+          }
         } else if (aModel.indexOf("meta.") >= 0) {
           //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
@@ -207,13 +369,70 @@ ow.ai.__gpttypes.bedrock = {
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
-
+ 
         var aInput = merge(_m, aOptions.params)
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
+        _captureStats(res, aModel)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
 
-        // Handle Nova-like structured output with messages
+        if (isArray(res.outputs)) {
+          var mistralTexts = []
+          var collectText = function(part) {
+            if (isUnDef(part)) return
+            if (isString(part)) {
+              if (String(part).length > 0) mistralTexts.push(String(part))
+            } else if (isArray(part)) {
+              part.forEach(collectText)
+            } else if (isMap(part)) {
+              if (isDef(part.text)) {
+                collectText(part.text)
+              } else if (isDef(part.generated_text)) {
+                collectText(part.generated_text)
+              } else if (isDef(part.outputText)) {
+                collectText(part.outputText)
+              } else if (isDef(part.output_text)) {
+                collectText(part.output_text)
+              } else if (isDef(part.value)) {
+                collectText(part.value)
+              } else if (isDef(part.json)) {
+                collectText(isString(part.json) ? part.json : JSON.stringify(part.json))
+              } else if (isDef(part.content)) {
+                collectText(part.content)
+              } else if (isDef(part.message)) {
+                collectText(part.message)
+              }
+            }
+          }
+
+          res.outputs.forEach(o => {
+            if (isDef(o.text)) collectText(o.text)
+            if (isDef(o.content)) collectText(o.content)
+            if (isDef(o.generated_text)) collectText(o.generated_text)
+            if (isDef(o.outputText)) collectText(o.outputText)
+            if (isDef(o.output_text)) collectText(o.output_text)
+          })
+
+          if (mistralTexts.length == 0 && isDef(res.generated_text)) collectText(res.generated_text)
+
+          if (mistralTexts.length > 0) {
+            var uniqueTexts = []
+            mistralTexts.forEach(text => {
+              if (uniqueTexts.indexOf(text) < 0) uniqueTexts.push(text)
+            })
+            uniqueTexts.forEach(text => {
+              cv.push(text)
+              _r.conversation.push({ role: "assistant", content: text })
+            })
+          }
+        }
+
+        if (isArray(res.content)) {
+          res = { output: { message: { role: res.role || "assistant", content: res.content } } }
+        }
+
+        // Handle structured output with messages (Nova/Claude)
         if (isDef(res.output) && isDef(res.output.message)) {
           var messages = Array.isArray(res.output.message) ? res.output.message : [res.output.message]
           for (var mi = 0; mi < messages.length; mi++) {
@@ -227,29 +446,48 @@ ow.ai.__gpttypes.bedrock = {
                 var content = msg.content[ci]
                 try {
                   // Tool call handling (preserve previous behavior)
-                  if (isDef(content.toolUse)) {
-                    var toolName = content.toolUse.name
-                    var toolInput = content.toolUse.input
-                    var toolCallId = content.toolUse.toolUseId
+                  if (isDef(content.toolUse) || content.type == "tool_use") {
+                    var _toolUse = content.toolUse || content
+                    var toolName = _toolUse.name
+                    var toolInput = _toolUse.input
+                    var toolCallId = _toolUse.toolUseId || _toolUse.id
 
                     // Find tool (from passed tools or internal tools)
                     var tool = toolsToUse.find(t => t.function && t.function.name === toolName) || _r.tools[toolName]
                     if (isDef(tool) && isDef(tool.fn)) {
                       try {
                         var toolResult = tool.fn(toolInput)
-                        var _tR = {
-                          role: "user",
-                          content: [{
-                            toolResult: {
-                              toolUseId: toolCallId,
+                        var _tR
+                        if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                          _tR = {
+                            role: "user",
+                            content: [{
+                              type: "tool_result",
+                              tool_use_id: toolCallId,
                               content: [!isObject(toolResult) ? {
+                                type: "text",
                                 text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
                               } : {
+                                type: "json",
                                 json: toolResult
-                              }],
-                              status: "success"
-                            }
-                          }]
+                              }]
+                            }]
+                          }
+                        } else {
+                          _tR = {
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [!isObject(toolResult) ? {
+                                  text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
+                                } : {
+                                  json: toolResult
+                                }],
+                                status: "success"
+                              }
+                            }]
+                          }
                         }
                         _r.conversation.push(_tR)
 
@@ -258,18 +496,32 @@ ow.ai.__gpttypes.bedrock = {
                         cv.push(_res)
                         return _res
                       } catch (e) {
-                        _r.conversation.push({
-                          role: "user",
-                          content: [{
-                            toolResult: {
-                              toolUseId: toolCallId,
+                        if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                          _r.conversation.push({
+                            role: "user",
+                            content: [{
+                              type: "tool_result",
+                              tool_use_id: toolCallId,
                               content: [{
+                                type: "text",
                                 text: "Error executing tool: " + e.message
-                              }],
-                              status: "error"
-                            }
-                          }]
-                        })
+                              }]
+                            }]
+                          })
+                        } else {
+                          _r.conversation.push({
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [{
+                                  text: "Error executing tool: " + e.message
+                                }],
+                                status: "error"
+                              }
+                            }]
+                          })
+                        }
                       }
                     }
                   } else {
@@ -316,6 +568,14 @@ ow.ai.__gpttypes.bedrock = {
           return cv.length > 0 ? cv.join("") : __
         }
       },
+      promptWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
+        var response = _r.prompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
+        return { response: response, stats: _r.getLastStats() }
+      },
+      rawPromptWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
+        var response = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, aTools)
+        return { response: response, stats: _r.getLastStats() }
+      },
       rawImgGen: (aPrompt, aModel) => {
         throw "Not implemented yet"
       },
@@ -345,6 +605,7 @@ ow.ai.__gpttypes.bedrock = {
         return _r
       },
       getModels: () => {
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         var res = aws.BEDROCK_ListFoundationalModels(aOptions.region)
         return res
       },

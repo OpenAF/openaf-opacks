@@ -20,8 +20,37 @@ var AWS = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
 
    aRegion = _$(aRegion).isString().default("us-east-1")
 
+   this._original = {
+      accessKey: aAccessKey,
+      secretKey: aSecretKey,
+      stoken   : aSessionToken,
+      region   : aRegion,
+      last     : now()
+   }
+
    this.connect(aAccessKey, aSecretKey, aSessionToken, aRegion);
-};
+}
+
+/**
+ * <odoc>
+ * <key>AWS.reconnect()</key>
+ * Resets the connection using the original credentials provided at initialization.
+ * </odoc>
+ */
+AWS.prototype.reconnect = function() {
+   this._original.last = now()
+   this.connect(this._original.accessKey, this._original.secretKey, this._original.stoken, this._original.region)
+}
+
+/**
+ * <odoc>
+ * <key>AWS.lastConnect() : Number</key>
+ * Returns the number of milliseconds since the last connect/reconnect.
+ * </odoc>
+ */
+AWS.prototype.lastConnect = function() {
+   return now() - this._original.last
+}
 
 AWS.prototype._imds = function() {
    var _role, _cred, _token

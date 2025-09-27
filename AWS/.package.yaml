@@ -33,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250814'
+version: '20250924'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -60,6 +60,7 @@ files:
 - aws_pi.js
 - aws_rds.js
 - aws_route53.js
+- aws_scheduler.js
 - aws_secrets.js
 - aws_secrets_sec.js
 - aws_sqs.js
@@ -70,15 +71,15 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: fb5a2aa8dc30f8d0bf556a320914c19220fc461a
+  .odoc.db: d5a5f51a432d83d9b76628e0466d25d8d43e20fe
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: aa5136e50400756b4bee9f45b741818db58f446b
+  aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_bedrock.js: bd07aa4e2d003a0e73ff5f7a5e9fce6032ff4c2f
+  aws_bedrock.js: 06242ae713fd8b41245c10a1e9dd8e852081d841
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: 587612d67ce6cd966951b94e226927b07e783714
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
-  aws_core.js: f9b85688521d19387c3ca4199e2fd4f2a9bf3849
+  aws_core.js: 40a750334bb652a8445b119fef69825ce2e73875
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
@@ -92,6 +93,7 @@ filesHash:
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
+  aws_scheduler.js: f741e27d96325c1f839ce535a6ffc5b8b0c2c6d9
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
@@ -100,4 +102,4 @@ filesHash:
   oJobLambda.yaml: 6ef6b94742883b6979476ec31bbc7bd40683cc76
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
-  utils/testRegions.js: ffb2abd757311ef469bb439ebe3daac63dde78b9
+  utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9
