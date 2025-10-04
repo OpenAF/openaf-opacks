@@ -25,6 +25,7 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - dd-plist-1.28.jar
 - mac.js
 - mac.yaml
@@ -32,6 +33,7 @@ files:
 - tests/testAllMac.yaml
 filesHash:
   .maven.yaml: ac92c000c0d67cd85c1f8f2a2a881285de2ec8cd
+  README.md: 1ca1613f2bc20a4e71a3f3e04d94e88ce5bd8818
   dd-plist-1.28.jar: 617d08cc6e9c800e4b77266087cc9294b6d87e11
   mac.js: 0b4b36e41abf0a67562c99fb0cfc5e2a3d9c9bee
   mac.yaml: 847a46444176c2db094698616711f2e8bb158dbb
