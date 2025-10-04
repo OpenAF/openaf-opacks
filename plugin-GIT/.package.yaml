@@ -26,6 +26,7 @@ files:
 - .odoc.db
 - .package.yaml
 - JavaEWAH-1.2.3.jar
+- README.md
 - compile.yaml
 - org.eclipse.jgit-7.2.0.202503040940-r.jar
 - plugin-git.jar
@@ -35,6 +36,7 @@ filesHash:
   .maven.yaml: a655041263283a09534178f9b7f8dafcacb2c312
   .odoc.db: bc44827c8f55b7d76e0114abf89acf601225fad7
   JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
+  README.md: 3c52f958f88b7bcea305a37c1f3f25d6680776c7
   compile.yaml: 8d07ec5ca4c092ce77ab110690572055965e6b69
   org.eclipse.jgit-7.2.0.202503040940-r.jar: 8d9379845e9d37b58b187abbab2f7a6b63b59f65
   plugin-git.jar: 4fa16add35beaf4b282122756360c943040bb259
