@@ -24,6 +24,7 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - animal-sniffer-annotations-1.24.jar
 - annotations-4.1.1.4.jar
 - api-common-2.50.2.jar
@@ -101,6 +102,7 @@ files:
 - threetenbp-1.7.0.jar
 filesHash:
   .maven.yaml: f0b45d6ed3970513249dd2987d5039c0b2277517
+  README.md: 771ac30ff6b3e4470204dbbbf60ede2d6d1688da
   animal-sniffer-annotations-1.24.jar: aa9ba58d30e0aad7f1808fce9c541ea3760678d8
   annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   api-common-2.50.2.jar: f6cca2fc1980d40c72552090ef5c5545f2b53c5c
