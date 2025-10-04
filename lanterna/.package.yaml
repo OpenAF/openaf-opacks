@@ -24,9 +24,11 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - lanterna-3.2.0-alpha1.jar
 - test.js
 filesHash:
   .maven.yaml: 77ad46f6f6f26237e09b8fee4a1d3a1dbe500a3c
+  README.md: 4bf0d8fe1cef50460494282dd2ac2c077df33712
   lanterna-3.2.0-alpha1.jar: eec36a4aa2f6b163e2daffe470f6754b299c5614
   test.js: e756aa804ab136548533a018de839175f521bae5
