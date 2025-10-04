@@ -41,6 +41,7 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - affinity-3.27ea1.jar
 - asm-9.2.jar
 - chronicle-analytics-2.27ea1.jar
@@ -61,6 +62,7 @@ files:
 - posix-2.27ea2.jar
 filesHash:
   .maven.yaml: 53fe996e1e2db2f0e0e1062d06a29877d8cc0490
+  README.md: 29ccf16c4c4f52849188f7a2f6d7905cc0ba2227
   affinity-3.27ea1.jar: 2c033e31cdbc31b144b5225964c0fac1fbadb96d
   asm-9.2.jar: 81a03f76019c67362299c40e0ba13405f5467bff
   chronicle-analytics-2.27ea1.jar: 98a3e8d4d9ec35cc7cc68e78cc9e5cce3bfaa012
