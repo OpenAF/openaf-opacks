@@ -24,6 +24,7 @@ files:
 - .maven.yaml
 - .package.yaml
 - .precompile
+- README.md
 - animal-sniffer-annotations-1.23.jar
 - annotations-4.1.1.4.jar
 - checker-qual-3.37.0.jar
@@ -70,6 +71,7 @@ files:
 filesHash:
   .maven.yaml: e3c001e482ae66aab69f322be3403b7d4b0ae463
   .precompile: f469636ceae98d4c1e551ff89b87b2939a48e2a6
+  README.md: d971bebf64df553d5485a118304a61c3c3de9937
   animal-sniffer-annotations-1.23.jar: 3c0daebd5f0e1ce72cc50c818321ac957aeb5d70
   annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   checker-qual-3.37.0.jar: ba74746d38026581c12166e164bb3c15e90cc4ea
