@@ -24,9 +24,11 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - jexer-1.6.0.jar
 - jexer.js
 filesHash:
   .maven.yaml: 4fe804232e760ba1925f354a1ff7dc799da3c2f4
+  README.md: db7bd958d52d8d8001e4d8a57ec849ce8402cfb1
   jexer-1.6.0.jar: a19bd86ebd164d86523c79e3b188251846c56750
   jexer.js: 7249cedd41cfd96d80ccea23a98bf43051b3135e
