@@ -26,6 +26,7 @@ files:
 - .odoc.db
 - .package.yaml
 - LICENSES.txt
+- README.md
 - annotations-24.1.0.jar
 - cache-api-1.1.1.jar
 - compile.yaml
@@ -36,6 +37,7 @@ filesHash:
   .maven.yaml: 3a5411f66c9a3a5b5647be8652f865f2c89ecd82
   .odoc.db: 2222cfff1b4e10f57f700a3a25cfc9a97763eada
   LICENSES.txt: d7ce9e985cc6d97abbbea1e8422417783f4fb773
+  README.md: 022e192a9cfcd5ac4ecce9ab7dcf765e232a61a6
   annotations-24.1.0.jar: 7af6a669488450c4a07c2c3254e2151df42d7d04
   cache-api-1.1.1.jar: c56fb980eb5208bfee29a9a5b9d951aba076bd91
   compile.yaml: f730870ffe1ac8c7cef2aad9ca7ee4c0d5bff83e

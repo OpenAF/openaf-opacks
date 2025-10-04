@@ -26,6 +26,7 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - hcl.js
 - hcl4j-0.9.8.jar
 - oafp_Terraform.js
@@ -35,6 +36,7 @@ filesHash:
   .maven.yaml: 80ef0143c2d3f62ff6428ac017f790ca2180b6dd
   .odoc.db: 295bc1d3e733d4a942d8beb633319c790e0588cc
   .precompile: da588afc4e62a756bbee5a4b4b086c2d989efea6
+  README.md: bd668ef7942ddfb328e00d466a4027e32c7f553b
   hcl.js: 9e5698715d29ff573f957b3ec43c4008f16f8a5c
   hcl4j-0.9.8.jar: 71b3953c383fce1ff2c07584561d3328bebb6868
   oafp_Terraform.js: 709fa83953f14c40de9f414048381eda2ebeac73

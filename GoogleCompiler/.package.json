@@ -32,6 +32,7 @@
     ".maven.yaml",
     ".package.json",
     "LICENSE",
+    "README.md",
     "compiler.jar",
     "compiler11.jar",
     "main.js"
@@ -39,6 +40,7 @@
   "filesHash": {
     ".maven.yaml": "3a26b01e8d74224474d3c5c38a6b786dea1c11d3",
     "LICENSE": "2b8b815229aa8a61e483fb4ba0588b8b6c491890",
+    "README.md": "83c36ce198987ac50de56a87b8805c9cc0830b9b",
     "compiler.jar": "8e7597243416b3d890c19d9cc57a35e5b96d0f2a",
     "compiler11.jar": "8cf40288312c18081bb94a183718d61f8cc898de",
     "main.js": "b9f7902d8bbfe20579e4ca49cdb15fe19ba0853b"

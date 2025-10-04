@@ -29,6 +29,7 @@ files:
 - .odoc.db
 - .package.yaml
 - LICENSES.txt
+- README.md
 - bcprov-jdk18on-1.76.jar
 - compile.yaml
 - jcifs-ng-2.1.10.jar
@@ -41,6 +42,7 @@ filesHash:
   .maven.yaml: 096e2e9f8933644a0624dbb5eb2c0d3e98fb0c0b
   .odoc.db: 56fe586e3373b0d93514a6df0316c1cdcad2b670
   LICENSES.txt: b083b42567957f979ab4fb5a4f171a8ba93c0080
+  README.md: 4f27d375e730dc1d89ee868b1093985ff3528c99
   bcprov-jdk18on-1.76.jar: 3a785d0b41806865ad7e311162bfa3fa60b3965b
   compile.yaml: 65950cd663e8840ab5a7329a74e1e862281c9e67
   jcifs-ng-2.1.10.jar: 94b4c0b173540ae98c379ea278713665fd8ab3eb
