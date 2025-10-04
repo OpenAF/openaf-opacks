@@ -26,6 +26,7 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - rocksdb.js
 - rocksdbjni-10.2.1.jar
 - tests/autoTestRocks.js
@@ -34,6 +35,7 @@ filesHash:
   .maven.yaml: 06ae44b61d9bd941ce61050e8c61c4c744f7b4c7
   .odoc.db: 1737cc42c3e23351e5e40bae50dcc8aee5a86d34
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
+  README.md: 098d238f3994cb44821651c2d2a8062f69ef5151
   rocksdb.js: 350d3097abeb5012d39a274f3020994a20c39284
   rocksdbjni-10.2.1.jar: 381243de9230cb91a1c9d62e55003fe60dd23097
   tests/autoTestRocks.js: 0293c08829dd2db5f5d9d3030c613efb2c3773b7
