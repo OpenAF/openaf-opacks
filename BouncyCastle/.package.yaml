@@ -23,11 +23,13 @@ dependencies:
 files:
 - .maven.yaml
 - .package.yaml
+- README.md
 - bcpkix-jdk18on-1.82.jar
 - bcprov-jdk18on-1.82.jar
 - bcutil-jdk18on-1.82.jar
 filesHash:
   .maven.yaml: cab9eff302f7c91ef98ca0493c190c81e60c8a50
+  README.md: 84afcd236d92c00178c2c0949b13c315fcd65085
   bcpkix-jdk18on-1.82.jar: ad7b7155abac3e4e4f73579d5176c11f7659c560
   bcprov-jdk18on-1.82.jar: e1118397395d21909a1b7b15120d0c2a68d7fd0c
   bcutil-jdk18on-1.82.jar: 1850911d674c91ce6444783ff10478e2c6e9bbf9
