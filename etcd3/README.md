@@ -14,15 +14,14 @@ opack install etcd3
 ```javascript
 loadLib("etcd3.js");
 
-ow.ch.use("etcd3");
-ow.ch.create("coordination", false, {
+$ch("coordination").create("etcd3", {
   host: "127.0.0.1",
   port: 2379,
   namespace: "openaf/",
   watch: true
 });
 
-ow.ch.set("coordination", "locks/demo", { owner: ow.server.getHostname(), at: Date.now() });
+$ch("coordination").set("locks/demo", { owner: ow.server.getHostname(), at: Date.now() });
 ```
 
 The channel exposes helpers such as `size`, `forEach`, `getAll`, `subscribe`, and automatic JSON encoding/decoding. Optional

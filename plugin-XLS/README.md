@@ -12,7 +12,7 @@ opack install plugin-XLS
 ## Example
 
 ```javascript
-Plugins.load("XLS");
+plugin("XLS");
 var xls = new XLS();
 var workbook = xls.open("template.xlsx");
 workbook.setValue("Sheet1", 1, 1, "Hello from OpenAF!");

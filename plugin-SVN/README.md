@@ -12,10 +12,10 @@ opack install plugin-SVN
 ## Example
 
 ```javascript
-Plugins.load("SVN");
+plugin("SVN");
 var svn = new SVN("https://svn.example.com/repos/project", "user", "pass");
 svn.checkout("trunk", "/tmp/project");
-print(svn.list("trunk"));
+cprint(svn.list("trunk"));
 ```
 
 The plugin includes both `svnkit` and `svnkit-cli` so you can perform common commands like checkout, update, commit, and branch

@@ -11,18 +11,8 @@ opack install GoogleCompiler
 
 ## Usage
 
-```javascript
-loadLib("main.js");
-
-// Minify a script with advanced optimisations
-var compiler = require("GoogleCompiler");
-compiler.compile({
-  js: ["src/app.js"],
-  compilation_level: "ADVANCED",
-  language_out: "ECMASCRIPT_2020",
-  output_wrapper: "(function(){%output%})();",
-  js_output_file: "dist/app.min.js"
-});
+```sh
+opack exec GoogleCompiler --js hello.js --js_output_file hello-compiled.js
 ```
 
 See the Closure Compiler [flag reference](https://github.com/google/closure-compiler/wiki/Flags-and-Options) for all supported

@@ -12,11 +12,11 @@ opack install plugin-Ignite
 ## Example
 
 ```javascript
-Plugins.load("Ignite");
+plugin("Ignite");
 var ignite = new Ignite();
 var cache = ignite.getOrCreateCache("sessions");
 cache.put("user1", { lastSeen: Date.now() });
-print(cache.get("user1"));
+cprint(cache.get("user1"));
 ```
 
 Consult the generated OpenAF documentation (`opack doc plugin-Ignite`) for the full list of helpers around cache configuration,

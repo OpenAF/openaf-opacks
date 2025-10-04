@@ -14,8 +14,7 @@ opack install rocksdb
 
 ```javascript
 loadLib("rocksdb.js");
-ow.ch.use("rocksdb");
-ow.ch.create("state", false, { path: "./db" });
+$ch("state").create("rocksdb", { path: "./db" });
 print(ow.ch.utils.rocksdb.liveStats("state"));
 ```
 

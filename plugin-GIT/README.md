@@ -12,10 +12,10 @@ opack install plugin-GIT
 ## Example
 
 ```javascript
-Plugins.load("GIT");
+plugin("GIT");
 var git = new GIT("/tmp/repo", "user", "token");
 git.clone("https://github.com/example/repo.git", "/tmp/repo", true, null, "user", "token");
-print(ow.format.toYAML(git.status()));
+cprint(git.status());
 ```
 
 The plugin exposes the major JGit commands (clone, fetch, checkout, commit, push, etc.) via a JavaScript-friendly API. Use it to

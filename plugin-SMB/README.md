@@ -12,9 +12,9 @@ opack install plugin-SMB
 ## Example
 
 ```javascript
-Plugins.load("SMB");
+plugin("SMB");
 var smb = new SMB("smb://fileserver/share", "DOMAIN\\user", "password");
-print(smb.list("/"));
+cprint(smb.list("/"));
 smb.copyTo("/reports/monthly.xlsx", "./monthly.xlsx");
 ```
 

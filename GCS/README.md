@@ -19,7 +19,7 @@ loadLib("gcs.js");
 
 var gcs = new GCS("service-account.json");
 var objects = gcs.listObjects("my-bucket", "reports/", false, true);
-print(ow.format.toYAML(objects));
+yprint(objects);
 ```
 
 The `listObjects` helper mirrors `io.listFiles`, returning metadata such as size, storage class, and custom attributes. Additional
