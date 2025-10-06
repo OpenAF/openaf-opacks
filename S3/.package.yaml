@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250810'
+version: '20251005'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -28,18 +28,14 @@ files:
 - .precompile
 - README.md
 - annotations-13.0.jar
-- bcprov-jdk18on-1.78.1.jar
-- checker-qual-3.43.0.jar
-- error_prone_annotations-2.28.0.jar
-- failureaccess-1.0.2.jar
-- guava-33.3.1-jre.jar
+- bcprov-jdk18on-1.81.jar
+- error_prone_annotations-2.36.0.jar
+- failureaccess-1.0.3.jar
+- guava-33.4.8-jre.jar
 - j2objc-annotations-3.0.0.jar
-- jsr305-3.0.2.jar
-- kotlin-stdlib-common-1.9.10.jar
-- kotlin-stdlib-jdk7-1.8.21.jar
-- kotlin-stdlib-jdk8-1.8.21.jar
+- jspecify-1.0.0.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.5.17.jar
+- minio-8.6.0.jar
 - oJobS3.yaml
 - s3-ojob-test.yaml
 - s3-test.yaml
@@ -53,18 +49,14 @@ filesHash:
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
-  bcprov-jdk18on-1.78.1.jar: 39e9e45359e20998eb79c1828751f94a818d25f8
-  checker-qual-3.43.0.jar: 9425eee39e56b116d2b998b7c2cebcbd11a3c98b
-  error_prone_annotations-2.28.0.jar: 59fc00087ce372de42e394d2c789295dff2d19f0
-  failureaccess-1.0.2.jar: c4a06a64e650562f30b7bf9aaec1bfed43aca12b
-  guava-33.3.1-jre.jar: 852f8b363da0111e819460021ca693cacca3e8db
+  bcprov-jdk18on-1.81.jar: d17c094daef57dbd80af71687a475aa6df7cbe54
+  error_prone_annotations-2.36.0.jar: 227d4d4957ccc3dc5761bd897e3a0ee587e750a7
+  failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
+  guava-33.4.8-jre.jar: e70a3268e6cd3e7d458aa15787ce6811c34e96ae
   j2objc-annotations-3.0.0.jar: 7399e65dd7e9ff3404f4535b2f017093bdb134c7
-  jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
-  kotlin-stdlib-common-1.9.10.jar: dafaf2c27f27c09220cee312df10917d9a5d97ce
-  kotlin-stdlib-jdk7-1.8.21.jar: 7473b8cd3c0ef9932345baf569bc398e8a717046
-  kotlin-stdlib-jdk8-1.8.21.jar: 67f57e154437cd9e6e9cf368394b95814836ff88
+  jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.5.17.jar: f93c9b595c490456ce685eeaf4ae62ab0e8bc90e
+  minio-8.6.0.jar: 327afdf89f12a2e46c989bd8d8c2a6d9f379ccff
   oJobS3.yaml: 5aa85da17da7e455e98b31c86616d97e0d0e2e47
   s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
   s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
