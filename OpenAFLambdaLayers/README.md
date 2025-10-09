@@ -10,16 +10,23 @@ In order to be able to run serveless AWS Lambda OpenAF scripts and oJobs the cur
 
 Build an AWS Lambda layers building container:
 
-````
+```bash
 $ docker build -t openaflambdabuilder .
-$ docker run -ti --rm -v /mydir:/output openaflambdabuilder
-````
+$ docker run -ti --rm -v $(pwd)/output:/output openaflambdabuilder
+```
+
+For ARM64 builds:
+
+```bash
+$ docker build -t openaflambdabuilder --platform linux/arm64.
+$ docker run -ti --rm -v $(pwd)/output:/output -e arch=aarch64 --platform linux/arm64 openaflambdabuilder
+```
 
 If you need specific oPacks different from ElasticSearch, Notifications, Kube and oJob-common you can use the OPACKS argument to specify your own list:
 
-````
-$ docker run -ti --rm -v /mydir:/output openaflambdabuilder OPACKS=oJob-common,aws,Mongo
-````
+```bash
+$ docker run -ti --rm -v $(pwd)/output:/output openaflambdabuilder OPACKS=oJob-common,aws,Mongo
+```
 
 Note: please be aware that AWS imposes a maximum limit to the uncompressed size of each layer.
 
@@ -35,15 +42,15 @@ On your target AWS region, select the Layers screen and create a new layer or cl
 
 #### OpenAF
 
-````javascript
+```javascript
 // Receives a map with a name
 var name = _$(__pmIn.name).default("world"); // default to world if not provided
 __pmOut.Hello = name + "!";
-````
+```
 
 #### oJob
 
-````yaml
+```yaml
 # Receives a map with a name
 todo:
   - Hello world!
@@ -57,7 +64,7 @@ jobs:
     exec: |
       args.name = _$(args.name).default("world"); // default to world if not provided
       __pm.Hello = args.name + "!";
-````
+```
 
 ### Handling arguments and output
 
@@ -89,7 +96,7 @@ In an oJob yaml/json definition:
 
 You can get a list with getEnvs() or access it directly:
 
-````javascript
+```javascript
 getEnv("AWS_LAMBDA_FUNCTION_MEMORY_SIZE");
 getEnv("AWS_SECRET_ACCESS_KEY");
 getEnv("AWS_DEFAULT_REGION");
@@ -99,7 +106,7 @@ getEnv("AWS_ACCESS_KEY_ID");
 getEnv("AWS_REGION");
 getEnv("AWS_LAMBDA_LOG_STREAM_NAME");
 getEnv("AWS_LAMBDA_FUNCTION_NAME");
-````
+```
 
 ## How to create an OpenAF AWS Lambda container
 

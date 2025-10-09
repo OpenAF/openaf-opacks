@@ -1,7 +1,7 @@
 FROM amazonlinux
 
 RUN yum update\
- && yum -y install java-11 zip tar gzip wget openssl\
+ && yum -y install java-25 zip tar gzip wget openssl\
  && mkdir /openaf\
  && cd /openaf\
  && wget -O openaf.jar.orig https://openaf.io/openaf.jar -q\

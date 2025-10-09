@@ -17,17 +17,17 @@ jobs:
     check:
       in: 
         arch: isString.default("x64")
-    exec : |
+    exec : | #js
       ow.loadObj(); ow.loadFormat();
       var h = new ow.obj.http();
       
       log("Downloading jre...");
       var arch = _$(args.arch, "arch").default("x64") // or aarch64
-      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/17/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
+      $rest().get2File("jre.tgz", "https://api.adoptium.net/v3/binary/latest/25/ga/linux/" + arch + "/jre/hotspot/normal/eclipse");
 
   #---------------------
   - name: Uncompress JRE
-    exec: |
+    exec: | #js
       ow.loadFormat();
       log("Uncompressing...");
       io.rm("jre");
@@ -37,7 +37,7 @@ jobs:
  
   #------------------------------
   - name: Remove unneed JRE parts
-    exec: |
+    exec: | #js
       log("Removing unneeded parts...");
       $sh("rm -rf jre/man")
       .sh("rm -rf jre/lib/ext/nashorn.jar")
@@ -47,7 +47,7 @@ jobs:
 
   #-----------------
   - name: Repack JRE
-    exec: |
+    exec: | #js
       ow.loadFormat();
       log("Repack JRE...");
       io.rm("minijvm.zip");
@@ -72,7 +72,7 @@ jobs:
 
   #----------------------
   - name: Download OpenAF
-    exec: |
+    exec: | #js
       ow.loadObj(); ow.loadFormat();
       var h = new ow.obj.http();
 
@@ -94,7 +94,7 @@ jobs:
 
   #---------------------
   - name: Prepare OpenAF
-    exec: |
+    exec: | #js
       ow.loadFormat();
       log("Preparing openaf...");
       global.jvmargs = " ";
@@ -105,7 +105,7 @@ jobs:
 
   #--------------------------------
   - name: Install additional opacks
-    exec: |
+    exec: | #js
       ow.loadFormat();
       log("Install additional opacks...");
 
@@ -141,7 +141,7 @@ jobs:
 
   #--------------------
   - name: Repack openaf
-    exec: | 
+    exec: | #js
       io.rm("openaf.zip");
       sh("chmod -R a+rw openaf");
       sh("chmod 755 bootstrap");
