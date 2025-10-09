@@ -173,8 +173,76 @@ ow.ai.__gpttypes.bedrock = {
 
         var cv = []
 
-        // aTools can be an array of tool objects or undefined (use _r.tools)
-        var toolsToUse = isDef(aTools) ? (isArray(aTools) ? aTools : []) : Object.values(_r.tools)
+        // Resolve tools that should be exposed to the model and keep a lookup by name
+        var toolRegistry = {}
+        Object.keys(_r.tools).forEach(name => {
+          if (isMap(_r.tools[name])) toolRegistry[name] = _r.tools[name]
+        })
+
+        var sanitizeToolSchema = function(schema, forNova) {
+          if (!isMap(schema)) return schema
+          var sanitized = schema
+          try {
+            sanitized = JSON.parse(JSON.stringify(schema))
+          } catch(je) {}
+
+          if (isDef(sanitized.required) && !isArray(sanitized.required)) {
+            if (isMap(sanitized.required)) {
+              sanitized.required = Object.keys(sanitized.required)
+            } else if (isString(sanitized.required)) {
+              sanitized.required = [ sanitized.required ]
+            } else {
+              delete sanitized.required
+            }
+          }
+          
+          // For Nova models, remove empty required array - let the model infer from the schema
+          if (forNova && isArray(sanitized.required) && sanitized.required.length == 0) {
+            delete sanitized.required
+          }
+          
+          if (!forNova && isArray(sanitized.required) && sanitized.required.length == 0) delete sanitized.required
+          delete sanitized.$schema
+          delete sanitized.$id
+          delete sanitized.definitions
+          return sanitized
+        }
+
+        var toolsToUse = []
+        var addTool = function(tool, fallbackName) {
+          if (isUnDef(tool) && isString(fallbackName) && isMap(toolRegistry[fallbackName])) {
+            tool = toolRegistry[fallbackName]
+          }
+          if (!isMap(tool)) return
+          var toolName = fallbackName
+          if (isMap(tool.function) && isString(tool.function.name)) toolName = tool.function.name
+          if (!isString(toolName)) return
+
+          if (!isMap(toolRegistry[toolName])) toolRegistry[toolName] = tool
+          var finalTool = toolRegistry[toolName]
+          if (!isMap(finalTool) || !isMap(finalTool.function)) return
+
+          if (toolsToUse.filter(t => isMap(t.function) && t.function.name === toolName).length == 0) {
+            toolsToUse.push(finalTool)
+          }
+        }
+
+        if (isArray(aTools)) {
+          aTools.forEach(tool => {
+            if (isString(tool)) {
+              addTool(toolRegistry[tool], tool)
+            } else if (isMap(tool)) {
+              addTool(tool, tool.name)
+            }
+          })
+        } else if (isMap(aTools)) {
+          Object.keys(aTools).forEach(name => {
+            addTool(toolRegistry[name], name)
+            addTool(aTools[name], name)
+          })
+        } else {
+          Object.keys(toolRegistry).forEach(name => addTool(toolRegistry[name], name))
+        }
 
         //aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
         //aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
@@ -191,6 +259,91 @@ ow.ai.__gpttypes.bedrock = {
 
         var _m = {}
 
+        var novaToText = function(value) {
+          if (isUnDef(value)) return ""
+          if (isString(value)) return value
+          if (isNumber(value) || isBoolean(value)) return String(value)
+          if (isArray(value)) return value.map(v => novaToText(v)).join("")
+          if (isMap(value)) {
+            if (isString(value.text)) return novaToText(value.text)
+            if (isDef(value.json)) {
+              try { return isString(value.json) ? value.json : JSON.stringify(value.json) } catch(j) { return String(value.json) }
+            }
+            if (isDef(value.content)) return novaToText(value.content)
+            if (isString(value.value)) return novaToText(value.value)
+            try { return JSON.stringify(value) } catch(e) { return String(value) }
+          }
+          return String(value)
+        }
+
+        var novaTextContent = function(value) {
+          return { text: novaToText(value) }
+        }
+
+        var sanitizeNovaToolTextArray = function(content) {
+          var arr = isArray(content) ? content : [content]
+          return arr.map(c => novaTextContent(c))
+        }
+
+        var ensureNovaContent = function(part) {
+          if (isMap(part)) {
+            if (isDef(part.type)) {
+              if (part.type == "text") return novaTextContent(part.text)
+              if (part.type == "tool_use" || part.type == "toolUse") {
+                var toolUseId = part.id || part.toolUseId || part.tool_use_id
+                var toolUse = {
+                  type: "toolUse",
+                  toolUseId: toolUseId,
+                  name: part.name,
+                  input: part.input
+                }
+                return toolUse
+              }
+              if (part.type == "tool_result" || part.type == "toolResult") {
+                var toolResult = {
+                  toolResult: {
+                    toolUseId: part.tool_use_id || part.toolUseId,
+                    content: sanitizeNovaToolTextArray(part.content),
+                    status: part.status
+                  }
+                }
+                if (isUnDef(toolResult.toolResult.status)) delete toolResult.toolResult.status
+                return toolResult
+              }
+            }
+            if (isDef(part.toolUse)) {
+              var tu = part.toolUse
+              return {
+                type: "toolUse",
+                toolUseId: tu.toolUseId || tu.tool_use_id || tu.id,
+                name: tu.name,
+                input: tu.input
+              }
+            }
+            if (isDef(part.toolResult)) {
+              var tr = part.toolResult
+              var sanitized = {
+                toolUseId: tr.toolUseId || tr.tool_use_id,
+                content: sanitizeNovaToolTextArray(tr.content),
+                status: tr.status
+              }
+              if (isUnDef(sanitized.status)) delete sanitized.status
+              return { toolResult: sanitized }
+            }
+            if (isString(part.text)) return novaTextContent(part.text)
+            if (isDef(part.text)) return novaTextContent(part.text)
+            if (isDef(part.message)) return novaTextContent(part.message)
+            if (isDef(part.value)) return novaTextContent(part.value)
+            if (isDef(part.content)) return novaTextContent(part.content)
+            if (Object.keys(part).length == 1 && isString(part[Object.keys(part)[0]])) {
+              return novaTextContent(part[Object.keys(part)[0]])
+            }
+            return novaTextContent(part)
+          }
+          if (isArray(part)) return novaTextContent(part.map(p => novaToText(p)).join(""))
+          return novaTextContent(part)
+        }
+
         if (aModel.indexOf("amazon.titan-") >= 0) {
           _m = {
             "inputText": aPrompt,
@@ -201,24 +354,41 @@ ow.ai.__gpttypes.bedrock = {
         } else if (aModel.indexOf("amazon.nova-") >= 0) {
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
           if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
-            baseConv = baseConv.concat({ role: "user", content: [{ text: aPrompt }] })
+            baseConv = baseConv.concat({ role: "user", content: [{ type: "text", text: aPrompt }] })
           }
 
           // Normalize every message into the shape Nova expects: { role, content: [ { text } ] } (or keep existing array content)
-          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
-            role: m.role,
-            content: Array.isArray(m.content) ? m.content : [{ text: m.content }]
-          }))
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => {
+            var parts = []
+            if (isArray(m.content)) {
+              parts = m.content.map(ensureNovaContent)
+            } else {
+              parts = [ensureNovaContent(m.content)]
+            }
+            return {
+              role: m.role,
+              content: parts
+            }
+          })
 
           _r.conversation = normalized // Update the conversation with the normalized messages
+
+          var systemMessages = []
+          normalized.filter(m => m.role == "system").forEach(m => {
+            var combined = m.content
+              .filter(c => isMap(c) && c.type == "text" && isString(c.text))
+              .map(c => c.text)
+              .join("\n")
+            if (combined.length > 0) systemMessages.push({ text: combined })
+          })
 
           _m = {
             messages: normalized.filter(r => r.role != "system"),
             schemaVersion: "messages-v1",
-            system: _r.conversation.filter(m => m.role == "system").map(m => ({ text: m.content.map(s => s.text).join("") })),
-            inferenceConfig: {
+            system: systemMessages,
+            inferenceConfig: merge({
               temperature: aTemperature
-            }
+            }, aOptions.params.inferenceConfig)
           }
           if (_m.system.length == 0) delete _m.system
 
@@ -227,19 +397,22 @@ ow.ai.__gpttypes.bedrock = {
             var toolConfig = []
             toolsToUse.forEach(tool => {
               if (isDef(tool) && isDef(tool.function)) {
-                toolConfig.push({
-                  toolSpec: {
-                    name: tool.function.name,
-                    description: tool.function.description,
-                    inputSchema: {
-                      json: tool.function.parameters
-                    }
-                  }
-                })
+            toolConfig.push({
+              toolSpec: {
+                name: tool.function.name,
+                description: tool.function.description,
+                inputSchema: {
+                  json: sanitizeToolSchema(tool.function.parameters, true)
+                }
               }
             })
+          }
+        })
             if (toolConfig.length > 0) {
-              _m.toolConfig = { tools: toolConfig }
+              _m.toolConfig = { 
+                tools: toolConfig,
+                toolChoice: { auto: {} }
+              }
             }
           }
         } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
@@ -372,7 +545,9 @@ ow.ai.__gpttypes.bedrock = {
  
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
+        //sprint(aInput)
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
+        //sprint(res)
         _captureStats(res, aModel)
         if (isDef(res.error)) return res
         if (isDef(res.generation)) return res.generation
@@ -453,24 +628,47 @@ ow.ai.__gpttypes.bedrock = {
                     var toolCallId = _toolUse.toolUseId || _toolUse.id
 
                     // Find tool (from passed tools or internal tools)
-                    var tool = toolsToUse.find(t => t.function && t.function.name === toolName) || _r.tools[toolName]
+                    var tool = (isString(toolName) ? toolRegistry[toolName] : __) || _r.tools[toolName]
                     if (isDef(tool) && isDef(tool.fn)) {
                       try {
                         var toolResult = tool.fn(toolInput)
+                        var _resultToText = function(value) {
+                          if (isString(value)) return value
+                          if (isNumber(value) || isBoolean(value)) return String(value)
+                          if (isArray(value) || isMap(value)) {
+                            try {
+                              return JSON.stringify(value)
+                            } catch(je) {
+                              return String(value)
+                            }
+                          }
+                          if (isUnDef(value)) return ""
+                          return String(value)
+                        }
+                        var _toolResultText = _resultToText(toolResult)
                         var _tR
+
                         if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
                           _tR = {
                             role: "user",
                             content: [{
                               type: "tool_result",
                               tool_use_id: toolCallId,
-                              content: [!isObject(toolResult) ? {
+                              content: [{
                                 type: "text",
-                                text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
-                              } : {
-                                type: "json",
-                                json: toolResult
+                                text: _toolResultText
                               }]
+                            }]
+                          }
+                        } else if (aModel.indexOf("amazon.nova-") >= 0) {
+                          _tR = {
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [{ text: _toolResultText }],
+                                status: "success"
+                              }
                             }]
                           }
                         } else {
@@ -506,6 +704,17 @@ ow.ai.__gpttypes.bedrock = {
                                 type: "text",
                                 text: "Error executing tool: " + e.message
                               }]
+                            }]
+                          })
+                        } else if (aModel.indexOf("amazon.nova-") >= 0) {
+                          _r.conversation.push({
+                            role: "user",
+                            content: [{
+                              toolResult: {
+                                toolUseId: toolCallId,
+                                content: [{ text: "Error executing tool: " + e.message }],
+                                status: "error"
+                              }
                             }]
                           })
                         } else {
