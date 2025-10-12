@@ -3099,8 +3099,9 @@ var _inputFns = new Map([
         
         var ma = new MiniA()
 
-        if (isUnDef(_r.__format)) _r.__format = "json"
-        if (isDef(_r.goal) && _r.__format == "json") _r.goal += "; answer in json"
+	var nostruct = true
+        if (isUnDef(_r.format)) { _r.format = "json"; nostruct = false }
+        if (isDef(_r.goal) && _r.format == "json") { _r.goal += "; answer in json"; nostruct = false }
         _r.shellbatch = true
 
         ma.setInteractionFn((e, m) => { 
@@ -3111,9 +3112,9 @@ var _inputFns = new Map([
         })
         ma.init(_r)
         var _res = ma.start(_r)
-        var __r = _fromJSSLON(_res, true)
+        var __r = nostruct ? _res : _fromJSSLON(_res, true)
         if (isDef(params.miniametrics)) io.writeFileJSON($t(params.miniametrics, { id: ma.getId() }), ma.getMetrics(), "")
-        _$o(isObject(__r) ? __r : _res, options)
+        _$o(isObject(__r) && nostrucft ? __r : _res, options)
     }],
     ["xls", (_res, options) => {
         _showTmpMsg()
