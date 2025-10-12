@@ -95,6 +95,7 @@ List of data input types that can be auto-detected (through the file extension o
 | mdtable | A Markdown table format |
 | mdcode | A Markdown code blocks format |
 | mcp | A Model Context Protocol (MCP) input |
+| minia | Executes a mini-a interaction definition (requires the mini-a oPack) |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code or OpenAF scripting file to execute and use the result as input |
@@ -444,6 +445,20 @@ List of options to use when _in=mcp_:
 * '__clientInfo__' (map) - Client information sent during initialization (default: {name: "OpenAF MCP Client", version: "1.0.0"})
 
 > For stdio type connections, the 'cmd' field is required. For remote type connections, the 'url' field is required.
+
+---
+
+### 🧾 mini-a input options
+
+List of options to use when _in=minia_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| minianolog | Boolean | If true hides mini-a interaction logs and shows a temporary progress message instead |
+| minialogfile | String | Path to append interaction log lines with timestamps |
+| miniametrics | String | Path to write the mini-a run metrics as JSON (placeholders can include the run id) |
+
+> Requires the 'mini-a' oPack (`opack install mini-a`). The input data must be a map or array understood by mini-a (for example the prompt, goal and options map).
 
 ---
 

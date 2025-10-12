@@ -3084,6 +3084,37 @@ var _inputFns = new Map([
             _exit(-1, "db is only supported with a SQL string.")
         }
     }],
+    ["minia", (_res, options) => {
+        params.minianolog = toBoolean( _$(params.minianolog, "minianolog").isString().default(false) )
+        if (params.minianolog) _showTmpMsg()
+        try {
+            includeOPack("mini-a")
+        } catch(e) {
+            _exit(-1, "mini-a not found. You need to install it to use the mini-a output (opack install mini-a)")
+        }
+
+        loadLib("mini-a.js")
+        var _r = _fromJSSLON(_res, true)
+        if (!isMap(_r) && !isArray(_r)) _exit(-1, "mini-a is only supported with a map or array input.")
+        
+        var ma = new MiniA()
+
+        if (isUnDef(_r.__format)) _r.__format = "json"
+        if (isDef(_r.goal) && _r.__format == "json") _r.goal += "; answer in json"
+        _r.shellbatch = true
+
+        ma.setInteractionFn((e, m) => { 
+            ma.defaultInteractionFn(e, m, (_e, _m, _i) => {
+                if (!params.minianolog) printErr(_e + "  " + ansiColor("FAINT,ITALIC", _m))
+                if (isDef(params.minialogfile)) io.writeFileString(params.minialogfile, `${ow.format.fromDate(new Date(), "yyyy-MM-dd HH:mm:ss.SSS")} | INFO | ${_i} | ${_e} | ${_m}\n`, __, true)
+            })
+        })
+        ma.init(_r)
+        var _res = ma.start(_r)
+        var __r = _fromJSSLON(_res, true)
+        if (isDef(params.miniametrics)) io.writeFileJSON($t(params.miniametrics, { id: ma.getId() }), ma.getMetrics(), "")
+        _$o(isObject(__r) ? __r : _res, options)
+    }],
     ["xls", (_res, options) => {
         _showTmpMsg()
         try {
@@ -3697,7 +3728,9 @@ var _inputFns = new Map([
         params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
         if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
-
+        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
+            params.llmenv = "OAF_MODEL"
+        }
         _showTmpMsg()
 
         var res = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )
