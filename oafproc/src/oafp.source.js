@@ -3114,7 +3114,7 @@ var _inputFns = new Map([
         var _res = ma.start(_r)
         var __r = nostruct ? _res : _fromJSSLON(_res, true)
         if (isDef(params.miniametrics)) io.writeFileJSON($t(params.miniametrics, { id: ma.getId() }), ma.getMetrics(), "")
-        _$o(isObject(__r) && nostrucft ? __r : _res, options)
+        _$o(isObject(__r) && nostruct ? __r : _res, options)
     }],
     ["xls", (_res, options) => {
         _showTmpMsg()
