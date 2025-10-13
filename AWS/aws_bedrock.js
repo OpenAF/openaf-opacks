@@ -11,7 +11,7 @@ loadLib("aws_core.js")
  */
 AWS.prototype.BEDROCK_ListFoundationalModels = function(aRegion, outputMode, provider, inferenceType, customType) {
   aRegion = _$(aRegion, "aRegion").isString().default(this.region)
-  
+
   var uri = "/foundation-models"
   var aURL = "https://bedrock." + aRegion + ".amazonaws.com" + uri
   var url = new java.net.URL(aURL)
@@ -24,7 +24,7 @@ AWS.prototype.BEDROCK_ListFoundationalModels = function(aRegion, outputMode, pro
     byOutputModality: outputMode,
     byProvider: provider
   }
- 
+
   var res = this.getURLEncoded(aURL, uri, $rest().query(params), {}, "bedrock", aHost, aRegion)
   if (isDef(res.error)) return res
 
@@ -56,7 +56,7 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
 
   return res
 }
- 
+
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
@@ -102,7 +102,7 @@ ow.ai.__gpttypes.bedrock = {
       // Handle stop reasons
       if (isString(aResponse.stop_reason)) stats.stopReason = aResponse.stop_reason
       if (isString(aResponse.stopReason)) stats.stopReason = aResponse.stopReason
-      
+
       // Handle results array finish reasons (Titan models)
       if (isArray(aResponse.results)) {
         var finishReasons = aResponse.results
@@ -152,15 +152,15 @@ ow.ai.__gpttypes.bedrock = {
       prompt: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
         var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
         if (isDef(__r) && isArray(__r.results) && __r.results.length > 0) {
-            if (__r.results[0].completionReason == "FINISH") {
-               return __r.results[0].outputText.trim()
-            } else {
-              if (isMap(__r.results[0])) {
-                return __r.results[0]
-              }
+          if (__r.results[0].completionReason == "FINISH") {
+            return __r.results[0].outputText.trim()
+          } else {
+            if (isMap(__r.results[0])) {
+              return __r.results[0]
             }
-         }
-         return __r
+          }
+        }
+        return __r
       },
       promptImage: (aPrompt, aImage, aDetailLevel, aRole, aModel, aTemperature, aJsonFlag) => {
         throw "Not implemented yet"
@@ -184,23 +184,23 @@ ow.ai.__gpttypes.bedrock = {
           var sanitized = schema
           try {
             sanitized = JSON.parse(JSON.stringify(schema))
-          } catch(je) {}
+          } catch (je) { }
 
           if (isDef(sanitized.required) && !isArray(sanitized.required)) {
             if (isMap(sanitized.required)) {
               sanitized.required = Object.keys(sanitized.required)
             } else if (isString(sanitized.required)) {
-              sanitized.required = [ sanitized.required ]
+              sanitized.required = [sanitized.required]
             } else {
               delete sanitized.required
             }
           }
-          
+
           // For Nova models, remove empty required array - let the model infer from the schema
           if (forNova && isArray(sanitized.required) && sanitized.required.length == 0) {
             delete sanitized.required
           }
-          
+
           if (!forNova && isArray(sanitized.required) && sanitized.required.length == 0) delete sanitized.required
           delete sanitized.$schema
           delete sanitized.$id
@@ -267,11 +267,11 @@ ow.ai.__gpttypes.bedrock = {
           if (isMap(value)) {
             if (isString(value.text)) return novaToText(value.text)
             if (isDef(value.json)) {
-              try { return isString(value.json) ? value.json : JSON.stringify(value.json) } catch(j) { return String(value.json) }
+              try { return isString(value.json) ? value.json : JSON.stringify(value.json) } catch (j) { return String(value.json) }
             }
             if (isDef(value.content)) return novaToText(value.content)
             if (isString(value.value)) return novaToText(value.value)
-            try { return JSON.stringify(value) } catch(e) { return String(value) }
+            try { return JSON.stringify(value) } catch (e) { return String(value) }
           }
           return String(value)
         }
@@ -291,13 +291,13 @@ ow.ai.__gpttypes.bedrock = {
               if (part.type == "text") return novaTextContent(part.text)
               if (part.type == "tool_use" || part.type == "toolUse") {
                 var toolUseId = part.id || part.toolUseId || part.tool_use_id
-                var toolUse = {
-                  type: "toolUse",
-                  toolUseId: toolUseId,
-                  name: part.name,
-                  input: part.input
+                return {
+                  toolUse: {
+                    toolUseId: toolUseId,
+                    name: part.name,
+                    input: part.input
+                  }
                 }
-                return toolUse
               }
               if (part.type == "tool_result" || part.type == "toolResult") {
                 var toolResult = {
@@ -314,10 +314,11 @@ ow.ai.__gpttypes.bedrock = {
             if (isDef(part.toolUse)) {
               var tu = part.toolUse
               return {
-                type: "toolUse",
-                toolUseId: tu.toolUseId || tu.tool_use_id || tu.id,
-                name: tu.name,
-                input: tu.input
+                toolUse: {
+                  toolUseId: tu.toolUseId || tu.tool_use_id || tu.id,
+                  name: tu.name,
+                  input: tu.input
+                }
               }
             }
             if (isDef(part.toolResult)) {
@@ -397,19 +398,19 @@ ow.ai.__gpttypes.bedrock = {
             var toolConfig = []
             toolsToUse.forEach(tool => {
               if (isDef(tool) && isDef(tool.function)) {
-            toolConfig.push({
-              toolSpec: {
-                name: tool.function.name,
-                description: tool.function.description,
-                inputSchema: {
-                  json: sanitizeToolSchema(tool.function.parameters, true)
-                }
+                toolConfig.push({
+                  toolSpec: {
+                    name: tool.function.name,
+                    description: tool.function.description,
+                    inputSchema: {
+                      json: sanitizeToolSchema(tool.function.parameters, true)
+                    }
+                  }
+                })
               }
             })
-          }
-        })
             if (toolConfig.length > 0) {
-              _m.toolConfig = { 
+              _m.toolConfig = {
                 tools: toolConfig,
                 toolChoice: { auto: {} }
               }
@@ -425,20 +426,32 @@ ow.ai.__gpttypes.bedrock = {
             role: m.role,
             content: Array.isArray(m.content)
               ? m.content.map(c => {
-                  if (isMap(c)) {
-                    if (isDef(c.toolResult)) {
-                      return {
-                        type: "tool_result",
-                        tool_use_id: c.toolResult.toolUseId || c.toolResult.tool_use_id,
-                        content: c.toolResult.content
-                      }
+                if (isMap(c)) {
+                  if (isDef(c.toolResult)) {
+                    // Extract text content from tool result
+                    var toolResultContent = c.toolResult.content
+                    if (isArray(toolResultContent)) {
+                      toolResultContent = toolResultContent.map(tc => {
+                        if (isMap(tc) && isDef(tc.text)) return tc.text
+                        return String(tc)
+                      }).join("")
+                    } else if (isMap(toolResultContent) && isDef(toolResultContent.text)) {
+                      toolResultContent = toolResultContent.text
+                    } else {
+                      toolResultContent = String(toolResultContent)
                     }
-                    if (isDef(c.type) && c.type != "text") return c
-                    return { type: c.type || "text", text: c.text }
+                    return {
+                      type: "tool_result",
+                      tool_use_id: c.toolResult.toolUseId || c.toolResult.tool_use_id,
+                      content: toolResultContent
+                    }
                   }
-                  return { type: "text", text: c }
-                })
-              : [{ type: "text", text: m.content }]
+                  if (isDef(c.type) && c.type != "text") return c
+                  return { type: c.type || "text", text: c.text || String(c) }
+                }
+                return { type: "text", text: String(c) }
+              })
+              : [{ type: "text", text: String(m.content) }]
           }))
 
           _r.conversation = normalized
@@ -542,7 +555,7 @@ ow.ai.__gpttypes.bedrock = {
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
- 
+
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         //sprint(aInput)
@@ -638,7 +651,7 @@ ow.ai.__gpttypes.bedrock = {
                           if (isArray(value) || isMap(value)) {
                             try {
                               return JSON.stringify(value)
-                            } catch(je) {
+                            } catch (je) {
                               return String(value)
                             }
                           }
@@ -654,10 +667,7 @@ ow.ai.__gpttypes.bedrock = {
                             content: [{
                               type: "tool_result",
                               tool_use_id: toolCallId,
-                              content: [{
-                                type: "text",
-                                text: _toolResultText
-                              }]
+                              content: _toolResultText
                             }]
                           }
                         } else if (aModel.indexOf("amazon.nova-") >= 0) {
@@ -700,10 +710,7 @@ ow.ai.__gpttypes.bedrock = {
                             content: [{
                               type: "tool_result",
                               tool_use_id: toolCallId,
-                              content: [{
-                                type: "text",
-                                text: "Error executing tool: " + e.message
-                              }]
+                              content: "Error executing tool: " + e.message
                             }]
                           })
                         } else if (aModel.indexOf("amazon.nova-") >= 0) {
@@ -793,12 +800,12 @@ ow.ai.__gpttypes.bedrock = {
       },
       addPrompt: (aRole, aPrompt) => {
         if (isUnDef(aPrompt)) {
-            aPrompt = aRole
-            aRole = "user"
-         }
-         if (isString(aPrompt)) _r.conversation.push({ role: aRole.toLowerCase(), content: aPrompt })
-         if (isArray(aPrompt))  _r.conversation = _r.conversation.concat(aPrompt)
-         return _r
+          aPrompt = aRole
+          aRole = "user"
+        }
+        if (isString(aPrompt)) _r.conversation.push({ role: aRole.toLowerCase(), content: aPrompt })
+        if (isArray(aPrompt)) _r.conversation = _r.conversation.concat(aPrompt)
+        return _r
       },
       addUserPrompt: (aPrompt) => {
         _r.conversation.push({ role: "user", content: aPrompt })
