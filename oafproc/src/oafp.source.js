@@ -954,6 +954,16 @@ const _addSrcInputLineFns = (type, fn) => {
 }
 
 // --- Transform functions
+if (typeof _resolveLLMEnvName === "undefined") {
+    var _resolveLLMEnvName = function (aEnv) {
+        var _env = aEnv
+        if (_env == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
+            _env = "OAF_MODEL"
+        }
+        return _env
+    }
+}
+
 var _transformFns = {
     "transforms"    : _r => {
         if (toBoolean(params.transforms)) {
@@ -1224,8 +1234,9 @@ var _transformFns = {
     "llmprompt": _r => {
         if (isString(params.llmprompt)) {
             params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+            params.llmenv     = _resolveLLMEnvName(params.llmenv)
             params.llmoptions = _$(params.llmoptions, "llmoptions").isString().default(__)
-            if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+            if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv)))
                 _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
             var res = $llm( _getSec(isDef(params.llmoptions) ? params.llmoptions : $sec("system", "envs").get(params.llmenv)) )
@@ -2385,6 +2396,16 @@ const _addSrcOutputFns = (type, fn) => {
 }
 
 // --- Input functions (input parsers)
+if (typeof _resolveLLMEnvName === "undefined") {
+    var _resolveLLMEnvName = function (aEnv) {
+        var _env = aEnv
+        if (_env == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
+            _env = "OAF_MODEL"
+        }
+        return _env
+    }
+}
+
 var _inputFns = new Map([
     ["?"    , (_res, options) => {
         _res = Array.from(_inputFns.keys()).filter(r => r != '?').sort()
@@ -3688,11 +3709,9 @@ var _inputFns = new Map([
     }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+        params.llmenv     = _resolveLLMEnvName(params.llmenv)
         params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
-        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
-            params.llmenv = "OAF_MODEL"
-        }
-        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv)))
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
 
         _showTmpMsg()
@@ -3726,12 +3745,10 @@ var _inputFns = new Map([
     }],
     ["llmmodels", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+        params.llmenv     = _resolveLLMEnvName(params.llmenv)
         params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
-        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv))) 
+        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv)))
             _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
-        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_MODEL"))) {
-            params.llmenv = "OAF_MODEL"
-        }
         _showTmpMsg()
 
         var res = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )

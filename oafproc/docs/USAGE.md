@@ -681,6 +681,7 @@ List of options to use when _in=llm_ or _llmprompt=..._:
 > OpenAF sBuckets are supported in llmoptions. You can set any of the environment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
 
 > Tip: Use the 'getlist=' optional transform to automatically filter list of data from LLMs prompt responses if relevant.
+> If `OAFP_MODEL` is not defined but `OAF_MODEL` is, the latter will be used automatically.
 > Example: `OAFP_MODEL="(type:ollama,model:llama3)" oafp llmprompt="hello world"`
 
 ---
