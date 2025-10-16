@@ -124,6 +124,7 @@ files:
 - docs/TEMPLATE.md
 - docs/USAGE.md
 - oafp.js
+- oafp.yaml
 - src/oafp.source.js
 filesHash:
   README.md: 39e6d4633258b4b425d406177947f9f0b296fccc
@@ -133,4 +134,5 @@ filesHash:
   docs/TEMPLATE.md: 95593ed3dfd869465b7d46438cabdb2a4d8f1e06
   docs/USAGE.md: 02eebd1d60a908c0bc1d04eeeae86f16bdd942a5
   oafp.js: 2d4fd6ba4efd54894026faaf7838de6bc16526e2
+  oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
   src/oafp.source.js: 0e5f723a63c70c12c98db2ae7afa1a93c941d620
