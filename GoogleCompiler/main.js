@@ -29,7 +29,7 @@ if (isUnDef(classPath)) {
 }
 
 var javaHome  = java.lang.System.getProperty("java.home") + "";
-var parameters = __expr.replace(/^exec GoogleCompiler/i, "");
+var parameters = __expr.replace(/^exec +GoogleCompiler/i, "");
 var res = $sh(javaHome + "/bin/java -jar " + classPath + "  " + parameters).exec(0) 
 
 if (res.exitcode != 0) {
