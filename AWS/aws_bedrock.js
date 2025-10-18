@@ -34,6 +34,27 @@ AWS.prototype.BEDROCK_ListFoundationalModels = function(aRegion, outputMode, pro
 
 /**
  * <odoc>
+ * <key>AWS.BEDROCK_GetFoundationalModel(aRegion, aModelId) : Map</key>
+ * Retrieves details for a specific foundational model identified by aModelId.
+ * </odoc>
+ */
+AWS.prototype.BEDROCK_GetFoundationalModel = function(aRegion, aModelId) {
+  aRegion = _$(aRegion, "aRegion").isString().default(this.region)
+  _$(aModelId, "aModelId").isString().$_()
+
+  var uri = "/foundation-models/" + encodeURIComponent(aModelId)
+  var aURL = "https://bedrock." + aRegion + ".amazonaws.com" + uri
+  var url = new java.net.URL(aURL)
+  var aHost = String(url.getHost())
+
+  var res = this.getURLEncoded(aURL, uri, "", {}, "bedrock", aHost, aRegion)
+  if (isDef(res.error)) return res
+
+  return res
+}
+
+/**
+ * <odoc>
  * <key>AWS.BEDROCK_InvokeModel(aRegion, aModelId, aInput) : Map</key>
  * Given aRegion, aModelId and aInput will invoke the specified model and return the results.
  * </odoc>
@@ -136,6 +157,7 @@ ow.ai.__gpttypes.bedrock = {
         if (isArray(aConversation)) _r.conversation = aConversation
         return _r
       },
+      getModelName: () => _model,
       getLastStats: () => _lastStats,
       setTool: (aName, aDesc, aParams, aFn) => {
         _r.tools[aName] = {
@@ -819,6 +841,11 @@ ow.ai.__gpttypes.bedrock = {
       cleanPrompt: () => {
         _r.conversation = []
         return _r
+      },
+      getModel: (aModelId) => {
+        aModelId = _$(aModelId, "aModelId").isString().default(_model)
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect()
+        return aws.BEDROCK_GetFoundationalModel(aOptions.region, aModelId)
       },
       getModels: () => {
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
