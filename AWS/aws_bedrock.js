@@ -173,6 +173,23 @@ ow.ai.__gpttypes.bedrock = {
       },
       prompt: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
         var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
+        
+        // Handle Anthropic/Claude structured output when JSON flag is true
+        if (aJsonFlag && isMap(__r) && isDef(__r.output) && isDef(__r.output.message)) {
+          var msg = __r.output.message
+          if (isArray(msg.content)) {
+            var textParts = []
+            msg.content.forEach(c => {
+              if (isMap(c) && c.type === "text" && isDef(c.text)) {
+                textParts.push(c.text)
+              }
+            })
+            if (textParts.length > 0) {
+              return textParts.join("")
+            }
+          }
+        }
+        
         if (isDef(__r) && isArray(__r.results) && __r.results.length > 0) {
           if (__r.results[0].completionReason == "FINISH") {
             return __r.results[0].outputText.trim()
