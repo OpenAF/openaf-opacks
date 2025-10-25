@@ -658,9 +658,9 @@ const _addSrcFileExtensionsNoMem = ext => {
 // --- Input functions processing per line
 var _inputLineFns = {
     "lines": (r, options) => {
-        if (!isBoolean(params.linesjoin)) params.linesjoin = toBoolean(_$(params.linesjoin, "linesjoin").isString().default(__))
+        params.linesjoin = _$(toBoolean(params.linesjoin), "linesjoin").isBoolean().default(false)
 
-        if (!params.linesjoin && isString(r)) {
+        if (!params.linesjoin && isBoolean(r)) {
             if (r.trim().length == 0) {
                 noFurtherOutput = true
                 return
@@ -675,7 +675,7 @@ var _inputLineFns = {
         }
     },
     "javagc": (r, options) => {
-        if (!isBoolean(params.javagcjoin)) params.javagcjoin = toBoolean(_$(params.javagcjoin, "javagcjoin").isString().default(__))
+        params.javagcjoin = _$(toBoolean(params.javagcjoin), "javagcjoin").isBoolean().default(false)
 
         if (params.javagcjoin) return true
 
@@ -816,7 +816,7 @@ var _inputLineFns = {
         }
     },
     "ndjson": (r, options) => {
-        if (!isBoolean(params.ndjsonjoin)) params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
+        params.ndjsonjoin = _$(toBoolean(params.ndjsonjoin), "ndjsonjoin").isBoolean().default(false)
         
         if (!params.ndjsonjoin) {
             if (isUnDef(global.__ndjsonbuf) && r.length != 0 && r.trim().startsWith("{")) global.__ndjsonbuf = ""
@@ -837,7 +837,7 @@ var _inputLineFns = {
         }
     },
     "ndslon": (r, options) => {
-        if (!isBoolean(params.ndslonjoin)) params.ndslonjoin = toBoolean(_$(params.ndslonjoin, "ndslonjoin").isString().default(__))
+        params.ndslonjoin = _$(toBoolean(params.ndslonjoin), "ndslonjoin").isBoolean().default(false)
         
         if (!params.ndslonjoin) {
             if (isUnDef(global.__ndslonbuf) && r.length != 0 && r.trim().startsWith("(")) global.__ndslonbuf = ""
@@ -1634,13 +1634,13 @@ var _outputFns = new Map([
     ["html", (r, options) => {
         let html, tmpf, res = false
 
-        params.htmlopen = toBoolean(_$(params.htmlopen, "htmlopen").isString().default("true"))
+        params.htmlopen = _$(toBoolean(params.htmlopen), "htmlopen").isBoolean().default(true)
         params.htmlwait = _$(params.htmlwait, "htmlwait").isNumber().default(2500)
 
         if (params.htmlopen) tmpf = io.createTempFile("oafp_", ".html")
 
         ow.loadTemplate()
-        params.htmldark = toBoolean(_$(params.htmldark, "htmldark").isString().default("false"))
+        params.htmldark = _$(toBoolean(params.htmldark), "htmldark").isBoolean().default(false)
         if (isString(r)) {
             html = ow.template.html.genStaticVersion(ow.template.parseMD2HTML(r, !toBoolean(params.htmlpart), !toBoolean(params.htmlcompact),__,params.htmldark))
             html = html.replace("<html>", "<html><meta charset=\"utf-8\">")
@@ -2147,8 +2147,8 @@ var _outputFns = new Map([
     ["db", (r, options) => {
         if (!isArray(r) || r.length < 1) _exit(-1, "db is only supported for filled arrays/lists")
         params.dbtable = _$(params.dbtable, "outdbtable").isString().default("data")
-        params.dbnocreate = toBoolean(_$(params.dbnocreate, "outdbnocreate").isString().default("false"))
-        params.dbicase = toBoolean(_$(params.dbicase, "outdbicase").isString().default("false"))
+        params.dbnocreate = _$(toBoolean(params.dbnocreate), "outdbnocreate").isBoolean().default(false)
+        params.dbicase = _$(toBoolean(params.dbicase), "outdbicase").isBoolean().default(false)
         params.dbbatchsize = _$(params.dbbatchsize, "dbbatchsize").isNumber().default(__)
 
         ow.loadObj()
@@ -2215,8 +2215,8 @@ var _outputFns = new Map([
     ["sql", (r, options) => {
         if (!isArray(r) || r.length < 1) _exit(-1, "sql is only supported for filled arrays/lists")
         params.sqltable = _$(params.sqltable, "sqltable").isString().default("data")
-        params.sqlicase = toBoolean(_$(params.sqlicase, "sqlicase").isString().default("false"))
-        params.sqlnocreate = toBoolean(_$(params.sqlnocreate, "sqlnocreate").isString().default("false"))
+        params.sqlicase = _$(toBoolean(params.sqlicase), "sqlicase").isBoolean().default(false)
+        params.sqlnocreate = _$(toBoolean(params.sqlnocreate), "sqlnocreate").isBoolean().default(false)
 
         ow.loadObj()
         if (!params.sqlnocreate) _print(ow.obj.fromObj2DBTableCreate(params.sqltable, r, __, !params.sqlicase)+";\n")
@@ -2290,7 +2290,7 @@ var _outputFns = new Map([
             xls.close()
     
             params.xlsopenwait = _$(params.xlsopenwait, "xlsopenwait").isNumber().default(5000)
-            params.xlsopen     = toBoolean(_$(params.xlsopen, "xlsopen").isString().default("true"))
+            params.xlsopen     = _$(toBoolean(params.xlsopen), "xlsopen").isBoolean().default(true)
             if (params.xlsopen) {
                 if (ow.format.isWindows()) {
                     $sh("start " + params.xlsfile).exec()
@@ -2439,21 +2439,21 @@ var _inputFns = new Map([
         _showTmpMsg()
         params.xmlignored = _$(params.xmlignored, "xmlignored").isString().default(__)
         params.xmlprefix = _$(params.xmlprefix, "xmlprefix").isString().default(__)
-        params.xmlfiltertag = toBoolean(_$(params.xmlfiltertag, "xmlfiltertag").isString().default(__))
+        params.xmlfiltertag = _$(toBoolean(params.xmlfiltertag), "xmlfiltertag").isBoolean().default(__)
         //if (_res.indexOf("<?xml") >= 0) _res = _res.substring(_res.indexOf("?>") + 2).trim()
         //if (_res.indexOf("<!DOCTYPE") >= 0) _res = _res.substring(_res.indexOf(">") + 1).trim()
         var _r = af.fromXML2Obj(_res, params.xmlignored, params.xmlprefix, !params.xmlfiltertag)
         _$o(_r, options)
     }],
     ["lines", (_res, options) => {
-        if (!isBoolean(params.linesjoin)) params.linesjoin = toBoolean(_$(params.linesjoin, "linesjoin").isString().default(__))
+        params.linesjoin = _$(toBoolean(params.linesjoin), "linesjoin").isBoolean().default(false)
 
         _showTmpMsg()
 
         let _linesvisual_header = __
         let _linesvisual_header_pos = []
 
-        params.linesvisualheadsep = toBoolean(_$(params.linesvisualheadsep, "linesvisualheadsep").isString().default(__))
+        params.linesvisualheadsep = _$(toBoolean(params.linesvisualheadsep), "linesvisualheadsep").isBoolean().default(false)
         let _headTitles = false
         let _headSep    = false
         if (isUnDef(params.linesvisualsepre)) params.linesvisualsepre = (params.linesvisualheadsep ? "\\s+" : " \\s+")
@@ -2560,7 +2560,7 @@ var _inputFns = new Map([
         }
     }],
     ["ndjson", (_res, options) => {
-        if (!isBoolean(params.ndjsonjoin)) params.ndjsonjoin = toBoolean(_$(params.ndjsonjoin, "ndjsonjoin").isString().default(__))
+        params.ndjsonjoin = _$(toBoolean(params.ndjsonjoin), "ndjsonjoin").isBoolean().default(false)
 
         _showTmpMsg()
         global.__ndjsonbuf = __, noOut = true
@@ -2619,7 +2619,7 @@ var _inputFns = new Map([
         if (noOut) _clearTmpMsg()
     }],
     ["ndslon", (_res, options) => {
-        if (!isBoolean(params.ndslonjoin)) params.ndslonjoin = toBoolean(_$(params.ndslonjoin, "ndslonjoin").isString().default(__))
+        params.ndslonjoin = _$(toBoolean(params.ndslonjoin), "ndslonjoin").isBoolean().default(false)
 
         _showTmpMsg()
         global.__ndslonbuf = __, noOut = true
@@ -3157,7 +3157,7 @@ var _inputFns = new Map([
         }
 
         params.inxlssheet        = _$(params.inxlssheet || params.xlssheet, "xlssheet").isString().default(0)
-        params.inxlsevalformulas = toBoolean(_$(params.inxlsevalformulas || params.xlsevalformulas, "xlsevalformulas").isString().default(true))
+        params.inxlsevalformulas = _$(toBoolean(params.inxlsevalformulas || params.xlsevalformulas), "xlsevalformulas").isBoolean().default(true)
         params.inxlscol          = _$(params.inxlscol || params.xlscol, "xlscol").isString().default("A")
         params.inxlsrow          = _$(params.inxlsrow || params.xlsrow, "xlsrow").isString().default(1)
 
@@ -3317,7 +3317,7 @@ var _inputFns = new Map([
         _$o(_r, options)
     }],
     ["javagc", (_res, options) => {
-        if (!isBoolean(params.javagcjoin)) params.javagcjoin = toBoolean(_$(params.javagcjoin, "javagcjoin").isString().default(__))
+        params.javagcjoin = _$(toBoolean(params.javagcjoin), "javagcjoin").isBoolean().default(false)
 
         // Pre-compile regex patterns for performance (moved outside hot path)
         const regexes = [
@@ -3551,9 +3551,9 @@ var _inputFns = new Map([
         ow.loadJava()
         if (isUnDef(ow.java.parseJFR)) _exit(-1, "jfr not available.")
 
-        if (!isBoolean(params.jfrjoin)) params.jfrjoin = toBoolean(_$(params.jfrjoin, "jfrjoin").isString().default(__))
-        if (!isBoolean(params.jfrdesc)) params.jfrdesc = toBoolean(_$(params.jfrdesc, "jfrdesc").isString().default(__))
-        
+        if (!isBoolean(params.jfrjoin)) params.jfrjoin = _$(toBoolean(params.jfrjoin), "jfrjoin").isBoolean().default(false)
+        if (!isBoolean(params.jfrdesc)) params.jfrdesc = _$(toBoolean(params.jfrdesc), "jfrdesc").isBoolean().default(false)
+
         _showTmpMsg()
         var _r
         if (isDef(params.file) && isUnDef(params.cmd)) {
@@ -4107,7 +4107,7 @@ var _run = () => {
     } else {
         // JSON base options
         params.jsonprefix = _$(params.jsonprefix, "jsonprefix").isString().default(__)
-        params.jsondesc   = toBoolean(_$(params.jsondesc, "jsondesc").default("false"))
+        params.jsondesc   = _$(toBoolean(params.jsondesc), "jsondesc").isBoolean().default(false)
 
         if (typeof params.insecure !== "undefined" && toBoolean(params.insecure)) {
             ow.loadJava().setIgnoreSSLDomains()
