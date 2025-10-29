@@ -90,6 +90,7 @@ ow.ai.__gpttypes.bedrock = {
     aOptions.model = _$(aOptions.model, "aOptions.model").isString().default("amazon.titan-text-express-v1")
     aOptions.temperature = _$(aOptions.temperature, "aOptions.temperature").isNumber().default(__)
     aOptions.region = _$(aOptions.region, "aOptions.region").isString().default("us-east-1")
+    aOptions.showReasoning = _$(aOptions.showReasoning, "aOptions.showReasoning").isBoolean().default(false)
 
     var aws = new AWS()
     var _model = aOptions.model
@@ -116,6 +117,9 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
         if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
         if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
+        if (isDef(aResponse.usage.prompt_tokens)) tokens.prompt = aResponse.usage.prompt_tokens
+        if (isDef(aResponse.usage.completion_tokens)) tokens.completion = aResponse.usage.completion_tokens
+        if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
         if (Object.keys(tokens).length > 0) stats.tokens = tokens
         stats.usage = aResponse.usage
       }
@@ -130,6 +134,17 @@ ow.ai.__gpttypes.bedrock = {
           .filter(r => isDef(r) && isDef(r.completionReason))
           .map(r => r.completionReason)
         if (finishReasons.length > 0) stats.finishReasons = finishReasons
+      }
+      if (isArray(aResponse.choices)) {
+        var choiceReasons = aResponse.choices
+          .map(c => (isMap(c) && (isString(c.finish_reason) || isString(c.finishReason))) ? (c.finish_reason || c.finishReason) : __)
+          .filter(r => isString(r))
+        if (choiceReasons.length > 0) {
+          if (isUnDef(stats.finishReasons)) stats.finishReasons = []
+          choiceReasons.forEach(r => {
+            if (stats.finishReasons.indexOf(r) < 0) stats.finishReasons.push(r)
+          })
+        }
       }
 
       // Handle output message structure (Nova/Claude models)
@@ -283,6 +298,41 @@ ow.ai.__gpttypes.bedrock = {
           Object.keys(toolRegistry).forEach(name => addTool(toolRegistry[name], name))
         }
 
+        var toolResultToText = function(value) {
+          if (isString(value)) return value
+          if (isNumber(value) || isBoolean(value)) return String(value)
+          if (isArray(value) || isMap(value)) {
+            try {
+              return JSON.stringify(value)
+            } catch (je) {
+              return String(value)
+            }
+          }
+          if (isUnDef(value)) return ""
+          return String(value)
+        }
+
+        var openAIContentToText = function(value) {
+          if (isUnDef(value)) return ""
+          if (isString(value)) return value
+          if (isNumber(value) || isBoolean(value)) return String(value)
+          if (isArray(value)) return value.map(v => openAIContentToText(v)).join("")
+          if (isMap(value)) {
+            if (isString(value.text)) return openAIContentToText(value.text)
+            if (isDef(value.json)) return openAIContentToText(value.json)
+            if (isDef(value.value)) return openAIContentToText(value.value)
+            if (isDef(value.content)) return openAIContentToText(value.content)
+            if (isDef(value.message)) return openAIContentToText(value.message)
+            if (isDef(value.data)) return openAIContentToText(value.data)
+            if (isDef(value.outputText)) return openAIContentToText(value.outputText)
+            if (isDef(value.output_text)) return openAIContentToText(value.output_text)
+            if (isDef(value.generated_text)) return openAIContentToText(value.generated_text)
+            if (isDef(value.toolResult) && isDef(value.toolResult.content)) return openAIContentToText(value.toolResult.content)
+            try { return JSON.stringify(value) } catch (je) { return String(value) }
+          }
+          return String(value)
+        }
+
         //aOptions.promptKey = _$(aOptions.promptKey, "aOptions.promptKey").isString().default("inputText")
         //aOptions.tempKey   = _$(aOptions.tempKey, "aOptions.tempKey").isString().default("textGenerationConfig.temperature")
         //aOptions.promptKeyMap = _$(toBoolean(aOptions.promptKeyMap), "aOptions.promptKeyMap").isBoolean().default(false)
@@ -294,9 +344,15 @@ ow.ai.__gpttypes.bedrock = {
         //msgs = aPrompt.map(c => isMap(c) ? c.content : c)
 
         //if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
-        if (aJsonFlag) aPrompt += ". answer in json."
+        if (aJsonFlag && isString(aPrompt)) aPrompt += ". answer in json."
 
         var _m = {}
+
+        var removeReasoningTags = function(text) {
+          if (!isString(text)) return text
+          // Remove <reasoning>...</reasoning> tags and their content
+          return text.replace(/<reasoning>[\s\S]*?<\/reasoning>/mgi, '').trim()
+        }
 
         var novaToText = function(value) {
           if (isUnDef(value)) return ""
@@ -455,6 +511,114 @@ ow.ai.__gpttypes.bedrock = {
               }
             }
           }
+        } else if (aModel.indexOf("openai.") >= 0) {
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: aPrompt })
+          }
+
+          var normalized = []
+          for (var omi = 0; omi < baseConv.length; omi++) {
+            var originalMsg = baseConv[omi]
+            if (!isMap(originalMsg)) {
+              normalized.push({ role: "user", content: openAIContentToText(originalMsg) })
+              continue
+            }
+            var role = isString(originalMsg.role) ? String(originalMsg.role).toLowerCase() : "user"
+            var normalizedMsg = { role: role }
+            if (isString(originalMsg.tool_call_id)) normalizedMsg.tool_call_id = originalMsg.tool_call_id
+
+            if (isArray(originalMsg.tool_calls)) {
+              try {
+                normalizedMsg.tool_calls = JSON.parse(JSON.stringify(originalMsg.tool_calls))
+              } catch (je) {
+                normalizedMsg.tool_calls = originalMsg.tool_calls
+              }
+            }
+            if (isString(originalMsg.id)) normalizedMsg.id = originalMsg.id
+
+            if (isArray(originalMsg.content)) {
+              var toolResultPart = originalMsg.content
+                .filter(p => isMap(p) && (isDef(p.toolResult) || p.type == "tool_result"))
+                .shift()
+              if (isDef(toolResultPart)) {
+                var toolContent = isMap(toolResultPart.toolResult) ? toolResultPart.toolResult.content : toolResultPart.content
+                var toolUseId = __
+                if (isMap(toolResultPart.toolResult)) toolUseId = toolResultPart.toolResult.toolUseId || toolResultPart.toolResult.tool_use_id
+                if (isUnDef(toolUseId) && isString(toolResultPart.tool_use_id)) toolUseId = toolResultPart.tool_use_id
+                if (isString(toolUseId)) normalizedMsg.tool_call_id = toolUseId
+                normalizedMsg.role = "tool"
+                normalizedMsg.content = openAIContentToText(toolContent)
+              } else if (originalMsg.content.every && originalMsg.content.every(p => isMap(p) && isString(p.type))) {
+                try {
+                  normalizedMsg.content = JSON.parse(JSON.stringify(originalMsg.content))
+                  normalizedMsg.content.forEach(part => {
+                    if (isDef(part.text)) part.text = openAIContentToText(part.text)
+                    if (isDef(part.content)) part.content = openAIContentToText(part.content)
+                    if (isDef(part.value)) part.value = openAIContentToText(part.value)
+                  })
+                } catch (jce) {
+                  normalizedMsg.content = originalMsg.content.map(p => {
+                    var clone = {}
+                    Object.keys(p).forEach(k => clone[k] = p[k])
+                    if (isDef(clone.text)) clone.text = openAIContentToText(clone.text)
+                    if (isDef(clone.content)) clone.content = openAIContentToText(clone.content)
+                    if (isDef(clone.value)) clone.value = openAIContentToText(clone.value)
+                    return clone
+                  })
+                }
+              } else {
+                normalizedMsg.content = openAIContentToText(originalMsg.content)
+              }
+            } else if (isMap(originalMsg.content)) {
+              if (isString(originalMsg.content.type) && (isDef(originalMsg.content.text) || isDef(originalMsg.content.content))) {
+                normalizedMsg.content = [{
+                  type: originalMsg.content.type,
+                  text: openAIContentToText(originalMsg.content.text || originalMsg.content.content)
+                }]
+              } else {
+                normalizedMsg.content = openAIContentToText(originalMsg.content)
+              }
+            } else {
+              normalizedMsg.content = openAIContentToText(originalMsg.content)
+            }
+
+            if (isUnDef(normalizedMsg.content)) normalizedMsg.content = ""
+            normalized.push(normalizedMsg)
+          }
+
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            for (var oi = normalized.length - 1; oi >= 0; oi--) {
+              if (normalized[oi].role == "user" && isString(normalized[oi].content)) {
+                normalized[oi].content = normalized[oi].content + ". answer in json."
+                break
+              }
+            }
+          }
+
+          _r.conversation = normalized
+
+          _m = {
+            messages: normalized,
+            temperature: aTemperature
+          }
+
+          if (toolsToUse.length > 0) {
+            var openAITools = toolsToUse
+              .filter(tool => isDef(tool) && isDef(tool.function))
+              .map(tool => ({
+                type: "function",
+                function: {
+                  name: tool.function.name,
+                  description: tool.function.description,
+                  parameters: sanitizeToolSchema(tool.function.parameters)
+                }
+              }))
+            if (openAITools.length > 0) {
+              _m.tools = openAITools
+              if (isUnDef(aOptions.params.tool_choice)) _m.tool_choice = "auto"
+            }
+          }
         } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
           if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
@@ -602,6 +766,108 @@ ow.ai.__gpttypes.bedrock = {
         //sprint(res)
         _captureStats(res, aModel)
         if (isDef(res.error)) return res
+        var handledOpenAI = false
+
+        if (aModel.indexOf("openai.") >= 0 && isArray(res.choices)) {
+          handledOpenAI = true
+          for (var ci = 0; ci < res.choices.length; ci++) {
+            var choice = res.choices[ci]
+            if (!isMap(choice)) continue
+            var message = isMap(choice.message) ? choice.message : {}
+            var storedMessage = {}
+            try {
+              storedMessage = JSON.parse(JSON.stringify(message))
+            } catch (je) {
+              storedMessage = {
+                role: message.role,
+                content: message.content,
+                tool_calls: message.tool_calls
+              }
+            }
+            if (!isString(storedMessage.role)) storedMessage.role = "assistant"
+            if (isUnDef(storedMessage.content)) storedMessage.content = ""
+            _r.conversation.push(storedMessage)
+
+            if (isArray(message.tool_calls) && message.tool_calls.length > 0) {
+              for (var ti = 0; ti < message.tool_calls.length; ti++) {
+                var toolCall = message.tool_calls[ti]
+                var toolName = isMap(toolCall) && isMap(toolCall["function"]) && isString(toolCall["function"].name) ? toolCall["function"].name : __
+                var toolCallId = isMap(toolCall) && isString(toolCall.id) ? toolCall.id : toolName
+                var toolArgs = isMap(toolCall) && isMap(toolCall["function"]) ? toolCall["function"].arguments : __
+                var parsedArgs = toolArgs
+                if (isString(toolArgs)) {
+                  try { parsedArgs = JSON.parse(toolArgs) } catch (pe) { parsedArgs = toolArgs }
+                }
+
+                var tool = isString(toolName) ? toolRegistry[toolName] : __
+                if (isUnDef(tool) && isString(toolName)) tool = _r.tools[toolName]
+
+                if (isDef(tool) && isDef(tool.fn)) {
+                  try {
+                    var toolResult = tool.fn(parsedArgs)
+                    var toolContent = toolResultToText(toolResult)
+                    if (isUnDef(toolCallId)) toolCallId = toolName
+                    _r.conversation.push({
+                      role: "tool",
+                      content: toolContent,
+                      tool_call_id: toolCallId
+                    })
+                  } catch (te) {
+                    if (isUnDef(toolCallId)) toolCallId = toolName
+                    _r.conversation.push({
+                      role: "tool",
+                      content: "Error executing tool: " + te.message,
+                      tool_call_id: toolCallId
+                    })
+                  }
+                } else {
+                  if (isUnDef(toolCallId)) toolCallId = toolName
+                  _r.conversation.push({
+                    role: "tool",
+                    content: "Tool " + (toolName || "<unknown>") + " is not available.",
+                    tool_call_id: toolCallId
+                  })
+                }
+              }
+              var _res = _r.rawPrompt(_r.conversation, aModel, aTemperature, aJsonFlag, aTools)
+              return _res
+            }
+
+            if (String(storedMessage.role).toLowerCase() === "assistant") {
+              var messageText = openAIContentToText(message.content)
+              if (isString(messageText) && messageText.length > 0) {
+                // Apply reasoning filter for OpenAI models when showReasoning is false
+                if (!aOptions.showReasoning) {
+                  messageText = removeReasoningTags(messageText)
+                }
+                cv.push(messageText)
+              }
+            }
+          }
+        }
+
+        if (handledOpenAI) {
+          if (aJsonFlag) {
+            // Apply reasoning filter to response even when returning JSON
+            var _fres = ""
+            if (!aOptions.showReasoning && isMap(res) && isArray(res.choices)) {
+              res.choices.forEach(choice => {
+                if (isMap(choice.message) && isString(choice.message.content)) {
+                  choice.message.content = removeReasoningTags(choice.message.content)
+                  _fres = choice.message.content
+                }
+              })
+            }
+            return _fres
+          }
+          var finalText = cv.length > 0 ? cv.join("") : __
+          // Apply reasoning filter one more time on the final output for OpenAI models
+          if (!aOptions.showReasoning && isString(finalText)) {
+            finalText = removeReasoningTags(finalText)
+          }
+          return finalText
+        }
+
         if (isDef(res.generation)) return res.generation
 
         if (isArray(res.outputs)) {
@@ -684,20 +950,7 @@ ow.ai.__gpttypes.bedrock = {
                     if (isDef(tool) && isDef(tool.fn)) {
                       try {
                         var toolResult = tool.fn(toolInput)
-                        var _resultToText = function(value) {
-                          if (isString(value)) return value
-                          if (isNumber(value) || isBoolean(value)) return String(value)
-                          if (isArray(value) || isMap(value)) {
-                            try {
-                              return JSON.stringify(value)
-                            } catch (je) {
-                              return String(value)
-                            }
-                          }
-                          if (isUnDef(value)) return ""
-                          return String(value)
-                        }
-                        var _toolResultText = _resultToText(toolResult)
+                        var _toolResultText = toolResultToText(toolResult)
                         var _tR
 
                         if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
@@ -719,6 +972,13 @@ ow.ai.__gpttypes.bedrock = {
                                 status: "success"
                               }
                             }]
+                          }
+                        } else if (aModel.indexOf("openai.") >= 0) {
+                          if (isUnDef(toolCallId)) toolCallId = toolName
+                          _tR = {
+                            role: "tool",
+                            content: _toolResultText,
+                            tool_call_id: toolCallId
                           }
                         } else {
                           _tR = {
@@ -762,6 +1022,13 @@ ow.ai.__gpttypes.bedrock = {
                                 status: "error"
                               }
                             }]
+                          })
+                        } else if (aModel.indexOf("openai.") >= 0) {
+                          if (isUnDef(toolCallId)) toolCallId = toolName
+                          _r.conversation.push({
+                            role: "tool",
+                            content: "Error executing tool: " + e.message,
+                            tool_call_id: toolCallId
                           })
                         } else {
                           _r.conversation.push({
