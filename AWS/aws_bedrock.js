@@ -526,6 +526,7 @@ ow.ai.__gpttypes.bedrock = {
             }
             var role = isString(originalMsg.role) ? String(originalMsg.role).toLowerCase() : "user"
             var normalizedMsg = { role: role }
+            // Preserve tool_call_id for tool role messages (OpenAI format)
             if (isString(originalMsg.tool_call_id)) normalizedMsg.tool_call_id = originalMsg.tool_call_id
 
             if (isArray(originalMsg.tool_calls)) {
@@ -546,6 +547,8 @@ ow.ai.__gpttypes.bedrock = {
                 var toolUseId = __
                 if (isMap(toolResultPart.toolResult)) toolUseId = toolResultPart.toolResult.toolUseId || toolResultPart.toolResult.tool_use_id
                 if (isUnDef(toolUseId) && isString(toolResultPart.tool_use_id)) toolUseId = toolResultPart.tool_use_id
+                // Also check for tool_call_id at the message level (OpenAI format)
+                if (isUnDef(toolUseId) && isString(originalMsg.tool_call_id)) toolUseId = originalMsg.tool_call_id
                 if (isString(toolUseId)) normalizedMsg.tool_call_id = toolUseId
                 normalizedMsg.role = "tool"
                 normalizedMsg.content = openAIContentToText(toolContent)
@@ -763,7 +766,6 @@ ow.ai.__gpttypes.bedrock = {
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         //sprint(aInput)
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
-        //sprint(res)
         _captureStats(res, aModel)
         if (isDef(res.error)) return res
         var handledOpenAI = false
