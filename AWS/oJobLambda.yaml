@@ -1,3 +1,4 @@
+# Author: Nuno Aguiar, Helder Marques
 include:
 - oJobHTTPd.yaml
 
@@ -21,6 +22,7 @@ jobs:
         secret    : secret
         token     : token
         debug     : debug
+        timeout   : timeout
   help   :
     text   : Adds a HTTP service to call AWS Lambda functions and return the result.
     expects:
@@ -46,6 +48,8 @@ jobs:
       desc: The AWS token to use.
     - name: debug
       desc: Whether to enable debug mode.
+    - name: timeout
+      desc: HTTP timeout in milliseconds.
   check  :
     in:
       port      : toNumber.isNumber.default(8091)
@@ -60,6 +64,7 @@ jobs:
       token     : isString.default(__)
       cache     : toNumber.isNumber.default(__)
       debug     : toBoolean.isBoolean.default(false)
+      timeout   : toNumber.isNumber.default(__)
   args:
     execURI: | #js
       var _res = {
@@ -77,6 +82,13 @@ jobs:
   exec   : | #js
     loadLib("aws.js")
 
+    if (isDef(args.timeout)) {
+      // Set global HTTP timeout flags
+      __flags.HTTP_CON_TIMEOUT = args.timeout;
+      __flags.HTTP_READ_TIMEOUT = args.timeout;
+    }
+    
+
     var aws = new AWS(args.accessKey, args.secret, args.token)
     if (isDef(args.assumeRole)) {
       log("Assuming role " + args.assumeRole + "...")
@@ -86,6 +98,11 @@ jobs:
     if (isUnDef(global.__ojobHttpdAWS)) global.__ojobHttpdAWS = {}
     var _args = clone(args)
     global.__ojobHttpdAWS[_args.uri] = k => {
+      if (isDef(_args.timeout)) {
+        // Set timeout flags for each request
+        __flags.HTTP_CON_TIMEOUT = _args.timeout;
+        __flags.HTTP_READ_TIMEOUT = _args.timeout;
+      }
       if (isDef(_args.assumeRole) && aws.checkAssumeRole()) {
         aws = new AWS(_args.accessKey, _args.secret, _args.token)
         log("Assuming role " + _args.assumeRole + "...")
@@ -111,6 +128,7 @@ jobs:
       try {
         if (_args.debug) {
           log("AWS Lambda function " + _args.lambda + " in region " + _args.region + ", request: " + af.toCSLON(_r))
+          log("HTTP timeout set to: " + _args.timeout + "ms")
         }
         var _res = aws.LAMBDA_Invoke(_args.region, _args.lambda, _r, _args.version)
         if (_args.debug) {
