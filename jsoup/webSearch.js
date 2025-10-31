@@ -36,78 +36,90 @@ WebSearch.prototype.getURL = function(aURL, aStyle) {
 /**
  * <odoc>
  * <key>WebSearch.search(aSearchPrompt, aLimit, aSearchEngine) : Map</key>
- * Uses aSearchEngine (e.g. google) to perform a web search using aSearchPrompt with an optional aLimit (12) results.
+ * Performs a web search using DuckDuckGo with aSearchPrompt and returns up to aLimit results (default: 12).\
+ * \
+ * Supported search engines:\
+ * - "duckduckgo" or "ddg" (default)\
+ * \
+ * Returns a map with:\
+ * - start: Starting position (always 0)\
+ * - limit: Maximum number of results requested\
+ * - results: Array of search results, each containing:\
+ *   - title: Page title\
+ *   - description: Snippet/description of the page\
+ *   - link: Direct URL to the page\
+ * \
+ * Example:\
+ *   var ws = new WebSearch();\
+ *   var results = ws.search("OpenAF", 5);\
+ *   results.results.forEach(r => print(r.title + ": " + r.link));\
  * </odoc>
  */
 WebSearch.prototype.search = function(aSearchPrompt, aLimit, aSearchEngine) {
     aSearchPrompt = _$(aSearchPrompt, "aSearchPrompt").isString().$_()
-    aSearchEngine = _$(aSearchEngine, "aSearchEngine").isString().default("google")
+    aSearchEngine = _$(aSearchEngine, "aSearchEngine").isString().default("duckduckgo")
     var aStart = 0
     aLimit = _$(aLimit, "aLimit").isNumber().default(12)
 
-    var res
-    const fnUA = () => {
-        return [`Lynx/${ow.obj.randomRange(2, 3)}.${ow.obj.randomRange(8,9)}.${ow.obj.randomRange(0, 2)}`,
-                `libwww-FM/${ow.obj.randomRange(2, 3)}.${ow.obj.randomRange(13, 15)}`,
-                `SSL-MM/${ow.obj.randomRange(1, 2)}.${ow.obj.randomRange(3, 5)}`,
-                `OpenSSL/${ow.obj.randomRange(1, 3)}.${ow.obj.randomRange(0, 4)}.${ow.obj.randomRange(0, 9)}`
-               ].join(" ")
-    }
+    // Based on https://github.com/nickclyde/duckduckgo-mcp-server
+    var res = $rest({
+        uriQuery: true,
+        requestHeaders: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        }
+    }).get("https://html.duckduckgo.com/html/", {
+        q: aSearchPrompt
+    })
 
-    switch(aSearchEngine) {
-    case "google":
-        // Based on https://github.com/Nv7-GitHub/googlesearch
+    var soup = new Jsoup()
+    soup = soup.getHTMLDoc4Str(res)
 
+    var results = soup.select(".result")
+    var searchResults = []
 
-        res = $rest({
-            uriQuery      : true,
-            requestHeaders: {
-                "User-Agent": fnUA(),
-                "Accept": "*\/*"
+    for(var i in results) {
+        var result = results[i]
+
+        // Get the main link (result__a)
+        var linkElem = result.select(".result__a")
+        if (linkElem.length == 0) continue
+
+        var title = linkElem.text()
+        var link = linkElem.attr("href")
+
+        // Skip empty links or ads (links containing y.js)
+        if (!link || link.indexOf("y.js") >= 0) continue
+
+        // Clean up DuckDuckGo redirect URLs
+        if (link.indexOf("//duckduckgo.com/l/?uddg=") >= 0 || link.indexOf("//duckduckgo.com/l/?kh=-1&uddg=") >= 0) {
+            try {
+                var uddgMatch = link.match(/uddg=([^&]+)/)
+                if (uddgMatch && uddgMatch[1]) {
+                    link = decodeURIComponent(uddgMatch[1])
+                }
+            } catch(e) {
+                // If decoding fails, keep the original link
             }
-        }).get("https://www.google.com/search", {
-            q: aSearchPrompt,
-            num: aLimit,
-            hl: "en",
-            start: aStart,
-            safe: "active",
-            gl: "None"
+        }
+
+        // Get description/snippet
+        var snippetElem = result.select(".result__snippet")
+        var description = snippetElem.length > 0 ? snippetElem.text() : ""
+
+        searchResults.push({
+            title: title,
+            description: description,
+            link: link
         })
 
-        //res = res.substring(res.indexOf("<html "))
-        //res = res.replace(/&nbsp;/g, " ")
-        var soup = new Jsoup()
-
-        soup = soup.getHTMLDoc4Str(res)
-        var ar = soup.select(".ezO2md")
-        res = []
-        var link, title, description
-        for(var ari in ar) {
-            var doc = ar[ari]
-            var link_tag = doc.select("a[href]")
-            var title_tag = link_tag.select("span.CVA68e")
-            var description_tag = doc.select("span.FrIlee")
-
-            var link = ""
-            if (link_tag.length > 0 && title_tag.length > 0 && description_tag.length > 0) {
-                link = String(link_tag.attr("href")).split("&")[0].replace("/url?q=", "")
-            }
-            link = String(link_tag.attr("href")).split("&")[0].replace("/url?q=", "")
-            title = title_tag.text()
-            description = description_tag.text()
-            
-            res.push({
-                title: title,
-                description: description,
-                link: link
-            })
-        }
-        
+        // Limit results
+        if (searchResults.length >= aLimit) break
     }
 
     return {
         start: aStart,
         limit: aLimit,
-        results: res
+        results: searchResults
     }
 }
