@@ -1,4 +1,4 @@
-loadExternalJars(getOPackPath("jsoup") || ".")
+loadExternalJars(getOPackPath("Jsoup") || ".")
 
 /**
  * <odoc>
