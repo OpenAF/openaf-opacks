@@ -2,8 +2,25 @@
 # remove zip -d minio-6.0.7-all.jar com/fasterxml/jackson/core/*
 # remove zip -d minio-6.0.7-all.jar org/apache/commons/codec/*
 artifacts:
-  - id      : rocksdbjni 
-    group   : org.rocksdb
-    #version : 8.6.7
-
-    #template: minio-{{version}}-all.jar
+- id      : rocksdbjni 
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-linux64.jar
+- id      : rocksdbjni 
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-linux64-musl.jar
+- id      : rocksdbjni
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-win64.jar
+- id      : rocksdbjni
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-osx.jar
+- id      : rocksdbjni
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-linux32-musl.jar
+- id      : rocksdbjni
+  group   : org.rocksdb
+  template: rocksdbjni-{{version}}-linux32.jar
+  #version : 8.6.7
+  
+  #template: minio-{{version}}-all.jar
+  
