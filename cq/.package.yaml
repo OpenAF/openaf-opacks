@@ -35,7 +35,7 @@ name: cq
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250918'
+version: '20251104'
 dependencies:
   openaf: '>=20250901'
 files:
@@ -45,10 +45,10 @@ files:
 - affinity-3.27ea1.jar
 - asm-9.2.jar
 - chronicle-analytics-2.27ea1.jar
-- chronicle-bytes-2.27ea7.jar
-- chronicle-core-2.27ea7.jar
-- chronicle-queue-5.27ea9.jar
-- chronicle-threads-2.27ea3.jar
+- chronicle-bytes-2.27ea8.jar
+- chronicle-core-2.27ea8.jar
+- chronicle-queue-5.27ea10.jar
+- chronicle-threads-2.27ea4.jar
 - chronicle-wire-2.27ea12.jar
 - compiler-2.27ea2.jar
 - cq.js
@@ -59,17 +59,17 @@ files:
 - jnr-ffi-2.2.15.jar
 - jnr-x86asm-1.0.2.jar
 - oafp_cq.js
-- posix-2.27ea2.jar
+- posix-2.27ea3.jar
 filesHash:
   .maven.yaml: 53fe996e1e2db2f0e0e1062d06a29877d8cc0490
   README.md: 29ccf16c4c4f52849188f7a2f6d7905cc0ba2227
   affinity-3.27ea1.jar: 2c033e31cdbc31b144b5225964c0fac1fbadb96d
   asm-9.2.jar: 81a03f76019c67362299c40e0ba13405f5467bff
   chronicle-analytics-2.27ea1.jar: 98a3e8d4d9ec35cc7cc68e78cc9e5cce3bfaa012
-  chronicle-bytes-2.27ea7.jar: c0260df18ed0bf952b48544abe8960c4f7801596
-  chronicle-core-2.27ea7.jar: db7595a4021ebb2485a84218ad21b677361b4642
-  chronicle-queue-5.27ea9.jar: 9c198bb6e913499760a0537a299abe38c9a7dc56
-  chronicle-threads-2.27ea3.jar: adcecac66024a75322f6ced6760f2627a2934df3
+  chronicle-bytes-2.27ea8.jar: c7b561699e41396e5e2b27d3cd95d90421b46016
+  chronicle-core-2.27ea8.jar: 1651d8ecdcbc4296456e8dcd8b8baeb497b161cd
+  chronicle-queue-5.27ea10.jar: 9b3bd551e022a1f91d83ccb501c2f91a1e638185
+  chronicle-threads-2.27ea4.jar: 5e990ec0344d4f6ceb8152d7c9dedf9c7db50e3f
   chronicle-wire-2.27ea12.jar: 1ea0a1d625be37aa9a8d7965cf3169b749447ece
   compiler-2.27ea2.jar: d6022ef12a01c1e0380d554cda0fc1badb18e29f
   cq.js: 3dd4c93fb11c9fd33cc90788c204be49e284b3bc
@@ -80,4 +80,4 @@ filesHash:
   jnr-ffi-2.2.15.jar: fa3c32f463423469de314b03a157d5f1f7476ec0
   jnr-x86asm-1.0.2.jar: 006936bbd6c5b235665d87bd450f5e13b52d4b48
   oafp_cq.js: d59c60756e0041d272372ccf2cf17ca9e2f31f0b
-  posix-2.27ea2.jar: 965dd188c4ba54d5759a7cfbc37d38ec0afa60c1
+  posix-2.27ea3.jar: 89f1a52c3fcc11db96e8632abae5907a161cd81a
