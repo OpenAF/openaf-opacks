@@ -96,6 +96,7 @@ ow.ai.__gpttypes.bedrock = {
     var _model = aOptions.model
     var _temperature = aOptions.temperature
     var _lastStats = __
+    var _debugCh = __
     var _resetStats = () => { _lastStats = __ }
     var _captureStats = (aResponse, aModelName) => {
       if (!isMap(aResponse)) {
@@ -174,6 +175,15 @@ ow.ai.__gpttypes.bedrock = {
       },
       getModelName: () => _model,
       getLastStats: () => _lastStats,
+      setDebugCh: (aChName) => {
+        if (isDef(aChName)) {
+          _debugCh = aChName
+          $ch(_debugCh).create()
+        } else {
+          _debugCh = __
+        }
+        return _r
+      },
       setTool: (aName, aDesc, aParams, aFn) => {
         _r.tools[aName] = {
           type: "function",
@@ -765,7 +775,9 @@ ow.ai.__gpttypes.bedrock = {
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         //sprint(aInput)
+        if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client'}, merge({_t:nowNano(),_f:'client'}, aInput))
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
+        if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm'}, merge({_t:nowNano(),_f:'llm'}, res))
         _captureStats(res, aModel)
         if (isDef(res.error)) return res
         var handledOpenAI = false
