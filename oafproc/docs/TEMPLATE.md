@@ -13,6 +13,7 @@ Here are some of the available helpers:
 | $stringify      | shows a JSON representation of the provided parameter |
 | $stringifyInLine| shows a JSON representation, without spaces, of the provided parameter |
 | $toYAML         | shows the YAML version of the parameter  | 
+| $toKYAML        | shows the KYAML version of the parameter  |
 | $toJSON         | shows the JSON version of the parameter  | 
 | $env            | shows the current environment variable identified by the parameter |
 | $escape         | shows an escaped version of the parameter | 
