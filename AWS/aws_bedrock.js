@@ -685,8 +685,14 @@ ow.ai.__gpttypes.bedrock = {
             _m.tools = toolsToUse.filter(tool => isDef(tool) && isDef(tool.function)).map(tool => ({
               name: tool.function.name,
               description: tool.function.description,
-              input_schema: tool.function.parameters
+              input_schema: sanitizeToolSchema(tool.function.parameters, false)
             }))
+            // Add tool_choice parameter if specified in options, otherwise default to auto
+            if (isDef(aOptions.params.tool_choice)) {
+              _m.tool_choice = aOptions.params.tool_choice
+            } else {
+              _m.tool_choice = { type: "auto" }
+            }
           }
         } else if (aModel.indexOf("mistral.") >= 0) {
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
