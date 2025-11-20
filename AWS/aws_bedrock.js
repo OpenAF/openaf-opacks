@@ -198,15 +198,28 @@ ow.ai.__gpttypes.bedrock = {
       },
       prompt: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
         var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
-        
-        // Handle Anthropic/Claude structured output when JSON flag is true
+
+        // Handle Nova/Anthropic/Claude structured output when JSON flag is true
         if (aJsonFlag && isMap(__r) && isDef(__r.output) && isDef(__r.output.message)) {
           var msg = __r.output.message
           if (isArray(msg.content)) {
             var textParts = []
             msg.content.forEach(c => {
-              if (isMap(c) && c.type === "text" && isDef(c.text)) {
-                textParts.push(c.text)
+              if (isMap(c)) {
+                // Handle text content
+                if (c.type === "text" && isDef(c.text)) {
+                  textParts.push(c.text)
+                }
+                // Handle JSON content (Nova models)
+                else if (isDef(c.json)) {
+                  textParts.push(isString(c.json) ? c.json : JSON.stringify(c.json))
+                }
+                // Handle plain text without type
+                else if (isDef(c.text)) {
+                  textParts.push(c.text)
+                }
+              } else if (isString(c)) {
+                textParts.push(c)
               }
             })
             if (textParts.length > 0) {
@@ -214,7 +227,7 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
         }
-        
+
         if (isDef(__r) && isArray(__r.results) && __r.results.length > 0) {
           if (__r.results[0].completionReason == "FINISH") {
             return __r.results[0].outputText.trim()
@@ -354,7 +367,7 @@ ow.ai.__gpttypes.bedrock = {
         //msgs = aPrompt.map(c => isMap(c) ? c.content : c)
 
         //if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
-        if (aJsonFlag && isString(aPrompt)) aPrompt += ". answer in json."
+        // JSON instructions are now handled per-model to avoid persisting in conversation history
 
         var _m = {}
 
@@ -479,8 +492,24 @@ ow.ai.__gpttypes.bedrock = {
 
           _r.conversation = normalized // Update the conversation with the normalized messages
 
+          var messagesForAPI = normalized
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var nvi = messagesForAPI.length - 1; nvi >= 0; nvi--) {
+              if (messagesForAPI[nvi].role == "user" && isArray(messagesForAPI[nvi].content)) {
+                for (var nci = messagesForAPI[nvi].content.length - 1; nci >= 0; nci--) {
+                  if (isMap(messagesForAPI[nvi].content[nci]) && messagesForAPI[nvi].content[nci].type == "text") {
+                    messagesForAPI[nvi].content[nci].text = messagesForAPI[nvi].content[nci].text + ". answer in json."
+                    break
+                  }
+                }
+                break
+              }
+            }
+          }
+
           var systemMessages = []
-          normalized.filter(m => m.role == "system").forEach(m => {
+          messagesForAPI.filter(m => m.role == "system").forEach(m => {
             var combined = m.content
               .filter(c => isMap(c) && c.type == "text" && isString(c.text))
               .map(c => c.text)
@@ -489,7 +518,7 @@ ow.ai.__gpttypes.bedrock = {
           })
 
           _m = {
-            messages: normalized.filter(r => r.role != "system"),
+            messages: messagesForAPI.filter(r => r.role != "system"),
             schemaVersion: "messages-v1",
             system: systemMessages,
             inferenceConfig: merge({
@@ -600,19 +629,21 @@ ow.ai.__gpttypes.bedrock = {
             normalized.push(normalizedMsg)
           }
 
+          _r.conversation = normalized
+
+          var messagesForAPI = normalized
           if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
-            for (var oi = normalized.length - 1; oi >= 0; oi--) {
-              if (normalized[oi].role == "user" && isString(normalized[oi].content)) {
-                normalized[oi].content = normalized[oi].content + ". answer in json."
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var oi = messagesForAPI.length - 1; oi >= 0; oi--) {
+              if (messagesForAPI[oi].role == "user" && isString(messagesForAPI[oi].content)) {
+                messagesForAPI[oi].content = messagesForAPI[oi].content + ". answer in json."
                 break
               }
             }
           }
 
-          _r.conversation = normalized
-
           _m = {
-            messages: normalized,
+            messages: messagesForAPI,
             temperature: aTemperature
           }
 
@@ -672,13 +703,29 @@ ow.ai.__gpttypes.bedrock = {
 
           _r.conversation = normalized
 
+          var messagesForAPI = normalized
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var aci = messagesForAPI.length - 1; aci >= 0; aci--) {
+              if (messagesForAPI[aci].role == "user" && isArray(messagesForAPI[aci].content)) {
+                for (var acci = messagesForAPI[aci].content.length - 1; acci >= 0; acci--) {
+                  if (isMap(messagesForAPI[aci].content[acci]) && messagesForAPI[aci].content[acci].type == "text") {
+                    messagesForAPI[aci].content[acci].text = messagesForAPI[aci].content[acci].text + ". answer in json."
+                    break
+                  }
+                }
+                break
+              }
+            }
+          }
+
           _m = {
             anthropic_version: "bedrock-2023-05-31",
-            messages: normalized.filter(r => r.role != "system"),
+            messages: messagesForAPI.filter(r => r.role != "system"),
             temperature: aTemperature
           }
 
-          var sysMsgs = normalized.filter(m => m.role == "system").map(m => m.content.map(s => s.text).join(""))
+          var sysMsgs = messagesForAPI.filter(m => m.role == "system").map(m => m.content.map(s => s.text).join(""))
           if (sysMsgs.length > 0) _m.system = sysMsgs.join("\n")
 
           if (toolsToUse.length > 0) {
@@ -729,8 +776,19 @@ ow.ai.__gpttypes.bedrock = {
 
           _r.conversation = normalized
 
-          var systemPrompts = normalized.filter(m => m.role == "system").map(m => m.content).join("\n").trim()
-          var chatMessages = normalized.filter(m => m.role == "user" || m.role == "assistant")
+          var messagesForAPI = normalized
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var mci = messagesForAPI.length - 1; mci >= 0; mci--) {
+              if (messagesForAPI[mci].role == "user" && isString(messagesForAPI[mci].content)) {
+                messagesForAPI[mci].content = messagesForAPI[mci].content + ". answer in json."
+                break
+              }
+            }
+          }
+
+          var systemPrompts = messagesForAPI.filter(m => m.role == "system").map(m => m.content).join("\n").trim()
+          var chatMessages = messagesForAPI.filter(m => m.role == "user" || m.role == "assistant")
 
           var promptSegments = []
           var firstUser = true
