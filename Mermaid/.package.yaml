@@ -22,7 +22,7 @@ name: Mermaid
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251105'
+version: '20251120'
 dependencies:
   openaf: '>=20230521'
 files:
@@ -30,5 +30,5 @@ files:
 - lib/mermaid.min.js
 - mermaid.js
 filesHash:
-  lib/mermaid.min.js: 199b6044142b7a33907f9979922f67c2c2e3ebf1
+  lib/mermaid.min.js: faa28aa31225a902390ec46b63d2bcf355f1d363
   mermaid.js: 4b3fafb11f71ac9ce5c22812f65bd37bbb177c62

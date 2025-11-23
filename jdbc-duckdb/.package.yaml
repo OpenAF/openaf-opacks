@@ -16,7 +16,7 @@ name: jdbc-duckdb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20251114'
+version: '20251116'
 dependencies:
   openaf: '>=20240318'
 files:
