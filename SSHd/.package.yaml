@@ -17,7 +17,7 @@ name: SSHd
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20241025'
+version: '20251122'
 dependencies:
   openaf: '>=20240812'
 files:
@@ -26,14 +26,14 @@ files:
 - .package.yaml
 - README.md
 - jcl-over-slf4j-1.7.36.jar
-- sshd-common-2.15.0.jar
-- sshd-core-2.15.0.jar
+- sshd-common-2.16.0.jar
+- sshd-core-2.16.0.jar
 - sshd.js
 filesHash:
-  .maven.yaml: db21e355fc891a9c59c44cd9d29687cfbbd51773
+  .maven.yaml: 20445db5d0f15fc4073f659cd1ef5715b42e4e89
   .odoc.db: 88d56dd8174b836f3d33d3c897d0553588c64dd4
   README.md: 672a0f1976636ccb8c59c04be649b1f461f38a9b
   jcl-over-slf4j-1.7.36.jar: d877e195a05aca4a2f1ad2ff14bfec1393af4b5e
-  sshd-common-2.15.0.jar: c3a4140b543d5e419d57809562fec297ffea46f5
-  sshd-core-2.15.0.jar: bc6ff14b0dddfaec40063b86871774d65a771eaa
+  sshd-common-2.16.0.jar: 964e47b6a067a79cc21f394020950011d4058576
+  sshd-core-2.16.0.jar: 4ad37ec93f2296821a60279a3acdb918129329ff
   sshd.js: e259c0eb5ad9cafee480cd36143605f1c2670ef0
