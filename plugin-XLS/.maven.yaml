@@ -9,15 +9,15 @@ artifacts:
 
     - id     : poi
       group  : org.apache.poi
-      version: 5.4.1
+      version: 5.5.0
   
     - id     : poi-excelant
       group  : org.apache.poi
-      version: 5.4.1
+      version: 5.5.0
   
     - id     : poi-ooxml
       group  : org.apache.poi
-      version: 5.4.1
+      version: 5.5.0
     
     # - id     : poi-ooxml-schemas
     #   group  : org.apache.poi
@@ -25,19 +25,19 @@ artifacts:
 
     - id     : poi-ooxml-full
       group  : org.apache.poi
-      version: 5.4.1
+      version: 5.5.0
 
     - id     : poi-scratchpad
       group  : org.apache.poi
-      version: 5.4.1
+      version: 5.5.0
 
     - id     : log4j-api
       group  : org.apache.logging.log4j
-      version: 2.25.0
+      version: 2.25.2
 
     - id     : log4j-core
       group  : org.apache.logging.log4j
-      version: 2.25.0
+      version: 2.25.2
 
     - id     : xmlbeans
       group  : org.apache.xmlbeans
