@@ -1013,12 +1013,24 @@ ow.ai.__gpttypes.bedrock = {
 
             // If message contains an array of content parts, iterate
             if (isArray(msg.content)) {
+              // First pass: collect all tool_use blocks
+              var toolUseBlocks = []
               for (var ci = 0; ci < msg.content.length; ci++) {
                 var content = msg.content[ci]
-                try {
-                  // Tool call handling (preserve previous behavior)
-                  if (isDef(content.toolUse) || content.type == "tool_use") {
-                    var _toolUse = content.toolUse || content
+                if (isDef(content.toolUse) || content.type == "tool_use") {
+                  toolUseBlocks.push(content)
+                }
+              }
+
+              // If there are tool calls, process ALL of them before making recursive call
+              if (toolUseBlocks.length > 0) {
+                var toolResultsToAdd = []
+                var hasToolCalls = false
+
+                for (var ti = 0; ti < toolUseBlocks.length; ti++) {
+                  var toolContent = toolUseBlocks[ti]
+                  try {
+                    var _toolUse = toolContent.toolUse || toolContent
                     var toolName = _toolUse.name
                     var toolInput = _toolUse.input
                     var toolCallId = _toolUse.toolUseId || _toolUse.id
@@ -1026,6 +1038,7 @@ ow.ai.__gpttypes.bedrock = {
                     // Find tool (from passed tools or internal tools)
                     var tool = (isString(toolName) ? toolRegistry[toolName] : __) || _r.tools[toolName]
                     if (isDef(tool) && isDef(tool.fn)) {
+                      hasToolCalls = true
                       try {
                         var toolResult = tool.fn(toolInput)
                         var _toolResultText = toolResultToText(toolResult)
@@ -1033,23 +1046,17 @@ ow.ai.__gpttypes.bedrock = {
 
                         if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
                           _tR = {
-                            role: "user",
-                            content: [{
-                              type: "tool_result",
-                              tool_use_id: toolCallId,
-                              content: _toolResultText
-                            }]
+                            type: "tool_result",
+                            tool_use_id: toolCallId,
+                            content: _toolResultText
                           }
                         } else if (aModel.indexOf("amazon.nova-") >= 0) {
                           _tR = {
-                            role: "user",
-                            content: [{
-                              toolResult: {
-                                toolUseId: toolCallId,
-                                content: [{ text: _toolResultText }],
-                                status: "success"
-                              }
-                            }]
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [{ text: _toolResultText }],
+                              status: "success"
+                            }
                           }
                         } else if (aModel.indexOf("openai.") >= 0) {
                           if (isUnDef(toolCallId)) toolCallId = toolName
@@ -1060,71 +1067,85 @@ ow.ai.__gpttypes.bedrock = {
                           }
                         } else {
                           _tR = {
-                            role: "user",
-                            content: [{
-                              toolResult: {
-                                toolUseId: toolCallId,
-                                content: [!isObject(toolResult) ? {
-                                  text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
-                                } : {
-                                  json: toolResult
-                                }],
-                                status: "success"
-                              }
-                            }]
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [!isObject(toolResult) ? {
+                                text: isString(toolResult) ? toolResult : JSON.stringify(toolResult)
+                              } : {
+                                json: toolResult
+                              }],
+                              status: "success"
+                            }
                           }
                         }
-                        _r.conversation.push(_tR)
-
-                        // Continue conversation with tool result (recursive)
-                        var _res = _r.rawPrompt(_r.conversation, aModel, aTemperature, aJsonFlag, aTools)
-                        cv.push(_res)
-                        return _res
+                        toolResultsToAdd.push(_tR)
                       } catch (e) {
+                        var _errR
                         if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
-                          _r.conversation.push({
-                            role: "user",
-                            content: [{
-                              type: "tool_result",
-                              tool_use_id: toolCallId,
-                              content: "Error executing tool: " + e.message
-                            }]
-                          })
+                          _errR = {
+                            type: "tool_result",
+                            tool_use_id: toolCallId,
+                            content: "Error executing tool: " + e.message
+                          }
                         } else if (aModel.indexOf("amazon.nova-") >= 0) {
-                          _r.conversation.push({
-                            role: "user",
-                            content: [{
-                              toolResult: {
-                                toolUseId: toolCallId,
-                                content: [{ text: "Error executing tool: " + e.message }],
-                                status: "error"
-                              }
-                            }]
-                          })
+                          _errR = {
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [{ text: "Error executing tool: " + e.message }],
+                              status: "error"
+                            }
+                          }
                         } else if (aModel.indexOf("openai.") >= 0) {
                           if (isUnDef(toolCallId)) toolCallId = toolName
-                          _r.conversation.push({
+                          _errR = {
                             role: "tool",
                             content: "Error executing tool: " + e.message,
                             tool_call_id: toolCallId
-                          })
+                          }
                         } else {
-                          _r.conversation.push({
-                            role: "user",
-                            content: [{
-                              toolResult: {
-                                toolUseId: toolCallId,
-                                content: [{
-                                  text: "Error executing tool: " + e.message
-                                }],
-                                status: "error"
-                              }
-                            }]
-                          })
+                          _errR = {
+                            toolResult: {
+                              toolUseId: toolCallId,
+                              content: [{
+                                text: "Error executing tool: " + e.message
+                              }],
+                              status: "error"
+                            }
+                          }
                         }
+                        toolResultsToAdd.push(_errR)
                       }
                     }
+                  } catch (ee) { $err(ee) }
+                }
+
+                // Add all tool results to conversation at once
+                if (hasToolCalls && toolResultsToAdd.length > 0) {
+                  // For Anthropic/Claude and Nova, wrap all tool_results in a single user message
+                  if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0 || aModel.indexOf("amazon.nova-") >= 0) {
+                    _r.conversation.push({
+                      role: "user",
+                      content: toolResultsToAdd
+                    })
                   } else {
+                    // For OpenAI, each tool result is a separate message
+                    toolResultsToAdd.forEach(function(tr) {
+                      _r.conversation.push(tr)
+                    })
+                  }
+
+                  // Now make the recursive call with all tool results
+                  var _res = _r.rawPrompt(_r.conversation, aModel, aTemperature, aJsonFlag, aTools)
+                  cv.push(_res)
+                  return _res
+                }
+              }
+
+              // Second pass: collect text content for assistant responses
+              for (var ci = 0; ci < msg.content.length; ci++) {
+                var content = msg.content[ci]
+                try {
+                  if (!isDef(content.toolUse) && content.type != "tool_use") {
                     // Only collect assistant text responses
                     if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
                       if (isString(content)) {
