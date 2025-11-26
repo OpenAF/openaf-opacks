@@ -200,32 +200,32 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http2</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-dns</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-socks</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler-proxy</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns</artifactId>
-            <version>4.1.127.Final</version>
+            <version>4.2.7.Final</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.plist</groupId>
