@@ -1027,8 +1027,9 @@ ow.ai.__gpttypes.bedrock = {
                 var toolResultsToAdd = []
                 var hasToolCalls = false
 
-                for (var ti = 0; ti < toolUseBlocks.length; ti++) {
-                  var toolContent = toolUseBlocks[ti]
+                //for (var ti = 0; ti < toolUseBlocks.length; ti++) {
+                toolResultsToAdd = pForEach(toolUseBlocks, function(toolContent, ti) {
+                  //var toolContent = toolUseBlocks[ti]
                   try {
                     var _toolUse = toolContent.toolUse || toolContent
                     var toolName = _toolUse.name
@@ -1078,7 +1079,8 @@ ow.ai.__gpttypes.bedrock = {
                             }
                           }
                         }
-                        toolResultsToAdd.push(_tR)
+                        //toolResultsToAdd.push(_tR)
+                        return _tR
                       } catch (e) {
                         var _errR
                         if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
@@ -1113,11 +1115,12 @@ ow.ai.__gpttypes.bedrock = {
                             }
                           }
                         }
-                        toolResultsToAdd.push(_errR)
+                        //toolResultsToAdd.push(_errR)
+                        return _errR
                       }
                     }
                   } catch (ee) { $err(ee) }
-                }
+                })
 
                 // Add all tool results to conversation at once
                 if (hasToolCalls && toolResultsToAdd.length > 0) {
