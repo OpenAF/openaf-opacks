@@ -114,13 +114,13 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(aResponse.usage.inputTokens)) tokens.prompt = aResponse.usage.inputTokens
         if (isDef(aResponse.usage.outputTokens)) tokens.completion = aResponse.usage.outputTokens
         if (isDef(aResponse.usage.totalTokens)) tokens.total = aResponse.usage.totalTokens
-        // Also handle alternative token field names
+        // Also handle alternative token field names (snake_case for OpenAI/Mistral)
         if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
         if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
         if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
+        // Handle prompt_tokens and completion_tokens (alternative naming)
         if (isDef(aResponse.usage.prompt_tokens)) tokens.prompt = aResponse.usage.prompt_tokens
         if (isDef(aResponse.usage.completion_tokens)) tokens.completion = aResponse.usage.completion_tokens
-        if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
         if (Object.keys(tokens).length > 0) stats.tokens = tokens
         stats.usage = aResponse.usage
       }
@@ -471,6 +471,8 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
         } else if (aModel.indexOf("amazon.nova-") >= 0) {
+          // Support for Amazon Nova models (both v1 and v2): amazon.nova-micro, amazon.nova-lite, amazon.nova-pro
+          // Both versions use the same message format and tool calling mechanisms
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
           if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
             baseConv = baseConv.concat({ role: "user", content: [{ type: "text", text: aPrompt }] })
@@ -549,6 +551,64 @@ ow.ai.__gpttypes.bedrock = {
                 toolChoice: { auto: {} }
               }
             }
+          }
+        } else if (aModel.indexOf("mistral.ministral-3-8b-instruct") >= 0 || aModel.indexOf("mistral.ministral-large") >= 0) {
+          // New Mistral message-based models (mistral.ministral-3-8b-instruct, mistral.ministral-large, etc.)
+          // These models use messages API format instead of the legacy prompt format
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: aPrompt })
+          }
+
+          var toTextForMistralMsg = function(content) {
+            if (isUnDef(content)) return ""
+            if (isString(content)) return content
+            if (isArray(content)) return content.map(toTextForMistralMsg).join("")
+            if (isMap(content)) {
+              if (isDef(content.text)) return content.text
+              if (isDef(content.generated_text)) return toTextForMistralMsg(content.generated_text)
+              if (isDef(content.outputText)) return toTextForMistralMsg(content.outputText)
+              if (isDef(content.output_text)) return toTextForMistralMsg(content.output_text)
+              if (isDef(content.value)) return isString(content.value) ? content.value : JSON.stringify(content.value)
+              if (isDef(content.content)) return toTextForMistralMsg(content.content)
+              if (isDef(content.message)) return toTextForMistralMsg(content.message)
+              return JSON.stringify(content)
+            }
+            return String(content)
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: String(m.role).toLowerCase(),
+            content: toTextForMistralMsg(m.content)
+          }))
+
+          _r.conversation = normalized
+
+          var messagesForAPI = normalized
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var mmi = messagesForAPI.length - 1; mmi >= 0; mmi--) {
+              if (messagesForAPI[mmi].role == "user" && isString(messagesForAPI[mmi].content)) {
+                messagesForAPI[mmi].content = messagesForAPI[mmi].content + ". answer in json."
+                break
+              }
+            }
+          }
+
+          _m = {
+            messages: messagesForAPI,
+            temperature: aTemperature
+          }
+
+          // Support Mistral message-based model parameters
+          if (isDef(aOptions.params.max_tokens)) {
+            _m.max_tokens = aOptions.params.max_tokens
+          }
+          if (isDef(aOptions.params.top_p)) {
+            _m.top_p = aOptions.params.top_p
+          }
+          if (isDef(aOptions.params.top_k)) {
+            _m.top_k = aOptions.params.top_k
           }
         } else if (aModel.indexOf("openai.") >= 0) {
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
@@ -742,6 +802,7 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
         } else if (aModel.indexOf("mistral.") >= 0) {
+          // Support for Mistral and Ministral models (mistral.mistral-7b, mistral.ministral-3b, mistral.ministral-8b, etc.)
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
           if (!Array.isArray(aPrompt) && aPrompt && aPrompt.length > 0) {
             baseConv = baseConv.concat({ role: "user", content: aPrompt })
@@ -816,6 +877,17 @@ ow.ai.__gpttypes.bedrock = {
             "prompt": promptText,
             "temperature": aTemperature
           }
+
+          // Support Mistral-specific parameters (max_tokens for Mistral/Ministral models)
+          if (isDef(aOptions.params.max_tokens)) {
+            _m.max_tokens = aOptions.params.max_tokens
+          }
+          if (isDef(aOptions.params.top_p)) {
+            _m.top_p = aOptions.params.top_p
+          }
+          if (isDef(aOptions.params.top_k)) {
+            _m.top_k = aOptions.params.top_k
+          }
         } else if (aModel.indexOf("meta.") >= 0) {
           //var msgs = []
           //msgs = _r.conversation.concat({role: "user", content: aPrompt })
@@ -832,9 +904,16 @@ ow.ai.__gpttypes.bedrock = {
         //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
         //$$(_m).set(aOptions.tempKey, aTemperature)
 
+        // Example configurations for different models:
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v1:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.nova-micro-v2:0', temperature: 0, params: (inferenceConfig: (max_new_tokens: 1024))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'amazon.titan-text-express-v1', temperature: 0, params: (textGenerationConfig: (maxTokenCount: 2048))))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'us.meta.llama3-2-3b-instruct-v1:0', temperature: 0, params: (max_gen_len: 2048) ))"
+        // Mistral Legacy (prompt format):
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.mistral-7b-instruct-v0:2', temperature: 0.7, params: (max_tokens: 1024, top_p: 0.9)))"
+        // Mistral Messages (newer format):
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.ministral-3-8b-instruct', temperature: 0.7, params: (max_tokens: 1024)))"
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.ministral-large-2407-v1:0', temperature: 0.7, params: (max_tokens: 2048)))"
 
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
@@ -845,6 +924,33 @@ ow.ai.__gpttypes.bedrock = {
         _captureStats(res, aModel)
         if (isDef(res.error)) return res
         var handledOpenAI = false
+        var handledMistralMessages = false
+
+        // Handle Mistral message-based models (similar to OpenAI format)
+        if (( aModel.match(/mistral\.ministral-3/) || aModel.match(/mistral\.mistral-large/) ) && isArray(res.choices)) {
+          handledMistralMessages = true
+          for (var mci = 0; mci < res.choices.length; mci++) {
+            var mchoice = res.choices[mci]
+            if (!isMap(mchoice)) continue
+            var mmessage = isMap(mchoice.message) ? mchoice.message : {}
+            var mstoredMessage = {}
+            try {
+              mstoredMessage = JSON.parse(JSON.stringify(mmessage))
+            } catch (mje) {
+              mstoredMessage = {
+                role: mmessage.role,
+                content: mmessage.content
+              }
+            }
+            if (!isString(mstoredMessage.role)) mstoredMessage.role = "assistant"
+            if (isUnDef(mstoredMessage.content)) mstoredMessage.content = ""
+            _r.conversation.push(mstoredMessage)
+
+            if (isString(mmessage.content) && mmessage.content.length > 0) {
+              cv.push(mmessage.content)
+            }
+          }
+        }
 
         if (aModel.indexOf("openai.") >= 0 && isArray(res.choices)) {
           handledOpenAI = true
@@ -922,6 +1028,14 @@ ow.ai.__gpttypes.bedrock = {
               }
             }
           }
+        }
+
+        if (handledMistralMessages) {
+          if (aJsonFlag) {
+            return cv.length > 0 ? cv.join("") : __
+          }
+          var finalText = cv.length > 0 ? cv.join("") : __
+          return finalText
         }
 
         if (handledOpenAI) {
