@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- lucene
+- search
+- vector
+- ann
+- embedding
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/Lucene.opack
+description: Lucene wrapper utilities and a minimal vector memory server for OpenAF
+name: Lucene
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20251204'
+dependencies:
+  openaf: '>=20251115'
+files:
+- .maven.yaml
+- .package.yaml
+- README.md
+- lucene-analyzers-common-8.11.4.jar
+- lucene-core-10.3.2.jar
+- lucene.js
+filesHash:
+  .maven.yaml: ff39fade49c405da1ef9a9af1f75f5245436cb17
+  README.md: 43159ab68caaa6f51a7020b1b22c156560d8c063
+  lucene-analyzers-common-8.11.4.jar: a74683594f32cb4d947b12fb6afc0a326b293952
+  lucene-core-10.3.2.jar: e46afe546d01bb56a87860ad60889945f29e7e51
+  lucene.js: ebfa6776df01914ba444ae1cec815e08fd0428c0

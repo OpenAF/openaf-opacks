@@ -1,0 +1,5 @@
+artifacts:
+- group  : org.apache.lucene
+  id     : lucene-core
+- group  : org.apache.lucene
+  id     : lucene-analyzers-common
