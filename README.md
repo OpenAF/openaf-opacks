@@ -38,6 +38,7 @@
   |**Jsoup**|<img src=".github/badges/Jsoup.svg"><br>Simple wrapper around the Java Jsoup library|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
+  |**Lucene**|<img src=".github/badges/Lucene.svg"><br>Lucene wrapper utilities and a minimal vector memory server for OpenAF|
   |**MDB**|<img src=".github/badges/MDB.svg"><br>Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
   |**MSBot**|<img src=".github/badges/MSBot.svg"><br>Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |**Mac**|<img src=".github/badges/Mac.svg"><br>Wrapper around Mac functionality.|
