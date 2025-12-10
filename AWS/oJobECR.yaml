@@ -7,20 +7,27 @@ include:
 #   opacks:
 #   - oJob-common
 #   - AWS
+#   - S3
 #   loadLibs:
 #   - aws.js
+#   - s3.js
 
 # todo:
-# - (httpdStart): 12345
+# - (httpdStart): 12233
 #   ((mapLibs )): true
-# - (ECRBrowse ): 12345
+# - (ECRBrowse ): 12233
 #   ((uri     )): /abc
 #   ((region  )): eu-west-1
 #   ((sortTab )): true
 #   ((incURI  )): true
+#   ((s3bucket)): content-bucket
+#   ((s3prefix)): content/registry
+#   ((cache   )): 15000
 #   ((options )):
 #     usePull : true
-#     registry: "registry.abc.com"
+#     #registry: "registry.abc.com"
+#     footer  : |
+#       Internal use only.
 
 jobs:
 # ------------------------
@@ -32,30 +39,43 @@ jobs:
       name  : ECRBrowse
       keyArg: port
       args  : 
-        accessKey : accessKey
-        secret    : secret
-        token     : token
-        region    : region
-        assumeRole: assumeRole
-        uri       : uri
-        path      : path
-        browse    : browse
-        logo      : logo
-        restrict  : restrict
-        incURI    : incURI
-        cache     : cache
-        sortTab   : sortTab
-        options   : options
+        accessKey  : accessKey
+        secret     : secret
+        token      : token
+        region     : region
+        assumeRole : assumeRole
+        uri        : uri
+        path       : path
+        browse     : browse
+        logo       : logo
+        restrict   : restrict
+        incURI     : incURI
+        cache      : cache
+        sortTab    : sortTab
+        options    : options
+        s3url      : s3url           # optional s3 url for static markdown description files
+        s3accesskey: s3accesskey     # optional s3 access key for static markdown description files
+        s3secret   : s3secret        # optional s3 secret for static markdown description files
+        s3region   : s3region        # optional s3 region for static markdown description files
+        s3bucket   : s3bucket        # optional s3 bucket containing static markdown description files
+        s3prefix   : s3prefix        # optional s3 prefix for static markdown description files
   exec : | #js
     args.options = merge(args.options, {
       showURI : args.incURI,
       sortTab : args.sortTab,
       logo    : args.logo,
       browse  : args.browse,
-      default : args.default
+      default : args.default,
+      s3url      : args.s3url,
+      s3accesskey: args.s3accesskey,
+      s3secret   : args.s3secret,
+      s3region   : args.s3region,
+      s3bucket   : args.s3bucket,
+      s3prefix   : args.s3prefix
     })
 
     loadLib("aws.js")
+    loadLib("s3.js")
     var aws = new AWS(args.accessKey, args.secret, args.token)
     if (isDef(args.assumeRole)) {
       log("Assuming role " + args.assumeRole + "...")
@@ -64,6 +84,30 @@ jobs:
 
     args.fns = {
       init   : () => {
+        $cache("ecr-desc")
+        .ttl(args.cache)
+        .fn(k => {
+          var _s3 
+          try {
+            _s3 = new S3(args.s3url, args.s3accesskey, args.s3secret, args.s3region)
+            var s3key = args.s3prefix + k.uri + ".md"
+            log(`Cache ECR description from s3://${args.s3bucket}/${s3key}...`)
+            var jstream = _s3.getObjectStream(args.s3bucket, s3key)
+            return af.fromInputStream2String(jstream)
+          } catch(ee) {
+            if (ee.message.indexOf("The specified key does not exist.") >= 0) {
+              logWarn("No description file found for " + k.uri)
+              return __
+            } else {
+              logWarn("Error initializing S3 client: " + ee.message)
+              return __
+            }
+          } finally {
+            _s3.close()
+          }
+        })
+        .create()
+
         $cache("ecr-imgs")
         .ttl(args.cache)
         .byDefault(true, __)
@@ -153,10 +197,21 @@ jobs:
           var _fields  = options.usePull ? [ "Repository Name", "# images", "# tags", "Last Push", "Last Pull" ] : [ "Repository Name", "# images", "# tags", "Last Push" ]
           var _aFields = options.usePull ? [ "left", "right", "right", "left", "left" ] : [ "left", "right", "right", "left" ]
 
+          // Check for markdown description in S3
+          var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
+          if (useMDDesc) {
+            mddesc = $cache("ecr-desc").get({ uri: puri })
+            if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
+              log(`No cached description found for image list ${puri}`)
+              useMDDesc = false
+            }
+          }
+
           return {
             isList: true,
             fields: _fields,
             alignFields: _aFields,
+            content: useMDDesc && isDef(mddesc.result) ? mddesc.result : __,
             key   : [ "Repository Name" ],
             list  : $from(lstParent).equals("level", level + 1).starts("name", puri + (level > 0 ? "/" : "")).pselect(f => {
               var c = f.isParent ? $from(lstParent).greater("level" ,level).starts("name", f.name + "/").count() : 0
@@ -198,22 +253,42 @@ jobs:
           var reg = _$(options.registry).default("")
           if (reg.length > 0) reg += "/"
 
+          // Check for markdown description in S3
+          var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
+          if (useMDDesc) {
+            mddesc = $cache("ecr-desc").get({ uri: puri })
+            if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
+              log(`No cached description found for image ${puri}`)
+              useMDDesc = false
+            }
+          }
+
           data = "\n"
           data += "## Contents\n\n"
+          if (useMDDesc) {
+            var s3key = options.s3prefix + puri + ".md"
+            data += "* [📰 Description](#📰-description)\n"
+          }
           data += "* [🏷️ Details per tag](#🏷️-details-per-tag)\n"
           data += "* [💾 How to retrieve each](#💾-how-to-retrieve-each)\n"
           data += "* [🔎 Manifest and artifact types per tag](#🔎-manifest-and-artifact-types-per-tag)\n"
           data += "\n---\n"
 
+          if (useMDDesc) {
+            data += "### 📰 Description\n\n"
+            data += mddesc.result
+            data += "\n---\n"
+          }
+
           data += "### 🏷️ Details per tag\n\n"
-          data += options.usePull ? "| Tag | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Pushed at | Size | Size in bytes |\n"
-          data += options.usePull ? "|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---|----:|----:|\n"
+          data += options.usePull ? "| Tag | Digest | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Digest | Pushed at | Size | Size in bytes |\n"
+          data += options.usePull ? "|:---:|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---:|:---|----:|----:|\n"
           $from(img).sort("-imagePushedAt").select(i => { 
             var _ref = isDef(i.imageTags) ? reg + puri + ":" + i.imageTags[0] : reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
             if (options.usePull)
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
             else
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
+              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
           })
 
           data += "\n---\n\n### 💾 How to retrieve each\n\n"
