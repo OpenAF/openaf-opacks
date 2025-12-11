@@ -2,32 +2,32 @@ include:
 - oJobHTTPd.yaml
 - oJobBrowse.yaml
 
-# ojob:
-#   daemon: true
-#   opacks:
-#   - oJob-common
-#   - AWS
-#   - S3
-#   loadLibs:
-#   - aws.js
-#   - s3.js
-
-# todo:
-# - (httpdStart): 12233
-#   ((mapLibs )): true
-# - (ECRBrowse ): 12233
-#   ((uri     )): /abc
-#   ((region  )): eu-west-1
-#   ((sortTab )): true
-#   ((incURI  )): true
-#   ((s3bucket)): content-bucket
-#   ((s3prefix)): content/registry
-#   ((cache   )): 15000
-#   ((options )):
-#     usePull : true
-#     #registry: "registry.abc.com"
-#     footer  : |
-#       Internal use only.
+#ojob:
+#  daemon: true
+#  opacks:
+#  - oJob-common
+#  - AWS
+#  - S3
+#  loadLibs:
+#  - aws.js
+#  - s3.js
+#
+#todo:
+#- (httpdStart): 12233
+#  ((mapLibs )): true
+#- (ECRBrowse ): 12233
+#  ((uri     )): /abc
+#  ((region  )): eu-west-1
+#  ((sortTab )): true
+#  ((incURI  )): true
+#  ((s3bucket)): content-bucket
+#  ((s3prefix)): content/registry/
+#  ((cache   )): 15000
+#  ((options )):
+#    usePull : true
+#    #registry: "registry.abc.com"
+#    footer  : |
+#      Internal use only.
 
 jobs:
 # ------------------------
@@ -103,7 +103,7 @@ jobs:
               return __
             }
           } finally {
-            _s3.close()
+            if (isDef(_s3)) _s3.close()
           }
         })
         .create()
@@ -245,7 +245,7 @@ jobs:
         do {
           img = $cache("ecr-imgs").get({ image: puri })
           sleep(100, true)
-        } while(isUnDef(img) && now() - ini < 3500)
+        } while(isUnDef(img) && now() - ini < 15000)
 
         if (isUnDef(img))
           data = "**Problem retrieving image data**"

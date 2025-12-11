@@ -38,6 +38,31 @@ dependencies:
   OpenAF: '>=20250315'
 files:
 - .odoc.db
+- .openaf_precompiled/.t8-20251210
+- .openaf_precompiled/aws_athena_js.class
+- .openaf_precompiled/aws_bedrock_js.class
+- .openaf_precompiled/aws_cloudwatch_js.class
+- .openaf_precompiled/aws_codeartifact_js.class
+- .openaf_precompiled/aws_cognito_js.class
+- .openaf_precompiled/aws_core_js.class
+- .openaf_precompiled/aws_cost_js.class
+- .openaf_precompiled/aws_dynamo_js.class
+- .openaf_precompiled/aws_ec2_js.class
+- .openaf_precompiled/aws_ecr_js.class
+- .openaf_precompiled/aws_ecs_js.class
+- .openaf_precompiled/aws_eks_js.class
+- .openaf_precompiled/aws_events_js.class
+- .openaf_precompiled/aws_iam_js.class
+- .openaf_precompiled/aws_js.class
+- .openaf_precompiled/aws_lambda_js.class
+- .openaf_precompiled/aws_organizations_js.class
+- .openaf_precompiled/aws_pi_js.class
+- .openaf_precompiled/aws_rds_js.class
+- .openaf_precompiled/aws_route53_js.class
+- .openaf_precompiled/aws_scheduler_js.class
+- .openaf_precompiled/aws_secrets_js.class
+- .openaf_precompiled/aws_sqs_js.class
+- .openaf_precompiled/aws_sts_js.class
 - .package.yaml
 - .precompile
 - aws.js
@@ -72,6 +97,31 @@ files:
 - utils/testRegions.js
 filesHash:
   .odoc.db: d5a5f51a432d83d9b76628e0466d25d8d43e20fe
+  .openaf_precompiled/.t8-20251210: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/aws_athena_js.class: 80a82e3b4cab2ddaa1aba0390b105b1b4639ae92
+  .openaf_precompiled/aws_bedrock_js.class: c2c4618c457de6df1e6f066d131da3adaf3f2725
+  .openaf_precompiled/aws_cloudwatch_js.class: c9c28a7bf74fbf26e27141bb626a0c0ee2d88979
+  .openaf_precompiled/aws_codeartifact_js.class: 0d859e5bca3cc6788049ce8a33bc15253b2932e0
+  .openaf_precompiled/aws_cognito_js.class: ee044b95c048b4fd82c12e8cd6d6104de44ee83a
+  .openaf_precompiled/aws_core_js.class: e5d4066b0b2e707182b10a513721109568085ecc
+  .openaf_precompiled/aws_cost_js.class: e49fc54779fc97fd4c2fdabbc5ad4f8e5bee305e
+  .openaf_precompiled/aws_dynamo_js.class: d487c01346c1f78b20dc1d48583de03632c2230d
+  .openaf_precompiled/aws_ec2_js.class: 335b9b66b295a772f1a5b45a4704db67e4eee555
+  .openaf_precompiled/aws_ecr_js.class: db6ba525adf8cbd2dd5f0a337fc6831c08bbfb6f
+  .openaf_precompiled/aws_ecs_js.class: 00eb68f51741063908873ffbd6b42d9a16f97e3c
+  .openaf_precompiled/aws_eks_js.class: b7cf28ba2f504d8e570be62b248b56956645dfa4
+  .openaf_precompiled/aws_events_js.class: dc164e75d77609f06f57a2c12f72516c58dc4703
+  .openaf_precompiled/aws_iam_js.class: 47fdb03feacf4ade387a48c08ae9eeeefe6ee102
+  .openaf_precompiled/aws_js.class: 9d78a94a58f9e9c1e16365abe90df791cfe2d66f
+  .openaf_precompiled/aws_lambda_js.class: b7bd398e02b82170dd8d0310929a37903d55f9b9
+  .openaf_precompiled/aws_organizations_js.class: 53b3094622c85e2aa741b42ea9dc92e59d833cc6
+  .openaf_precompiled/aws_pi_js.class: db03d21721d63a30c37a734f330f2227a7da0acf
+  .openaf_precompiled/aws_rds_js.class: f0d3c8e943dfff287dd0e98d1ae94ba5b60b71ab
+  .openaf_precompiled/aws_route53_js.class: 4e8242401b1178a6b26d0e1c650e4ba3447dd6ea
+  .openaf_precompiled/aws_scheduler_js.class: 5972fde2d3a63939c00fea2bafb5a1dd204de185
+  .openaf_precompiled/aws_secrets_js.class: 27d946e5b74d4b3430438a3e7d554ad8d621984d
+  .openaf_precompiled/aws_sqs_js.class: 97d5b3e27f10edb19adb19d512839b432d90aabc
+  .openaf_precompiled/aws_sts_js.class: 3ab986d865f1962f235f01835470c38d5d1f29ad
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
@@ -98,7 +148,7 @@ filesHash:
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
-  oJobECR.yaml: 0aea11cb68506f2ff1875b7eb6173e84f6e0548c
+  oJobECR.yaml: 0c6afcc8a3997436e9486c5cdcf8d2517ff29b5c
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
