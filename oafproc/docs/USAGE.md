@@ -109,6 +109,7 @@ List of data input types that can be auto-detected (through the file extension o
 | snmp | A SNMP device source |
 | sql | One or more SQLs statements to AST (Abstract Syntax Tree) or beautified SQL |
 | toml | TOML format |
+| toon | TOON format |
 | xls | A XLSx compatible file (requires file=abc.xlsx) |
 | xml | An XML format (auto-detected) |
 | yaml | A YAML format (auto-detected) |
@@ -223,6 +224,7 @@ List of available formats to use with the _output_ option:
 | template | A Handlebars template format |
 | text | A string text format |
 | toml | A TOML format (arrays will have outkey=list) |
+| toon | A TOON format |
 | tree | A tree-like format |
 | xls | A XLSx output format |
 | xml | An XML format |

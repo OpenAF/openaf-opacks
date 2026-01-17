@@ -1262,7 +1262,7 @@ var _transformFns = {
             res = res.withContext(shouldStr ? stringify(_r,__,true) : _r, (isDef(params.llmcontext) ? params.llmcontext : `${type} input data`))
             if (isString(params.out)) {
                 if (params.out == "md" || params.out == "mdtable" || params.out == "raw") {
-                    cprint(res.getGPT().getConversation())
+                    //cprint(res.getGPT().getConversation())
                     let _res = res.prompt(params.llmprompt)
                     if (isDef(params.llmconversation)) io.writeFileJSON( params.llmconversation, res.getGPT().getConversation(), "" )
                     return _res
@@ -1686,6 +1686,9 @@ var _outputFns = new Map([
         _o$o(r, options)
     }],
     ["clkyaml", (r, options) => {
+        _o$o(r, options)
+    }],
+    ["toon", (r, options) => {
         _o$o(r, options)
     }],
     ["cjson", (r, options) => {
@@ -3895,6 +3898,11 @@ var _inputFns = new Map([
         _showTmpMsg()
         if (isUnDef(af.fromTOML)) _exit(-1, "TOML support not found.")
         _$o(af.fromTOML(_res), options)
+    }],
+    ["toon", (_res, options) => {
+        _showTmpMsg()
+        if (isUnDef(af.fromTOON)) _exit(-1, "TOON support not found.")
+        _$o(af.fromTOON(_res), options)
     }],
     ["slon", (_res, options) => {
         _showTmpMsg()
