@@ -1642,29 +1642,89 @@ ow.ai.__gpttypes.bedrock = {
         }
         aOnDelta = _$(aOnDelta, "aOnDelta").default(__)
 
+        // Resolve tools that should be exposed to the model and keep a lookup by name
+        var toolRegistry = {}
+        Object.keys(_r.tools).forEach(name => {
+          if (isMap(_r.tools[name])) toolRegistry[name] = _r.tools[name]
+        })
+
+        var sanitizeToolSchema = function(schema, forNova) {
+          if (!isMap(schema)) return schema
+          var sanitized = schema
+          try {
+            sanitized = JSON.parse(JSON.stringify(schema))
+          } catch (je) { }
+
+          if (isDef(sanitized.required) && !isArray(sanitized.required)) {
+            if (isMap(sanitized.required)) {
+              sanitized.required = Object.keys(sanitized.required)
+            } else if (isString(sanitized.required)) {
+              sanitized.required = [sanitized.required]
+            } else {
+              delete sanitized.required
+            }
+          }
+
+          // For Nova models, remove empty required array - let the model infer from the schema
+          if (forNova && isArray(sanitized.required) && sanitized.required.length == 0) {
+            delete sanitized.required
+          }
+
+          if (!forNova && isArray(sanitized.required) && sanitized.required.length == 0) delete sanitized.required
+          delete sanitized.$schema
+          delete sanitized.$id
+          delete sanitized.definitions
+          return sanitized
+        }
+
+        var toolsToUse = []
+        var addTool = function(tool, fallbackName) {
+          if (isUnDef(tool) && isString(fallbackName) && isMap(toolRegistry[fallbackName])) {
+            tool = toolRegistry[fallbackName]
+          }
+          if (!isMap(tool)) return
+          var toolName = fallbackName
+          if (isMap(tool.function) && isString(tool.function.name)) toolName = tool.function.name
+          if (!isString(toolName)) return
+
+          if (!isMap(toolRegistry[toolName])) toolRegistry[toolName] = tool
+          var finalTool = toolRegistry[toolName]
+          if (!isMap(finalTool) || !isMap(finalTool.function)) return
+
+          if (toolsToUse.filter(t => isMap(t.function) && t.function.name === toolName).length == 0) {
+            toolsToUse.push(finalTool)
+          }
+        }
+
+        if (isArray(aTools)) {
+          aTools.forEach(tool => {
+            if (isString(tool)) {
+              addTool(toolRegistry[tool], tool)
+            } else if (isMap(tool)) {
+              addTool(tool, tool.name)
+            }
+          })
+        } else if (isMap(aTools)) {
+          Object.keys(aTools).forEach(name => {
+            addTool(toolRegistry[name], name)
+            addTool(aTools[name], name)
+          })
+        } else {
+          Object.keys(toolRegistry).forEach(name => addTool(toolRegistry[name], name))
+        }
+
+        // Ensure tool functions are reachable by name
+        toolsToUse.forEach(function(tool) {
+          if (!isMap(tool) || !isMap(tool.function)) return
+          var toolName = tool.function.name
+          if (!isString(toolName)) return
+          if (isDef(tool.function.func) && isUnDef(tool.fn)) tool.fn = tool.function.func
+          if (isDef(tool.fn)) toolRegistry[toolName] = tool
+        })
+
         // Build input using existing logic from rawPrompt
         // This reuses the same message normalization for all model families
         var _m = {}
-
-        // Check if we have tools
-        if (isDef(aTools)) {
-          if (isArray(aTools)) {
-            aTools.forEach(function(tool) {
-              if (isDef(tool.function)) {
-                var toolName = tool.function.name
-                if (isDef(tool.function.func)) {
-                  if (!isMap(_r.tools)) _r.tools = {}
-                  _r.tools[toolName] = tool.function.func
-                }
-              }
-            })
-          } else if (isMap(aTools)) {
-            Object.keys(aTools).forEach(function(toolName) {
-              if (!isMap(_r.tools)) _r.tools = {}
-              _r.tools[toolName] = aTools[toolName]
-            })
-          }
-        }
 
         // Add prompt to conversation if it's a string
         if (isString(aPrompt) && aPrompt.length > 0) {
@@ -1730,24 +1790,23 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           // Add tools if configured
-          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
+          if (toolsToUse.length > 0) {
             var toolConfig = []
-            Object.keys(_r.tools).forEach(function(toolName) {
-              var tool = _r.tools[toolName]
-              if (isDef(tool.schema)) {
+            toolsToUse.forEach(function(tool) {
+              if (isDef(tool) && isDef(tool.function)) {
                 toolConfig.push({
                   toolSpec: {
-                    name: toolName,
-                    description: tool.description || "",
+                    name: tool.function.name,
+                    description: tool.function.description || "",
                     inputSchema: {
-                      json: tool.schema
+                      json: sanitizeToolSchema(tool.function.parameters, true)
                     }
                   }
                 })
               }
             })
             if (toolConfig.length > 0) {
-              _m.toolConfig = { tools: toolConfig }
+              _m.toolConfig = { tools: toolConfig, toolChoice: { auto: {} } }
             }
           }
         } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
@@ -1782,21 +1841,14 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           // Add tools if configured
-          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
-            var tools = []
-            Object.keys(_r.tools).forEach(function(toolName) {
-              var tool = _r.tools[toolName]
-              if (isDef(tool.schema)) {
-                tools.push({
-                  name: toolName,
-                  description: tool.description || "",
-                  input_schema: tool.schema
-                })
-              }
-            })
-            if (tools.length > 0) {
-              _m.tools = tools
-            }
+          if (toolsToUse.length > 0) {
+            _m.tools = toolsToUse
+              .filter(tool => isDef(tool) && isDef(tool.function))
+              .map(tool => ({
+                name: tool.function.name,
+                description: tool.function.description || "",
+                input_schema: sanitizeToolSchema(tool.function.parameters, false)
+              }))
           }
         } else if (aModel.indexOf("openai.") >= 0) {
           // OpenAI format
@@ -1815,24 +1867,17 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           // Add tools if configured
-          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
-            var tools = []
-            Object.keys(_r.tools).forEach(function(toolName) {
-              var tool = _r.tools[toolName]
-              if (isDef(tool.schema)) {
-                tools.push({
-                  type: "function",
-                  function: {
-                    name: toolName,
-                    description: tool.description || "",
-                    parameters: tool.schema
-                  }
-                })
-              }
-            })
-            if (tools.length > 0) {
-              _m.tools = tools
-            }
+          if (toolsToUse.length > 0) {
+            _m.tools = toolsToUse
+              .filter(tool => isDef(tool) && isDef(tool.function))
+              .map(tool => ({
+                type: "function",
+                function: {
+                  name: tool.function.name,
+                  description: tool.function.description || "",
+                  parameters: sanitizeToolSchema(tool.function.parameters)
+                }
+              }))
           }
         } else if (aModel.indexOf("mistral.") >= 0) {
           // Mistral format (supports both legacy prompt and messages)
@@ -1939,12 +1984,65 @@ ow.ai.__gpttypes.bedrock = {
 
         if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream'}, {_t:nowNano(),_f:'llm-stream', content: fullContent, events: events.length})
 
-        // Update conversation history (only if content is non-empty)
-        if (fullContent.length > 0) {
-          _r.conversation.push({
+        var toolResultToText = function(value) {
+          if (isString(value)) return value
+          if (isNumber(value) || isBoolean(value)) return String(value)
+          if (isArray(value) || isMap(value)) {
+            try {
+              return JSON.stringify(value)
+            } catch (je) {
+              return String(value)
+            }
+          }
+          if (isUnDef(value)) return ""
+          return String(value)
+        }
+
+        var normalizeOpenAIToolCalls = function(calls) {
+          var byIndex = {}
+          calls.forEach(c => {
+            if (!isMap(c)) return
+            var idx = isNumber(c.index) ? c.index : (isString(c.id) ? c.id : __)
+            if (isUnDef(idx)) idx = Object.keys(byIndex).length
+            if (isUnDef(byIndex[idx])) {
+              byIndex[idx] = {
+                id: c.id,
+                type: c.type,
+                function: { name: "", arguments: "" }
+              }
+            }
+            var entry = byIndex[idx]
+            if (isDef(c.id)) entry.id = c.id
+            if (isDef(c.type)) entry.type = c.type
+            if (isMap(c.function)) {
+              if (isDef(c.function.name)) entry.function.name = c.function.name
+              if (isDef(c.function.arguments)) entry.function.arguments += c.function.arguments
+            }
+          })
+          return Object.keys(byIndex)
+            .sort((a, b) => Number(a) - Number(b))
+            .map(k => byIndex[k])
+        }
+
+        var normalizedToolCalls = toolCalls
+        if (toolCalls.length > 0 && (aModel.indexOf("openai.") >= 0 || aModel.indexOf("mistral.") >= 0)) {
+          normalizedToolCalls = normalizeOpenAIToolCalls(toolCalls)
+        }
+
+        // Update conversation history
+        if (fullContent.length > 0 || normalizedToolCalls.length > 0) {
+          var storedMessage = {
             role: "assistant",
             content: fullContent
-          })
+          }
+          if (normalizedToolCalls.length > 0) {
+            if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("mistral.") >= 0) {
+              storedMessage.tool_calls = normalizedToolCalls
+            } else if (fullContent.length == 0) {
+              storedMessage.content = normalizedToolCalls
+            }
+          }
+          _r.conversation.push(storedMessage)
         }
 
         // Capture stats from streaming events
@@ -1975,12 +2073,115 @@ ow.ai.__gpttypes.bedrock = {
           events: events
         }
 
-        if (toolCalls.length > 0) {
-          response.toolCalls = toolCalls
+        if (normalizedToolCalls.length > 0) {
+          response.toolCalls = normalizedToolCalls
         }
 
         if (isDef(finishReason)) {
           response.finishReason = finishReason
+        }
+
+        // Execute tools if tool calls are present, then continue the conversation
+        if (normalizedToolCalls.length > 0) {
+          var toolResultsToAdd = []
+          var hasToolCalls = false
+
+          normalizedToolCalls.forEach(function(tc) {
+            var toolName = __
+            var toolInput = __
+            var toolCallId = __
+
+            if (isMap(tc) && isMap(tc.function)) {
+              toolName = tc.function.name
+              toolCallId = isString(tc.id) ? tc.id : toolName
+              toolInput = tc.function.arguments
+              if (isString(toolInput)) {
+                try { toolInput = JSON.parse(toolInput) } catch (pe) { }
+              }
+            } else if (isMap(tc) && (isDef(tc.toolUse) || tc.type == "tool_use" || tc.type == "toolUse")) {
+              var tu = tc.toolUse || tc
+              toolName = tu.name
+              toolInput = tu.input
+              toolCallId = tu.toolUseId || tu.tool_use_id || tu.id
+            }
+
+            if (!isString(toolName)) return
+            hasToolCalls = true
+
+            var tool = toolRegistry[toolName] || _r.tools[toolName]
+            var toolFn = isDef(tool) ? (tool.fn || (isMap(tool.function) ? tool.function.func : __)) : __
+            var toolResult
+            try {
+              if (isFunction(toolFn)) {
+                toolResult = toolFn(toolInput)
+              } else {
+                toolResult = "Tool " + toolName + " is not available."
+              }
+              var toolContent = toolResultToText(toolResult)
+              if (isUnDef(toolCallId)) toolCallId = toolName
+
+              if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                toolResultsToAdd.push({
+                  type: "tool_result",
+                  tool_use_id: toolCallId,
+                  content: toolContent
+                })
+              } else if (aModel.indexOf("amazon.nova-") >= 0) {
+                toolResultsToAdd.push({
+                  toolResult: {
+                    toolUseId: toolCallId,
+                    content: [{ text: toolContent }],
+                    status: "success"
+                  }
+                })
+              } else {
+                toolResultsToAdd.push({
+                  role: "tool",
+                  content: toolContent,
+                  tool_call_id: toolCallId
+                })
+              }
+            } catch (te) {
+              var errContent = "Error executing tool: " + te.message
+              if (isUnDef(toolCallId)) toolCallId = toolName
+              if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+                toolResultsToAdd.push({
+                  type: "tool_result",
+                  tool_use_id: toolCallId,
+                  content: errContent
+                })
+              } else if (aModel.indexOf("amazon.nova-") >= 0) {
+                toolResultsToAdd.push({
+                  toolResult: {
+                    toolUseId: toolCallId,
+                    content: [{ text: errContent }],
+                    status: "error"
+                  }
+                })
+              } else {
+                toolResultsToAdd.push({
+                  role: "tool",
+                  content: errContent,
+                  tool_call_id: toolCallId
+                })
+              }
+            }
+          })
+
+          if (hasToolCalls && toolResultsToAdd.length > 0) {
+            if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0 || aModel.indexOf("amazon.nova-") >= 0) {
+              _r.conversation.push({
+                role: "user",
+                content: toolResultsToAdd
+              })
+            } else {
+              toolResultsToAdd.forEach(function(tr) {
+                _r.conversation.push(tr)
+              })
+            }
+
+            return _r.rawPromptStream(_r.conversation, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
+          }
         }
 
         return response
