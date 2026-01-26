@@ -1760,16 +1760,24 @@ ow.ai.__gpttypes.bedrock = {
           var messages = []
           var systemPrompts = []
 
+          var toNovaTextParts = function(content) {
+            if (isUnDef(content)) return []
+            if (isString(content)) return [{ text: content }]
+            if (isArray(content)) {
+              return content.map(c => {
+                if (isMap(c) && isString(c.text)) return { text: c.text }
+                return { text: isString(c) ? c : JSON.stringify(c) }
+              })
+            }
+            if (isMap(content) && isString(content.text)) return [{ text: content.text }]
+            return [{ text: JSON.stringify(content) }]
+          }
+
           _r.conversation.forEach(function(msg) {
             if (msg.role == "system") {
-              systemPrompts.push({ text: msg.content })
+              toNovaTextParts(msg.content).forEach(p => systemPrompts.push(p))
             } else {
-              var content = []
-              if (isString(msg.content)) {
-                content.push({ text: msg.content })
-              } else if (isArray(msg.content)) {
-                content = msg.content
-              }
+              var content = toNovaTextParts(msg.content)
               messages.push({
                 role: msg.role,
                 content: content
@@ -1777,8 +1785,24 @@ ow.ai.__gpttypes.bedrock = {
             }
           })
 
+          var messagesForAPI = messages
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(messages))
+            for (var nvi = messagesForAPI.length - 1; nvi >= 0; nvi--) {
+              if (messagesForAPI[nvi].role == "user" && isArray(messagesForAPI[nvi].content)) {
+                for (var nci = messagesForAPI[nvi].content.length - 1; nci >= 0; nci--) {
+                  if (isMap(messagesForAPI[nvi].content[nci]) && isDef(messagesForAPI[nvi].content[nci].text)) {
+                    messagesForAPI[nvi].content[nci].text = messagesForAPI[nvi].content[nci].text + ". answer in json."
+                    break
+                  }
+                }
+                break
+              }
+            }
+          }
+
           _m = {
-            messages: messages,
+            messages: messagesForAPI,
             schemaVersion: "messages-v1",
             inferenceConfig: {
               temperature: aTemperature
@@ -1812,11 +1836,25 @@ ow.ai.__gpttypes.bedrock = {
         } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
           // Claude/Anthropic format
           var messages = []
-          var systemPrompt = ""
+          var systemPromptParts = []
+
+          var toAnthropicText = function(content) {
+            if (isUnDef(content)) return ""
+            if (isString(content)) return content
+            if (isArray(content)) {
+              return content.map(c => {
+                if (isMap(c) && isString(c.text)) return c.text
+                return isString(c) ? c : JSON.stringify(c)
+              }).join("")
+            }
+            if (isMap(content) && isString(content.text)) return content.text
+            return JSON.stringify(content)
+          }
 
           _r.conversation.forEach(function(msg) {
             if (msg.role == "system") {
-              systemPrompt = msg.content
+              var sp = toAnthropicText(msg.content)
+              if (sp.length > 0) systemPromptParts.push(sp)
             } else {
               var content = msg.content
               if (isString(content)) {
@@ -1829,13 +1867,30 @@ ow.ai.__gpttypes.bedrock = {
             }
           })
 
+          var messagesForAPI = messages
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(messages))
+            for (var aci = messagesForAPI.length - 1; aci >= 0; aci--) {
+              if (messagesForAPI[aci].role == "user" && isArray(messagesForAPI[aci].content)) {
+                for (var acci = messagesForAPI[aci].content.length - 1; acci >= 0; acci--) {
+                  if (isMap(messagesForAPI[aci].content[acci]) && messagesForAPI[aci].content[acci].type == "text") {
+                    messagesForAPI[aci].content[acci].text = messagesForAPI[aci].content[acci].text + ". answer in json."
+                    break
+                  }
+                }
+                break
+              }
+            }
+          }
+
           _m = {
-            messages: messages,
+            messages: messagesForAPI,
             anthropic_version: "bedrock-2023-05-31",
             max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096),
             temperature: aTemperature
           }
 
+          var systemPrompt = systemPromptParts.join("\n")
           if (systemPrompt.length > 0) {
             _m.system = systemPrompt
           }
@@ -1860,8 +1915,19 @@ ow.ai.__gpttypes.bedrock = {
             })
           })
 
+          var messagesForAPI = messages
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(messages))
+            for (var oi = messagesForAPI.length - 1; oi >= 0; oi--) {
+              if (messagesForAPI[oi].role == "user" && isString(messagesForAPI[oi].content)) {
+                messagesForAPI[oi].content = messagesForAPI[oi].content + ". answer in json."
+                break
+              }
+            }
+          }
+
           _m = {
-            messages: messages,
+            messages: messagesForAPI,
             temperature: aTemperature,
             max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
           }
@@ -1902,8 +1968,18 @@ ow.ai.__gpttypes.bedrock = {
                 content: msg.content
               })
             })
+            var messagesForAPI = messages
+            if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+              messagesForAPI = JSON.parse(JSON.stringify(messages))
+              for (var mi = messagesForAPI.length - 1; mi >= 0; mi--) {
+                if (messagesForAPI[mi].role == "user" && isString(messagesForAPI[mi].content)) {
+                  messagesForAPI[mi].content = messagesForAPI[mi].content + ". answer in json."
+                  break
+                }
+              }
+            }
             _m = {
-              messages: messages,
+              messages: messagesForAPI,
               temperature: aTemperature,
               max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
             }
