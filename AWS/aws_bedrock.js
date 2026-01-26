@@ -2114,6 +2114,11 @@ ow.ai.__gpttypes.bedrock = {
           if (normalizedToolCalls.length > 0) {
             if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("mistral.") >= 0) {
               storedMessage.tool_calls = normalizedToolCalls
+            } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0 || aModel.indexOf("amazon.nova-") >= 0) {
+              var contentParts = []
+              if (fullContent.length > 0) contentParts.push({ type: "text", text: fullContent })
+              normalizedToolCalls.forEach(tc => contentParts.push(tc))
+              storedMessage.content = contentParts
             } else if (fullContent.length == 0) {
               storedMessage.content = normalizedToolCalls
             }
