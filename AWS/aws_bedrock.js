@@ -78,6 +78,150 @@ AWS.prototype.BEDROCK_InvokeModel = function(aRegion, aModelId, aInput) {
   return res
 }
 
+/**
+ * <odoc>
+ * <key>AWS.BEDROCK_InvokeModelStream(aRegion, aModelId, aInput, aOnChunk) : Map</key>
+ * Given aRegion, aModelId, aInput and aOnChunk callback, will invoke the specified model with streaming
+ * and call aOnChunk(decodedChunk, rawEvent) for each chunk. Returns {events: Array} with all events.
+ * </odoc>
+ */
+AWS.prototype.BEDROCK_InvokeModelStream = function(aRegion, aModelId, aInput, aOnChunk) {
+  aRegion = _$(aRegion, "aRegion").isString().default(this.region)
+  _$(aModelId, "aModelId").isString().$_()
+  _$(aInput, "aInput").$_()
+  _$(aOnChunk, "aOnChunk").isFunction().$_()
+
+  var uri = "/model/" + encodeURIComponent(aModelId) + "/invoke-with-response-stream"
+  var aURL = "https://bedrock-runtime." + aRegion + ".amazonaws.com/model/" + encodeURIComponent(aModelId) + "/invoke-with-response-stream"
+  var url = new java.net.URL(aURL)
+  var aHost = String(url.getHost())
+  var aURI = String(url.getPath())
+
+  var payload = stringify(aInput, __, "")
+  var headers = this.__getRequest("post", aURI, "bedrock", aHost, aRegion, "", payload, __, __, 'application/json')
+
+  // Add required headers for streaming
+  headers["Content-Type"] = "application/json"
+  headers["Accept"] = "application/vnd.amazon.eventstream"
+
+  // Create HTTP connection with streaming enabled
+  ow.loadObj()
+  var events = []
+  var streamError
+  var rstream
+
+  try {
+    // Create http object with delayBuild to control exception handling
+    var h = new ow.obj.http(aURL, "POST", payload, headers, false, 30000, true, {delayBuild: true})
+    h.setThrowExceptions(false)
+
+    // Build the client
+    if (isDef(h.client.build)) {
+      h.client = h.client.build()
+    }
+
+    // Now execute the request
+    h.exec(aURL, "POST", payload, headers, false, 30000, true)
+
+    // Check response code
+    var responseCode = h.responseCode()
+    if (responseCode != 200) {
+      // Read error response
+      var errorBody = h.response()
+      return {
+        error: "HTTP " + responseCode + ": " + errorBody,
+        events: []
+      }
+    }
+
+    // Get the response stream
+    rstream = h.responseStream()
+    if (isUnDef(rstream)) {
+      return {
+        error: "Failed to get response stream",
+        events: []
+      }
+    }
+
+    // Process event stream incrementally
+    // AWS Bedrock uses binary eventstream format, so we parse the framing as bytes
+    try {
+      var pending = []
+      var readUInt32BE = (arr, idx) => {
+        return (((arr[idx] & 0xff) << 24) | ((arr[idx + 1] & 0xff) << 16) | ((arr[idx + 2] & 0xff) << 8) | (arr[idx + 3] & 0xff)) >>> 0
+      }
+
+      var processPending = () => {
+        while (pending.length >= 12) {
+          var totalLen = readUInt32BE(pending, 0)
+          if (totalLen < 16) {
+            pending = []
+            return
+          }
+          if (pending.length < totalLen) return
+
+          var headersLen = readUInt32BE(pending, 4)
+          var payloadStart = 12 + headersLen
+          var payloadLen = totalLen - headersLen - 16
+
+          if (payloadLen >= 0 && (payloadStart + payloadLen) <= pending.length) {
+            var payloadBytes = pending.slice(payloadStart, payloadStart + payloadLen)
+            var payloadStr = af.fromBytes2String(af.fromArray2Bytes(payloadBytes))
+
+            try {
+              var payload = jsonParse(payloadStr)
+              if (isDef(payload.bytes)) {
+                var decodedBytes = af.fromBytes2String(af.fromBase64(payload.bytes))
+                var chunk = jsonParse(decodedBytes)
+
+                events.push(chunk)
+
+                if (isDef(aOnChunk)) {
+                  try {
+                    aOnChunk(chunk, payload)
+                  } catch(callbackError) {
+                    // Log but don't fail
+                  }
+                }
+              }
+            } catch(parseError) {
+              // Skip unparseable chunks
+            }
+          }
+
+          pending = pending.slice(totalLen)
+        }
+      }
+
+      ioStreamReadBytes(rstream, (buffer) => {
+        for (var i = 0; i < buffer.length; i++) {
+          pending.push(buffer[i])
+        }
+        processPending()
+      })
+    } catch(readError) {
+      streamError = "Error reading stream: " + String(readError)
+    } finally {
+      // Always close the stream
+      try {
+        rstream.close()
+      } catch(closeError) {
+        // Ignore close errors
+      }
+    }
+  } catch(httpError) {
+    streamError = "HTTP error: " + String(httpError)
+  }
+
+  if (isDef(streamError)) {
+    return { error: streamError, events: events }
+  }
+
+  return {
+    events: events
+  }
+}
+
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
@@ -114,6 +258,10 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(aResponse.usage.inputTokens)) tokens.prompt = aResponse.usage.inputTokens
         if (isDef(aResponse.usage.outputTokens)) tokens.completion = aResponse.usage.outputTokens
         if (isDef(aResponse.usage.totalTokens)) tokens.total = aResponse.usage.totalTokens
+        // Calculate total if not provided
+        if (isUnDef(tokens.total) && isDef(tokens.prompt) && isDef(tokens.completion)) {
+          tokens.total = tokens.prompt + tokens.completion
+        }
         // Also handle alternative token field names (snake_case for OpenAI/Mistral)
         if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
         if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
@@ -1314,6 +1462,643 @@ ow.ai.__gpttypes.bedrock = {
         var response = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, aTools)
         return { response: response, stats: _r.getLastStats() }
       },
+
+      // ---- Streaming Functions ----
+
+      /**
+       * Helper function to extract text delta from streaming chunks
+       * @param {Object} chunk - The decoded chunk from the stream
+       * @param {String} aModel - The model ID to determine parsing strategy
+       * @returns {String|undefined} - The text content or undefined if no content
+       */
+      _extractStreamingDelta: (chunk, aModel) => {
+        // Claude/Anthropic streaming format
+        if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+          if (chunk.type == "content_block_delta" && isDef(chunk.delta) && isDef(chunk.delta.text)) {
+            return chunk.delta.text
+          }
+          return __
+        }
+
+        // Nova streaming format (similar to Claude)
+        if (aModel.indexOf("amazon.nova-") >= 0) {
+          if (chunk.type == "content_block_delta" && isDef(chunk.delta) && isDef(chunk.delta.text)) {
+            return chunk.delta.text
+          }
+          if (isDef(chunk.contentBlockDelta) && isDef(chunk.contentBlockDelta.delta) && isDef(chunk.contentBlockDelta.delta.text)) {
+            return chunk.contentBlockDelta.delta.text
+          }
+          return __
+        }
+
+        // Titan streaming format
+        if (aModel.indexOf("amazon.titan-") >= 0) {
+          if (isDef(chunk.outputText)) {
+            return chunk.outputText
+          }
+          return __
+        }
+
+        // OpenAI streaming format
+        if (aModel.indexOf("openai.") >= 0) {
+          if (isArray(chunk.choices) && chunk.choices.length > 0) {
+            var choice = chunk.choices[0]
+            if (isDef(choice.delta) && isDef(choice.delta.content)) {
+              return choice.delta.content
+            }
+          }
+          return __
+        }
+
+        // Mistral streaming format
+        if (aModel.indexOf("mistral.") >= 0) {
+          // Newer message-based models (ministral-*) use OpenAI-style choices/delta format
+          if (aModel.indexOf("ministral-") >= 0 || aModel.indexOf("mistral-large") >= 0) {
+            if (isArray(chunk.choices) && chunk.choices.length > 0) {
+              var choice = chunk.choices[0]
+              if (isDef(choice.delta) && isDef(choice.delta.content)) {
+                return choice.delta.content
+              }
+            }
+          } else {
+            // Older prompt-based models use outputs format
+            if (isArray(chunk.outputs) && chunk.outputs.length > 0 && isDef(chunk.outputs[0].text)) {
+              return chunk.outputs[0].text
+            }
+          }
+          return __
+        }
+
+        // Meta/Llama streaming format
+        if (aModel.indexOf("meta.") >= 0) {
+          if (isDef(chunk.generation)) {
+            return chunk.generation
+          }
+          return __
+        }
+
+        return __
+      },
+
+      /**
+       * Helper function to extract finish reason from streaming chunks
+       * @param {Object} chunk - The decoded chunk from the stream
+       * @param {String} aModel - The model ID to determine parsing strategy
+       * @returns {String|undefined} - The finish reason or undefined
+       */
+      _extractStreamingFinishReason: (chunk, aModel) => {
+        // Claude/Anthropic
+        if ((aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) && chunk.type == "message_delta") {
+          if (isDef(chunk.delta) && isDef(chunk.delta.stop_reason)) {
+            return chunk.delta.stop_reason
+          }
+        }
+
+        // Nova
+        if (aModel.indexOf("amazon.nova-") >= 0 && chunk.type == "message_delta") {
+          if (isDef(chunk.delta) && isDef(chunk.delta.stopReason)) {
+            return chunk.delta.stopReason
+          }
+        }
+
+        // Titan
+        if (aModel.indexOf("amazon.titan-") >= 0 && isDef(chunk.completionReason)) {
+          return chunk.completionReason
+        }
+
+        // OpenAI
+        if (aModel.indexOf("openai.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+          if (isDef(chunk.choices[0].finish_reason)) {
+            return chunk.choices[0].finish_reason
+          }
+        }
+
+        // Mistral (newer message-based models use choices format like OpenAI)
+        if (aModel.indexOf("mistral.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+          if (isDef(chunk.choices[0].finish_reason)) {
+            return chunk.choices[0].finish_reason
+          }
+          if (isDef(chunk.choices[0].stop_reason)) {
+            return chunk.choices[0].stop_reason
+          }
+        }
+
+        return __
+      },
+
+      /**
+       * Helper function to extract tool calls from streaming chunks
+       * @param {Object} chunk - The decoded chunk from the stream
+       * @param {String} aModel - The model ID to determine parsing strategy
+       * @returns {Array|undefined} - Array of tool calls or undefined
+       */
+      _extractStreamingToolCalls: (chunk, aModel) => {
+        // Claude/Anthropic tool use
+        if ((aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) && chunk.type == "content_block_start") {
+          if (isDef(chunk.content_block) && chunk.content_block.type == "tool_use") {
+            return [chunk.content_block]
+          }
+        }
+
+        // Nova tool use
+        if (aModel.indexOf("amazon.nova-") >= 0) {
+          if (chunk.type == "content_block_start" && isDef(chunk.content_block) && chunk.content_block.type == "toolUse") {
+            return [chunk.content_block]
+          }
+          if (isDef(chunk.contentBlockStart) && isDef(chunk.contentBlockStart.start) && isDef(chunk.contentBlockStart.start.toolUse)) {
+            return [chunk.contentBlockStart.start.toolUse]
+          }
+        }
+
+        // OpenAI tool calls
+        if (aModel.indexOf("openai.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+          var choice = chunk.choices[0]
+          if (isDef(choice.delta) && isArray(choice.delta.tool_calls)) {
+            return choice.delta.tool_calls
+          }
+        }
+
+        return __
+      },
+
+      /**
+       * Core streaming function that processes streaming responses from Bedrock models
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID (defaults to configured model)
+       * @param {Number} aTemperature - Temperature setting (defaults to configured temperature)
+       * @param {Boolean} aJsonFlag - Whether to request JSON output
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) called for each chunk
+       * @returns {Object} - {content, events, toolCalls?, finishReason?}
+       */
+      rawPromptStream: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
+        aPrompt = _$(aPrompt, "aPrompt").default("")
+        if (isUnDef(aModel) || aModel == null) aModel = _model
+        if (isUnDef(aTemperature) || aTemperature == null) aTemperature = _temperature
+        aJsonFlag = _$(aJsonFlag, "aJsonFlag").isBoolean().default(false)
+        if (isFunction(aTools) && isUnDef(aOnDelta)) {
+          aOnDelta = aTools
+          aTools = __
+        }
+        aOnDelta = _$(aOnDelta, "aOnDelta").default(__)
+
+        // Build input using existing logic from rawPrompt
+        // This reuses the same message normalization for all model families
+        var _m = {}
+
+        // Check if we have tools
+        if (isDef(aTools)) {
+          if (isArray(aTools)) {
+            aTools.forEach(function(tool) {
+              if (isDef(tool.function)) {
+                var toolName = tool.function.name
+                if (isDef(tool.function.func)) {
+                  if (!isMap(_r.tools)) _r.tools = {}
+                  _r.tools[toolName] = tool.function.func
+                }
+              }
+            })
+          } else if (isMap(aTools)) {
+            Object.keys(aTools).forEach(function(toolName) {
+              if (!isMap(_r.tools)) _r.tools = {}
+              _r.tools[toolName] = aTools[toolName]
+            })
+          }
+        }
+
+        // Add prompt to conversation if it's a string
+        if (isString(aPrompt) && aPrompt.length > 0) {
+          _r.conversation.push({ role: "user", content: aPrompt })
+        }
+
+        // Handle array prompt
+        if (isArray(aPrompt)) {
+          _r.conversation = _r.conversation.concat(aPrompt)
+        }
+
+        // Build model-specific input structure (reusing logic from rawPrompt)
+        if (aModel.indexOf("amazon.titan-") >= 0) {
+          // Titan format
+          var prompt = ""
+          if (_r.conversation.length > 0) {
+            _r.conversation.forEach(function(msg) {
+              if (msg.role == "user") prompt += "User: " + msg.content + "\n"
+              if (msg.role == "assistant") prompt += "Assistant: " + msg.content + "\n"
+              if (msg.role == "system") prompt = msg.content + "\n" + prompt
+            })
+            prompt += "Assistant: "
+          }
+          _m = {
+            inputText: prompt,
+            textGenerationConfig: {
+              temperature: aTemperature,
+              maxTokenCount: _$(aOptions.params.textGenerationConfig.maxTokenCount).isNumber().default(4096)
+            }
+          }
+        } else if (aModel.indexOf("amazon.nova-") >= 0) {
+          // Nova format (messages-based)
+          var messages = []
+          var systemPrompts = []
+
+          _r.conversation.forEach(function(msg) {
+            if (msg.role == "system") {
+              systemPrompts.push({ text: msg.content })
+            } else {
+              var content = []
+              if (isString(msg.content)) {
+                content.push({ text: msg.content })
+              } else if (isArray(msg.content)) {
+                content = msg.content
+              }
+              messages.push({
+                role: msg.role,
+                content: content
+              })
+            }
+          })
+
+          _m = {
+            messages: messages,
+            schemaVersion: "messages-v1",
+            inferenceConfig: {
+              temperature: aTemperature
+            }
+          }
+
+          if (systemPrompts.length > 0) {
+            _m.system = systemPrompts
+          }
+
+          // Add tools if configured
+          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
+            var toolConfig = []
+            Object.keys(_r.tools).forEach(function(toolName) {
+              var tool = _r.tools[toolName]
+              if (isDef(tool.schema)) {
+                toolConfig.push({
+                  toolSpec: {
+                    name: toolName,
+                    description: tool.description || "",
+                    inputSchema: {
+                      json: tool.schema
+                    }
+                  }
+                })
+              }
+            })
+            if (toolConfig.length > 0) {
+              _m.toolConfig = { tools: toolConfig }
+            }
+          }
+        } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) {
+          // Claude/Anthropic format
+          var messages = []
+          var systemPrompt = ""
+
+          _r.conversation.forEach(function(msg) {
+            if (msg.role == "system") {
+              systemPrompt = msg.content
+            } else {
+              var content = msg.content
+              if (isString(content)) {
+                content = [{ type: "text", text: content }]
+              }
+              messages.push({
+                role: msg.role,
+                content: content
+              })
+            }
+          })
+
+          _m = {
+            messages: messages,
+            anthropic_version: "bedrock-2023-05-31",
+            max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096),
+            temperature: aTemperature
+          }
+
+          if (systemPrompt.length > 0) {
+            _m.system = systemPrompt
+          }
+
+          // Add tools if configured
+          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
+            var tools = []
+            Object.keys(_r.tools).forEach(function(toolName) {
+              var tool = _r.tools[toolName]
+              if (isDef(tool.schema)) {
+                tools.push({
+                  name: toolName,
+                  description: tool.description || "",
+                  input_schema: tool.schema
+                })
+              }
+            })
+            if (tools.length > 0) {
+              _m.tools = tools
+            }
+          }
+        } else if (aModel.indexOf("openai.") >= 0) {
+          // OpenAI format
+          var messages = []
+          _r.conversation.forEach(function(msg) {
+            messages.push({
+              role: msg.role,
+              content: msg.content
+            })
+          })
+
+          _m = {
+            messages: messages,
+            temperature: aTemperature,
+            max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
+          }
+
+          // Add tools if configured
+          if (isDef(_r.tools) && Object.keys(_r.tools).length > 0) {
+            var tools = []
+            Object.keys(_r.tools).forEach(function(toolName) {
+              var tool = _r.tools[toolName]
+              if (isDef(tool.schema)) {
+                tools.push({
+                  type: "function",
+                  function: {
+                    name: toolName,
+                    description: tool.description || "",
+                    parameters: tool.schema
+                  }
+                })
+              }
+            })
+            if (tools.length > 0) {
+              _m.tools = tools
+            }
+          }
+        } else if (aModel.indexOf("mistral.") >= 0) {
+          // Mistral format (supports both legacy prompt and messages)
+          if (aModel.indexOf("mistral-7b") >= 0 || aModel.indexOf("mixtral-8x7b") >= 0) {
+            // Legacy format for older models
+            var prompt = ""
+            _r.conversation.forEach(function(msg) {
+              if (msg.role == "user") prompt += "[INST] " + msg.content + " [/INST]"
+              if (msg.role == "assistant") prompt += msg.content
+            })
+            _m = {
+              prompt: prompt,
+              temperature: aTemperature,
+              max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
+            }
+          } else {
+            // Messages format for newer models
+            var messages = []
+            _r.conversation.forEach(function(msg) {
+              messages.push({
+                role: msg.role,
+                content: msg.content
+              })
+            })
+            _m = {
+              messages: messages,
+              temperature: aTemperature,
+              max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
+            }
+          }
+        } else if (aModel.indexOf("meta.") >= 0) {
+          // Meta/Llama format
+          var prompt = ""
+          _r.conversation.forEach(function(msg) {
+            if (msg.role == "user") prompt += "<s>[INST] " + msg.content + " [/INST]"
+            if (msg.role == "assistant") prompt += msg.content + "</s>"
+            if (msg.role == "system") prompt = "<s>[INST] <<SYS>>\n" + msg.content + "\n<</SYS>>\n\n" + prompt
+          })
+          _m = {
+            prompt: prompt,
+            temperature: aTemperature,
+            max_tokens: _$(aOptions.params.max_tokens).isNumber().default(4096)
+          }
+        }
+
+        // Merge with any additional params
+        var aInput = merge(_m, aOptions.params)
+
+        // Reconnect if needed
+        if (aws.lastConnect() > 5 * 60000) aws.reconnect()
+
+        // Debug logging
+        if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client-stream'}, merge({_t:nowNano(),_f:'client-stream'}, aInput))
+
+        // Call streaming API
+        var fullContent = ""
+        var events = []
+        var toolCalls = []
+        var finishReason = __
+
+        try {
+          var result = aws.BEDROCK_InvokeModelStream(aOptions.region, aModel, aInput, (chunk, event) => {
+            // Extract content delta
+            var delta = _r._extractStreamingDelta(chunk, aModel)
+            if (isDef(delta) && delta.length > 0) {
+              fullContent += delta
+
+              // Call user callback with delta
+              if (isDef(aOnDelta)) {
+                try {
+                  aOnDelta(delta, chunk)
+                } catch(callbackError) {
+                  // Log but don't fail the stream
+                }
+              }
+            }
+
+            // Extract finish reason
+            var reason = _r._extractStreamingFinishReason(chunk, aModel)
+            if (isDef(reason)) {
+              finishReason = reason
+            }
+
+            // Extract tool calls
+            var tools = _r._extractStreamingToolCalls(chunk, aModel)
+            if (isDef(tools) && isArray(tools)) {
+              toolCalls = toolCalls.concat(tools)
+            }
+
+            events.push(chunk)
+          })
+
+          events = events.concat(result.events)
+
+          // Check for errors in result
+          if (isDef(result.error)) {
+            if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(result.error)})
+            return { error: result.error, content: fullContent, events: events }
+          }
+        } catch(streamError) {
+          if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(streamError)})
+          return { error: streamError, content: fullContent, events: events }
+        }
+
+        if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream'}, {_t:nowNano(),_f:'llm-stream', content: fullContent, events: events.length})
+
+        // Update conversation history (only if content is non-empty)
+        if (fullContent.length > 0) {
+          _r.conversation.push({
+            role: "assistant",
+            content: fullContent
+          })
+        }
+
+        // Capture stats from streaming events
+        // Nova models put usage in metadata.usage in the final event
+        if (events.length > 0) {
+          // Look for event with usage information
+          var usageEvent = events.find(e => isDef(e.usage))
+
+          // For Nova, usage is in metadata.usage
+          if (isUnDef(usageEvent)) {
+            var metadataEvent = events.find(e => isDef(e.metadata) && isDef(e.metadata.usage))
+            if (isDef(metadataEvent)) {
+              // Extract usage to top level for _captureStats
+              usageEvent = {usage: metadataEvent.metadata.usage}
+              // Also include stop reason if present
+              if (isDef(finishReason)) usageEvent.stopReason = finishReason
+            }
+          }
+
+          if (isDef(usageEvent)) {
+            _captureStats(usageEvent, aModel)
+          }
+        }
+
+        // Build response object
+        var response = {
+          content: fullContent,
+          events: events
+        }
+
+        if (toolCalls.length > 0) {
+          response.toolCalls = toolCalls
+        }
+
+        if (isDef(finishReason)) {
+          response.finishReason = finishReason
+        }
+
+        return response
+      },
+
+      /**
+       * Streams a prompt and returns aggregated text content
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Boolean} aJsonFlag - Whether to request JSON output
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {String} - The accumulated text content
+       */
+      promptStream: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
+        var result = _r.rawPromptStream(aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
+        if (isDef(result.error)) return result
+        return result.content
+      },
+
+      /**
+       * Streams a prompt and returns {response, stats}
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Boolean} aJsonFlag - Whether to request JSON output
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {Object} - {response: String, stats: Object}
+       */
+      promptStreamWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
+        var response = _r.promptStream(aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
+        return {
+          response: response,
+          stats: _r.getLastStats()
+        }
+      },
+
+      /**
+       * Streams a prompt and returns {response, stats} with full response object
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Boolean} aJsonFlag - Whether to request JSON output
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {Object} - {response: {content, events, ...}, stats: Object}
+       */
+      rawPromptStreamWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
+        var response = _r.rawPromptStream(aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
+        return {
+          response: response,
+          stats: _r.getLastStats()
+        }
+      },
+
+      /**
+       * Streams a prompt with JSON output and returns parsed JSON
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {Object} - Parsed JSON object or text if parsing fails
+       */
+      promptStreamJSON: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
+        var text = _r.promptStream(aPrompt, aModel, aTemperature, true, aTools, aOnDelta)
+        if (isDef(text.error)) return text
+        try {
+          return jsonParse(text)
+        } catch(e) {
+          return text
+        }
+      },
+
+      /**
+       * Streams a prompt with JSON output and returns {response, stats}
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {Object} - {response: Object (parsed JSON), stats: Object}
+       */
+      promptStreamJSONWithStats: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
+        var response = _r.promptStreamJSON(aPrompt, aModel, aTemperature, aTools, aOnDelta)
+        return {
+          response: response,
+          stats: _r.getLastStats()
+        }
+      },
+
+      /**
+       * Streams a prompt with JSON output and returns {response, raw, stats}
+       * @param {String|Array} aPrompt - The prompt or conversation array
+       * @param {String} aModel - Model ID
+       * @param {Number} aTemperature - Temperature setting
+       * @param {Object} aTools - Tools configuration
+       * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
+       * @returns {Object} - {response: Object (parsed JSON), raw: Object, stats: Object}
+       */
+      promptStreamJSONWithStatsRaw: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
+        var rawResult = _r.rawPromptStream(aPrompt, aModel, aTemperature, true, aTools, aOnDelta)
+        var parsed
+        try {
+          parsed = jsonParse(rawResult.content)
+        } catch(e) {
+          parsed = rawResult.content
+        }
+
+        return {
+          response: parsed,
+          raw: rawResult,
+          stats: _r.getLastStats()
+        }
+      },
+
       rawImgGen: (aPrompt, aModel) => {
         throw "Not implemented yet"
       },
