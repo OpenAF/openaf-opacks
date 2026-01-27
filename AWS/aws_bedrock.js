@@ -1593,20 +1593,26 @@ ow.ai.__gpttypes.bedrock = {
        * @returns {Array|undefined} - Array of tool calls or undefined
        */
       _extractStreamingToolCalls: (chunk, aModel) => {
-        // Claude/Anthropic tool use
+        // Claude/Anthropic tool use - return with index for tracking
         if ((aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) && chunk.type == "content_block_start") {
           if (isDef(chunk.content_block) && chunk.content_block.type == "tool_use") {
-            return [chunk.content_block]
+            var toolCall = clone(chunk.content_block)
+            toolCall._index = chunk.index  // Track index for accumulating input
+            return [toolCall]
           }
         }
 
         // Nova tool use
         if (aModel.indexOf("amazon.nova-") >= 0) {
           if (chunk.type == "content_block_start" && isDef(chunk.content_block) && chunk.content_block.type == "toolUse") {
-            return [chunk.content_block]
+            var novaToolCall = clone(chunk.content_block)
+            novaToolCall._index = chunk.index
+            return [novaToolCall]
           }
           if (isDef(chunk.contentBlockStart) && isDef(chunk.contentBlockStart.start) && isDef(chunk.contentBlockStart.start.toolUse)) {
-            return [chunk.contentBlockStart.start.toolUse]
+            var novaToolCall2 = clone(chunk.contentBlockStart.start.toolUse)
+            novaToolCall2._index = chunk.contentBlockStart.contentBlockIndex
+            return [novaToolCall2]
           }
         }
 
@@ -1615,6 +1621,39 @@ ow.ai.__gpttypes.bedrock = {
           var choice = chunk.choices[0]
           if (isDef(choice.delta) && isArray(choice.delta.tool_calls)) {
             return choice.delta.tool_calls
+          }
+        }
+
+        return __
+      },
+
+      /**
+       * Helper function to extract tool input delta from streaming chunks (for Anthropic/Nova)
+       * @param {Object} chunk - The decoded chunk from the stream
+       * @param {String} aModel - The model ID to determine parsing strategy
+       * @returns {Object|undefined} - {index, partial_json} or undefined
+       */
+      _extractStreamingToolInputDelta: (chunk, aModel) => {
+        // Claude/Anthropic input_json_delta
+        if ((aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0) && chunk.type == "content_block_delta") {
+          if (isDef(chunk.delta) && chunk.delta.type == "input_json_delta" && isDef(chunk.delta.partial_json)) {
+            return { index: chunk.index, partial_json: chunk.delta.partial_json }
+          }
+        }
+
+        // Nova input delta (similar structure)
+        if (aModel.indexOf("amazon.nova-") >= 0) {
+          if (chunk.type == "content_block_delta" && isDef(chunk.delta) && chunk.delta.type == "input_json_delta") {
+            return { index: chunk.index, partial_json: chunk.delta.partial_json }
+          }
+          if (isDef(chunk.contentBlockDelta) && isDef(chunk.contentBlockDelta.delta)) {
+            var novaDelta = chunk.contentBlockDelta.delta
+            if (novaDelta.type == "input_json_delta" || isDef(novaDelta.toolUse)) {
+              var partialJson = novaDelta.partial_json || (novaDelta.toolUse && novaDelta.toolUse.input) || ""
+              if (isString(partialJson)) {
+                return { index: chunk.contentBlockDelta.contentBlockIndex, partial_json: partialJson }
+              }
+            }
           }
         }
 
@@ -2013,6 +2052,8 @@ ow.ai.__gpttypes.bedrock = {
         var events = []
         var toolCalls = []
         var finishReason = __
+        // Track pending tool calls by index for accumulating input JSON (Anthropic/Nova streaming)
+        var pendingToolCalls = {}
 
         try {
           var result = aws.BEDROCK_InvokeModelStream(aOptions.region, aModel, aInput, (chunk, event) => {
@@ -2037,10 +2078,30 @@ ow.ai.__gpttypes.bedrock = {
               finishReason = reason
             }
 
-            // Extract tool calls
+            // Extract tool calls (content_block_start for Anthropic/Nova)
             var tools = _r._extractStreamingToolCalls(chunk, aModel)
             if (isDef(tools) && isArray(tools)) {
-              toolCalls = toolCalls.concat(tools)
+              tools.forEach(function(tc) {
+                if (isDef(tc._index)) {
+                  // Store in pending map for input accumulation
+                  pendingToolCalls[tc._index] = {
+                    type: tc.type || "tool_use",
+                    id: tc.id || tc.toolUseId,
+                    name: tc.name,
+                    input: "",  // Will accumulate JSON string
+                    _index: tc._index
+                  }
+                } else {
+                  // Non-indexed tool calls (OpenAI style) go directly to toolCalls
+                  toolCalls.push(tc)
+                }
+              })
+            }
+
+            // Extract tool input delta (content_block_delta with input_json_delta)
+            var inputDelta = _r._extractStreamingToolInputDelta(chunk, aModel)
+            if (isDef(inputDelta) && isDef(pendingToolCalls[inputDelta.index])) {
+              pendingToolCalls[inputDelta.index].input += inputDelta.partial_json
             }
 
             events.push(chunk)
@@ -2059,6 +2120,36 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream'}, {_t:nowNano(),_f:'llm-stream', content: fullContent, events: events.length})
+
+        // Finalize pending tool calls by parsing accumulated input JSON
+        Object.keys(pendingToolCalls).sort((a, b) => Number(a) - Number(b)).forEach(function(idx) {
+          var pending = pendingToolCalls[idx]
+          var parsedInput = {}
+          if (isString(pending.input) && pending.input.length > 0) {
+            try {
+              parsedInput = JSON.parse(pending.input)
+            } catch (parseErr) {
+              // If parsing fails, try to use as-is or empty object
+              parsedInput = {}
+            }
+          }
+          var finalizedTool = {
+            type: pending.type || "tool_use",
+            id: pending.id,
+            name: pending.name,
+            input: parsedInput
+          }
+          // For Nova models, use toolUse wrapper
+          if (aModel.indexOf("amazon.nova-") >= 0) {
+            finalizedTool = {
+              type: "toolUse",
+              toolUseId: pending.id,
+              name: pending.name,
+              input: parsedInput
+            }
+          }
+          toolCalls.push(finalizedTool)
+        })
 
         var toolResultToText = function(value) {
           if (isString(value)) return value
