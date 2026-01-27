@@ -1765,14 +1765,11 @@ ow.ai.__gpttypes.bedrock = {
         // This reuses the same message normalization for all model families
         var _m = {}
 
-        // Add prompt to conversation if it's a string
+        // Add prompt to conversation if it's a string; arrays are treated as the full conversation
         if (isString(aPrompt) && aPrompt.length > 0) {
           _r.conversation.push({ role: "user", content: aPrompt })
-        }
-
-        // Handle array prompt
-        if (isArray(aPrompt)) {
-          _r.conversation = _r.conversation.concat(aPrompt)
+        } else if (isArray(aPrompt)) {
+          _r.conversation = aPrompt
         }
 
         // Build model-specific input structure (reusing logic from rawPrompt)
