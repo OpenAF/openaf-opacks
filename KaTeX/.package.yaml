@@ -1,0 +1,155 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- katex
+- latex
+- math
+- formula
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/KaTeX.opack
+description: Wrapper for KaTeX library
+name: KaTeX
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260128'
+dependencies:
+  openaf: '>=20230521'
+files:
+- .package.yaml
+- katex.js
+- lib/auto-render.min.js
+- lib/fonts/KaTeX_AMS-Regular.ttf
+- lib/fonts/KaTeX_AMS-Regular.woff
+- lib/fonts/KaTeX_AMS-Regular.woff2
+- lib/fonts/KaTeX_Caligraphic-Bold.ttf
+- lib/fonts/KaTeX_Caligraphic-Bold.woff
+- lib/fonts/KaTeX_Caligraphic-Bold.woff2
+- lib/fonts/KaTeX_Caligraphic-Regular.ttf
+- lib/fonts/KaTeX_Caligraphic-Regular.woff
+- lib/fonts/KaTeX_Caligraphic-Regular.woff2
+- lib/fonts/KaTeX_Fraktur-Bold.ttf
+- lib/fonts/KaTeX_Fraktur-Bold.woff
+- lib/fonts/KaTeX_Fraktur-Bold.woff2
+- lib/fonts/KaTeX_Fraktur-Regular.ttf
+- lib/fonts/KaTeX_Fraktur-Regular.woff
+- lib/fonts/KaTeX_Fraktur-Regular.woff2
+- lib/fonts/KaTeX_Main-Bold.ttf
+- lib/fonts/KaTeX_Main-Bold.woff
+- lib/fonts/KaTeX_Main-Bold.woff2
+- lib/fonts/KaTeX_Main-BoldItalic.ttf
+- lib/fonts/KaTeX_Main-BoldItalic.woff
+- lib/fonts/KaTeX_Main-BoldItalic.woff2
+- lib/fonts/KaTeX_Main-Italic.ttf
+- lib/fonts/KaTeX_Main-Italic.woff
+- lib/fonts/KaTeX_Main-Italic.woff2
+- lib/fonts/KaTeX_Main-Regular.ttf
+- lib/fonts/KaTeX_Main-Regular.woff
+- lib/fonts/KaTeX_Main-Regular.woff2
+- lib/fonts/KaTeX_Math-BoldItalic.ttf
+- lib/fonts/KaTeX_Math-BoldItalic.woff
+- lib/fonts/KaTeX_Math-BoldItalic.woff2
+- lib/fonts/KaTeX_Math-Italic.ttf
+- lib/fonts/KaTeX_Math-Italic.woff
+- lib/fonts/KaTeX_Math-Italic.woff2
+- lib/fonts/KaTeX_SansSerif-Bold.ttf
+- lib/fonts/KaTeX_SansSerif-Bold.woff
+- lib/fonts/KaTeX_SansSerif-Bold.woff2
+- lib/fonts/KaTeX_SansSerif-Italic.ttf
+- lib/fonts/KaTeX_SansSerif-Italic.woff
+- lib/fonts/KaTeX_SansSerif-Italic.woff2
+- lib/fonts/KaTeX_SansSerif-Regular.ttf
+- lib/fonts/KaTeX_SansSerif-Regular.woff
+- lib/fonts/KaTeX_SansSerif-Regular.woff2
+- lib/fonts/KaTeX_Script-Regular.ttf
+- lib/fonts/KaTeX_Script-Regular.woff
+- lib/fonts/KaTeX_Script-Regular.woff2
+- lib/fonts/KaTeX_Size1-Regular.ttf
+- lib/fonts/KaTeX_Size1-Regular.woff
+- lib/fonts/KaTeX_Size1-Regular.woff2
+- lib/fonts/KaTeX_Size2-Regular.ttf
+- lib/fonts/KaTeX_Size2-Regular.woff
+- lib/fonts/KaTeX_Size2-Regular.woff2
+- lib/fonts/KaTeX_Size3-Regular.ttf
+- lib/fonts/KaTeX_Size3-Regular.woff
+- lib/fonts/KaTeX_Size3-Regular.woff2
+- lib/fonts/KaTeX_Size4-Regular.ttf
+- lib/fonts/KaTeX_Size4-Regular.woff
+- lib/fonts/KaTeX_Size4-Regular.woff2
+- lib/fonts/KaTeX_Typewriter-Regular.ttf
+- lib/fonts/KaTeX_Typewriter-Regular.woff
+- lib/fonts/KaTeX_Typewriter-Regular.woff2
+- lib/katex.min.css
+- lib/katex.min.js
+filesHash:
+  katex.js: ff3ffd439b5458696979532e954fa550f1966ae9
+  lib/auto-render.min.js: 4169ff59087666a21f545d76c0ee7c59f2a8873f
+  lib/fonts/KaTeX_AMS-Regular.ttf: 1dfd0ee6e30f8a1c23999d9d965db8700b5a9f2e
+  lib/fonts/KaTeX_AMS-Regular.woff: 99ada2de3200e795143d639232c3444b08018235
+  lib/fonts/KaTeX_AMS-Regular.woff2: 34494743736fda757197d16fcc6a6e1a79317c86
+  lib/fonts/KaTeX_Caligraphic-Bold.ttf: 8fab738a16ba8fb7e7002a075f036a455a45c6e8
+  lib/fonts/KaTeX_Caligraphic-Bold.woff: dd23ac0fb0ac469b0624485ea78d700f63614203
+  lib/fonts/KaTeX_Caligraphic-Bold.woff2: 5bfa49cac46cd1d7ab1351388d37c11af59ba615
+  lib/fonts/KaTeX_Caligraphic-Regular.ttf: 26f26a13e6a7d0a69b48f62acd31a8196bce7f6e
+  lib/fonts/KaTeX_Caligraphic-Regular.woff: 1a6f39bd70c9b74713078df5f7dd6108f9bad38b
+  lib/fonts/KaTeX_Caligraphic-Regular.woff2: 9f8077e0b38a290cd9b7b136b0ac29c8375e81a6
+  lib/fonts/KaTeX_Fraktur-Bold.ttf: 4e08dd00383124e7cd96970ccb0fbe35c9efaaa3
+  lib/fonts/KaTeX_Fraktur-Bold.woff: 5bbafd501f262219426af7f20c1103bb4b732592
+  lib/fonts/KaTeX_Fraktur-Bold.woff2: f98f89272eca11ae417672c59a0faa6a88805a89
+  lib/fonts/KaTeX_Fraktur-Regular.ttf: 17db40882dd5f140625f28dd94c43045e1893e98
+  lib/fonts/KaTeX_Fraktur-Regular.woff: 6f756376360f0815b44862f57f795eb7c1cd4db2
+  lib/fonts/KaTeX_Fraktur-Regular.woff2: a5764c6e2784d02820c0b904089f3fac798be4fa
+  lib/fonts/KaTeX_Main-Bold.ttf: 413ab3dc3fc3a5752275bae2cae67eb58f2b32f0
+  lib/fonts/KaTeX_Main-Bold.woff: f69a36250eae6e8a02173a9909aa628428ba2060
+  lib/fonts/KaTeX_Main-Bold.woff2: 31050a1b1b123fb2c59cad1f74b7dff90deb8fce
+  lib/fonts/KaTeX_Main-BoldItalic.ttf: ba6464e442fd50aef7678924ba0f2d9581ebbb07
+  lib/fonts/KaTeX_Main-BoldItalic.woff: 038bbdc8887a9730ad94147fc57c6ff4dfb48411
+  lib/fonts/KaTeX_Main-BoldItalic.woff2: a4a4905b8b126f9ffd553d21a72a0c24e9480345
+  lib/fonts/KaTeX_Main-Italic.ttf: 1d5668a2b94ae7dbeefdd7cd68d98fe9d5825e07
+  lib/fonts/KaTeX_Main-Italic.woff: 7c8589213bc7003e2c2334b51ca4152858987abd
+  lib/fonts/KaTeX_Main-Italic.woff2: c9b2b5ffd2f27aa5c6b6f9ba41a7b2b4e66102d3
+  lib/fonts/KaTeX_Main-Regular.ttf: 8744db6ef8c309e3dc85f1bbe980520ad8b7bfd4
+  lib/fonts/KaTeX_Main-Regular.woff: fdcae54ba1d4635ee85a5462cc1c97e521cfd515
+  lib/fonts/KaTeX_Main-Regular.woff2: c884086c25cec8558160b2026f906ef7da3570ac
+  lib/fonts/KaTeX_Math-BoldItalic.ttf: e80cc4c232d2075f762a52d46beb4ffbd37a5f1a
+  lib/fonts/KaTeX_Math-BoldItalic.woff: d54e6480d6d4046c6a5619aa383baa5971fb8a0c
+  lib/fonts/KaTeX_Math-BoldItalic.woff2: 8fcb9d2de65ac71a0c4fdd986173db730592ed8a
+  lib/fonts/KaTeX_Math-Italic.ttf: 9e9a10d8fa5ad88c9ecfa4902addd4d92580b2bc
+  lib/fonts/KaTeX_Math-Italic.woff: 1c1b48739e1cb4be13ddd8c0bc279dde851bdba0
+  lib/fonts/KaTeX_Math-Italic.woff2: db4883d0cff95ecb5c03410e3283a737c51ed604
+  lib/fonts/KaTeX_SansSerif-Bold.ttf: 20b45f5346b686d52c445745393d1707bb88ec1d
+  lib/fonts/KaTeX_SansSerif-Bold.woff: a2beddc8a3d4d08028d707776edbd4d24f2ec0fc
+  lib/fonts/KaTeX_SansSerif-Bold.woff2: 886e61797a525d4aafce0aaf57414fdfaea1b873
+  lib/fonts/KaTeX_SansSerif-Italic.ttf: 991fbdc03168bb14a4447cfa3e515f09a6ecfedc
+  lib/fonts/KaTeX_SansSerif-Italic.woff: 7564a366b76fd837041c24beef4c5580a5add40e
+  lib/fonts/KaTeX_SansSerif-Italic.woff2: 3d5fa3cb309f8d83b4dcbdd27725f270f60f3eeb
+  lib/fonts/KaTeX_SansSerif-Regular.ttf: 4a8e17a0cb58a8228dd4417fbd1b899e41dab045
+  lib/fonts/KaTeX_SansSerif-Regular.woff: 804610f4cb2e2ead9694b8da2ec84ece8d09c38d
+  lib/fonts/KaTeX_SansSerif-Regular.woff2: e45d5f4f4a7f2ff3dca9fccc2f148e781e23f292
+  lib/fonts/KaTeX_Script-Regular.ttf: c6f675da81ad29cbf24b2cf770f795b4da2c648e
+  lib/fonts/KaTeX_Script-Regular.woff: 6a05cdca4f1f7085e607dc38bedef55753f86fd8
+  lib/fonts/KaTeX_Script-Regular.woff2: 63b80959f1fc56899ae21ba0cbbcd39a6cb08390
+  lib/fonts/KaTeX_Size1-Regular.ttf: 3280bacbcb1245971fe01017b474c76c337c10c9
+  lib/fonts/KaTeX_Size1-Regular.woff: aefe6674a56533627c739cd7896398f14487e01c
+  lib/fonts/KaTeX_Size1-Regular.woff2: 57fa599974a1bc0b37d5f0e5cc8602302f02b573
+  lib/fonts/KaTeX_Size2-Regular.ttf: faf73ff3e795184e5431666ffafeb8aa0e28834d
+  lib/fonts/KaTeX_Size2-Regular.woff: 46698ff1819bd27826fd5d2dc4ba4e1f63cacdf4
+  lib/fonts/KaTeX_Size2-Regular.woff2: ee18713634a3be8c997276808552ab195a598f43
+  lib/fonts/KaTeX_Size3-Regular.ttf: 302a61b2ecdf82d39e6780f42bd07ee4ce67b8d5
+  lib/fonts/KaTeX_Size3-Regular.woff: 1da1905a6d1d9bcab92b059df72b528dea708bcb
+  lib/fonts/KaTeX_Size3-Regular.woff2: 19a7caadfb66bd2757810ae47e5c7a0e005101a1
+  lib/fonts/KaTeX_Size4-Regular.ttf: 3d8d9dd58a03b7a46d497f5761e60d8b844a5199
+  lib/fonts/KaTeX_Size4-Regular.woff: 8fdddb83513ec226231ebee05079ec45fc013578
+  lib/fonts/KaTeX_Size4-Regular.woff2: 9bed17fb92f2650501e229862c40c6407e1c5528
+  lib/fonts/KaTeX_Typewriter-Regular.ttf: 629b99faf18d97529f21a1b1018093e60bcd058f
+  lib/fonts/KaTeX_Typewriter-Regular.woff: f5e729fa4ff466fc07e0c7ab1979ad70c45fa5d5
+  lib/fonts/KaTeX_Typewriter-Regular.woff2: 7a08883fffc6958c71cc01a75a0b99cca3e4b475
+  lib/katex.min.css: f93c672c792cee11a447e3ad2368e13d8a25667e
+  lib/katex.min.js: 8935cc5ee5dc7596f71543b9c906df2a2800f9a9
