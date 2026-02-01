@@ -36,6 +36,7 @@
   |**InstallCert**|<img src=".github/badges/InstallCert.svg"><br>Easy local installation of SSL certificates.|
   |**Jira**|<img src=".github/badges/Jira.svg"><br>Wrapper for the JIRA REST API|
   |**Jsoup**|<img src=".github/badges/Jsoup.svg"><br>Simple wrapper around the Java Jsoup library|
+  |**KaTeX**|<img src=".github/badges/KaTeX.svg"><br>Wrapper for KaTeX library|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
   |**Lucene**|<img src=".github/badges/Lucene.svg"><br>Lucene wrapper utilities and a minimal vector memory server for OpenAF|
