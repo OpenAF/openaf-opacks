@@ -1,6 +1,6 @@
-mysql-connector-j-9.5.0.jar:
+mysql-connector-j-9.6.0.jar:
   name: The GNU General Public License, v2 with Universal FOSS Exception, v1.0
-  version: 9.5.0
+  version: 9.6.0
   changed from original: false
   comments: For detailed license information see the LICENSE file in this distribution.
   license: ''
