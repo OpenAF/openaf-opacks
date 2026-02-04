@@ -1,0 +1,301 @@
+include:
+- oJobHTTPd.yaml
+- oJobBrowse.yaml
+
+jobs:
+# ------------------------
+- name : HTTP Browse - codeartifact
+  to   : HTTP Browse generic
+  typeArgs:
+    noLog   : false
+    shortcut:
+      name  : CodeArtifactBrowse
+      keyArg: port
+      args  :
+        accessKey : accessKey
+        secret    : secret
+        token     : token
+        region    : region
+        assumeRole: assumeRole
+        uri       : uri
+        path      : path
+        browse    : browse
+        logo      : logo
+        incURI    : incURI
+        cache     : cache
+        sortTab   : sortTab
+        options   : options
+        domain    : domain
+        repository: repository
+        format    : format
+        namespace : namespace
+  exec : | #js
+    args.options = merge(args.options, {
+      showURI : args.incURI,
+      sortTab : args.sortTab,
+      logo    : args.logo,
+      browse  : args.browse,
+      default : args.default
+    })
+
+    loadLib("aws.js")
+    var aws = new AWS(args.accessKey, args.secret, args.token)
+    if (isDef(args.assumeRole)) {
+      log("Assuming role " + args.assumeRole + "...")
+      aws = aws.assumeRole(args.assumeRole)
+    }
+
+    var getAWS = () => {
+      var _aws = new AWS(args.accessKey, args.secret, args.token)
+      if (isDef(args.assumeRole)) {
+        log("Assuming role " + args.assumeRole + "...")
+        _aws = _aws.assumeRole(args.assumeRole)
+      }
+      return _aws
+    }
+
+    var buildPackageTree = aPackages => {
+      var _packages = (aPackages || []).map(p => {
+        var parts = [ p.format ]
+        if (isDef(p.namespace) && p.namespace.length > 0) parts.push(p.namespace)
+        parts.push(p.package)
+        return merge({ path: parts.join("/") }, p)
+      })
+
+      var _parents = []
+      $from(_packages)
+      .select(r => {
+        var parts = r.path.split("/")
+        for(var i = 0; i < parts.length; i++) {
+          var parent = parts.slice(0, i + 1).join("/")
+          if ($from(_parents).equals("name", parent).equals("level", i + 1).none()) {
+            _parents.push({ name: parent, isParent: parent != r.path, level: i + 1, pkg: r })
+          }
+        }
+      })
+
+      return { list: _packages, parents: _parents }
+    }
+
+    args.fns = {
+      init   : () => {
+        $cache("codeartifact-domains")
+        .ttl(args.cache)
+        .fn(() => {
+          var _aws = getAWS()
+          var lst = _aws.CODEARTIFACT_ListDomains(args.region)
+          if (isDef(args.domain)) lst = lst.filter(f => (f.domainName || f.name) == args.domain)
+          return lst
+        })
+        .create()
+
+        $cache("codeartifact-repos")
+        .ttl(args.cache)
+        .fn(k => {
+          var _aws = getAWS()
+          var lst = _aws.CODEARTIFACT_ListRepositories(args.region, args.repository)
+          if (isDef(k.domain)) lst = lst.filter(f => f.domainName == k.domain)
+          return lst
+        })
+        .create()
+
+        $cache("codeartifact-packages")
+        .ttl(args.cache)
+        .fn(k => {
+          var _aws = getAWS()
+          var lst = _aws.CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format)
+          if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
+          return lst
+        })
+        .create()
+
+        $cache("codeartifact-versions")
+        .ttl(args.cache)
+        .fn(k => {
+          var _aws = getAWS()
+          return _aws.CODEARTIFACT_ListPackageVersions(args.region, k.repository, k.domain, k.format, k.namespace, k.package)
+        })
+        .create()
+
+        $cache("codeartifact-assets")
+        .ttl(args.cache)
+        .fn(k => {
+          var _aws = getAWS()
+          return _aws.CODEARTIFACT_ListPackageVersionAssets(args.region, k.repository, k.domain, k.format, k.namespace, k.package, k.version)
+        })
+        .create()
+      },
+      getList: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var parts = puri.split("/").filter(r => r.length > 0)
+
+        if (parts.length == 0) {
+          var domains = $cache("codeartifact-domains").get({})
+          return {
+            isList: true,
+            fields: [ "Domain", "Owner", "Created" ],
+            alignFields: [ "left", "left", "left" ],
+            key   : [ "Domain" ],
+            list  : $from(domains).sort("domainName").pselect(d => {
+              return {
+                isDirectory: true,
+                values     : {
+                  "Domain" : d.domainName || d.name,
+                  "Owner"  : d.owner || "",
+                  "Created": isDef(d.createdTime) ? new Date(d.createdTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                }
+              }
+            })
+          }
+        }
+
+        if (parts.length == 1) {
+          var domain = parts[0]
+          var repos = $cache("codeartifact-repos").get({ domain: domain })
+          return {
+            isList: true,
+            fields: [ "Repository", "Domain", "Owner", "Description" ],
+            alignFields: [ "left", "left", "left", "left" ],
+            key   : [ "Repository" ],
+            list  : $from(repos).sort("repositoryName").pselect(r => {
+              return {
+                isDirectory: true,
+                values     : {
+                  "Repository" : r.repositoryName || r.name,
+                  "Domain"     : r.domainName || "",
+                  "Owner"      : r.owner || "",
+                  "Description": r.description || ""
+                }
+              }
+            })
+          }
+        }
+
+        var domain = parts[0]
+        var repo = parts[1]
+        var remaining = parts.slice(2).join("/")
+
+        var packages = $cache("codeartifact-packages").get({ domain: domain, repository: repo })
+        var tree = buildPackageTree(packages)
+        var lstParent = tree.parents
+
+        if (remaining.length == 0) {
+          return {
+            isList: true,
+            fields: [ "Package", "Format", "Namespace" ],
+            alignFields: [ "left", "left", "left" ],
+            key   : [ "Package" ],
+            list  : $from(lstParent).equals("level", 1).sort("name").pselect(f => {
+              return {
+                isDirectory: f.isParent,
+                values     : {
+                  "Package"  : f.name,
+                  "Format"   : f.pkg.format || "",
+                  "Namespace": f.pkg.namespace || ""
+                }
+              }
+            })
+          }
+        }
+
+        var level = remaining.split("/").filter(r => r.length > 0).length
+
+        if (remaining.length > 0 && $from(lstParent).starts("name", remaining).none()) {
+          return { isFile: false }
+        }
+
+        var leaf = $from(lstParent).equals("isParent", false).equals("name", remaining).first()
+        if (isDef(leaf) && isDef(leaf.pkg)) {
+          var versions = $cache("codeartifact-versions").get({
+            domain    : domain,
+            repository: repo,
+            format    : leaf.pkg.format,
+            namespace : leaf.pkg.namespace,
+            package   : leaf.pkg.package
+          })
+
+          return {
+            isList: true,
+            fields: [ "Version", "Status", "Published" ],
+            alignFields: [ "left", "left", "left" ],
+            key   : [ "Version" ],
+            list  : $from(versions).sort("-publishedTime").pselect(v => {
+              return {
+                isDirectory: false,
+                values     : {
+                  "Version"  : v.version || "",
+                  "Status"   : v.status || "",
+                  "Published": isDef(v.publishedTime) ? new Date(v.publishedTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                }
+              }
+            })
+          }
+        }
+
+        return {
+          isList: true,
+          fields: [ "Package", "Format", "Namespace" ],
+          alignFields: [ "left", "left", "left" ],
+          key   : [ "Package" ],
+          list  : $from(lstParent)
+                  .equals("level", level + 1)
+                  .starts("name", remaining + (level > 0 ? "/" : ""))
+                  .sort("name")
+                  .pselect(f => {
+                    return {
+                      isDirectory: f.isParent,
+                      values     : {
+                        "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), "") + (f.isParent ? "/" : ""),
+                        "Format"   : f.pkg.format || "",
+                        "Namespace": f.pkg.namespace || ""
+                      }
+                    }
+                  })
+        }
+      },
+      getObj: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var parts = puri.split("/").filter(r => r.length > 0)
+
+        var domain = parts[0]
+        var repo = parts[1]
+        var version = parts[parts.length - 1]
+        var pkgParts = parts.slice(2, -1)
+        var format = pkgParts[0]
+        var pkg = pkgParts[pkgParts.length - 1]
+        var namespace = pkgParts.length > 2 ? pkgParts.slice(1, -1).join("/") : __
+
+        var assets = $cache("codeartifact-assets").get({
+          domain    : domain,
+          repository: repo,
+          format    : format,
+          namespace : namespace,
+          package   : pkg,
+          version   : version
+        })
+
+        var data = "\n"
+        data += `## Package version assets\n\n`
+        data += `Domain: \`${domain}\`  \n`
+        data += `Repository: \`${repo}\`  \n`
+        data += `Package: \`${pkg}\`  \n`
+        data += `Format: \`${format}\`  \n`
+        data += `Namespace: \`${isDef(namespace) ? namespace : ""}\`  \n`
+        data += `Version: \`${version}\`\n\n`
+
+        data += "| Asset | Size | Hash | Hash Algorithm |\n"
+        data += "|:---|---:|---|---|\n"
+        $from(assets).sort("assetName").select(a => {
+          data += `| ${a.name || a.assetName || ""} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${a.hash || ""} | ${a.hashAlgorithm || ""} |\n`
+        })
+
+        if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
+
+        return {
+          data: data,
+          type: "raw"
+        }
+      }
+    }
