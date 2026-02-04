@@ -2,6 +2,10 @@ include:
 - oJobHTTPd.yaml
 - oJobBrowse.yaml
 
+#ojob:
+#  daemon: true
+#  logToConsole: true
+
 jobs:
 # ------------------------
 - name : HTTP Browse - codeartifact
@@ -55,7 +59,7 @@ jobs:
     }
 
     var buildPackageTree = aPackages => {
-      var _packages = (aPackages || []).map(p => {
+      var _packages = pForEach(aPackages || [], p => {
         var parts = [ p.format ]
         if (isDef(p.namespace) && p.namespace.length > 0) parts.push(p.namespace)
         parts.push(p.package)
@@ -63,20 +67,57 @@ jobs:
       })
 
       var _parents = []
-      $from(_packages)
-      .select(r => {
+      var _parentsMap = {}
+      var _childrenMap = {}
+      var _leafByPath = {}
+
+      for(var i = 0; i < _packages.length; i++) {
+        var r = _packages[i]
         var parts = r.path.split("/")
-        for(var i = 0; i < parts.length; i++) {
-          var parent = parts.slice(0, i + 1).join("/")
-          if ($from(_parents).equals("name", parent).equals("level", i + 1).none()) {
-            _parents.push({ name: parent, isParent: parent != r.path, level: i + 1, pkg: r })
+        for(var j = 0; j < parts.length; j++) {
+          var parent = parts.slice(0, j + 1).join("/")
+          var key = parent + "|" + (j + 1)
+          if (!isDef(_parentsMap[key])) {
+            var entry = { name: parent, isParent: parent != r.path, level: j + 1, pkg: r }
+            _parentsMap[key] = entry
+            _parents.push(entry)
+          } else if (parent == r.path) {
+            _parentsMap[key].isParent = false
+            _parentsMap[key].pkg = r
+          }
+
+          if (j > 0) {
+            var prefix = parts.slice(0, j).join("/")
+            if (!isDef(_childrenMap[prefix])) _childrenMap[prefix] = []
+            if (_childrenMap[prefix].indexOf(parent) == -1) _childrenMap[prefix].push(parent)
           }
         }
-      })
+        _leafByPath[r.path] = r
+      }
 
-      return { list: _packages, parents: _parents }
+      Object.keys(_childrenMap).forEach(k => _childrenMap[k].sort())
+
+      return { list: _packages, parents: _parents, parentsMap: _parentsMap, childrenMap: _childrenMap, leafByPath: _leafByPath }
     }
 
+    var getPaging = (page, pageSize) => {
+      var _pageSize = isDef(pageSize) ? Number(pageSize) : Number(isDef(args.pageSize) ? args.pageSize : (args.options || {}).pageSize)
+      if (isNaN(_pageSize) || _pageSize <= 0) _pageSize = 0
+      var _page = isDef(page) ? Number(page) : Number(isDef(args.page) ? args.page : (args.options || {}).page)
+      if (isNaN(_page) || _page <= 0) _page = 1
+      return { pageSize: _pageSize, page: _page }
+    }
+
+    var applyPaging = (aList, page, pageSize) => {
+      var p = getPaging(page, pageSize)
+      if (p.pageSize <= 0) return { list: aList, total: aList.length, page: p.page, pageSize: 0 }
+      var start = (p.page - 1) * p.pageSize
+      return { list: aList.slice(start, start + p.pageSize), total: aList.length, page: p.page, pageSize: p.pageSize }
+    }
+
+    var withPagingInfo = (lst, pageInfo) => merge({ pageInfo: pageInfo }, lst)
+
+    // Paging options: pageSize/page can be passed as args or via args.options
     args.fns = {
       init   : () => {
         $cache("codeartifact-domains")
@@ -109,6 +150,14 @@ jobs:
         })
         .create()
 
+        $cache("codeartifact-package-tree")
+        .ttl(args.cache)
+        .fn(k => {
+          var packages = $cache("codeartifact-packages").get(k)
+          return buildPackageTree(packages)
+        })
+        .create()
+
         $cache("codeartifact-versions")
         .ttl(args.cache)
         .fn(k => {
@@ -129,47 +178,51 @@ jobs:
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
+        var reqPage = isDef(request.params.page) ? Number(request.params.page) : __
+        var reqPageSize = isDef(request.params.pageSize) ? Number(request.params.pageSize) : __
 
         if (parts.length == 0) {
           var domains = $cache("codeartifact-domains").get({})
-          return {
+          var paged = applyPaging($from(domains).sort("domainName").pselect(d => {
+            return {
+              isDirectory: true,
+              values     : {
+                "Domain" : d.domainName || d.name,
+                "Owner"  : d.owner || "",
+                "Created": isDef(d.createdTime) ? new Date(d.createdTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+              }
+            }
+          }), reqPage, reqPageSize)
+          return withPagingInfo({
             isList: true,
             fields: [ "Domain", "Owner", "Created" ],
             alignFields: [ "left", "left", "left" ],
             key   : [ "Domain" ],
-            list  : $from(domains).sort("domainName").pselect(d => {
-              return {
-                isDirectory: true,
-                values     : {
-                  "Domain" : d.domainName || d.name,
-                  "Owner"  : d.owner || "",
-                  "Created": isDef(d.createdTime) ? new Date(d.createdTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
-                }
-              }
-            })
-          }
+            list  : paged.list
+          }, paged)
         }
 
         if (parts.length == 1) {
           var domain = parts[0]
           var repos = $cache("codeartifact-repos").get({ domain: domain })
-          return {
+          var paged = applyPaging($from(repos).sort("repositoryName").pselect(r => {
+            return {
+              isDirectory: true,
+              values     : {
+                "Repository" : r.repositoryName || r.name,
+                "Domain"     : r.domainName || "",
+                "Owner"      : r.owner || "",
+                "Description": r.description || ""
+              }
+            }
+          }), reqPage, reqPageSize)
+          return withPagingInfo({
             isList: true,
             fields: [ "Repository", "Domain", "Owner", "Description" ],
             alignFields: [ "left", "left", "left", "left" ],
             key   : [ "Repository" ],
-            list  : $from(repos).sort("repositoryName").pselect(r => {
-              return {
-                isDirectory: true,
-                values     : {
-                  "Repository" : r.repositoryName || r.name,
-                  "Domain"     : r.domainName || "",
-                  "Owner"      : r.owner || "",
-                  "Description": r.description || ""
-                }
-              }
-            })
-          }
+            list  : paged.list
+          }, paged)
         }
 
         var domain = parts[0]
@@ -177,82 +230,110 @@ jobs:
         var remaining = parts.slice(2).join("/")
 
         var packages = $cache("codeartifact-packages").get({ domain: domain, repository: repo })
-        var tree = buildPackageTree(packages)
+        var tree = $cache("codeartifact-package-tree").get({ domain: domain, repository: repo })
         var lstParent = tree.parents
+        var childrenMap = tree.childrenMap || {}
+        var leafByPath = tree.leafByPath || {}
 
         if (remaining.length == 0) {
-          return {
+          var rootChildren = childrenMap[""] || $from(lstParent).equals("level", 1).select(r => r.name).sort()
+          var paged = applyPaging($from(rootChildren).pselect(name => {
+            var f = tree.parentsMap[name + "|1"]
+            return {
+              isDirectory: f.isParent,
+              values     : {
+                "Package"  : f.name,
+                "Format"   : f.pkg.format || "",
+                "Namespace": f.pkg.namespace || ""
+              }
+            }
+          }), reqPage, reqPageSize)
+          return withPagingInfo({
             isList: true,
             fields: [ "Package", "Format", "Namespace" ],
             alignFields: [ "left", "left", "left" ],
             key   : [ "Package" ],
-            list  : $from(lstParent).equals("level", 1).sort("name").pselect(f => {
-              return {
-                isDirectory: f.isParent,
-                values     : {
-                  "Package"  : f.name,
-                  "Format"   : f.pkg.format || "",
-                  "Namespace": f.pkg.namespace || ""
-                }
-              }
-            })
-          }
+            list  : paged.list
+          }, paged)
         }
 
         var level = remaining.split("/").filter(r => r.length > 0).length
 
-        if (remaining.length > 0 && $from(lstParent).starts("name", remaining).none()) {
-          return { isFile: false }
+        if (remaining.length > 0) {
+          var remParts = remaining.split("/").filter(r => r.length > 0)
+          if (remParts.length > 1) {
+            var ver = remParts[remParts.length - 1]
+            var pkgPath = remParts.slice(0, -1).join("/")
+            var leafPkg = leafByPath[pkgPath]
+            if (isDef(leafPkg)) {
+              var versions = $cache("codeartifact-versions").get({
+                domain    : domain,
+                repository: repo,
+                format    : leafPkg.format,
+                namespace : leafPkg.namespace,
+                package   : leafPkg.package
+              })
+
+              if ($from(versions).equals("version", ver).any()) {
+                return { isFile: true }
+              }
+            }
+          }
+
+          if (!isDef(childrenMap[remaining]) && !isDef(leafByPath[remaining])) {
+            return { isFile: false }
+          }
         }
 
-        var leaf = $from(lstParent).equals("isParent", false).equals("name", remaining).first()
-        if (isDef(leaf) && isDef(leaf.pkg)) {
+        var leaf = leafByPath[remaining]
+        if (isDef(leaf)) {
           var versions = $cache("codeartifact-versions").get({
             domain    : domain,
             repository: repo,
-            format    : leaf.pkg.format,
-            namespace : leaf.pkg.namespace,
-            package   : leaf.pkg.package
+            format    : leaf.format,
+            namespace : leaf.namespace,
+            package   : leaf.package
           })
 
-          return {
+          var _paged = applyPaging($from(versions).sort("-publishedTime").pselect(v => {
+            return {
+              isDirectory: false,
+              values     : {
+                "Version"  : v.version || "",
+                "Status"   : v.status || "",
+                "Published": isDef(v.publishedTime) ? new Date(v.publishedTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+              }
+            }
+          }), reqPage, reqPageSize)
+          return withPagingInfo({
             isList: true,
             fields: [ "Version", "Status", "Published" ],
             alignFields: [ "left", "left", "left" ],
             key   : [ "Version" ],
-            list  : $from(versions).sort("-publishedTime").pselect(v => {
-              return {
-                isDirectory: false,
-                values     : {
-                  "Version"  : v.version || "",
-                  "Status"   : v.status || "",
-                  "Published": isDef(v.publishedTime) ? new Date(v.publishedTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
-                }
-              }
-            })
-          }
+            list  : _paged.list
+          }, _paged)
         }
 
-        return {
+        var listPrefix = remaining
+        var listNames = childrenMap[listPrefix] || []
+        var paged = applyPaging($from(listNames).pselect(name => {
+          var f = tree.parentsMap[name + "|" + (level + 1)]
+          return {
+            isDirectory: f.isParent,
+            values     : {
+              "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), "") + (f.isParent ? "/" : ""),
+              "Format"   : f.pkg.format || "",
+              "Namespace": f.pkg.namespace || ""
+            }
+          }
+        }), reqPage, reqPageSize)
+        return withPagingInfo({
           isList: true,
           fields: [ "Package", "Format", "Namespace" ],
           alignFields: [ "left", "left", "left" ],
           key   : [ "Package" ],
-          list  : $from(lstParent)
-                  .equals("level", level + 1)
-                  .starts("name", remaining + (level > 0 ? "/" : ""))
-                  .sort("name")
-                  .pselect(f => {
-                    return {
-                      isDirectory: f.isParent,
-                      values     : {
-                        "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), "") + (f.isParent ? "/" : ""),
-                        "Format"   : f.pkg.format || "",
-                        "Namespace": f.pkg.namespace || ""
-                      }
-                    }
-                  })
-        }
+          list  : paged.list
+        }, paged)
       },
       getObj: (request, options) => {
         const uri = request.uri
@@ -275,20 +356,25 @@ jobs:
           package   : pkg,
           version   : version
         })
+        traverse(assets, (aK, aV, aP, aO) => {
+          if (aK == "SHA-512") {
+            delete aO[aK]
+          }
+        })
 
         var data = "\n"
-        data += `## Package version assets\n\n`
-        data += `Domain: \`${domain}\`  \n`
-        data += `Repository: \`${repo}\`  \n`
-        data += `Package: \`${pkg}\`  \n`
-        data += `Format: \`${format}\`  \n`
-        data += `Namespace: \`${isDef(namespace) ? namespace : ""}\`  \n`
-        data += `Version: \`${version}\`\n\n`
+        data += `## 📦 Package version assets\n\n`
+        data += `🏷️ **Domain:** \`${domain}\`  \n`
+        data += `📦 **Repository:** \`${repo}\`  \n`
+        data += `📄 **Package:** \`${pkg}\`  \n`
+        data += `🧩 **Format:** \`${format}\`  \n`
+        data += `🧭 **Namespace:** ${isDef(namespace) ? "`" + namespace + "`" : ""}  \n`
+        data += `🔖 **Version:** \`${version}\`\n\n---\n`
 
-        data += "| Asset | Size | Hash | Hash Algorithm |\n"
-        data += "|:---|---:|---|---|\n"
+        data += "| Asset | Size | Hashes |\n"
+        data += "|:---|---:|---|\n"
         $from(assets).sort("assetName").select(a => {
-          data += `| ${a.name || a.assetName || ""} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${a.hash || ""} | ${a.hashAlgorithm || ""} |\n`
+          data += `| ${a.name || a.assetName || ""} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${af.toYAML(a.hashes).replace(/\n/g, "</br>") || ""} |\n`
         })
 
         if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
@@ -299,3 +385,16 @@ jobs:
         }
       }
     }
+
+
+# todo:
+# - (httpdStart): 33221
+#   ((mapLibs )): true
+# - (CodeArtifactBrowse): 33221
+#   ((region          )): eu-west-1
+#   ((uri             )): /test
+#   ((browse          )): true
+#   ((cache           )): 3600000
+#   ((options         )):
+#     pageSize: 250
+#     page    : 1
