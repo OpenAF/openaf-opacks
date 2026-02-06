@@ -33,6 +33,7 @@ jobs:
         repository: repository
         format    : format
         namespace : namespace
+        initialize: initialize
   exec : | #js
     args.options = merge(args.options, {
       showURI : args.incURI,
@@ -110,12 +111,46 @@ jobs:
 
     var applyPaging = (aList, page, pageSize) => {
       var p = getPaging(page, pageSize)
-      if (p.pageSize <= 0) return { list: aList, total: aList.length, page: p.page, pageSize: 0 }
-      var start = (p.page - 1) * p.pageSize
-      return { list: aList.slice(start, start + p.pageSize), total: aList.length, page: p.page, pageSize: p.pageSize }
+      var _list = isArray(aList) ? aList : []
+      var total = _list.length
+
+      if (p.pageSize <= 0) {
+        return {
+          list       : _list,
+          total      : total,
+          page       : 1,
+          pageSize   : 0,
+          totalPages : 1,
+          hasPrevious: false,
+          hasNext    : false
+        }
+      }
+
+      var totalPages = Math.max(1, Math.ceil(total / p.pageSize))
+      var currentPage = Math.min(Math.max(1, p.page), totalPages)
+      var start = (currentPage - 1) * p.pageSize
+
+      return {
+        list       : _list.slice(start, start + p.pageSize),
+        total      : total,
+        page       : currentPage,
+        pageSize   : p.pageSize,
+        totalPages : totalPages,
+        hasPrevious: currentPage > 1,
+        hasNext    : currentPage < totalPages
+      }
     }
 
-    var withPagingInfo = (lst, pageInfo) => merge({ pageInfo: pageInfo }, lst)
+    var withPagingInfo = (lst, pageInfo) => merge({
+      pageInfo: {
+        total      : pageInfo.total,
+        page       : pageInfo.page,
+        pageSize   : pageInfo.pageSize,
+        totalPages : pageInfo.totalPages,
+        hasPrevious: pageInfo.hasPrevious,
+        hasNext    : pageInfo.hasNext
+      }
+    }, lst)
 
     // Paging options: pageSize/page can be passed as args or via args.options
     args.fns = {
@@ -144,8 +179,10 @@ jobs:
         .ttl(args.cache)
         .fn(k => {
           var _aws = getAWS()
+          log(`Fetching packages for domain ${k.domain} and repository ${k.repository}...`)
           var lst = _aws.CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format)
           if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
+          log(`Fetched ${lst.length} packages for domain ${k.domain} and repository ${k.repository}.`)
           return lst
         })
         .create()
@@ -153,7 +190,9 @@ jobs:
         $cache("codeartifact-package-tree")
         .ttl(args.cache)
         .fn(k => {
+          log(`Building package tree for domain ${k.domain} and repository ${k.repository}...`)
           var packages = $cache("codeartifact-packages").get(k)
+          log(`Built package tree for domain ${k.domain} and repository ${k.repository}.`)
           return buildPackageTree(packages)
         })
         .create()
@@ -173,17 +212,30 @@ jobs:
           return _aws.CODEARTIFACT_ListPackageVersionAssets(args.region, k.repository, k.domain, k.format, k.namespace, k.package, k.version)
         })
         .create()
+
+        if (isDef(args.initialize)) {
+          $doV(() => {
+            var _inits = af.fromJSSLON(args.initialize)
+            pForEach(_inits, i => {
+              $cache("codeartifact-package-tree").get({
+                domain    : i.domain,
+                repository: i.repository
+              })
+            })
+          })
+        }
       },
       getList: (request, options) => {
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
-        var reqPage = isDef(request.params.page) ? Number(request.params.page) : __
-        var reqPageSize = isDef(request.params.pageSize) ? Number(request.params.pageSize) : __
+        var reqParams = isMap(request.params) ? request.params : {}
+        var reqPage = isDef(reqParams.page) ? Number(reqParams.page) : __
+        var reqPageSize = isDef(reqParams.pageSize) ? Number(reqParams.pageSize) : __
 
         if (parts.length == 0) {
           var domains = $cache("codeartifact-domains").get({})
-          var paged = applyPaging($from(domains).sort("domainName").pselect(d => {
+          var paged = applyPaging($from(domains).sort("domainName").select(d => {
             return {
               isDirectory: true,
               values     : {
@@ -205,7 +257,7 @@ jobs:
         if (parts.length == 1) {
           var domain = parts[0]
           var repos = $cache("codeartifact-repos").get({ domain: domain })
-          var paged = applyPaging($from(repos).sort("repositoryName").pselect(r => {
+          var paged = applyPaging($from(repos).sort("repositoryName").select(r => {
             return {
               isDirectory: true,
               values     : {
@@ -237,7 +289,7 @@ jobs:
 
         if (remaining.length == 0) {
           var rootChildren = childrenMap[""] || $from(lstParent).equals("level", 1).select(r => r.name).sort()
-          var paged = applyPaging($from(rootChildren).pselect(name => {
+          var paged = applyPaging($from(rootChildren).select(name => {
             var f = tree.parentsMap[name + "|1"]
             return {
               isDirectory: f.isParent,
@@ -295,7 +347,7 @@ jobs:
             package   : leaf.package
           })
 
-          var _paged = applyPaging($from(versions).sort("-publishedTime").pselect(v => {
+          var _paged = applyPaging($from(versions).sort("-publishedTime").select(v => {
             return {
               isDirectory: false,
               values     : {
@@ -316,7 +368,7 @@ jobs:
 
         var listPrefix = remaining
         var listNames = childrenMap[listPrefix] || []
-        var paged = applyPaging($from(listNames).pselect(name => {
+        var paged = applyPaging($from(listNames).select(name => {
           var f = tree.parentsMap[name + "|" + (level + 1)]
           return {
             isDirectory: f.isParent,
@@ -397,4 +449,3 @@ jobs:
 #   ((cache           )): 3600000
 #   ((options         )):
 #     pageSize: 250
-#     page    : 1
