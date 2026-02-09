@@ -56,6 +56,47 @@ var results = $ch("embeddings").getAll({ vector: embedText("fox jumps"), k: 5 })
 cprint(results)
 ```
 
+## Text search with searchDB.js
+
+The `searchDB.js` helper wraps Apache Lucene to index text files on disk and
+search for matching lines later. It is independent of `vectordb.js` and stores
+the index at the configured filesystem path.
+
+```javascript
+load("searchDB.js")
+
+// Index a set of text files (one document per line)
+searchDB.indexFiles({
+  indexPath: "./data/text-index",
+  files: [
+    "./docs/guide.txt",
+    "./docs/notes.txt"
+  ],
+  reset: true
+})
+
+// Search and list which files/lines matched
+var matches = searchDB.search({
+  indexPath: "./data/text-index",
+  query: "vector search",
+  limit: 25
+})
+
+cprint(matches)
+```
+
+### searchDB.js API
+
+- `indexFiles({ indexPath, files, encoding, reset })`
+  - `indexPath` *(String)*: Directory where the Lucene index will be stored.
+  - `files` *(Array)*: List of text file paths to index.
+  - `encoding` *(String, optional)*: File encoding (default `UTF-8`).
+  - `reset` *(Boolean, optional)*: Recreate the index before indexing (default `true`).
+- `search({ indexPath, query, limit })`
+  - `indexPath` *(String)*: Directory where the Lucene index resides.
+  - `query` *(String)*: Lucene query string to run against indexed lines.
+  - `limit` *(Number, optional)*: Maximum hits to return (default `20`).
+
 ### Channel options
 
 - `path` *(String, optional)*: Filesystem path for the Lucene index. Defaults
