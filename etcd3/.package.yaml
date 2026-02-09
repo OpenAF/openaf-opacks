@@ -67,6 +67,7 @@ files:
 - perfmark-api-0.26.0.jar
 - proto-google-common-protos-2.22.0.jar
 - protobuf-java-3.25.0.jar
+- slf4j-api-1.7.36.jar
 filesHash:
   .maven.yaml: e3c001e482ae66aab69f322be3403b7d4b0ae463
   .precompile: f469636ceae98d4c1e551ff89b87b2939a48e2a6
@@ -113,3 +114,4 @@ filesHash:
   perfmark-api-0.26.0.jar: ef65452adaf20bf7d12ef55913aba24037b82738
   proto-google-common-protos-2.22.0.jar: 627126f6a05085dab0caba68dcdad118512975ef
   protobuf-java-3.25.0.jar: 0fd148453f05744419358b57a79702436cd70af6
+  slf4j-api-1.7.36.jar: 6c62681a2f655b49963a5983b8b0950a6120ae14
