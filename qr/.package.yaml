@@ -18,7 +18,7 @@ name: QR
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250223'
+version: '20260208'
 dependencies:
   openaf: '>=20241117'
 files:
@@ -27,21 +27,21 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- lib/core-3.5.3.jar
+- lib/core-3.5.4.jar
 - lib/jai-imageio-core-1.4.0.jar
-- lib/javase-3.5.3.jar
+- lib/javase-3.5.4.jar
 - oafp_qr.js
 - qr.js
 - tests/tests.js
 - tests/tests.yaml
 filesHash:
-  .maven.yaml: 6f8d0871142e3f2e12237c18f758d952a26c9f25
+  .maven.yaml: ecf6b270b9c8c89a4ab3e48a10dabdabdf54cf50
   .odoc.db: ff36ff6713ef41ea3d53d9c7cb35add0cce164d2
   .precompile: 87d0b8c5672656702f3a8a3230f916cbbede5086
   README.md: 07f2e68801e1ec718ed23bd618c8acb0ca052ba4
-  lib/core-3.5.3.jar: ca1349214a356cd7958651b2d5a0e1f3811a9c4b
+  lib/core-3.5.4.jar: 955fcd6bcd0723ddfb8ee6ed502d5fdf0e9676a9
   lib/jai-imageio-core-1.4.0.jar: fb6d79b929556362a241b2f65a04e538062f0077
-  lib/javase-3.5.3.jar: 55d93bb3ffee425a7be56cd6ff572fb64ac84593
+  lib/javase-3.5.4.jar: 5393a868b60694a181a8470a85f89a4bec3dce2e
   oafp_qr.js: d5d3cdd301053ad3ad08b4342e2d7d6946bf7950
   qr.js: 79931628007963980262f8f2e8e77a6fd62f0c82
   tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af

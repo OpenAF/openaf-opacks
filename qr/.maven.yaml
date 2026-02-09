@@ -1,12 +1,12 @@
 artifacts:
     - id      : com.google.zxing
       group   : core
-      version : 3.4.0
+      version : 3.5.4
       template: core-{{version}}.jar
 
     - id      : com.google.zxing
       group   : javase
-      version : 3.4.0
+      version : 3.5.4
       template: javase-{{version}}.jar
 
     - id      : com.github.jai-imageio
