@@ -20,8 +20,7 @@ scripts:
     _old.forEach(arg => {
       if (!_args.includes(arg)) _args.push(arg)
     })
-
-    restartOpenAF(["--install", "args=" + _old.join(" ")])
+    restartOpenAF(["--install", "args=" + _args.join(" ")])
 keywords:
 - Chronicle
 - Queue
@@ -35,22 +34,23 @@ name: cq
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251122'
+version: '20260208'
 dependencies:
   openaf: '>=20250901'
 files:
 - .maven.yaml
 - .package.yaml
 - README.md
-- affinity-3.27ea1.jar
+- affinity-2026.2.jar
+- annotations-24.0.1.jar
 - asm-9.2.jar
-- chronicle-analytics-2.27ea1.jar
-- chronicle-bytes-2.27ea9.jar
-- chronicle-core-2.27ea9.jar
-- chronicle-queue-5.27ea11.jar
-- chronicle-threads-2.27ea4.jar
-- chronicle-wire-2.27ea13.jar
-- compiler-2.27ea3.jar
+- chronicle-analytics-2026.2.jar
+- chronicle-bytes-2026.3.jar
+- chronicle-core-2026.3.jar
+- chronicle-queue-2026.1.jar
+- chronicle-threads-2026.3.jar
+- chronicle-wire-2026.3.jar
+- compiler-2026.2.jar
 - cq.js
 - jffi-1.3.12-native.jar
 - jffi-1.3.12.jar
@@ -59,19 +59,21 @@ files:
 - jnr-ffi-2.2.15.jar
 - jnr-x86asm-1.0.2.jar
 - oafp_cq.js
-- posix-2.27ea3.jar
+- posix-2026.2.jar
+- queue-data/metadata.cq4t
 filesHash:
   .maven.yaml: 53fe996e1e2db2f0e0e1062d06a29877d8cc0490
-  README.md: 29ccf16c4c4f52849188f7a2f6d7905cc0ba2227
-  affinity-3.27ea1.jar: 2c033e31cdbc31b144b5225964c0fac1fbadb96d
+  README.md: 8478e321d106059174cbbcacf873ecdb08d67d6e
+  affinity-2026.2.jar: fbc11d25b0865c931a06d61bc398c446b33b0dc5
+  annotations-24.0.1.jar: 13c5c75c4206580aa4d683bffee658caae6c9f43
   asm-9.2.jar: 81a03f76019c67362299c40e0ba13405f5467bff
-  chronicle-analytics-2.27ea1.jar: 98a3e8d4d9ec35cc7cc68e78cc9e5cce3bfaa012
-  chronicle-bytes-2.27ea9.jar: bebfd5665d1d69e39f4ab783b51025789a5de47d
-  chronicle-core-2.27ea9.jar: 1d972e3e8dade3c35772f733dd0a319717b3b4a9
-  chronicle-queue-5.27ea11.jar: e133246eab9331bff607244fce41b6f2ac25eced
-  chronicle-threads-2.27ea4.jar: 5e990ec0344d4f6ceb8152d7c9dedf9c7db50e3f
-  chronicle-wire-2.27ea13.jar: f431eec32dda54c5aa1c28b80439246ea5e0e20f
-  compiler-2.27ea3.jar: b92015188d3f17cd53d87a0d2729e8eb3659dd30
+  chronicle-analytics-2026.2.jar: a97db4ea025b103963e4b975e753456f93626f78
+  chronicle-bytes-2026.3.jar: 8da00ac85f58857505333a3c460aec301126a7d2
+  chronicle-core-2026.3.jar: 02faf8c8c9b3d3d903e088670215195058d08f20
+  chronicle-queue-2026.1.jar: f56d919ee3d86e63432be0037cbcc34580d1b60f
+  chronicle-threads-2026.3.jar: 1e77c6bf5597de68b669a1097fa550329d2597da
+  chronicle-wire-2026.3.jar: b1be302d924a5a4b45f5b2b6042b725d79ddd20a
+  compiler-2026.2.jar: 70d38a460881307c3a86a8819908b1e5894af21d
   cq.js: 3dd4c93fb11c9fd33cc90788c204be49e284b3bc
   jffi-1.3.12-native.jar: ebd0e45f447d80c16fbf2a82ff0253de28837b41
   jffi-1.3.12.jar: a439d46fb5d5d9539f16db7d574c7aafb952874a
@@ -80,4 +82,5 @@ filesHash:
   jnr-ffi-2.2.15.jar: fa3c32f463423469de314b03a157d5f1f7476ec0
   jnr-x86asm-1.0.2.jar: 006936bbd6c5b235665d87bd450f5e13b52d4b48
   oafp_cq.js: d59c60756e0041d272372ccf2cf17ca9e2f31f0b
-  posix-2.27ea3.jar: 89f1a52c3fcc11db96e8632abae5907a161cd81a
+  posix-2026.2.jar: ccb5fbee7068ea81624eb1529f52b17aaa0a1f4c
+  queue-data/metadata.cq4t: 67dfd19f3eb3649d6f3f6631e44d0bd36b8d8d19

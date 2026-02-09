@@ -19,7 +19,7 @@ var queue = new CQ("./queue-data", "DAILY");
 queue.append({ event: "start", timestamp: Date.now() });
 queue.appendAll([{ event: "finish" }]);
 print(queue.size());
-print(ow.format.toYAML(queue.readAll()));
+print(af.toYAML(queue.readAll()));
 queue.close(true);
 ```
 
