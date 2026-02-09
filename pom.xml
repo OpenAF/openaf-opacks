@@ -210,7 +210,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-dns</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
