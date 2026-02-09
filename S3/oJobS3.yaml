@@ -298,11 +298,11 @@ jobs:
       }
 
 # -----------------------
-- name : HTTP Browse - s3
-  to   : HTTP Browse generic
-  typeArgs:
+- name    : HTTP Browse - s3
+  to      : HTTP Browse generic
+  typeArgs: 
     noLog   : false 
-    shortcut:
+    shortcut: &httpBrowseS3TypeArgs
       name  : S3Browse
       keyArg: port
       args  : 
@@ -321,7 +321,7 @@ jobs:
         cache    : cache
         sortTab  : sortTab
         options  : options
-  exec : | #js
+  exec    : &httpBrowseS3Exec | #js
     args.options = merge(args.options, {
       showURI: args.incURI,
       sortTab: args.sortTab,
@@ -401,7 +401,7 @@ jobs:
           if (!_go) return { data: "no content", type: "md" }
         }
 
-        print("--> " + options.parentPath + puri)
+        log("get: " + options.parentPath + puri)
         switch(ext) {
         case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "md" }
         case "yml" :
@@ -437,3 +437,13 @@ jobs:
         }
       }
     }
+
+# --------------------------------
+- name    : HTTP Browse - s3 - API
+  to      : HTTP Browse API 
+  typeArgs: 
+    noLog   : false 
+    shortcut:
+      <<    : *httpBrowseS3TypeArgs
+      name  : S3BrowseAPI
+  exec    : *httpBrowseS3Exec
