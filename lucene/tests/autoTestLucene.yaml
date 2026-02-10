@@ -1,0 +1,58 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- lucene::VectorDB
+- lucene::SearchDBChannel
+- lucene::SearchDBAdvanced
+- lucene::SearchDBHelper
+- Test results
+
+jobs:
+- name: lucene::Init
+  exec: |
+    loadLib("lucene.js")
+    args.tests = require("tests/autoTestLucene.js")
+
+- name: lucene::VectorDB
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testVectorDB
+
+- name: lucene::SearchDBChannel
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSearchDBChannel
+
+- name: lucene::SearchDBAdvanced
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSearchDBAdvanced
+
+- name: lucene::SearchDBHelper
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSearchDBHelper
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - lucene::VectorDB
+  - lucene::SearchDBChannel
+  - lucene::SearchDBAdvanced
+  - lucene::SearchDBHelper
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

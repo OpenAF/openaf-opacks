@@ -5,34 +5,47 @@ scripts:
   preinstall: ''
   postinstall: ''
 keywords:
+- vectordb
 - lucene
-- search
 - vector
-- ann
+- ai
 - embedding
+- llm
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
-  url: https://openaf.io/opacks/Lucene.opack
-description: Lucene wrapper utilities and a minimal vector memory server for OpenAF
-name: Lucene
+  url: https://openaf.io/opacks/lucene.opack
+description: A lucene wrapper for both a small vector database for storing & querying vector embeddings and simple searching text with lucene.
+name: lucene
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251204'
+version: '20260210'
 dependencies:
-  openaf: '>=20251115'
+  openaf: '>=20250926'
 files:
 - .maven.yaml
 - .package.yaml
 - README.md
-- lucene-analyzers-common-8.11.4.jar
+- lucene-analysis-common-10.3.2.jar
 - lucene-core-10.3.2.jar
+- lucene-facet-10.3.2.jar
+- lucene-queries-10.3.2.jar
+- lucene-queryparser-10.3.2.jar
+- lucene-sandbox-10.3.2.jar
 - lucene.js
+- tests/autoTestLucene.js
+- tests/autoTestLucene.yaml
 filesHash:
-  .maven.yaml: ff39fade49c405da1ef9a9af1f75f5245436cb17
-  README.md: 43159ab68caaa6f51a7020b1b22c156560d8c063
-  lucene-analyzers-common-8.11.4.jar: a74683594f32cb4d947b12fb6afc0a326b293952
+  .maven.yaml: a403c731c6eb0e251c0747ba11bfd0c7b6d5683e
+  README.md: 32a2e335f01144bc80bdc1249d73bd3675219265
+  lucene-analysis-common-10.3.2.jar: 6aceb9bc2fa78798e14e5318ed1c4251f99fcfac
   lucene-core-10.3.2.jar: e46afe546d01bb56a87860ad60889945f29e7e51
-  lucene.js: ebfa6776df01914ba444ae1cec815e08fd0428c0
+  lucene-facet-10.3.2.jar: b951a92989893d2b96c2d4cb885fa1a91c65368b
+  lucene-queries-10.3.2.jar: e2519bed51773348277c52fe9d4bd434b6b68f88
+  lucene-queryparser-10.3.2.jar: cc9a5decdc61ff00ec1d27e3276ed4da058e5f34
+  lucene-sandbox-10.3.2.jar: a38472709daa3c4bb4e657cb1afa6ceeec9548fe
+  lucene.js: 780434a3ea7db4207eb37f01ef96a4b59c2da794
+  tests/autoTestLucene.js: 5801e633d56af5a1e4a4e7ac0f14cc52259aeecb
+  tests/autoTestLucene.yaml: f16d79ef7c285b9701d7deab3468d5a1b62cba30
