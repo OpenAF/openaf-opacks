@@ -1,5 +1,5 @@
 artifacts:
 - group  : org.apache.lucene
-  id     : lucene-core
+  id     : lucene-analysis-common
 - group  : org.apache.lucene
-  id     : lucene-analyzers-common
+  id     : lucene-queryparser
