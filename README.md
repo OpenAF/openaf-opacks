@@ -39,7 +39,6 @@
   |**KaTeX**|<img src=".github/badges/KaTeX.svg"><br>Wrapper for KaTeX library|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
-  |**Lucene**|<img src=".github/badges/Lucene.svg"><br>Lucene wrapper utilities and a minimal vector memory server for OpenAF|
   |**MDB**|<img src=".github/badges/MDB.svg"><br>Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
   |**MSBot**|<img src=".github/badges/MSBot.svg"><br>Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |**Mac**|<img src=".github/badges/Mac.svg"><br>Wrapper around Mac functionality.|
@@ -69,7 +68,6 @@
   |**TimeLive**|<img src=".github/badges/TimeLive.svg"><br>Wrapper for TimeLive timesheets API|
   |**Tunnels**|<img src=".github/badges/Tunnels.svg"><br>Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
   |**UnixPAM**|<img src=".github/badges/UnixPAM.svg"><br>Provides UNIX PAM based authentication|
-  |**VectorDB**|<img src=".github/badges/VectorDB.svg"><br>A small vector database for storing and querying vector embeddings|
   |**XChart**|<img src=".github/badges/XChart.svg"><br>Provides a wrapper to use the XChart java charts library. Allows the creation of png (or others) images of charts and html/css inline images of charts.|
   |**asciinema**|<img src=".github/badges/asciinema.svg"><br>Asciinema wrapper for use with OpenAF HTTPd server|
   |**cq**|<img src=".github/badges/cq.svg"><br>A Chronicle Queue&#x27;s OpenAF wrapper.|
@@ -99,6 +97,7 @@
   |**jdbc-yugabytedb**|<img src=".github/badges/jdbc-yugabytedb.svg"><br>Wrapper for JDBC drivers of yugabytedb|
   |**jexer**|<img src=".github/badges/jexer.svg"><br>Wrapper for the Jexer library|
   |**lanterna**|<img src=".github/badges/lanterna.svg"><br>Wrapper for the Java Lanterna library|
+  |**lucene**|<img src=".github/badges/lucene.svg"><br>A lucene wrapper for both a small vector database for storing &amp; querying vector embeddings and simple searching text with lucene.|
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
   |**oJobIO**|<img src=".github/badges/oJobIO.svg"><br>Service to provide easy-to-access oJobs for daily routines.|
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
