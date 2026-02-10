@@ -1,7 +1,7 @@
-sqlite-jdbc-3.51.1.0.jar:
+sqlite-jdbc-3.51.2.0.jar:
   name: The Apache Software License, Version 2.0
   url: https://www.apache.org/licenses/LICENSE-2.0.txt
-  version: 3.51.1.0
+  version: 3.51.2.0
   changed from original: false
   comments: ''
   license: |-
