@@ -12,7 +12,7 @@ jobs:
   to   : HTTP Browse generic
   typeArgs:
     noLog   : false
-    shortcut:
+    shortcut: &httpBrowseCodeArtifactTypeArgs
       name  : CodeArtifactBrowse
       keyArg: port
       args  :
@@ -34,7 +34,7 @@ jobs:
         format    : format
         namespace : namespace
         initialize: initialize
-  exec : | #js
+  exec : &httpBrowseCodeArtifactExec | #js
     args.options = merge(args.options, {
       showURI : args.incURI,
       sortTab : args.sortTab,
@@ -437,6 +437,17 @@ jobs:
         }
       }
     }
+
+
+# -----------------------------------------
+- name    : HTTP Browse - codeartifact - API
+  to      : HTTP Browse API
+  typeArgs:
+    noLog   : false
+    shortcut:
+      <<    : *httpBrowseCodeArtifactTypeArgs
+      name  : CodeArtifactBrowseAPI
+  exec    : *httpBrowseCodeArtifactExec
 
 
 # todo:
