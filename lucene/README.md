@@ -208,6 +208,33 @@ searchDB.indexFiles({
   reset: true
 })
 
+// Recursive local indexing
+searchDB.indexFiles({
+  indexPath: "./data/text-index",
+  path: "./docs",
+  recursive: true,
+  reset: false
+})
+
+// Recursive S3 indexing
+searchDB.indexFiles({
+  indexPath: "./data/text-index",
+  reset: false,
+  s3: {
+    url: "https://s3.amazonaws.com",
+    bucket: "my-bucket",
+    prefix: "documents/",
+    accessKey: "...",
+    secret: "...",
+    region: "us-east-1"
+  }
+})
+
+// Incremental changes
+searchDB.addFile({ indexPath: "./data/text-index", file: "./docs/new-file.txt" })
+searchDB.removeFile({ indexPath: "./data/text-index", file: "./docs/new-file.txt" })
+searchDB.removeFile({ indexPath: "./data/text-index", file: "s3://my-bucket/documents/old-file.txt" })
+
 var matches = searchDB.search({
   indexPath: "./data/text-index",
   query: "vector search",
@@ -218,17 +245,31 @@ cprint(matches)
 
 ### `searchDB` API
 
-- `indexFiles({ indexPath, files, encoding, reset })`
+- `indexFiles({ indexPath, files, path, recursive, s3, encoding, reset })`
+- `addFile({ indexPath, file, encoding, reset })`
+- `removeFile({ indexPath, file })`
 - `search({ indexPath, query, limit })`
 
 Defaults:
 
 - `indexPath`: `./lucene/search`
 - `encoding`: `UTF-8`
+- `recursive`: `false`
 - `reset`: `true`
 - `limit`: `20`
 
 Search results include `file`, `line`, `text`, and `score`.
+
+## oJob wrapper
+
+Use `oJobLucene.yaml` for quick operations:
+
+```bash
+ojob oJobLucene.yaml job="Lucene SearchDB Index Files" indexPath=./data/text-index path=./docs recursive=true reset=true
+ojob oJobLucene.yaml job="Lucene SearchDB Add File" indexPath=./data/text-index file=./docs/new-file.txt
+ojob oJobLucene.yaml job="Lucene SearchDB Remove File" indexPath=./data/text-index file=./docs/new-file.txt
+ojob oJobLucene.yaml job="Lucene SearchDB Search" indexPath=./data/text-index query="lucene" limit=10
+```
 
 ## Testing
 
