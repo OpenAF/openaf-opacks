@@ -1,0 +1,110 @@
+# Author: Nuno Aguiar
+
+jobs:
+- name: Lucene SearchDB Index Files
+  typeArgs:
+    shortcut:
+      name  : luceneIndexFiles
+      keyArg: indexPath
+      args:
+        files     : files
+        path      : path
+        recursive : recursive
+        encoding  : encoding
+        reset     : reset
+        s3        : s3
+  help: |
+    Indexes files for searchDB. Expects:
+
+      indexPath (String) The index path (defaults to ./lucene/search).
+      files     (Array)  Optional list of local files.
+      path      (String) Optional local path to index.
+      recursive (Boolean) If true and path is provided, index recursively.
+      encoding  (String) File encoding (defaults to UTF-8).
+      reset     (Boolean) If true recreates the index (defaults to true).
+      s3        (Map) Optional S3 definition: { bucket, prefix, url, accessKey, secret, region, useVersion1, ignoreCertCheck }.
+  check:
+    in:
+      indexPath: isString.default("./lucene/search")
+      files    : isArray.default([])
+      path     : isString.default(__)
+      recursive: toBoolean.isBoolean.default(false)
+      encoding : isString.default("UTF-8")
+      reset    : toBoolean.isBoolean.default(true)
+      s3       : isMap.default(__)
+  exec: |
+    loadLib("lucene.js")
+    searchDB.indexFiles(args)
+
+- name: Lucene SearchDB Add File
+  typeArgs:
+    shortcut:
+      name  : luceneAddFile
+      keyArg: file
+      args:
+        indexPath: indexPath
+        encoding : encoding
+        reset    : reset
+  help: |
+    Adds a single local file to a searchDB index. Expects:
+
+      file      (String) The local file path to add.
+      indexPath (String) The index path (defaults to ./lucene/search).
+      encoding  (String) File encoding (defaults to UTF-8).
+      reset     (Boolean) If true recreates the index before adding.
+  check:
+    in:
+      file     : isString
+      indexPath: isString.default("./lucene/search")
+      encoding : isString.default("UTF-8")
+      reset    : toBoolean.isBoolean.default(false)
+  exec: |
+    loadLib("lucene.js")
+    searchDB.addFile(args)
+
+- name: Lucene SearchDB Remove File
+  typeArgs:
+    shortcut:
+      name  : luceneRemoveFile
+      keyArg: file
+      args:
+        indexPath: indexPath
+  help: |
+    Removes a file from a searchDB index. Expects:
+
+      file      (String) The indexed file path (for S3 use s3://bucket/object).
+      indexPath (String) The index path (defaults to ./lucene/search).
+  check:
+    in:
+      file     : isString
+      indexPath: isString.default("./lucene/search")
+  exec: |
+    loadLib("lucene.js")
+    searchDB.removeFile(args)
+
+- name: Lucene SearchDB Search
+  typeArgs:
+    shortcut:
+      name  : luceneSearch
+      keyArg: query
+      args:
+        indexPath: indexPath
+        limit    : limit
+  help: |
+    Searches a searchDB index. Expects:
+
+      query     (String) Lucene query expression.
+      indexPath (String) The index path (defaults to ./lucene/search).
+      limit     (Number) Maximum results (defaults to 20).
+
+    Sets in args:
+
+      result (Array) Search results.
+  check:
+    in:
+      query    : isString
+      indexPath: isString.default("./lucene/search")
+      limit    : toNumber.isNumber.default(20)
+  exec: |
+    loadLib("lucene.js")
+    args.result = searchDB.search(args)

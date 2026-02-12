@@ -11,6 +11,7 @@ todo:
 - lucene::SearchDBChannel
 - lucene::SearchDBAdvanced
 - lucene::SearchDBHelper
+- lucene::SearchDBHelperFileOps
 - Test results
 
 jobs:
@@ -39,6 +40,11 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testSearchDBHelper
 
+- name: lucene::SearchDBHelperFileOps
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSearchDBHelperFileOps
+
 - name: Test results
   from: oJob Test Results
   deps:
@@ -46,6 +52,7 @@ jobs:
   - lucene::SearchDBChannel
   - lucene::SearchDBAdvanced
   - lucene::SearchDBHelper
+  - lucene::SearchDBHelperFileOps
   args:
     quiet: true
   exec: |

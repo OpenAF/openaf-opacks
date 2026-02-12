@@ -228,4 +228,47 @@
 
     cleanPath(basePath)
   }
+
+
+  exports.testSearchDBHelperFileOps = function() {
+    var indexPath = basePath + "/helper-fileops-index"
+    var docsPath = basePath + "/fileops-docs"
+
+    cleanPath(basePath)
+    io.mkdir(basePath)
+    io.mkdir(docsPath)
+
+    var rootFile = docsPath + "/root.txt"
+    var nestedPath = docsPath + "/nested"
+    var nestedFile = nestedPath + "/child.txt"
+
+    io.mkdir(nestedPath)
+    io.writeFileString(rootFile, "alpha line\nshared terms\n")
+    io.writeFileString(nestedFile, "nested line\nrecursive keyword\n")
+
+    searchDB.indexFiles({
+      indexPath: indexPath,
+      path: docsPath,
+      recursive: true,
+      reset: true
+    })
+
+    var recHits = searchDB.search({ indexPath: indexPath, query: "recursive", limit: 10 })
+    ow.test.assert(recHits.length >= 1, true, "searchDB helper recursive indexing should include nested files")
+
+    var addFile = docsPath + "/single.txt"
+    io.writeFileString(addFile, "single add file\n")
+    searchDB.addFile({ indexPath: indexPath, file: addFile })
+
+    var addHits = searchDB.search({ indexPath: indexPath, query: "single", limit: 10 })
+    ow.test.assert(addHits.length >= 1, true, "searchDB helper addFile should index a single file")
+
+    searchDB.removeFile({ indexPath: indexPath, file: addFile })
+
+    var removedHits = searchDB.search({ indexPath: indexPath, query: "single", limit: 10 })
+    ow.test.assert(removedHits.length, 0, "searchDB helper removeFile should remove indexed lines from file")
+
+    cleanPath(basePath)
+  }
+
 })()

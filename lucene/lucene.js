@@ -1309,13 +1309,78 @@ var searchDB = {
 
         return __
     },
-    indexFiles: function(options) {
-        options = _$(options, "options").isMap().default({})
-        options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
-        options.files = _$(options.files, "options.files").isArray().default([])
-        options.encoding = _$(options.encoding, "options.encoding").isString().default("UTF-8")
-        options.reset = _$(options.reset, "options.reset").isBoolean().default(true)
+    __indexContent: function(writer, filePath, content) {
+        var lines = String(content).split(/\r?\n/)
+        for (var li = 0; li < lines.length; li++) {
+            var lineText = lines[li]
+            var doc = new Packages.org.apache.lucene.document.Document()
+            doc.add(new Packages.org.apache.lucene.document.StringField("path", String(filePath), Packages.org.apache.lucene.document.Field.Store.YES))
+            doc.add(new Packages.org.apache.lucene.document.StoredField("line", java.lang.Integer.valueOf(li + 1)))
+            doc.add(new Packages.org.apache.lucene.document.TextField("content", String(lineText), Packages.org.apache.lucene.document.Field.Store.YES))
+            writer.addDocument(doc)
+        }
+    },
+    __collectLocalFiles: function(options) {
+        var files = []
 
+        if (isArray(options.files)) {
+            for (var i = 0; i < options.files.length; i++) {
+                if (isDef(options.files[i])) files.push(String(options.files[i]))
+            }
+        }
+
+        if (isDef(options.path)) {
+            if (toBoolean(options.recursive)) {
+                var recFiles = listFilesRecursive(options.path)
+                for (var ri = 0; ri < recFiles.length; ri++) {
+                    if (recFiles[ri].isFile) files.push(String(recFiles[ri].filepath))
+                }
+            } else {
+                var lst = io.listFiles(options.path).files
+                for (var li = 0; li < lst.length; li++) {
+                    if (lst[li].isFile) files.push(String(lst[li].filepath))
+                }
+            }
+        }
+
+        return files
+    },
+    __collectS3Files: function(options) {
+        if (isUnDef(options.s3)) return []
+
+        var cfg = options.s3
+        if (isMap(cfg)) {
+            _$(cfg.bucket, "options.s3.bucket").isString().$_()
+            cfg.prefix = _$(cfg.prefix, "options.s3.prefix").isString().default("")
+
+            if (isUnDef(cfg.client)) {
+                loadLib("s3.js")
+                cfg.client = new S3(cfg.url, cfg.accessKey, cfg.secret, cfg.region, cfg.useVersion1, cfg.ignoreCertCheck)
+                cfg.__ownedClient = true
+            }
+        }
+
+        _$(cfg.client, "options.s3.client").$_("Please provide options.s3.client or S3 configuration parameters.")
+
+        var files = []
+        try {
+            var lst = cfg.client.listObjects(cfg.bucket, cfg.prefix, false, true)
+            for (var i = 0; i < lst.length; i++) {
+                if (lst[i].isFile) {
+                    files.push({
+                        id: "s3://" + cfg.bucket + "/" + String(lst[i].filename).replace(/^\/+/, ""),
+                        bucket: cfg.bucket,
+                        object: lst[i].filename
+                    })
+                }
+            }
+        } finally {
+            if (cfg.__ownedClient) cfg.client.close()
+        }
+
+        return files
+    },
+    __withWriter: function(options, fn) {
         var analyzer = new Packages.org.apache.lucene.analysis.standard.StandardAnalyzer()
         var dir = Packages.org.apache.lucene.store.FSDirectory.open(java.nio.file.Paths.get(options.indexPath))
         var config = new Packages.org.apache.lucene.index.IndexWriterConfig(analyzer)
@@ -1327,25 +1392,90 @@ var searchDB = {
 
         var writer = new Packages.org.apache.lucene.index.IndexWriter(dir, config)
         try {
-            for (var fi = 0; fi < options.files.length; fi++) {
-                var filePath = options.files[fi]
-                if (isUnDef(filePath)) continue
-                var content = io.readFileString(filePath, options.encoding)
-                var lines = String(content).split(/\r?\n/)
-                for (var li = 0; li < lines.length; li++) {
-                    var lineText = lines[li]
-                    var doc = new Packages.org.apache.lucene.document.Document()
-                    doc.add(new Packages.org.apache.lucene.document.StringField("path", String(filePath), Packages.org.apache.lucene.document.Field.Store.YES))
-                    doc.add(new Packages.org.apache.lucene.document.StoredField("line", java.lang.Integer.valueOf(li + 1)))
-                    doc.add(new Packages.org.apache.lucene.document.TextField("content", String(lineText), Packages.org.apache.lucene.document.Field.Store.YES))
-                    writer.addDocument(doc)
-                }
-            }
+            fn(writer)
             writer.commit()
         } finally {
             writer.close()
             dir.close()
         }
+    },
+    addFile: function(options) {
+        options = _$(options, "options").isMap().default({})
+        options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
+        options.file = _$(options.file, "options.file").isString().$_()
+        options.encoding = _$(options.encoding, "options.encoding").isString().default("UTF-8")
+        options.reset = _$(options.reset, "options.reset").isBoolean().default(false)
+
+        this.__withWriter(options, function(writer) {
+            var content = io.readFileString(options.file, options.encoding)
+            this.__indexContent(writer, options.file, content)
+        })
+    },
+    removeFile: function(options) {
+        options = _$(options, "options").isMap().default({})
+        options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
+        options.file = _$(options.file, "options.file").isString().$_()
+
+        var analyzer = new Packages.org.apache.lucene.analysis.standard.StandardAnalyzer()
+        var dir = Packages.org.apache.lucene.store.FSDirectory.open(java.nio.file.Paths.get(options.indexPath))
+        var config = new Packages.org.apache.lucene.index.IndexWriterConfig(analyzer)
+        config.setOpenMode(Packages.org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
+
+        var writer = new Packages.org.apache.lucene.index.IndexWriter(dir, config)
+        try {
+            var term = new Packages.org.apache.lucene.index.Term("path", String(options.file))
+            var terms = java.lang.reflect.Array.newInstance(Packages.org.apache.lucene.index.Term, 1)
+            terms[0] = term
+            writer.deleteDocuments(terms)
+            writer.commit()
+        } finally {
+            writer.close()
+            dir.close()
+        }
+    },
+    indexFiles: function(options) {
+        options = _$(options, "options").isMap().default({})
+        options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
+        options.files = _$(options.files, "options.files").isArray().default([])
+        options.path = _$(options.path, "options.path").isString().default(__)
+        options.recursive = _$(options.recursive, "options.recursive").isBoolean().default(false)
+        options.s3 = _$(options.s3, "options.s3").isMap().default(__)
+        options.encoding = _$(options.encoding, "options.encoding").isString().default("UTF-8")
+        options.reset = _$(options.reset, "options.reset").isBoolean().default(true)
+
+        var localFiles = this.__collectLocalFiles(options)
+        var s3Files = this.__collectS3Files(options)
+
+        this.__withWriter(options, function(writer) {
+            for (var fi = 0; fi < localFiles.length; fi++) {
+                var filePath = localFiles[fi]
+                if (isUnDef(filePath)) continue
+                var content = io.readFileString(filePath, options.encoding)
+                this.__indexContent(writer, filePath, content)
+            }
+
+            if (isDef(options.s3) && s3Files.length > 0) {
+                var cfg = options.s3
+                var client = cfg.client
+                var ownClient = false
+                if (isUnDef(client)) {
+                    loadLib("s3.js")
+                    client = new S3(cfg.url, cfg.accessKey, cfg.secret, cfg.region, cfg.useVersion1, cfg.ignoreCertCheck)
+                    ownClient = true
+                }
+
+                try {
+                    for (var si = 0; si < s3Files.length; si++) {
+                        var sf = s3Files[si]
+                        var stream = client.getObjectStream(sf.bucket, sf.object)
+                        var txt = af.fromInputStream2String(stream, options.encoding)
+                        this.__indexContent(writer, sf.id, txt)
+                    }
+                } finally {
+                    if (ownClient) client.close()
+                }
+            }
+        })
     },
     search: function(options) {
         options = _$(options, "options").isMap().default({})
