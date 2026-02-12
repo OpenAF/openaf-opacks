@@ -16,15 +16,15 @@ name: jdbc-postgresql
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260120'
+version: '20260212'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-postgresql.js
-- postgresql-42.7.9.jar
+- postgresql-42.7.10.jar
 filesHash:
-  LICENSES.txt: b365dc2e00c5453a9f356922c83c794cbd9f1e02
+  LICENSES.txt: d6de6f1d93f77bd516475d4fc828c41f7d94567f
   jdbc-postgresql.js: 6fc8a4ee453c2f0acd20e3981fc93437e4b6ea43
-  postgresql-42.7.9.jar: 2b748cd83a1ba3d6ef62dc64e075d1760f9a6d31
+  postgresql-42.7.10.jar: 35100a3f0899551e27af8fed4a3414619a4663b3
