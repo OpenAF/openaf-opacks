@@ -1,6 +1,7 @@
 # Author: Nuno Aguiar
 
 jobs:
+# ---------------------------------
 - name: Lucene SearchDB Index Files
   typeArgs:
     shortcut:
@@ -36,6 +37,7 @@ jobs:
     loadLib("lucene.js")
     searchDB.indexFiles(args)
 
+# ------------------------------
 - name: Lucene SearchDB Add File
   typeArgs:
     shortcut:
@@ -62,6 +64,7 @@ jobs:
     loadLib("lucene.js")
     searchDB.addFile(args)
 
+# ---------------------------------
 - name: Lucene SearchDB Remove File
   typeArgs:
     shortcut:
@@ -82,6 +85,7 @@ jobs:
     loadLib("lucene.js")
     searchDB.removeFile(args)
 
+# ----------------------------
 - name: Lucene SearchDB Search
   typeArgs:
     shortcut:
