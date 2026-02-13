@@ -191,6 +191,31 @@ ow.ch.__types.vectordb = {
         }
         return __
     },
+    /**
+     * <odoc>
+     * <key>ow.ch.types.vectordb</key>
+     * A vector database channel type using Apache Lucene's k-NN capabilities.\
+     * Supports storing vectors along with payload metadata, and performing similarity search.\
+     * Options:\
+     *   - path (string, required): filesystem path for Lucene index storage\
+     *   - dimension (number, default: 384): dimensionality of the vectors\
+     *   - idField (string, default: "id"): name of the field to use as the unique identifier for documents\
+     *   - vectorField (string, default: "vector"): name of the field to store the vector for k-NN search\
+     *   - vectorStoreField (string, default: vectorField + "_stored"): name of the field to store the vector as JSON for retrieval (since k-NN fields are not stored)\
+     *   - payloadField (string, default: "payload"): name of the field to store the payload metadata as JSON\
+     *   - metaPrefix (string, default: "meta_"): prefix to use for storing individual metadata fields for filtering\
+     *   - autoCommit (boolean, default: true): whether to automatically commit after each write operation\
+     *   - autoRefresh (boolean, default: true): whether to automatically refresh the searcher after each write operation\
+     *   - similarity (string, default: "cosine"): similarity function to use for k-NN search ("cosine", "dot_product", or "euclidean")\
+     *   Example usage:\
+     *   // Create a vectordb channel\
+     *   ow.ch.create("myVectors", "vectordb", { path: "./my_vector_index", dimension: 128 })\
+     *   // Add a vector with payload\
+     *   ow.ch.set("myVectors", "vec1", { vector: [0.1, 0.2, ...], payload: { name: "Vector 1", category: "A" } })\
+     *   // Search for similar vectors\
+     *   var results = ow.ch.search("myVectors", [0.1, 0.2, ...], 5, function(result) { return result.payload.category === "A" })\
+     * </odoc>
+     */
     create: function(aName, shouldCompress, options) {
         options                  = _$(options, "options").isMap().default({})
         _$(options.path, "options.path").isString().$_()
@@ -1085,6 +1110,43 @@ ow.ch.__types.searchdb = {
             if (channel.hasFacets) channel.taxoWriter.commit()
         }
     },
+    /**
+     * <odoc>
+     * <key>ow.ch.types.searchDB</key>
+     * Creates a new search database or opens an existing one. The search database is stored in the file system and uses Apache Lucene under the hood.\
+     * \ 
+     * The returned object has the following methods:\
+     * \
+     *   - `size()`: returns the number of documents in the search database.\
+     *   - `forEach(fn)`: iterates over all documents in the search database, calling `fn(id, doc)` for each document, where `id` is the document ID and `doc` is the document object.\
+     *   - `getAll([full])`: returns an array of all documents in the search database. If `full` is provided with certain options, it can return additional metadata and support more complex queries.\
+     * \
+     * The `create` method takes three parameters:\
+     * \
+     *   - `aName`: a string representing the name of the search database.\
+     *   - `shouldCompress`: a boolean indicating whether to compress the stored data (not currently used).\
+     *   - `options`: an object with the following optional properties:\
+     *   - `path`: a string specifying the file system path where the search database will be stored. Defaults to `./lucene/aName`.\
+     *   `idField`, `contentField`, `payloadField`: strings specifying the field names for document ID, content, and payload. Defaults to "id", "content", and "payload" respectively.\
+     *   `autoCommit`: a boolean indicating whether to automatically commit changes to the index. Defaults to true.\
+     *   `autoRefresh`: a boolean indicating whether to automatically refresh the searcher after commits. Defaults to true.\
+     *   `schema`: an object defining the schema for additional fields in the documents.\
+     *   `facetFields`: an array of strings specifying which fields should be treated as facets for faceted search.\
+     *   `defaultSortField`: a string specifying the default field to sort search results by.\
+     *   `analyzer`: a string specifying the Lucene analyzer to use (e.g., "standard", "whitespace"). Defaults to "standard".\
+     *   `taxonomyPath`: a string specifying the file system path for storing facet taxonomy data. Defaults to `options.path/_taxonomy`.\
+     * \
+     * Example usage:\
+     * \
+     * var db = ow.ch.types.searchDB.create("mySearchDB", false, { autoCommit: true, facetFields: ["category"] });\
+     * db.forEach(function(id, doc) {\
+     *   console.log("Document ID:", id);\
+     *   console.log("Content:", doc.content);\
+     * });\
+     * var allDocs = db.getAll();\
+     * console.log("Total documents:", allDocs.length);\
+     * </odoc>
+     */
     create: function(aName, shouldCompress, options) {
         if (!this.__isObj(options)) options = {}
         options.path = _$(options.path, "options.path").isString().default("./lucene/" + aName)
@@ -1392,13 +1454,29 @@ var searchDB = {
 
         var writer = new Packages.org.apache.lucene.index.IndexWriter(dir, config)
         try {
-            fn(writer)
+            fn.call(this, writer)
             writer.commit()
         } finally {
             writer.close()
             dir.close()
         }
     },
+    /**
+     * <odoc>
+     * <key>searchDB.addFile(options)</key>
+     * Indexes a file line by line. Each line is indexed as a separate document with fields: `path` (file path), `line` (line number) and `content` (line text).\
+     * \
+     * `options` is an object that can have the following properties:\
+     * - `indexPath` (string, default `"./lucene/search"`): path to the Lucene index directory.\
+     * - `file` (string, required): path to the file to be indexed.\
+     * - `encoding` (string, default `"UTF-8"`): file encoding.\
+     * - `reset` (boolean, default `false`): if true, the existing index will be cleared before indexing the file.\
+     * \
+     * Example:\
+     * \
+     * searchDB.addFile({ file: "./logs/app.log", reset: true })
+     * </odoc>
+     */
     addFile: function(options) {
         options = _$(options, "options").isMap().default({})
         options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
@@ -1411,6 +1489,20 @@ var searchDB = {
             this.__indexContent(writer, options.file, content)
         })
     },
+    /**
+     * <odoc>
+     * <key>searchDB.removeFile(options)</key>
+     * Removes all documents from the index that have the `path` field equal to the specified file path.\
+     * \
+     * `options` is an object that can have the following properties:\
+     * - `indexPath` (string, default `"./lucene/search"`): path to the Lucene index directory.\
+     * - `file` (string, required): path to the file whose indexed documents should be removed.\
+     * \
+     * Example:\
+     * \
+     * searchDB.removeFile({ file: "./logs/app.log" })
+     * </odoc>
+     */
     removeFile: function(options) {
         options = _$(options, "options").isMap().default({})
         options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
@@ -1433,6 +1525,32 @@ var searchDB = {
             dir.close()
         }
     },
+    /**
+     * <odoc>
+     * <key>searchDB.indexFiles(options)</key>
+     * Indexes multiple files line by line. Each line is indexed as a separate document with fields: `path` (file path), `line` (line number) and `content` (line text).\
+     * \
+     * `options` is an object that can have the following properties:\
+     *   - `indexPath` (string, default `"./lucene/search"`): path to the Lucene index directory.\
+     *   - `files` (array of strings, optional): list of file paths to be indexed.\
+     *   - `path` (string, optional): if specified, all files in this directory will be indexed. If `recursive` is true, files in subdirectories will also be indexed.\
+     *   - `recursive` (boolean, default `false`): if true, files in subdirectories of `path` will also be indexed.\
+     *   - `s3` (object, optional): if specified, files from an S3 bucket will be indexed. The object should have the following properties:\
+     *   - `client` (S3 client instance, optional): if not provided, a new S3 client will be created using the other configuration parameters.\
+     *   - `url` (string, required if `client` is not provided): S3 service URL.\
+     *   - `accessKey` (string, required if `client` is not provided): S3 access key.\
+     *   - `secret` (string, required if `client` is not provided): S3 secret key.\
+     *   - `region` (string, optional): S3 region.\
+     *   `useVersion1` (boolean, default `false`): if true, S3 client will use version 1 of the API.\
+     *   `ignoreCertCheck` (boolean, default `false`): if true, SSL certificate checks will be ignored when connecting to S3.
+     *   - `encoding` (string, default `"UTF-8"`): file encoding.\
+     *   - `reset` (boolean, default `false`): if true, the existing index will be cleared before indexing the files.\
+     * \
+     * Example:\
+     * \
+     * searchDB.indexFiles({ path: "./logs", recursive: true, reset: true })
+     * </odoc>
+     */
     indexFiles: function(options) {
         options = _$(options, "options").isMap().default({})
         options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")
@@ -1477,6 +1595,30 @@ var searchDB = {
             }
         })
     },
+    /**
+     * <odoc>
+     * <key>searchDB.search(options)</key>
+     * Searches the indexed documents for lines matching the specified query.\
+     * \
+     * `options` is an object that can have the following properties:\
+     * - `indexPath` (string, default `"./lucene/search"`): path to the Lucene index directory.\
+     * - `query` (string, required): Lucene query string to search for in the `content` field of the indexed documents.\
+     * - `limit` (number, default `20`): maximum number of search results to return.\
+     * \
+     * The method returns an array of search results, where each result is an object with the following properties:\
+     * - `file`: the value of the `path` field of the indexed document (i.e., the file path).\
+     * - `line`: the value of the `line` field of the indexed document (i.e., the line number).\
+     * - `text`: the value of the `content` field of the indexed document (i.e., the line text).\
+     * - `score`: the relevance score of the search result.\
+     * \
+     * Example:\
+     * \
+     * var results = searchDB.search({ query: "error", limit: 10 })\
+     * results.forEach(function(r) {\
+     *   console.log(r.file + ":" + r.line + " - " + r.text)\
+     * })
+     * </odoc>
+     */
     search: function(options) {
         options = _$(options, "options").isMap().default({})
         options.indexPath = _$(options.indexPath, "options.indexPath").isString().default("./lucene/search")

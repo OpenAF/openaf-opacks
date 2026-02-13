@@ -21,11 +21,14 @@ name: lucene
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260212'
+version: '20260213'
 dependencies:
   openaf: '>=20250926'
 files:
 - .maven.yaml
+- .odoc.db
+- .openaf_precompiled/.t8-20260212
+- .openaf_precompiled/lucene_js.class
 - .package.yaml
 - README.md
 - lucene-analysis-common-10.3.2.jar
@@ -36,10 +39,15 @@ files:
 - lucene-sandbox-10.3.2.jar
 - lucene.js
 - oJobLucene.yaml
+- sss/segments_1
+- sss/write.lock
 - tests/autoTestLucene.js
 - tests/autoTestLucene.yaml
 filesHash:
   .maven.yaml: a403c731c6eb0e251c0747ba11bfd0c7b6d5683e
+  .odoc.db: 7b8dfc21edad884f6a066b7db024cdd12e2deb8d
+  .openaf_precompiled/.t8-20260212: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/lucene_js.class: 2003f6c4133f963e93761a6b93470fcbbebba611
   README.md: 0a1af96b918a2c2a67238d098b5b50df811d84b3
   lucene-analysis-common-10.3.2.jar: 6aceb9bc2fa78798e14e5318ed1c4251f99fcfac
   lucene-core-10.3.2.jar: e46afe546d01bb56a87860ad60889945f29e7e51
@@ -47,7 +55,9 @@ filesHash:
   lucene-queries-10.3.2.jar: e2519bed51773348277c52fe9d4bd434b6b68f88
   lucene-queryparser-10.3.2.jar: cc9a5decdc61ff00ec1d27e3276ed4da058e5f34
   lucene-sandbox-10.3.2.jar: a38472709daa3c4bb4e657cb1afa6ceeec9548fe
-  lucene.js: cffcf6ebd17c8e13c13fbffe6afe7106b63e75e0
-  oJobLucene.yaml: 5e226c7276abeb828308bdd532f4fab82d922faa
+  lucene.js: cdac3483a4cb6b18e7d4474e4a8222401658c7f9
+  oJobLucene.yaml: 91bb37c691b95e357c0518a790ce12951593bffb
+  sss/segments_1: ada8c07c605d2f473630265daf37813da6f7ede4
+  sss/write.lock: da39a3ee5e6b4b0d3255bfef95601890afd80709
   tests/autoTestLucene.js: 0eddd736f9f84002b7ccab5d279c5969b734e34a
   tests/autoTestLucene.yaml: 4566dffa15732b5e16ef0e4bf3e6d6e7a076ed29
