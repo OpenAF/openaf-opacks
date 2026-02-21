@@ -1,4 +1,4 @@
 artifacts:
 - id     : org.eclipse.jgit
   group  : org.eclipse.jgit
-  version: 7.4.0.202509020913-r
+  version:  7.5.0.202512021534-r
