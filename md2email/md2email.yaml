@@ -1,0 +1,437 @@
+# Author: Nuno Aguiar
+
+jobs:
+
+# -----------------------
+- name : MD2Email Convert
+  help :
+    text   : Converts a Markdown string to a raw HTML fragment (no wrapping template, no inline styles).
+    expects:
+    - name    : markdown
+      desc    : The Markdown string to convert
+      required: true
+    - name    : tables
+      desc    : Enable GFM table extension (default true)
+    - name    : strikethrough
+      desc    : Enable GFM strikethrough ~~text~~ (default true)
+    - name    : taskListItems
+      desc    : Enable task-list [ ] / [x] items (default true)
+    - name    : headingAnchor
+      desc    : Add id= anchor attributes to headings (default false)
+    - name    : ins
+      desc    : Enable ++underline++ extension (default false)
+    - name    : autolink
+      desc    : Auto-link bare URLs in text (default false)
+    - name    : sanitizeUrls
+      desc    : "Strip javascript:/data: scheme hrefs (default false)"
+    returns:
+    - name: html
+      desc: Rendered HTML fragment string
+  typeArgs:
+    shortcut:
+      name  : md2emailConvert
+      keyArg: markdown
+      args  :
+        tables        : tables
+        strikethrough : strikethrough
+        taskListItems : taskListItems
+        headingAnchor : headingAnchor
+        ins           : ins
+        autolink      : autolink
+        sanitizeUrls  : sanitizeUrls
+  check:
+    in:
+      markdown     : isString
+      tables       : toBoolean.isBoolean.default(true)
+      strikethrough: toBoolean.isBoolean.default(true)
+      taskListItems: toBoolean.isBoolean.default(true)
+      headingAnchor: toBoolean.isBoolean.default(false)
+      ins          : toBoolean.isBoolean.default(false)
+      autolink     : toBoolean.isBoolean.default(false)
+      sanitizeUrls : toBoolean.isBoolean.default(false)
+  exec : | #js
+    loadLib("md2email.js")
+    var m = new MD2Email({
+      tables        : args.tables,
+      strikethrough : args.strikethrough,
+      taskListItems : args.taskListItems,
+      headingAnchor : args.headingAnchor,
+      ins           : args.ins,
+      autolink      : args.autolink,
+      sanitizeUrls  : args.sanitizeUrls
+    })
+    args.html = m.toHTML(args.markdown)
+
+# -----------------------------
+- name : MD2Email To Email HTML
+  help :
+    text   : Converts a Markdown string to a complete, email-client-ready XHTML document with inline styles.
+    expects:
+    - name    : markdown
+      desc    : The Markdown string to convert
+      required: true
+    - name    : title
+      desc    : Value for the HTML <title> tag (also used as email subject hint)
+    - name    : width
+      desc    : Max width of the content column in pixels (default "600")
+    - name    : padding
+      desc    : Inner padding of the content cell (default "32px 40px")
+    - name    : bgColor
+      desc    : Page background colour (default "#f5f5f5")
+    - name    : contentBg
+      desc    : Content area background colour (default "#ffffff")
+    - name    : borderColor
+      desc    : Header/footer separator colour (default "#eeeeee")
+    - name    : fontFamily
+      desc    : Base font family (default "Arial,Helvetica,sans-serif")
+    - name    : fontSize
+      desc    : Base font size (default "14px")
+    - name    : header
+      desc    : Raw HTML inserted above the content (optional)
+    - name    : footer
+      desc    : Raw HTML inserted below the content (optional)
+    - name    : theme
+      desc    : Named theme "default" or "dark" (default "default")
+    - name    : tables
+      desc    : Enable GFM table extension (default true)
+    - name    : strikethrough
+      desc    : Enable GFM strikethrough (default true)
+    - name    : taskListItems
+      desc    : Enable task-list items (default true)
+    - name    : headingAnchor
+      desc    : Add id= anchor attributes to headings (default false)
+    - name    : ins
+      desc    : Enable ++underline++ extension (default false)
+    - name    : autolink
+      desc    : Auto-link bare URLs (default false)
+    - name    : sanitizeUrls
+      desc    : "Strip javascript:/data: scheme hrefs (default false)"
+    returns:
+    - name: html
+      desc: Full email-ready XHTML document string
+  typeArgs:
+    shortcut:
+      name  : md2emailToEmailHTML
+      keyArg: markdown
+      args  :
+        title        : title
+        width        : width
+        padding      : padding
+        bgColor      : bgColor
+        contentBg    : contentBg
+        borderColor  : borderColor
+        fontFamily   : fontFamily
+        fontSize     : fontSize
+        header       : header
+        footer       : footer
+        theme        : theme
+        tables       : tables
+        strikethrough: strikethrough
+        taskListItems: taskListItems
+        headingAnchor: headingAnchor
+        ins          : ins
+        autolink     : autolink
+        sanitizeUrls : sanitizeUrls
+  check:
+    in:
+      markdown     : isString
+      title        : isString.default(__)
+      width        : isString.default("600")
+      padding      : isString.default("32px 40px")
+      bgColor      : isString.default("#f5f5f5")
+      contentBg    : isString.default("#ffffff")
+      borderColor  : isString.default("#eeeeee")
+      fontFamily   : isString.default("Arial,Helvetica,sans-serif")
+      fontSize     : isString.default("14px")
+      header       : isString.default(__)
+      footer       : isString.default(__)
+      theme        : isString.default("default")
+      tables       : toBoolean.isBoolean.default(true)
+      strikethrough: toBoolean.isBoolean.default(true)
+      taskListItems: toBoolean.isBoolean.default(true)
+      headingAnchor: toBoolean.isBoolean.default(false)
+      ins          : toBoolean.isBoolean.default(false)
+      autolink     : toBoolean.isBoolean.default(false)
+      sanitizeUrls : toBoolean.isBoolean.default(false)
+  exec : | #js
+    loadLib("md2email.js")
+    var m = new MD2Email({
+      tables        : args.tables,
+      strikethrough : args.strikethrough,
+      taskListItems : args.taskListItems,
+      headingAnchor : args.headingAnchor,
+      ins           : args.ins,
+      autolink      : args.autolink,
+      sanitizeUrls  : args.sanitizeUrls
+    })
+    var opts = {
+      theme      : args.theme,
+      width      : args.width,
+      padding    : args.padding,
+      bgColor    : args.bgColor,
+      contentBg  : args.contentBg,
+      borderColor: args.borderColor,
+      fontFamily : args.fontFamily,
+      fontSize   : args.fontSize
+    }
+    if (isDef(args.title))  opts.title  = args.title
+    if (isDef(args.header)) opts.header = args.header
+    if (isDef(args.footer)) opts.footer = args.footer
+    args.html = m.toEmailHTML(args.markdown, opts)
+
+# ---------------------------
+- name : MD2Email To Text
+  help :
+    text   : Converts a Markdown string to plain text (all markup stripped). Useful as the text/plain alternative in a MIME email.
+    expects:
+    - name    : markdown
+      desc    : The Markdown string to convert
+      required: true
+    returns:
+    - name: text
+      desc: Plain text rendering of the Markdown input
+  typeArgs:
+    shortcut:
+      name  : md2emailToText
+      keyArg: markdown
+  check:
+    in:
+      markdown: isString
+  exec : | #js
+    loadLib("md2email.js")
+    args.text = new MD2Email().toText(args.markdown)
+
+# --------------------------------
+- name : MD2Email Convert File
+  help :
+    text   : Reads a Markdown file and converts it to a raw HTML fragment.
+    expects:
+    - name    : file
+      desc    : Path to the input Markdown file
+      required: true
+    - name    : output
+      desc    : Path to write the resulting HTML fragment (optional; if omitted args.html is set)
+    - name    : encoding
+      desc    : File encoding (default "UTF-8")
+    - name    : tables
+      desc    : Enable GFM table extension (default true)
+    - name    : strikethrough
+      desc    : Enable GFM strikethrough (default true)
+    - name    : taskListItems
+      desc    : Enable task-list items (default true)
+    - name    : headingAnchor
+      desc    : Add id= anchor to headings (default false)
+    - name    : ins
+      desc    : Enable ++underline++ (default false)
+    - name    : autolink
+      desc    : Auto-link bare URLs (default false)
+    - name    : sanitizeUrls
+      desc    : "Strip javascript:/data: hrefs (default false)"
+    returns:
+    - name: html
+      desc: Rendered HTML fragment (also written to output if provided)
+  typeArgs:
+    shortcut:
+      name  : md2emailConvertFile
+      keyArg: file
+      args  :
+        output       : output
+        encoding     : encoding
+        tables       : tables
+        strikethrough: strikethrough
+        taskListItems: taskListItems
+        headingAnchor: headingAnchor
+        ins          : ins
+        autolink     : autolink
+        sanitizeUrls : sanitizeUrls
+  check:
+    in:
+      file         : isString
+      output       : isString.default(__)
+      encoding     : isString.default("UTF-8")
+      tables       : toBoolean.isBoolean.default(true)
+      strikethrough: toBoolean.isBoolean.default(true)
+      taskListItems: toBoolean.isBoolean.default(true)
+      headingAnchor: toBoolean.isBoolean.default(false)
+      ins          : toBoolean.isBoolean.default(false)
+      autolink     : toBoolean.isBoolean.default(false)
+      sanitizeUrls : toBoolean.isBoolean.default(false)
+  exec : | #js
+    loadLib("md2email.js")
+    var markdown = io.readFileString(args.file, args.encoding)
+    var m = new MD2Email({
+      tables        : args.tables,
+      strikethrough : args.strikethrough,
+      taskListItems : args.taskListItems,
+      headingAnchor : args.headingAnchor,
+      ins           : args.ins,
+      autolink      : args.autolink,
+      sanitizeUrls  : args.sanitizeUrls
+    })
+    args.html = m.toHTML(markdown)
+    if (isDef(args.output)) io.writeFileString(args.output, args.html, args.encoding)
+
+# -----------------------------------
+- name : MD2Email To Email File
+  help :
+    text   : Reads a Markdown file and writes a complete email-ready XHTML document. When the source file contains a YAML front matter block, its title, header, and footer fields are used as defaults.
+    expects:
+    - name    : file
+      desc    : Path to the input Markdown file
+      required: true
+    - name    : output
+      desc    : Path to write the resulting HTML file (optional; if omitted args.html is set)
+    - name    : encoding
+      desc    : File encoding (default "UTF-8")
+    - name    : title
+      desc    : Email title / <title> tag (overrides front matter title if provided)
+    - name    : width
+      desc    : Max width of content column (default "600")
+    - name    : padding
+      desc    : Inner padding of content cell (default "32px 40px")
+    - name    : bgColor
+      desc    : Page background colour (default "#f5f5f5")
+    - name    : contentBg
+      desc    : Content area background colour (default "#ffffff")
+    - name    : borderColor
+      desc    : Header/footer separator colour (default "#eeeeee")
+    - name    : header
+      desc    : Raw HTML above the content (overrides front matter header)
+    - name    : footer
+      desc    : Raw HTML below the content (overrides front matter footer)
+    - name    : theme
+      desc    : Named theme "default" or "dark" (default "default")
+    - name    : tables
+      desc    : Enable GFM table extension (default true)
+    - name    : strikethrough
+      desc    : Enable GFM strikethrough (default true)
+    - name    : taskListItems
+      desc    : Enable task-list items (default true)
+    - name    : headingAnchor
+      desc    : Add id= anchor to headings (default false)
+    - name    : ins
+      desc    : Enable ++underline++ (default false)
+    - name    : autolink
+      desc    : Auto-link bare URLs (default false)
+    - name    : sanitizeUrls
+      desc    : "Strip javascript:/data: hrefs (default false)"
+    returns:
+    - name: html
+      desc: Full email-ready XHTML document (also written to output if provided)
+    - name: meta
+      desc: Parsed YAML front matter map (empty map if none)
+  typeArgs:
+    shortcut:
+      name  : md2emailToEmailFile
+      keyArg: file
+      args  :
+        output       : output
+        encoding     : encoding
+        title        : title
+        width        : width
+        padding      : padding
+        bgColor      : bgColor
+        contentBg    : contentBg
+        borderColor  : borderColor
+        header       : header
+        footer       : footer
+        theme        : theme
+        tables       : tables
+        strikethrough: strikethrough
+        taskListItems: taskListItems
+        headingAnchor: headingAnchor
+        ins          : ins
+        autolink     : autolink
+        sanitizeUrls : sanitizeUrls
+  check:
+    in:
+      file         : isString
+      output       : isString.default(__)
+      encoding     : isString.default("UTF-8")
+      title        : isString.default(__)
+      width        : isString.default("600")
+      padding      : isString.default("32px 40px")
+      bgColor      : isString.default("#f5f5f5")
+      contentBg    : isString.default("#ffffff")
+      borderColor  : isString.default("#eeeeee")
+      header       : isString.default(__)
+      footer       : isString.default(__)
+      theme        : isString.default("default")
+      tables       : toBoolean.isBoolean.default(true)
+      strikethrough: toBoolean.isBoolean.default(true)
+      taskListItems: toBoolean.isBoolean.default(true)
+      headingAnchor: toBoolean.isBoolean.default(false)
+      ins          : toBoolean.isBoolean.default(false)
+      autolink     : toBoolean.isBoolean.default(false)
+      sanitizeUrls : toBoolean.isBoolean.default(false)
+  exec : | #js
+    loadLib("md2email.js")
+    var markdown = io.readFileString(args.file, args.encoding)
+    var m = new MD2Email({
+      tables        : args.tables,
+      strikethrough : args.strikethrough,
+      taskListItems : args.taskListItems,
+      headingAnchor : args.headingAnchor,
+      ins           : args.ins,
+      yamlFrontMatter: true,
+      autolink      : args.autolink,
+      sanitizeUrls  : args.sanitizeUrls
+    })
+
+    // Extract YAML front matter for default values
+    args.meta = m.extractFrontMatter(markdown)
+
+    var opts = {
+      theme      : args.theme,
+      width      : args.width,
+      padding    : args.padding,
+      bgColor    : args.bgColor,
+      contentBg  : args.contentBg,
+      borderColor: args.borderColor
+    }
+    // Front matter provides defaults; explicit args override
+    opts.title  = _$(args.title).default(_$(args.meta.title).default(  _$(args.meta.subject).default(__)))
+    opts.header = _$(args.header).default(_$(args.meta.header).default(__))
+    opts.footer = _$(args.footer).default(_$(args.meta.footer).default(__))
+
+    args.html = m.toEmailHTML(markdown, opts)
+    if (isDef(args.output)) io.writeFileString(args.output, args.html, args.encoding)
+
+# -----------------------------------
+- name : MD2Email Extract Front Matter
+  help :
+    text   : Extracts YAML front matter metadata from a Markdown string or file.
+    expects:
+    - name    : markdown
+      desc    : Markdown string to parse (mutually exclusive with file)
+    - name    : file
+      desc    : Path to a Markdown file (mutually exclusive with markdown)
+    - name    : encoding
+      desc    : File encoding when file is used (default "UTF-8")
+    returns:
+    - name: meta
+      desc: Map of YAML front matter key/value pairs (empty map if none found)
+  typeArgs:
+    shortcut:
+      name  : md2emailFrontMatter
+      keyArg: file
+      args  :
+        markdown: markdown
+        encoding: encoding
+  check:
+    in:
+      markdown: isString.default(__)
+      file    : isString.default(__)
+      encoding: isString.default("UTF-8")
+  exec : | #js
+    loadLib("md2email.js")
+    var md
+    if (isDef(args.file)) {
+      md = io.readFileString(args.file, args.encoding)
+    } else if (isDef(args.markdown)) {
+      md = args.markdown
+    } else {
+      throw "Either markdown or file must be provided."
+    }
+    var m = new MD2Email({ yamlFrontMatter: true })
+    args.meta = m.extractFrontMatter(md)

@@ -1,0 +1,282 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- md2email::BasicToHTML
+- md2email::InlineMarkup
+- md2email::Links
+- md2email::Blockquote
+- md2email::FencedCode
+- md2email::HorizontalRule
+- md2email::UnorderedList
+- md2email::OrderedList
+- md2email::GFMTables
+- md2email::GFMStrikethrough
+- md2email::TaskListItems
+- md2email::InsExtension
+- md2email::HeadingAnchor
+- md2email::AutolinkExtension
+- md2email::YamlFrontMatter
+- md2email::ToText
+- md2email::ParseAndRender
+- md2email::ApplyInlineStyles
+- md2email::PreCodeInlineStyle
+- md2email::SetGetStyle
+- md2email::SetStyleMap
+- md2email::ToEmailHTMLHasStyles
+- md2email::ToEmailHTMLFullDoc
+- md2email::ToEmailHTMLOptions
+- md2email::ToEmailHTMLNoWrap
+- md2email::DarkTheme
+- md2email::GetAvailableThemes
+- md2email::RegisterTheme
+- md2email::Md2EmailConvert
+- md2email::Md2EmailToEmail
+- md2email::WrapInTemplate
+- md2email::GetParserRenderer
+- md2email::EmptyString
+- md2email::UnicodeContent
+- md2email::XSSEntities
+- md2email::StyleMapCustomOverride
+- Test results
+
+jobs:
+- name: md2email::Init
+  exec: |
+    loadLib("md2email.js")
+    args.tests = require("tests/autoTestMd2Email.js")
+
+- name: md2email::BasicToHTML
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testBasicToHTML
+
+- name: md2email::InlineMarkup
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testInlineMarkup
+
+- name: md2email::Links
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testLinks
+
+- name: md2email::Blockquote
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testBlockquote
+
+- name: md2email::FencedCode
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testFencedCode
+
+- name: md2email::HorizontalRule
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHorizontalRule
+
+- name: md2email::UnorderedList
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnorderedList
+
+- name: md2email::OrderedList
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testOrderedList
+
+- name: md2email::GFMTables
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGFMTables
+
+- name: md2email::GFMStrikethrough
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGFMStrikethrough
+
+- name: md2email::TaskListItems
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testTaskListItems
+
+- name: md2email::InsExtension
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testInsExtension
+
+- name: md2email::HeadingAnchor
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHeadingAnchor
+
+- name: md2email::AutolinkExtension
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testAutolinkExtension
+
+- name: md2email::YamlFrontMatter
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testYamlFrontMatter
+
+- name: md2email::ToText
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToText
+
+- name: md2email::ParseAndRender
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testParseAndRender
+
+- name: md2email::ApplyInlineStyles
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testApplyInlineStyles
+
+- name: md2email::PreCodeInlineStyle
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPreCodeInlineStyle
+
+- name: md2email::SetGetStyle
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetGetStyle
+
+- name: md2email::SetStyleMap
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetStyleMap
+
+- name: md2email::ToEmailHTMLHasStyles
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToEmailHTMLHasStyles
+
+- name: md2email::ToEmailHTMLFullDoc
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToEmailHTMLFullDoc
+
+- name: md2email::ToEmailHTMLOptions
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToEmailHTMLOptions
+
+- name: md2email::ToEmailHTMLNoWrap
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToEmailHTMLNoWrap
+
+- name: md2email::DarkTheme
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDarkTheme
+
+- name: md2email::GetAvailableThemes
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetAvailableThemes
+
+- name: md2email::RegisterTheme
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testRegisterTheme
+
+- name: md2email::Md2EmailConvert
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2EmailConvert
+
+- name: md2email::Md2EmailToEmail
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2EmailToEmail
+
+- name: md2email::WrapInTemplate
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testWrapInTemplate
+
+- name: md2email::GetParserRenderer
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetParserRenderer
+
+- name: md2email::EmptyString
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testEmptyString
+
+- name: md2email::UnicodeContent
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnicodeContent
+
+- name: md2email::XSSEntities
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testXSSEntities
+
+- name: md2email::StyleMapCustomOverride
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testStyleMapCustomOverride
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - md2email::BasicToHTML
+  - md2email::InlineMarkup
+  - md2email::Links
+  - md2email::Blockquote
+  - md2email::FencedCode
+  - md2email::HorizontalRule
+  - md2email::UnorderedList
+  - md2email::OrderedList
+  - md2email::GFMTables
+  - md2email::GFMStrikethrough
+  - md2email::TaskListItems
+  - md2email::InsExtension
+  - md2email::HeadingAnchor
+  - md2email::AutolinkExtension
+  - md2email::YamlFrontMatter
+  - md2email::ToText
+  - md2email::ParseAndRender
+  - md2email::ApplyInlineStyles
+  - md2email::PreCodeInlineStyle
+  - md2email::SetGetStyle
+  - md2email::SetStyleMap
+  - md2email::ToEmailHTMLHasStyles
+  - md2email::ToEmailHTMLFullDoc
+  - md2email::ToEmailHTMLOptions
+  - md2email::ToEmailHTMLNoWrap
+  - md2email::DarkTheme
+  - md2email::GetAvailableThemes
+  - md2email::RegisterTheme
+  - md2email::Md2EmailConvert
+  - md2email::Md2EmailToEmail
+  - md2email::WrapInTemplate
+  - md2email::GetParserRenderer
+  - md2email::EmptyString
+  - md2email::UnicodeContent
+  - md2email::XSSEntities
+  - md2email::StyleMapCustomOverride
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

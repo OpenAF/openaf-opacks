@@ -1,0 +1,63 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- markdown
+- commonmark
+- email
+- html
+- mime
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/md2email
+  url: https://openaf.io/opacks/md2email.opack
+description: CommonMark (Markdown) to email-ready HTML converter. Wraps commonmark-java 0.24 with GFM extensions (tables, strikethrough, task lists, autolink) and produces inline-styled, email-client-compatible HTML output.
+name: md2email
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260222'
+dependencies:
+  openaf: '>=20221216'
+files:
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- .precompile
+- README.md
+- autolink-0.11.0.jar
+- commonmark-0.24.0.jar
+- commonmark-ext-autolink-0.24.0.jar
+- commonmark-ext-gfm-strikethrough-0.24.0.jar
+- commonmark-ext-gfm-tables-0.24.0.jar
+- commonmark-ext-heading-anchor-0.24.0.jar
+- commonmark-ext-ins-0.24.0.jar
+- commonmark-ext-task-list-items-0.24.0.jar
+- commonmark-ext-yaml-front-matter-0.24.0.jar
+- md2email.js
+- md2email.yaml
+- tests/autoTestMd2Email.js
+- tests/autoTestMd2Email.yaml
+filesHash:
+  .maven.yaml: 046b76aea82a2c7b6585ac2f0d9525bb4ea24c2b
+  .odoc.db: 2c54de7c58f4eaa9bf4c6f0523303f3442901431
+  .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
+  README.md: 6eef319b11b2954a29eec6139f1fb7c0dd32153d
+  autolink-0.11.0.jar: 32abc7854d5801d19ff16be92362fa4c511d9a70
+  commonmark-0.24.0.jar: 59af01016ece382b55b4acb6a5190b08879c637c
+  commonmark-ext-autolink-0.24.0.jar: 703e28852088ff1b4b3a06622416fd807147bd84
+  commonmark-ext-gfm-strikethrough-0.24.0.jar: 9e9c1e5b50340643099d52c6b841f60fb6f54c27
+  commonmark-ext-gfm-tables-0.24.0.jar: 8a30c4e89ce33450c47604325751bec613bce541
+  commonmark-ext-heading-anchor-0.24.0.jar: 0e7f9e687d78da6d7cd600c6d81e5f8694064d72
+  commonmark-ext-ins-0.24.0.jar: df866f9b8032686de7b09dcf34b99561945a68fb
+  commonmark-ext-task-list-items-0.24.0.jar: 69535c5694e8a00b7d9d2b1f6ffcbf9f7b16e100
+  commonmark-ext-yaml-front-matter-0.24.0.jar: 6917a0e3230858b2834d8ebf9392228a75191152
+  md2email.js: 20871e5317b3036edd4456d1e8f085f136cbf2a1
+  md2email.yaml: 634f575aea40f82cbc93fb1fcf228f5926bb48e8
+  tests/autoTestMd2Email.js: 1782367dd58b05d591213a998c51ce3db41c02df
+  tests/autoTestMd2Email.yaml: c1589b72fb04e8f87b9115c514dbdde2757980f1
