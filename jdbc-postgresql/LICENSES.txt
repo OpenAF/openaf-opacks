@@ -1,7 +1,7 @@
-postgresql-42.7.9.jar:
+postgresql-42.7.10.jar:
   name: BSD-2-Clause
   url: https://jdbc.postgresql.org/about/license.html
-  version: 42.7.9
+  version: 42.7.10
   changed from original: false
   comments: BSD-2-Clause, copyright PostgreSQL Global Development Group
   license: https://jdbc.postgresql.org/license/
