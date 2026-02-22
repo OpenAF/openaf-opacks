@@ -26,7 +26,6 @@ dependencies:
   openaf: '>=20250926'
 files:
 - .maven.yaml
-- .odoc.db
 - .package.yaml
 - README.md
 - lucene-analysis-common-10.3.2.jar
