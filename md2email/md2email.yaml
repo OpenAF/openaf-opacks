@@ -60,7 +60,7 @@ jobs:
       autolink      : args.autolink,
       sanitizeUrls  : args.sanitizeUrls
     })
-    args.html = m.toHTML(args.markdown)
+    args.html = m.toHTML($t(args.markdown, args))
 
 # -----------------------------
 - name : MD2Email To Email HTML
@@ -177,7 +177,7 @@ jobs:
     if (isDef(args.title))  opts.title  = args.title
     if (isDef(args.header)) opts.header = args.header
     if (isDef(args.footer)) opts.footer = args.footer
-    args.html = m.toEmailHTML(args.markdown, opts)
+    args.html = m.toEmailHTML($t(args.markdown, args), opts)
 
 # ---------------------------
 - name : MD2Email To Text
@@ -199,7 +199,7 @@ jobs:
       markdown: isString
   exec : | #js
     loadLib("md2email.js")
-    args.text = new MD2Email().toText(args.markdown)
+    args.text = new MD2Email().toText($t(args.markdown, args))
 
 # --------------------------------
 - name : MD2Email Convert File
@@ -268,7 +268,7 @@ jobs:
       autolink      : args.autolink,
       sanitizeUrls  : args.sanitizeUrls
     })
-    args.html = m.toHTML(markdown)
+    args.html = m.toHTML($t(markdown, args))
     if (isDef(args.output)) io.writeFileString(args.output, args.html, args.encoding)
 
 # -----------------------------------
@@ -379,7 +379,7 @@ jobs:
     })
 
     // Extract YAML front matter for default values
-    args.meta = m.extractFrontMatter(markdown)
+    args.meta = m.extractFrontMatter($t(markdown, args))
 
     var opts = {
       theme      : args.theme,
@@ -394,7 +394,7 @@ jobs:
     opts.header = _$(args.header).default(_$(args.meta.header).default(__))
     opts.footer = _$(args.footer).default(_$(args.meta.footer).default(__))
 
-    args.html = m.toEmailHTML(markdown, opts)
+    args.html = m.toEmailHTML($t(markdown, args), opts)
     if (isDef(args.output)) io.writeFileString(args.output, args.html, args.encoding)
 
 # -----------------------------------
@@ -429,7 +429,7 @@ jobs:
     if (isDef(args.file)) {
       md = io.readFileString(args.file, args.encoding)
     } else if (isDef(args.markdown)) {
-      md = args.markdown
+      md = $t(args.markdown, args)
     } else {
       throw "Either markdown or file must be provided."
     }
