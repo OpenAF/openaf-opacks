@@ -19,7 +19,7 @@ name: KaTeX
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260128'
+version: '20260224'
 dependencies:
   openaf: '>=20230521'
 files:
@@ -88,8 +88,9 @@ files:
 - lib/fonts/KaTeX_Typewriter-Regular.woff2
 - lib/katex.min.css
 - lib/katex.min.js
+- lib/showdown-katex.min.js
 filesHash:
-  katex.js: ff3ffd439b5458696979532e954fa550f1966ae9
+  katex.js: 300a229a26ed5e75552b0c0481471e4b5cfdd643
   lib/auto-render.min.js: 4169ff59087666a21f545d76c0ee7c59f2a8873f
   lib/fonts/KaTeX_AMS-Regular.ttf: 1dfd0ee6e30f8a1c23999d9d965db8700b5a9f2e
   lib/fonts/KaTeX_AMS-Regular.woff: 99ada2de3200e795143d639232c3444b08018235
@@ -153,3 +154,4 @@ filesHash:
   lib/fonts/KaTeX_Typewriter-Regular.woff2: 7a08883fffc6958c71cc01a75a0b99cca3e4b475
   lib/katex.min.css: f93c672c792cee11a447e3ad2368e13d8a25667e
   lib/katex.min.js: 8935cc5ee5dc7596f71543b9c906df2a2800f9a9
+  lib/showdown-katex.min.js: ddde9917233428f9fc7a5e312e360d5ef5272fbd
