@@ -24,6 +24,7 @@ version: '20260225'
 dependencies:
   OpenAF: '>=20240101'
 files:
+- .claude/settings.local.json
 - .maven.yaml
 - .package.yaml
 - Dockerfile
@@ -32,9 +33,10 @@ files:
 - ghcopilot.js
 - jackson-datatype-jsr310-2.20.1.jar
 filesHash:
+  .claude/settings.local.json: dae92ed9fa3f9edc2948cc849174845a1a1c8e61
   .maven.yaml: e77d659041aeb5d864d85d7b22233249b97283e6
   Dockerfile: 4a6c59e651bc35f57b2f78ac8a286ada43f84d45
-  README.md: 6f60fc851effd2d520fdffb185e4ebc15ca1f5cc
+  README.md: 29d2af4efc89fa45613017bbd8d22acb0b19a751
   copilot-sdk-1.0.9.jar: 60beeb48e402be84cbb6eafcdb214aed9aab9c0b
   ghcopilot.js: f730c4f74c6b3bad9c6e60fd34c61ba7c6867b26
   jackson-datatype-jsr310-2.20.1.jar: 7ad06a455afc4a38412d5dab127191bdc3d90faf

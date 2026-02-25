@@ -73,6 +73,7 @@ Adding or removing tools causes the session to be transparently recreated on the
 
 ## Options
 
+- `params` (map, optional; reserved for provider compatibility)
 - `model` (string, default: `gpt-4.1`)
 - `timeout` (number in ms, default: `120000`)
 - `mode` (string, optional; forwarded to `MessageOptions.setMode`)
@@ -93,9 +94,21 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `availableTools` (array of strings, optional; restrict which built-in tools the agent may use)
 - `excludedTools` (array of strings, optional; block specific built-in tools)
 
+## Additional methods
+
+Along with the standard `ow.ai.gpt` surface, this provider also exposes:
+
+- `getModels()`
+- `getLastStats()`
+- `promptWithStats(...)`
+- `rawPromptWithStats(...)`
+- `promptStreamWithStats(...)`
+- `rawPromptStreamWithStats(...)`
+- `close()`
+
 ## Docker
 
-A sample `Dockerfile` is included in this folder and is based on `openaf/oaf:alpine`, adding Node.js/npm plus the `@github/copilot` binary.
+A sample `Dockerfile` is included in this folder and is based on `openaf/oaf:edge-t8`, adding Node.js/npm plus the `@github/copilot` binary.
 
 Build and run:
 
