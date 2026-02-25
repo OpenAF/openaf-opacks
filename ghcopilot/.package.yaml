@@ -1,0 +1,36 @@
+author: OpenAF
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- github
+- copilot
+- llm
+- ai
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: ''
+  url: https://openaf.io/opacks/ghcopilot.opack
+description: OpenAF ow.ai provider using copilot-sdk-java.
+name: ghcopilot
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260225'
+dependencies:
+  OpenAF: '>=20240101'
+files:
+- .maven.yaml
+- .package.yaml
+- Dockerfile
+- README.md
+- ghcopilot.js
+filesHash:
+  .maven.yaml: e77d659041aeb5d864d85d7b22233249b97283e6
+  Dockerfile: 559694013129e71b5964a80f7860d12429a5b1a7
+  README.md: dcac387869179c493dc276e8bf3b2059862abcab
+  ghcopilot.js: 3f9df1e0f00dc2bb8f6de39e05ef9a4cfb614ade
