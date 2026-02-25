@@ -1,8 +1,8 @@
-FROM openaf/oaf:alpine
+FROM openaf/oaf:edge-t8
 
-RUN apk add --no-cache nodejs npm \
-  && npm install -g @github/copilot \
-  && npm cache clean --force
+RUN sudo apk add --no-cache nodejs npm \
+  && sudo npm install -g @github/copilot \
+  && sudo npm cache clean --force
 
 ENV GITHUB_TOKEN=""
 ENV GH_TOKEN=""

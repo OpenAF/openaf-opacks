@@ -33,11 +33,16 @@ var llm = ow.ai.llm({
 
 llm.addSystemPrompt("You are concise.")
 print(llm.prompt("Say hello in one sentence."))
+
+var streamed = llm.promptStream("Count from 1 to 3.", __, __, false, __, (chunk, full) => {
+  printnl(chunk)
+})
+print("\nFinal: " + streamed)
 ```
 
 ## oaf_model / OAFP_MODEL definition
 
-You can define this provider in `OAFP_MODEL` / `oaf_model` using `token` to authenticate the Copilot CLI process:
+You can define this provider in `OAFP_MODEL` / `OAF_MODEL` using `token` to authenticate the Copilot CLI process:
 
 ```yaml
 type: ghcopilot
@@ -49,6 +54,22 @@ options:
 ```
 
 `token` is forwarded to the SDK and also exported to the Copilot process as `GH_TOKEN` and `GITHUB_TOKEN`.
+
+## Tool use
+
+Register tools with `setTool` before prompting. The SDK's native `ToolDefinition` / `ToolHandler` mechanism is used, so the Copilot agent calls tools automatically during `sendAndWait`:
+
+```javascript
+llm.setTool(
+  "get_time",
+  "Returns the current UTC time as an ISO-8601 string",
+  { type: "object", properties: {}, required: [] },
+  (args) => new Date().toISOString()
+)
+print(llm.prompt("What time is it right now?"))
+```
+
+Adding or removing tools causes the session to be transparently recreated on the next call.
 
 ## Options
 
@@ -65,6 +86,12 @@ options:
 - `autoRestart` (boolean, default: `false`)
 - `useLoggedInUser` (boolean, optional)
 - `logLevel` (string, optional)
+- `reasoningEffort` (string, optional; forwarded to `SessionConfig.setReasoningEffort`)
+- `configDir` (string, optional; forwarded to `SessionConfig.setConfigDir`)
+- `skillDirectories` (array of strings, optional)
+- `disabledSkills` (array of strings, optional)
+- `availableTools` (array of strings, optional; restrict which built-in tools the agent may use)
+- `excludedTools` (array of strings, optional; block specific built-in tools)
 
 ## Docker
 
@@ -83,3 +110,4 @@ docker run --rm -it \
 
 - This opack uses the Java SDK session `sendAndWait` flow.
 - `aJsonFlag=true` appends a JSON-only instruction and attempts to parse the answer.
+- Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, and `getModelInfo(aModelId)`.
