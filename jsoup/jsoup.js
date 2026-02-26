@@ -54,6 +54,7 @@ Jsoup.prototype.getHTMLDoc4Str = function(aString) {
  * </odoc>
  */
 Jsoup.prototype.cleanHTML = function(aHTML, aOption) {
+    if (isObject(aHTML)) aHTML = af.toTOON(aHTML)
     aHTML = _$(aHTML, "aHTML").isString().$_()
     aOption = _$(aOption, "aOption").isString().oneOf(["none", "basic", "basicWithImages", "relaxed", "simpleText"]).default("basic")
 

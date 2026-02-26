@@ -1,0 +1,4 @@
+artifacts:
+  - id      : copilot-sdk
+    group   : io.github.copilot-community-sdk
+    version : 1.0.9

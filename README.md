@@ -98,6 +98,7 @@
   |**jexer**|<img src=".github/badges/jexer.svg"><br>Wrapper for the Jexer library|
   |**lanterna**|<img src=".github/badges/lanterna.svg"><br>Wrapper for the Java Lanterna library|
   |**lucene**|<img src=".github/badges/lucene.svg"><br>A lucene wrapper for both a small vector database for storing &amp; querying vector embeddings and simple searching text with lucene.|
+  |**md2email**|<img src=".github/badges/md2email.svg"><br>CommonMark (Markdown) to email-ready HTML converter. Wraps commonmark-java 0.24 with GFM extensions (tables, strikethrough, task lists, autolink) and produces inline-styled, email-client-compatible HTML output.|
   |**oDoc2MD**|<img src=".github/badges/oDoc2MD.svg"><br>Generating markdown documentation based on existing oDoc databases.|
   |**oJobIO**|<img src=".github/badges/oJobIO.svg"><br>Service to provide easy-to-access oJobs for daily routines.|
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|

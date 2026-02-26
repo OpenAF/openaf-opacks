@@ -16,6 +16,12 @@
 - Update the opack `version` in its package file to the current date in `yyyyMMdd` format (for example `20250312`).
 - Highlight packaging actions and version bumps in your change notes to guide reviewers.
 
+## Helpful Commands
+- Create or update `.package.yaml`: run `opack genpack .` in the opack folder.
+- Create or update `.odoc.db`: run `ojob ojob.io/oaf/genODoc key=[opack-name] folder=.`
+- Remove jars already included in OpenAF: run `ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true`
+- Download Maven jars based on `.maven.yaml`: run `ojob ojob.io/oaf/mavenGetJars folder=.`
+
 ## Testing & Debugging
 - There is no global test harness. Look for opack-specific tests (`tests/`, `ojob` scripts, `*.test.js`, etc.) and follow the instructions provided in the folder.
 - Install opacks locally with `opack install <OpackName>` if you need to exercise them in an OpenAF environment.
