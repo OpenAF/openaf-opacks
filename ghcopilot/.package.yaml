@@ -34,7 +34,7 @@ files:
 filesHash:
   .maven.yaml: e77d659041aeb5d864d85d7b22233249b97283e6
   Dockerfile: 4a6c59e651bc35f57b2f78ac8a286ada43f84d45
-  README.md: 6efacc60ea9c949d1667f309407d4a68e5f9b942
+  README.md: 29d2af4efc89fa45613017bbd8d22acb0b19a751
   copilot-sdk-1.0.9.jar: 60beeb48e402be84cbb6eafcdb214aed9aab9c0b
   ghcopilot.js: f730c4f74c6b3bad9c6e60fd34c61ba7c6867b26
   jackson-datatype-jsr310-2.20.1.jar: 7ad06a455afc4a38412d5dab127191bdc3d90faf
