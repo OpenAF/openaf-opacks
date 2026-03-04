@@ -39,6 +39,133 @@ ow.ai.__gpttypes.ghcopilot = {
     var _debugCh         = __
 
     var _resetStats = () => { _lastStats = __ }
+    var _isWindows = String(java.lang.System.getProperty("os.name")).toLowerCase().indexOf("win") >= 0
+
+    var _isCliMissingStartupError = (aErr) => {
+      var m = String(aErr).toLowerCase()
+      return (m.indexOf("cannot run program") >= 0 && (m.indexOf("copilot") >= 0 || m.indexOf("gh-copilot") >= 0)) ||
+             (m.indexOf("createprocess") >= 0 && m.indexOf("error=2") >= 0) ||
+             m.indexOf("no such file") >= 0 ||
+             m.indexOf("enoent") >= 0
+    }
+
+    var _buildCliNotFoundError = (aCause, aDetection) => {
+      var lines = [
+        "GitHub Copilot CLI executable was not found.",
+        "Install it with one of:",
+        "  npm install -g @github/copilot",
+        "  gh extension install github/gh-copilot",
+        "Then confirm with: copilot --version",
+        "If the binary is not on PATH, set options.cliPath to an absolute executable path."
+      ]
+
+      if (isMap(aDetection)) {
+        if (isString(aDetection.requestedPath))
+          lines.push("Configured cliPath: " + aDetection.requestedPath)
+        if (isArray(aDetection.searchedNames) && aDetection.searchedNames.length > 0)
+          lines.push("Checked executable names: " + aDetection.searchedNames.join(", "))
+      }
+      if (isDef(aCause)) lines.push("Cause: " + String(aCause))
+
+      return lines.join("\n")
+    }
+
+    var _resolveCliPath = () => {
+      var candidates = _isWindows
+        ? ["copilot.exe", "copilot.cmd", "copilot.bat", "copilot", "gh-copilot.exe", "gh-copilot.cmd", "gh-copilot.bat", "gh-copilot"]
+        : ["copilot", "gh-copilot"]
+
+      var _existsAndExecutable = (aPath) => {
+        if (!isString(aPath) || aPath.trim().length === 0) return false
+        var f = new java.io.File(String(aPath))
+        return f.exists() && f.isFile() && f.canExecute()
+      }
+
+      var _normalize = (aPath) => {
+        var p = String(aPath)
+        if (p.indexOf("~/") === 0 || p.indexOf("~\\") === 0) {
+          p = String(java.lang.System.getProperty("user.home")) + p.substring(1)
+        }
+        return String(new java.io.File(p).getAbsolutePath())
+      }
+
+      if (isString(aOptions.cliPath)) {
+        var cp = _normalize(aOptions.cliPath)
+        if (_existsAndExecutable(cp)) {
+          aOptions.cliPath = cp
+          return { found: true, path: cp, searchedNames: candidates }
+        }
+        return { found: false, requestedPath: cp, searchedNames: candidates }
+      }
+
+      var sep = String(java.lang.System.getProperty("path.separator"))
+      var _rawEnvPath = java.lang.System.getenv("PATH")
+      var envPath = (_rawEnvPath === null ? "" : String(_rawEnvPath))
+      var dirs = envPath.length > 0 ? envPath.split(java.util.regex.Pattern.quote(sep)) : []
+      var _extraDirs = []
+      var _homeDir = String(java.lang.System.getProperty("user.home"))
+      var _addDir = (aPath) => {
+        if (!isString(aPath) || aPath.trim().length === 0) return
+        var d = _normalize(aPath)
+        if (_extraDirs.indexOf(d) < 0) _extraDirs.push(d)
+      }
+
+      if (_isWindows) {
+        var _appData = java.lang.System.getenv("APPDATA")
+        if (isDef(_appData) && String(_appData).length > 0) {
+          _addDir(String(new java.io.File(String(_appData), "npm").getAbsolutePath()))
+        }
+      } else {
+        _addDir("/opt/homebrew/bin")
+        _addDir("/usr/local/bin")
+        _addDir("/usr/bin")
+        _addDir(String(new java.io.File(_homeDir, ".npm-global/bin").getAbsolutePath()))
+      }
+
+      // Common GitHub CLI extension install locations for gh-copilot
+      _addDir(String(new java.io.File(_homeDir, ".local/share/gh/extensions/github/gh-copilot/bin").getAbsolutePath()))
+      _addDir(String(new java.io.File(_homeDir, ".local/share/gh/extensions/gh-copilot/bin").getAbsolutePath()))
+      _addDir(String(new java.io.File(_homeDir, "Library/Application Support/GitHub CLI/extensions/github/gh-copilot/bin").getAbsolutePath()))
+      _addDir(String(new java.io.File(_homeDir, "Library/Application Support/GitHub CLI/extensions/gh-copilot/bin").getAbsolutePath()))
+      _addDir(String(new java.io.File(_homeDir, ".config/gh/extensions/github/gh-copilot/bin").getAbsolutePath()))
+      _addDir(String(new java.io.File(_homeDir, ".config/gh/extensions/gh-copilot/bin").getAbsolutePath()))
+
+      var _dirsFinal = []
+      dirs.forEach(d => {
+        if (!isString(d) || d.length === 0) return
+        var nd = _normalize(d)
+        if (_dirsFinal.indexOf(nd) < 0) _dirsFinal.push(nd)
+      })
+      _extraDirs.forEach(d => {
+        if (_dirsFinal.indexOf(d) < 0) _dirsFinal.push(d)
+      })
+      var foundCopilot = __
+      var foundGhCopilot = __
+
+      _dirsFinal.forEach(d => {
+        candidates.forEach(n => {
+          var p = String(new java.io.File(d, n).getAbsolutePath())
+          if (!_existsAndExecutable(p)) return
+          if (n.indexOf("gh-copilot") === 0) {
+            if (isUnDef(foundGhCopilot)) foundGhCopilot = p
+          } else {
+            if (isUnDef(foundCopilot)) foundCopilot = p
+          }
+        })
+      })
+
+      if (isDef(foundCopilot)) {
+        aOptions.cliPath = foundCopilot
+        return { found: true, path: foundCopilot, searchedNames: candidates }
+      }
+
+      if (isDef(foundGhCopilot)) {
+        aOptions.cliPath = foundGhCopilot
+        return { found: true, path: foundGhCopilot, searchedNames: candidates, fallback: true }
+      }
+
+      return { found: false, searchedNames: candidates }
+    }
 
     // Serialize a Java object to a plain JS value via Jackson
     var _fromJava = (jObj) => {
@@ -106,6 +233,11 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isDef(_client)) return
 
       var co = new Packages.com.github.copilot.sdk.json.CopilotClientOptions()
+      var _cliDetected = __
+      if (isUnDef(aOptions.cliUrl)) {
+        _cliDetected = _resolveCliPath()
+        if (!_cliDetected.found) throw _buildCliNotFoundError(__, _cliDetected)
+      }
       if (isString(aOptions.cliPath)) co.setCliPath(aOptions.cliPath)
       if (isString(aOptions.cliUrl))  co.setCliUrl(aOptions.cliUrl)
       if (isString(aOptions.cwd))     co.setCwd(aOptions.cwd)
@@ -124,7 +256,12 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isDef(aOptions.useLoggedInUser)) co.setUseLoggedInUser(aOptions.useLoggedInUser)
 
       _client = new Packages.com.github.copilot.sdk.CopilotClient(co)
-      _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+      try {
+        _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+      } catch(e) {
+        if (_isCliMissingStartupError(e)) throw _buildCliNotFoundError(e, _cliDetected)
+        throw e
+      }
     }
 
     // Create (or recreate) the session when streaming mode, model, system message, or tools change
@@ -152,6 +289,9 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isString(aOptions.reasoningEffort)) sc.setReasoningEffort(aOptions.reasoningEffort)
       if (isString(aOptions.configDir))       sc.setConfigDir(aOptions.configDir)
       sc.setStreaming(_wantStreaming)
+      try {
+        sc.setOnPermissionRequest(Packages.com.github.copilot.sdk.json.PermissionHandler.APPROVE_ALL)
+      } catch(e) {}
 
       // System message — use the SDK's native SystemMessageConfig
       if (_currentSysMsg.length > 0) {

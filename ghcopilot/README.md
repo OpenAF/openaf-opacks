@@ -8,6 +8,40 @@ OpenAF wrapper around the [copilot-sdk-java](https://github.com/copilot-communit
 - GitHub Copilot CLI installed and available in `PATH` (or configured with `cliPath`)
 - Valid Copilot authentication on the local machine, or a token
 
+## Install GitHub Copilot CLI
+
+Use one of the following options:
+
+### npm (direct install)
+
+```bash
+npm install -g @github/copilot
+```
+
+### GitHub CLI extension
+
+```bash
+gh extension install github/gh-copilot
+```
+
+After installation, confirm the binary is available:
+
+```bash
+copilot --version
+```
+
+Authenticate with one of the following:
+
+```bash
+copilot auth login
+```
+
+or export a token for non-interactive use:
+
+```bash
+export GITHUB_TOKEN=...
+```
+
 ## Install Java dependencies
 
 From this folder run:
@@ -54,6 +88,12 @@ options:
 ```
 
 `token` is forwarded to the SDK and also exported to the Copilot process as `GH_TOKEN` and `GITHUB_TOKEN`.
+
+You can also set the model in OpenAF directly with:
+
+```bash
+export OAF_MODEL="(type: ghcopilot, options: (model: gpt-4.1, timeout: 900000, token: $(gh auth token)))"
+```
 
 ## Tool use
 
