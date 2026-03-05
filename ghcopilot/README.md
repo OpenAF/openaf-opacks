@@ -129,6 +129,7 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `logLevel` (string, optional): SDK/CLI logging verbosity for troubleshooting (for example `debug`, `info`, `warn`, `error`).
 - `reasoningEffort` (string, optional): Reasoning intensity hint forwarded to `SessionConfig.setReasoningEffort`.
 - `configDir` (string, optional): Custom configuration directory forwarded to `SessionConfig.setConfigDir`.
+- `onPermissionRequest` (internal, default: `PermissionHandler.APPROVE_ALL`): Session permission requests are auto-approved by default to satisfy SDK session creation requirements.
 - `skillDirectories` (array of strings, optional): Additional directories where Copilot skills are loaded from.
 - `disabledSkills` (array of strings, optional): Skill IDs/names to disable, even if available in configured skill directories.
 - `availableTools` (array of strings, optional): Allowlist of built-in tools the agent is permitted to call.
