@@ -135,7 +135,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>7.5.2</version>
+            <version>7.6.1</version>
         </dependency>
         <dependency>
             <groupId>io.minio</groupId>
@@ -200,32 +200,32 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http2</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-dns</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-socks</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler-proxy</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns</artifactId>
-            <version>4.2.7.Final</version>
+            <version>4.2.10.Final</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.plist</groupId>
@@ -317,5 +317,10 @@
             <artifactId>autolink</artifactId>
             <version>0.11.0</version>
         </dependency>
+        <dependency>
+ 	    <groupId>io.github.copilot-community-sdk</groupId>
+	    <artifactId>copilot-sdk</artifactId>
+	    <version>1.0.10</version>
+	</dependency>
     </dependencies>
 </project>
