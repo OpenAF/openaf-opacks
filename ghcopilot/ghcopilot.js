@@ -410,7 +410,7 @@ ow.ai.__gpttypes.ghcopilot = {
       },
       prompt: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
         var rr = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
-        if (isMap(rr) && isString(rr.response)) return rr.response
+        if (isMap(rr) && isDef(rr.response)) return rr.response
         return rr
       },
       rawPrompt: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
@@ -553,6 +553,28 @@ ow.ai.__gpttypes.ghcopilot = {
       rawPromptWithStats: (aPrompt, aModel, aTemperature, aJsonFlag, tools) => {
         var response = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
         return { response: response, stats: _lastStats }
+      },
+      jsonPrompt: (aPrompt, aModel, aTemperature, tools) => {
+        return _r.prompt(aPrompt, aModel, aTemperature, true, tools)
+      },
+      jsonPromptWithStats: (aPrompt, aModel, aTemperature, tools) => {
+        var out = _r.prompt(aPrompt, aModel, aTemperature, true, tools)
+        return { response: out, stats: _lastStats }
+      },
+      jsonPromptWithStatsRaw: (aPrompt, aModel, aTemperature, tools) => {
+        var out = _r.rawPrompt(aPrompt, aModel, aTemperature, true, tools)
+        var parsed = (isMap(out) && isDef(out.response) ? out.response : out)
+        var raw = (isMap(out) && isDef(out.raw) ? out.raw : out)
+        return { response: parsed, raw: raw, stats: _lastStats }
+      },
+      promptJSON: (aPrompt, aModel, aTemperature, tools) => {
+        return _r.jsonPrompt(aPrompt, aModel, aTemperature, tools)
+      },
+      promptJSONWithStats: (aPrompt, aModel, aTemperature, tools) => {
+        return _r.jsonPromptWithStats(aPrompt, aModel, aTemperature, tools)
+      },
+      promptJSONWithStatsRaw: (aPrompt, aModel, aTemperature, tools) => {
+        return _r.jsonPromptWithStatsRaw(aPrompt, aModel, aTemperature, tools)
       },
       addPrompt: (aRole, aPrompt) => {
         aRole = _$(aRole, "aRole").isString().default("user")
