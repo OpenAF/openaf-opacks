@@ -27,14 +27,16 @@ dependencies:
 files:
 - .maven.yaml
 - .odoc.db
+- .openaf_precompiled/.t8-20260304
+- .openaf_precompiled/lucene_js.class
 - .package.yaml
 - README.md
-- lucene-analysis-common-10.3.2.jar
-- lucene-core-10.3.2.jar
-- lucene-facet-10.3.2.jar
-- lucene-queries-10.3.2.jar
-- lucene-queryparser-10.3.2.jar
-- lucene-sandbox-10.3.2.jar
+- lucene-analysis-common-10.4.0.jar
+- lucene-core-10.4.0.jar
+- lucene-facet-10.4.0.jar
+- lucene-queries-10.4.0.jar
+- lucene-queryparser-10.4.0.jar
+- lucene-sandbox-10.4.0.jar
 - lucene.js
 - oJobLucene.yaml
 - tests/autoTestLucene.js
@@ -42,13 +44,15 @@ files:
 filesHash:
   .maven.yaml: a403c731c6eb0e251c0747ba11bfd0c7b6d5683e
   .odoc.db: 7b8dfc21edad884f6a066b7db024cdd12e2deb8d
+  .openaf_precompiled/.t8-20260304: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/lucene_js.class: 2003f6c4133f963e93761a6b93470fcbbebba611
   README.md: 0a1af96b918a2c2a67238d098b5b50df811d84b3
-  lucene-analysis-common-10.3.2.jar: 6aceb9bc2fa78798e14e5318ed1c4251f99fcfac
-  lucene-core-10.3.2.jar: e46afe546d01bb56a87860ad60889945f29e7e51
-  lucene-facet-10.3.2.jar: b951a92989893d2b96c2d4cb885fa1a91c65368b
-  lucene-queries-10.3.2.jar: e2519bed51773348277c52fe9d4bd434b6b68f88
-  lucene-queryparser-10.3.2.jar: cc9a5decdc61ff00ec1d27e3276ed4da058e5f34
-  lucene-sandbox-10.3.2.jar: a38472709daa3c4bb4e657cb1afa6ceeec9548fe
+  lucene-analysis-common-10.4.0.jar: 61c4a7b27753662619e84261b42f404fda85886f
+  lucene-core-10.4.0.jar: 7493bc763cd5e91f2a8f7722c2f90d8ce15c6319
+  lucene-facet-10.4.0.jar: 3783257107005397b48749b2de5cefc8bfc6e252
+  lucene-queries-10.4.0.jar: 43b2654a448504dc4ac382f6d9b6896e2e8b67b7
+  lucene-queryparser-10.4.0.jar: 6e3e758b60b1e2549a85139d9498b54565c38eeb
+  lucene-sandbox-10.4.0.jar: 15976efaae9213b1a61e3509da6f366e243b90c7
   lucene.js: cdac3483a4cb6b18e7d4474e4a8222401658c7f9
   oJobLucene.yaml: 91bb37c691b95e357c0518a790ce12951593bffb
   tests/autoTestLucene.js: 0eddd736f9f84002b7ccab5d279c5969b734e34a
