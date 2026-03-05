@@ -27,8 +27,6 @@ dependencies:
 files:
 - .maven.yaml
 - .odoc.db
-- .openaf_precompiled/.t8-20260304
-- .openaf_precompiled/lucene_js.class
 - .package.yaml
 - README.md
 - lucene-analysis-common-10.4.0.jar
@@ -44,8 +42,6 @@ files:
 filesHash:
   .maven.yaml: a403c731c6eb0e251c0747ba11bfd0c7b6d5683e
   .odoc.db: 7b8dfc21edad884f6a066b7db024cdd12e2deb8d
-  .openaf_precompiled/.t8-20260304: da39a3ee5e6b4b0d3255bfef95601890afd80709
-  .openaf_precompiled/lucene_js.class: 2003f6c4133f963e93761a6b93470fcbbebba611
   README.md: 0a1af96b918a2c2a67238d098b5b50df811d84b3
   lucene-analysis-common-10.4.0.jar: 61c4a7b27753662619e84261b42f404fda85886f
   lucene-core-10.4.0.jar: 7493bc763cd5e91f2a8f7722c2f90d8ce15c6319
