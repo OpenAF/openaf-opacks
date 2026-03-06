@@ -33,6 +33,7 @@ Here are some of the available helpers:
 | $pbar           | shows an ansi ascii progress bar with a value and a max value, a min value, a size, an indicator and space char |
 | $pbars          | shows an ansi ascii tree of progress bars with a format string: "unit path:color:legend... [-min:0] [-max:100] [-hsize:40]"|
 | $ptable         | shows an ansi ascii printTable representation of an object  |
+| $mdtable        | shows a markdown table given an array of headers and an array of rows (objects, arrays, or scalars) |
 | $ptree          | shows an ansi ascii printTree representation of an object  |
 | $pchart         | shows an ansi ascii line chart with an object and a format string: "unit path:color:legend... [-min:0] [-max:100] [-hsize:40] [-vsize:10]" |
 | $output         | shows an $output representation of an object (aObj as 1st arg and options in slon as 2nd arg) |

@@ -8,11 +8,13 @@ if (isDef($sec().procMap)) params = $sec().procMap(params)
 
 // --- Util functions
 // Util functions
+var _activeTransformKeys = null
 const _transform = r => {
-    var _ks = Object.keys(_transformFns)
-    for(var ikey = 0; ikey < _ks.length; ikey++) {
-        var key = _ks[ikey]
-        if (isDef(params[key])) r = _transformFns[key](r)
+    if (_activeTransformKeys === null) {
+        _activeTransformKeys = Object.keys(_transformFns).filter(key => isDef(params[key]))
+    }
+    for (var ikey = 0; ikey < _activeTransformKeys.length; ikey++) {
+        r = _transformFns[_activeTransformKeys[ikey]](r)
     }
     return r
 }
@@ -656,6 +658,7 @@ const _addSrcFileExtensionsNoMem = ext => {
 }
 
 // --- Input functions processing per line
+var _dsv_reEscape = null, _dsv_reSepre = null
 var _inputLineFns = {
     "lines": (r, options) => {
         params.linesjoin = _$(toBoolean(params.linesjoin), "linesjoin").isBoolean().default(false)
@@ -870,6 +873,8 @@ var _inputLineFns = {
 
         if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
         if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
+        if (_dsv_reEscape === null && params.indsvescape) _dsv_reEscape = new RegExp(params.indsvescape + params.indsvquote, "g")
+        if (_dsv_reSepre  === null && params.indsvsepre)  _dsv_reSepre  = new RegExp(params.indsvsepre)
 
         var _dsvmap = rs => {
             var _r = {}
@@ -887,7 +892,7 @@ var _inputLineFns = {
                     if (isUnDef(params.indsvsepre)) {
                         params.indsvfields = rs.trim().split(params.indsvsep)
                     } else {
-                        params.indsvfields = rs.trim().split(new RegExp(params.indsvsepre))
+                        params.indsvfields = rs.trim().split(_dsv_reSepre)
                     }
                     params.indsvfields = params.indsvfields.map(f => {
                         if (params.indsvtrim) f = f.trim()
@@ -895,7 +900,7 @@ var _inputLineFns = {
                             f = f.substring(1, f.length - 1)
                         }
                         if (params.indsvescape) {
-                            f = f.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            f = f.replace(_dsv_reEscape, params.indsvquote)
                         }
                         return f
                     })
@@ -912,18 +917,18 @@ var _inputLineFns = {
                             s = s.substring(1, s.length - 1)
                         }
                         if (params.indsvescape) {
-                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            s = s.replace(_dsv_reEscape, params.indsvquote)
                         }
                         return s
                     })
                 } else {
-                    _r = pForEach(rs.split(new RegExp(params.indsvsepre)), s => {
+                    _r = pForEach(rs.split(_dsv_reSepre), s => {
                         if (params.indsvtrim) s = s.trim()
                         if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
                             s = s.substring(1, s.length - 1)
                         }
                         if (params.indsvescape) {
-                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            s = s.replace(_dsv_reEscape, params.indsvquote)
                         }
                         return s
                     })
@@ -2551,9 +2556,9 @@ var _inputFns = new Map([
 
                     if (toBoolean(params.linesvisual)) {
                         var _r = _visualProc(r)
-                        if (isDef(_r)) _$o(_r, clone(options), true)
+                        if (isDef(_r)) _$o(_r, options, true)
                     } else {
-                        _$o(r, clone(options), true)
+                        _$o(r, options, true)
                     }
                 })
                 _p = _parCheck(_p)
@@ -2613,7 +2618,7 @@ var _inputFns = new Map([
 
             var _p = _parInit()
             ioStreamReadLines(_stream, r => {
-                _parExec(_p, () => _ndjline(r, line => _$o(jsonParse(line, __, __, true), clone(options), true) ) )
+                _parExec(_p, () => _ndjline(r, line => _$o(jsonParse(line, __, __, true), options, true) ) )
                 _p = _parCheck(_p)
             })
             _parDone(_p)
@@ -2672,7 +2677,7 @@ var _inputFns = new Map([
 
             var _p = _parInit()
             ioStreamReadLines(_stream, r => {
-                _parExec(_p, () => _ndslonline(r, line => _$o(af.fromSLON(line), clone(options), true) ) )
+                _parExec(_p, () => _ndslonline(r, line => _$o(af.fromSLON(line), options, true) ) )
                 _p = _parCheck(_p)
             })
             _parDone(_p)
@@ -2694,6 +2699,8 @@ var _inputFns = new Map([
 
         if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
         if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
+        var _reEscape = params.indsvescape ? new RegExp(params.indsvescape + params.indsvquote, "g") : null
+        var _reSepre  = params.indsvsepre  ? new RegExp(params.indsvsepre) : null
         var _dsvmap = r => {
             var _r = {}
             params.indsvfields.forEach((f, i) => {
@@ -2710,7 +2717,7 @@ var _inputFns = new Map([
                     if (isUnDef(params.indsvsepre)) {
                         params.indsvfields = r.trim().split(params.indsvsep)
                     } else {
-                        params.indsvfields = r.trim().split(new RegExp(params.indsvsepre))
+                        params.indsvfields = r.trim().split(_reSepre)
                     }
                     params.indsvfields = params.indsvfields.map(f => {
                         if (params.indsvtrim) f = f.trim()
@@ -2718,7 +2725,7 @@ var _inputFns = new Map([
                             f = f.substring(1, f.length - 1)
                         }
                         if (params.indsvescape) {
-                            f = f.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            f = f.replace(_reEscape, params.indsvquote)
                         }
                         return f
                     })
@@ -2735,18 +2742,18 @@ var _inputFns = new Map([
                             s = s.substring(1, s.length - 1)
                         }
                         if (params.indsvescape) {
-                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            s = s.replace(_reEscape, params.indsvquote)
                         }
                         return s
                     })
                 } else {
-                    _r = pForEach(r.split(new RegExp(params.indsvsepre)), s => {
+                    _r = pForEach(r.split(_reSepre), s => {
                         if (params.indsvtrim) s = s.trim()
                         if (params.indsvquote && s.startsWith(params.indsvquote) && s.endsWith(params.indsvquote)) {
                             s = s.substring(1, s.length - 1)
                         }
                         if (params.indsvescape) {
-                            s = s.replace(new RegExp(params.indsvescape + params.indsvquote, "g"), params.indsvquote)
+                            s = s.replace(_reEscape, params.indsvquote)
                         }
                         return s
                     })
@@ -2788,7 +2795,7 @@ var _inputFns = new Map([
                 _parExec(_p, () => {
                     if (isString(r)) {
                         var _dsv = _dsvproc(r)
-                        if (isDef(_dsv)) _$o(_dsv, clone(options), true)
+                        if (isDef(_dsv)) _$o(_dsv, options, true)
                     }
                     return true
                 })

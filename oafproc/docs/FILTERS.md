@@ -93,6 +93,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | from_slon(obj) | 20240215 | Converts a slon string representation into an object | from_slon('(abc: 123)') |
 | from_timeAbbr(x) | 20240209 | Converts a time abbreviation into ms | from_timeAbbr('12s') |
 | from_toml(str) | 20240502 | Given a TOML format string tries to convert it to an object | from_toml(@) |
+| from_toon(str) | 20260116 | Given a TOON format string tries to convert it to an object | from_toon(@) |
 | from_xml(str) | 20251115 | Given an XML format string tries to convert it to an object | from_xml(@) |
 | from_yaml(str) | 20240215 | Converts a YAML string representation into an object | from_yaml(@) |
 | get(nameOrPath) | 20240305 | Given a path to the original object or a name set by 'set' or 'setp' returns the corresponding value | packages[].{name: name, version: version, parentVersion: get('version') } |
@@ -180,6 +181,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | to_slon(obj) | 20240215 | Given an object will return the SLON representation of it. | to_slon(@) |
 | to_string(any) | base | Transforms any input into a string | to_string(`123`) |
 | to_toml(obj) | 20240502 | Given an object outputs a TOML format string if possible | to_toml(@) |
+| to_toon(obj) | 20260116 | Given an object will return the TOON representation of it. | to_toon(@) |
 | to_xml(obj) | 20251115 | Given an object will return the XML representation of it. | to_xml(@) |
 | to_yaml(obj, inline) | 20240215 | Given an object will return the YAML representation of it with optional inline boolean flag | to_yaml(@, `true`) |
 | trim(str) | 20240209 | Given a string will return a trimmed version of it | trim(@) |
