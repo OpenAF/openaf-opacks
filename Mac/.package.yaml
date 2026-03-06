@@ -19,22 +19,26 @@ name: Mac
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240406'
+version: '20260305'
 dependencies:
   OpenAF: '>=20240318'
 files:
 - .maven.yaml
+- .openaf_precompiled/.t8-20260305
+- .openaf_precompiled/mac_js.class
 - .package.yaml
 - README.md
-- dd-plist-1.28.jar
+- dd-plist-1.29.jar
 - mac.js
 - mac.yaml
 - oafp_Mac.js
 - tests/testAllMac.yaml
 filesHash:
   .maven.yaml: ac92c000c0d67cd85c1f8f2a2a881285de2ec8cd
+  .openaf_precompiled/.t8-20260305: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/mac_js.class: 7e5fdcea12b96e20bb7f9fb1a3aaa8ab1e4f0802
   README.md: 1ca1613f2bc20a4e71a3f3e04d94e88ce5bd8818
-  dd-plist-1.28.jar: 617d08cc6e9c800e4b77266087cc9294b6d87e11
+  dd-plist-1.29.jar: 6a536bf6708bb80c040b602e14783959028bb7dd
   mac.js: 0b4b36e41abf0a67562c99fb0cfc5e2a3d9c9bee
   mac.yaml: 847a46444176c2db094698616711f2e8bb158dbb
   oafp_Mac.js: 17657a4362a8119689af940df51dff5afceab993
