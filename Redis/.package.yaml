@@ -29,8 +29,8 @@ files:
 - README.md
 - commons-pool2-2.12.1.jar
 - error_prone_annotations-2.41.0.jar
-- jedis-7.1.0.jar
-- json-20250517.jar
+- jedis-7.3.0.jar
+- json-20251224.jar
 - redis-authx-core-0.1.1-beta2.jar
 - redis.js
 filesHash:
@@ -40,7 +40,7 @@ filesHash:
   README.md: 9bf7a6da2b3108fd393b95e8dbf15cdb0a9a0784
   commons-pool2-2.12.1.jar: e5c7b6c9f5a4b59be2bba213fbec70b413376fc1
   error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
-  jedis-7.1.0.jar: 880c53d55191c7d95a0c2a66272159962ad90752
-  json-20250517.jar: d67181bbd819ccceb929b580a4e2fcb0c8b17cd8
+  jedis-7.3.0.jar: 3c3e8103e3cd321a1ed0ee9909998c5fbd196a58
+  json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
   redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
   redis.js: c31a2c25d453cacfb0763485c37e3c8d253d82e7
