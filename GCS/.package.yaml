@@ -27,7 +27,7 @@ files:
 - README.md
 - animal-sniffer-annotations-1.24.jar
 - annotations-4.1.1.4.jar
-- api-common-2.55.1.jar
+- api-common-2.58.0.jar
 - auto-value-annotations-1.11.0.jar
 - checker-qual-3.49.0.jar
 - conscrypt-openjdk-uber-2.5.2.jar
@@ -35,44 +35,44 @@ files:
 - error_prone_annotations-2.42.0.jar
 - exporter-metrics-0.33.0.jar
 - failureaccess-1.0.3.jar
-- gapic-google-cloud-storage-v2-2.60.0.jar
-- gax-2.72.1.jar
-- gax-grpc-2.72.1.jar
-- gax-httpjson-2.72.1.jar
+- gapic-google-cloud-storage-v2-2.64.0.jar
+- gax-2.75.0.jar
+- gax-grpc-2.75.0.jar
+- gax-httpjson-2.75.0.jar
 - gcs.js
 - google-api-client-2.7.2.jar
-- google-api-services-storage-v1-rev20250925-2.0.0.jar
-- google-auth-library-credentials-1.40.0.jar
-- google-auth-library-oauth2-http-1.40.0.jar
-- google-cloud-core-2.62.1.jar
-- google-cloud-core-grpc-2.62.1.jar
-- google-cloud-core-http-2.62.1.jar
+- google-api-services-storage-v1-rev20251118-2.0.0.jar
+- google-auth-library-credentials-1.43.0.jar
+- google-auth-library-oauth2-http-1.43.0.jar
+- google-cloud-core-2.65.0.jar
+- google-cloud-core-grpc-2.65.0.jar
+- google-cloud-core-http-2.65.0.jar
 - google-cloud-monitoring-3.52.0.jar
-- google-cloud-storage-2.60.0.jar
-- google-http-client-2.0.2.jar
-- google-http-client-apache-v2-2.0.2.jar
-- google-http-client-appengine-2.0.2.jar
-- google-http-client-gson-2.0.2.jar
-- google-http-client-jackson2-2.0.2.jar
+- google-cloud-storage-2.64.0.jar
+- google-http-client-2.1.0.jar
+- google-http-client-apache-v2-2.1.0.jar
+- google-http-client-appengine-2.1.0.jar
+- google-http-client-gson-2.1.0.jar
+- google-http-client-jackson2-2.1.0.jar
 - google-oauth-client-1.39.0.jar
-- grpc-alts-1.76.0.jar
-- grpc-api-1.76.0.jar
-- grpc-auth-1.76.0.jar
-- grpc-context-1.76.0.jar
-- grpc-core-1.76.0.jar
-- grpc-google-cloud-storage-v2-2.60.0.jar
-- grpc-googleapis-1.76.0.jar
-- grpc-grpclb-1.76.0.jar
-- grpc-inprocess-1.76.0.jar
-- grpc-netty-shaded-1.76.0.jar
-- grpc-opentelemetry-1.76.0.jar
-- grpc-protobuf-1.76.0.jar
-- grpc-protobuf-lite-1.76.0.jar
-- grpc-rls-1.76.0.jar
-- grpc-services-1.76.0.jar
-- grpc-stub-1.76.0.jar
-- grpc-util-1.76.0.jar
-- grpc-xds-1.76.0.jar
+- grpc-alts-1.76.3.jar
+- grpc-api-1.76.3.jar
+- grpc-auth-1.76.3.jar
+- grpc-context-1.76.3.jar
+- grpc-core-1.76.3.jar
+- grpc-google-cloud-storage-v2-2.64.0.jar
+- grpc-googleapis-1.76.3.jar
+- grpc-grpclb-1.76.3.jar
+- grpc-inprocess-1.76.3.jar
+- grpc-netty-shaded-1.76.3.jar
+- grpc-opentelemetry-1.76.3.jar
+- grpc-protobuf-1.76.3.jar
+- grpc-protobuf-lite-1.76.3.jar
+- grpc-rls-1.76.3.jar
+- grpc-services-1.76.3.jar
+- grpc-stub-1.76.3.jar
+- grpc-util-1.76.3.jar
+- grpc-xds-1.76.3.jar
 - guava-33.5.0-jre.jar
 - j2objc-annotations-3.1.jar
 - jackson-dataformat-xml-2.18.2.jar
@@ -83,24 +83,23 @@ files:
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
 - opencensus-api-0.31.1.jar
 - opencensus-contrib-http-util-0.31.1.jar
-- opentelemetry-api-1.52.0.jar
-- opentelemetry-common-1.52.0.jar
-- opentelemetry-context-1.52.0.jar
+- opentelemetry-api-1.51.0.jar
+- opentelemetry-context-1.51.0.jar
 - opentelemetry-gcp-resources-1.37.0-alpha.jar
-- opentelemetry-sdk-1.52.0.jar
-- opentelemetry-sdk-common-1.52.0.jar
-- opentelemetry-sdk-extension-autoconfigure-spi-1.52.0.jar
-- opentelemetry-sdk-logs-1.52.0.jar
-- opentelemetry-sdk-metrics-1.52.0.jar
-- opentelemetry-sdk-trace-1.52.0.jar
+- opentelemetry-sdk-1.51.0.jar
+- opentelemetry-sdk-common-1.51.0.jar
+- opentelemetry-sdk-extension-autoconfigure-spi-1.51.0.jar
+- opentelemetry-sdk-logs-1.51.0.jar
+- opentelemetry-sdk-metrics-1.51.0.jar
+- opentelemetry-sdk-trace-1.51.0.jar
 - opentelemetry-semconv-1.29.0-alpha.jar
 - perfmark-api-0.27.0.jar
 - proto-google-cloud-monitoring-v3-3.52.0.jar
-- proto-google-cloud-storage-v2-2.60.0.jar
-- proto-google-common-protos-2.63.1.jar
-- proto-google-iam-v1-1.58.1.jar
-- protobuf-java-3.25.8.jar
-- protobuf-java-util-3.25.8.jar
+- proto-google-cloud-storage-v2-2.64.0.jar
+- proto-google-common-protos-2.66.0.jar
+- proto-google-iam-v1-1.61.0.jar
+- protobuf-java-4.33.2.jar
+- protobuf-java-util-4.33.2.jar
 - re2j-1.8.jar
 - shared-resourcemapping-0.33.0.jar
 - stax2-api-4.2.2.jar
@@ -111,7 +110,7 @@ filesHash:
   README.md: 771ac30ff6b3e4470204dbbbf60ede2d6d1688da
   animal-sniffer-annotations-1.24.jar: aa9ba58d30e0aad7f1808fce9c541ea3760678d8
   annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
-  api-common-2.55.1.jar: 8dd7577815d3ded29b685ebb33cc41525ca1c59d
+  api-common-2.58.0.jar: b64131952163da1834d7271d32da2cd8566333c4
   auto-value-annotations-1.11.0.jar: f0d047931d07cfbc6fa4079854f181ff62891d6f
   checker-qual-3.49.0.jar: 54be36cb42c9b991c109e467e2bfa82af4cda44e
   conscrypt-openjdk-uber-2.5.2.jar: d858f142ea189c62771c505a6548d8606ac098fe
@@ -119,44 +118,44 @@ filesHash:
   error_prone_annotations-2.42.0.jar: 57a3eddaddd4f2d412e13d3bcefba29b5ebda1b6
   exporter-metrics-0.33.0.jar: 6f0cd9f1481cf92e566478140aa4d26e159b5ad8
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  gapic-google-cloud-storage-v2-2.60.0.jar: bec9562b9c8b1a7d126c1b03cc44fbe868c81e49
-  gax-2.72.1.jar: 27357249073aa98ba8bcadba6ade835969a5442b
-  gax-grpc-2.72.1.jar: 2dda757e3961a01a52ccb78abafd89f955aed197
-  gax-httpjson-2.72.1.jar: f6842f1cfe14d295a27561b3d34d468e6c5054b5
+  gapic-google-cloud-storage-v2-2.64.0.jar: 71e6f2303ca5131a6f1e2cc7e1a93d760fd5db0e
+  gax-2.75.0.jar: 0a8fc0a19410b29562811856f213f8133275aa8d
+  gax-grpc-2.75.0.jar: 675eb3e266aec9d7bf0b3870ed664f2f323d3739
+  gax-httpjson-2.75.0.jar: 6410fa1f4c270de7b27c7607053ce0bd63fca919
   gcs.js: 3557effe860857cacf15680f8ed0efa85bca3539
   google-api-client-2.7.2.jar: 495d58d6e31c2c5e24a707a50d6355ba92dd3d0c
-  google-api-services-storage-v1-rev20250925-2.0.0.jar: 3dfccb9ae1369b19e154b2d432b074d10e02f73c
-  google-auth-library-credentials-1.40.0.jar: a67fe5cd75cddef3f8ccba57584cbe18287792aa
-  google-auth-library-oauth2-http-1.40.0.jar: d9c00747cf1caf90fb72613498cc4736d8089438
-  google-cloud-core-2.62.1.jar: bed2de5fe36d50ff19e34471faee487a751f0eb9
-  google-cloud-core-grpc-2.62.1.jar: 6f19c509ed62f742e9f8b3dc64456a4636cddc05
-  google-cloud-core-http-2.62.1.jar: c0f34f287861b857c270a2044b46689923749a0d
+  google-api-services-storage-v1-rev20251118-2.0.0.jar: be0cbdd97a934c9947d4a1e1190a4b43198809d4
+  google-auth-library-credentials-1.43.0.jar: 25e69f62a18c5f557a6a457222a9df0b60f517d4
+  google-auth-library-oauth2-http-1.43.0.jar: bbc236ceb2e072ec9a959dad11cffdfafca46a1e
+  google-cloud-core-2.65.0.jar: 735f045e3a482f6816c52e47a23d0081842723cd
+  google-cloud-core-grpc-2.65.0.jar: 179389c1cd79cacf18fd11b9f3abf1af60173857
+  google-cloud-core-http-2.65.0.jar: b97958ef284454bcb596f521df9c46bfc406d27c
   google-cloud-monitoring-3.52.0.jar: 86d0cdb998c0313ce70ef3c38636d87c56fc4396
-  google-cloud-storage-2.60.0.jar: 66ebec687a245328cffeebbaf545234e8ed417cc
-  google-http-client-2.0.2.jar: 5605d66977094595cf4dde9db532596b1cc95459
-  google-http-client-apache-v2-2.0.2.jar: 2cad8761d7c93281f71b19b60cb648977f96e74e
-  google-http-client-appengine-2.0.2.jar: 4ff7a32210c31616c911bf92a33678b7236e9e84
-  google-http-client-gson-2.0.2.jar: bed01c219e4e543a3a12885fc19f7dc994949b79
-  google-http-client-jackson2-2.0.2.jar: 2877664965c0c1e4f7488ac6401b058f47bc6efd
+  google-cloud-storage-2.64.0.jar: 2b3c58dd50919081e5baeaddfeeeea7ef513aafd
+  google-http-client-2.1.0.jar: f4c08fa160a5199af19f81080fbaa921ae2193c7
+  google-http-client-apache-v2-2.1.0.jar: 0e1af7948c8505b26f17cad54a61a43d6fa45686
+  google-http-client-appengine-2.1.0.jar: 9df9de27b31fca53b0126ed635f3e71018cdc3d1
+  google-http-client-gson-2.1.0.jar: e65ea98fe4e8d3a512559698a0d8664908fd36f3
+  google-http-client-jackson2-2.1.0.jar: b4c10b1a877369a60e81d325c2aed72a459c2c29
   google-oauth-client-1.39.0.jar: 99f02f3c46c68c01dfc95878456b009a13229c88
-  grpc-alts-1.76.0.jar: 1e1c4a8037f47f0187986b55e6ba16fecac9ede3
-  grpc-api-1.76.0.jar: f213e3ee49b82497dfc0f5eb30bac62d917f1a52
-  grpc-auth-1.76.0.jar: 90d76c353bb1cf64940a9303da19fb435bc5104b
-  grpc-context-1.76.0.jar: 529d9887c6ec08ac5c6ff32699eb314a724f63b4
-  grpc-core-1.76.0.jar: 44e562312b45d848297b80963fe0f93f5b71589c
-  grpc-google-cloud-storage-v2-2.60.0.jar: 2d3b41541c53e32526c49c8f3ee38b96a9c37209
-  grpc-googleapis-1.76.0.jar: 01c40e8ee7a35d204fff7edd683b8e21fc0b1c39
-  grpc-grpclb-1.76.0.jar: 1326720efc091026de55b633f37f37d201baeb44
-  grpc-inprocess-1.76.0.jar: e982c13b380284308b71bf277bd768c04b9e0ad3
-  grpc-netty-shaded-1.76.0.jar: a74011488cb0ad7f06c74c864c444e25be7c026e
-  grpc-opentelemetry-1.76.0.jar: b3c09836f743625a1add5e3b9e2fe89cb6b8a3df
-  grpc-protobuf-1.76.0.jar: 46ad89c9e74468c8e488b32c192ca18626b68a49
-  grpc-protobuf-lite-1.76.0.jar: aa913fd7efa0047f4ecf94896caf7d3264a9c94e
-  grpc-rls-1.76.0.jar: 0dd835210b7be4c03c15d28b47e4b91dc1695603
-  grpc-services-1.76.0.jar: 6cbd545ad99445170b73e57f1818bbddbf206ba3
-  grpc-stub-1.76.0.jar: a3f668a0cfea0c0b92d85e7e243b6dc4d5f0380d
-  grpc-util-1.76.0.jar: ba5ea4f0abf4ba97314fb38862c6bae9b45e14cd
-  grpc-xds-1.76.0.jar: fed501e49aaaa3d051dd95dbcf66fcdc0b241a83
+  grpc-alts-1.76.3.jar: 29261ce05b41b0473426a039cc7b51b8fb2a93eb
+  grpc-api-1.76.3.jar: 9567ea184e512c6589bd487757b13d002794574b
+  grpc-auth-1.76.3.jar: 66fcac1dd6a1effa446240ca0e78b2d1894e3848
+  grpc-context-1.76.3.jar: ffdee9dad114dd12c29e53aaeb7a4cf29d3b350b
+  grpc-core-1.76.3.jar: 54e45371ce687cf7f6de9bef5e6eed513dcc50b9
+  grpc-google-cloud-storage-v2-2.64.0.jar: 001a2eff404147b6b131a830dca89d52f8d662e3
+  grpc-googleapis-1.76.3.jar: d62f061d96d4216f97318597576cac30f0845d26
+  grpc-grpclb-1.76.3.jar: 0bda1ff08dc8dc169e9fd6fd8d6736cdb850b6b4
+  grpc-inprocess-1.76.3.jar: 86ef9fd64b4bd4669715b82e2956000d1850ca65
+  grpc-netty-shaded-1.76.3.jar: 469bbe6945eacb4fdbd79d7a2805d99327fa780a
+  grpc-opentelemetry-1.76.3.jar: 069e2ed64330a34e057544d4797fa411fd544410
+  grpc-protobuf-1.76.3.jar: 892dd921d8c1003de16ece7db666f3cca9c8f14a
+  grpc-protobuf-lite-1.76.3.jar: 855e45464cc7db445c523a2d8a3e367cadf7bac0
+  grpc-rls-1.76.3.jar: 4116b64b379afd39bbb0c62217774a47575b8727
+  grpc-services-1.76.3.jar: a0b2c6dba5522db22fb6e0f6eb7da908aee2ad73
+  grpc-stub-1.76.3.jar: 7fa5c609d2c730831689df5f9c40206ffd2166d1
+  grpc-util-1.76.3.jar: 8e4e4dd8daca916794c9084fdea642e6bae04ce0
+  grpc-xds-1.76.3.jar: bd6414e908164a93812086a2c7fb622e27828f0a
   guava-33.5.0-jre.jar: 8699de25f2f979108d6c1b804a7ba38cda1116bc
   j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
   jackson-dataformat-xml-2.18.2.jar: 069cb3b7bd34b3f7842cc4a6fd717981433bf73e
@@ -167,24 +166,23 @@ filesHash:
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
   opencensus-api-0.31.1.jar: 66a60c7201c2b8b20ce495f0295b32bb0ccbbc57
   opencensus-contrib-http-util-0.31.1.jar: 3c13fc5715231fadb16a9b74a44d9d59c460cfa8
-  opentelemetry-api-1.52.0.jar: 1e1cc2b982d5377f5ff2733fc7e734fb59a8bd87
-  opentelemetry-common-1.52.0.jar: c00d4d658267a0ce170fdd6621f3650a52ab9de9
-  opentelemetry-context-1.52.0.jar: 01b3f7cff7e9a32da832069c84561fa7c7536e95
+  opentelemetry-api-1.51.0.jar: 9806bcb604f693fb4b75962df9d4d2d19da4806d
+  opentelemetry-context-1.51.0.jar: e807ef03950f5b01f7b8c2698c0abba4072288ed
   opentelemetry-gcp-resources-1.37.0-alpha.jar: e2e4f1932bdc40aa9f38d746652712152e3f3fa1
-  opentelemetry-sdk-1.52.0.jar: 4f51f201c573a651fe727b82e24540f18f083695
-  opentelemetry-sdk-common-1.52.0.jar: bbad038086235a54bd15fd36989647c3ba84462b
-  opentelemetry-sdk-extension-autoconfigure-spi-1.52.0.jar: 6e31fda9b6d104e28f0994f6fbea6ee0e207a1f6
-  opentelemetry-sdk-logs-1.52.0.jar: 2e7aff03e9b9cfa6493f9511188e4a590ea963c2
-  opentelemetry-sdk-metrics-1.52.0.jar: c235dbadec56d8520b4c91812d1e4574dee570f1
-  opentelemetry-sdk-trace-1.52.0.jar: 5690c742d79cfd8c83b44444be3f594cecf16923
+  opentelemetry-sdk-1.51.0.jar: f5c088880d3c63c573dd598b53450a6d266df879
+  opentelemetry-sdk-common-1.51.0.jar: b5038626586b5756d2a62a2e7307b2cca5386aad
+  opentelemetry-sdk-extension-autoconfigure-spi-1.51.0.jar: 676e3163b2773c9b315ff0075d88bcd31d1031d9
+  opentelemetry-sdk-logs-1.51.0.jar: 33f962d29bb6eddf33005b169b0948cd785f82d6
+  opentelemetry-sdk-metrics-1.51.0.jar: 769cf069a94fa2eac393441efff3fb4408a4327b
+  opentelemetry-sdk-trace-1.51.0.jar: 22abd9ed89341e341f1968acf1817fd57bf23000
   opentelemetry-semconv-1.29.0-alpha.jar: 613d7f7743eb2b974680ad1af1685802e6a7cb58
   perfmark-api-0.27.0.jar: f86f575a41b091786a4b027cd9c0c1d2e3fc1c01
   proto-google-cloud-monitoring-v3-3.52.0.jar: f2edbef9dbe715c4451d90698bd4e7a3edc4d58e
-  proto-google-cloud-storage-v2-2.60.0.jar: e13b1b74830fcf37201f1a3c3ab4d4367e44d41c
-  proto-google-common-protos-2.63.1.jar: f1a8ce90a841cd22a0c27d449c9f32802dd7b3b4
-  proto-google-iam-v1-1.58.1.jar: 027756235d0ba03b7d335cde1edbeb4dfed83b99
-  protobuf-java-3.25.8.jar: 2ba593767658038775b2ea9724c3686609874470
-  protobuf-java-util-3.25.8.jar: 0be3cb8bef1415d3b87cf5bf4de0b9149f6a0990
+  proto-google-cloud-storage-v2-2.64.0.jar: d382981fe41eac5b77da1c9fd5b40fd956a91059
+  proto-google-common-protos-2.66.0.jar: fbb64d872bfb1ad173049b16304e057fb9912e5c
+  proto-google-iam-v1-1.61.0.jar: 7c8be3aaf2096fe483a416dcfdb9a76eec2167a5
+  protobuf-java-4.33.2.jar: c85bf5de1ad10453792675f6515401f7b8eb6860
+  protobuf-java-util-4.33.2.jar: 3c40e96546f9152b213b128798a7e5df7568b66b
   re2j-1.8.jar: 12c25e923e9e4fb1575a7640a2698745c6f19a94
   shared-resourcemapping-0.33.0.jar: 9c4f5ed770ccf34c3e78adadd979227fb9105de3
   stax2-api-4.2.2.jar: b0d746cadea928e5264f2ea294ea9a1bf815bbde
