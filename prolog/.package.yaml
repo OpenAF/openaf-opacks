@@ -23,8 +23,6 @@ dependencies:
 files:
 - .maven.yaml
 - .odoc.db
-- .openaf_precompiled/.t8-20260306
-- .openaf_precompiled/prolog_js.class
 - .package.yaml
 - .precompile
 - README.md
@@ -35,8 +33,6 @@ files:
 filesHash:
   .maven.yaml: f86de7ab8bbe26c711afba61f7e5d3d1ef4b3492
   .odoc.db: a216883b46f9c6dd79cba2528c49a876f9d2b2e1
-  .openaf_precompiled/.t8-20260306: da39a3ee5e6b4b0d3255bfef95601890afd80709
-  .openaf_precompiled/prolog_js.class: ed353ab5bd3bb4fa46ee85fde4d986bd80e86f5b
   .precompile: 61adf0138f2b4c4f5a6f4ce1116d1a439e4c9aff
   README.md: 11fa0d1f43baa377d79c76a1176e7e4bdbf09894
   projog-clp-0.3.0.jar: 5a46819536cb8c3cef0cfdc85103b46645fd7f6e
