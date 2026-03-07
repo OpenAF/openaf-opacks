@@ -24,6 +24,8 @@ dependencies:
   OpenAF: '>=20240318'
 files:
 - .maven.yaml
+- .openaf_precompiled/.t8-20260305
+- .openaf_precompiled/mac_js.class
 - .package.yaml
 - README.md
 - dd-plist-1.29.jar
@@ -33,6 +35,8 @@ files:
 - tests/testAllMac.yaml
 filesHash:
   .maven.yaml: ac92c000c0d67cd85c1f8f2a2a881285de2ec8cd
+  .openaf_precompiled/.t8-20260305: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/mac_js.class: 7e5fdcea12b96e20bb7f9fb1a3aaa8ab1e4f0802
   README.md: 1ca1613f2bc20a4e71a3f3e04d94e88ce5bd8818
   dd-plist-1.29.jar: 6a536bf6708bb80c040b602e14783959028bb7dd
   mac.js: 0b4b36e41abf0a67562c99fb0cfc5e2a3d9c9bee
