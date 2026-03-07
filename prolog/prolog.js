@@ -2,6 +2,39 @@
 
 loadExternalJars(getOPackPath("Prolog") || ".");
 
+var __projogBootstrapFile;
+
+var __ensureProjogBootstrap = function() {
+   if (isDef(__projogBootstrapFile) && io.fileExists(__projogBootstrapFile)) return __projogBootstrapFile;
+
+   var tmpFile = new java.io.File(java.lang.System.getProperty("java.io.tmpdir"), "projog-bootstrap.pl");
+   if (!tmpFile.exists() || tmpFile.length() <= 0) {
+      var defaultProps = new Packages.org.projog.core.kb.ProjogDefaultProperties();
+      var cl = defaultProps.getClass().getClassLoader();
+      var inS = cl.getResourceAsStream("projog-bootstrap.pl");
+      if (inS == null) throw "Unable to locate projog-bootstrap.pl in projog-core jar.";
+
+      try {
+         java.nio.file.Files.copy(inS, tmpFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+      } finally {
+         inS.close();
+      }
+   }
+
+   __projogBootstrapFile = String(tmpFile.getAbsolutePath());
+   return __projogBootstrapFile;
+};
+
+var __newProjog = function() {
+   var bootstrapScript = __ensureProjogBootstrap();
+   var props = new JavaAdapter(Packages.org.projog.core.kb.ProjogProperties, {
+      getBootstrapScript: function() {
+         return bootstrapScript;
+      }
+   });
+   return new Packages.org.projog.api.Projog(props);
+};
+
 /**
  * <odoc>
  * <key>Prolog.Prolog(aInput) : Prolog</key>
@@ -11,7 +44,7 @@ loadExternalJars(getOPackPath("Prolog") || ".");
  * </odoc>
  */
 var Prolog = function(aInput) {
-   this.pl = new Packages.org.projog.api.Projog();
+   this.pl = __newProjog();
    if (isString(aInput)) {
       if (io.fileExists(aInput)) {
          this.consultFile(aInput);
@@ -127,7 +160,7 @@ Prolog.prototype.q = function(aQuery, aMapOrArray, aKey, aPrefix, otherGoals, aT
    otherGoals = _$(otherGoals, "otherGoals").isString().default("");
 
    if (isArray(aMapOrArray) || isMap(aMapOrArray) || otherGoals.length > 0) {
-      this.pl = new Packages.org.projog.api.Projog();
+      this.pl = __newProjog();
 
       if (otherGoals.length > 0) {
          if (!otherGoals.trim().endsWith(".")) otherGoals += ".";
