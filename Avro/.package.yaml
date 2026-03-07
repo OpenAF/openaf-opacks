@@ -17,53 +17,53 @@ name: Avro
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20240812'
+version: '20260306'
 dependencies:
   openaf: '>=20240318'
 files:
 - .maven.yaml
 - .package.yaml
 - README.md
-- avro-1.12.0.jar
-- avro-compiler-1.12.0.jar
-- avro-mapred-1.12.0.jar
+- avro-1.12.1.jar
+- avro-compiler-1.12.1.jar
+- avro-mapred-1.12.1.jar
 - avro.js
-- commons-text-1.12.0.jar
+- commons-text-1.15.0.jar
 - javax.annotation-api-1.3.2.jar
 - javax.servlet-api-3.1.0.jar
 - jopt-simple-5.0.4.jar
 - oafp_avro.js
-- reload4j-1.2.25.jar
+- reload4j-1.2.26.jar
 - samples/twitter.snappy.avro
 - samples/userdata5.avro
-- slf4j-api-2.0.13.jar
-- slf4j-reload4j-2.0.13.jar
-- snappy-java-1.1.10.5.jar
-- trevni-avro-1.12.0.jar
-- trevni-core-1.12.0.jar
-- velocity-engine-core-2.3.jar
-- xz-1.9.jar
-- zstd-jni-1.5.6-4.jar
+- slf4j-api-2.0.17.jar
+- slf4j-reload4j-2.0.17.jar
+- snappy-java-1.1.10.8.jar
+- trevni-avro-1.12.1.jar
+- trevni-core-1.12.1.jar
+- velocity-engine-core-2.4.1.jar
+- xz-1.12.jar
+- zstd-jni-1.5.7-7.jar
 filesHash:
-  .maven.yaml: f18b8e6aeef9fec3c32793e4c055e8d69c876c6f
+  .maven.yaml: 51ae688939c061357afb2b56214554d535ee9203
   README.md: ede87352949985f5268f910fe1ac08cd86e908f7
-  avro-1.12.0.jar: 6e692a464b213f6df49f8e3e7fcf42df0dbb7639
-  avro-compiler-1.12.0.jar: 937dd214d41027af050e379868d6c08ed969f282
-  avro-mapred-1.12.0.jar: f9b03f960eba06829c52a6ed907009ae81724c93
+  avro-1.12.1.jar: 1c6294ac1d67ce396f51827c87ba2e01de304500
+  avro-compiler-1.12.1.jar: 0bf929636c1392073f797f0559f45ce4f2575cd4
+  avro-mapred-1.12.1.jar: 4b11d31fdc87f6240b573cb2a68fe6dead007650
   avro.js: 2955a60b554855cad108368528762dfb7f85ec95
-  commons-text-1.12.0.jar: 66aa90dc099701c4d3b14bd256c328f592ccf0d6
+  commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   javax.servlet-api-3.1.0.jar: 3cd63d075497751784b2fa84be59432f4905bf7c
   jopt-simple-5.0.4.jar: 4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c
   oafp_avro.js: 4176a6c84531ce276bdcd7e8b406223dc68c1a3e
-  reload4j-1.2.25.jar: 45921e383a1001c2a599fc4c6cf59af80cdd1cf1
+  reload4j-1.2.26.jar: f9a29cea570c15844d2ec98bf8e2e523017a6a53
   samples/twitter.snappy.avro: 6ef77337320c2cce2abe3e8e498f54c1f128414e
   samples/userdata5.avro: 109d360501a60877c09dd682686051de5dee7bae
-  slf4j-api-2.0.13.jar: 80229737f704b121a318bba5d5deacbcf395bc77
-  slf4j-reload4j-2.0.13.jar: e8de9f981349fee84f8d708cd0ed2337d193faed
-  snappy-java-1.1.10.5.jar: ac605269f3598506196e469f1fb0d7ed5c55059e
-  trevni-avro-1.12.0.jar: 3036c3887949d8ea182b44c9d5865d7c2d68912c
-  trevni-core-1.12.0.jar: bd02c4aec6719130eb809b5093928486c0cf37a7
-  velocity-engine-core-2.3.jar: e2133b723d0e42be74880d34de6bf6538ea7f915
-  xz-1.9.jar: 1ea4bec1a921180164852c65006d928617bd2caf
-  zstd-jni-1.5.6-4.jar: ba9e303e0b5e94cdd0017390d7d8c06f47fd61f7
+  slf4j-api-2.0.17.jar: d9e58ac9c7779ba3bf8142aff6c830617a7fe60f
+  slf4j-reload4j-2.0.17.jar: 334b175c8ce44b3a6815fc92971916f36e15d000
+  snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
+  trevni-avro-1.12.1.jar: 850646adffe2f43a6c6236390d3ba674ef7fe29c
+  trevni-core-1.12.1.jar: 443d53fe1c98cf5f94b22d9b3cb8828a712ed291
+  velocity-engine-core-2.4.1.jar: 0b662837e8006d5c383bd128503ea86ef5b4d361
+  xz-1.12.jar: bb9703ba3753ab8665f65e6a25b3ddc7b09b1caf
+  zstd-jni-1.5.7-7.jar: f36a1a88f8f0e5f7f06aa99f23ea743cef49ded5
