@@ -26,14 +26,14 @@ files:
 - .package.yaml
 - README.md
 - jcl-over-slf4j-1.7.36.jar
-- sshd-common-2.16.0.jar
-- sshd-core-2.16.0.jar
+- sshd-common-2.17.1.jar
+- sshd-core-2.17.1.jar
 - sshd.js
 filesHash:
-  .maven.yaml: 20445db5d0f15fc4073f659cd1ef5715b42e4e89
+  .maven.yaml: 02850eb93ea89b16cce464aae03f5656a4c6e102
   .odoc.db: 88d56dd8174b836f3d33d3c897d0553588c64dd4
   README.md: 672a0f1976636ccb8c59c04be649b1f461f38a9b
   jcl-over-slf4j-1.7.36.jar: d877e195a05aca4a2f1ad2ff14bfec1393af4b5e
-  sshd-common-2.16.0.jar: 964e47b6a067a79cc21f394020950011d4058576
-  sshd-core-2.16.0.jar: 4ad37ec93f2296821a60279a3acdb918129329ff
+  sshd-common-2.17.1.jar: 5c8ce7fcea1f8068b36c00a98714bb695f5935dd
+  sshd-core-2.17.1.jar: 02582f7b736365e3cbe70bcf90f12ac99d7d7a29
   sshd.js: e259c0eb5ad9cafee480cd36143605f1c2670ef0
