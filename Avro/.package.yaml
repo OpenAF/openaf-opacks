@@ -22,8 +22,6 @@ dependencies:
   openaf: '>=20240318'
 files:
 - .maven.yaml
-- .openaf_precompiled/.t8-20260307
-- .openaf_precompiled/avro_js.class
 - .package.yaml
 - README.md
 - avro-1.12.1.jar
@@ -48,8 +46,6 @@ files:
 - zstd-jni-1.5.7-7.jar
 filesHash:
   .maven.yaml: 51ae688939c061357afb2b56214554d535ee9203
-  .openaf_precompiled/.t8-20260307: da39a3ee5e6b4b0d3255bfef95601890afd80709
-  .openaf_precompiled/avro_js.class: e8e068d90fead7feb03d79e2b129ac59b8d866da
   README.md: ede87352949985f5268f910fe1ac08cd86e908f7
   avro-1.12.1.jar: 1c6294ac1d67ce396f51827c87ba2e01de304500
   avro-compiler-1.12.1.jar: 0bf929636c1392073f797f0559f45ce4f2575cd4
