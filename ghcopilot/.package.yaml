@@ -29,14 +29,14 @@ files:
 - .package.yaml
 - Dockerfile
 - README.md
-- copilot-sdk-1.0.10.jar
+- copilot-sdk-1.0.11-SNAPSHOT.jar
 - ghcopilot.js
 - jackson-datatype-jsr310-2.21.1.jar
 filesHash:
   .claude/settings.local.json: 6905fb233a7ff433a4c4652e9e6ae9b84394e438
   .maven.yaml: b954c13b4ddee906f3283f132dd73374e583dba6
   Dockerfile: 4a6c59e651bc35f57b2f78ac8a286ada43f84d45
-  README.md: b230e364ae68adb758e74a2d4c2e6aaae84fb7ad
-  copilot-sdk-1.0.10.jar: 65d4f4cc00cd017028412e68e67ea9c2ae2421c8
-  ghcopilot.js: 9e35a3736c5ef0b4eb64f10468f965327d5ce234
+  README.md: a56afc105431bd5d6a5b75f01ed56a814f1e51ff
+  copilot-sdk-1.0.11-SNAPSHOT.jar: 49aaf65a03bf8d8140f9fcd1d03b6cac89756641
+  ghcopilot.js: 5e13285bb4413a181d9bedb01d27e3baa352eef6
   jackson-datatype-jsr310-2.21.1.jar: 115f5b1786b36e20a2b1108099f6b77617fb42ec

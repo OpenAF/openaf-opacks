@@ -50,6 +50,34 @@ ow.ai.__gpttypes.ghcopilot = {
              m.indexOf("enoent") >= 0
     }
 
+    var _isProtocolMismatchError = (aErr) => {
+      var m = String(aErr).toLowerCase()
+      return m.indexOf("sdk protocol version mismatch") >= 0 ||
+             (m.indexOf("sdk expects version") >= 0 && m.indexOf("server reports version") >= 0)
+    }
+
+    var _buildProtocolMismatchError = (aErr) => {
+      var _sdkVersion = "2"
+      try {
+        _sdkVersion = String(Packages.com.github.copilot.sdk.SdkProtocolVersion.get())
+      } catch(pe) {}
+
+      var lines = [
+        "GitHub Copilot CLI/server protocol is incompatible with the bundled Java SDK.",
+        "Bundled SDK protocol version: " + _sdkVersion,
+        "The local Copilot CLI/server reports a newer protocol version.",
+        "This opack currently uses the community Java SDK, and that SDK must match the Copilot CLI/server protocol.",
+        "Use one of the following:",
+        "  - pin or downgrade your Copilot CLI to a version compatible with protocol " + _sdkVersion,
+        "  - point options.cliPath to a compatible Copilot CLI binary",
+        "  - update this opack once the upstream Java SDK adds support for the newer protocol",
+        "Check the installed CLI with: copilot --version",
+        "Original error: " + String(aErr)
+      ]
+
+      return lines.join("\n")
+    }
+
     var _buildCliNotFoundError = (aCause, aDetection) => {
       var lines = [
         "GitHub Copilot CLI executable was not found.",
@@ -261,6 +289,7 @@ ow.ai.__gpttypes.ghcopilot = {
         _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
       } catch(e) {
         if (_isCliMissingStartupError(e)) throw _buildCliNotFoundError(e, _cliDetected)
+        if (_isProtocolMismatchError(e)) throw _buildProtocolMismatchError(e)
         throw e
       }
     }
@@ -346,7 +375,12 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isArray(aOptions.excludedTools) && aOptions.excludedTools.length > 0)
         sc.setExcludedTools(_toJavaList(aOptions.excludedTools))
 
-      _session         = _client.createSession(sc).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+      try {
+        _session = _client.createSession(sc).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+      } catch(e) {
+        if (_isProtocolMismatchError(e)) throw _buildProtocolMismatchError(e)
+        throw e
+      }
       _sessionStreaming = _wantStreaming
       _sessionModel    = aOptions.model
       _sessionSysMsg   = _currentSysMsg

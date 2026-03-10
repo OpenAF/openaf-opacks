@@ -8,6 +8,26 @@ OpenAF wrapper around the [copilot-sdk-java](https://github.com/copilot-communit
 - GitHub Copilot CLI installed and available in `PATH` (or configured with `cliPath`)
 - Valid Copilot authentication on the local machine, or a token
 
+## Compatibility note
+
+This opack currently wraps the community Java SDK shipped in this folder. If you see an error like:
+
+```text
+SDK protocol version mismatch: SDK expects version 2, but server reports version 3
+```
+
+your local `copilot` CLI/server is newer than the bundled Java SDK protocol. In that case, either:
+
+- point `options.cliPath` at an older compatible `copilot` binary
+- pin/downgrade the installed `@github/copilot` CLI to a compatible version
+- update the bundled Java SDK when upstream adds support for the newer protocol
+
+Check the active CLI with:
+
+```bash
+copilot --version
+```
+
 ## Install GitHub Copilot CLI
 
 Use one of the following options:
