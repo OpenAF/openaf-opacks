@@ -61,6 +61,7 @@ var llm = ow.ai.llm({
     model: "gpt-4.1",
     timeout: 120000,
     useStdio: true,
+    excludeAllExistingTools: true,
     token: "<github-token>"
   }
 })
@@ -134,6 +135,34 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `disabledSkills` (array of strings, optional): Skill IDs/names to disable, even if available in configured skill directories.
 - `availableTools` (array of strings, optional): Allowlist of built-in tools the agent is permitted to call.
 - `excludedTools` (array of strings, optional): Blocklist of built-in tools that must not be called.
+- `excludeAllExistingTools` (boolean, default: `false`): Disables all built-in Copilot tools for the session while still allowing tools registered with `setTool(...)`.
+
+### All available options
+
+The following options are supported:
+
+- `params`
+- `model`
+- `timeout`
+- `mode`
+- `token`
+- `githubToken`
+- `cliPath`
+- `cliUrl`
+- `cwd`
+- `useStdio`
+- `autoStart`
+- `autoRestart`
+- `useLoggedInUser`
+- `logLevel`
+- `reasoningEffort`
+- `configDir`
+- `onPermissionRequest`
+- `skillDirectories`
+- `disabledSkills`
+- `availableTools`
+- `excludedTools`
+- `excludeAllExistingTools`
 
 ## Additional methods
 

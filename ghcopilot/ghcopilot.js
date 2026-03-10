@@ -26,6 +26,7 @@ ow.ai.__gpttypes.ghcopilot = {
     aOptions.disabledSkills   = _$(aOptions.disabledSkills,   "aOptions.disabledSkills").isArray().default(__)
     aOptions.availableTools   = _$(aOptions.availableTools,   "aOptions.availableTools").isArray().default(__)
     aOptions.excludedTools    = _$(aOptions.excludedTools,    "aOptions.excludedTools").isArray().default(__)
+    aOptions.excludeAllExistingTools = _$(aOptions.excludeAllExistingTools, "aOptions.excludeAllExistingTools").isBoolean().default(false)
 
     var _conversation    = []
     var _lastStats       = __
@@ -337,8 +338,11 @@ ow.ai.__gpttypes.ghcopilot = {
         sc.setSkillDirectories(_toJavaList(aOptions.skillDirectories))
       if (isArray(aOptions.disabledSkills) && aOptions.disabledSkills.length > 0)
         sc.setDisabledSkills(_toJavaList(aOptions.disabledSkills))
-      if (isArray(aOptions.availableTools) && aOptions.availableTools.length > 0)
+      if (toBoolean(aOptions.excludeAllExistingTools)) {
+        sc.setAvailableTools(new java.util.ArrayList())
+      } else if (isArray(aOptions.availableTools) && aOptions.availableTools.length > 0) {
         sc.setAvailableTools(_toJavaList(aOptions.availableTools))
+      }
       if (isArray(aOptions.excludedTools) && aOptions.excludedTools.length > 0)
         sc.setExcludedTools(_toJavaList(aOptions.excludedTools))
 
