@@ -1,20 +1,54 @@
 /**
  * <odoc>
- * <key>ElasticSearch.ElasticSearch(aURL, aUser, aPassword) : ElasticSearch</key>
+ * <key>ElasticSearch.ElasticSearch(aURL, aUser, aPassword, aOptions) : ElasticSearch</key>
  * Creates a new instance of ElasticSearch give a elasticsearch aURL (without index), an user
- * and a password.
+ * and a password. Optionally aOptions.aws can be provided with region, service, accessKey,
+ * secretKey and sessionToken to use AWS IAM authentication with SigV4 signing.
  * </odoc>
  */
-var ElasticSearch = function(aURL, aUser, aPassword) {
+var ElasticSearch = function(aURL, aUser, aPassword, aOptions) {
 	this.url  = _$(aURL, "url").isString().$_()
 	this.user = _$(aUser, "user").isString().default(__)
 	this.pass = _$(aPassword, "pass").isString().default(__)
+	this._restExtras = {}
+	this._awsIAM = __
+	this._awsPreAction = __
+	this._manualPreAction = __
+	aOptions = _$(aOptions).isMap().default({})
 
 	if (this.url.endsWith("/")) this.url = this.url.substring(0, this.url.length -1)
 
-	this.restmap = {
-		login: Packages.openaf.AFCmdBase.afc.dIP(this.user),
-		pass : Packages.openaf.AFCmdBase.afc.dIP(this.pass)
+	this._rebuildRESTMap()
+
+	if (isMap(aOptions.aws)) this.setAWSIAM(aOptions.aws)
+}
+
+ElasticSearch.prototype._rebuildRESTMap = function() {
+	this.restmap = clone(_$(this._restExtras).isMap().default({}))
+	var _login = this.restmap.login
+	var _pass  = this.restmap.pass
+
+	delete this.restmap.login
+	delete this.restmap.pass
+	delete this.restmap.preAction
+
+	if (isDef(this._awsIAM)) {
+		if (isDef(_login)) this.restmap.login = _login
+		if (isDef(_pass)) this.restmap.pass = _pass
+	} else {
+		if (isDef(this.user)) this.restmap.login = Packages.openaf.AFCmdBase.afc.dIP(this.user)
+		if (isDef(this.pass)) this.restmap.pass  = Packages.openaf.AFCmdBase.afc.dIP(this.pass)
+	}
+	if (isDef(this._awsPreAction)) this.restmap.preAction = this._awsPreAction
+	if (isDef(this._manualPreAction)) this.restmap.preAction = this._manualPreAction
+}
+
+ElasticSearch.prototype._loadAWS = function() {
+	if (isDef(global.AWS) && isDef(global.AWS.prototype) && isDef(global.AWS.prototype.restPreActionOpenSearch)) return
+	if (isUnDef(getOPackPath("AWS"))) throw "No AWS oPack installed. Please install by executing 'opack install AWS'."
+	loadLib("aws.js")
+	if (isUnDef(global.AWS) || isUnDef(global.AWS.prototype) || isUnDef(global.AWS.prototype.restPreActionOpenSearch)) {
+		throw "Please install/update the AWS oPack to a version supporting OpenSearch IAM authentication."
 	}
 }
 
@@ -26,10 +60,12 @@ var ElasticSearch = function(aURL, aUser, aPassword) {
  * </odoc>
  */
 ElasticSearch.prototype.setRESTMap = function(aMap) {
-	this.restmap = merge(aMap, {
-		login: Packages.openaf.AFCmdBase.afc.dIP(this.user),
-		pass : Packages.openaf.AFCmdBase.afc.dIP(this.pass)
-	});
+	aMap = _$(aMap).isMap().default({})
+	this._restExtras = clone(aMap)
+
+	if (isDef(aMap.preAction)) this._manualPreAction = aMap.preAction
+
+	this._rebuildRESTMap()
 };
 
 /**
@@ -39,7 +75,26 @@ ElasticSearch.prototype.setRESTMap = function(aMap) {
  * </odoc>
  */
 ElasticSearch.prototype.setPreAction = function(aPreAction) {
-	this.restmap.preAction = aPreAction;
+	this._manualPreAction = aPreAction
+	this._rebuildRESTMap()
+};
+
+/**
+ * <odoc>
+ * <key>ElasticSearch.setAWSIAM(aOptions)</key>
+ * Sets AWS IAM authentication through SigV4 signing. Expected options: region, service (defaults to "es"),
+ * accessKey, secretKey, sessionToken, amzFields, date and contentType.
+ * </odoc>
+ */
+ElasticSearch.prototype.setAWSIAM = function(aOptions) {
+	aOptions = _$(aOptions).isMap().default({})
+	aOptions.region = _$(aOptions.region, "aOptions.region").isString().$_()
+	aOptions.service = _$(aOptions.service).isString().default("es")
+
+	this._loadAWS()
+	this._awsIAM = clone(aOptions)
+	this._awsPreAction = (new AWS(aOptions.accessKey, aOptions.secretKey, aOptions.sessionToken, aOptions.region)).restPreActionOpenSearch(aOptions)
+	this._rebuildRESTMap()
 };
 
 /**
@@ -553,8 +608,8 @@ ElasticSearch.prototype.createCh = function(aIndex, aIdKey, aChName) {
 		index: aIndex,
 		idKey: aIdKey,
 		url  : parent.url,
-		user : parent.user,
-		pass : parent.pass,
+		user : (isDef(parent._awsIAM) ? __ : parent.user),
+		pass : (isDef(parent._awsIAM) ? __ : parent.pass),
 		preAction: this.restmap.preAction
 	});
 };

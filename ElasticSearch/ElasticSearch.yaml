@@ -7,6 +7,11 @@ jobs:
          - args.url    (String)  An ElasticSearch base URL
          - args.user   (String)  An ElasticSearch user
          - args.pass   (String)  An ElasticSearch password
+         - args.awsRegion (String) AWS region to use for IAM auth
+         - args.awsService (String) AWS signing service to use (defaults to "es"; use "aoss" for serverless)
+         - args.awsAccessKey (String) Optional AWS access key override
+         - args.awsSecretKey (String) Optional AWS secret key override
+         - args.awsSessionToken (String) Optional AWS session token override
          - args.index  (String)  An ElasticSearch index
          - args.hostid (String)  An log hostid 
          - args.prefix (String)  A ElasticSearch index prefix to use instead of index
@@ -16,7 +21,17 @@ jobs:
        if (isUnDef(args.hostid)) throw "Please define an ElasticSearch hostid";
 
        load("elasticsearch.js");
-       global.__es = new ElasticSearch(args.url, args.user, args.pass);
+       var _aws = __;
+       if (isDef(args.awsRegion)) {
+         _aws = {
+           region: args.awsRegion,
+           service: _$(args.awsService).isString().default("es"),
+           accessKey: _$(args.awsAccessKey).isString().default(__),
+           secretKey: _$(args.awsSecretKey).isString().default(__),
+           sessionToken: _$(args.awsSessionToken).isString().default(__)
+         };
+       }
+       global.__es = new ElasticSearch(args.url, args.user, args.pass, { aws: _aws });
        global.__es.startLog((isDef(args.index)) ? args.index : ow.ch.utils.getElasticIndex(args.prefix), args.hostid);
 
    # Stop logging to ElasticSearch
