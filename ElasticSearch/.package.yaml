@@ -25,9 +25,11 @@ files:
 - .package.yaml
 - .precompile
 - ElasticSearch.yaml
+- README.md
 - elasticsearch.js
 filesHash:
   .odoc.db: 8d37dc74916d3abe8a3d90d7e68bd9b463a5087c
   .precompile: 65efea614ff4d1a11ea14ddea08713710e04296e
   ElasticSearch.yaml: 48b90e5d7ac0c2dbf97f5843273e3e99e31485b6
+  README.md: 0203b1b376e858e122d4dd955c8e453a44d8f0fb
   elasticsearch.js: c4dfa3d64ea5fb282313e98d38fa94f4858f55a6
