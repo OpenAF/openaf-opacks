@@ -573,6 +573,36 @@ AWS.prototype.restPreActionAWSSign4 = function(aRegion, aService, aAmzFields, aD
 
 /**
  * <odoc>
+ * <key>AWS.restPreActionOpenSearch(aOptions) : Function</key>
+ * Provides a preAction function to be used with $rest pre-actions for AWS signed OpenSearch/OpenSearch Serverless rest requests.
+ * Expected options: region, service (defaults to "es"), accessKey, secretKey, sessionToken, amzFields, date and contentType (defaults to application/json).
+ * </odoc>
+ */
+AWS.prototype.restPreActionOpenSearch = function(aOptions) {
+   aOptions = _$(aOptions).isMap().default({})
+
+   var _region      = _$(aOptions.region, "aOptions.region").isString().$_()
+   var _service     = _$(aOptions.service).isString().default("es")
+   var _amzFields   = _$(aOptions.amzFields).isMap().default(__)
+   var _date        = _$(aOptions.date).isDate().default(__)
+   var _contentType = _$(aOptions.contentType).isString().default("application/json")
+   var _aws         = this
+
+   if (isDef(aOptions.accessKey) || isDef(aOptions.secretKey) || isDef(aOptions.sessionToken)) {
+      _aws = new AWS(aOptions.accessKey, aOptions.secretKey, aOptions.sessionToken, _region)
+   }
+
+   return _aws.restPreActionAWSSign4({
+      region     : _region,
+      service    : _service,
+      amzFields  : _amzFields,
+      date       : _date,
+      contentType: _contentType
+   })
+}
+
+/**
+ * <odoc>
  * <key>AWS.getURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType) : Object</key>
  * Tries to send a POST http request given aURL, aURI, ordered aParams, an object aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzFields, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
  * Returns the object returned by the API.
