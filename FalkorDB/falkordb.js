@@ -543,7 +543,7 @@ ow.loadObj();
 *    - user  (String)  Optional FalkorDB username.\
 *    - pass  (String)  Optional FalkorDB password.\
 * \
-* Channel values are persisted directly as node properties. The key must include the configured `label` field. Graph-wide operations such as `size` and `destroy` apply to all nodes in the configured graph.
+* Channel values are persisted directly as node properties. The key must include the configured `label` field. Graph-wide operations such as `size` and `destroy` apply to all nodes in the configured graph. `getAll()` also accepts either a GQL/Cypher string or a map like `{ gql, params, readOnly }`, returning the raw query rows.
 * </odoc>
 */
 ow.ch.__types.falkordb = {
@@ -639,6 +639,23 @@ ow.ch.__types.falkordb = {
 
     return aObj;
   },
+  __isQueryRequest: function(aRequest) {
+    return isString(aRequest) || (isMap(aRequest) && (isDef(aRequest.gql) || isDef(aRequest.cypher) || isDef(aRequest.query)));
+  },
+  __runGetAllQuery: function(aName, aRequest) {
+    var req = isString(aRequest) ? { gql: aRequest } : aRequest;
+    req = _$(req, "query request").isMap().$_();
+
+    var gql = _$(req.gql).isString().default(_$(req.cypher).isString().default(_$(req.query).isString().default(__)));
+    _$(gql, "query request.gql").isString().$_("Please provide a GQL/Cypher query.");
+
+    var params = _$(req.params, "query request.params").isMap().default(__);
+    var readOnly = _$(req.readOnly).isBoolean().default(true);
+
+    return readOnly
+      ? this.__channels[aName].f.readOnlyQuery(gql, params)
+      : this.__channels[aName].f.query(gql, params);
+  },
   create: function(aName, shouldCompress, options) {
     options = _$(options, "options").isMap().default({});
     _$(options.host, "falkordb host").isString().$_();
@@ -666,6 +683,7 @@ ow.ch.__types.falkordb = {
     this.__getRawKeys(aName).forEach(k => aFunction(this.__extractPublicKey(aName, k), this.get(aName, k)));
   },
   getAll: function(aName, full) {
+    if (this.__isQueryRequest(full)) return this.__runGetAllQuery(aName, full);
     return this.__getRawKeys(aName, full).map(k => this.get(aName, k));
   },
   getKeys: function(aName, full) {

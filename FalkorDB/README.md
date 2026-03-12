@@ -28,6 +28,16 @@ Channel reads such as `get`, `getAll`, `pop`, and `shift` convert Java map resul
 
 `getKeys()` returns key maps containing only `typeField` and the configured `keyFields`. `get()` and `getAll()` return node values without those key fields, and add `edgesField` when configured.
 
+`getAll()` also accepts an optional GQL/Cypher query instead of the usual `full` flag. You can pass either a query string or a map like `{ gql: "MATCH (n:Person) RETURN n.name AS name", params: { ... }, readOnly: true }`. Query mode returns the raw row maps from FalkorDB, while the default mode still returns channel values.
+
+Examples:
+
+```javascript
+$ch("people").getAll("MATCH (n:Person) RETURN n.name AS name");
+$ch("people").getAll({ gql: "MATCH (n:Person) WHERE n.age > $age RETURN n", params: { age: 30 } });
+$ch("people").getAll({ query: "CREATE (n:Tmp {name:$name}) RETURN n", params: { name: "x" }, readOnly: false });
+```
+
 Edges use an array of `{ type, target, properties, value }` entries. `type` is the relationship name, `target` identifies the destination node and may include either the configured `label` field or `typeField`, `properties` applies relationship properties, and `value` optionally updates the destination node properties.
 
 You can create a channel directly from an instance with `getCh`:
