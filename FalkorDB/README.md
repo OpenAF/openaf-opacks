@@ -62,3 +62,29 @@ var alice = ch.get({ _TYPE: "Person", name: "Alice" });
 print(ch.getKeys()[0]._TYPE);
 print(alice._EDGES[0].target.name);
 ```
+
+## oAFp
+
+This opack also provides `oafp` support through `oafp_falkordb.js`.
+
+Examples:
+
+```bash
+echo "MATCH (n) RETURN n LIMIT 5" | oafp libs=falkordb in=falkordb infalkordbgraph=demo
+oafp libs=falkordb in=falkordb data="(gql: 'MATCH (n:Person) RETURN n.name AS name', readOnly: true)" infalkordbgraph=demo
+oafp libs=falkordb in=falkordb data="MATCH (n:Person) WHERE n.age > \$age RETURN n.name AS name" infalkordbgraph=demo infalkordbparams="(age: 30)" infalkordbreadonly=true
+```
+
+Supported `oafp` input type:
+
+- `falkordb`: executes a FalkorDB GQL/Cypher query and returns the resulting rows.
+
+Connection options:
+
+- `infalkordbhost`
+- `infalkordbport`
+- `infalkordbgraph`
+- `infalkordbuser`
+- `infalkordbpass`
+- `infalkordbparams`
+- `infalkordbreadonly`
