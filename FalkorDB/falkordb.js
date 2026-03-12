@@ -376,6 +376,124 @@ FalkorDB.prototype.chDestroy = function(aLabelField, aChannel) {
 
 /**
  * <odoc>
+ * <key>FalkorDB.exportChStream(aLabelField, aFn, aMap) : Number</key>
+ * Streams graph nodes in batches invoking aFn(aBatch, aMeta) for each batch.
+ * Each entry has the channel-compatible shape `{ key, value }`, where key
+ * includes aLabelField and any optional aMap.keyFields. value includes node
+ * properties and, by default, outgoing edges in aMap.edgesField (`_EDGES`).
+ * Use aMap.batchSize (defaults to 100), aMap.typeField (`_TYPE`),
+ * aMap.edgesField (`_EDGES`), aMap.withEdges (defaults to true),
+ * aMap.keyFields (defaults to []), and aMap.filter (optional key filter).
+ * Returns the total exported record count.
+ * </odoc>
+ */
+FalkorDB.prototype.exportChStream = function(aLabelField, aFn, aMap) {
+  _$(aLabelField, "label field").isString().$_();
+  _$(aFn, "callback function").isFunction().$_();
+  aMap = _$(aMap).isMap().default({});
+
+  var batchSize = _$(aMap.batchSize).isNumber().default(100);
+  var typeField = _$(aMap.typeField).isString().default("_TYPE");
+  var edgesField = _$(aMap.edgesField).isString().default("_EDGES");
+  var withEdges = _$(aMap.withEdges).isBoolean().default(true);
+  var keyFields = _$(aMap.keyFields).isArray().default([]);
+  var filter = _$(aMap.filter).isMap().default(__);
+  var keys = this.chGetKeys(aLabelField, __, filter);
+  var total = 0;
+
+  if (batchSize <= 0) batchSize = 100;
+
+  for (var i = 0; i < keys.length; i += batchSize) {
+    var batch = [];
+    var bs = keys.slice(i, i + batchSize);
+
+    bs.forEach(k => {
+      var key = {};
+      var value = this.chGet(aLabelField, __, k);
+
+      key[typeField] = k[aLabelField];
+      keyFields.forEach(f => {
+        if (isDef(k[f])) key[f] = k[f];
+      });
+
+      if (withEdges) value[edgesField] = this.chGetEdges(aLabelField, __, k, typeField);
+
+      batch.push({ key: key, value: value });
+      total++;
+    });
+
+    aFn(batch, {
+      op: "batch",
+      batch: Number(i / batchSize) + 1,
+      count: batch.length,
+      total: total
+    });
+  }
+
+  return total;
+};
+
+/**
+ * <odoc>
+ * <key>FalkorDB.importChStream(aLabelField, aFn, aMap) : Number</key>
+ * Imports graph nodes in batches by repeatedly invoking aFn(aMeta) until it
+ * returns undefined/null. Each returned batch can be either an array of
+ * `{ key, value }` records or a map containing `items`/`batch` with that array.
+ * Keys must include the configured type field (`aMap.typeField`, defaults to
+ * `_TYPE`) so the node label can be mapped into aLabelField. Edge arrays can
+ * be provided in value[aMap.edgesField] (`_EDGES`). Returns the total imported
+ * record count.
+ * </odoc>
+ */
+FalkorDB.prototype.importChStream = function(aLabelField, aFn, aMap) {
+  _$(aLabelField, "label field").isString().$_();
+  _$(aFn, "callback function").isFunction().$_();
+  aMap = _$(aMap).isMap().default({});
+
+  var typeField = _$(aMap.typeField).isString().default("_TYPE");
+  var edgesField = _$(aMap.edgesField).isString().default("_EDGES");
+  var timestamps = _$(aMap.timestamps).isBoolean().default(false);
+  var total = 0;
+  var idx = 0;
+
+  while(true) {
+    var raw = aFn({ op: "next", batch: idx + 1, total: total });
+    if (isUnDef(raw) || raw === null) break;
+
+    var records = raw;
+    if (isMap(raw)) records = _$(raw.items).isArray().default(_$(raw.batch).isArray().default([]));
+    records = _$(records, "batch records").isArray().$_();
+    if (records.length <= 0) break;
+
+    records.forEach(rec => {
+      rec = _$(rec, "record").isMap().$_();
+
+      var key = _$(rec.key, "record.key").isMap().default({});
+      var value = _$(rec.value, "record.value").isMap().default({});
+
+      if (isDef(key[typeField]) && isUnDef(key[aLabelField])) {
+        key[aLabelField] = key[typeField];
+        delete key[typeField];
+      }
+      if (isDef(value[typeField]) && isUnDef(key[aLabelField])) key[aLabelField] = value[typeField];
+      _$(key[aLabelField], "record.key." + aLabelField).isString().$_("Missing record key type/label field.");
+
+      var edges = _$(value[edgesField]).isArray().default(__);
+      if (isDef(edges)) delete value[edgesField];
+
+      this.chSet(aLabelField, __, key, value, __, timestamps);
+      if (isDef(edges)) this.chSetEdges(aLabelField, __, key, edges, typeField);
+      total++;
+    });
+
+    idx++;
+  }
+
+  return total;
+};
+
+/**
+ * <odoc>
  * <key>FalkorDB.query(aCypher, aParams) : Array</key>
  * Executes a Cypher query and returns an array of row maps.
  * </odoc>
