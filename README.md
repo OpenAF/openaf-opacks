@@ -25,6 +25,7 @@
   |**Docsify**|<img src=".github/badges/Docsify.svg"><br>Wrapper to quickly build and server Docsify markdown documentation.|
   |**ElasticSearch**|<img src=".github/badges/ElasticSearch.svg"><br>Provides ElasticSearch functionality for OpenAF scripts.|
   |**EncryptText**|<img src=".github/badges/EncryptText.svg"><br>Encrypts a password by asking the user and not displaying on the shell session.|
+  |**FalkorDB**|<img src=".github/badges/FalkorDB.svg"><br>OpenAF wrapper for FalkorDB using the official Java client.|
   |**GCP**|<img src=".github/badges/GCP.svg"><br>Simplified and light GCP API calls to avoid including the GCP Java SDK (work in progress)|
   |**GCS**|<img src=".github/badges/GCS.svg"><br>Google Cloud Storage (GCS) wrapper|
   |**GIST**|<img src=".github/badges/GIST.svg"><br>Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
