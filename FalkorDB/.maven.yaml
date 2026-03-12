@@ -1,0 +1,12 @@
+artifacts:
+- group: com.falkordb
+  id: jfalkordb
+- group: redis.clients
+  id: jedis
+- group: org.apache.commons
+  id: commons-pool2
+- group: org.apache.commons
+  id: commons-text
+- group: org.apache.commons
+  id: commons-lang3
+

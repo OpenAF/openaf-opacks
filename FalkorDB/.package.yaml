@@ -1,0 +1,47 @@
+author: OpenAF
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- falkordb
+- graph
+- cypher
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/FalkorDB
+  url: https://openaf.io/opacks/FalkorDB.opack
+description: OpenAF wrapper for FalkorDB using the official Java client.
+name: FalkorDB
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: 20260312
+dependencies:
+  openaf: '>=20240318'
+files:
+- .maven.yaml
+- .package.yaml
+- README.md
+- commons-pool2-2.13.1.jar
+- commons-text-1.15.0.jar
+- error_prone_annotations-2.41.0.jar
+- falkordb.js
+- jedis-7.4.0.jar
+- jfalkordb-0.7.0.jar
+- json-20251224.jar
+- redis-authx-core-0.1.1-beta2.jar
+filesHash:
+  .maven.yaml: 6c8d2ea89dfdf33229d506d56df843809e2d8542
+  README.md: 1cc80bd4610361d9f433a2690447b43bfe559493
+  commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
+  commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
+  error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
+  falkordb.js: 4359f7a2cf4550f17b0f73cfb7665afbbe061d0c
+  jedis-7.4.0.jar: 6eefc2614699bdd3c1ce16dde040ef578435816f
+  jfalkordb-0.7.0.jar: f0fb4bbb59dd89501adc9c84566b4ef8ecfbbb64
+  json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
+  redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
