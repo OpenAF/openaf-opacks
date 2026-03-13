@@ -414,6 +414,8 @@ jobs:
           }
         })
 
+        if (options._api) return { data: assets, type: "json" }
+
         var data = "\n"
         data += `## 📦 Package version assets\n\n`
         data += `🏷️ **Domain:** \`${domain}\`  \n`

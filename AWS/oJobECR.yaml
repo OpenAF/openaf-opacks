@@ -263,6 +263,8 @@ jobs:
             }
           }
 
+          if (options._api) return { data: { ecrdesc: mddesc, ecrimgs: img }, type: "json" }
+
           data = "\n"
           data += "## Contents\n\n"
           if (useMDDesc) {
