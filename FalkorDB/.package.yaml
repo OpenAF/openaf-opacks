@@ -43,9 +43,9 @@ filesHash:
   commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
   commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
   error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
-  falkordb.js: cd116777a7047d6d2f394e1077e688bc19d684ae
+  falkordb.js: cb4ee91719817a4784f27f0c38b50b744d95900d
   jedis-7.4.0.jar: 6eefc2614699bdd3c1ce16dde040ef578435816f
   jfalkordb-0.7.0.jar: f0fb4bbb59dd89501adc9c84566b4ef8ecfbbb64
   json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
-  oafp_falkordb.js: bee809124dedb05d25a0c4c64a3ae7a9d13526d9
+  oafp_falkordb.js: 95a2b1281cae7c93a0c1633a4e65f85ae50aa542
   redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
