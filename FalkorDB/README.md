@@ -20,6 +20,34 @@ fdb.close();
 
 `linkNodes(fromName, fromType, toName, toType, relationship, properties)` merges two `:Node` entries by `name` and `type`, creates the relationship between them, and applies the provided relationship properties map.
 
+
+`exportChStream(labelField, callback, options)` and `importChStream(labelField, callback, options)` provide streaming batch export/import helpers around the channel data model:
+
+- `exportChStream` invokes `callback(batch, meta)` for each batch of `{ key, value }` records and returns the total exported record count.
+- `importChStream` repeatedly invokes `callback(meta)` to fetch the next batch (until `null`/`undefined`) and writes all records into the graph, returning the total imported count.
+
+Example:
+
+```javascript
+var exported = [];
+fdb.exportChStream("type", (batch) => exported = exported.concat(batch), {
+  keyFields: ["name"],
+  batchSize: 200,
+  typeField: "_TYPE",
+  edgesField: "_EDGES"
+});
+
+var i = 0;
+fdb.importChStream("type", () => {
+  if (i++ > 0) return __;
+  return exported;
+}, {
+  typeField: "_TYPE",
+  edgesField: "_EDGES",
+  timestamps: true
+});
+```
+
 ## OpenAF channel
 
 `falkordb.js` also provides `ow.ch.__types.falkordb`. On channel creation, `options.label` is mandatory and names the key field whose string value becomes the FalkorDB node label. Set `options.keyFields` to the list of additional channel key properties that uniquely identify a node within that label. In practice you should set `keyFields` whenever you expect `getKeys()`, `getAll()`, `pop()`, or `shift()` to preserve non-key properties correctly. Channel values are persisted directly as node properties, and graph-wide operations such as `size` and `destroy` apply to the whole configured graph. Set `options.timestamps` to `true` to also persist `createdAt` and `updatedAt`; it defaults to `false`. Set `options.typeField` to control which special field name is used in channel keys for the FalkorDB node label; it defaults to `_TYPE`. Set `options.edgesField` to control which special field name is used for outgoing edges in channel values; it defaults to `_EDGES`.
@@ -75,11 +103,16 @@ oafp libs=falkordb in=falkordb data="(gql: 'MATCH (n:Person) RETURN n.name AS na
 oafp libs=falkordb in=falkordb data="MATCH (n:Person) WHERE n.age > \$age RETURN n.name AS name" infalkordbgraph=demo infalkordbparams="(age: 30)" infalkordbreadonly=true
 ```
 
-Supported `oafp` input type:
+Supported `oafp` input types:
 
 - `falkordb`: executes a FalkorDB GQL/Cypher query and returns the resulting rows.
+- `falkordbexport`: exports nodes as channel-compatible records (`[{ key, value }]`) so they can be piped/stored.
 
-Connection options:
+Supported `oafp` output format:
+
+- `falkordb`: imports `[{ key, value }]` records into FalkorDB.
+
+Connection/query options (input):
 
 - `infalkordbhost`
 - `infalkordbport`
@@ -88,3 +121,28 @@ Connection options:
 - `infalkordbpass`
 - `infalkordbparams`
 - `infalkordbreadonly`
+- `infalkordblabel`
+- `infalkordbkeyfields`
+- `infalkordbbatchsize`
+- `infalkordbtypefield`
+- `infalkordbedgesfield`
+- `infalkordbwithedges`
+
+Import options (`out=falkordb`):
+
+- `falkordbhost`
+- `falkordbport`
+- `falkordbgraph`
+- `falkordbuser`
+- `falkordbpass`
+- `falkordblabel`
+- `falkordbtypefield`
+- `falkordbedgesfield`
+- `falkordbtimestamps`
+
+Export/import example:
+
+```bash
+oafp libs=falkordb in=falkordbexport infalkordbgraph=demo infalkordblabel=type > /tmp/falkor.json
+cat /tmp/falkor.json | oafp in=json out=falkordb libs=falkordb falkordbgraph=demo2 falkordblabel=type
+```
