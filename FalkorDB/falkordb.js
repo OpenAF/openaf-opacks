@@ -1,10 +1,13 @@
 /**
  * <odoc>
- * <key>FalkorDB.FalkorDB(aHost, aPort, aGraph, aUser, aPass)</key>
- * Creates a new FalkorDB wrapper instance.
+ * <key>FalkorDB.FalkorDB(aHost, aPort, aGraph, aUser, aPass, aOptions)</key>
+ * Creates a new FalkorDB wrapper instance. Optionally aOptions map can include:
+ * - socksProxy.host / socksProxy.port : SOCKS5 proxy to use (hostname is forwarded to the proxy for remote DNS resolution, avoiding local pre-resolution that breaks Kubernetes-internal hostnames)
+ * - connectionTimeout : connection timeout in ms (default 2000)
+ * - socketTimeout     : socket read timeout in ms (default 2000)
  * </odoc>
  */
-var FalkorDB = function(aHost, aPort, aGraph, aUser, aPass) {
+var FalkorDB = function(aHost, aPort, aGraph, aUser, aPass, aOptions) {
   var path = getOPackPath("FalkorDB") || ".";
   $path(io.listFiles(path).files, "[?ends_with(filename, '.jar') == `true`].canonicalPath").forEach((v) => {
     af.externalAddClasspath("file:///" + v.replace(/\\/g, "/"));
@@ -16,10 +19,54 @@ var FalkorDB = function(aHost, aPort, aGraph, aUser, aPass) {
   this.user = _$(aUser).isString().default(__);
   this.pass = _$(aPass).isString().default(__);
 
-  if (isDef(this.user) && isDef(this.pass)) {
-    this.__driver = Packages.com.falkordb.FalkorDB.driver(this.host, this.port, String(this.user), String(this.pass));
+  var options = _$(aOptions).isMap().default({});
+
+  if (isDef(options.socksProxy)) {
+    var _proxyHost    = options.socksProxy.host;
+    var _proxyPort    = options.socksProxy.port;
+    var _targetHost   = this.host;
+    var _targetPort   = this.port;
+    var _connTimeout  = _$(options.connectionTimeout).isNumber().default(2000);
+    var _soTimeout    = _$(options.socketTimeout).isNumber().default(2000);
+
+    // Custom socket factory: connects via SOCKS5 using an unresolved InetSocketAddress so
+    // the proxy (e.g. socksd) receives the hostname and resolves it internally.
+    // This avoids Jedis pre-resolving the hostname locally, which fails for K8s-internal DNS names.
+    var _socketFactory = new JavaAdapter(Packages.redis.clients.jedis.JedisSocketFactory, {
+      createSocket: function() {
+        var _proxy = new java.net.Proxy(
+          java.net.Proxy.Type.SOCKS,
+          new java.net.InetSocketAddress(_proxyHost, _proxyPort)
+        );
+        var _s = new java.net.Socket(_proxy);
+        _s.setReuseAddress(true);
+        _s.setKeepAlive(true);
+        _s.setTcpNoDelay(true);
+        _s.connect(java.net.InetSocketAddress.createUnresolved(_targetHost, _targetPort), _connTimeout);
+        if (_soTimeout > 0) _s.setSoTimeout(_soTimeout);
+        return _s;
+      }
+    });
+
+    var _ccb = Packages.redis.clients.jedis.DefaultJedisClientConfig.builder();
+    if (isDef(this.user)) _ccb = _ccb.user(String(this.user));
+    if (isDef(this.pass)) _ccb = _ccb.password(String(this.pass));
+    var _clientConfig = _ccb.build();
+
+    // JedisFactory(JedisSocketFactory, JedisClientConfig) is protected; access via reflection.
+    var _ctor = Packages.redis.clients.jedis.JedisFactory.class.getDeclaredConstructor(
+      Packages.redis.clients.jedis.JedisSocketFactory.class,
+      Packages.redis.clients.jedis.JedisClientConfig.class
+    );
+    _ctor.setAccessible(true);
+    var _pool = new Packages.redis.clients.jedis.JedisPool(_ctor.newInstance([_socketFactory, _clientConfig]));
+    this.__driver = new Packages.com.falkordb.impl.api.DriverImpl(_pool);
   } else {
-    this.__driver = Packages.com.falkordb.FalkorDB.driver(this.host, this.port);
+    if (isDef(this.user) && isDef(this.pass)) {
+      this.__driver = Packages.com.falkordb.FalkorDB.driver(this.host, this.port, String(this.user), String(this.pass));
+    } else {
+      this.__driver = Packages.com.falkordb.FalkorDB.driver(this.host, this.port);
+    }
   }
 
   this.__graph = this.__driver.graph(this.graphName);

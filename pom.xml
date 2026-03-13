@@ -30,7 +30,22 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>7.3.0</version>
+            <version>7.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.falkordb</groupId>
+            <artifactId>jfalkordb</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
