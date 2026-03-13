@@ -54,7 +54,7 @@ var FalkorDB = function(aHost, aPort, aGraph, aUser, aPass, aOptions) {
     var _clientConfig = _ccb.build();
 
     // JedisFactory(JedisSocketFactory, JedisClientConfig) is protected; access via reflection.
-    var _ctor = Packages.redis.clients.jedis.JedisFactory.class.getDeclaredConstructor(
+    var _ctor = af.getClass("redis.clients.jedis.JedisFactory").getDeclaredConstructor(
       Packages.redis.clients.jedis.JedisSocketFactory.class,
       Packages.redis.clients.jedis.JedisClientConfig.class
     );
@@ -831,9 +831,10 @@ ow.ch.__types.falkordb = {
     options.typeField = _$(options.typeField, "falkordb typeField").isString().default("_TYPE");
     options.edgesField = _$(options.edgesField, "falkordb edgesField").isString().default("_EDGES");
     options.timestamps = _$(options.timestamps, "falkordb timestamps").isBoolean().default(false);
+    options.options = _$(options.options, "falkordb options").isMap().default({})
 
     this.__channels[aName] = {
-      f: new FalkorDB(options.host, options.port, options.graph, options.user, options.pass),
+      f: new FalkorDB(options.host, options.port, options.graph, options.user, options.pass, options.options),
       o: options
     };
   },
