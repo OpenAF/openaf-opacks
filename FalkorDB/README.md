@@ -16,6 +16,26 @@ print(res);
 fdb.close();
 ```
 
+Constructor signature:
+
+`new FalkorDB(host, port, graph, user, pass, options)`
+
+`options` supports:
+
+- `socksProxy: { host, port }` to connect through SOCKS5 with remote DNS resolution (useful for Kubernetes-internal hostnames).
+- `connectionTimeout` in milliseconds (default `2000`).
+- `socketTimeout` in milliseconds (default `2000`).
+
+Example with SOCKS5:
+
+```javascript
+var fdb = new FalkorDB("falkordb.default.svc.cluster.local", 6379, "demo", __, __, {
+  socksProxy: { host: "127.0.0.1", port: 1080 },
+  connectionTimeout: 5000,
+  socketTimeout: 5000
+});
+```
+
 `createOrUpdateNode(name, type, properties)` merges a `:Node` by `name` and `type`, then applies the provided properties map.
 
 `linkNodes(fromName, fromType, toName, toType, relationship, properties)` merges two `:Node` entries by `name` and `type`, creates the relationship between them, and applies the provided relationship properties map.
@@ -25,6 +45,26 @@ fdb.close();
 
 - `exportChStream` invokes `callback(batch, meta)` for each batch of `{ key, value }` records and returns the total exported record count.
 - `importChStream` repeatedly invokes `callback(meta)` to fetch the next batch (until `null`/`undefined`) and writes all records into the graph, returning the total imported count.
+
+`exportChStream` options:
+
+- `batchSize` (default `100`)
+- `typeField` (default `_TYPE`)
+- `edgesField` (default `_EDGES`)
+- `withEdges` (default `true`)
+- `keyFields` (default `[]`)
+- `filter` optional key filter map passed to `chGetKeys`
+
+`importChStream` options:
+
+- `typeField` (default `_TYPE`)
+- `edgesField` (default `_EDGES`)
+- `timestamps` (default `false`)
+
+`importChStream` accepts each callback result as either:
+
+- an array of `{ key, value }`
+- or a map containing `items` or `batch` with that array
 
 Example:
 
@@ -51,6 +91,8 @@ fdb.importChStream("type", () => {
 ## OpenAF channel
 
 `falkordb.js` also provides `ow.ch.__types.falkordb`. On channel creation, `options.label` is mandatory and names the key field whose string value becomes the FalkorDB node label. Set `options.keyFields` to the list of additional channel key properties that uniquely identify a node within that label. In practice you should set `keyFields` whenever you expect `getKeys()`, `getAll()`, `pop()`, or `shift()` to preserve non-key properties correctly. Channel values are persisted directly as node properties, and graph-wide operations such as `size` and `destroy` apply to the whole configured graph. Set `options.timestamps` to `true` to also persist `createdAt` and `updatedAt`; it defaults to `false`. Set `options.typeField` to control which special field name is used in channel keys for the FalkorDB node label; it defaults to `_TYPE`. Set `options.edgesField` to control which special field name is used for outgoing edges in channel values; it defaults to `_EDGES`.
+
+To pass low-level connection options (including SOCKS5), use `options.options`, which is forwarded to `new FalkorDB(..., options.options)`.
 
 Channel reads such as `get`, `getAll`, `pop`, and `shift` convert Java map results into native OpenAF/JavaScript maps with `af.fromJavaMap`.
 
@@ -89,6 +131,22 @@ ch.set(
 var alice = ch.get({ _TYPE: "Person", name: "Alice" });
 print(ch.getKeys()[0]._TYPE);
 print(alice._EDGES[0].target.name);
+```
+
+Channel creation with SOCKS5:
+
+```javascript
+$ch("people").create(1, "falkordb", {
+  host: "falkordb.default.svc.cluster.local",
+  port: 6379,
+  graph: "demo",
+  label: "type",
+  options: {
+    socksProxy: { host: "127.0.0.1", port: 1080 },
+    connectionTimeout: 5000,
+    socketTimeout: 5000
+  }
+});
 ```
 
 ## oAFp

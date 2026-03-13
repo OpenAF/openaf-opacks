@@ -668,10 +668,11 @@ FalkorDB.prototype.close = function() {
 
 /**
  * <odoc>
- * <key>FalkorDB.getCh(aCh, extraChannelOptions) : Channel</key>
+ * <key>FalkorDB.getCh(aCh, options) : Channel</key>
  * Creates and returns a new channel with aCh using the current FalkorDB connection
- * details. Use `extraChannelOptions.label` to define the mandatory key field whose
- * value becomes the FalkorDB node label.
+ * details. Use `options.label` to define the mandatory key field whose value
+ * becomes the FalkorDB node label. Extra low-level FalkorDB options can be
+ * provided through `options.options`.
  * </odoc>
  */
 FalkorDB.prototype.getCh = function(aCh, options) {
@@ -705,6 +706,7 @@ ow.loadObj();
 *    - typeField (String) Optional special field name for the FalkorDB node label on `get`/`getAll` and accepted on `set`/`setAll`. Defaults to `_TYPE`.\
 *    - edgesField (String) Optional special field name for outgoing edges on `get`/`getAll` and accepted on `set`/`setAll`. Defaults to `_EDGES`.\
 *    - timestamps (Boolean) When true stores `createdAt` and `updatedAt` fields. Defaults to false.\
+*    - options (Map) Optional low-level FalkorDB constructor options (e.g. `socksProxy`, `connectionTimeout`, `socketTimeout`).\
 *    - user  (String)  Optional FalkorDB username.\
 *    - pass  (String)  Optional FalkorDB password.\
 * \
