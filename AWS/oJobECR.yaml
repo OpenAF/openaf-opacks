@@ -247,9 +247,10 @@ jobs:
           sleep(100, true)
         } while(isUnDef(img) && now() - ini < 15000)
 
-        if (isUnDef(img))
+        if (isUnDef(img)) {
+          if (options._api) return { data: { error: "Problem retrieving image data" }, type: "json" }
           data = "**Problem retrieving image data**"
-        else {
+        } else {
           var reg = _$(options.registry).default("")
           if (reg.length > 0) reg += "/"
 
