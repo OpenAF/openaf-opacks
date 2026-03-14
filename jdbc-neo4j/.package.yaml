@@ -1,0 +1,28 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://neo4j.com/docs/jdbc-manual/current/. To use it just: loadLib(\"jdbc-neo4j.js\"); var db = new DB(\"jdbc:neo4j://{{host}}:{{port}}/{{database}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- neo4j
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of neo4j
+name: jdbc-neo4j
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20260314'
+dependencies:
+  openaf: '>=20240318'
+files:
+- .package.yaml
+- jdbc-neo4j.js
+- neo4j-jdbc-full-bundle-6.11.0.jar
+filesHash:
+  jdbc-neo4j.js: 85178bee7bc0fb6b1fdd77ab3cde8ee517c799ae
+  neo4j-jdbc-full-bundle-6.11.0.jar: f07020f8eefdf39369e722a96ab4efcd2b66a349

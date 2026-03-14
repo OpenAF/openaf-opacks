@@ -1,0 +1,30 @@
+author: ojob.io/db/jdbc
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: 'log("Check https://github.com/aws/amazon-neptune-jdbc-driver. To use it just: loadLib(\"jdbc-neptune.js\"); var db = new DB(\"jdbc:neptune:opencypher://{{host}}:{{port}}\", ...) ");'
+keywords:
+- DB
+- JDBC
+- neptune
+bugs:
+  url: URL to track bugs
+repository: {}
+description: Wrapper for JDBC drivers of neptune
+name: jdbc-neptune
+main: ''
+mainJob: ''
+license: Check the LICENSES.txt file
+version: '20260314'
+dependencies:
+  openaf: '>=20240318'
+files:
+- .package.yaml
+- LICENSES.txt
+- amazon-neptune-jdbc-driver-3.0.3.jar
+- jdbc-neptune.js
+filesHash:
+  LICENSES.txt: c54aeab88e3ebaee7867320e34ec6da553580b41
+  amazon-neptune-jdbc-driver-3.0.3.jar: 04063deb011fe4475cc39d25a9996b42449a568c
+  jdbc-neptune.js: ec2c22a49b3155364b9b05517dbd9a1a51c82956
