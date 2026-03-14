@@ -1,0 +1,76 @@
+# Author: Nuno Aguiar
+
+jobs:
+- name: Playwright Page Info
+  typeArgs:
+    shortcut:
+      name  : playwrightInfo
+      keyArg: url
+      args:
+        engine         : engine
+        timeout        : timeout
+        headless       : headless
+        waitUntil      : waitUntil
+        waitForSelector: waitForSelector
+  help: |
+    Loads an URL with Playwright Java and returns metadata. Expects:
+
+      url             (String) URL to load.
+      engine          (String) chromium (default), firefox or webkit.
+      timeout         (Number) Navigation timeout in ms (default 30000).
+      headless        (Boolean) Runs headless by default.
+      waitUntil       (String) load (default), domcontentloaded, networkidle or commit.
+      waitForSelector (String) Optional selector to wait for.
+
+    Sets in args:
+
+      result (Map) Result map with url/title/content.
+  check:
+    in:
+      url            : isString
+      engine         : isString.default("chromium")
+      timeout        : toNumber.isNumber.default(30000)
+      headless       : toBoolean.isBoolean.default(true)
+      waitUntil      : isString.default("load")
+      waitForSelector: isString.default(__)
+  exec: |
+    loadLib("playwright.js")
+    var pw = new Playwright()
+    args.result = pw.run(args)
+
+- name: Playwright Screenshot
+  typeArgs:
+    shortcut:
+      name  : playwrightShot
+      keyArg: url
+      args:
+        screenshotPath: screenshotPath
+        fullPage      : fullPage
+        engine         : engine
+        timeout        : timeout
+        headless       : headless
+  help: |
+    Loads an URL with Playwright Java and saves a screenshot. Expects:
+
+      url            (String) URL to load.
+      screenshotPath (String) Output image path (default screenshot.png).
+      fullPage       (Boolean) Full page capture (default true).
+      engine         (String) chromium (default), firefox or webkit.
+      timeout        (Number) Navigation timeout in ms (default 30000).
+      headless       (Boolean) Runs headless by default.
+
+    Sets in args:
+
+      result (Map) Result map with url/title/content/screenshotPath.
+  check:
+    in:
+      url           : isString
+      screenshotPath: isString.default("screenshot.png")
+      fullPage      : toBoolean.isBoolean.default(true)
+      engine        : isString.default("chromium")
+      timeout       : toNumber.isNumber.default(30000)
+      headless      : toBoolean.isBoolean.default(true)
+  exec: |
+    loadLib("playwright.js")
+    var pw = new Playwright()
+    args.result = pw.run(args)

@@ -1,0 +1,3 @@
+artifacts:
+- group : com.microsoft.playwright
+  id    : playwright

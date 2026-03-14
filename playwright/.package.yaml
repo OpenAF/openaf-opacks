@@ -1,0 +1,31 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- playwright
+- browser
+- automation
+- java
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/playwright.opack
+description: Wrapper around Microsoft Playwright Java for browser automation from OpenAF.
+name: playwright
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260309'
+dependencies:
+  openaf: '>=20240318'
+files:
+- .maven.yaml
+- .package.yaml
+- README.md
+- oJobPlaywright.yaml
+- oafp_playwright.js
+- playwright.js

@@ -168,6 +168,11 @@
             <version>0.0.24</version>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.56.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
             <version>10.4.2</version>
