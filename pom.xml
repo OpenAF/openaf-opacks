@@ -335,7 +335,7 @@
         <dependency>
  	    <groupId>io.github.copilot-community-sdk</groupId>
 	    <artifactId>copilot-sdk</artifactId>
-	    <version>1.0.10</version>
+	    <version>1.0.11</version>
 	</dependency>
     </dependencies>
 </project>
