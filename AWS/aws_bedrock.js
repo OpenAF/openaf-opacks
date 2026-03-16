@@ -1044,9 +1044,50 @@ ow.ai.__gpttypes.bedrock = {
             "temperature": aTemperature
           }
         } else {
+          // use messages API format
+          var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0) {
+            baseConv = baseConv.concat({ role: "user", content: aPrompt })
+          }
+
+          var toText = function(content) {
+            if (isUnDef(content)) return ""
+            if (isString(content)) return content
+            if (isArray(content)) return content.map(toText).join("")
+            if (isMap(content)) {
+              if (isDef(content.text)) return content.text
+              if (isDef(content.generated_text)) return toText(content.generated_text)
+              if (isDef(content.outputText)) return toText(content.outputText)
+              if (isDef(content.output_text)) return toText(content.output_text)
+              if (isDef(content.value)) return isString(content.value) ? content.value : JSON.stringify(content.value)
+              if (isDef(content.content)) return toText(content.content)
+              if (isDef(content.message)) return toText(content.message)
+              return JSON.stringify(content)
+            }
+            return String(content)
+          }
+
+          var normalized = baseConv.filter(m => isDef(m.role)).map(m => ({
+            role: String(m.role).toLowerCase(),
+            content: toText(m.content)
+          }))
+
+          _r.conversation = normalized
+
+          var messagesForAPI = normalized
+          if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
+            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            for (var mii = messagesForAPI.length - 1; mii >= 0; mii--) {
+              if (messagesForAPI[mii].role == "user" && isString(messagesForAPI[mii].content)) {
+                messagesForAPI[mii].content = messagesForAPI[mii].content + ". answer in json."
+                break
+              }
+            }
+          }
+
           _m = {
-            "prompt": aPrompt,
-            "temperature": aTemperature
+            messages: messagesForAPI,
+            temperature: aTemperature
           }
         }
         //$$(_m).set(aOptions.promptKey, aOptions.promptKeyMap ? msgs : msgs.join("; "))
@@ -1100,7 +1141,7 @@ ow.ai.__gpttypes.bedrock = {
           }
         }
 
-        if (aModel.indexOf("openai.") >= 0 && isArray(res.choices)) {
+        if (isArray(res.choices)) {
           handledOpenAI = true
           for (var ci = 0; ci < res.choices.length; ci++) {
             var choice = res.choices[ci]
@@ -1120,9 +1161,13 @@ ow.ai.__gpttypes.bedrock = {
             if (isUnDef(storedMessage.content)) storedMessage.content = ""
             _r.conversation.push(storedMessage)
 
-            if (isArray(message.tool_calls) && message.tool_calls.length > 0) {
-              for (var ti = 0; ti < message.tool_calls.length; ti++) {
-                var toolCall = message.tool_calls[ti]
+            var choiceToolCalls = []
+            if (isArray(message.tool_calls)) choiceToolCalls = message.tool_calls
+            if (choiceToolCalls.length == 0 && isArray(choice.tool_calls)) choiceToolCalls = choice.tool_calls
+
+            if (choiceToolCalls.length > 0) {
+              for (var ti = 0; ti < choiceToolCalls.length; ti++) {
+                var toolCall = choiceToolCalls[ti]
                 var toolName = isMap(toolCall) && isMap(toolCall["function"]) && isString(toolCall["function"].name) ? toolCall["function"].name : __
                 var toolCallId = isMap(toolCall) && isString(toolCall.id) ? toolCall.id : toolName
                 var toolArgs = isMap(toolCall) && isMap(toolCall["function"]) ? toolCall["function"].arguments : __
@@ -1167,6 +1212,14 @@ ow.ai.__gpttypes.bedrock = {
 
             if (String(storedMessage.role).toLowerCase() === "assistant") {
               var messageText = openAIContentToText(message.content)
+              if (!isString(messageText) || messageText.length == 0) messageText = openAIContentToText(choice.content)
+              if (!isString(messageText) || messageText.length == 0) messageText = openAIContentToText(choice.text)
+              if (!isString(messageText) || messageText.length == 0) messageText = openAIContentToText(choice.output_text)
+              if (!isString(messageText) || messageText.length == 0) messageText = openAIContentToText(choice.outputText)
+              if (!isString(messageText) || messageText.length == 0) messageText = openAIContentToText(choice.generated_text)
+              if ((!isString(messageText) || messageText.length == 0) && isMap(choice.delta)) {
+                messageText = openAIContentToText(choice.delta.content)
+              }
               if (isString(messageText) && messageText.length > 0) {
                 // Apply reasoning filter for OpenAI models when showReasoning is false
                 if (!aOptions.showReasoning) {
@@ -1190,11 +1243,18 @@ ow.ai.__gpttypes.bedrock = {
           if (aJsonFlag) {
             // Apply reasoning filter to response even when returning JSON
             var _fres = ""
-            if (!aOptions.showReasoning && isMap(res) && isArray(res.choices)) {
+            if (isMap(res) && isArray(res.choices)) {
               res.choices.forEach(choice => {
-                if (isMap(choice.message) && isString(choice.message.content)) {
-                  choice.message.content = removeReasoningTags(choice.message.content)
-                  _fres = choice.message.content
+                var ctext = __
+                if (isMap(choice.message)) ctext = openAIContentToText(choice.message.content)
+                if (!isString(ctext) || ctext.length == 0) ctext = openAIContentToText(choice.content)
+                if (!isString(ctext) || ctext.length == 0) ctext = openAIContentToText(choice.text)
+                if (!isString(ctext) || ctext.length == 0) ctext = openAIContentToText(choice.output_text)
+                if (!isString(ctext) || ctext.length == 0) ctext = openAIContentToText(choice.outputText)
+                if (!isString(ctext) || ctext.length == 0) ctext = openAIContentToText(choice.generated_text)
+                if (isString(ctext) && ctext.length > 0) {
+                  if (!aOptions.showReasoning) ctext = removeReasoningTags(ctext)
+                  _fres = ctext
                 }
               })
             }
@@ -1321,7 +1381,7 @@ ow.ai.__gpttypes.bedrock = {
                               status: "success"
                             }
                           }
-                        } else if (aModel.indexOf("openai.") >= 0) {
+                        } else if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0) {
                           if (isUnDef(toolCallId)) toolCallId = toolName
                           _tR = {
                             role: "tool",
@@ -1359,7 +1419,7 @@ ow.ai.__gpttypes.bedrock = {
                               status: "error"
                             }
                           }
-                        } else if (aModel.indexOf("openai.") >= 0) {
+                        } else if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0) {
                           if (isUnDef(toolCallId)) toolCallId = toolName
                           _errR = {
                             role: "tool",
@@ -1529,6 +1589,17 @@ ow.ai.__gpttypes.bedrock = {
           return __
         }
 
+        // Minimax streaming format (uses OpenAI-style choices/delta format)
+        if (aModel.indexOf("minimax.") >= 0) {
+          if (isArray(chunk.choices) && chunk.choices.length > 0) {
+            var choice = chunk.choices[0]
+            if (isDef(choice.delta) && isDef(choice.delta.content)) {
+              return choice.delta.content
+            }
+          }
+          return __
+        }
+
         // Meta/Llama streaming format
         if (aModel.indexOf("meta.") >= 0) {
           if (isDef(chunk.generation)) {
@@ -1567,7 +1638,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         // OpenAI
-        if (aModel.indexOf("openai.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+        if ((aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0) && isArray(chunk.choices) && chunk.choices.length > 0) {
           if (isDef(chunk.choices[0].finish_reason)) {
             return chunk.choices[0].finish_reason
           }
@@ -1575,6 +1646,16 @@ ow.ai.__gpttypes.bedrock = {
 
         // Mistral (newer message-based models use choices format like OpenAI)
         if (aModel.indexOf("mistral.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+          if (isDef(chunk.choices[0].finish_reason)) {
+            return chunk.choices[0].finish_reason
+          }
+          if (isDef(chunk.choices[0].stop_reason)) {
+            return chunk.choices[0].stop_reason
+          }
+        }
+
+        // Minimax (uses OpenAI-style choices format)
+        if (aModel.indexOf("minimax.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
           if (isDef(chunk.choices[0].finish_reason)) {
             return chunk.choices[0].finish_reason
           }
@@ -1617,7 +1698,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         // OpenAI tool calls
-        if (aModel.indexOf("openai.") >= 0 && isArray(chunk.choices) && chunk.choices.length > 0) {
+        if ((aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0) && isArray(chunk.choices) && chunk.choices.length > 0) {
           var choice = chunk.choices[0]
           if (isDef(choice.delta) && isArray(choice.delta.tool_calls)) {
             return choice.delta.tool_calls
@@ -1941,7 +2022,7 @@ ow.ai.__gpttypes.bedrock = {
                 input_schema: sanitizeToolSchema(tool.function.parameters, false)
               }))
           }
-        } else if (aModel.indexOf("openai.") >= 0) {
+        } else if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0) {
           // OpenAI format
           var messages = []
           _r.conversation.forEach(function(msg) {
@@ -2189,7 +2270,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         var normalizedToolCalls = toolCalls
-        if (toolCalls.length > 0 && (aModel.indexOf("openai.") >= 0 || aModel.indexOf("mistral.") >= 0)) {
+        if (toolCalls.length > 0 && (aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0 || aModel.indexOf("mistral.") >= 0)) {
           normalizedToolCalls = normalizeOpenAIToolCalls(toolCalls)
         }
 
@@ -2200,7 +2281,7 @@ ow.ai.__gpttypes.bedrock = {
             content: fullContent
           }
           if (normalizedToolCalls.length > 0) {
-            if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("mistral.") >= 0) {
+            if (aModel.indexOf("openai.") >= 0 || aModel.indexOf("minimax.") >= 0 || aModel.indexOf("qwen.") >= 0 || aModel.indexOf("mistral.") >= 0) {
               storedMessage.tool_calls = normalizedToolCalls
             } else if (aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0 || aModel.indexOf("amazon.nova-") >= 0) {
               var contentParts = []

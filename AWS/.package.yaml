@@ -33,11 +33,10 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260312'
+version: '20260315'
 dependencies:
   OpenAF: '>=20250315'
 files:
-- .claude/settings.local.json
 - .odoc.db
 - .package.yaml
 - .precompile
@@ -73,12 +72,11 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .claude/settings.local.json: e57bb7a5c9adf01a3a7d1daea9c5de645a0ee62f
   .odoc.db: ac69cb5fcad6d2736496ce17646da888adf556ef
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_bedrock.js: ad19937416eb1c3964c751922adde5a057b1fbfd
+  aws_bedrock.js: 34c2109aed4f7ad7cc11f096b72f5934ae277803
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: 587612d67ce6cd966951b94e226927b07e783714
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
