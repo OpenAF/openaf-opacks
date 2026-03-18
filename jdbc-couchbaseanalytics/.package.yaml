@@ -16,15 +16,15 @@ name: jdbc-couchbaseanalytics
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20240811'
+version: '20260318'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- couchbase-jdbc-driver-1.0.5.jar
+- couchbase-jdbc-driver-1.1.0.jar
 - jdbc-couchbaseanalytics.js
 filesHash:
-  LICENSES.txt: 7b3144cffdebb99b5ed88c004d2a9b179ddfe93a
-  couchbase-jdbc-driver-1.0.5.jar: 45ae8d4ae5d03ab281520d9601543d9d722dac3f
+  LICENSES.txt: 4b162221a4c37945b667e67fcb9efe154fbf53d0
+  couchbase-jdbc-driver-1.1.0.jar: bf9cf60912194a699d86412c312338dfc7f15ee3
   jdbc-couchbaseanalytics.js: d91da8da46cd77027dd46a0def46732a86abd5c5
