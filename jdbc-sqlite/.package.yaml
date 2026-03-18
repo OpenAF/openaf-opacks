@@ -16,7 +16,7 @@ name: jdbc-sqlite
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260317'
+version: '20260318'
 dependencies:
   openaf: '>=20240318'
 files:
