@@ -87,6 +87,8 @@
   |**jdbc-mariadb**|<img src=".github/badges/jdbc-mariadb.svg"><br>Wrapper for JDBC drivers of mariadb|
   |**jdbc-mdb**|<img src=".github/badges/jdbc-mdb.svg"><br>Wrapper for JDBC drivers of mdb|
   |**jdbc-mysql**|<img src=".github/badges/jdbc-mysql.svg"><br>Wrapper for JDBC drivers of mysql|
+  |**jdbc-neo4j**|<img src=".github/badges/jdbc-neo4j.svg"><br>Wrapper for JDBC drivers of neo4j|
+  |**jdbc-neptune**|<img src=".github/badges/jdbc-neptune.svg"><br>Wrapper for JDBC drivers of neptune|
   |**jdbc-odbc**|<img src=".github/badges/jdbc-odbc.svg"><br>Wrapper for JDBC drivers of odbc|
   |**jdbc-opendistro**|<img src=".github/badges/jdbc-opendistro.svg"><br>Wrapper for JDBC drivers of opendistro|
   |**jdbc-oracle**|<img src=".github/badges/jdbc-oracle.svg"><br>Wrapper for JDBC drivers of oracle|
