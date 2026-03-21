@@ -19,13 +19,29 @@ name: playwright
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260309'
+version: '20260321'
 dependencies:
   openaf: '>=20240318'
 files:
 - .maven.yaml
 - .package.yaml
 - README.md
+- driver-1.58.0.jar
+- error_prone_annotations-2.41.0.jar
+- gson-2.13.2.jar
 - oJobPlaywright.yaml
 - oafp_playwright.js
+- opentest4j-1.3.0.jar
+- playwright-1.58.0.jar
 - playwright.js
+filesHash:
+  .maven.yaml: 3a113ab6384f7638cce2de788f8321237dd29b2e
+  README.md: 86569b4aa78989c9c9d06b6847a1b6a439fe6a5a
+  driver-1.58.0.jar: d989406e7cc59fc639bc1384778806f0e3bf97f4
+  error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
+  gson-2.13.2.jar: 48b8230771e573b54ce6e867a9001e75977fe78e
+  oJobPlaywright.yaml: 070731333dc4957f49ac9a3f8426b22b94a82e49
+  oafp_playwright.js: 1c3dacd1636f38717f93c52088be535ba4cb29db
+  opentest4j-1.3.0.jar: 152ea56b3a72f655d4fd677fc0ef2596c3dd5e6e
+  playwright-1.58.0.jar: 56eb41f8318ca5ced961b59e89518bdc8e2dedc8
+  playwright.js: 006b260db87dc0e362451e9df86fd05309ab147a

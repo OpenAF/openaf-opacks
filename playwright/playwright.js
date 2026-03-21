@@ -1,7 +1,59 @@
 // Author: Nuno Aguiar
 
 var __playwrightPath = getOPackPath("playwright") || "."
-loadExternalJars(__playwrightPath)
+var __playwrightLocalPath = "."
+
+var __playwrightListJars = function(aFolder, aExpr) {
+  if (isUnDef(aFolder) || isUnDef(aExpr) || !io.fileExists(aFolder)) return []
+
+  return $from(io.listFiles(aFolder).files)
+         .match("filename", aExpr)
+         .select(function(r) { return r.filename })
+}
+
+var __playwrightGetVersion = function(aFolder) {
+  var _versions = []
+
+  _versions = _versions.concat(__playwrightListJars(aFolder, "^driver-bundle-(.+)\\.jar$"))
+  _versions = _versions.concat(__playwrightListJars(aFolder, "^playwright-(.+)\\.jar$"))
+  _versions = _versions.concat(__playwrightListJars(aFolder, "^driver-(.+)\\.jar$"))
+
+  if (_versions.length <= 0) return __
+
+  var _res = String(_versions[0]).match(/-(.+)\.jar$/)
+  return isDef(_res) ? _res[1] : __
+}
+
+var __playwrightHasBundle = function(aFolder) {
+  return __playwrightListJars(aFolder, "^driver-bundle-(.+)\\.jar$").length > 0
+}
+
+var __playwrightEnsureBundle = function() {
+  if (__playwrightHasBundle(__playwrightLocalPath) || __playwrightHasBundle(__playwrightPath)) return
+
+  var _target = __playwrightLocalPath
+  var _version = __playwrightGetVersion(__playwrightLocalPath)
+
+  if (isUnDef(_version)) {
+    _target = __playwrightPath
+    _version = __playwrightGetVersion(__playwrightPath)
+  }
+
+  ow.loadJava()
+  var maven = new ow.java.maven()
+
+  printErr("Playwright driver bundle not found locally. Attempting to download from Maven Central...")
+  if (isDef(_version)) {
+    maven.getFileVersion("com.microsoft.playwright.driver-bundle", "driver-bundle-{{version}}.jar", _version, _target)
+  } else {
+    maven.getFile("com.microsoft.playwright.driver-bundle", "driver-bundle-{{version}}.jar", _target)
+  }
+  printErr("Playwright driver bundle downloaded successfully.")
+}
+
+__playwrightEnsureBundle()
+loadExternalJars(__playwrightLocalPath)
+if (__playwrightPath != __playwrightLocalPath) loadExternalJars(__playwrightPath)
 
 var Playwright = function(aOptions) {
   this.options = _$(aOptions, "aOptions").isMap().default({})

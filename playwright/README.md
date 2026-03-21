@@ -83,3 +83,5 @@ ojob ojob.io/oaf/mavenGetJars folder=.
 ## Notes
 
 On first execution Playwright may download browser binaries for the current platform.
+`playwright.js` loads jars from the current folder first and then from the installed opack folder.
+If `driver-bundle-<version>.jar` is not found in either location, it will try to download the matching driver bundle from Maven Central into the folder where the detected Playwright jars live.
