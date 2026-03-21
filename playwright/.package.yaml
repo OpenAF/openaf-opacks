@@ -36,7 +36,7 @@ files:
 - playwright.js
 filesHash:
   .maven.yaml: 3a113ab6384f7638cce2de788f8321237dd29b2e
-  README.md: 86569b4aa78989c9c9d06b6847a1b6a439fe6a5a
+  README.md: 25b6a38ebe69b2dcc63e831dbd92ceec889441ff
   driver-1.58.0.jar: d989406e7cc59fc639bc1384778806f0e3bf97f4
   error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
   gson-2.13.2.jar: 48b8230771e573b54ce6e867a9001e75977fe78e
