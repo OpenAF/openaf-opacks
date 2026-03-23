@@ -1,0 +1,4 @@
+artifacts:
+  - group  : com.uber
+    id     : h3
+

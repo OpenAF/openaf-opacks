@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- h3
+- geospatial
+- hexagonal-grid
+- uber
+- gis
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/h3.opack
+description: OpenAF wrapper around Uber H3 geospatial indexing Java library
+name: h3
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260323'
+dependencies:
+  openaf: '>=20220101'
+files:
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- README.md
+- h3-4.4.0.jar
+- h3.js
+filesHash:
+  .maven.yaml: 02942fdb56903c58075dbe09924e36d97f5ae0b7
+  .odoc.db: 9f77917506ddd4be99755603e93645b3e5d2bb3d
+  README.md: 7109530db9a7c0374a10500e3e8471166b8b3456
+  h3-4.4.0.jar: 48fb9f368c298a52aedc896e9f81d5e9a711e240
+  h3.js: 4bbc742a365c2c3786efe6e3a50f1df4e1fca837
