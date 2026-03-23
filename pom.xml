@@ -342,5 +342,10 @@
 	    <artifactId>copilot-sdk</artifactId>
 	    <version>1.0.11</version>
 	</dependency>
+        <dependency>
+            <groupId>com.uber</groupId>
+            <artifactId>h3</artifactId>
+            <version>4.1.1</version>
+        </dependency>
     </dependencies>
 </project>
