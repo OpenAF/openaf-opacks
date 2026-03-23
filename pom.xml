@@ -185,7 +185,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.56.0</version>
+            <version>1.58.0</version>
         </dependency>
         <dependency>
             <groupId>org.rocksdb</groupId>
