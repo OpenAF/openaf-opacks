@@ -1,0 +1,35 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- bunny.net
+- bunny
+- cdn
+- stream
+- storage
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/BunnyNet.opack
+description: bunny.net API wrapper using OpenAF $rest
+name: BunnyNet
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260323'
+dependencies:
+  S3: '>=20251005'
+  openaf: '>=20241117'
+files:
+- .odoc.db
+- .package.yaml
+- README.md
+- bunnynet.js
+filesHash:
+  .odoc.db: 2befe24c1eda59c2989d0ff01375b77513c9bc33
+  README.md: 3e4bcea216f97b0374b79dddb09c7dc44376a3aa
+  bunnynet.js: 808122d4f954d512b3b67a0ccce5d4bd3190c552
