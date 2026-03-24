@@ -241,6 +241,12 @@ ow.ai.__gpttypes.bedrock = {
     var _temperature = aOptions.temperature
     var _lastStats = __
     var _debugCh = __
+    var isMistralMessagesModel = aModelName => {
+      if (!isString(aModelName)) return false
+      return aModelName.indexOf("mistral.ministral-") >= 0 ||
+             aModelName.indexOf("mistral.mistral-large") >= 0 ||
+             aModelName.indexOf("mistral.devstral-") >= 0
+    }
     var _resetStats = () => { _lastStats = __ }
     var _captureStats = (aResponse, aModelName) => {
       if (!isMap(aResponse)) {
@@ -700,8 +706,8 @@ ow.ai.__gpttypes.bedrock = {
               }
             }
           }
-        } else if (aModel.indexOf("mistral.ministral-3-8b-instruct") >= 0 || aModel.indexOf("mistral.ministral-large") >= 0) {
-          // New Mistral message-based models (mistral.ministral-3-8b-instruct, mistral.ministral-large, etc.)
+        } else if (isMistralMessagesModel(aModel)) {
+          // New Mistral message-based models (mistral.ministral-*, mistral.mistral-large, mistral.devstral-*, etc.)
           // These models use messages API format instead of the legacy prompt format
           var baseConv = Array.isArray(aPrompt) ? aPrompt : _r.conversation
           if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0) {
@@ -1103,6 +1109,7 @@ ow.ai.__gpttypes.bedrock = {
         // Mistral Messages (newer format):
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.ministral-3-8b-instruct', temperature: 0.7, params: (max_tokens: 1024)))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.ministral-large-2407-v1:0', temperature: 0.7, params: (max_tokens: 2048)))"
+        // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.devstral-2-123b', temperature: 0, params: (max_tokens: 4096)))"
 
         var aInput = merge(_m, aOptions.params)
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
@@ -1116,7 +1123,7 @@ ow.ai.__gpttypes.bedrock = {
         var handledMistralMessages = false
 
         // Handle Mistral message-based models (similar to OpenAI format)
-        if (( aModel.match(/mistral\.ministral-3/) || aModel.match(/mistral\.mistral-large/) ) && isArray(res.choices)) {
+        if (isMistralMessagesModel(aModel) && isArray(res.choices)) {
           handledMistralMessages = true
           for (var mci = 0; mci < res.choices.length; mci++) {
             var mchoice = res.choices[mci]
@@ -1141,7 +1148,7 @@ ow.ai.__gpttypes.bedrock = {
           }
         }
 
-        if (isArray(res.choices)) {
+        if (!handledMistralMessages && isArray(res.choices)) {
           handledOpenAI = true
           for (var ci = 0; ci < res.choices.length; ci++) {
             var choice = res.choices[ci]
@@ -1573,7 +1580,7 @@ ow.ai.__gpttypes.bedrock = {
         // Mistral streaming format
         if (aModel.indexOf("mistral.") >= 0) {
           // Newer message-based models (ministral-*) use OpenAI-style choices/delta format
-          if (aModel.indexOf("ministral-") >= 0 || aModel.indexOf("mistral-large") >= 0) {
+          if (isMistralMessagesModel(aModel)) {
             if (isArray(chunk.choices) && chunk.choices.length > 0) {
               var choice = chunk.choices[0]
               if (isDef(choice.delta) && isDef(choice.delta.content)) {
