@@ -200,13 +200,12 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 
 A sample `Dockerfile` is included in this folder and is based on `openaf/oaf:edge-t8`, adding Node.js/npm plus the `@github/copilot` binary.
 
-Build and run:
+Build the image, export `OAF_MODEL`, and then run the container with that environment variable:
 
 ```bash
-docker build -t ghcopilot-runtime .
-docker run --rm -it \
-  -e GITHUB_TOKEN=... \
-  ghcopilot-runtime copilot --help
+docker build -t my-image .
+export OAF_MODEL="(type: ghcopilot, options: (model: gpt-4.1, timeout: 900000, token: $(gh auth token)))"
+docker run --rm -ti -e OAF_MODEL=$OAF_MODEL my-image
 ```
 
 ## Notes

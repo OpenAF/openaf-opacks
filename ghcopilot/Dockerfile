@@ -1,13 +1,15 @@
-FROM openaf/oaf:edge-t8
+FROM openaf/mini-a:deb-t8
 
-RUN sudo apk add --no-cache nodejs npm \
-  && sudo npm install -g @github/copilot \
-  && sudo npm cache clean --force
+USER root
+RUN apt-get update -y\
+ && apt-get install -y curl bash\
+ && curl -fsSL https://gh.io/copilot-install | bash\
+ && apt-get clean\
+ && rm -rf /var/lib/apt/lists/*\
+ && rm -rf /tmp/*\
+ && rm -rf /var/tmp/*\
+ && /openaf/opack install ghcopilot
 
-ENV GITHUB_TOKEN=""
-ENV GH_TOKEN=""
+ENV OAF_MINI_A_LIBS="@ghcopilot/ghcopilot.js"
 
-WORKDIR /work
-
-ENTRYPOINT ["copilot"]
-CMD ["--help"]
+USER openaf
