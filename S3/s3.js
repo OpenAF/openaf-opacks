@@ -13,6 +13,7 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertChe
         loadExternalJars(getOPackPath("S3"))
 
     aURL = _$(aURL).default("https://s3.amazonaws.com")
+    this.url = String(aURL).replace(/\/+$/, "")
 
     this.httpClient = new Packages.okhttp3.OkHttpClient()
 
@@ -30,10 +31,63 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertChe
         }
     }
     this.s3 = this.s3.build()
-    if (ignoreCertCheck) this.s3 = this.s3.ignoreCertCheck()
+    if (ignoreCertCheck) this.s3.ignoreCertCheck()
 
     this.useVersion1 = useVersion1
 }
+
+S3.prototype._toStringMap = function(aMap) {
+    var res = new java.util.HashMap();
+    if (isDef(aMap) && isMap(aMap)) {
+        Object.keys(aMap).forEach(k => {
+            res.put(String(k), String(aMap[k]));
+        });
+    }
+    return res;
+};
+
+S3.prototype._toZonedDateTime = function(aDate) {
+    return java.time.ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(aDate.getTime()), java.time.ZoneId.systemDefault());
+};
+
+S3.prototype._encodeURLPath = function(aPath) {
+    return String(aPath).split("/").map(part => String(java.net.URLEncoder.encode(String(part), "UTF-8")).replace(/\+/g, "%20")).join("/");
+};
+
+S3.prototype._fromMetadata = function(aMeta) {
+    var res = {};
+    if (isUnDef(aMeta) || isNull(aMeta)) return res;
+
+    var setValue = function(aKey, aValue) {
+        var key = String(aKey).replace(/^x-amz-meta-/i, "").toLowerCase();
+        if (isDef(aValue) && !isNull(aValue)) {
+            if (isJavaObject(aValue) && isDef(aValue.iterator)) {
+                var vals = [];
+                var it = aValue.iterator();
+                while(it.hasNext()) vals.push(String(it.next()));
+                res[key] = (vals.length == 1 ? vals[0] : vals);
+            } else {
+                res[key] = String(aValue);
+            }
+        }
+    };
+
+    if (aMeta instanceof Packages.io.minio.Http.Headers) {
+        var it = aMeta.keySet().iterator();
+        while(it.hasNext()) {
+            var key = String(it.next());
+            setValue(key, aMeta.get(key));
+        }
+    } else {
+        var _res = af.fromJavaMap(aMeta);
+        Object.keys(_res).forEach(key => {
+            var value = _res[key];
+            res[String(key).replace(/^x-amz-meta-/i, "").toLowerCase()] = value;
+        });
+    }
+
+    return res;
+};
 
 /**
  * <odoc>
@@ -153,7 +207,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
             owner: isNull(item.owner()) ? __ : String(item.owner().displayName()),
             version: String(item.versionId()),
-            metadata: af.fromJavaMap(item.userMetadata()),
+            metadata: this._fromMetadata(item.userMetadata()),
             contentType: (isUnDef(stat.contentType) ? void 0 : String(stat.contentType))
         });
     }
@@ -179,7 +233,7 @@ S3.prototype.statObject = function(aBucket, aObjectName) {
     res.contentType = _stat.contentType();
     res.modifiedTime = new Date(_stat.lastModified().toString());
     res.etag = String(_stat.etag()).replace(/^"(.+)"$/, "$1");
-    res.meta = af.fromJavaMap(_stat.userMetadata());
+    res.meta = this._fromMetadata(_stat.userMetadata());
     res.length = _stat.size();
 
     for(var kk in res.meta) {
@@ -221,7 +275,7 @@ S3.prototype.getPresignedGetObject = function(aBucket, aObjectName, expireInSecs
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
 
-    var pgo = Packages.io.minio.GetPresignedObjectUrlArgs.builder().method(Packages.io.minio.http.Method.GET).bucket(aBucket).object(aObjectName);
+    var pgo = Packages.io.minio.GetPresignedObjectUrlArgs.builder().method(Packages.io.minio.Http.Method.GET).bucket(aBucket).object(aObjectName);
     if (isDef(expireInSecs) && isNumber(expireInSecs)) {
         pgo = pgo.expiry(expireInSecs);
     } else {
@@ -241,7 +295,7 @@ S3.prototype.getPresignedPutObject = function(aBucket, aObjectName, expireInSecs
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
 
-    var pgo = Packages.io.minio.GetPresignedObjectUrlArgs.builder().method(Packages.io.minio.http.Method.PUT).bucket(aBucket).object(aObjectName);
+    var pgo = Packages.io.minio.GetPresignedObjectUrlArgs.builder().method(Packages.io.minio.Http.Method.PUT).bucket(aBucket).object(aObjectName);
     if (isDef(expireInSecs) && isNumber(expireInSecs)) {
         pgo = pgo.expiry(expireInSecs);
     } else {
@@ -327,11 +381,7 @@ S3.prototype.putObjectStream = function(aBucket, aObjectName, aStream, aMetaMap,
     aContentType = _$(aContentType).default(null);
     aMetaMap = _$(aMetaMap).isMap().default({});
 
-    var hmm = Packages.com.google.common.collect.HashMultimap.create();
-    Object.keys(aMetaMap).forEach(k => {
-        hmm.put(k, aMetaMap[k]);
-    });
-    var pos = Packages.io.minio.PutObjectArgs.builder().bucket(aBucket).object(aObjectName).stream(aStream, aStream instanceof Packages.io.minio.GetObjectResponse ? aStream.headers().get("Content-Length") : aStream.available(), -1).userMetadata(hmm)
+    var pos = Packages.io.minio.PutObjectArgs.builder().bucket(aBucket).object(aObjectName).stream(aStream, aStream instanceof Packages.io.minio.GetObjectResponse ? aStream.headers().get("Content-Length") : aStream.available(), -1).userMetadata(this._toStringMap(aMetaMap))
     if (isDef(aContentType) && aContentType != null) 
         pos = pos.contentType(aContentType)
     else if (aStream instanceof Packages.io.minio.GetObjectResponse) {      
@@ -415,9 +465,25 @@ S3.prototype.getObject = function(aBucket, aObjectName, aRemotePath) {
  */
 S3.prototype.decomposeURL = function(aURL) {
     var url = new java.net.URL(aURL);
+    var endpoint = new java.net.URL(this.url);
+    var path = String(url.getPath()).replace(/^\/+/, "");
+    var bucket, objectName;
+    var decode = function(aValue) {
+        return String(java.net.URLDecoder.decode(String(aValue), "UTF-8"));
+    };
+
+    if (String(url.getHost()) == String(endpoint.getHost()) && Number(url.getPort()) == Number(endpoint.getPort())) {
+        var parts = path.split("/");
+        bucket = decode(parts.shift());
+        objectName = parts.map(decode).join("/");
+    } else {
+        bucket = decode(String(url.getHost()).replace(/([^\.]+)\..+/, "$1"));
+        objectName = path.split("/").map(decode).join("/");
+    }
+
     return {
-        bucket: String(url.getHost()).replace(/([^\.]+)\..+/, "$1"),
-        objectName: String(url.getPath()).replace(/^\/+/, "")
+        bucket: bucket,
+        objectName: objectName
     };
 };
 
@@ -442,7 +508,7 @@ S3.prototype.getObjectURL = function(aBucket, aObjectName) {
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aObjectName).isString().$_("Please provide an object name.");
 
-    return String(this.s3.getObjectUrl(aBucket, aObjectName));
+    return this.url + "/" + this._encodeURLPath(aBucket) + "/" + this._encodeURLPath(aObjectName);
 };
 
 /**
@@ -483,10 +549,10 @@ S3.prototype.removeObjects = function(aBucket, aListObjectNames, aLimitPerCall) 
     var ll = new java.util.LinkedList();
     aListObjectNames.forEach(obj => {
         if (isString(obj)) {
-            ll.add(new Packages.io.minio.messages.DeleteObject(obj));
+            ll.add(new Packages.io.minio.messages.DeleteRequest.Object(obj));
         }
         if (isMap(obj)) {
-            ll.add(new Packages.io.minio.messages.DeleteObject(obj.name, obj.version));
+            ll.add(new Packages.io.minio.messages.DeleteRequest.Object(obj.name, obj.version));
         }
     });
 
@@ -528,30 +594,25 @@ S3.prototype.copyObject = function(aSourceBucket, aObjectName, aTargetBucket, aD
     _$(aTargetBucket).isString().$_("Please provide a target bucket.");
     _$(aDestObjectName).isString().$_("Please provide a destination object name.");
 
-    //var co = new Packages.io.minio.CopyConditions();
+    var source = Packages.io.minio.SourceObject.builder()
+                 .bucket(aSourceBucket)
+                 .object(aObjectName);
+
+    if (isDef(aCopyOptions) && isMap(aCopyOptions)) {
+        if (isDef(aCopyOptions.matchETag) && isString(aCopyOptions.matchETag)) { source = source.matchETag(aCopyOptions.matchETag); }
+        if (isDef(aCopyOptions.matchETagNone) && isString(aCopyOptions.matchETagNone)) { source = source.notMatchETag(aCopyOptions.matchETagNone); }
+        if (isDef(aCopyOptions.modified) && isDate(aCopyOptions.modified)) { source = source.modifiedSince(this._toZonedDateTime(aCopyOptions.modified)); }
+        if (isDef(aCopyOptions.unmodified) && isDate(aCopyOptions.unmodified)) { source = source.unmodifiedSince(this._toZonedDateTime(aCopyOptions.unmodified)); }
+    }
 
     var coa = Packages.io.minio.CopyObjectArgs.builder()
               .bucket(aTargetBucket)
               .object(aDestObjectName)
-              .source(Packages.io.minio.CopySource.builder().bucket(aSourceBucket).object(aObjectName).build());
+              .source(source.build());
     if (isDef(aMetaMap) && isMap(aMetaMap)) {
-        co.setReplaceMetadataDirective();
-        var hmm = Packages.com.google.common.collect.HashMultimap.create();
-        Object.keys(aMetaMap).forEach(k => {
-            hmm.put(k, aMetaMap[k]);
-        });
-        coa = coa.userMetadata(hmm);
-        //this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, co, af.toJavaMap(aMetaMap));
-    } // else {
-    if (isDef(aCopyOptions) && isMap(aCopyOptions)) {
-        if (isDef(aCopyOptions.matchETag) && isString(aCopyOptions.matchETag)) { coa = coa.matchETag(aCopyOptions.matchETag); }
-        if (isDef(aCopyOptions.matchETagNone) && isString(aCopyOptions.matchETagNone)) { coa = coa.notMatchEtag(aCopyOptions.matchETagNone); }
-        if (isDef(aCopyOptions.modified) && isDate(aCopyOptions.modified)) { coa = coa.modifiedSince(aCopyOptions.modified); }
-        if (isDef(aCopyOptions.unmodified) && isDate(aCopyOptions.unmodified)) { coa = coa.unmodifiedSice(aCopyOptions.unmodified); }
+        coa = coa.metadataDirective(Packages.io.minio.Directive.REPLACE).userMetadata(this._toStringMap(aMetaMap));
     }
-    //this.s3.copyObject(aSourceBucket, aObjectName, aTargetBucket, aDestObjectName, co);
     this.s3.copyObject(coa.build());
-    //}
 };
 
 /**
@@ -1303,4 +1364,3 @@ ow.ch.__types.s3 = {
         }
     }
 }
-

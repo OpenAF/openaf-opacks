@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251005'
+version: '20260325'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -28,39 +28,39 @@ files:
 - .precompile
 - README.md
 - annotations-13.0.jar
-- bcprov-jdk18on-1.81.jar
-- error_prone_annotations-2.36.0.jar
+- bcprov-jdk18on-1.82.jar
+- error_prone_annotations-2.41.0.jar
 - failureaccess-1.0.3.jar
-- guava-33.4.8-jre.jar
-- j2objc-annotations-3.0.0.jar
+- guava-33.5.0-jre.jar
+- j2objc-annotations-3.1.jar
 - jspecify-1.0.0.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-8.6.0.jar
+- minio-9.0.0.jar
 - oJobS3.yaml
 - s3-ojob-test.yaml
 - s3-test.yaml
 - s3.js
 - s3.yaml
 - simple-xml-safe-2.7.1.jar
-- snappy-java-1.1.10.7.jar
+- snappy-java-1.1.10.8.jar
 filesHash:
   .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
-  .odoc.db: 1dffa95699f05e893be587e1fca839ba5d90a3a7
+  .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
-  bcprov-jdk18on-1.81.jar: d17c094daef57dbd80af71687a475aa6df7cbe54
-  error_prone_annotations-2.36.0.jar: 227d4d4957ccc3dc5761bd897e3a0ee587e750a7
+  bcprov-jdk18on-1.82.jar: e1118397395d21909a1b7b15120d0c2a68d7fd0c
+  error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  guava-33.4.8-jre.jar: e70a3268e6cd3e7d458aa15787ce6811c34e96ae
-  j2objc-annotations-3.0.0.jar: 7399e65dd7e9ff3404f4535b2f017093bdb134c7
+  guava-33.5.0-jre.jar: 8699de25f2f979108d6c1b804a7ba38cda1116bc
+  j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
   jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-8.6.0.jar: 327afdf89f12a2e46c989bd8d8c2a6d9f379ccff
+  minio-9.0.0.jar: 14e9aa679a9f3634ece771ab4fff98a66bfce7c4
   oJobS3.yaml: 1e7ad5e04a410a9758d60bf505c4771b8fba0798
-  s3-ojob-test.yaml: ed62acaa7afbdde47cac29bad06bf8697cb23449
-  s3-test.yaml: c60f3b6cddeb0eaac75bcdfe0947e3d19dd08c92
-  s3.js: d5b5780553d3326cf61727a34eff61b019e23db7
+  s3-ojob-test.yaml: 41175a1afbf0ad793545ac07044b30332d38bf02
+  s3-test.yaml: a2de40ad76982154cac0cfbda2a0be7adf763754
+  s3.js: 15d68bb46fb80410cb18e71441858fed9deb1267
   s3.yaml: 49966168322c35fad8f68eb1a17fd87922841cb3
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
-  snappy-java-1.1.10.7.jar: 3049f95640f4625a945cfab85715f603fa4c8f80
+  snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d

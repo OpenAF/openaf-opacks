@@ -22,8 +22,13 @@ todo:
 
 - S3::Create, list and remove bucket
 - S3::Upload, list, download and delete an object
+- S3::URL helpers and ranged reads
 - S3::Upload and stat with metadata
 - S3::Copy object
+- S3::Copy object replacing metadata
+- S3::List by prefix and remove objects by prefix
+- S3::Object URL
+- S3::Ignore cert check
 - S3::Close
 
 jobs:
@@ -57,16 +62,17 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      global.s3.makeBucket(args.init.testBucket);
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket);
 
-      ow.test.assert(global.s3.bucketExists(args.init.testBucket), true, "Problem with creating bucket.");
+      ow.test.assert(global.s3.bucketExists(bucket), true, "Problem with creating bucket.");
 
       var ar = global.s3.listBuckets();
-      ow.test.assert($from(ar).equals("name", args.init.testBucket).count(), 1, "Problem with listing buckets.");
+      ow.test.assert($from(ar).equals("name", bucket).count(), 1, "Problem with listing buckets.");
 
-      global.s3.removeBucket(args.init.testBucket);
+      global.s3.removeBucket(bucket);
       ar = global.s3.listBuckets();
-      ow.test.assert($from(ar).equals("name", args.init.testBucket).count(), 0, "Problem with removing buckets.");
+      ow.test.assert($from(ar).equals("name", bucket).count(), 0, "Problem with removing buckets.");
 
 # -----------------------------------------------------
 - name: S3::Upload, list, download and delete an object
@@ -74,32 +80,66 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      global.s3.makeBucket(args.init.testBucket); 
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket); 
 
       try {
-        global.s3.putObject(args.init.testBucket, "anExample.md", "README.md");
-        var ar = global.s3.listObjects(args.init.testBucket);
+        global.s3.putObject(bucket, "anExample.md", "README.md");
+        var ar = global.s3.listObjects(bucket);
         ow.test.assert($from(ar).equals("filename", "anExample.md").count(), 1, "Problem with putting object.");
 
-        ow.test.assert(global.s3.objectExists(args.init.testBucket, "anExample.md"), true, "Problem with objectExists.");
-        ow.test.assert(global.s3.statObject(args.init.testBucket, "anExample.md").length, io.fileInfo("README.md").size, "Problem with statObject.");
+        ow.test.assert(global.s3.objectExists(bucket, "anExample.md"), true, "Problem with objectExists.");
+        ow.test.assert(global.s3.statObject(bucket, "anExample.md").length, io.fileInfo("README.md").size, "Problem with statObject.");
         
-        var is = global.s3.getObjectStream(args.init.testBucket, "anExample.md");
+        var is = global.s3.getObjectStream(bucket, "anExample.md");
         ow.test.assert(af.fromBytes2String(af.fromInputStream2Bytes(is)), io.readFileString("README.md"), "Problem with getObjectStream.");
 
-        global.s3.getObject(args.init.testBucket, "anExample.md", "test.txt");
+        global.s3.getObject(bucket, "anExample.md", "test.txt");
         ow.test.assert(io.readFileString("test.txt"), io.readFileString("README.md"), "Problem with getObject.");
-        global.s3.removeObject(args.init.testBucket, "anExample.md");
+        global.s3.removeObject(bucket, "anExample.md");
 
-        var purl = global.s3.getPresignedPutObject(args.init.testBucket, "anExample.md");
+        var purl = global.s3.getPresignedPutObject(bucket, "anExample.md");
         $rest().put(purl, io.readFileString("README.md"));
 
-        var url = global.s3.getPresignedGetObject(args.init.testBucket, "anExample.md");
+        var url = global.s3.getPresignedGetObject(bucket, "anExample.md");
         ow.test.assert($rest().get(url), io.readFileString("README.md"), "Problem with getPresignedGetObject/getPresignedPutObject");
       } finally {
         io.rm("test.txt");
-        global.s3.removeObject(args.init.testBucket, "anExample.md");
-        global.s3.removeBucket(args.init.testBucket); 
+        global.s3.removeObject(bucket, "anExample.md");
+        global.s3.removeBucket(bucket); 
+      }
+
+# --------------------------------
+- name: S3::URL helpers and ranged reads
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket);
+
+      try {
+        var objectName = "folder name/anExample.md";
+        var objectURL  = global.s3.getObjectURL(bucket, objectName);
+        var expected   = io.readFileString("README.md");
+        var partial    = expected.substr(10, 25);
+
+        global.s3.putObjectByURL(objectURL, "README.md", { via: "url" });
+
+        var byURL = global.s3.getObjectStreamByURL(objectURL, 10, 25);
+        ow.test.assert(af.fromBytes2String(af.fromInputStream2Bytes(byURL)), partial, "Problem with getObjectStreamByURL range.");
+
+        global.s3.getObjectByURL(objectURL, "test-url.txt");
+        ow.test.assert(io.readFileString("test-url.txt"), expected, "Problem with getObjectByURL.");
+
+        ow.test.assert(global.s3.decomposeURL(objectURL), {
+          bucket    : bucket,
+          objectName: objectName
+        }, "Problem with decomposeURL.");
+      } finally {
+        io.rm("test-url.txt");
+        global.s3.listObjects(bucket, "", __, true).forEach(r => global.s3.removeObject(bucket, r.filename));
+        global.s3.removeBucket(bucket);
       }
 
 # ---------------------------------------
@@ -108,15 +148,16 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      global.s3.makeBucket(args.init.testBucket); 
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket); 
 
       try {
-        global.s3.putObject(args.init.testBucket, "anExample.md", "README.md", { test: "123" });
-        var out = global.s3.statObject(args.init.testBucket, "anExample.md");
+        global.s3.putObject(bucket, "anExample.md", "README.md", { test: "123" });
+        var out = global.s3.statObject(bucket, "anExample.md");
         ow.test.assert(out.meta.test, "123", "Problem setting metadata.");
       } finally {
-        global.s3.removeObject(args.init.testBucket, "anExample.md");
-        global.s3.removeBucket(args.init.testBucket);
+        global.s3.removeObject(bucket, "anExample.md");
+        global.s3.removeBucket(bucket);
       }
 
 # ---------------------
@@ -125,15 +166,93 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      global.s3.makeBucket(args.init.testBucket); 
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket); 
 
       try {
-        global.s3.putObject(args.init.testBucket, "anExample.md", "README.md");
-        global.s3.copyObject(args.init.testBucket, "anExample.md", args.init.testBucket, "anExample.old");
-        ow.test.assert(global.s3.objectExists(args.init.testBucket, "anExample.md"), true, "Problem with copyObject (1)");
-        ow.test.assert(global.s3.objectExists(args.init.testBucket, "anExample.old"), true, "Problem with copyObject (2)");
+        global.s3.putObject(bucket, "anExample.md", "README.md");
+        global.s3.copyObject(bucket, "anExample.md", bucket, "anExample.old");
+        ow.test.assert(global.s3.objectExists(bucket, "anExample.md"), true, "Problem with copyObject (1)");
+        ow.test.assert(global.s3.objectExists(bucket, "anExample.old"), true, "Problem with copyObject (2)");
       } finally {
-        global.s3.removeObject(args.init.testBucket, "anExample.md");
-        global.s3.removeObject(args.init.testBucket, "anExample.old");
-        global.s3.removeBucket(args.init.testBucket);
+        global.s3.removeObject(bucket, "anExample.md");
+        global.s3.removeObject(bucket, "anExample.old");
+        global.s3.removeBucket(bucket);
+      }
+
+# ------------------------------------
+- name: S3::Copy object replacing metadata
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket);
+
+      try {
+        global.s3.putObject(bucket, "anExample.md", "README.md", { original: "yes" });
+        var etag = global.s3.statObject(bucket, "anExample.md").etag;
+
+        global.s3.copyObject(bucket, "anExample.md", bucket, "anExample.copy", {
+          copied: "yes"
+        }, {
+          matchETag: etag
+        });
+
+        var copied = global.s3.statObject(bucket, "anExample.copy");
+        ow.test.assert(copied.meta.copied, "yes", "Problem replacing metadata on copyObject.");
+        ow.test.assert(isUnDef(copied.meta.original), true, "Problem clearing original metadata on copyObject.");
+      } finally {
+        global.s3.removeObject(bucket, "anExample.md");
+        global.s3.removeObject(bucket, "anExample.copy");
+        global.s3.removeBucket(bucket);
+      }
+
+# --------------------------------------------
+- name: S3::List by prefix and remove objects by prefix
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      var bucket = args.init.testBucket + "-" + now();
+      global.s3.makeBucket(bucket);
+
+      try {
+        global.s3.putObject(bucket, "folder/a.md", "README.md", { scope: "folder" });
+        global.s3.putObject(bucket, "folder/sub/b.md", "README.md", { scope: "folder" });
+        global.s3.putObject(bucket, "root.md", "README.md", { scope: "root" });
+
+        var folderList = global.s3.listObjects(bucket, "folder/", true, true);
+        ow.test.assert(folderList.length, 2, "Problem listing objects by prefix.");
+        ow.test.assert($from(folderList).equals("filename", "folder/a.md").count(), 1, "Problem listing first prefixed object.");
+        ow.test.assert($from(folderList).equals("filename", "folder/sub/b.md").count(), 1, "Problem listing nested prefixed object.");
+        ow.test.assert($from(folderList).notEmpty("contentType").count(), 2, "Problem retrieving contentType from listObjects.");
+
+        var errs = global.s3.removeObjectsByPrefix(bucket, "folder/");
+        ow.test.assert(errs.length, 0, "Problem with removeObjectsByPrefix.");
+        ow.test.assert(global.s3.objectExists(bucket, "root.md"), true, "Problem keeping objects outside the prefix.");
+        ow.test.assert(global.s3.objectExists(bucket, "folder/a.md"), false, "Problem removing prefixed objects.");
+      } finally {
+        global.s3.listObjects(bucket, "", __, true).forEach(r => global.s3.removeObject(bucket, r.filename));
+        global.s3.removeBucket(bucket);
+      }
+
+# -------------------
+- name: S3::Object URL
+  deps: S3 Init
+  to  : oJob Test
+  args:
+    func: |
+      ow.test.assert(global.s3.getObjectURL(args.init.testBucket, "folder name/anExample.md"), args.init.url + "/" + args.init.testBucket + "/folder%20name/anExample.md", "Problem with getObjectURL.");
+
+# --------------------------
+- name: S3::Ignore cert check
+  to  : oJob Test
+  args:
+    func: |
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region, __, true);
+      try {
+        ow.test.assert(isDef(s3.s3), true, "Problem creating client with ignoreCertCheck.");
+      } finally {
+        s3.close();
       }

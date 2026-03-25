@@ -9,14 +9,24 @@ init:
 
 todo:
 - Count buckets
+- Test count buckets
 - Create bucket
+- Test bucket exists
 - Put object
+- Test uploaded object exists
 - Copy object
+- Test copied object exists
 - List objects
+- Test listed objects
 - Remove object
+- Test objects removed
 - Sync squash remote
+- Test sync actions
 - Remove all objects
+- Test bucket empty
 - Destroy bucket
+- Test bucket removed
+- Results
 
 ojob:
   opacks      :
@@ -26,16 +36,28 @@ ojob:
         
 include:
 - s3.yaml
-- ojob.io/common/ojob
+- oJobTest.yaml
 
 jobs:
+- name: Results
+  from: oJob Test Results
+  type: shutdown
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED: {{pass}}/{{count}}", args.results);
+    tprint("Tests FAILED: {{fail}}/{{count}}", args.results);
+    if (args.results.fail > 0) printErr("There are failed tests");
+
 - name : Set args
   args :
     url      : *URL
     accessKey: *KEY
     secret   : *SECRET
     #region   : *REGION
-    bucket   : *BUCKET
+  exec: |
+    global.s3TestBucket = _$(global.s3TestBucket).isString().default(args.init.testBucket + "-" + now());
+    args.bucket = global.s3TestBucket;
 
 # -------------------
 - name : Count buckets
@@ -48,10 +70,39 @@ jobs:
     __key        : args
     __path       : length(list)
 
+# -----------------------
+- name: Test count buckets
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(isArray(s3.listBuckets()), true, "Problem listing buckets through oJob.");
+      } finally {
+        s3.close();
+      }
+
 # --------------------
 - name : Create bucket
   from : Set args
   to   : S3 Make bucket
+
+# ------------------------
+- name: Test bucket exists
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.bucketExists(bucket), true, "Problem creating bucket through oJob.");
+      } finally {
+        s3.close();
+      }
 
 # -----------------
 - name : Put object
@@ -61,15 +112,47 @@ jobs:
     objectName  : s3-ojob-test.yaml
     localPath   : s3-ojob-test.yaml
 
+# --------------------------------
+- name: Test uploaded object exists
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.objectExists(bucket, "s3-ojob-test.yaml"), true, "Problem uploading object through oJob.");
+      } finally {
+        s3.close();
+      }
+
 # ------------------
 - name : Copy object
   from : Set args
   to   : S3 Copy object
   args :
-    sourceBucket: *BUCKET
-    targetBucket: *BUCKET
     sourceObject: s3-ojob-test.yaml
     targetObject: s3-ojob-test2.yaml
+  exec: |
+    args.sourceBucket = args.bucket;
+    args.targetBucket = args.bucket;
+
+# ------------------------------
+- name: Test copied object exists
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.objectExists(bucket, "s3-ojob-test.yaml"), true, "Problem keeping source object after oJob copy.");
+        ow.test.assert(s3.objectExists(bucket, "s3-ojob-test2.yaml"), true, "Problem copying object through oJob.");
+      } finally {
+        s3.close();
+      }
 
 # -------------------
 - name : List objects
@@ -85,6 +168,23 @@ jobs:
     __key        : args
     __path       : list
 
+# ------------------------
+- name: Test listed objects
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        var lst = s3.listObjects(bucket, "", true, true);
+        ow.test.assert($from(lst).equals("filename", "s3-ojob-test.yaml").count(), 1, "Problem listing uploaded object through oJob.");
+        ow.test.assert($from(lst).equals("filename", "s3-ojob-test2.yaml").count(), 1, "Problem listing copied object through oJob.");
+      } finally {
+        s3.close();
+      }
+
 # --------------------
 - name : Remove object
   from : Set args
@@ -92,6 +192,22 @@ jobs:
   args :
   - objectName  : s3-ojob-test.yaml
   - objectName  : s3-ojob-test2.yaml
+
+# --------------------------
+- name: Test objects removed
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.objectExists(bucket, "s3-ojob-test.yaml"), false, "Problem removing first object through oJob.");
+        ow.test.assert(s3.objectExists(bucket, "s3-ojob-test2.yaml"), false, "Problem removing second object through oJob.");
+      } finally {
+        s3.close();
+      }
 
 # -------------------------
 - name : Sync squash remote
@@ -109,6 +225,21 @@ jobs:
     __key        : args
     __path       : actions
 
+# -----------------------
+- name: Test sync actions
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert($from(s3.listObjects(bucket, "", __, true)).greaterEquals("size", 0).count() > 0, true, "Problem syncing local folder to bucket through oJob.");
+      } finally {
+        s3.close();
+      }
+
 # -------------------------
 - name : Remove all objects
   from : Set args
@@ -117,7 +248,37 @@ jobs:
     prefix: ""
     #limitPerCall: 1000
 
+# ----------------------
+- name: Test bucket empty
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.listObjects(bucket, "", __, true).length, 0, "Problem removing objects by prefix through oJob.");
+      } finally {
+        s3.close();
+      }
+
 # ---------------------
 - name : Destroy bucket
   from : Set args
   to   : S3 Remove bucket
+
+# ------------------------
+- name: Test bucket removed
+  deps: Set args
+  to  : oJob Test
+  args:
+    func: |
+      loadLib("s3.js");
+      var bucket = _$(global.s3TestBucket).isString().default(args.init.testBucket);
+      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+      try {
+        ow.test.assert(s3.bucketExists(bucket), false, "Problem removing bucket through oJob.");
+      } finally {
+        s3.close();
+      }
