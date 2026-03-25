@@ -13,6 +13,7 @@
   |**Badgen**|<img src=".github/badges/Badgen.svg"><br>The Badgen library to generate badge like SVG rewritten for OpenAF|
   |**Bench**|<img src=".github/badges/Bench.svg"><br>A collection of benchmark performance tests|
   |**BouncyCastle**|<img src=".github/badges/BouncyCastle.svg"><br>Extra Java BouncyCastle crypto algorithms.|
+  |**BunnyNet**|<img src=".github/badges/BunnyNet.svg"><br>bunny.net API wrapper using OpenAF $rest|
   |**CmdUtils**|<img src=".github/badges/CmdUtils.svg"><br>Common object library for command utilities|
   |**Compress**|<img src=".github/badges/Compress.svg"><br>Provides encapsulation for the Apache Compress library.|
   |**Compromise**|<img src=".github/badges/Compromise.svg"><br>Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
