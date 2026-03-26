@@ -72,13 +72,13 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: ac69cb5fcad6d2736496ce17646da888adf556ef
+  .odoc.db: 00582f8d0d0d89d3f846288b5b3c8ae9e7778df8
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: 39b240cfd59145a9cb7b1796c7c450612d2c1ea0
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
-  aws_codeartifact.js: 587612d67ce6cd966951b94e226927b07e783714
+  aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
   aws_core.js: aea7e34120709126ddf18d6254a9b0f2372a17e5
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
@@ -99,7 +99,7 @@ filesHash:
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
-  oJobCodeArtifact.yaml: f06e4012d4e92c001e7da25c25f46a43422831e2
+  oJobCodeArtifact.yaml: 8bf695f382e784648edf7436703851f2db820183
   oJobECR.yaml: f15b791f50c38d1507b1b034337beb3b4ab41542
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
   oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09

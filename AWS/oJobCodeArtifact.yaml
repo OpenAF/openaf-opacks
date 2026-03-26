@@ -3,11 +3,12 @@ include:
 - oJobBrowse.yaml
 
 #ojob:
+#  catch: $err(exception, __, __, job.exec)
 #  daemon: true
 #  logToConsole: true
 
 jobs:
-# ------------------------
+# ---------------------------------
 - name : HTTP Browse - codeartifact
   to   : HTTP Browse generic
   typeArgs:
@@ -34,13 +35,15 @@ jobs:
         format    : format
         namespace : namespace
         initialize: initialize
+        download  : download
   exec : &httpBrowseCodeArtifactExec | #js
     args.options = merge(args.options, {
       showURI : args.incURI,
       sortTab : args.sortTab,
       logo    : args.logo,
       browse  : args.browse,
-      default : args.default
+      default : args.default,
+      download: args.download
     })
 
     loadLib("aws.js")
@@ -373,7 +376,7 @@ jobs:
           return {
             isDirectory: f.isParent,
             values     : {
-              "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), "") + (f.isParent ? "/" : ""),
+              "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), ""),
               "Format"   : f.pkg.format || "",
               "Namespace": f.pkg.namespace || ""
             }
@@ -399,6 +402,17 @@ jobs:
         var format = pkgParts[0]
         var pkg = pkgParts[pkgParts.length - 1]
         var namespace = pkgParts.length > 2 ? pkgParts.slice(1, -1).join("/") : __
+
+        if (options.download && isDef(request.params) && isDef(request.params.asset)) {
+          try {
+            var _aws = getAWS()
+            var result = _aws.CODEARTIFACT_GetPackageVersionAsset(args.region, repo, domain, format, namespace, pkg, version, request.params.asset)
+            return { stream: result.stream }
+          } catch(e) {
+            logErr("CodeArtifact download error [" + request.params.asset + "]: " + String(e))
+            throw e
+          }
+        }
 
         var assets = $cache("codeartifact-assets").get({
           domain    : domain,
@@ -428,7 +442,14 @@ jobs:
         data += "| Asset | Size | Hashes |\n"
         data += "|:---|---:|---|\n"
         $from(assets).sort("assetName").select(a => {
-          data += `| ${a.name || a.assetName || ""} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${af.toYAML(a.hashes).replace(/\n/g, "</br>") || ""} |\n`
+          var assetName = a.name || a.assetName || ""
+          var dlLink = (options.download && assetName.length > 0)
+            ? `<a href="?asset=${encodeURIComponent(assetName)}" download="${assetName}">⬇</a> `
+            : ""
+          var assetDisplay = (options.download && assetName.length > 0)
+            ? `<a href="?asset=${encodeURIComponent(assetName)}" download="${assetName}">${assetName}</a>`
+            : assetName
+          data += `| ${dlLink}${assetDisplay} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${af.toYAML(a.hashes).replace(/\n/g, "</br>") || ""} |\n`
         })
 
         if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
@@ -441,7 +462,7 @@ jobs:
     }
 
 
-# -----------------------------------------
+# ------------------------------------------
 - name    : HTTP Browse - codeartifact - API
   to      : HTTP Browse API
   typeArgs:
@@ -452,13 +473,15 @@ jobs:
   exec    : *httpBrowseCodeArtifactExec
 
 
-# todo:
-# - (httpdStart): 33221
-#   ((mapLibs )): true
-# - (CodeArtifactBrowse): 33221
-#   ((region          )): eu-west-1
-#   ((uri             )): /test
-#   ((browse          )): true
-#   ((cache           )): 3600000
-#   ((options         )):
-#     pageSize: 250
+#todo:
+#- (httpdStart): 33221
+#  ((mapLibs )): true
+#- (CodeArtifactBrowse): 33221
+#  ((region          )): eu-west-1
+#  ((uri             )): /test
+#  ((browse          )): true
+#  ((cache           )): 3600000
+#  ((download        )): true
+#  ((sortTab         )): true
+#  ((options         )):
+#    pageSize: 250

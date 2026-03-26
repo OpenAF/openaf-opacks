@@ -129,6 +129,50 @@ AWS.prototype.CODEARTIFACT_ListPackageVersions = function(aRegion, aRepository, 
 
 /**
  * <odoc>
+ * <key>AWS.CODEARTIFACT_GetPackageVersionAsset(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion, aAsset) : Map</key>
+ * Given a region, a repository, a domain, a format, a namespace, a package, a version and an asset name, returns a map with a stream property
+ * containing the binary content of the asset and the contentType header value.
+ * </odoc>
+ */
+AWS.prototype.CODEARTIFACT_GetPackageVersionAsset = function(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion, aAsset) {
+    aRegion = _$(aRegion).isString().default(this.region)
+    var params = {}
+    if (isDef(aRepository)) params.repository = aRepository
+    if (isDef(aDomain))     params.domain = aDomain
+    if (isDef(aFormat))     params.format = aFormat
+    if (isDef(aNamespace))  params.namespace = aNamespace
+    if (isDef(aPackage))    params.package = aPackage
+    if (isDef(aVersion))    params.version = aVersion
+    if (isDef(aAsset))      params.asset = aAsset
+
+    var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/package/version/asset"
+    var url = new java.net.URL(aURL)
+    var aHost = String(url.getHost())
+    var aURI = String(url.getPath())
+
+    // SigV4 requires query params sorted alphabetically; no Content-Type for GET without body.
+    // encodeURIComponent leaves ! * ' ( ) unencoded, but SigV4 requires encoding all chars
+    // except A-Z a-z 0-9 - _ . ~ — so we apply the extra replacements after encodeURIComponent.
+    var _sigV4Encode = s => encodeURIComponent(s).replace(/!/g,"%21").replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29").replace(/\*/g,"%2A")
+    var queryStr = Object.keys(params).sort().map(k => _sigV4Encode(k) + "=" + _sigV4Encode(params[k])).join("&")
+
+    var _rawHeaders = this.__getRequest("get", aURI, "codeartifact", aHost, aRegion, queryStr, "", __, __)
+    var headers = {}
+    Object.keys(_rawHeaders).forEach(k => { if (isDef(_rawHeaders[k])) headers[k] = _rawHeaders[k] })
+    var h = new ow.obj.http()
+    h.setThrowExceptions(false)
+    h.getStream(aURL + "?" + queryStr, __, headers, 30000)
+    if (h.responseCode() >= 400) {
+        var _code = h.responseCode()
+        var _body = ""
+        try { _body = af.fromInputStream2String(h.outputObj); h.close() } catch(_e) { try { h.close() } catch(_) {} }
+        throw "IOException " + _code + " [query: " + queryStr + "]: " + _body
+    }
+    return { stream: h.outputObj, contentType: h.responseType() }
+}
+
+/**
+ * <odoc>
  * <key>AWS.CODEARTIFACT_ListPackageVersionAssets(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion) : array</key>
  * Given a region, a repository, a domain, a format, a namespace and a package version, returns a list of package version assets in the account.
  * If no format is given, all packages are returned.
