@@ -33,7 +33,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260324'
+version: '20260325'
 dependencies:
   OpenAF: '>=20250315'
 files:
