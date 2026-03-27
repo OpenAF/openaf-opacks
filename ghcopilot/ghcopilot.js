@@ -420,6 +420,85 @@ ow.ai.__gpttypes.ghcopilot = {
         }
         return _r
       },
+      exportConversation: () => {
+        var _result = []
+        var i = 0
+        while (i < _conversation.length) {
+          var msg = _conversation[i]
+          if (!isMap(msg)) { i++; continue }
+          var role = msg.role
+          if (role == "developer") role = "system"
+          if (role == "tool") {
+            var toolResults = []
+            while (i < _conversation.length && isMap(_conversation[i]) && _conversation[i].role == "tool") {
+              var tr = _conversation[i]
+              var name = ""
+              for (var j = _result.length - 1; j >= 0; j--) {
+                if (_result[j].role == "assistant" && isArray(_result[j].toolCalls)) {
+                  var matchTc = _result[j].toolCalls.find(tc => tc.id == (tr.tool_call_id || ""))
+                  if (isDef(matchTc)) { name = matchTc.name; break }
+                }
+              }
+              toolResults.push({ id: tr.tool_call_id || "", name: name, result: tr.content })
+              i++
+            }
+            _result.push({ role: "user", content: null, toolResults: toolResults })
+            continue
+          }
+          var entry = { role: role, content: null }
+          if (isString(msg.content)) {
+            entry.content = msg.content
+          } else if (isArray(msg.content)) {
+            var textParts = msg.content.filter(c => isMap(c) && c.type == "text")
+            entry.content = textParts.length > 0 ? textParts.map(c => c.text).join("\n") : null
+          }
+          if (role == "assistant" && isArray(msg.tool_calls) && msg.tool_calls.length > 0) {
+            entry.toolCalls = msg.tool_calls.map(tc => ({
+              id: tc.id || "",
+              name: isDef(tc.function) ? tc.function.name : "",
+              arguments: isDef(tc.function) ? (isString(tc.function.arguments) ? jsonParse(tc.function.arguments) : (tc.function.arguments || {})) : {}
+            }))
+          }
+          _result.push(entry)
+          i++
+        }
+        return _result
+      },
+      importConversation: aExport => {
+        _$(aExport, "aExport").isArray().$_()
+        var _conv = []
+        aExport.forEach((msg, idx) => {
+          if (!isMap(msg)) return
+          var role = msg.role
+          if (role == "assistant" && isArray(msg.toolCalls) && msg.toolCalls.length > 0) {
+            _conv.push({
+              role: "assistant",
+              content: isDef(msg.content) ? msg.content : null,
+              tool_calls: msg.toolCalls.map((tc, ti) => ({
+                id: tc.id || ("tc_" + idx + "_" + ti),
+                type: "function",
+                function: {
+                  name: tc.name,
+                  arguments: isString(tc.arguments) ? tc.arguments : stringify(tc.arguments || {}, __, "")
+                }
+              }))
+            })
+          } else if (role == "user" && isArray(msg.toolResults) && msg.toolResults.length > 0) {
+            msg.toolResults.forEach((tr, ti) => {
+              _conv.push({
+                role: "tool",
+                content: isString(tr.result) ? tr.result : stringify(tr.result || "", __, ""),
+                tool_call_id: tr.id || ("tc_" + idx + "_" + ti)
+              })
+            })
+          } else {
+            _conv.push({ role: role, content: isDef(msg.content) ? (msg.content || "") : "" })
+          }
+        })
+        _conversation   = _conv
+        _r.conversation = _conversation
+        return _r
+      },
       getModelName: () => aOptions.model,
       getLastStats: () => _lastStats,
       setDebugCh: (aChName) => {

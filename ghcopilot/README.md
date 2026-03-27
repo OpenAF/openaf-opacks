@@ -212,4 +212,4 @@ docker run --rm -ti -e OAF_MODEL=$OAF_MODEL my-image
 
 - This opack uses the Java SDK session `sendAndWait` flow.
 - `aJsonFlag=true` appends a JSON-only instruction and attempts to parse the answer.
-- Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, and `getModelInfo(aModelId)`.
+- Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, `getModelInfo(aModelId)`, `exportConversation()`, and `importConversation(...)`.
