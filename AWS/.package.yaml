@@ -33,11 +33,14 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260325'
+version: '20260327'
 dependencies:
   OpenAF: '>=20250315'
 files:
+- .claude/settings.local.json
 - .odoc.db
+- .openaf_precompiled/.t8-20260324
+- .openaf_precompiled/aws_core_js.class
 - .package.yaml
 - .precompile
 - aws.js
@@ -72,11 +75,14 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
+  .claude/settings.local.json: 214e59d2d5ff4f58035b7cbde64b44243fa30f18
   .odoc.db: 00582f8d0d0d89d3f846288b5b3c8ae9e7778df8
+  .openaf_precompiled/.t8-20260324: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/aws_core_js.class: b5632fe3953c2325a8b8b3e36e0a197d4dccfcba
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
-  aws_bedrock.js: 39b240cfd59145a9cb7b1796c7c450612d2c1ea0
+  aws_bedrock.js: 25358e6af45d448c08498ad27faaa44ce1dc86ea
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf

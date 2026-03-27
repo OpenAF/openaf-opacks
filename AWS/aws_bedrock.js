@@ -241,6 +241,13 @@ ow.ai.__gpttypes.bedrock = {
     var _temperature = aOptions.temperature
     var _lastStats = __
     var _debugCh = __
+    var _normalizePortableRole = role => {
+      if (!isString(role)) return "user"
+      role = String(role).toLowerCase()
+      if (role == "developer") return "system"
+      if (role == "model") return "assistant"
+      return role
+    }
     var isMistralMessagesModel = aModelName => {
       if (!isString(aModelName)) return false
       return aModelName.indexOf("mistral.ministral-") >= 0 ||
@@ -317,6 +324,131 @@ ow.ai.__gpttypes.bedrock = {
       _lastStats = stats
       return _lastStats
     }
+    var _contentToPortableText = value => {
+      if (isUnDef(value)) return null
+      if (isString(value)) return value
+      if (isNumber(value) || isBoolean(value)) return String(value)
+      if (isArray(value)) {
+        var parts = value.map(v => _contentToPortableText(v)).filter(v => isString(v) && v.length > 0)
+        return parts.length > 0 ? parts.join("\n") : null
+      }
+      if (isMap(value)) {
+        if (isDef(value.toolUse) || isDef(value.toolResult) || value.type == "tool_use" || value.type == "toolUse" || value.type == "tool_result" || value.type == "toolResult") return null
+        if (isDef(value.text)) return _contentToPortableText(value.text)
+        if (isDef(value.json)) {
+          try { return isString(value.json) ? value.json : JSON.stringify(value.json) } catch (e) { return String(value.json) }
+        }
+        if (isDef(value.value)) return _contentToPortableText(value.value)
+        if (isDef(value.content)) return _contentToPortableText(value.content)
+        if (isDef(value.message)) return _contentToPortableText(value.message)
+        if (isDef(value.data)) return _contentToPortableText(value.data)
+        if (isDef(value.outputText)) return _contentToPortableText(value.outputText)
+        if (isDef(value.output_text)) return _contentToPortableText(value.output_text)
+        if (isDef(value.generated_text)) return _contentToPortableText(value.generated_text)
+        try { return JSON.stringify(value) } catch (e) { return String(value) }
+      }
+      return String(value)
+    }
+    var _extractPortableToolCalls = msg => {
+      var toolCalls = []
+      if (!isMap(msg)) return toolCalls
+
+      if (isArray(msg.tool_calls)) {
+        msg.tool_calls.forEach(tc => {
+          if (!isMap(tc)) return
+          var args = {}
+          if (isMap(tc.function)) {
+            args = isString(tc.function.arguments) ? jsonParse(tc.function.arguments, true) : tc.function.arguments
+          }
+          toolCalls.push({
+            id: tc.id || "",
+            name: isMap(tc.function) ? tc.function.name : "",
+            arguments: isMap(args) || isArray(args) ? args : {}
+          })
+        })
+      }
+
+      if (isArray(msg.content)) {
+        msg.content.forEach(part => {
+          if (!isMap(part)) return
+          var toolUse = __
+          if (isDef(part.toolUse)) toolUse = part.toolUse
+          if (part.type == "tool_use" || part.type == "toolUse") toolUse = part
+          if (!isMap(toolUse)) return
+          toolCalls.push({
+            id: toolUse.toolUseId || toolUse.tool_use_id || toolUse.id || "",
+            name: toolUse.name || "",
+            arguments: isDef(toolUse.input) ? toolUse.input : {}
+          })
+        })
+      }
+
+      return toolCalls
+    }
+    var _extractPortableToolResults = msg => {
+      var toolResults = []
+      if (!isMap(msg)) return toolResults
+
+      if (msg.role == "tool") {
+        toolResults.push({
+          id: msg.tool_call_id || "",
+          name: "",
+          result: isDef(msg.content) ? msg.content : ""
+        })
+      }
+
+      if (isArray(msg.content)) {
+        msg.content.forEach(part => {
+          if (!isMap(part)) return
+          var toolResult = __
+          if (isDef(part.toolResult)) toolResult = part.toolResult
+          if (part.type == "tool_result" || part.type == "toolResult") toolResult = part
+          if (!isMap(toolResult)) return
+          toolResults.push({
+            id: toolResult.toolUseId || toolResult.tool_use_id || part.tool_use_id || "",
+            name: "",
+            result: _normalizePortableToolResult(isDef(toolResult.content) ? toolResult.content : part.content)
+          })
+        })
+      }
+
+      return toolResults
+    }
+    var _buildImportedToolResultMessages = (toolResults, idx) => {
+      if (!isArray(toolResults) || toolResults.length == 0) return []
+      if (_model.indexOf("anthropic.") >= 0 || _model.indexOf("claude") >= 0) {
+        return [{
+          role: "user",
+          content: toolResults.map((tr, ti) => ({
+            type: "tool_result",
+            tool_use_id: tr.id || ("tc_" + idx + "_" + ti),
+            content: isString(tr.result) ? tr.result : stringify(tr.result || "", __, "")
+          }))
+        }]
+      }
+      if (_model.indexOf("amazon.nova-") >= 0) {
+        return [{
+          role: "user",
+          content: toolResults.map((tr, ti) => ({
+            toolResult: {
+              toolUseId: tr.id || ("tc_" + idx + "_" + ti),
+              content: [{ text: isString(tr.result) ? tr.result : stringify(tr.result || "", __, "") }],
+              status: "success"
+            }
+          }))
+        }]
+      }
+      return toolResults.map((tr, ti) => ({
+        role: "tool",
+        content: isString(tr.result) ? tr.result : stringify(tr.result || "", __, ""),
+        tool_call_id: tr.id || ("tc_" + idx + "_" + ti)
+      }))
+    }
+    var _normalizePortableToolResult = value => {
+      if (isString(value) || isNumber(value) || isBoolean(value)) return value
+      var txt = _contentToPortableText(value)
+      return isDef(txt) ? txt : value
+    }
     var _r = {
       conversation: [],
       tools: {},
@@ -325,6 +457,83 @@ ow.ai.__gpttypes.bedrock = {
       },
       setConversation: (aConversation) => {
         if (isArray(aConversation)) _r.conversation = aConversation
+        return _r
+      },
+      exportConversation: () => {
+        var _result = []
+        var i = 0
+        while (i < _r.conversation.length) {
+          var msg = _r.conversation[i]
+          if (!isMap(msg)) { i++; continue }
+
+          var role = _normalizePortableRole(msg.role)
+          var toolResults = _extractPortableToolResults(msg)
+          if (toolResults.length > 0) {
+            while ((i + 1) < _r.conversation.length) {
+              var nextToolResults = _extractPortableToolResults(_r.conversation[i + 1])
+              if (nextToolResults.length == 0) break
+              toolResults = toolResults.concat(nextToolResults)
+              i++
+            }
+
+            for (var j = _result.length - 1; j >= 0; j--) {
+              if (_result[j].role == "assistant" && isArray(_result[j].toolCalls)) {
+                toolResults.forEach(tr => {
+                  if (isString(tr.name) && tr.name.length > 0) return
+                  var matchTc = _result[j].toolCalls.find(tc => tc.id == (tr.id || ""))
+                  if (isDef(matchTc)) tr.name = matchTc.name
+                })
+                break
+              }
+            }
+
+            _result.push({ role: "user", content: null, toolResults: toolResults })
+            i++
+            continue
+          }
+
+          var entry = { role: role, content: _contentToPortableText(msg.content) }
+          var toolCalls = role == "assistant" ? _extractPortableToolCalls(msg) : []
+          if (toolCalls.length > 0) entry.toolCalls = toolCalls
+          _result.push(entry)
+          i++
+        }
+        return _result
+      },
+      importConversation: (aExport) => {
+        _$(aExport, "aExport").isArray().$_()
+        var _conv = []
+        aExport.forEach((msg, idx) => {
+          if (!isMap(msg)) return
+          var role = _normalizePortableRole(msg.role)
+
+          if (role == "assistant" && isArray(msg.toolCalls) && msg.toolCalls.length > 0) {
+            _conv.push({
+              role: "assistant",
+              content: isDef(msg.content) ? msg.content : null,
+              tool_calls: msg.toolCalls.map((tc, ti) => ({
+                id: tc.id || ("tc_" + idx + "_" + ti),
+                type: "function",
+                function: {
+                  name: tc.name,
+                  arguments: isString(tc.arguments) ? tc.arguments : stringify(tc.arguments || {}, __, "")
+                }
+              }))
+            })
+            return
+          }
+
+          if (role == "user" && isArray(msg.toolResults) && msg.toolResults.length > 0) {
+            _conv = _conv.concat(_buildImportedToolResultMessages(msg.toolResults, idx))
+            return
+          }
+
+          _conv.push({
+            role: role,
+            content: isDef(msg.content) ? (msg.content || "") : ""
+          })
+        })
+        _r.conversation = _conv
         return _r
       },
       getModelName: () => _model,
