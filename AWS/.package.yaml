@@ -37,7 +37,6 @@ version: '20260327'
 dependencies:
   OpenAF: '>=20250315'
 files:
-- .claude/settings.local.json
 - .odoc.db
 - .openaf_precompiled/.t8-20260324
 - .openaf_precompiled/aws_core_js.class
@@ -75,7 +74,6 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .claude/settings.local.json: 214e59d2d5ff4f58035b7cbde64b44243fa30f18
   .odoc.db: 00582f8d0d0d89d3f846288b5b3c8ae9e7778df8
   .openaf_precompiled/.t8-20260324: da39a3ee5e6b4b0d3255bfef95601890afd80709
   .openaf_precompiled/aws_core_js.class: b5632fe3953c2325a8b8b3e36e0a197d4dccfcba
