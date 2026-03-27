@@ -18,7 +18,7 @@ name: rocksdb
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260325'
+version: '20260327'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -28,12 +28,12 @@ files:
 - .precompile
 - README.md
 - rocksdb.js
-- rocksdbjni-10.7.5-linux32-musl.jar
-- rocksdbjni-10.7.5-linux32.jar
-- rocksdbjni-10.7.5-linux64-musl.jar
-- rocksdbjni-10.7.5-linux64.jar
-- rocksdbjni-10.7.5-osx.jar
-- rocksdbjni-10.7.5-win64.jar
+- rocksdbjni-10.8.3-linux32-musl.jar
+- rocksdbjni-10.8.3-linux32.jar
+- rocksdbjni-10.8.3-linux64-musl.jar
+- rocksdbjni-10.8.3-linux64.jar
+- rocksdbjni-10.8.3-osx.jar
+- rocksdbjni-10.8.3-win64.jar
 - tests/autoTestRocks.js
 - tests/autoTestRocks.yaml
 filesHash:
@@ -42,11 +42,11 @@ filesHash:
   .precompile: b256ffd9d67f0e98a0e3035d7c225e5b444837b5
   README.md: 098d238f3994cb44821651c2d2a8062f69ef5151
   rocksdb.js: 350d3097abeb5012d39a274f3020994a20c39284
-  rocksdbjni-10.7.5-linux32-musl.jar: 5c66834888461738e27e2f71494605e2b2e90564
-  rocksdbjni-10.7.5-linux32.jar: ede639e7b3dee60d769aa7d35db123eacefe9007
-  rocksdbjni-10.7.5-linux64-musl.jar: 6e0a534abecd9691ac98d02c1dca88499e496d5a
-  rocksdbjni-10.7.5-linux64.jar: af2a526770c8804491d2bab2a4280312ebae7130
-  rocksdbjni-10.7.5-osx.jar: e05173072ea87ca9ea4aaf3d86ebb025b630a7de
-  rocksdbjni-10.7.5-win64.jar: 21aef3fe76588598648d84f3ff770e7e2bf7e1d8
+  rocksdbjni-10.8.3-linux32-musl.jar: 83512465c9795d5781dc3d74a3686a52431b7935
+  rocksdbjni-10.8.3-linux32.jar: f6bad68b68e06b51eb6fb8fc3b3f17b874012006
+  rocksdbjni-10.8.3-linux64-musl.jar: c5b188ac507f9465910cad6d12cdb71a7fde2f08
+  rocksdbjni-10.8.3-linux64.jar: b6e952b1bd7038de47f6ec49b88c3d5e326b2686
+  rocksdbjni-10.8.3-osx.jar: a3d2706cbb9ff0795b277aae07ab9faae187bde4
+  rocksdbjni-10.8.3-win64.jar: e085a90736f39f7c570768189c23322bb6623e65
   tests/autoTestRocks.js: 0293c08829dd2db5f5d9d3030c613efb2c3773b7
   tests/autoTestRocks.yaml: 930233438b594f1ed9a01e3be2eecba77d1de2f4
