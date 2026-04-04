@@ -12,10 +12,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf
@@ -63,7 +63,7 @@ jobs:
     - name: Commit changes GooglePhoneNumber
       env :
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v5
+      uses: openaf/ojob-action@v7
       with:
         ojob: 'ojob.io/git/hub/checkIn'
         args: "message=\"Update GooglePhone\" paths=\"GooglePhoneNumber/\" title=\"Update GooglePhone oPack\" bodyFile=/tmp/output.out"
@@ -75,10 +75,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf
@@ -137,10 +137,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf
@@ -200,10 +200,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf
@@ -264,10 +264,10 @@ jobs:
       contents: write
       pull-requests: write
     steps      :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Cache OpenAF runtime
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf

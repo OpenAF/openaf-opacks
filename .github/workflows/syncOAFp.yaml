@@ -51,14 +51,14 @@ jobs:
     ## to use a more updated runtime.
     # --------------------------
     - name: Cache OpenAF runtime
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key : oaf-t8
         path: /tmp/oaf
 
     # --------------
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     
 
     ## Add here other steps
