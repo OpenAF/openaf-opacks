@@ -51,3 +51,39 @@ $kube().delete(def) // Deleting a namespace
 ```
 
 > You can transform an existing YAML definition into a JSON by executing: ```var def = io.readFileYAML('myobj.yaml')```
+
+Getting a list of all horizontal pod autoscalers in a namespace:
+
+```javascript
+$kube().getHPAs("default")
+$kube().getHPA("my-hpa", "default")
+```
+
+Getting a list of custom resource objects:
+
+```javascript
+$kube().list({
+  apiVersion: "argoproj.io/v1alpha1",
+  kind: "Application",
+  plural: "applications",
+  namespaced: true
+}, "argocd")
+```
+
+Getting and deleting a custom resource object:
+
+```javascript
+$kube().get({
+  apiVersion: "argoproj.io/v1alpha1",
+  kind: "Application",
+  plural: "applications",
+  namespaced: true
+}, "guestbook", "argocd")
+
+$kube().deleteObject({
+  apiVersion: "argoproj.io/v1alpha1",
+  kind: "Application",
+  plural: "applications",
+  namespaced: true
+}, "guestbook", "argocd")
+```

@@ -38,6 +38,18 @@ var $kube = function(aMap) {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
 			return _r._k.getObject(aNS, aKind, aName)
 		},
+		deleteObject: (aResource, aName, aNS) => {
+			aNS = _$(aNS, "aNS").default(_r._ns)
+			return _r._k.deleteObject(aNS, aResource, aName)
+		},
+		applyObject: (aObj, aNS) => {
+			aNS = _$(aNS, "aNS").default(_r._ns)
+			return _r._k.applyObject(aNS, aObj)
+		},
+		list : (aResource, aNS, full) => {
+			aNS = _$(aNS, "aNS").default(_r._ns)
+			return _r._k.listObjects(aNS, aResource, full)
+		},
 		apply: (aStream, aNS) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
 			return _r._k.apply(aNS, aStream)
@@ -65,6 +77,10 @@ var $kube = function(aMap) {
 		},
 		getNodesMetrics: () => _r._k.getNodesMetrics(),
 		getNodeMetrics: node => _r._k.getNodeMetrics(node),
+		getHPA: (aName, aNS) => {
+			aNS = _$(aNS, "aNS").default(_r._ns)
+			return _r._k.getHPA(aNS, aName)
+		},
 		getLog: (aNS, aPodName, aContainer, aStream) => {
 			aNS = _$(aNS, "aNS").isString().default(_r._ns)
 			return _r._k.getLog(aNS, aPodName, aContainer, aStream)
@@ -81,14 +97,19 @@ var $kube = function(aMap) {
 	  { ab: "ClusterRoleBindings", fn: "getClusterRoleBindings" },
 	  { ab: "Roles",  fn: "getRoles"       },
 	  { ab: "RoleBindings", fn: "getRoleBindings" },
+	  { ab: "HPAs",   fn: "getHPAs"        },
 	  { ab: "ING",    fn: "getIngresses"   },
+	  { ab: "IngressClasses", fn: "getIngressClasses" },
 	  { ab: "NetworkPolicies", fn: "getNetworkPolicies" },
+	  { ab: "EndpointSlices", fn: "getEndpointSlices" },
 	  { ab: "Quota",  fn: "getResourceQuotas" },
+	  { ab: "LimitRanges", fn: "getLimitRanges" },
 	  { ab: "StorageClasses", fn: "getStorageClasses" },
 	  { ab: "SVC",    fn: "getServices"    },
 	  { ab: "SA",     fn: "getServiceAccounts" },
 	  { ab: "Secrets",fn: "getSecrets"     },
 	  { ab: "RS",     fn: "getReplicaSets" },
+	  { ab: "RC",     fn: "getReplicationControllers" },
 	  { ab: "PVC",    fn: "getPersistentVolumeClaims" },
 	  { ab: "PV",     fn: "getPersistentVolumes" },
 	  { ab: "NO",     fn: "getNodes"       },
@@ -97,6 +118,13 @@ var $kube = function(aMap) {
 	  { ab: "Jobs",   fn: "getJobs"        },
 	  { ab: "DS",     fn: "getDaemonSets"  },
 	  { ab: "CJ",     fn: "getCronJobs"    },
+	  { ab: "PDBs",   fn: "getPodDisruptionBudgets" },
+	  { ab: "Leases", fn: "getLeases"      },
+	  { ab: "PriorityClasses", fn: "getPriorityClasses" },
+	  { ab: "RuntimeClasses", fn: "getRuntimeClasses" },
+	  { ab: "CSRs",   fn: "getCertificateSigningRequests" },
+	  { ab: "CRDs",   fn: "getCustomResourceDefinitions" },
+	  { ab: "APIServices", fn: "getAPIServices" },
 	  { ab: "Deploy", fn: "getDeployments" },
 	  { ab: "Version",fn: "getVersion"     },
 	  { ab: "Node",   fn: "getNode"        },
@@ -417,6 +445,118 @@ Kube.prototype.getNamespaces = function (full) {
 	}
 };
 
+Kube.prototype.__splitApiVersion = function(aApiVersion) {
+	aApiVersion = _$(aApiVersion, "aApiVersion").isString().default("v1")
+
+	if (aApiVersion.indexOf("/") >= 0) {
+		var parts = aApiVersion.split("/", 2)
+		return {
+			group    : parts[0],
+			version  : parts[1],
+			apiVersion: aApiVersion
+		}
+	}
+
+	return {
+		group    : "",
+		version  : aApiVersion,
+		apiVersion: aApiVersion
+	}
+}
+
+Kube.prototype.__guessPlural = function(aKind) {
+	aKind = _$(aKind, "aKind").isString().$_()
+
+	var _map = {
+		Endpoints: "endpoints",
+		EndpointSlice: "endpointslices",
+		Ingress: "ingresses",
+		IngressClass: "ingressclasses",
+		NetworkPolicy: "networkpolicies",
+		ResourceQuota: "resourcequotas",
+		StorageClass: "storageclasses",
+		Service: "services",
+		ServiceAccount: "serviceaccounts",
+		Secret: "secrets",
+		ReplicaSet: "replicasets",
+		ReplicationController: "replicationcontrollers",
+		PersistentVolumeClaim: "persistentvolumeclaims",
+		PersistentVolume: "persistentvolumes",
+		Node: "nodes",
+		Pod: "pods",
+		ConfigMap: "configmaps",
+		Job: "jobs",
+		DaemonSet: "daemonsets",
+		CronJob: "cronjobs",
+		Deployment: "deployments",
+		StatefulSet: "statefulsets",
+		HorizontalPodAutoscaler: "horizontalpodautoscalers",
+		PodDisruptionBudget: "poddisruptionbudgets",
+		LimitRange: "limitranges",
+		Lease: "leases",
+		PriorityClass: "priorityclasses",
+		RuntimeClass: "runtimeclasses",
+		CertificateSigningRequest: "certificatesigningrequests",
+		CustomResourceDefinition: "customresourcedefinitions",
+		APIService: "apiservices"
+	}
+
+	if (isDef(_map[aKind])) return _map[aKind]
+
+	var _kind = aKind.substring(0, 1).toLowerCase() + aKind.substring(1)
+	if (_kind.endsWith("s")) return _kind + "es"
+	if (_kind.endsWith("y")) return _kind.substring(0, _kind.length - 1) + "ies"
+	return _kind + "s"
+}
+
+Kube.prototype.__getResourceDescriptor = function(aResource, aVersion, aPlural, aNamespaced) {
+	var _r = {}
+
+	if (isMap(aResource)) {
+		_r = clone(aResource)
+	} else {
+		_r.kind = aResource
+		if (isDef(aVersion)) _r.apiVersion = aVersion
+		if (isDef(aPlural)) _r.plural = aPlural
+		if (isDef(aNamespaced)) _r.namespaced = aNamespaced
+	}
+
+	_$( _r.kind, "kind").isString().$_()
+
+	if (isUnDef(_r.apiVersion) && isDef(_r.version)) {
+		_r.apiVersion = (isDef(_r.group) && _r.group.length > 0) ? _r.group + "/" + _r.version : _r.version
+	}
+
+	var _v = this.__splitApiVersion(_$( _r.apiVersion, "apiVersion").isString().default("v1"))
+	_r.group      = _$( _r.group, "group").isString().default(_v.group)
+	_r.version    = _$( _r.version, "version").isString().default(_v.version)
+	_r.apiVersion = _r.group.length > 0 ? _r.group + "/" + _r.version : _r.version
+	_r.plural     = _$( _r.plural, "plural").isString().default(this.__guessPlural(_r.kind))
+	_r.namespaced = _$( _r.namespaced, "namespaced").isBoolean().default(true)
+
+	return _r
+}
+
+Kube.prototype.__getGenericResourceClient = function(aNamespace, aResource) {
+	var _r = this.__getResourceDescriptor(aResource)
+	var _c = this.client.genericKubernetesResources(
+		(new Packages.io.fabric8.kubernetes.client.dsl.base.ResourceDefinitionContext.Builder())
+		.withGroup(_r.group)
+		.withVersion(_r.version)
+		.withKind(_r.kind)
+		.withPlural(_r.plural)
+		.withNamespaced(_r.namespaced)
+		.build()
+	)
+
+	if (_r.namespaced) {
+		aNamespace = _$(aNamespace, "namespace").isString().default("default")
+		_c = _c.inNamespace(aNamespace)
+	}
+
+	return _c
+}
+
 /**
  * <odoc>
  * <key>Kube.getServices(aNamespace) : Array</key>
@@ -535,6 +675,16 @@ Kube.prototype.getIngresses = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getIngressClasses(aNamespace) : Array</key>
+ * Tries to retrieve the list of ingress classes on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getIngressClasses = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.network().v1().ingressClasses()) : this.__displayResult(this.client.network().v1().ingressClasses().list().items))
+}
+
+/**
+ * <odoc>
  * <key>Kube.getNetworkPolicies(aNamespace) : Array</key>
  * Tries to retrieve the list of network policies on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -549,6 +699,20 @@ Kube.prototype.getNetworkPolicies = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getEndpointSlices(aNamespace) : Array</key>
+ * Tries to retrieve the list of endpoint slices on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getEndpointSlices = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.discovery().v1().endpointSlices().inNamespace(aNamespace)) : this.__displayResult(this.client.discovery().v1().endpointSlices().inNamespace(aNamespace).list().items))
+	} else {
+		return (full ? this.__dR(this.client.discovery().v1().endpointSlices()) : this.__displayResult(this.client.discovery().v1().endpointSlices().list().items))
+	}
+}
+
+/**
+ * <odoc>
  * <key>Kube.getResourceQuotas(aNamespace) : Array</key>
  * Tries to retrieve the list of resource quotas on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -558,6 +722,20 @@ Kube.prototype.getResourceQuotas = function(aNamespace, full) {
 		return (full ? this.__dR(this.client.inNamespace(aNamespace).resourceQuotas()) : this.__displayResult(this.client.inNamespace(aNamespace).resourceQuotas().list().items))
 	} else {
 		return (full ? this.__dR(this.client.resourceQuotas()) : this.__displayResult(this.client.resourceQuotas().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getLimitRanges(aNamespace) : Array</key>
+ * Tries to retrieve the list of limit ranges on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getLimitRanges = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).limitRanges()) : this.__displayResult(this.client.inNamespace(aNamespace).limitRanges().list().items))
+	} else {
+		return (full ? this.__dR(this.client.limitRanges()) : this.__displayResult(this.client.limitRanges().list().items))
 	}
 }
 
@@ -642,6 +820,20 @@ Kube.prototype.getReplicaSets = function(aNamespace, full) {
 		return (full ? this.__dR(this.client.inNamespace(aNamespace).apps().replicaSets()) : this.__displayResult(this.client.inNamespace(aNamespace).apps().replicaSets().list().items));
 	} else {
 		return (full ? this.__dR(this.client.apps().replicaSets()) : this.__displayResult(this.client.apps().replicaSets().list().items));
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getReplicationControllers(aNamespace) : Array</key>
+ * Tries to retrieve the list of replication controllers on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getReplicationControllers = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).replicationControllers()) : this.__displayResult(this.client.inNamespace(aNamespace).replicationControllers().list().items));
+	} else {
+		return (full ? this.__dR(this.client.replicationControllers()) : this.__displayResult(this.client.replicationControllers().list().items));
 	}
 }
 
@@ -826,6 +1018,62 @@ Kube.prototype.getCronJobs = function(aNamespace, full) {
 
 /**
  * <odoc>
+ * <key>Kube.getHPAs(aNamespace) : Array</key>
+ * Tries to retrieve the list of horizontal pod autoscalers on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getHPAs = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.autoscaling().v2().horizontalPodAutoscalers().inNamespace(aNamespace)) : this.__displayResult(this.client.autoscaling().v2().horizontalPodAutoscalers().inNamespace(aNamespace).list().items))
+	} else {
+		return (full ? this.__dR(this.client.autoscaling().v2().horizontalPodAutoscalers()) : this.__displayResult(this.client.autoscaling().v2().horizontalPodAutoscalers().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getHPA(aNamespace, aName) : Map</key>
+ * Tries to retrieve the HPA aName on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getHPA = function(aNamespace, aName) {
+	if (isDef(aNamespace)) {
+		return this.__dR(this.client.autoscaling().v2().horizontalPodAutoscalers().inNamespace(aNamespace).withName(aName))
+	} else {
+		return this.__dR(this.client.autoscaling().v2().horizontalPodAutoscalers().withName(aName))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getPodDisruptionBudgets(aNamespace) : Array</key>
+ * Tries to retrieve the list of pod disruption budgets on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getPodDisruptionBudgets = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.policy().v1().podDisruptionBudget().inNamespace(aNamespace)) : this.__displayResult(this.client.policy().v1().podDisruptionBudget().inNamespace(aNamespace).list().items))
+	} else {
+		return (full ? this.__dR(this.client.policy().v1().podDisruptionBudget()) : this.__displayResult(this.client.policy().v1().podDisruptionBudget().list().items))
+	}
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getLeases(aNamespace) : Array</key>
+ * Tries to retrieve the list of leases on the current k8s cluster optionally filtering by the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.getLeases = function(aNamespace, full) {
+	if (isDef(aNamespace)) {
+		return (full ? this.__dR(this.client.inNamespace(aNamespace).leases()) : this.__displayResult(this.client.inNamespace(aNamespace).leases().list().items))
+	} else {
+		return (full ? this.__dR(this.client.leases()) : this.__displayResult(this.client.leases().list().items))
+	}
+}
+
+/**
+ * <odoc>
  * <key>Kube.getServiceAccounts(aNamespace) : Array</key>
  * Tries to retrieve the list of service accounts on the current k8s cluster optionally filtering by the provided aNamespace.
  * </odoc>
@@ -837,6 +1085,56 @@ Kube.prototype.getServiceAccounts = function(aNamespace, full) {
 		return (full ? this.__dR(this.client.serviceAccounts()) : this.__displayResult(this.client.serviceAccounts().list().items));
 	}
 };
+
+/**
+ * <odoc>
+ * <key>Kube.getPriorityClasses(aNamespace) : Array</key>
+ * Tries to retrieve the list of priority classes on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getPriorityClasses = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.scheduling().v1().priorityClasses()) : this.__displayResult(this.client.scheduling().v1().priorityClasses().list().items))
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getRuntimeClasses(aNamespace) : Array</key>
+ * Tries to retrieve the list of runtime classes on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getRuntimeClasses = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.runtimeClasses()) : this.__displayResult(this.client.runtimeClasses().list().items))
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getCertificateSigningRequests(aNamespace) : Array</key>
+ * Tries to retrieve the list of certificate signing requests on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getCertificateSigningRequests = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.certificates().v1().certificateSigningRequests()) : this.__displayResult(this.client.certificates().v1().certificateSigningRequests().list().items))
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getCustomResourceDefinitions(aNamespace) : Array</key>
+ * Tries to retrieve the list of custom resource definitions on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getCustomResourceDefinitions = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.apiextensions().v1().customResourceDefinitions()) : this.__displayResult(this.client.apiextensions().v1().customResourceDefinitions().list().items))
+}
+
+/**
+ * <odoc>
+ * <key>Kube.getAPIServices(aNamespace) : Array</key>
+ * Tries to retrieve the list of aggregated API services on the current k8s cluster.
+ * </odoc>
+ */
+Kube.prototype.getAPIServices = function(aNamespace, full) {
+	return (full ? this.__dR(this.client.apiServices()) : this.__displayResult(this.client.apiServices().list().items))
+}
 
 /**
  * <odoc>
@@ -899,11 +1197,29 @@ Kube.prototype.get = function(aNamespace, aStream) {
 
 /**
  * <odoc>
+ * <key>Kube.listObjects(aNamespace, aResource, full) : Array</key>
+ * Given aResource (e.g. { apiVersion: "argoproj.io/v1alpha1", kind: "Application", plural: "applications", namespaced: true })
+ * will try to list objects of that kind on the provided aNamespace.
+ * </odoc>
+ */
+Kube.prototype.listObjects = function(aNamespace, aResource, full) {
+	var _c = this.__getGenericResourceClient(aNamespace, aResource)
+	return (full ? this.__dR(_c) : this.__displayResult(_c.list().items))
+}
+
+/**
+ * <odoc>
  * <key>Kube.getObject(aNamespace, aKind, aName, aVersion) : Map</key>
- * Given an object aKind and aName will try to retrieve the current object definition.
+ * Given an object aKind and aName will try to retrieve the current object definition. For custom resources you can also provide
+ * aKind as a map such as { apiVersion, kind, plural, namespaced }.
  * </odoc>
  */
 Kube.prototype.getObject = function(aNamespace, aKind, aName, aVersion) {
+	if (isMap(aKind)) {
+		_$(aName, "name").isString().$_()
+		return this.__dR(this.__getGenericResourceClient(aNamespace, aKind).withName(aName))
+	}
+
 	_$(aNamespace, "namespace").isString().$_()
 	_$(aKind, "kind").isString().$_()
     _$(aName, "name").isString().$_()
@@ -917,6 +1233,35 @@ Kube.prototype.getObject = function(aNamespace, aKind, aName, aVersion) {
 		}
 	}))).fromServer().get())
 };
+
+/**
+ * <odoc>
+ * <key>Kube.deleteObject(aNamespace, aResource, aName) : Boolean</key>
+ * Given aResource (e.g. { apiVersion, kind, plural, namespaced }) and aName will try to delete the current object definition.
+ * </odoc>
+ */
+Kube.prototype.deleteObject = function(aNamespace, aResource, aName) {
+	_$(aName, "name").isString().$_()
+	return Boolean(this.__getGenericResourceClient(aNamespace, aResource).withName(aName).delete())
+}
+
+/**
+ * <odoc>
+ * <key>Kube.applyObject(aNamespace, aObj) : Map</key>
+ * Given aObj as an object it will try to apply it on the provided aNamespace using the generic Fabric8 resource API.
+ * </odoc>
+ */
+Kube.prototype.applyObject = function(aNamespace, aObj) {
+	_$(aObj, "aObj").isMap().$_()
+	if (isDef(aNamespace) && isUnDef(aObj.metadata)) aObj.metadata = {}
+	if (isDef(aNamespace) && isUnDef(aObj.metadata.namespace)) aObj.metadata.namespace = aNamespace
+	var aStream = af.fromString2InputStream(stringify(aObj))
+	if (isDef(aNamespace)) {
+		return this.__displayResult(this.client.inNamespace(aNamespace).load(aStream).createOrReplace())
+	} else {
+		return this.__displayResult(this.client.load(aStream).createOrReplace())
+	}
+}
 
 /**
  * <odoc>
