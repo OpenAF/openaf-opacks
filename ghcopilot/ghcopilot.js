@@ -26,7 +26,7 @@ ow.ai.__gpttypes.ghcopilot = {
     aOptions.disabledSkills   = _$(aOptions.disabledSkills,   "aOptions.disabledSkills").isArray().default(__)
     aOptions.availableTools   = _$(aOptions.availableTools,   "aOptions.availableTools").isArray().default(__)
     aOptions.excludedTools    = _$(aOptions.excludedTools,    "aOptions.excludedTools").isArray().default(__)
-    aOptions.excludeAllExistingTools = _$(aOptions.excludeAllExistingTools, "aOptions.excludeAllExistingTools").isBoolean().default(false)
+    aOptions.excludeAllExistingTools = _$(aOptions.excludeAllExistingTools, "aOptions.excludeAllExistingTools").isBoolean().default(true)
 
     var _conversation    = []
     var _lastStats       = __
