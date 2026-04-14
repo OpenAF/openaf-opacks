@@ -29,6 +29,7 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - mcp-notify.yaml
 - msteams.js
 - notificationsPushover.yaml
@@ -38,9 +39,10 @@ files:
 filesHash:
   .odoc.db: bccc183a8df3aebb9a9d894604dda29bdc23416c
   .precompile: 296680c7a954da9eb871b3c3ee40ff7fba58ee5d
-  mcp-notify.yaml: 4cf7bc2f560712eaba8a78057f1483da152816ba
-  msteams.js: c1b24936bbd2898a6d59dea3dcdd644e44213d39
+  README.md: 4c1216a263188bc9337700d7f0524f3d75530eb0
+  mcp-notify.yaml: cd9597c9e0ec47736a3371d49d7351ada3aedeb3
+  msteams.js: 36226eb5297c2941799c9abd53c33e815ef0491b
   notificationsPushover.yaml: c4fbfb5f947bd2f5b7c1d1ca3bd7bd45a06eaec5
-  notificationsSlack.yaml: f86a16cce73a37e5d2b7623e64e6437f134fafeb
+  notificationsSlack.yaml: d2e206929861cecf3fb9844255f69734b2906d0a
   pushover.js: a183d24a29956d69e96b01323e8769cdc3ae6c2d
-  slack.js: 92dbc7f3934e7da1e40c3643d06a89e38b01a9c1
+  slack.js: 4256a6fe055b7f68f7dc2a55c494b4beca14cbce
