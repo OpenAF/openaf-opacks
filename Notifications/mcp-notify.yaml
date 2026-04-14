@@ -1,15 +1,23 @@
 # Author: Nuno Aguiar
 help:
-  text   : A STDIO MCP notification server (Pushover)
-  expects: 
+  text   : A STDIO/HTTP MCP notification server (Pushover, Slack, MS Teams)
+  expects:
   - name     : pushoverkey
     desc     : Pushover API Key
     example  : "abc123"
-    mandatory: true
+    mandatory: false
   - name     : userid
     desc     : Pushover User Key
     example  : "def456"
-    mandatory: true
+    mandatory: false
+  - name     : slackWebhook
+    desc     : Slack incoming webhook URL
+    example  : "https://hooks.slack.com/services/..."
+    mandatory: false
+  - name     : teamsWebhook
+    desc     : MS Teams Workflows webhook URL
+    example  : "https://prod.webhooks.office.com/..."
+    mandatory: false
   - name     : onport
     desc     : If defined starts a MCP server on the provided port
     example  : "8888"
@@ -27,7 +35,7 @@ todo:
     ((fnsMeta)): &MCPFNSMETA
       sendNotification:
         name       : sendNotification
-        description: Sends a notification via Pushover.
+        description: Sends a push notification via Pushover.
         inputSchema:
           type      : object
           properties:
@@ -37,10 +45,61 @@ todo:
           required: [ message ]
         annotations:
           title         : sendNotification
-          readOnlyHint  : true
-          idempotentHint: true
+          readOnlyHint  : false
+          idempotentHint: false
+      sendSlackNotification:
+        name       : sendSlackNotification
+        description: Sends a message to Slack via an incoming webhook. Supports plain text or block layout with optional header.
+        inputSchema:
+          type      : object
+          properties:
+            message:
+              type       : string
+              description: Plain text message (required for mode=message)
+            mode:
+              type       : string
+              description: "Send mode: message (default) or block"
+              enum       : [ message, block ]
+            sectionTxt:
+              type       : string
+              description: "(block mode) Markdown section text"
+            contextTxt:
+              type       : string
+              description: "(block mode) Context line(s) as a single string"
+            headerTxt:
+              type       : string
+              description: "(block mode) Optional header text"
+          required: []
+        annotations:
+          title         : sendSlackNotification
+          readOnlyHint  : false
+          idempotentHint: false
+      sendTeamsNotification:
+        name       : sendTeamsNotification
+        description: Sends an Adaptive Card to MS Teams via a Workflows webhook with a title, body text and optional key-value fact table.
+        inputSchema:
+          type      : object
+          properties:
+            title:
+              type       : string
+              description: Card title displayed in bold
+            message:
+              type       : string
+              description: Card body text
+            facts:
+              type                : object
+              description         : Optional key-value pairs rendered as a fact table
+              additionalProperties:
+                type: string
+          required: [ title, message ]
+        annotations:
+          title         : sendTeamsNotification
+          readOnlyHint  : false
+          idempotentHint: false
     ((fns    )): &MCPFNS
-      sendNotification  : Send notification
+      sendNotification      : Send notification
+      sendSlackNotification : Send Slack notification
+      sendTeamsNotification : Send Teams notification
   ((else)):
   - (stdioMCP ): *MCPSERVER
     ((fnsMeta)): *MCPFNSMETA
@@ -52,31 +111,48 @@ ojob:
   - oJob-common: 20250914
   - Notifications
   catch       : printErrnl("[" + job.name + "] "); $err(exception, __, __, job.exec)
-  logToConsole: false   # to change when finished
+  logToConsole: false
   argsFromEnvs: true
   daemon      : true
   loadLibs    :
   - pushover.js
-        
+
 include:
 - oJobMCP.yaml
 
 jobs:
 # -----------
 - name : Init
-  check:
-    in:
-      pushoverkey: isString
-      userid     : isString
   exec : | #js
-    global.pushoverkey = args.pushoverkey
-    global.userid      = args.userid
+    var _hasAny = false
+
+    if (isDef(args.pushoverkey) && isDef(args.userid)) {
+      _$(args.pushoverkey, "pushoverkey").isString().$_()
+      _$(args.userid, "userid").isString().$_()
+      global.pushoverkey = args.pushoverkey
+      global.userid      = args.userid
+      _hasAny = true
+    }
+
+    if (isDef(args.slackWebhook)) {
+      _$(args.slackWebhook, "slackWebhook").isString().$_()
+      global.slackWebhook = args.slackWebhook
+      _hasAny = true
+    }
+
+    if (isDef(args.teamsWebhook)) {
+      _$(args.teamsWebhook, "teamsWebhook").isString().$_()
+      global.teamsWebhook = args.teamsWebhook
+      _hasAny = true
+    }
+
+    if (!_hasAny) throw "At least one notification target must be configured (pushoverkey+userid, slackWebhook, or teamsWebhook)"
 
 # ------------------------
 - name : Send notification
   check:
     in:
-      message    : isString
+      message: isString
   exec : | #js
     var po
     try {
@@ -86,4 +162,55 @@ jobs:
     } catch(e) {
       logErr("Error sending Pushover notification: " + e.toString())
       return "[ERROR] Couldn't send notification."
+    }
+
+# ----------------------------
+- name : Send Slack notification
+  check:
+    in:
+      message   : isString.default("")
+      mode      : isString.default("message")
+      sectionTxt: isString.default("")
+      contextTxt: isString.default(__)
+      headerTxt : isString.default(__)
+  exec : | #js
+    if (isUnDef(global.slackWebhook)) {
+      logErr("Slack webhook not configured")
+      return "[ERROR] Slack webhook not configured."
+    }
+    try {
+      loadLib("slack.js")
+      var sl = new Slack(global.slackWebhook)
+      if (args.mode === "block") {
+        sl.sendBlock(args.sectionTxt, args.contextTxt, args.headerTxt)
+      } else {
+        if (!args.message) return "[ERROR] message is required for mode=message"
+        sl.send(args.message)
+      }
+      return "Slack notification sent."
+    } catch(e) {
+      logErr("Error sending Slack notification: " + e.toString())
+      return "[ERROR] Couldn't send Slack notification."
+    }
+
+# ----------------------------
+- name : Send Teams notification
+  check:
+    in:
+      title  : isString
+      message: isString
+      facts  : isMap.default({})
+  exec : | #js
+    if (isUnDef(global.teamsWebhook)) {
+      logErr("Teams webhook not configured")
+      return "[ERROR] Teams webhook not configured."
+    }
+    try {
+      loadLib("msteams.js")
+      var ms = new MSTeams(global.teamsWebhook)
+      ms.sendSection(args.title, args.message, args.facts)
+      return "Teams notification sent."
+    } catch(e) {
+      logErr("Error sending Teams notification: " + e.toString())
+      return "[ERROR] Couldn't send Teams notification."
     }

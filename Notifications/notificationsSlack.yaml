@@ -1,21 +1,91 @@
 jobs:
-  - name: Send Slack
-    help: >
-      Sends a messange to Slack. Expects:
+- name: Send Slack
+  help:
+    text: Sends a message to Slack via an incoming webhook.
+    expects:
+    - name     : webHookURL
+      desc     : The Slack incoming webhook URL
+      example  : "https://hooks.slack.com/services/..."
+      mandatory: true
+    - name     : message
+      desc     : Message text (plain text or Slack markdown). Required for mode=message and mode=attachments.
+      example  : "Hello from OpenAF"
+      mandatory: false
+    - name     : attachments
+      desc     : Array of attachment maps (mode=attachments). See https://api.slack.com/docs/message-formatting
+      mandatory: false
+    - name     : mode
+      desc     : "Send mode: message (default), attachments, or block"
+      example  : "block"
+      mandatory: false
+    - name     : sectionTxt
+      desc     : "(block mode) Markdown section text"
+      example  : "*Alert*: something happened"
+      mandatory: false
+    - name     : contextTxt
+      desc     : "(block mode) Context line string or array of strings"
+      example  : "env: prod"
+      mandatory: false
+    - name     : headerTxt
+      desc     : "(block mode) Optional header text (plain)"
+      example  : "Deployment complete"
+      mandatory: false
+    - name     : headerEmoji
+      desc     : "(block mode) Emoji for header block, defaults to :bell:"
+      example  : ":rocket:"
+      mandatory: false
+    - name     : channel
+      desc     : Override the default webhook channel
+      mandatory: false
+    - name     : username
+      desc     : Override the bot display name
+      mandatory: false
 
-        webHookURL      (String) The Slack web hook URL
-        message         (String) A markdown Slack pre-message
-        attachments     (Array)  An array of maps (see https://api.slack.com/docs/message-formatting)
+  check:
+    in:
+      webHookURL : isString
+      message    : isString.default("")
+      attachments: default(__)
+      mode       : isString.default("message")
+      sectionTxt : isString.default("")
+      contextTxt : default(__)
+      headerTxt  : isString.default(__)
+      headerEmoji: isString.default(__)
+      channel    : isString.default(__)
+      username   : isString.default(__)
 
-    exec: |
-      _$(args.webHookURL).isString().$_("Please provide a Slack web hook URL");
-      _$(args.message).isString().$_("Please provide a message to send.");
-      args.attachments = _$(args.attachments).isArray().default(void 0);
+  typeArgs:
+    shortcut:
+      name  : sendSlack
+      keyArg: message
+      args  :
+        webHookURL : webHookURL
+        message    : message
+        attachments: attachments
+        mode       : mode
+        sectionTxt : sectionTxt
+        contextTxt : contextTxt
+        headerTxt  : headerTxt
+        headerEmoji: headerEmoji
+        channel    : channel
+        username   : username
 
-      loadLib("slack.js");
-      var sl = new Slack(args.webHookURL);
-      if (isUnDef(args.attachments)) {
-        sl.send(args.message);
-      } else {
-        sl.sendAttachments(args.message, args.attachments);
-      }
+  exec: |
+    loadLib("slack.js");
+    var sl  = new Slack(args.webHookURL);
+    var opt = {};
+    if (isDef(args.channel))  opt.channel  = args.channel;
+    if (isDef(args.username)) opt.username = args.username;
+
+    switch(args.mode) {
+    case "block":
+      sl.sendBlock(args.sectionTxt, args.contextTxt, args.headerTxt, args.headerEmoji, opt);
+      break;
+    case "attachments":
+      _$(args.attachments).isArray().$_("Please provide an attachments array for mode=attachments");
+      sl.sendAttachments(args.message, args.attachments, opt);
+      break;
+    default:
+      _$(args.message).isString().$_("Please provide a message");
+      sl.send(args.message, opt);
+    }
