@@ -38,6 +38,8 @@ dependencies:
   OpenAF: '>=20250315'
 files:
 - .odoc.db
+- .openaf_precompiled/.t8-20260324
+- .openaf_precompiled/aws_core_js.class
 - .package.yaml
 - .precompile
 - aws.js
@@ -73,6 +75,8 @@ files:
 - utils/testRegions.js
 filesHash:
   .odoc.db: 00582f8d0d0d89d3f846288b5b3c8ae9e7778df8
+  .openaf_precompiled/.t8-20260324: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/aws_core_js.class: b5632fe3953c2325a8b8b3e36e0a197d4dccfcba
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
