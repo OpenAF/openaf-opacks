@@ -324,7 +324,85 @@ ow.ai.__gpttypes.bedrock = {
       _lastStats = stats
       return _lastStats
     }
+    var _reasoningTagNames = {
+      think: true, thinking: true, thought: true, thoughts: true,
+      analysis: true, reasoning: true, rationale: true, plan: true,
+      scratchpad: true, chainofthought: true, thinkingprocess: true,
+      innerthought: true, innermonologue: true, assistantthoughts: true
+    }
+    var _reasoningFieldNames = {
+      reasoning: true, thinking: true, thought: true, thoughts: true,
+      reasoningContent: true, reasoning_content: true,
+      reasoningText: true, reasoning_text: true
+    }
+    var _normalizeReasoningTag = tag => String(tag || "").toLowerCase().replace(/[\s_-]+/g, "")
+    var _stripReasoningTags = text => {
+      if (!isString(text)) return text
+      return String(text).replace(/<\s*([a-zA-Z0-9_-]+)(?:\s[^>]*)?>([\s\S]*?)<\/\s*\1\s*>/mg, (match, tag) => {
+        return _reasoningTagNames[_normalizeReasoningTag(tag)] ? "" : match
+      }).trim()
+    }
+    var _isReasoningPart = value => {
+      if (!isMap(value) || !isString(value.type)) return false
+      return _reasoningTagNames[_normalizeReasoningTag(value.type)] === true
+    }
+    var _reasoningSafeText = value => {
+      if (isUnDef(value) || value === null) return null
+      if (isString(value)) return _stripReasoningTags(value)
+      if (isNumber(value) || isBoolean(value)) return String(value)
+      if (isArray(value)) {
+        var parts = value.map(v => _reasoningSafeText(v)).filter(v => isString(v) && v.length > 0)
+        return parts.length > 0 ? parts.join("\n") : null
+      }
+      if (isMap(value)) {
+        if (isDef(value.toolUse) || isDef(value.toolResult) || value.type == "tool_use" || value.type == "toolUse" || value.type == "tool_result" || value.type == "toolResult") return null
+        if (_isReasoningPart(value)) return null
+        if (isDef(value.text)) return _reasoningSafeText(value.text)
+        if (isDef(value.json)) {
+          try { return isString(value.json) ? _stripReasoningTags(value.json) : JSON.stringify(value.json) } catch (e) { return _stripReasoningTags(String(value.json)) }
+        }
+        if (isDef(value.value)) return _reasoningSafeText(value.value)
+        if (isDef(value.content)) return _reasoningSafeText(value.content)
+        if (isDef(value.message)) return _reasoningSafeText(value.message)
+        if (isDef(value.data)) return _reasoningSafeText(value.data)
+        if (isDef(value.outputText)) return _reasoningSafeText(value.outputText)
+        if (isDef(value.output_text)) return _reasoningSafeText(value.output_text)
+        if (isDef(value.generated_text)) return _reasoningSafeText(value.generated_text)
+
+        var sanitized = {}
+        Object.keys(value).forEach(k => {
+          if (_reasoningFieldNames[k]) return
+          sanitized[k] = value[k]
+        })
+        if (Object.keys(sanitized).length == 0) return null
+        try { return _stripReasoningTags(JSON.stringify(sanitized)) } catch (e) { return _stripReasoningTags(String(sanitized)) }
+      }
+      return _stripReasoningTags(String(value))
+    }
+    var _sanitizeAssistantContent = value => {
+      if (aOptions.showReasoning) return value
+      if (isArray(value)) {
+        return value.map(v => _sanitizeAssistantContent(v)).filter(v => isDef(v) && (!isString(v) || v.length > 0))
+      }
+      if (isMap(value)) {
+        if (_isReasoningPart(value)) return __
+        var clone = {}
+        Object.keys(value).forEach(k => {
+          if (_reasoningFieldNames[k]) return
+          if (k == "content") {
+            clone[k] = _sanitizeAssistantContent(value[k])
+          } else if (k == "text" && isDef(value[k])) {
+            clone[k] = _stripReasoningTags(String(value[k]))
+          } else {
+            clone[k] = value[k]
+          }
+        })
+        return Object.keys(clone).length > 0 ? clone : __
+      }
+      return isString(value) ? _stripReasoningTags(value) : value
+    }
     var _contentToPortableText = value => {
+      if (!aOptions.showReasoning) return _reasoningSafeText(value)
       if (isUnDef(value)) return null
       if (isString(value)) return value
       if (isNumber(value) || isBoolean(value)) return String(value)
@@ -449,6 +527,41 @@ ow.ai.__gpttypes.bedrock = {
       var txt = _contentToPortableText(value)
       return isDef(txt) ? txt : value
     }
+    var _extractJSONResponseText = value => {
+      if (isUnDef(value)) return __
+      if (isString(value)) return value
+      if (isMap(value)) {
+        if (isMap(value.message) && isString(value.message.content)) return value.message.content
+        if (isString(value.response)) return value.response
+        if (isDef(value.output) && isDef(value.output.message)) {
+          var _msg = value.output.message
+          var _content = isArray(_msg) ? _msg : [ _msg ]
+          var _parts = []
+          _content.forEach(msg => {
+            if (!isMap(msg) || !isArray(msg.content)) return
+            msg.content.forEach(c => {
+              if (isMap(c)) {
+                if (c.type === "text" && isDef(c.text)) {
+                  _parts.push(String(c.text))
+                } else if (isDef(c.json)) {
+                  try {
+                    _parts.push(isString(c.json) ? c.json : JSON.stringify(c.json))
+                  } catch(e) {
+                    _parts.push(String(c.json))
+                  }
+                } else if (isDef(c.text)) {
+                  _parts.push(String(c.text))
+                }
+              } else if (isString(c)) {
+                _parts.push(c)
+              }
+            })
+          })
+          if (_parts.length > 0) return _parts.join("")
+        }
+      }
+      return __
+    }
     var _r = {
       conversation: [],
       tools: {},
@@ -563,32 +676,9 @@ ow.ai.__gpttypes.bedrock = {
         var __r = _r.rawPrompt(aPrompt, aModel, aTemperature, aJsonFlag, tools)
 
         // Handle Nova/Anthropic/Claude structured output when JSON flag is true
-        if (aJsonFlag && isMap(__r) && isDef(__r.output) && isDef(__r.output.message)) {
-          var msg = __r.output.message
-          if (isArray(msg.content)) {
-            var textParts = []
-            msg.content.forEach(c => {
-              if (isMap(c)) {
-                // Handle text content
-                if (c.type === "text" && isDef(c.text)) {
-                  textParts.push(c.text)
-                }
-                // Handle JSON content (Nova models)
-                else if (isDef(c.json)) {
-                  textParts.push(isString(c.json) ? c.json : JSON.stringify(c.json))
-                }
-                // Handle plain text without type
-                else if (isDef(c.text)) {
-                  textParts.push(c.text)
-                }
-              } else if (isString(c)) {
-                textParts.push(c)
-              }
-            })
-            if (textParts.length > 0) {
-              return textParts.join("")
-            }
-          }
+        if (aJsonFlag) {
+          var _jsonText = _extractJSONResponseText(__r)
+          if (isString(_jsonText) && _jsonText.length > 0) return _jsonText
         }
 
         if (isDef(__r) && isArray(__r.results) && __r.results.length > 0) {
@@ -699,6 +789,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         var openAIContentToText = function(value) {
+          if (!aOptions.showReasoning) return _reasoningSafeText(value) || ""
           if (isUnDef(value)) return ""
           if (isString(value)) return value
           if (isNumber(value) || isBoolean(value)) return String(value)
@@ -736,11 +827,11 @@ ow.ai.__gpttypes.bedrock = {
 
         var removeReasoningTags = function(text) {
           if (!isString(text)) return text
-          // Remove <reasoning>...</reasoning> tags and their content
-          return text.replace(/<reasoning>[\s\S]*?<\/reasoning>/mgi, '').trim()
+          return _stripReasoningTags(text)
         }
 
         var novaToText = function(value) {
+          if (!aOptions.showReasoning) return _reasoningSafeText(value) || ""
           if (isUnDef(value)) return ""
           if (isString(value)) return value
           if (isNumber(value) || isBoolean(value)) return String(value)
@@ -924,6 +1015,7 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           var toTextForMistralMsg = function(content) {
+            if (!aOptions.showReasoning) return _reasoningSafeText(content) || ""
             if (isUnDef(content)) return ""
             if (isString(content)) return content
             if (isArray(content)) return content.map(toTextForMistralMsg).join("")
@@ -1172,6 +1264,7 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           var toText = function(content) {
+            if (!aOptions.showReasoning) return _reasoningSafeText(content) || ""
             if (isUnDef(content)) return ""
             if (isString(content)) return content
             if (isArray(content)) return content.map(toText).join("")
@@ -1266,6 +1359,7 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           var toText = function(content) {
+            if (!aOptions.showReasoning) return _reasoningSafeText(content) || ""
             if (isUnDef(content)) return ""
             if (isString(content)) return content
             if (isArray(content)) return content.map(toText).join("")
@@ -1349,10 +1443,13 @@ ow.ai.__gpttypes.bedrock = {
             }
             if (!isString(mstoredMessage.role)) mstoredMessage.role = "assistant"
             if (isUnDef(mstoredMessage.content)) mstoredMessage.content = ""
+            if (String(mstoredMessage.role).toLowerCase() === "assistant") {
+              mstoredMessage.content = _sanitizeAssistantContent(mstoredMessage.content)
+            }
             _r.conversation.push(mstoredMessage)
 
             if (isString(mmessage.content) && mmessage.content.length > 0) {
-              cv.push(mmessage.content)
+              cv.push(aOptions.showReasoning ? mmessage.content : (_reasoningSafeText(mmessage.content) || ""))
             }
           }
         }
@@ -1375,6 +1472,9 @@ ow.ai.__gpttypes.bedrock = {
             }
             if (!isString(storedMessage.role)) storedMessage.role = "assistant"
             if (isUnDef(storedMessage.content)) storedMessage.content = ""
+            if (String(storedMessage.role).toLowerCase() === "assistant") {
+              storedMessage.content = _sanitizeAssistantContent(storedMessage.content)
+            }
             _r.conversation.push(storedMessage)
 
             var choiceToolCalls = []
@@ -1484,12 +1584,17 @@ ow.ai.__gpttypes.bedrock = {
           return finalText
         }
 
-        if (isDef(res.generation)) return res.generation
+        if (isDef(res.generation)) return aOptions.showReasoning ? res.generation : (_reasoningSafeText(res.generation) || "")
 
         if (isArray(res.outputs)) {
           var mistralTexts = []
           var collectText = function(part) {
             if (isUnDef(part)) return
+            if (!aOptions.showReasoning) {
+              var sanitizedPart = _reasoningSafeText(part)
+              if (isString(sanitizedPart) && sanitizedPart.length > 0) mistralTexts.push(sanitizedPart)
+              return
+            }
             if (isString(part)) {
               if (String(part).length > 0) mistralTexts.push(String(part))
             } else if (isArray(part)) {
@@ -1547,6 +1652,9 @@ ow.ai.__gpttypes.bedrock = {
           for (var mi = 0; mi < messages.length; mi++) {
             var msg = messages[mi]
             // keep conversation updated
+            if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
+              msg = merge(msg, { content: _sanitizeAssistantContent(msg.content) })
+            }
             _r.conversation.push(msg)
 
             // If message contains an array of content parts, iterate
@@ -1689,7 +1797,10 @@ ow.ai.__gpttypes.bedrock = {
                   if (!isDef(content.toolUse) && content.type != "tool_use") {
                     // Only collect assistant text responses
                     if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
-                      if (isString(content)) {
+                      if (!aOptions.showReasoning) {
+                        var sanitizedContent = _reasoningSafeText(content)
+                        if (isString(sanitizedContent) && sanitizedContent.length > 0) cv.push(sanitizedContent)
+                      } else if (isString(content)) {
                         cv.push(content)
                       } else if (isMap(content)) {
                         if (isDef(content.text)) {
@@ -1709,21 +1820,31 @@ ow.ai.__gpttypes.bedrock = {
             } else {
               // If content is not an array, and role is assistant, append its string form
               if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
-                cv.push(String(msg.content))
+                if (!aOptions.showReasoning) {
+                  var sanitizedMessage = _reasoningSafeText(msg.content)
+                  if (isString(sanitizedMessage) && sanitizedMessage.length > 0) cv.push(sanitizedMessage)
+                } else {
+                  cv.push(String(msg.content))
+                }
               }
             }
           }
         } else if (isDef(res.outputText)) {
           // Some models return outputText / text fields
-          cv.push(String(res.outputText))
+          cv.push(aOptions.showReasoning ? String(res.outputText) : (_reasoningSafeText(res.outputText) || ""))
           _r.conversation.push({ role: "assistant", content: res.outputText })
         } else if (isString(res)) {
-          cv.push(res)
+          cv.push(aOptions.showReasoning ? res : (_reasoningSafeText(res) || ""))
         } else if (isMap(res) && isDef(res.output) && isString(res.output)) {
-          cv.push(res.output)
+          cv.push(aOptions.showReasoning ? res.output : (_reasoningSafeText(res.output) || ""))
         }
 
         if (aJsonFlag) {
+          var _jsonResponseText = _extractJSONResponseText(res)
+          if (isString(_jsonResponseText) && _jsonResponseText.length > 0) {
+            if (isMap(res) && !isString(res.response)) res.response = _jsonResponseText
+            if (isMap(res) && !isMap(res.message)) res.message = { content: _jsonResponseText }
+          }
           _r.conversation.push(res)
           return res
         } else {
