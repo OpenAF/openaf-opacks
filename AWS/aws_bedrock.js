@@ -235,6 +235,9 @@ ow.ai.__gpttypes.bedrock = {
     aOptions.temperature = _$(aOptions.temperature, "aOptions.temperature").isNumber().default(__)
     aOptions.region = _$(aOptions.region, "aOptions.region").isString().default("us-east-1")
     aOptions.showReasoning = _$(aOptions.showReasoning, "aOptions.showReasoning").isBoolean().default(false)
+    aOptions.strictToolMsg = _$(aOptions.strictToolMsg, "aOptions.strictToolMsg").isBoolean().default(
+      _$(aOptions.params.strictToolMsg, "aOptions.params.strictToolMsg").isBoolean().default(false)
+    )
 
     var aws = new AWS()
     var _model = aOptions.model
@@ -2363,10 +2366,22 @@ ow.ai.__gpttypes.bedrock = {
           // OpenAI format
           var messages = []
           _r.conversation.forEach(function(msg) {
-            messages.push({
+            var serializedMsg = {
               role: msg.role,
               content: msg.content
-            })
+            }
+            if (aOptions.strictToolMsg) {
+              if (isString(msg.tool_call_id)) serializedMsg.tool_call_id = msg.tool_call_id
+              if (isArray(msg.tool_calls)) {
+                try {
+                  serializedMsg.tool_calls = JSON.parse(JSON.stringify(msg.tool_calls))
+                } catch (je) {
+                  serializedMsg.tool_calls = msg.tool_calls
+                }
+              }
+              if (isString(msg.id)) serializedMsg.id = msg.id
+            }
+            messages.push(serializedMsg)
           })
 
           var messagesForAPI = messages
