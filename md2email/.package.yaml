@@ -25,7 +25,6 @@ version: '20260418'
 dependencies:
   openaf: '>=20221216'
 files:
-- .claude/settings.local.json
 - .maven.yaml
 - .odoc.db
 - .openaf_precompiled/.t8-20260413
@@ -47,7 +46,6 @@ files:
 - tests/autoTestMd2Email.js
 - tests/autoTestMd2Email.yaml
 filesHash:
-  .claude/settings.local.json: 55519198ba9459892e490caef781be25402af37a
   .maven.yaml: 8596346e434ff996e698e26660e6c2221bee77fc
   .odoc.db: 2c54de7c58f4eaa9bf4c6f0523303f3442901431
   .openaf_precompiled/.t8-20260413: da39a3ee5e6b4b0d3255bfef95601890afd80709
