@@ -18,7 +18,7 @@ name: plugin-GIT
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260220'
+version: '20260418'
 dependencies:
   openaf: '>=20230704'
 files:
@@ -28,17 +28,17 @@ files:
 - JavaEWAH-1.2.3.jar
 - README.md
 - compile.yaml
-- org.eclipse.jgit-7.5.0.202512021534-r.jar
+- org.eclipse.jgit-7.6.0.202603022253-r.jar
 - plugin-git.jar
 - src/openaf/plugins/GIT.class
 - src/openaf/plugins/GIT.java
 filesHash:
-  .maven.yaml: 4027c6c92cf02b4d8808aec1b743c9074b48f25c
-  .odoc.db: 3ac832f2e8d49d9c7bc43c12b45eef8ef1f60e77
+  .maven.yaml: 36161a963e6b2b726d04cadcd87c031e22acdb04
+  .odoc.db: e8103b29125f38e06251f0df0bbfa07ad699f0ba
   JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
   README.md: 3c52f958f88b7bcea305a37c1f3f25d6680776c7
   compile.yaml: 8cba5f4eac9724a275b3c9f1484ae8bc3f950cc2
-  org.eclipse.jgit-7.5.0.202512021534-r.jar: 55647c66694ace25ee42be42aff619125cd58b29
-  plugin-git.jar: b16487765bd3ebdb186733fa043de2b161f9c02b
+  org.eclipse.jgit-7.6.0.202603022253-r.jar: 1c6d9f63581d24c9a7d9c50a6dbe6ab6df13dc0f
+  plugin-git.jar: 0864309847d48c46e65666c31775052fa1ec2a2c
   src/openaf/plugins/GIT.class: d7d5caf6148eeea0a006d923101b4c940cd0d52f
   src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11
