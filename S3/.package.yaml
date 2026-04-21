@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260325'
+version: '20260420'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -28,7 +28,7 @@ files:
 - .precompile
 - README.md
 - annotations-13.0.jar
-- bcprov-jdk18on-1.82.jar
+- bcprov-jdk18on-1.84.jar
 - error_prone_annotations-2.41.0.jar
 - failureaccess-1.0.3.jar
 - guava-33.5.0-jre.jar
@@ -49,7 +49,7 @@ filesHash:
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 276fa3fc3f5fc129d58636dc84883f8bfce69ce9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
-  bcprov-jdk18on-1.82.jar: e1118397395d21909a1b7b15120d0c2a68d7fd0c
+  bcprov-jdk18on-1.84.jar: 2d5651789941d2f8ae9b8771f23356de6b61e96b
   error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
   guava-33.5.0-jre.jar: 8699de25f2f979108d6c1b804a7ba38cda1116bc
