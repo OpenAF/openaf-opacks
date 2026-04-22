@@ -743,11 +743,17 @@ List of options to use when _out=chart_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| chart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". The 'unit' used should be either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. The 'path' is equivalent to the 'path=' jmespath filter (quotes should be used for non-basic 'path' expressions; and '@' should be used for the current value). The 'color' should be one of the basic color names. The 'legend' should be the label of the value (in quotes if includes spaces) |
-| chartcls | Boolean | If true the screen will be cleared for each execution |
+| chart  | String | Chart definition in the format `"<unit> <path:color:legend>... [-min:<n>] [-max:<n>] [-hsize:<n>] [-vsize:<n>]"`. The 'unit' must be one of: `int`, `dec1`, `dec2`, `dec3`, `dec4`, `dec`, `bytes` or `si`. The 'path' is a JMESPath expression equivalent to the `path=` filter (use quotes for non-basic expressions; use `@` for the current root value). The 'color' should be one of the basic ANSI color names. The 'legend' is the series label (quote it if it contains spaces). The `-min` and `-max` flags set the Y-axis range; `-hsize` and `-vsize` override the default chart width and height in terminal columns/rows. |
+| chartcls | Boolean | If true the screen will be cleared before rendering each update (alternative to `loopcls=true`) |
 
-Example: 
-```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart chartcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+Examples:
+```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart loopcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+
+```oafp cmd="uptime" in=raw path="replace(trim(@), '.+ ([\d\.]+),? ([\d\.]+),? ([\d\.]+)$', '', '$1|$2|$3').split(@,'|')" out=chart chart="dec2 [0]:green:load1m [1]:yellow:load5m [2]:red:load15m -min:0" loop=1 loopcls=true```
+
+```oafp cmd="ps -p 12345 -o %cpu,%mem" in=lines linesvisual=true linesvisualsepre="\\s+" out=chart chart="int '\"%CPU\"':red:cpu '\"%MEM\"':blue:mem -min:0 -max:100" loop=1 loopcls=true```
+
+```HOST=1.1.1.1 && PORT=53 && oafp in=oaf data="data=ow.loadNet().testPortLatency('$HOST',$PORT)" out=chart chart="int @:red:latencyMS -min:0" loop=1 loopcls=true```
 
 ---
 
@@ -860,15 +866,35 @@ List of options to use when _out=grid_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| grid   | String | A JSON/SLON configuration composed of an array with another array per grid line. Each line array should have a map per column (see below for the map options) | 
+| grid   | String | A JSON/SLON configuration structured as an array of row arrays. Each row array contains one map per column cell (see column cell options below). |
 
-Each map should be composed of a:
+Each column cell map supports:
 
-  * 'title'
-  * 'type' (tree, map, chart, bar, table, area, text and md)
-  * a 'path' to select the data (for non chart types) 
-  * an 'obj' (for chart type the format is the same of chart=...) 
-  * or 'cmd' (to run a command that outputs json on stdout)
+| Field | Type | Description |
+|-------|------|-------------|
+| title | String | Label displayed as a bold header above the cell content. Auto-set from `path` if not provided. |
+| type  | String | Rendering type: `tree` (default for maps/arrays), `map`, `table`, `chart`, `bar`, `area`, `text`, `md`, `func`, or `empty` |
+| path  | String | JMESPath expression to select data from the pipeline input (use `@` for root). Auto-sets `title` if not provided. |
+| obj   | String | Data or format string to render. For `chart`: same format as `chart=`; for `bar`: same format as `bar=`; for `func`: JS function body with `mx` (height) and `my` (width) args returning a string. |
+| cmd   | String | Shell command whose JSON stdout is used as cell data instead of the pipeline input. |
+| xspan | Number | Number of columns this cell spans (default: 1). |
+| yspan | Number | Number of rows this cell spans (default: 1). |
+
+Extra fields for `bar` type cells:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| max   | Number | Maximum value for the bar scale |
+| min   | Number | Minimum value for the bar scale |
+| indicator | String | Bar fill character (default: `━`) |
+| space | String | Background character (default: ` `) |
+
+Examples:
+```oafp cmd="cat /sys/fs/cgroup/cpu.stat | sed 's/ /: /g'" in=yaml out=grid grid="[[(title:cpu.stat,type:tree)|(title:chart,type:chart,obj:'int nr_throttled:red:throttled nr_bursts:blue:bursts -min:0 -vsize:10')]]" loop=1 loopcls=true```
+
+```HSPERF=/tmp/hsperfdata_user/12345 && oafp $HSPERF in=hsperf path=java out=grid grid="[[(title:Threads,type:chart,obj:'int threads.live:green:live threads.livePeak:red:peak threads.daemon:blue:daemon -min:0')|(title:ClassLoaders,type:chart,obj:'int cls.loadedClasses:blue:loaded cls.unloadedClasses:red:unloaded')]|[(title:Heap,type:chart,obj:'bytes __mem.total:red:total __mem.used:blue:used -min:0')|(title:Metaspace,type:chart,obj:'bytes __mem.metaTotal:blue:total __mem.metaUsed:green:used -min:0')]]" loop=1 loopcls=true```
+
+```NS=my-namespace && POD=my-pod-123 && oafp cmd="kubectl top -n $NS pod $POD" in=lines linesvisual=true path="[].{name:NAME,cpu:from_siAbbr(\"CPU(cores)\"),mem:from_bytesAbbr(\"MEMORY(bytes)\")}" out=grid grid="[[(title:cpu,type:chart,obj:'dec3 cpu:blue:cpu -min:0')|(title:mem,type:chart,obj:'bytes mem:green:mem -min:0')]]" loop=2 loopcls=true```
 
 ---
 
@@ -947,10 +973,12 @@ List of options to use when _out=schart_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| schart  | String | Chart definition in the format "<unit> <path:color:legend>... [-min:0] [-max:100]". Unit is either 'int', 'dec1', 'dec2', 'dec3', 'dec', 'bytes' or 'si'. Path is equivalent to the 'path' filter (quotes should be used for non-basic 'path' expressions). |
+| schart  | String | Chart definition in the format `"<unit> <path:color:legend>... [-min:<n>] [-max:<n>] [-hsize:<n>] [-vsize:<n>]"`. Unit must be one of: `int`, `dec1`, `dec2`, `dec3`, `dec4`, `dec`, `bytes` or `si`. Path is a JMESPath expression equivalent to the `path=` filter (use quotes for non-basic expressions). The `-min` and `-max` flags set the Y-axis range; `-hsize` and `-vsize` override the default chart width and height in terminal columns/rows. Unlike `out=chart` (which accumulates values over time), `schart` renders a fixed snapshot from the current input array. |
 
-Example: 
+Examples:
 ```oafp data="[(x:1,y:2)|(x:2,y:5)|(x:1,y:4)|(x:2,y:5)|(x:1,y:5)]" in=slon out=schart schart="int '[].x':red:x '[].y':blue:y -min:0 -vsize:8"```
+
+```URL="http://localhost:9090" && METRIC="go_memstats_alloc_bytes" && echo "{query:'max($METRIC)',start:'2024-06-18T20:00:00Z',end:'2024-06-18T20:15:00Z',step:5}" | oafp in=ch inch="(type:prometheus,options:(urlQuery:'$URL'))" inchall=true out=json | oafp path="[].{timestamp:to_date(mul([0],\`1000\`)),value:to_number([1])} | []" out=schart schart="bytes '[].value':green:$METRIC -min:0"```
 
 ---
 
