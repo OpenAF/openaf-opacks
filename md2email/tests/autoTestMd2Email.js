@@ -416,4 +416,12 @@
         ow.test.assert(html.indexOf("font-size:99px;") >= 0, true,
             "toEmailHTML should honour custom styleMap override for h1")
     }
+
+    exports.testToHTMLMap = function() {
+        var m = new MD2Email()
+        var res = m.toHTMLMap("Hello map")
+        ow.test.assert(isMap(res), true, "toHTMLMap should return a map")
+        ow.test.assert(isArray(res.pngFiles), true, "toHTMLMap should include pngFiles array")
+        ow.test.assert(res.html.indexOf("<p>Hello map</p>") >= 0, true, "toHTMLMap should include rendered html")
+    }
 })()

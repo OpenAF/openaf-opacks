@@ -34,3 +34,7 @@ artifacts:
 - group  : org.nibor.autolink
   id     : autolink
   #version: 0.11.0
+
+- group  : com.github.weisj
+  id     : jsvg
+  version: 1.7.0

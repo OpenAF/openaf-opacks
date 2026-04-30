@@ -97,6 +97,10 @@ full email-safe XHTML document.
 | `styleMap` | Map | `{}` | Override/extend the element style map |
 | `theme` | String | `"default"` | Named theme: `"default"` or `"dark"` |
 | `wrap` | Boolean | `true` | Wrap in full HTML doc (false → styled fragment only) |
+| `svgToPng` | Boolean | `false` | Convert inline `<svg>...</svg>` blocks to PNG images |
+| `svgPngMode` | String | `"file"` | `"file"` to create PNG files + `<img src="file">`, `"embed"` for data URI |
+| `svgPngOutDir` | String | `"."` | Output directory when `svgPngMode = "file"` |
+| `svgPngBaseName` | String | `"md2email-svg"` | Prefix for generated PNG filenames |
 
 ```javascript
 var m  = new MD2Email({ tables: true, strikethrough: true })
@@ -123,6 +127,26 @@ var html = m.toEmailHTML(md, {
 })
 
 io.writeFileString("alert.html", html)
+```
+
+---
+
+### `m.toHTMLMap(aMarkdown, aOptions) : Map`
+
+Converts markdown to HTML and returns a map:
+
+- `html` → resulting HTML (with `<svg>` converted when enabled)
+- `pngFiles` → list of generated PNG paths
+
+```javascript
+var m = new MD2Email()
+var res = m.toHTMLMap("Chart:<svg viewBox='0 0 100 20'><rect width='100' height='20' fill='red'/></svg>", {
+  svgToPng     : true,
+  svgPngMode   : "file",
+  svgPngOutDir : "/tmp",
+  svgPngBaseName: "mail-chart"
+})
+print(res.pngFiles)
 ```
 
 ---
@@ -221,6 +245,13 @@ var email = md2email.toEmail(
     "# Hello\n\nBody.",
     { autolink: true },             // MD2Email constructor options
     { title: "Hello", wrap: true }  // email template options
+)
+
+// Return map result with generated PNG files
+var emailMap = md2email.toEmailMap(
+  "Inline SVG: <svg viewBox='0 0 20 20'><circle cx='10' cy='10' r='8' fill='green'/></svg>",
+  {},
+  { svgToPng: true, svgPngMode: "embed" }
 )
 
 // Apply inline styles to an existing HTML string

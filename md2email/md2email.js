@@ -5,6 +5,7 @@
 
 var __md2emailPath = getOPackPath("md2email") || "."
 loadExternalJars(__md2emailPath)
+ow.loadFormat()
 
 // ---------------------------------------------------------------------------
 // Default per-element inline styles (email-client–compatible)
@@ -127,6 +128,52 @@ var __md2emailStyledTag = function(tag, attrs, style) {
         attrs = attrs + ' style="' + style + '"'
     }
     return "<" + tag + attrs + ">"
+}
+
+var __md2emailConvertSVGBlocks = function(aHTML, aOptions) {
+    var o = _$(aOptions).isMap().default({})
+    if (!_$(o.svgToPng).isBoolean().default(false)) return { html: aHTML, pngFiles: [] }
+
+    var mode = String(_$(o.svgPngMode).isString().default("file")).toLowerCase()
+    var base = _$(o.svgPngBaseName).isString().default("md2email-svg")
+    var outDir = _$(o.svgPngOutDir).isString().default(".")
+    var files = []
+    var idx = 0
+
+    var out = aHTML.replace(/<svg\b[\s\S]*?<\/svg>/gi, function(svgBlock) {
+        var pngPath = outDir.replace(/[\\\/]$/, "") + "/" + base + "-" + idx + ".png"
+        var bytes = __md2emailSVGToPNG(svgBlock)
+        io.writeFileBytes(pngPath, bytes)
+        files.push(pngPath)
+        idx++
+
+        if (mode == "embed") {
+            return '<img src="data:image/png;base64,' + af.toBase64Bytes(bytes) + '" alt="svg image"/>'
+        } else {
+            return '<img src="' + pngPath + '" alt="svg image"/>'
+        }
+    })
+
+    return { html: out, pngFiles: files }
+}
+
+var __md2emailSVGToPNG = function(aSVG) {
+    var loader = new Packages.com.github.weisj.jsvg.parser.SVGLoader()
+    var svg = loader.load(new java.io.StringReader(String(aSVG)))
+
+    var viewBox = svg.viewBox()
+    var width = Math.max(1, Number(viewBox.width))
+    var height = Math.max(1, Number(viewBox.height))
+
+    var image = new Packages.java.awt.image.BufferedImage(width, height, Packages.java.awt.image.BufferedImage.TYPE_INT_ARGB)
+    var g = image.createGraphics()
+    g.setRenderingHint(Packages.java.awt.RenderingHints.KEY_ANTIALIASING, Packages.java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+    svg.render(null, g, new Packages.java.awt.geom.Rectangle2D$Float(0, 0, width, height))
+    g.dispose()
+
+    var baos = new java.io.ByteArrayOutputStream()
+    Packages.javax.imageio.ImageIO.write(image, "png", baos)
+    return baos.toByteArray()
 }
 
 // ---------------------------------------------------------------------------
@@ -316,7 +363,8 @@ MD2Email.prototype.toEmailHTML = function(aMarkdown, aOptions) {
     var styleMap = merge(merge({}, baseStyle), _$(aOptions.styleMap).isMap().default({}))
 
     // Parse and render HTML fragment
-    var htmlFragment = this.toHTML(aMarkdown)
+    var htmlResult = this.toHTMLMap(aMarkdown, aOptions)
+    var htmlFragment = htmlResult.html
 
     // Apply inline styles
     htmlFragment = __md2emailApplyStyles(htmlFragment, styleMap)
@@ -325,6 +373,13 @@ MD2Email.prototype.toEmailHTML = function(aMarkdown, aOptions) {
 
     // Wrap in email-safe template
     return __md2emailWrap(htmlFragment, aOptions)
+}
+
+MD2Email.prototype.toHTMLMap = function(aMarkdown, aOptions) {
+    _$(aMarkdown, "aMarkdown").isString().$_()
+    aOptions = _$(aOptions).isMap().default({})
+    var html = String(this._renderer.render(this._parser.parse(aMarkdown)))
+    return __md2emailConvertSVGBlocks(html, aOptions)
 }
 
 /**
@@ -558,6 +613,19 @@ var md2email = {
 
     toEmail: function(aMarkdown, aConvertOptions, aEmailOptions) {
         return new MD2Email(aConvertOptions).toEmailHTML(aMarkdown, aEmailOptions)
+    },
+    convertMap: function(aMarkdown, aOptions, aOutputOptions) {
+        return new MD2Email(aOptions).toHTMLMap(aMarkdown, aOutputOptions)
+    },
+    toEmailMap: function(aMarkdown, aConvertOptions, aEmailOptions) {
+        var m = new MD2Email(aConvertOptions)
+        var res = m.toHTMLMap(aMarkdown, aEmailOptions)
+        var theme = _$(aEmailOptions.theme).isString().default("default")
+        var baseStyle = __md2emailStyles[theme] || __md2emailStyles["default"]
+        var styleMap = merge(merge({}, baseStyle), _$(aEmailOptions.styleMap).isMap().default({}))
+        var html = __md2emailApplyStyles(res.html, styleMap)
+        res.emailHTML = _$(aEmailOptions.wrap).isBoolean().default(true) ? __md2emailWrap(html, aEmailOptions) : html
+        return res
     },
 
     applyInlineStyles: function(aHTML, aStyleMap) {
