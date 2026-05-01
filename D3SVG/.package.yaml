@@ -30,8 +30,27 @@ dependencies:
 files:
 - .package.yaml
 - README.md
+- GALLERY.md
 - d3svg.js
 - samples/bar.js
 - samples/line.js
 - samples/pie.js
+- samples/advanced.js
 - tests/test_d3svg.js
+- gallery/area.svg
+- gallery/bar_dark.svg
+- gallery/bar_horizontal.svg
+- gallery/bar_vertical.svg
+- gallery/bullet_chart.svg
+- gallery/donut.svg
+- gallery/gauge.svg
+- gallery/heatmap.svg
+- gallery/kpi_card.svg
+- gallery/line_multi.svg
+- gallery/line_single.svg
+- gallery/pie.svg
+- gallery/progress_bar.svg
+- gallery/scatter.svg
+- gallery/sparkline.svg
+- gallery/stacked_bar.svg
+- gallery/timeline.svg

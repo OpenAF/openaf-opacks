@@ -397,6 +397,186 @@ assert("zero formats cleanly",       d._formatNum(0),          "0")
 assert(".2f specifier",              d._formatNum(1.2345, ".2f"), "1.23")
 assert(".0% specifier",              d._formatNum(0.5, ".0%"),    "50%")
 
+// ─── areaChart ────────────────────────────────────────────────────────────────
+
+print("▶ areaChart")
+;(function() {
+  var data = [{x:0,y:0},{x:1,y:5},{x:2,y:3},{x:3,y:8}]
+  var svg  = d.areaChart(data, { title: "Area test" })
+  assertIsValidSVG("areaChart valid SVG", svg)
+  assertContains("areaChart has path", svg, "<path")
+  assertContains("areaChart has fill-opacity", svg, "fill-opacity")
+})()
+;(function() {
+  assertIsValidSVG("areaChart empty", d.areaChart([],{}))
+  assertContains("areaChart empty No data", d.areaChart([],{}), "No data")
+})()
+
+// ─── stackedBarChart ─────────────────────────────────────────────────────────
+
+print("▶ stackedBarChart")
+;(function() {
+  var data = [{q:'Q1',a:10,b:20},{q:'Q2',a:15,b:18}]
+  var svg  = d.stackedBarChart(data, {
+    category:'q', series:[{key:'a',label:'A'},{key:'b',label:'B'}],
+    showLegend:true, title:'Stacked'
+  })
+  assertIsValidSVG("stackedBarChart valid SVG", svg)
+  assertContains("stackedBarChart has rect", svg, "<rect")
+  assertContains("stackedBarChart has legend", svg, ">A<")
+})()
+;(function() {
+  assertIsValidSVG("stackedBarChart empty", d.stackedBarChart([],{}))
+  assertContains("stackedBarChart empty No data", d.stackedBarChart([],{}), "No data")
+})()
+
+// ─── scatterPlot ─────────────────────────────────────────────────────────────
+
+print("▶ scatterPlot")
+;(function() {
+  var data = [{x:10,y:20},{x:30,y:5},{x:15,y:35}]
+  var svg  = d.scatterPlot(data, { title: "Scatter" })
+  assertIsValidSVG("scatterPlot valid SVG", svg)
+  assertContains("scatterPlot has circle", svg, "<circle")
+})()
+;(function() {
+  assertIsValidSVG("scatterPlot empty", d.scatterPlot([],{}))
+  assertContains("scatterPlot empty No data", d.scatterPlot([],{}), "No data")
+})()
+;(function() {
+  var multi = [{name:'A',values:[{x:1,y:2}]},{name:'B',values:[{x:3,y:4}]}]
+  assertIsValidSVG("scatterPlot multi-series", d.scatterPlot(multi, {}))
+})()
+
+// ─── heatmap ─────────────────────────────────────────────────────────────────
+
+print("▶ heatmap")
+;(function() {
+  var data = [{row:'R1',col:'C1',value:10},{row:'R1',col:'C2',value:50},
+              {row:'R2',col:'C1',value:80},{row:'R2',col:'C2',value:30}]
+  var svg  = d.heatmap(data, { showValues: true })
+  assertIsValidSVG("heatmap valid SVG", svg)
+  assertContains("heatmap has rect", svg, "<rect")
+})()
+;(function() {
+  assertIsValidSVG("heatmap empty", d.heatmap([],{}))
+  assertContains("heatmap empty No data", d.heatmap([],{}), "No data")
+})()
+
+// ─── sparkline ───────────────────────────────────────────────────────────────
+
+print("▶ sparkline")
+;(function() {
+  var svg = d.sparkline([3,8,5,12,7,15], {width:120, height:40})
+  assertIsValidSVG("sparkline valid SVG", svg)
+  assertContains("sparkline has path", svg, "<path")
+})()
+;(function() {
+  assertIsValidSVG("sparkline empty returns SVG", d.sparkline([],{}))
+})()
+;(function() {
+  var svg = d.sparkline([{y:3},{y:8},{y:5}], {})
+  assertContains("sparkline from objects has path", svg, "<path")
+})()
+
+// ─── gauge ───────────────────────────────────────────────────────────────────
+
+print("▶ gauge")
+;(function() {
+  var svg = d.gauge(75, { min: 0, max: 100, title: "Speed", unit: "mph" })
+  assertIsValidSVG("gauge valid SVG", svg)
+  assertContains("gauge has arc path", svg, "<path")
+  assertContains("gauge shows value", svg, "75")
+  assertContains("gauge has needle", svg, "<line")
+})()
+;(function() {
+  var svg = d.gauge(0, { min: 0, max: 100 })
+  assertIsValidSVG("gauge value 0", svg)
+})()
+;(function() {
+  var svg = d.gauge(150, { min: 0, max: 100 })
+  assertIsValidSVG("gauge clamped over max", svg)
+})()
+
+// ─── progressBar ─────────────────────────────────────────────────────────────
+
+print("▶ progressBar")
+;(function() {
+  var svg = d.progressBar(72, { width: 400, title: "Download" })
+  assertIsValidSVG("progressBar valid SVG", svg)
+  assertContains("progressBar has rects", svg, "<rect")
+  assertContains("progressBar shows pct", svg, "%")
+})()
+;(function() {
+  var svg = d.progressBar([
+    {label:'CPU',value:65},{label:'Memory',value:42}
+  ], { width: 400 })
+  assertIsValidSVG("progressBar multi valid SVG", svg)
+  assertContains("progressBar multi has label", svg, "CPU")
+})()
+
+// ─── kpiCard ─────────────────────────────────────────────────────────────────
+
+print("▶ kpiCard")
+;(function() {
+  var svg = d.kpiCard([
+    {label:'Revenue', value:'$2M', change:15},
+    {label:'Users',   value:48200, change:-2}
+  ], { width: 380, height: 120 })
+  assertIsValidSVG("kpiCard valid SVG", svg)
+  assertContains("kpiCard has label", svg, "Revenue")
+  assertContains("kpiCard has change arrow", svg, "▲")
+})()
+;(function() {
+  var svg = d.kpiCard({label:'Score', value:95}, {})
+  assertIsValidSVG("kpiCard single item", svg)
+  assertContains("kpiCard single label", svg, "Score")
+})()
+
+// ─── bulletChart ─────────────────────────────────────────────────────────────
+
+print("▶ bulletChart")
+;(function() {
+  var data = [
+    {label:'Sales', value:75, target:90, ranges:[{value:60,color:'#fadbd8'},{value:120,color:'#d5f5e3'}]},
+    {label:'Profit',value:45, target:60}
+  ]
+  var svg = d.bulletChart(data, { showValues: true })
+  assertIsValidSVG("bulletChart valid SVG", svg)
+  assertContains("bulletChart has rect", svg, "<rect")
+  assertContains("bulletChart has target line", svg, "<line")
+  assertContains("bulletChart has label", svg, "Sales")
+})()
+;(function() {
+  assertIsValidSVG("bulletChart empty", d.bulletChart([],{}))
+  assertContains("bulletChart empty No data", d.bulletChart([],{}), "No data")
+})()
+
+// ─── timeline ────────────────────────────────────────────────────────────────
+
+print("▶ timeline")
+;(function() {
+  var data = [
+    {label:'Start', date:'Jan', color:'#3498db'},
+    {label:'Launch',date:'Jun', color:'#27ae60'}
+  ]
+  var svg = d.timeline(data, { width: 500, height: 160, title: "Roadmap" })
+  assertIsValidSVG("timeline valid SVG", svg)
+  assertContains("timeline has circles", svg, "<circle")
+  assertContains("timeline has label", svg, "Start")
+})()
+;(function() {
+  assertIsValidSVG("timeline empty", d.timeline([],{}))
+  assertContains("timeline empty No events", d.timeline([],{}), "No events")
+})()
+
+// ─── _interpolateColor ────────────────────────────────────────────────────────
+
+print("▶ _interpolateColor")
+assert("interpolateColor t=0", d._interpolateColor('#ffffff','#000000',0), "rgb(255,255,255)")
+assert("interpolateColor t=1", d._interpolateColor('#ffffff','#000000',1), "rgb(0,0,0)")
+assert("interpolateColor mid red", d._interpolateColor('#000000','#ff0000',0.5), "rgb(128,0,0)")
+
 // ─── Summary ─────────────────────────────────────────────────────────────────
 
 print("")
