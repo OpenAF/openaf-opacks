@@ -383,11 +383,13 @@
 
     exports.testUnicodeContent = function() {
         var m    = new MD2Email()
-        var html = m.toHTML("# Héllo Wörld\n\nçâü")
+        var html = m.toHTML("# Héllo Wörld\n\nçâü 😀")
         ow.test.assert(html.indexOf("Héllo") >= 0, true,
             "toHTML should preserve non-ASCII characters in headings")
         ow.test.assert(html.indexOf("çâü") >= 0, true,
             "toHTML should preserve non-ASCII characters in paragraphs")
+        ow.test.assert(html.indexOf("😀") >= 0, true,
+            "toHTML should preserve non-BMP unicode characters such as emoji")
     }
 
     exports.testXSSEntities = function() {
@@ -564,29 +566,52 @@
         var dir = String(tmp.getPath())
         io.writeFileString(dir + "/chart.png", "not a real png")
 
-        var calls = { html: "", msg: "", embeds: [] }
+        var calls = { html: "", msg: "", embeds: [], charset: "" }
         var email = {
             setHTML: function(html) { calls.html = html; return email },
             setMessage: function(msg) { calls.msg = msg; return email },
+            setCharset: function(charset) { calls.charset = charset; return email },
             embedFile: function(path, name) {
                 calls.embeds.push({ path: path, name: name })
                 return "returned-" + name
             }
         }
 
-        var res = new MD2Email().setEmailFromMarkdown(email, "# Report\n\n![Chart](chart.png)", {
+        var res = new MD2Email().setEmailFromMarkdown(email, "# Report 😀\n\n![Chart](chart.png)", {
             wrap   : false,
             baseDir: dir
         })
 
+        ow.test.assert(calls.charset, "UTF-8",
+            "setEmailFromMarkdown should set UTF-8 charset on compatible Email objects")
         ow.test.assert(calls.embeds.length, 1, "setEmailFromMarkdown should embed one local image")
         ow.test.assert(String(calls.embeds[0].name), "chart.png", "setEmailFromMarkdown should use the file name as embed name")
         ow.test.assert(calls.html.indexOf('src="cid:returned-chart.png"') >= 0, true,
             "setEmailFromMarkdown should rewrite image src to the CID returned by embedFile")
+        ow.test.assert(calls.html.indexOf("😀") >= 0, true,
+            "setEmailFromMarkdown should preserve emoji in HTML content")
         ow.test.assert(res.embeddedFiles[0].cid, "returned-chart.png",
             "setEmailFromMarkdown should return embedded file metadata")
-        ow.test.assert(calls.msg.indexOf("Report") >= 0, true,
-            "setEmailFromMarkdown should set the plain-text alternative message")
+        ow.test.assert(calls.msg.indexOf("Report 😀") >= 0, true,
+            "setEmailFromMarkdown should set the UTF-8 plain-text alternative message")
+    }
+
+    exports.testSetEmailFromMarkdownCustomCharset = function() {
+        var calls = { charset: "" }
+        var email = {
+            setHTML: function(html) { return email },
+            setMessage: function(msg) { return email },
+            setCharset: function(charset) { calls.charset = charset; return email },
+            embedFile: function(path, name) { return "cid" }
+        }
+
+        new MD2Email().setEmailFromMarkdown(email, "Olá 😀", {
+            wrap        : false,
+            emailCharset: "ISO-8859-1"
+        })
+
+        ow.test.assert(calls.charset, "ISO-8859-1",
+            "setEmailFromMarkdown should allow overriding the email charset")
     }
 
     exports.testSetEmailFromMarkdownFileDeduplicatesImages = function() {

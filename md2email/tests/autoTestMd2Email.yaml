@@ -49,6 +49,7 @@ todo:
 - md2email::ToHTMLMapKeepsUnsupportedSVG
 - md2email::SetEmailFromMarkdownFileEmbedsLocalImage
 - md2email::SetEmailFromMarkdownEmbedsLocalImage
+- md2email::SetEmailFromMarkdownCustomCharset
 - md2email::SetEmailFromMarkdownFileDeduplicatesImages
 - Test results
 
@@ -268,6 +269,11 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testSetEmailFromMarkdownEmbedsLocalImage
 
+- name: md2email::SetEmailFromMarkdownCustomCharset
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetEmailFromMarkdownCustomCharset
+
 - name: md2email::SetEmailFromMarkdownFileDeduplicatesImages
   from: md2email::Init
   to  : oJob Test
@@ -315,6 +321,7 @@ jobs:
   - md2email::ToHTMLMapKeepsUnsupportedSVG
   - md2email::SetEmailFromMarkdownFileEmbedsLocalImage
   - md2email::SetEmailFromMarkdownEmbedsLocalImage
+  - md2email::SetEmailFromMarkdownCustomCharset
   - md2email::SetEmailFromMarkdownFileDeduplicatesImages
   args:
     quiet: true

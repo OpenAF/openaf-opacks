@@ -617,6 +617,7 @@ MD2Email.prototype.toHTMLMap = function(aMarkdown, aOptions) {
  * \
  * aOptions are the same as toEmailHTML(), plus:\
  *   - baseDir              {String}  Folder used to resolve relative images (default ".")\
+ *   - emailCharset         {String}  Charset set on the OpenAF Email object before content (default "UTF-8"; false disables)\
  *   - setMessage           {Boolean} Also call setMessage() with plain text (default true)\
  *   - embedExternalImages  {Boolean} Call addExternalImage() for http(s) images (default false)\
  * \
@@ -647,7 +648,9 @@ MD2Email.prototype.setEmailFromMarkdown = function(aEmail, aMarkdownString, aOpt
     var html = this.toEmailHTML(aMarkdownString, emailOptions)
     var embedded = __md2emailEmbedLocalImages(html, aEmail, baseDir, o)
     var text = this.toText(aMarkdownString)
+    var emailCharset = _$(o.emailCharset).isString().default("UTF-8")
 
+    if (o.emailCharset !== false && isFunction(aEmail.setCharset)) aEmail.setCharset(emailCharset)
     aEmail.setHTML(embedded.html)
     if (_$(o.setMessage).isBoolean().default(true) && isFunction(aEmail.setMessage)) aEmail.setMessage(text)
 

@@ -171,7 +171,8 @@ print(res.pngFiles)
 
 Renders a markdown string as email-ready HTML, rewrites local markdown image
 references to `cid:...`, embeds those files into an OpenAF `Email` object with
-`embedFile(path, name)`, and then calls `setHTML(html)`.
+`embedFile(path, name)`, sets the email charset to `UTF-8` by default, and then
+calls `setHTML(html)`.
 
 Inline `<svg>...</svg>` blocks are converted to PNG files by default so they
 can also be embedded. SVG blocks that cannot be converted are left inline.
@@ -204,6 +205,7 @@ Additional options:
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `baseDir` | String | `"."` | Folder used to resolve relative image paths |
+| `emailCharset` | String / Boolean | `"UTF-8"` | Charset passed to `Email.setCharset()` before content is set; use `false` to skip |
 | `setMessage` | Boolean | `true` | Also call `setMessage()` with the markdown plain-text rendering |
 | `embedExternalImages` | Boolean | `false` | Call `addExternalImage()` for `http(s)` images |
 

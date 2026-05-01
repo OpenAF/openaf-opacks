@@ -48,7 +48,7 @@ filesHash:
   .maven.yaml: 66cc51c0a27edf4abbaf89ff5a18e5db4d65282a
   .odoc.db: 96cddb05f139e8f8dc67b2b69c2f7bf3df3116ca
   .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
-  README.md: bd7d5a08ae6323f35813f7fa14697db2adffd27d
+  README.md: 68433dc0a9d6b9c7a0b838764adde199bc73b65b
   autolink-0.12.0.jar: 917f405aadfe8e315740ffc367b4675a5ff6f2a0
   commonmark-0.28.0.jar: 9fa5c6ea2a17aedfec543c693be35573307750dd
   commonmark-ext-autolink-0.28.0.jar: 175b9cd4441b12dbe45bb442bdb14d4a553ccb46
@@ -59,7 +59,7 @@ filesHash:
   commonmark-ext-task-list-items-0.28.0.jar: 16044b2f44588c26b59b0060bec008d2bd39a130
   commonmark-ext-yaml-front-matter-0.28.0.jar: c21169ab375ed56396b2845c0ba023a2a6740ac9
   jsvg-2.0.0.jar: f65d5c3beed92a2d6cdc666185c3e751b887032f
-  md2email.js: 5b36f0283a37e412b307e925eef657d30f1ce9d5
+  md2email.js: cb70d67c09ce1e0faa3f8a71722e5db3ef1ffa9f
   md2email.yaml: af77e62654f053b484ba78b81ba6721b40c6f779
-  tests/autoTestMd2Email.js: 757d6aed317939afcc972761b8bede1dc5922300
-  tests/autoTestMd2Email.yaml: c145a30b106d521cc02d5c55c77ca9a67b408eaf
+  tests/autoTestMd2Email.js: 4f6db1cf345fd60edbbf011f58b6f333ec7ecd4c
+  tests/autoTestMd2Email.yaml: d385ec22f4a8464bbbefbcab95f2beebdb0bbf56
