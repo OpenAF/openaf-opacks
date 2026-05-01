@@ -43,6 +43,13 @@ todo:
 - md2email::UnicodeContent
 - md2email::XSSEntities
 - md2email::StyleMapCustomOverride
+- md2email::ToHTMLMap
+- md2email::NormalizeSVGFontsUsesJavaFamilies
+- md2email::ToHTMLMapConvertsSVGWithSystemFonts
+- md2email::ToHTMLMapKeepsUnsupportedSVG
+- md2email::SetEmailFromMarkdownFileEmbedsLocalImage
+- md2email::SetEmailFromMarkdownEmbedsLocalImage
+- md2email::SetEmailFromMarkdownFileDeduplicatesImages
 - Test results
 
 jobs:
@@ -231,6 +238,41 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testStyleMapCustomOverride
 
+- name: md2email::ToHTMLMap
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToHTMLMap
+
+- name: md2email::NormalizeSVGFontsUsesJavaFamilies
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testNormalizeSVGFontsUsesJavaFamilies
+
+- name: md2email::ToHTMLMapConvertsSVGWithSystemFonts
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToHTMLMapConvertsSVGWithSystemFonts
+
+- name: md2email::ToHTMLMapKeepsUnsupportedSVG
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testToHTMLMapKeepsUnsupportedSVG
+
+- name: md2email::SetEmailFromMarkdownFileEmbedsLocalImage
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetEmailFromMarkdownFileEmbedsLocalImage
+
+- name: md2email::SetEmailFromMarkdownEmbedsLocalImage
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetEmailFromMarkdownEmbedsLocalImage
+
+- name: md2email::SetEmailFromMarkdownFileDeduplicatesImages
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetEmailFromMarkdownFileDeduplicatesImages
+
 - name: Test results
   from: oJob Test Results
   deps:
@@ -270,6 +312,10 @@ jobs:
   - md2email::UnicodeContent
   - md2email::XSSEntities
   - md2email::StyleMapCustomOverride
+  - md2email::ToHTMLMapKeepsUnsupportedSVG
+  - md2email::SetEmailFromMarkdownFileEmbedsLocalImage
+  - md2email::SetEmailFromMarkdownEmbedsLocalImage
+  - md2email::SetEmailFromMarkdownFileDeduplicatesImages
   args:
     quiet: true
   exec: |

@@ -11,6 +11,7 @@ Key features:
 - Built-in **default** and **dark** themes, plus custom theme registration
 - Plain-text (`toText`) rendering for MIME multipart emails
 - Email-safe XHTML document template wrapper with header/footer slots
+- SVG-to-PNG conversion for inline SVG blocks (email-client compatible)
 
 ## Installation
 
@@ -97,6 +98,12 @@ full email-safe XHTML document.
 | `styleMap` | Map | `{}` | Override/extend the element style map |
 | `theme` | String | `"default"` | Named theme: `"default"` or `"dark"` |
 | `wrap` | Boolean | `true` | Wrap in full HTML doc (false → styled fragment only) |
+| `svgToPng` | Boolean | `false` | Convert inline `<svg>...</svg>` blocks to PNG images |
+| `svgPngMode` | String | `"file"` | `"file"` to create PNG files + `<img src="file">`, `"embed"` for data URI |
+| `svgPngOutDir` | String | `"."` | Output directory when `svgPngMode = "file"` |
+| `svgPngBaseName` | String | `"md2email-svg"` | Prefix for generated PNG filenames |
+| `svgNormalizeFonts` | Boolean | `true` | Rewrite SVG web/system font aliases to Java AWT font families before PNG rendering |
+| `svgFontFamilyAliases` | Map | built-in OS-aware aliases | Override or add SVG font-family aliases used before PNG rendering |
 
 ```javascript
 var m  = new MD2Email({ tables: true, strikethrough: true })
@@ -123,6 +130,95 @@ var html = m.toEmailHTML(md, {
 })
 
 io.writeFileString("alert.html", html)
+```
+
+---
+
+### `m.toHTMLMap(aMarkdown, aOptions) : Map`
+
+Converts markdown to HTML and returns a map:
+
+- `html` → resulting HTML (with `<svg>` converted when enabled)
+- `pngFiles` → list of generated PNG paths
+
+SVG blocks that the PNG renderer cannot parse are left inline instead of
+failing the conversion.
+
+Before JSVG renders inline SVG text, md2email rewrites common browser font
+aliases such as `system-ui`, `-apple-system`, `BlinkMacSystemFont`,
+`ui-sans-serif`, `sans-serif`, `serif`, and `monospace` to Java AWT font
+families available on the current OS. The built-in aliases prefer native
+system UI fonts on macOS, Windows, and Linux, then fall back to Java logical
+fonts such as `SansSerif`.
+
+```javascript
+var m = new MD2Email()
+var res = m.toHTMLMap("Chart:<svg viewBox='0 0 100 20'><rect width='100' height='20' fill='red'/></svg>", {
+  svgToPng     : true,
+  svgPngMode   : "file",
+  svgPngOutDir : "/tmp",
+  svgPngBaseName: "mail-chart",
+  svgFontFamilyAliases: {
+    "system-ui": [ "Segoe UI", "Helvetica Neue", "Noto Sans", "SansSerif" ]
+  }
+})
+print(res.pngFiles)
+```
+
+---
+
+### `m.setEmailFromMarkdown(aEmail, aMarkdownString, aOptions) : Map`
+
+Renders a markdown string as email-ready HTML, rewrites local markdown image
+references to `cid:...`, embeds those files into an OpenAF `Email` object with
+`embedFile(path, name)`, and then calls `setHTML(html)`.
+
+Inline `<svg>...</svg>` blocks are converted to PNG files by default so they
+can also be embedded. SVG blocks that cannot be converted are left inline.
+Relative image paths are resolved from `baseDir`, which defaults to the current
+folder.
+
+```javascript
+plugin("Email")
+loadLib("md2email.js")
+
+var email = new Email("smtp.example.com", "me@example.com", true, true, true)
+email.login("me@example.com", "password")
+
+var md = [
+    "# Weekly Report",
+    "",
+    "![Chart](chart.png)"
+].join("\n")
+
+var res = new MD2Email().setEmailFromMarkdown(email, md, {
+    title  : "Weekly Report",
+    baseDir: "/path/to/report-assets"
+})
+
+email.send("Weekly Report", res.text, [ "you@example.com" ], [], [], "me@example.com")
+```
+
+Additional options:
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `baseDir` | String | `"."` | Folder used to resolve relative image paths |
+| `setMessage` | Boolean | `true` | Also call `setMessage()` with the markdown plain-text rendering |
+| `embedExternalImages` | Boolean | `false` | Call `addExternalImage()` for `http(s)` images |
+
+The returned map includes `html`, `text`, `embeddedFiles`, `externalImages`,
+and the original `email` object.
+
+### `m.setEmailFromMarkdownFile(aEmail, aMarkdownFile, aOptions) : Map`
+
+Reads a markdown file and delegates to `setEmailFromMarkdown()`. Relative image
+paths are resolved from the markdown file folder unless `baseDir` is provided.
+
+```javascript
+var res = new MD2Email().setEmailFromMarkdownFile(email, "report.md", {
+    title: "Weekly Report"
+})
 ```
 
 ---
@@ -223,6 +319,24 @@ var email = md2email.toEmail(
     { title: "Hello", wrap: true }  // email template options
 )
 
+// Return map result with generated PNG files
+var emailMap = md2email.toEmailMap(
+  "Inline SVG: <svg viewBox='0 0 20 20'><circle cx='10' cy='10' r='8' fill='green'/></svg>",
+  {},
+  { svgToPng: true, svgPngMode: "embed" }
+)
+
+// Populate an OpenAF Email object from markdown and embed local images
+var res = md2email.setEmailFromMarkdown(email, "# Report\n\n![Chart](chart.png)", {}, {
+    title  : "Report",
+    baseDir: "/path/to/report-assets"
+})
+
+// Or read markdown from a file; relative images resolve from that file's folder
+var fileRes = md2email.setEmailFromMarkdownFile(email, "report.md", {}, {
+    title: "Report"
+})
+
 // Apply inline styles to an existing HTML string
 var styled = md2email.applyInlineStyles(existingHtml, {
     p   : "color:#333;line-height:1.7;",
@@ -266,4 +380,5 @@ All JARs are self-contained in the opack — no external runtime dependencies.
 | `commonmark-ext-ins` | 0.24.0 | `++underline++` |
 | `commonmark-ext-yaml-front-matter` | 0.24.0 | YAML metadata |
 | `commonmark-ext-autolink` | 0.24.0 | Bare URL linking |
-| `autolink` | 0.11.0 | URL detection (used by autolink ext) |
+| `autolink` | 0.12.0 | URL detection (used by autolink ext) |
+| `jsvg` | 2.0.0 | SVG to PNG rendering for inline SVG blocks |

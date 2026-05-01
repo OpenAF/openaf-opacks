@@ -5,6 +5,7 @@
 
 var __md2emailPath = getOPackPath("md2email") || "."
 loadExternalJars(__md2emailPath)
+ow.loadFormat()
 
 // ---------------------------------------------------------------------------
 // Default per-element inline styles (email-client–compatible)
@@ -127,6 +128,269 @@ var __md2emailStyledTag = function(tag, attrs, style) {
         attrs = attrs + ' style="' + style + '"'
     }
     return "<" + tag + attrs + ">"
+}
+
+var __md2emailJavaFontFamiliesCache
+var __md2emailJavaFontFamilySetCache
+
+var __md2emailJavaFontFamilies = function() {
+    if (isDef(__md2emailJavaFontFamiliesCache)) return __md2emailJavaFontFamiliesCache
+    __md2emailJavaFontFamiliesCache = af.fromJavaArray(Packages.java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()).map(function(f) {
+        return String(f)
+    })
+    return __md2emailJavaFontFamiliesCache
+}
+
+var __md2emailJavaFontFamilySet = function() {
+    if (isDef(__md2emailJavaFontFamilySetCache)) return __md2emailJavaFontFamilySetCache
+    var set = {}
+    __md2emailJavaFontFamilies().forEach(function(f) {
+        set[String(f).toLowerCase()] = f
+    })
+    ;["SansSerif", "Serif", "Monospaced"].forEach(function(f) {
+        set[String(f).toLowerCase()] = f
+    })
+    __md2emailJavaFontFamilySetCache = set
+    return set
+}
+
+var __md2emailDefaultSVGFontAliases = function() {
+    var os = String(Packages.java.lang.System.getProperty("os.name", "")).toLowerCase()
+    var systemSans
+    if (os.indexOf("mac") >= 0 || os.indexOf("darwin") >= 0) {
+        systemSans = [ ".AppleSystemUIFont", "Helvetica Neue", "Helvetica", "Arial", "SansSerif" ]
+    } else if (os.indexOf("win") >= 0) {
+        systemSans = [ "Segoe UI", "Arial", "SansSerif" ]
+    } else {
+        systemSans = [ "Noto Sans", "DejaVu Sans", "Liberation Sans", "Arial", "SansSerif" ]
+    }
+
+    return {
+        "system-ui"          : systemSans,
+        "-apple-system"      : systemSans,
+        "blinkmacsystemfont" : systemSans,
+        "ui-sans-serif"     : systemSans,
+        "sans-serif"        : [ "SansSerif" ],
+        "serif"             : [ "Serif" ],
+        "monospace"         : [ "Monospaced" ],
+        "ui-monospace"      : [ "SF Mono", "Menlo", "Consolas", "Liberation Mono", "DejaVu Sans Mono", "Monospaced" ]
+    }
+}
+
+var __md2emailSplitFontFamilies = function(aFamilyList) {
+    return String(aFamilyList).split(/\s*,\s*/).filter(function(f) { return String(f).trim().length > 0 })
+}
+
+var __md2emailUnquoteFontFamily = function(aFamily) {
+    var f = String(aFamily).trim()
+    if (f.length >= 2 && ((f.charAt(0) == '"' && f.charAt(f.length - 1) == '"') || (f.charAt(0) == "'" && f.charAt(f.length - 1) == "'"))) {
+        return f.substring(1, f.length - 1)
+    }
+    return f
+}
+
+var __md2emailNormalizeSVGFontFamilyValue = function(aFamilyList, aOptions) {
+    var o = _$(aOptions).isMap().default({})
+    if (!_$(o.svgNormalizeFonts).isBoolean().default(true)) return aFamilyList
+
+    var aliases = __md2emailDefaultSVGFontAliases()
+    var customAliases = _$(o.svgFontFamilyAliases).isMap().default({})
+    Object.keys(customAliases).forEach(function(k) {
+        aliases[String(k).toLowerCase()] = customAliases[k]
+    })
+    var supported = __md2emailJavaFontFamilySet()
+    var out = []
+    var seen = {}
+
+    __md2emailSplitFontFamilies(aFamilyList).forEach(function(rawFamily) {
+        var family = __md2emailUnquoteFontFamily(rawFamily)
+        var key = String(family).toLowerCase()
+        var candidates = isDef(aliases[key]) ? aliases[key] : [ family ]
+        if (!isArray(candidates)) candidates = __md2emailSplitFontFamilies(candidates)
+
+        candidates.forEach(function(candidate) {
+            var name = __md2emailUnquoteFontFamily(candidate)
+            var supportedName = supported[String(name).toLowerCase()]
+            if (isUnDef(supportedName)) return
+            var seenKey = String(supportedName).toLowerCase()
+            if (seen[seenKey]) return
+            seen[seenKey] = true
+            out.push(supportedName)
+        })
+    })
+
+    if (out.length <= 0) out.push("SansSerif")
+    return out.join(", ")
+}
+
+var __md2emailNormalizeSVGFonts = function(aSVG, aOptions) {
+    var svg = String(aSVG)
+    svg = svg.replace(/(\bfont-family\s*=\s*)(["'])(.*?)\2/gi, function(match, prefix, quote, familyList) {
+        return prefix + quote + __md2emailNormalizeSVGFontFamilyValue(familyList, aOptions) + quote
+    })
+    svg = svg.replace(/(font-family\s*:\s*)((?:"[^"]*"|'[^']*'|[^;])+)(;?)/gi, function(match, prefix, familyList, suffix) {
+        return prefix + __md2emailNormalizeSVGFontFamilyValue(familyList, aOptions) + suffix
+    })
+    return svg
+}
+
+var __md2emailConvertSVGBlocks = function(aHTML, aOptions) {
+    var o = _$(aOptions).isMap().default({})
+    if (!_$(o.svgToPng).isBoolean().default(false)) return { html: aHTML, pngFiles: [] }
+
+    var mode = String(_$(o.svgPngMode).isString().default("file")).toLowerCase()
+    var base = _$(o.svgPngBaseName).isString().default("md2email-svg")
+    var outDir = _$(o.svgPngOutDir).isString().default(".")
+    var files = []
+    var idx = 0
+
+    var out = aHTML.replace(/<svg\b[\s\S]*?<\/svg>/gi, function(svgBlock) {
+        var pngPath = outDir.replace(/[\\\/]$/, "") + "/" + base + "-" + idx + ".png"
+        var bytes
+        try {
+            bytes = __md2emailSVGToPNG(svgBlock, o)
+        } catch(e) {
+            return svgBlock
+        }
+        io.writeFileBytes(pngPath, bytes)
+        files.push(pngPath)
+        idx++
+
+        if (mode == "embed") {
+            return '<img src="data:image/png;base64,' + af.fromBytes2String(af.toBase64Bytes(bytes)) + '" alt="svg image"/>'
+        } else {
+            return '<img src="' + pngPath + '" alt="svg image"/>'
+        }
+    })
+
+    return { html: out, pngFiles: files }
+}
+
+var __md2emailSVGToPNG = function(aSVG, aOptions) {
+    var loader = new Packages.com.github.weisj.jsvg.parser.SVGLoader()
+    var normalizedSVG = __md2emailNormalizeSVGFonts(aSVG, aOptions)
+    var svgBytes = new java.lang.String(normalizedSVG).getBytes("UTF-8")
+    var svg = loader.load(
+        new java.io.ByteArrayInputStream(svgBytes),
+        new java.net.URI("memory://md2email.svg"),
+        Packages.com.github.weisj.jsvg.parser.LoaderContext.createDefault()
+    )
+    if (isUnDef(svg)) throw "Unable to parse SVG block"
+
+    var viewBox = svg.viewBox()
+    var width = Math.max(1, Number(viewBox.width))
+    var height = Math.max(1, Number(viewBox.height))
+
+    var image = new Packages.java.awt.image.BufferedImage(width, height, Packages.java.awt.image.BufferedImage.TYPE_INT_ARGB)
+    var g = image.createGraphics()
+    g.setRenderingHint(Packages.java.awt.RenderingHints.KEY_ANTIALIASING, Packages.java.awt.RenderingHints.VALUE_ANTIALIAS_ON)
+    svg.render(null, g, new Packages.com.github.weisj.jsvg.view.ViewBox(0, 0, width, height))
+    g.dispose()
+
+    var baos = new java.io.ByteArrayOutputStream()
+    Packages.javax.imageio.ImageIO.write(image, "png", baos)
+    return af.fromArray2Bytes(af.fromJavaArray(baos.toByteArray()))
+}
+
+var __md2emailIsLocalImageSrc = function(aSrc) {
+    if (isUnDef(aSrc)) return false
+    var src = String(aSrc).trim()
+    if (src.length <= 0) return false
+    if (src.match(/^(cid|data|http|https|mailto):/i)) return false
+    if (src.charAt(0) == "#") return false
+    return true
+}
+
+var __md2emailStripUrlSuffix = function(aSrc) {
+    var src = String(aSrc)
+    var pHash = src.indexOf("#")
+    var pQuery = src.indexOf("?")
+    var p = -1
+    if (pHash >= 0) p = pHash
+    if (pQuery >= 0 && (p < 0 || pQuery < p)) p = pQuery
+    return p >= 0 ? src.substring(0, p) : src
+}
+
+var __md2emailDecodeFileRef = function(aSrc) {
+    var src = __md2emailStripUrlSuffix(aSrc)
+    try {
+        return String(Packages.java.net.URLDecoder.decode(src, "UTF-8"))
+    } catch(e) {
+        return src
+    }
+}
+
+var __md2emailResolveFile = function(aSrc, aBaseDir) {
+    var src = __md2emailDecodeFileRef(aSrc)
+    var file = new java.io.File(src)
+    if (!file.isAbsolute()) file = new java.io.File(aBaseDir, src)
+    return file.getCanonicalFile()
+}
+
+var __md2emailUniqueCIDName = function(aFile, aUsedNames) {
+    var file = aFile.getName()
+    if (!aUsedNames[file]) {
+        aUsedNames[file] = true
+        return file
+    }
+
+    var dot = file.lastIndexOf(".")
+    var base = dot >= 0 ? file.substring(0, dot) : file
+    var ext = dot >= 0 ? file.substring(dot) : ""
+    var idx = 1
+    var cid = base + "-" + idx + ext
+    while (aUsedNames[cid]) {
+        idx++
+        cid = base + "-" + idx + ext
+    }
+    aUsedNames[cid] = true
+    return cid
+}
+
+var __md2emailEmbedLocalImages = function(aHTML, aEmail, aBaseDir, aOptions) {
+    var o = _$(aOptions).isMap().default({})
+    var embedExternal = _$(o.embedExternalImages).isBoolean().default(false)
+    var embedded = []
+    var external = []
+    var pathToCID = {}
+    var usedNames = {}
+
+    var html = String(aHTML).replace(/<img\b([^>]*?)\bsrc\s*=\s*(['"])(.*?)\2([^>]*)>/gi, function(match, before, quote, src, after) {
+        if (String(src).match(/^https?:\/\//i)) {
+            if (embedExternal && isFunction(aEmail.addExternalImage)) {
+                aEmail.addExternalImage(src)
+                external.push(src)
+            }
+            return match
+        }
+
+        if (!__md2emailIsLocalImageSrc(src)) return match
+
+        var file = __md2emailResolveFile(src, aBaseDir)
+        if (!file.exists() || !file.isFile()) throw "Markdown image file not found: " + file.getPath()
+
+        var path = String(file.getPath())
+        var cid = pathToCID[path]
+        if (isUnDef(cid)) {
+            var name = __md2emailUniqueCIDName(file, usedNames)
+            cid = String(aEmail.embedFile(path, name))
+            embedded.push({
+                src : String(src),
+                path: path,
+                name: name,
+                cid : cid
+            })
+            pathToCID[path] = cid
+        }
+
+        return "<img" + before + "src=" + quote + "cid:" + cid + quote + after + ">"
+    })
+
+    return {
+        html          : html,
+        embeddedFiles : embedded,
+        externalImages: external
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -281,6 +545,9 @@ MD2Email.prototype.toText = function(aMarkdown) {
  *   - styleMap   {Map}     Override or extend element style map\
  *   - theme      {String}  Named theme: "default" or "dark" (default: "default")\
  *   - wrap       {Boolean} Wrap in full HTML template (default: true)\
+ *   - svgToPng   {Boolean} Convert inline SVG blocks to PNG images (default: false)\
+ *   - svgNormalizeFonts    {Boolean} Rewrite SVG web/system font aliases to Java fonts (default: true)\
+ *   - svgFontFamilyAliases {Map}     Custom SVG font alias map for PNG rendering\
  * \
  * Example:\
  *   loadLib("md2email.js")\
@@ -316,7 +583,8 @@ MD2Email.prototype.toEmailHTML = function(aMarkdown, aOptions) {
     var styleMap = merge(merge({}, baseStyle), _$(aOptions.styleMap).isMap().default({}))
 
     // Parse and render HTML fragment
-    var htmlFragment = this.toHTML(aMarkdown)
+    var htmlResult = this.toHTMLMap(aMarkdown, aOptions)
+    var htmlFragment = htmlResult.html
 
     // Apply inline styles
     htmlFragment = __md2emailApplyStyles(htmlFragment, styleMap)
@@ -325,6 +593,99 @@ MD2Email.prototype.toEmailHTML = function(aMarkdown, aOptions) {
 
     // Wrap in email-safe template
     return __md2emailWrap(htmlFragment, aOptions)
+}
+
+MD2Email.prototype.toHTMLMap = function(aMarkdown, aOptions) {
+    _$(aMarkdown, "aMarkdown").isString().$_()
+    aOptions = _$(aOptions).isMap().default({})
+    var html = String(this._renderer.render(this._parser.parse(aMarkdown)))
+    return __md2emailConvertSVGBlocks(html, aOptions)
+}
+
+/**
+ * <odoc>
+ * <key>MD2Email.setEmailFromMarkdown(aEmail, aMarkdownString, aOptions) : Map</key>
+ * Renders aMarkdownString as email-ready HTML, rewrites local image
+ * references to cid: names and embeds those files into the provided OpenAF
+ * Email object using embedFile(). Finally calls aEmail.setHTML(html).\
+ * \
+ * By default inline &lt;svg&gt; blocks are converted to temporary PNG files so
+ * they can also be embedded. Local image paths are resolved relative to
+ * baseDir, defaulting to the current folder. External http(s) images are left
+ * unchanged unless embedExternalImages=true, in which case addExternalImage()
+ * is called.\
+ * \
+ * aOptions are the same as toEmailHTML(), plus:\
+ *   - baseDir              {String}  Folder used to resolve relative images (default ".")\
+ *   - setMessage           {Boolean} Also call setMessage() with plain text (default true)\
+ *   - embedExternalImages  {Boolean} Call addExternalImage() for http(s) images (default false)\
+ * \
+ * Example:\
+ *   plugin("Email")\
+ *   loadLib("md2email.js")\
+ *   var email = new Email("smtp.example.com", "me@example.com", true, true, true)\
+ *   var res = new MD2Email().setEmailFromMarkdown(email, "# Report\n\n![Logo](logo.png)", { title: "Report" })\
+ *   email.send("Report", res.text, [ "you@example.com" ], [], [], "me@example.com")\
+ * </odoc>
+ */
+MD2Email.prototype.setEmailFromMarkdown = function(aEmail, aMarkdownString, aOptions) {
+    _$(aMarkdownString, "aMarkdownString").isString().$_()
+    if (isUnDef(aEmail) || !isFunction(aEmail.setHTML) || !isFunction(aEmail.embedFile)) {
+        throw "aEmail must be an OpenAF Email object with setHTML() and embedFile()"
+    }
+
+    var o = _$(aOptions).isMap().default({})
+    var baseDir = _$(o.baseDir).isString().default(".")
+
+    var emailOptions = merge({
+        svgToPng      : true,
+        svgPngMode    : "file",
+        svgPngOutDir  : String(Packages.java.lang.System.getProperty("java.io.tmpdir")),
+        svgPngBaseName: "md2email-svg"
+    }, o)
+
+    var html = this.toEmailHTML(aMarkdownString, emailOptions)
+    var embedded = __md2emailEmbedLocalImages(html, aEmail, baseDir, o)
+    var text = this.toText(aMarkdownString)
+
+    aEmail.setHTML(embedded.html)
+    if (_$(o.setMessage).isBoolean().default(true) && isFunction(aEmail.setMessage)) aEmail.setMessage(text)
+
+    return {
+        email         : aEmail,
+        html          : embedded.html,
+        text          : text,
+        embeddedFiles : embedded.embeddedFiles,
+        externalImages: embedded.externalImages
+    }
+}
+
+/**
+ * <odoc>
+ * <key>MD2Email.setEmailFromMarkdownFile(aEmail, aMarkdownFile, aOptions) : Map</key>
+ * Reads aMarkdownFile and delegates to setEmailFromMarkdown(). Markdown image
+ * paths are resolved relative to the markdown file folder unless baseDir is
+ * provided. The default generated SVG PNG prefix is based on the markdown file
+ * name.\
+ * \
+ * Example:\
+ *   plugin("Email")\
+ *   loadLib("md2email.js")\
+ *   var email = new Email("smtp.example.com", "me@example.com", true, true, true)\
+ *   var res = new MD2Email().setEmailFromMarkdownFile(email, "report.md", { title: "Report" })\
+ * </odoc>
+ */
+MD2Email.prototype.setEmailFromMarkdownFile = function(aEmail, aMarkdownFile, aOptions) {
+    _$(aMarkdownFile, "aMarkdownFile").isString().$_()
+
+    var o = _$(aOptions).isMap().default({})
+    var mdFile = new java.io.File(aMarkdownFile).getCanonicalFile()
+    var fileOptions = merge({
+        baseDir       : String(mdFile.getParentFile().getPath()),
+        svgPngBaseName: String(mdFile.getName()).replace(/\.[^\.]+$/, "") + "-svg"
+    }, o)
+
+    return this.setEmailFromMarkdown(aEmail, io.readFileString(String(mdFile.getPath())), fileOptions)
 }
 
 /**
@@ -510,6 +871,34 @@ var __md2emailWrap = function(aHTMLContent, aOptions) {
 
 /**
  * <odoc>
+ * <key>md2email.setEmailFromMarkdown(aEmail, aMarkdownString, aConvertOptions, aEmailOptions) : Map</key>
+ * Shortcut: creates an MD2Email instance with aConvertOptions and calls
+ * setEmailFromMarkdown(aEmail, aMarkdownString, aEmailOptions).\
+ * \
+ * Example:\
+ *   plugin("Email")\
+ *   loadLib("md2email.js")\
+ *   var email = new Email("smtp.example.com", "me@example.com", true, true, true)\
+ *   md2email.setEmailFromMarkdown(email, "# Report", {}, { title: "Report" })\
+ * </odoc>
+ */
+
+/**
+ * <odoc>
+ * <key>md2email.setEmailFromMarkdownFile(aEmail, aMarkdownFile, aConvertOptions, aEmailOptions) : Map</key>
+ * Shortcut: creates an MD2Email instance with aConvertOptions and calls
+ * setEmailFromMarkdownFile(aEmail, aMarkdownFile, aEmailOptions).\
+ * \
+ * Example:\
+ *   plugin("Email")\
+ *   loadLib("md2email.js")\
+ *   var email = new Email("smtp.example.com", "me@example.com", true, true, true)\
+ *   md2email.setEmailFromMarkdownFile(email, "report.md", {}, { title: "Report" })\
+ * </odoc>
+ */
+
+/**
+ * <odoc>
  * <key>md2email.applyInlineStyles(aHTML, aStyleMap) : String</key>
  * Applies a map of tag→style strings as inline style= attributes to the
  * provided HTML fragment. Returns the styled HTML string.\
@@ -527,6 +916,32 @@ var __md2emailWrap = function(aHTMLContent, aOptions) {
  * \
  * Example:\
  *   var html = md2email.wrapInTemplate("&lt;p&gt;Hello&lt;/p&gt;", { title: "Hi", bgColor: "#eee" })\
+ * </odoc>
+ */
+
+/**
+ * <odoc>
+ * <key>md2email.normalizeSVGFonts(aSVG, aOptions) : String</key>
+ * Rewrites SVG font-family values that use browser/system aliases (for
+ * example system-ui, -apple-system, ui-sans-serif, sans-serif) to Java AWT
+ * font family names available on the current platform. This is used by the
+ * inline SVG-to-PNG renderer by default.\
+ * \
+ * Options:\
+ *   - svgNormalizeFonts     {Boolean} Enable/disable rewriting (default true)\
+ *   - svgFontFamilyAliases  {Map}     Custom alias map. Values can be strings
+ *                                     or arrays of fallback family names.\
+ * \
+ * Example:\
+ *   var svg = md2email.normalizeSVGFonts('&lt;text font-family="system-ui, sans-serif"&gt;Hi&lt;/text&gt;')\
+ * </odoc>
+ */
+
+/**
+ * <odoc>
+ * <key>md2email.getJavaFontFamilies() : Array</key>
+ * Returns the Java AWT font family names visible to the current runtime.
+ * These are the family names JSVG can match while rendering SVG text.
  * </odoc>
  */
 
@@ -559,6 +974,25 @@ var md2email = {
     toEmail: function(aMarkdown, aConvertOptions, aEmailOptions) {
         return new MD2Email(aConvertOptions).toEmailHTML(aMarkdown, aEmailOptions)
     },
+    setEmailFromMarkdown: function(aEmail, aMarkdownString, aConvertOptions, aEmailOptions) {
+        return new MD2Email(aConvertOptions).setEmailFromMarkdown(aEmail, aMarkdownString, aEmailOptions)
+    },
+    setEmailFromMarkdownFile: function(aEmail, aMarkdownFile, aConvertOptions, aEmailOptions) {
+        return new MD2Email(aConvertOptions).setEmailFromMarkdownFile(aEmail, aMarkdownFile, aEmailOptions)
+    },
+    convertMap: function(aMarkdown, aOptions, aOutputOptions) {
+        return new MD2Email(aOptions).toHTMLMap(aMarkdown, aOutputOptions)
+    },
+    toEmailMap: function(aMarkdown, aConvertOptions, aEmailOptions) {
+        var m = new MD2Email(aConvertOptions)
+        var res = m.toHTMLMap(aMarkdown, aEmailOptions)
+        var theme = _$(aEmailOptions.theme).isString().default("default")
+        var baseStyle = __md2emailStyles[theme] || __md2emailStyles["default"]
+        var styleMap = merge(merge({}, baseStyle), _$(aEmailOptions.styleMap).isMap().default({}))
+        var html = __md2emailApplyStyles(res.html, styleMap)
+        res.emailHTML = _$(aEmailOptions.wrap).isBoolean().default(true) ? __md2emailWrap(html, aEmailOptions) : html
+        return res
+    },
 
     applyInlineStyles: function(aHTML, aStyleMap) {
         return __md2emailApplyStyles(aHTML, aStyleMap)
@@ -566,6 +1000,15 @@ var md2email = {
 
     wrapInTemplate: function(aHTMLContent, aOptions) {
         return __md2emailWrap(aHTMLContent, aOptions)
+    },
+
+    normalizeSVGFonts: function(aSVG, aOptions) {
+        _$(aSVG, "aSVG").isString().$_()
+        return __md2emailNormalizeSVGFonts(aSVG, aOptions)
+    },
+
+    getJavaFontFamilies: function() {
+        return __md2emailJavaFontFamilies().slice(0)
     },
 
     getAvailableThemes: function() {

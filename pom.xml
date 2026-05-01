@@ -347,5 +347,10 @@
             <artifactId>h3</artifactId>
             <version>4.4.0</version>
         </dependency>
-    </dependencies>
+            <dependency>
+            <groupId>com.github.weisj</groupId>
+            <artifactId>jsvg</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+</dependencies>
 </project>
