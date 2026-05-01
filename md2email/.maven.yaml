@@ -1,35 +1,35 @@
 artifacts:
 - group  : org.commonmark
   id     : commonmark
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-gfm-tables
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-gfm-strikethrough
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-task-list-items
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-heading-anchor
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-ins
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-yaml-front-matter
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.commonmark
   id     : commonmark-ext-autolink
-  version: 0.28.0
+  #version: 0.28.0
 
 - group  : org.nibor.autolink
   id     : autolink
@@ -37,4 +37,4 @@ artifacts:
 
 - group  : com.github.weisj
   id     : jsvg
-  version: 1.7.0
+  #version: 1.7.0

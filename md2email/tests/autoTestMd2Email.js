@@ -424,4 +424,193 @@
         ow.test.assert(isArray(res.pngFiles), true, "toHTMLMap should include pngFiles array")
         ow.test.assert(res.html.indexOf("<p>Hello map</p>") >= 0, true, "toHTMLMap should include rendered html")
     }
+
+    exports.testNormalizeSVGFontsUsesJavaFamilies = function() {
+        var svg = '<svg><text font-family="system-ui, -apple-system, sans-serif" style="font-family: ui-monospace, monospace;">Hi</text></svg>'
+        var out = md2email.normalizeSVGFonts(svg, {
+            svgFontFamilyAliases: {
+                "system-ui"     : [ "SansSerif" ],
+                "-apple-system" : [ "SansSerif" ],
+                "ui-monospace"  : [ "Monospaced" ]
+            }
+        })
+
+        ow.test.assert(out.indexOf("system-ui") >= 0, false,
+            "normalizeSVGFonts should remove browser system font aliases")
+        ow.test.assert(out.indexOf("-apple-system") >= 0, false,
+            "normalizeSVGFonts should remove Apple browser font aliases")
+        ow.test.assert(out.indexOf("SansSerif") >= 0, true,
+            "normalizeSVGFonts should add a Java logical sans-serif family")
+        ow.test.assert(out.indexOf("Monospaced") >= 0, true,
+            "normalizeSVGFonts should add a Java logical monospace family")
+    }
+
+    exports.testToHTMLMapConvertsSVGWithSystemFonts = function() {
+        var svg = [
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" width="120" height="32">',
+            '  <rect x="0" y="0" width="120" height="32" fill="#ffffff"/>',
+            '  <text x="8" y="21" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#111111">Hello</text>',
+            '</svg>'
+        ].join("\n")
+
+        var res = new MD2Email().toHTMLMap(svg, { svgToPng: true, svgPngMode: "embed" })
+        ow.test.assert(res.html.indexOf("data:image/png;base64,") >= 0, true,
+            "toHTMLMap should convert SVGs that use browser system font aliases")
+        ow.test.assert(res.html.indexOf("<svg") >= 0, false,
+            "toHTMLMap should replace converted SVG with an img")
+    }
+
+    exports.testToHTMLMapKeepsUnsupportedSVG = function() {
+        var svg = [
+            '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="320" viewBox="0 0 600 320">',
+            '  <defs>',
+            '    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">',
+            '      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>',
+            '    </filter>',
+            '  </defs>',
+            '  <rect width="600" height="320" rx="12" fill="#1e1e2e"/>',
+            '  <text x="300" y="36" text-anchor="middle" fill="#cdd6f4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="600">CPU Usage Breakdown</text>',
+            '  ',
+            '  <!-- Donut chart -->',
+            '  <g transform="translate(160, 170)">',
+            '    <!-- Background ring -->',
+            '    <circle r="80" fill="none" stroke="#313244" stroke-width="24"/>',
+            '    <!-- User 33.14% -->',
+            '    <circle r="80" fill="none" stroke="#89b4fa" stroke-width="24" stroke-dasharray="166.5 335.5" stroke-dashoffset="0" transform="rotate(-90)"/>',
+            '    <!-- System 21.14% -->',
+            '    <circle r="80" fill="none" stroke="#f9e2af" stroke-width="24" stroke-dasharray="106.1 395.9" stroke-dashoffset="-166.5" transform="rotate(-90)"/>',
+            '    <!-- Idle 45.71% -->',
+            '    <circle r="80" fill="none" stroke="#a6e3a1" stroke-width="24" stroke-dasharray="229.4 272.6" stroke-dashoffset="-272.6" transform="rotate(-90)"/>',
+            '    ',
+            '    <text x="0" y="8" text-anchor="middle" fill="#cdd6f4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="28" font-weight="700">54.3%</text>',
+            '    <text x="0" y="28" text-anchor="middle" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11">Active</text>',
+            '  </g>',
+            '  ',
+            '  <!-- Legend -->',
+            '  <g transform="translate(320, 110)">',
+            '    <rect x="0" y="0" width="14" height="14" rx="3" fill="#89b4fa"/>',
+            '    <text x="24" y="12" fill="#cdd6f4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14">User — 33.14%</text>',
+            '    ',
+            '    <rect x="0" y="32" width="14" height="14" rx="3" fill="#f9e2af"/>',
+            '    <text x="24" y="44" fill="#cdd6f4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14">System — 21.14%</text>',
+            '    ',
+            '    <rect x="0" y="64" width="14" height="14" rx="3" fill="#a6e3a1"/>',
+            '    <text x="24" y="76" fill="#cdd6f4" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14">Idle — 45.71%</text>',
+            '  </g>',
+            '  ',
+            '  <!-- Load averages -->',
+            '  <g transform="translate(320, 220)">',
+            '    <text x="0" y="0" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600">LOAD AVERAGES</text>',
+            '    <rect x="0" y="12" width="40" height="50" rx="4" fill="#313244"/>',
+            '    <text x="20" y="38" text-anchor="middle" fill="#89b4fa" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">1.56</text>',
+            '    <text x="20" y="54" text-anchor="middle" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10">1m</text>',
+            '    ',
+            '    <rect x="52" y="12" width="40" height="50" rx="4" fill="#313244"/>',
+            '    <text x="72" y="38" text-anchor="middle" fill="#f9e2af" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">1.76</text>',
+            '    <text x="72" y="54" text-anchor="middle" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10">5m</text>',
+            '    ',
+            '    <rect x="104" y="12" width="40" height="50" rx="4" fill="#313244"/>',
+            '    <text x="124" y="38" text-anchor="middle" fill="#fab387" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700">1.80</text>',
+            '    <text x="124" y="54" text-anchor="middle" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10">15m</text>',
+            '  </g>',
+            '  ',
+            '  <text x="300" y="300" text-anchor="middle" fill="#6c7086" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11">Processes: 692 total · 3 running · 689 sleeping · 2903 threads</text>',
+            '</svg>'
+        ].join("\n")
+
+        var res = new MD2Email().toHTMLMap(svg, { svgToPng: true, svgPngMode: "embed" })
+        ow.test.assert(res.html.indexOf("<svg") >= 0, true,
+            "toHTMLMap should keep inline SVG when PNG conversion cannot parse it")
+        ow.test.assert(res.pngFiles.length, 0,
+            "toHTMLMap should not report a generated PNG for an unsupported SVG")
+    }
+
+    exports.testSetEmailFromMarkdownFileEmbedsLocalImage = function() {
+        var tmp = java.io.File.createTempFile("md2email-test", "")
+        tmp.delete()
+        tmp.mkdirs()
+
+        var dir = String(tmp.getPath())
+        io.writeFileString(dir + "/chart.png", "not a real png")
+        io.writeFileString(dir + "/mail.md", "# Report\n\n![Chart](chart.png)")
+
+        var calls = { html: "", msg: "", embeds: [] }
+        var email = {
+            setHTML: function(html) { calls.html = html; return email },
+            setMessage: function(msg) { calls.msg = msg; return email },
+            embedFile: function(path, name) {
+                calls.embeds.push({ path: path, name: name })
+                return "returned-" + name
+            }
+        }
+
+        var res = new MD2Email().setEmailFromMarkdownFile(email, dir + "/mail.md", { wrap: false })
+
+        ow.test.assert(calls.embeds.length, 1, "setEmailFromMarkdownFile should embed one local image")
+        ow.test.assert(String(calls.embeds[0].name), "chart.png", "setEmailFromMarkdownFile should use the file name as embed name")
+        ow.test.assert(calls.html.indexOf('src="cid:returned-chart.png"') >= 0, true,
+            "setEmailFromMarkdownFile should rewrite image src to the CID returned by embedFile")
+        ow.test.assert(res.embeddedFiles[0].cid, "returned-chart.png",
+            "setEmailFromMarkdownFile should return embedded file metadata")
+        ow.test.assert(calls.msg.indexOf("Report") >= 0, true,
+            "setEmailFromMarkdownFile should set the plain-text alternative message")
+    }
+
+    exports.testSetEmailFromMarkdownEmbedsLocalImage = function() {
+        var tmp = java.io.File.createTempFile("md2email-test", "")
+        tmp.delete()
+        tmp.mkdirs()
+
+        var dir = String(tmp.getPath())
+        io.writeFileString(dir + "/chart.png", "not a real png")
+
+        var calls = { html: "", msg: "", embeds: [] }
+        var email = {
+            setHTML: function(html) { calls.html = html; return email },
+            setMessage: function(msg) { calls.msg = msg; return email },
+            embedFile: function(path, name) {
+                calls.embeds.push({ path: path, name: name })
+                return "returned-" + name
+            }
+        }
+
+        var res = new MD2Email().setEmailFromMarkdown(email, "# Report\n\n![Chart](chart.png)", {
+            wrap   : false,
+            baseDir: dir
+        })
+
+        ow.test.assert(calls.embeds.length, 1, "setEmailFromMarkdown should embed one local image")
+        ow.test.assert(String(calls.embeds[0].name), "chart.png", "setEmailFromMarkdown should use the file name as embed name")
+        ow.test.assert(calls.html.indexOf('src="cid:returned-chart.png"') >= 0, true,
+            "setEmailFromMarkdown should rewrite image src to the CID returned by embedFile")
+        ow.test.assert(res.embeddedFiles[0].cid, "returned-chart.png",
+            "setEmailFromMarkdown should return embedded file metadata")
+        ow.test.assert(calls.msg.indexOf("Report") >= 0, true,
+            "setEmailFromMarkdown should set the plain-text alternative message")
+    }
+
+    exports.testSetEmailFromMarkdownFileDeduplicatesImages = function() {
+        var tmp = java.io.File.createTempFile("md2email-test", "")
+        tmp.delete()
+        tmp.mkdirs()
+
+        var dir = String(tmp.getPath())
+        io.writeFileString(dir + "/chart.png", "not a real png")
+        io.writeFileString(dir + "/mail.md", "![One](chart.png)\n\n![Two](./chart.png)")
+
+        var calls = { html: "", embeds: [] }
+        var email = {
+            setHTML: function(html) { calls.html = html; return email },
+            embedFile: function(path, name) {
+                calls.embeds.push({ path: path, name: name })
+                return "cid-" + name
+            }
+        }
+
+        new MD2Email().setEmailFromMarkdownFile(email, dir + "/mail.md", { wrap: false, setMessage: false })
+
+        ow.test.assert(calls.embeds.length, 1, "setEmailFromMarkdownFile should embed the same local file once")
+        ow.test.assert(calls.html.split("cid:cid-chart.png").length - 1, 2,
+            "setEmailFromMarkdownFile should reuse the same CID for repeated image references")
+    }
 })()
