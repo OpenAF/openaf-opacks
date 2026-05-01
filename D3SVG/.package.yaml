@@ -1,0 +1,37 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- D3SVG
+- SVG
+- chart
+- d3
+- visualization
+- barChart
+- lineChart
+- pieChart
+- JSVG
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/D3SVG.opack
+description: Server-side SVG chart and diagram generation for OpenAF, inspired by d3.js, producing standalone SVG compatible with JSVG
+name: D3SVG
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260501'
+dependencies:
+  openaf: '>=20230325'
+files:
+- .package.yaml
+- README.md
+- d3svg.js
+- samples/bar.js
+- samples/line.js
+- samples/pie.js
+- tests/test_d3svg.js
