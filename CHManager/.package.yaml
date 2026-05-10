@@ -1,0 +1,71 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: |
+    print("Using CHManager")
+    print("---------------")
+    print()
+    print("  1) TUI usage/help:")
+    print("       opack exec CHManager -jobhelp")
+    print("       opack exec CHManager")
+    print()
+    print("  2) Web interface:")
+    print("       ojob CHManager/CHManager-web.yaml")
+    print("       ch-manager-web onport=8090 [libs=@MyOPack/channels.js]")
+    print()
+    print("  3) Optional Unix aliases to run CHManager quickly:")
+    print("       Bash: echo 'alias ch-manager=\"opack exec CHManager\"' >> ~/.bashrc && . ~/.bashrc")
+    print("             echo 'alias ch-manager-web=\"ojob CHManager-web.yaml\"' >> ~/.bashrc && . ~/.bashrc")
+    print("       Zsh:  echo 'alias ch-manager=\"opack exec CHManager\"' >> ~/.zshrc && . ~/.zshrc")
+    print("             echo 'alias ch-manager-web=\"ojob CHManager-web.yaml\"' >> ~/.zshrc && . ~/.zshrc")
+    print("       sh:   echo 'alias ch-manager=\"opack exec CHManager\"' >> ~/.profile && . ~/.profile")
+    print("             echo 'alias ch-manager-web=\"ojob CHManager-web.yaml\"' >> ~/.profile && . ~/.profile")
+    print("     Or create portable wrappers:")
+    print("       mkdir -p ~/bin && printf '#!/usr/bin/env sh\\nopack exec CHManager \"$@\"\\n' > ~/bin/ch-manager && chmod +x ~/bin/ch-manager")
+    print("       mkdir -p ~/bin && printf '#!/usr/bin/env sh\\nojob CHManager-web.yaml \"$@\"\\n' > ~/bin/ch-manager-web && chmod +x ~/bin/ch-manager-web")
+    print("       Ensure ~/bin is on your PATH")
+    print()
+    print("See README.md for commands and examples.")
+    print()
+keywords:
+- channel
+- manager
+- tui
+- web
+- openaf
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/CHManager.opack
+description: OpenAF Channel Manager – TUI and Web interface for browsing, managing and operating OpenAF channels (all built-in and opack types).
+name: CHManager
+main: ''
+mainJob: CHManager.yaml
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260510'
+dependencies:
+  openaf: '>=20250926'
+files:
+- .maven.yaml
+- .package.yaml
+- CHManager-con.js
+- CHManager-web.yaml
+- CHManager.js
+- CHManager.yaml
+- README.md
+- public/index.html
+- tests/autoTestCHManager.js
+- tests/autoTestCHManager.yaml
+filesHash:
+  .maven.yaml: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
+  CHManager-con.js: cbbdf227fffacbe7bbe44ca5c185bb61e3d9e468
+  CHManager-web.yaml: 37217c71e82b9486636e50e90283229abb6b1615
+  CHManager.js: 617636e7c1ee713d3a693e35c293b6bea985395d
+  CHManager.yaml: 9bab91e77e149a8a4d569d6e78859901f6b7697b
+  README.md: c0c40078a172c8fe63db05de92e8aae085a7ad78
+  public/index.html: 08fd0d9737868757bd808b0123105cf04b0aa45b
+  tests/autoTestCHManager.js: bc5eff6641d26fe85c9694d642286accf0b580e6
+  tests/autoTestCHManager.yaml: 3b04521c77b58044d385ecdde13f8caede079eb0
