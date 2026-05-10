@@ -19,6 +19,7 @@
   |**Compromise**|<img src=".github/badges/Compromise.svg"><br>Integrates the NPL Compromise lib (https://github.com/nlp-compromise/compromise) into a opack.|
   |**Confluence**|<img src=".github/badges/Confluence.svg"><br>Wrapper for the Confluence REST API|
   |**CopyFiles**|<img src=".github/badges/CopyFiles.svg"><br>Provides a generic script for configurable copy and syncing of several source and target folders on the same system. Can compare to copy only new files, rename successfull transfered files to done or any other action (like database update), translate a source filename to a target name, provide exclusion lists, etc.|
+  |**D3SVG**|<img src=".github/badges/D3SVG.svg"><br>Server-side SVG chart and diagram generation for OpenAF, inspired by d3.js, producing standalone SVG compatible with JSVG|
   |**DRProxy**|<img src=".github/badges/DRProxy.svg"><br>DRProxy is a Debug Reverse Proxy to be used in helping debug HTTP/HTTPs communication. It allows the interception of pre-proxy and post-proxy requests for any debug need.|
   |**Debug**|<img src=".github/badges/Debug.svg"><br>Debug wrapper functionality to transform comments into active debugging|
   |**Docker**|<img src=".github/badges/Docker.svg"><br>A wrapper to access the amihaiemil/docker-java-api api to access a docker client.|
