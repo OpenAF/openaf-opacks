@@ -1,5 +1,16 @@
 artifacts:
-- group: com.amihaiemil.web
-  id: docker-java-api
-  version: 0.0.13
-
+#- group: com.amihaiemil.web
+#  id: docker-java-api
+#  version: 0.0.13
+- group: org.apache.httpcomponents
+  id: httpclient
+  version: 4.5.14
+- group: com.github.jnr
+  id: jnr-unixsocket
+  version: 0.38.23
+- group: javax.json
+  id: javax.json-api
+  version: 1.1.4
+- group: org.glassfish
+  id: javax.json
+  version: 1.1.4
