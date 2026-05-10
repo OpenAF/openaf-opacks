@@ -1,0 +1,37 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- channel
+- manager
+- tui
+- web
+- openaf
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/CHManager.opack
+description: OpenAF Channel Manager – TUI and Web interface for browsing, managing and operating OpenAF channels (all built-in and opack types).
+name: CHManager
+main: ''
+mainJob: CHManager.yaml
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260510'
+dependencies:
+  openaf: '>=20250926'
+files:
+- .maven.yaml
+- .package.yaml
+- CHManager.js
+- CHManager.yaml
+- CHManager-web.yaml
+- CHManager-con.js
+- public/index.html
+- README.md
+- tests/autoTestCHManager.js
+- tests/autoTestCHManager.yaml
+filesHash: {}

@@ -1,0 +1,87 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] " + exception)
+  opacks:
+  - openaf
+  - CHManager
+
+todo:
+- CHManager::BasicLifecycle
+- CHManager::SetGetUnset
+- CHManager::GetKeysPaginated
+- CHManager::ClearAll
+- CHManager::EditDef
+- CHManager::PersistenceRoundTrip
+- CHManager::CreateRemote
+- CHManager::HousekeepSubscriber
+- CHManager::MirrorSubscriber
+- CHManager::TypeRegistry
+- CHManager::TypeFilter
+- CHManager::GetAll
+
+jobs:
+- name: CHManager::Init
+  exec: |
+    args.tests = require("tests/autoTestCHManager.js")
+
+- name: CHManager::BasicLifecycle
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testBasicLifecycle
+
+- name: CHManager::SetGetUnset
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetGetUnset
+
+- name: CHManager::GetKeysPaginated
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetKeysPaginated
+
+- name: CHManager::ClearAll
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testClearAll
+
+- name: CHManager::EditDef
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testEditDef
+
+- name: CHManager::PersistenceRoundTrip
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPersistenceRoundTrip
+
+- name: CHManager::CreateRemote
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testCreateRemote
+
+- name: CHManager::HousekeepSubscriber
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHousekeepSubscriber
+
+- name: CHManager::MirrorSubscriber
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMirrorSubscriber
+
+- name: CHManager::TypeRegistry
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testTypeRegistry
+
+- name: CHManager::TypeFilter
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testTypeFilter
+
+- name: CHManager::GetAll
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetAll

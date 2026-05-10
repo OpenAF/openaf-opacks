@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHManager – OpenAF Channel Manager</title>
+<link rel="stylesheet" href="/css/nJSMap.css">
+<style>
+  :root {
+    --bg: #0f1115; --bg2: #181b22; --bg3: #1e222c;
+    --border: #2c3140; --text: #d0d6e0; --dim: #6b7280;
+    --accent: #da9fff; --ok: #5ccea0; --err: #ff6b6b;
+    --type: #56d0f5; --badge: #f0c040; --num: #9de38c;
+    --hover: #252a38;
+  }
+  [data-theme=light] {
+    --bg: #f4f5f7; --bg2: #ffffff; --bg3: #e8ebf0;
+    --border: #c8cdd8; --text: #1a202c; --dim: #6b7280;
+    --accent: #7c3aed; --ok: #16a34a; --err: #dc2626;
+    --type: #0369a1; --badge: #b45309; --num: #15803d;
+    --hover: #e2e6ef;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Cascadia Code','Consolas','Fira Code',monospace; font-size: 13px; height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── Top bar ─────────────────────────────────────────────────────── */
+  #topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  #topbar h1 { font-size: 15px; color: var(--accent); font-weight: 600; margin-right: auto; }
+  #topbar h1 span { color: var(--dim); font-weight: 400; font-size: 12px; margin-left: 8px; }
+  #top-selected-size { color: var(--badge) !important; }
+  .btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: inherit; }
+  .btn:hover { background: var(--hover); }
+  .btn-ok { border-color: var(--ok); color: var(--ok); }
+  .btn-err { border-color: var(--err); color: var(--err); }
+
+  /* ── Layout ──────────────────────────────────────────────────────── */
+  #layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────── */
+  #sidebar { width: 240px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  #sidebar-header { padding: 8px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+  #sidebar-header span { color: var(--dim); font-size: 11px; flex: 1; }
+  #ch-list { flex: 1; overflow-y: auto; }
+  .ch-item { padding: 7px 10px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+  .ch-item:hover { background: var(--hover); }
+  .ch-item.active { background: var(--hover); border-left: 2px solid var(--accent); }
+  .ch-item .ch-name { color: var(--text); font-weight: 500; }
+  .ch-item .ch-meta { font-size: 11px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: var(--bg3); border: 1px solid var(--border); }
+  .badge-type { color: var(--type); border-color: var(--type); }
+  .badge-open { color: var(--ok); border-color: var(--ok); }
+  .badge-closed { color: var(--dim); }
+  .badge-exp { color: var(--badge); border-color: var(--badge); }
+  .badge-peer { color: var(--badge); border-color: var(--badge); }
+
+  /* ── Main area ───────────────────────────────────────────────────── */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #main-header { padding: 8px 14px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  #ch-title { font-size: 14px; color: var(--accent); font-weight: 600; flex: 1; }
+  #ch-subtitle { font-size: 11px; color: var(--dim); }
+
+  /* ── Tabs ────────────────────────────────────────────────────────── */
+  #tabs { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 14px; flex-shrink: 0; }
+  .tab { padding: 6px 14px; cursor: pointer; color: var(--dim); border-bottom: 2px solid transparent; font-size: 12px; }
+  .tab.active { color: var(--accent); border-color: var(--accent); }
+  .tab:hover { color: var(--text); }
+
+  /* ── Content panels ──────────────────────────────────────────────── */
+  #content { flex: 1; overflow-y: auto; padding: 12px 14px; }
+
+  /* ── Tables ──────────────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: var(--bg3); color: var(--dim); text-align: left; padding: 5px 8px; border: 1px solid var(--border); position: sticky; top: 0; }
+  td { padding: 4px 8px; border: 1px solid var(--border); vertical-align: top; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  tr:hover td { background: var(--hover); }
+  .key-cell { color: var(--num); font-size: 11px; max-width: 200px; }
+  .val-cell { color: var(--text); }
+  .num-cell { color: var(--dim); text-align: right; width: 40px; }
+
+  /* ── Pagination ──────────────────────────────────────────────────── */
+  #pagination { display: flex; gap: 8px; align-items: center; padding: 8px 0; font-size: 12px; color: var(--dim); }
+  #pagination .btn { padding: 2px 8px; }
+
+  /* ── Ops panel ───────────────────────────────────────────────────── */
+  .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 700px; }
+  .ops-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
+  .ops-card h3 { font-size: 12px; color: var(--accent); margin-bottom: 8px; }
+  .ops-card p { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
+  .field-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .field-row label { font-size: 11px; color: var(--dim); width: 90px; flex-shrink: 0; }
+  .field-row input, .field-row select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 3px 6px; border-radius: 3px; font-size: 12px; font-family: inherit; flex: 1; }
+
+  /* ── Live view ───────────────────────────────────────────────────── */
+  #live-log { font-size: 11px; max-height: calc(100vh - 200px); overflow-y: auto; }
+  .live-entry { padding: 3px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  .live-ts { color: var(--dim); flex-shrink: 0; }
+  .live-op { color: var(--badge); width: 60px; flex-shrink: 0; }
+  .live-key { color: var(--num); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .live-val { color: var(--dim); flex: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── Modal ───────────────────────────────────────────────────────── */
+  #modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100; align-items: center; justify-content: center; }
+  #modal-bg.visible { display: flex; }
+  #modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; width: 560px; max-height: 85vh; overflow-y: auto; padding: 20px 24px; }
+  #modal h2 { font-size: 15px; color: var(--accent); margin-bottom: 14px; }
+  .modal-field { margin-bottom: 10px; }
+  .modal-field label { display: block; font-size: 11px; color: var(--dim); margin-bottom: 3px; }
+  .modal-field input, .modal-field select, .modal-field textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; font-size: 12px; font-family: inherit; }
+  .modal-field textarea { resize: vertical; min-height: 80px; }
+  .modal-field input.required { border-color: var(--badge); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+  .format-tabs { display: flex; gap: 6px; margin: 6px 0 8px; flex-wrap: wrap; }
+  .format-tabs .btn.active { border-color: var(--accent); color: var(--accent); background: var(--hover); }
+  .data-pre { color: var(--text); font-size: 12px; padding: 8px; background: var(--bg3); border-radius: 4px; overflow-x: auto; line-height: 1.45; }
+  .njsmap-host, .tree-editor { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-size: 12px; overflow: auto; }
+  .viewer-full { height: calc(100vh - 280px); min-height: 340px; }
+  .tree-pre { white-space: pre; overflow: auto; line-height: 1.45; }
+  .pt-line { color: var(--text); }
+  .pt-key { color: var(--text); font-weight: 700; }
+  .pt-sep { color: var(--dim); }
+  .pt-str { color: var(--type); }
+  .pt-num { color: var(--num); }
+  .pt-bool { color: var(--err); }
+  .pt-null, .pt-def { color: var(--badge); }
+  .tree-row { display: flex; gap: 6px; align-items: center; min-height: 26px; border-left: 1px solid var(--border); margin-left: 8px; padding-left: 8px; }
+  .tree-key { color: var(--num); min-width: 90px; }
+  .tree-type { color: var(--type); font-size: 10px; text-transform: uppercase; }
+  .tree-prim { color: var(--text); word-break: break-word; }
+  .tree-empty { color: var(--dim); font-style: italic; }
+  .tree-editor input, .tree-editor select { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 3px 5px; border-radius: 3px; font-family: inherit; font-size: 11px; }
+  .tree-editor .tree-key-in { width: 120px; color: var(--num); }
+  .tree-editor .tree-val-in { flex: 1; min-width: 140px; }
+  .tree-editor .tree-actions { display: flex; gap: 4px; margin: 6px 0 6px 16px; }
+  .option-grid { display: grid; gap: 8px; margin-bottom: 10px; }
+  .option-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: start; }
+  .option-meta { color: var(--dim); font-size: 10px; line-height: 1.35; margin-top: 2px; }
+  .option-name { color: var(--num); font-size: 11px; padding-top: 5px; word-break: break-word; }
+  .option-name .req { color: var(--err); }
+  .type-help { color: var(--dim); font-size: 11px; line-height: 1.45; margin: 6px 0 10px; }
+  .opts-section { margin-top: 10px; border: 1px solid var(--border); border-radius: 4px; padding: 8px; }
+  .opts-section summary { cursor: pointer; font-size: 11px; color: var(--dim); }
+  .opts-section details[open] summary { color: var(--accent); }
+
+  /* ── Value editor modal ──────────────────────────────────────────── */
+  #val-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 110; align-items: center; justify-content: center; }
+  #val-modal-bg.visible { display: flex; }
+  #val-modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; width: 700px; max-height: 85vh; overflow-y: auto; padding: 20px 24px; }
+  #val-modal h2 { font-size: 14px; color: var(--accent); margin-bottom: 10px; }
+  #val-key-display { font-size: 11px; color: var(--num); margin-bottom: 8px; }
+  #val-editor { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px; font-family: inherit; font-size: 12px; min-height: 200px; resize: vertical; }
+  .val-actions { display: flex; gap: 8px; margin-top: 10px; }
+  #val-error { color: var(--err); font-size: 11px; margin-top: 4px; display: none; }
+
+  /* ── Toasts ──────────────────────────────────────────────────────── */
+  #toast-area { position: fixed; bottom: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 6px; }
+  .toast { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 12px; animation: fadeIn .2s; max-width: 320px; }
+  .toast-ok  { border-color: var(--ok);  color: var(--ok); }
+  .toast-err { border-color: var(--err); color: var(--err); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  #empty-state { color: var(--dim); text-align: center; padding: 40px; font-size: 13px; }
+  #empty-state kbd { background: var(--bg3); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <h1>CHManager <span>OpenAF Channel Manager</span><span id="top-selected-size"></span></h1>
+  <button class="btn btn-ok" onclick="openAddModal()">＋ Add Channel</button>
+  <button class="btn" onclick="refreshAll()">⟳ Refresh</button>
+  <button class="btn" onclick="toggleTheme()">◑ Theme</button>
+</div>
+
+<!-- Layout -->
+<div id="layout">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <span id="sidebar-count">0 channels</span>
+      <button class="btn" style="padding:2px 6px;font-size:11px" onclick="openAddModal()">＋</button>
+    </div>
+    <div id="ch-list"></div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+    <div id="main-header">
+      <div id="ch-title">Select a channel</div>
+      <div id="ch-subtitle"></div>
+      <button class="btn btn-ok" id="btn-open"    style="display:none" onclick="openChannel()">Open</button>
+      <button class="btn btn-err" id="btn-close"  style="display:none" onclick="closeChannel()">Close</button>
+      <button class="btn" id="btn-edit"            style="display:none" onclick="openEditModal()">Edit</button>
+      <button class="btn btn-err" id="btn-delete"  style="display:none" onclick="deleteChannel()">Delete</button>
+    </div>
+    <div id="tabs">
+      <div class="tab active" onclick="showTab('keys')"     id="tab-keys">Keys</div>
+      <div class="tab"        onclick="showTab('values')"   id="tab-values">Values</div>
+      <div class="tab"        onclick="showTab('ops')"      id="tab-ops">Operations</div>
+      <div class="tab"        onclick="showTab('live')"     id="tab-live">Live</div>
+      <div class="tab"        onclick="showTab('def')"      id="tab-def">Definition</div>
+    </div>
+    <div id="content">
+      <div id="empty-state">Select a channel in the sidebar or click <kbd>＋ Add Channel</kbd></div>
+      <div id="panel-keys"   style="display:none"></div>
+      <div id="panel-values" style="display:none"></div>
+      <div id="panel-ops"    style="display:none"></div>
+      <div id="panel-live"   style="display:none"><div id="live-log"></div></div>
+      <div id="panel-def"    style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit channel modal -->
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div id="modal">
+    <h2 id="modal-title">Add Channel</h2>
+    <div class="modal-field">
+      <label>Name <span style="color:var(--err)">*</span></label>
+      <input id="mf-name" class="required" placeholder="my-channel" />
+    </div>
+    <div class="modal-field">
+      <label>Type <span style="color:var(--err)">*</span></label>
+      <select id="mf-type" onchange="onTypeChange()"></select>
+    </div>
+    <div class="modal-field">
+      <label><input type="checkbox" id="mf-autoopen"> Auto-open on startup</label>
+    </div>
+    <div id="opts-required" class="opts-section" style="display:none">
+      <details open><summary>Required options</summary><div id="opts-required-fields"></div></details>
+    </div>
+    <div id="opts-optional" class="opts-section" style="display:none;margin-top:8px">
+      <details><summary>Optional options</summary><div id="opts-optional-fields"></div></details>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ok" onclick="saveChannel()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Value editor modal -->
+<div id="val-modal-bg" onclick="if(event.target===this)closeValModal()">
+  <div id="val-modal">
+    <h2 id="val-modal-title">Set Value</h2>
+    <div id="val-key-display"></div>
+    <div class="modal-field"><label>Key (JSON or SLON)</label><input id="val-key-in" /></div>
+    <div class="modal-field">
+      <label>Value (JSON, SLON, or visual)</label>
+      <div class="format-tabs">
+        <button class="btn active" id="btn-val-text" onclick="setValEditorMode('text')">Text</button>
+        <button class="btn" id="btn-val-visual" onclick="setValEditorMode('visual')">Visual</button>
+      </div>
+      <textarea id="val-editor"></textarea>
+      <div id="val-visual" class="tree-editor" style="display:none"></div>
+    </div>
+    <div id="val-error"></div>
+    <div class="val-actions">
+      <button class="btn" onclick="formatValEditor('json')">JSON</button>
+      <button class="btn" onclick="formatValEditor('slon')">SLON</button>
+      <button class="btn" onclick="closeValModal()">Cancel</button>
+      <button class="btn btn-ok" onclick="saveVal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast area -->
+<div id="toast-area"></div>
+
+<script src="/js/openafsigil.js"></script>
+<script src="/js/njsmap.js"></script>
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+var _selected   = null
+var _defs       = []
+var _types      = []
+var _keyPage    = 1
+var _valPage    = 1
+var _keyTotal   = 0
+var _valTotal   = 0
+var _pageSize   = 50
+var _editMode   = false
+var _valEditKey = null
+var _sseSource  = null
+var _liveActive = false
+var _liveCount  = 0
+var _defViewMode = "json"
+var _keysViewMode = "table"
+var _valsViewMode = "table"
+var _selectedSize = null
+var _valEditorMode = "text"
+var _valEditorData = {}
+var _optsEditorMode = "text"
+var _optsEditorData = {}
+var _treeEditors = {}
+var _optionFieldData = {}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", function() {
+  loadTypes().then(function() {
+    refreshAll()
+  })
+  // Start SSE
+  startSSE()
+})
+
+function toggleTheme() {
+  var t = document.documentElement.getAttribute("data-theme")
+  document.documentElement.setAttribute("data-theme", t === "light" ? "" : "light")
+}
+
+// ── API helpers ──────────────────────────────────────────────────────────────
+function api(method, path, body) {
+  return fetch("/api" + path, {
+    method: method,
+    headers: body ? { "Content-Type": "application/json" } : {},
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function(r) {
+    if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || r.statusText) })
+    return r.json()
+  })
+}
+
+function loadTypes() {
+  return api("GET", "/types").then(function(t) {
+    _types = t
+    var sel = document.getElementById("mf-type")
+    sel.innerHTML = ""
+    t.forEach(function(ty) {
+      var o = document.createElement("option")
+      o.value = ty.type
+      o.textContent = ty.type + (ty.opack !== "(built-in)" ? " [" + ty.opack + "]" : "") + (ty.available ? "" : " ✘")
+      if (!ty.available) o.style.color = "var(--err)"
+      sel.appendChild(o)
+    })
+  })
+}
+
+function refreshAll() {
+  api("GET", "/channels").then(function(defs) {
+    _defs = defs
+    renderSidebar()
+    if (_selected) {
+      var found = defs.find(function(d) { return d.name === _selected })
+      if (!found) { _selected = null; renderMain() }
+      else renderMain()
+    }
+  }).catch(function(e) { toast("Refresh failed: " + e.message, "err") })
+}
+
+// ── Sidebar ──────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  var list = document.getElementById("ch-list")
+  document.getElementById("sidebar-count").textContent = _defs.length + " channel" + (_defs.length === 1 ? "" : "s")
+  list.innerHTML = ""
+  _defs.forEach(function(d) {
+    var el = document.createElement("div")
+    el.className = "ch-item" + (d.name === _selected ? " active" : "")
+    el.onclick = function() { selectChannel(d.name) }
+    var badges = '<span class="badge badge-type">' + d.type + '</span>'
+    if (d.isOpen)    badges += '<span class="badge badge-open">● open</span>'
+    else             badges += '<span class="badge badge-closed">○ closed</span>'
+    if (d.isExposed) badges += '<span class="badge badge-exp">↑ exp</span>'
+    if (d.isPeered)  badges += '<span class="badge badge-peer">⇄ peer</span>'
+    if (d.autoOpen)  badges += '<span class="badge">⚙ auto</span>'
+    el.innerHTML = '<div class="ch-name">' + esc(d.name) + '</div><div class="ch-meta">' + badges + '</div>'
+    list.appendChild(el)
+  })
+}
+
+function selectChannel(name) {
+  _selected = name
+  _keyPage  = 1
+  _valPage  = 1
+  renderSidebar()
+  renderMain()
+}
+
+// ── Main area ─────────────────────────────────────────────────────────────────
+var _curTab = "keys"
+
+function showTab(tab) {
+  _curTab = tab
+  ;["keys","values","ops","live","def"].forEach(function(t) {
+    document.getElementById("tab-" + t).className    = "tab" + (t === tab ? " active" : "")
+    document.getElementById("panel-" + t).style.display = t === tab ? "block" : "none"
+  })
+  document.getElementById("empty-state").style.display = "none"
+  if (tab === "keys")   loadKeys()
+  if (tab === "values") loadValues()
+  if (tab === "ops")    renderOps()
+  if (tab === "def")    renderDef()
+  if (tab === "live") {
+    if (!_liveActive && _selected) startLive()
+  }
+}
+
+function renderMain() {
+  var d = _defs.find(function(x) { return x.name === _selected })
+  if (!d) {
+    document.getElementById("ch-title").textContent    = "Select a channel"
+    document.getElementById("ch-subtitle").textContent = ""
+    document.getElementById("top-selected-size").textContent = ""
+    document.getElementById("empty-state").style.display = "block"
+    ;["keys","values","ops","live","def"].forEach(function(t) { document.getElementById("panel-" + t).style.display = "none" })
+    document.getElementById("btn-open").style.display    = "none"
+    document.getElementById("btn-close").style.display   = "none"
+    document.getElementById("btn-edit").style.display    = "none"
+    document.getElementById("btn-delete").style.display  = "none"
+    return
+  }
+  document.getElementById("ch-title").textContent    = d.name
+  document.getElementById("ch-subtitle").textContent = d.type + (d.isOpen ? " · open" : " · closed")
+  document.getElementById("btn-open").style.display    = d.isOpen ? "none" : "inline-block"
+  document.getElementById("btn-close").style.display   = d.isOpen ? "inline-block" : "none"
+  document.getElementById("btn-edit").style.display    = "inline-block"
+  document.getElementById("btn-delete").style.display  = "inline-block"
+  document.getElementById("empty-state").style.display = "none"
+  refreshSelectedSize()
+  showTab(_curTab)
+}
+
+// ── Keys panel ───────────────────────────────────────────────────────────────
+function loadKeys() {
+  if (!_selected) return
+  var d = _defs.find(function(x) { return x.name === _selected })
+  if (!d || !d.isOpen) {
+    document.getElementById("panel-keys").innerHTML = '<p style="color:var(--dim);padding:20px">Channel is not open. Click <b>Open</b> to activate it.</p>'; return
+  }
+  api("GET", "/channels/" + enc(_selected) + "/keys?page=" + _keyPage + "&size=" + _pageSize)
+    .then(function(res) {
+      _keyTotal = res.total
+      applySelectedSize(res.total)
+      renderKeysTable(res.keys, res.total, res.page)
+    }).catch(function(e) { document.getElementById("panel-keys").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>' })
+}
+
+function renderKeysTable(keys, total, page) {
+  var pages = Math.ceil(total / _pageSize) || 1
+  var html  = '<button class="btn btn-ok" style="margin-bottom:8px" onclick="openNewValModal()">＋ Set New Key</button>'
+  html += '<div class="format-tabs" style="margin-bottom:8px">'
+  html += '<button class="btn' + (_keysViewMode === "table" ? " active" : "") + '" onclick="setKeysViewMode(\'table\')">Table</button>'
+  html += '<button class="btn' + (_keysViewMode === "tree" ? " active" : "") + '" onclick="setKeysViewMode(\'tree\')">Tree</button>'
+  html += '<button class="btn' + (_keysViewMode === "visual" ? " active" : "") + '" onclick="setKeysViewMode(\'visual\')">Visual</button>'
+  html += '</div>'
+  if (_keysViewMode === "tree") {
+    html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(keys) + '</div>'
+  } else if (_keysViewMode === "visual") {
+    html += '<div class="njsmap-host viewer-full">' + renderNJSMap(keys) + '</div>'
+  } else {
+    html += '<table><tr><th class="num-cell">#</th><th>Key</th><th style="width:60px">Actions</th></tr>'
+    keys.forEach(function(k, i) {
+      var ks = JSON.stringify(k)
+      var kenc = encodeURIComponent(ks)
+      var kd = compactData(k)
+      var idx = (page - 1) * _pageSize + i + 1
+      html += '<tr><td class="num-cell">' + idx + '</td>'
+      html += '<td class="key-cell" onclick="clickKeyEnc(\'' + kenc + '\')" title="' + esc(kd) + '">' + esc(kd) + '</td>'
+      html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="unsetKeyEnc(\'' + kenc + '\')">✕</button></td>'
+      html += '</tr>'
+    })
+    html += '</table>'
+  }
+  html += renderPager(page, pages, total, "keys")
+  document.getElementById("panel-keys").innerHTML = html
+}
+
+function setKeysViewMode(mode) {
+  _keysViewMode = mode
+  loadKeys()
+}
+
+function clickKeyEnc(keyEnc) {
+  clickKey(decodeURIComponent(keyEnc))
+}
+
+function clickKey(keyStr) {
+  api("GET", "/channels/" + enc(_selected) + "/get?key=" + encodeURIComponent(keyStr))
+    .then(function(r) { openValModal(r.key, r.value) })
+    .catch(function(e) { toast("Error: " + e.message, "err") })
+}
+
+function unsetKeyEnc(keyEnc) {
+  unsetKey(decodeURIComponent(keyEnc))
+}
+
+function unsetKey(keyStr) {
+  if (!confirm("Remove key " + keyStr + "?")) return
+  api("DELETE", "/channels/" + enc(_selected) + "/unset?key=" + encodeURIComponent(keyStr))
+    .then(function() { toast("Key removed"); loadKeys() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function openNewValModal() {
+  openValModal(null, null)
+}
+
+// ── Values panel ─────────────────────────────────────────────────────────────
+function loadValues() {
+  if (!_selected) return
+  var d = _defs.find(function(x) { return x.name === _selected })
+  if (!d || !d.isOpen) {
+    document.getElementById("panel-values").innerHTML = '<p style="color:var(--dim);padding:20px">Channel is not open.</p>'; return
+  }
+  api("GET", "/channels/" + enc(_selected) + "/values?page=" + _valPage + "&size=" + _pageSize)
+    .then(function(res) {
+      _valTotal = res.total
+      applySelectedSize(res.total)
+      renderValuesTable(res.values, res.total, res.page)
+    }).catch(function(e) { document.getElementById("panel-values").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>' })
+}
+
+function renderValuesTable(vals, total, page) {
+  var pages = Math.ceil(total / _pageSize) || 1
+  var html  = '<div class="format-tabs" style="margin-bottom:8px">'
+  html += '<button class="btn' + (_valsViewMode === "table" ? " active" : "") + '" onclick="setValsViewMode(\'table\')">Table</button>'
+  html += '<button class="btn' + (_valsViewMode === "tree" ? " active" : "") + '" onclick="setValsViewMode(\'tree\')">Tree</button>'
+  html += '<button class="btn' + (_valsViewMode === "visual" ? " active" : "") + '" onclick="setValsViewMode(\'visual\')">Visual</button>'
+  html += '</div>'
+  if (_valsViewMode === "tree") {
+    html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(vals) + '</div>'
+  } else if (_valsViewMode === "visual") {
+    html += '<div class="njsmap-host viewer-full">' + renderNJSMap(vals) + '</div>'
+  } else {
+    html += '<table><tr><th class="num-cell">#</th><th>Value</th></tr>'
+    vals.forEach(function(v, i) {
+      var vs  = JSON.stringify(v)
+      var venc = encodeURIComponent(vs)
+      var vd  = compactData(v)
+      var idx = (page - 1) * _pageSize + i + 1
+      html += '<tr><td class="num-cell">' + idx + '</td>'
+      html += '<td class="val-cell" onclick="openValFromEnc(\'' + venc + '\')" title="' + esc(vd) + '">' + esc(vd.length > 120 ? vd.substring(0, 120) + "…" : vd) + '</td>'
+      html += '</tr>'
+    })
+    html += '</table>'
+  }
+  html += renderPager(page, pages, total, "values")
+  document.getElementById("panel-values").innerHTML = html
+}
+
+function setValsViewMode(mode) {
+  _valsViewMode = mode
+  loadValues()
+}
+
+function openValFromEnc(valEnc) {
+  try {
+    openValModal(null, JSON.parse(decodeURIComponent(valEnc)))
+  } catch(e) {
+    toast("Value decode error: " + e.message, "err")
+  }
+}
+
+function renderPager(page, pages, total, which) {
+  if (pages <= 1) return '<div class="pagination" style="color:var(--dim);font-size:11px;padding:6px 0">' + total + ' entries</div>'
+  var html = '<div id="pagination">'
+  html += '<button class="btn" onclick="changePageTo(\'' + which + '\',1)" ' + (page <= 1 ? "disabled" : "") + '>⏮</button>'
+  html += '<button class="btn" onclick="changePage(\'' + which + '\',-1)" ' + (page <= 1 ? "disabled" : "") + '>◀</button>'
+  html += '<span>Page ' + page + ' / ' + pages + ' (' + total + ' entries)</span>'
+  html += '<button class="btn" onclick="changePage(\'' + which + '\',1)" ' + (page >= pages ? "disabled" : "") + '>▶</button>'
+  html += '<button class="btn" onclick="changePageTo(\'' + which + '\',' + pages + ')" ' + (page >= pages ? "disabled" : "") + '>⏭</button>'
+  html += '</div>'
+  return html
+}
+
+function changePage(which, delta) {
+  if (which === "keys") {
+    _keyPage = Math.max(1, _keyPage + delta); loadKeys()
+  } else {
+    _valPage = Math.max(1, _valPage + delta); loadValues()
+  }
+}
+
+function changePageTo(which, page) {
+  if (which === "keys") {
+    _keyPage = Math.max(1, page); loadKeys()
+  } else {
+    _valPage = Math.max(1, page); loadValues()
+  }
+}
+
+// ── Ops panel ─────────────────────────────────────────────────────────────────
+function renderOps() {
+  var html = '<div class="ops-grid">'
+
+  html += card("Expose via HTTP",
+    "Serve this channel over HTTP so remote instances can access it.",
+    '<div class="field-row"><label>Port</label><input id="op-exp-port" value="8091" /></div>' +
+    '<div class="field-row"><label>Path</label><input id="op-exp-path" placeholder="/' + (_selected||"ch") + '" /></div>' +
+    '<button class="btn btn-ok" onclick="doExpose()">Expose</button> ' +
+    '<button class="btn btn-err" onclick="doUnexpose()">Remove</button>')
+
+  html += card("Peer with remotes",
+    "Bidirectional sync with one or more remote channel URLs.",
+    '<div class="field-row"><label>Port</label><input id="op-peer-port" value="8092" /></div>' +
+    '<div class="field-row"><label>Path</label><input id="op-peer-path" placeholder="/' + (_selected||"ch") + '" /></div>' +
+    '<div class="field-row"><label>Remote URLs</label><input id="op-peer-urls" placeholder="http://host:8092/path,..." /></div>' +
+    '<button class="btn btn-ok" onclick="doPeer()">Peer</button> ' +
+    '<button class="btn btn-err" onclick="doUnpeer()">Unpeer all</button>')
+
+  html += card("Mirror subscriber",
+    "Mirror all changes from this channel to another open channel.",
+    '<div class="field-row"><label>Target channel</label><input id="op-mirror-target" placeholder="other-channel" /></div>' +
+    '<button class="btn btn-ok" onclick="doMirror()">Add Mirror</button>')
+
+  html += card("Housekeep",
+    "Automatically remove oldest entries when size exceeds a limit.",
+    '<div class="field-row"><label>Max keys</label><input id="op-hk-max" value="100" /></div>' +
+    '<button class="btn btn-ok" onclick="doHousekeep()">Add Housekeep</button>')
+
+  html += card("Buffer subscriber",
+    "Buffer writes and flush periodically to another channel.",
+    '<div class="field-row"><label>Target channel</label><input id="op-buf-target" placeholder="target-channel" /></div>' +
+    '<div class="field-row"><label>Key fields</label><input id="op-buf-idxs" placeholder="id,type" /></div>' +
+    '<div class="field-row"><label>Flush after N</label><input id="op-buf-num" value="100" /></div>' +
+    '<div class="field-row"><label>Flush after ms</label><input id="op-buf-time" value="2500" /></div>' +
+    '<button class="btn btn-ok" onclick="doBuffer()">Add Buffer</button>')
+
+  html += card("Sync channels",
+    "One-shot sync: copy missing/updated entries between two open channels.",
+    '<div class="field-row"><label>Target channel</label><input id="op-sync-target" placeholder="target-channel" /></div>' +
+    '<div class="field-row"><label>Key fields</label><input id="op-sync-idxs" placeholder="id,type" /></div>' +
+    '<button class="btn btn-ok" onclick="doSync()">Sync now</button>')
+
+  html += card("Clear all entries",
+    "Remove ALL entries from this channel. Cannot be undone.",
+    '<button class="btn btn-err" onclick="doClear()">Clear all</button>')
+
+  html += card("Export",
+    "Export all entries to a JSON or YAML file path on the server.",
+    '<div class="field-row"><label>File path</label><input id="op-exp-file" placeholder="/tmp/export.json" /></div>' +
+    '<button class="btn" onclick="doExport()">Export</button>')
+
+  html += '</div>'
+  document.getElementById("panel-ops").innerHTML = html
+}
+
+function card(title, desc, body) {
+  return '<div class="ops-card"><h3>' + esc(title) + '</h3><p>' + esc(desc) + '</p>' + body + '</div>'
+}
+
+function doExpose() {
+  var port = parseInt(document.getElementById("op-exp-port").value)
+  var path = document.getElementById("op-exp-path").value || ("/" + _selected)
+  api("POST", "/channels/" + enc(_selected) + "/expose", { port: port, path: path })
+    .then(function() { toast("Exposed on port " + port); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doUnexpose() {
+  api("POST", "/channels/" + enc(_selected) + "/unexpose", {})
+    .then(function() { toast("Unexposed"); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doPeer() {
+  var port = parseInt(document.getElementById("op-peer-port").value)
+  var path = document.getElementById("op-peer-path").value || ("/" + _selected)
+  var urls = document.getElementById("op-peer-urls").value.split(",").map(function(s){return s.trim()}).filter(Boolean)
+  api("POST", "/channels/" + enc(_selected) + "/peer", { port: port, path: path, urls: urls })
+    .then(function() { toast("Peered with " + urls.length + " remote(s)"); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doUnpeer() {
+  api("POST", "/channels/" + enc(_selected) + "/unpeer", {})
+    .then(function() { toast("Unpeered"); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doMirror() {
+  var target = document.getElementById("op-mirror-target").value.trim()
+  if (!target) { toast("Target channel is required", "err"); return }
+  api("POST", "/channels/" + enc(_selected) + "/mirror", { target: target })
+    .then(function(r) { toast("Mirror subscriber added (id: " + r.subId + ")") })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doHousekeep() {
+  var max = parseInt(document.getElementById("op-hk-max").value)
+  api("POST", "/channels/" + enc(_selected) + "/housekeep", { maxKeys: max })
+    .then(function(r) { toast("Housekeep subscriber added") })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doBuffer() {
+  var target = document.getElementById("op-buf-target").value.trim()
+  var idxs   = document.getElementById("op-buf-idxs").value.split(",").map(function(s){return s.trim()}).filter(Boolean)
+  var byNum  = parseInt(document.getElementById("op-buf-num").value)
+  var byTime = parseInt(document.getElementById("op-buf-time").value)
+  api("POST", "/channels/" + enc(_selected) + "/buffer", { target: target, idxs: idxs, byNum: byNum, byTime: byTime })
+    .then(function(r) { toast("Buffer subscriber added") })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doSync() {
+  var target = document.getElementById("op-sync-target").value.trim()
+  var idxs   = document.getElementById("op-sync-idxs").value.split(",").map(function(s){return s.trim()}).filter(Boolean)
+  api("POST", "/channels/" + enc(_selected) + "/sync", { target: target, idxs: idxs })
+    .then(function() { toast("Sync complete") })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doClear() {
+  if (!confirm("Clear ALL entries in '" + _selected + "'? This cannot be undone.")) return
+  api("POST", "/channels/" + enc(_selected) + "/clear", {})
+    .then(function(r) { toast("Cleared " + r.removed + " entries"); loadKeys() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function doExport() {
+  var file = document.getElementById("op-exp-file").value.trim()
+  if (!file) { toast("File path is required", "err"); return }
+  // Use set endpoint as export trigger – this just informs via alert since export writes to server FS
+  api("GET", "/channels/" + enc(_selected) + "/values?page=1&size=100000")
+    .then(function(r) { toast("Export not yet wired to server-side file write via web UI. Use TUI: /export " + _selected + " " + file) })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+// ── Live panel ───────────────────────────────────────────────────────────────
+function startLive() {
+  _liveActive = true
+  _liveCount  = 0
+}
+
+function startSSE() {
+  if (_sseSource) _sseSource.close()
+  _sseSource = new EventSource("/api/events")
+  _sseSource.onmessage = function(e) {
+    try {
+      var ev = JSON.parse(e.data)
+      if (!ev.channel) return
+      var log = document.getElementById("live-log")
+      if (!log) return
+      if (_curTab !== "live" || ev.channel !== _selected) return
+      var entry = document.createElement("div")
+      entry.className = "live-entry"
+      var ts = new Date(ev.ts).toISOString().replace("T", " ").replace("Z", "").substring(0, 23)
+      entry.innerHTML = '<span class="live-ts">' + esc(ts) + '</span>'
+        + '<span class="live-op">' + esc(ev.op) + '</span>'
+        + '<span class="live-key">' + esc(compactData(ev.key)) + '</span>'
+      log.insertBefore(entry, log.firstChild)
+      _liveCount++
+      if (_liveCount > 200) { var last = log.lastChild; if (last) log.removeChild(last) }
+    } catch(err) {}
+  }
+  _sseSource.onerror = function() { _sseSource = null; setTimeout(startSSE, 3000) }
+}
+
+// ── Definition panel ─────────────────────────────────────────────────────────
+function renderDef() {
+  if (!_selected) return
+  Promise.all([
+    api("GET", "/channels/" + enc(_selected)),
+    api("GET", "/channels/" + enc(_selected) + "/size").catch(function() { return { size: null } })
+  ]).then(function(all) {
+      var d = all[0]
+      var sz = all[1]
+      var tinfo = getTypeInfo(d.type)
+      var payload = mergeTypeInfo(d, tinfo)
+      var sizeInfo = '<div class="type-help">Current size: ' + esc(sz && sz.size !== null && sz.size !== undefined ? String(sz.size) : "n/a") + '</div>'
+      document.getElementById("panel-def").innerHTML =
+        sizeInfo + renderTypeInfo(tinfo) + renderDataViewer(payload, _defViewMode, "setDefViewMode")
+    }).catch(function(e) { document.getElementById("panel-def").innerHTML = '<p style="color:var(--err)">' + esc(e.message) + '</p>' })
+}
+
+function setDefViewMode(mode) {
+  _defViewMode = mode
+  renderDef()
+}
+
+// ── Channel open/close ────────────────────────────────────────────────────────
+function openChannel() {
+  api("POST", "/channels/" + enc(_selected) + "/open", {})
+    .then(function() { toast("Opened: " + _selected); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function closeChannel() {
+  api("POST", "/channels/" + enc(_selected) + "/close", {})
+    .then(function() { toast("Closed: " + _selected); refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function deleteChannel() {
+  if (!confirm("Delete channel definition '" + _selected + "'?")) return
+  api("DELETE", "/channels/" + enc(_selected), {})
+    .then(function() { toast("Deleted: " + _selected); _selected = null; refreshAll() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+// ── Add/Edit modal ────────────────────────────────────────────────────────────
+function openAddModal() {
+  _editMode = false
+  document.getElementById("modal-title").textContent = "Add Channel"
+  document.getElementById("mf-name").value           = ""
+  document.getElementById("mf-name").disabled        = false
+  document.getElementById("mf-type").value           = "simple"
+  document.getElementById("mf-autoopen").checked     = false
+  onTypeChange()
+  document.getElementById("modal-bg").classList.add("visible")
+  document.getElementById("mf-name").focus()
+}
+
+function openEditModal() {
+  if (!_selected) return
+  _editMode = true
+  var d = _defs.find(function(x) { return x.name === _selected })
+  if (!d) return
+  document.getElementById("modal-title").textContent = "Edit Channel: " + d.name
+  document.getElementById("mf-name").value           = d.name
+  document.getElementById("mf-name").disabled        = true
+  document.getElementById("mf-type").value           = d.type
+  document.getElementById("mf-autoopen").checked     = d.autoOpen
+  onTypeChange(d.options)
+  document.getElementById("modal-bg").classList.add("visible")
+}
+
+function onTypeChange(existingOpts) {
+  var type  = document.getElementById("mf-type").value
+  var tinfo = getTypeInfo(type)
+  _optsEditorData = cloneData(existingOpts || {})
+  _optsEditorMode = "text"
+  _optionFieldData = cloneData(_optsEditorData)
+  var reqDiv = document.getElementById("opts-required")
+  var optDiv = document.getElementById("opts-optional")
+  reqDiv.style.display = "block"
+  optDiv.style.display = "none"
+  document.getElementById("opts-required-fields").innerHTML =
+    renderTypeInfo(tinfo) +
+    renderOptionFields(tinfo, _optsEditorData) +
+    '<div class="modal-field"><label>Raw options (JSON, SLON, or visual)</label>' +
+    '<div class="format-tabs">' +
+    '<button class="btn active" id="btn-opts-text" onclick="setOptsEditorMode(\'text\')">Text</button>' +
+    '<button class="btn" id="btn-opts-visual" onclick="setOptsEditorMode(\'visual\')">Visual</button>' +
+    '<button class="btn" onclick="formatOptsEditor(\'json\')">JSON</button>' +
+    '<button class="btn" onclick="formatOptsEditor(\'slon\')">SLON</button>' +
+    '</div>' +
+    '<textarea id="mf-opts" style="min-height:80px">' +
+    esc(JSON.stringify(_optsEditorData, null, 2)) +
+    '</textarea><div id="opts-visual" class="tree-editor" style="display:none"></div></div>'
+}
+
+function closeModal() {
+  document.getElementById("modal-bg").classList.remove("visible")
+}
+
+function saveChannel() {
+  var name = document.getElementById("mf-name").value.trim()
+  var type = document.getElementById("mf-type").value
+  var autoOpen = document.getElementById("mf-autoopen").checked
+  var options
+  try { options = getOptsEditorData() } catch(e) { toast("Options are invalid: " + e.message, "err"); return }
+
+  var p
+  if (_editMode) {
+    p = api("PUT", "/channels/" + enc(name), { type: type, options: options, autoOpen: autoOpen })
+  } else {
+    p = api("POST", "/channels", { name: name, type: type, options: options, autoOpen: autoOpen })
+  }
+  p.then(function() {
+    closeModal()
+    toast((_editMode ? "Updated" : "Added") + ": " + name)
+    refreshAll()
+  }).catch(function(e) { toast(e.message, "err") })
+}
+
+function setOptsEditorMode(mode, keepData) {
+  try {
+    if (!keepData) _optsEditorData = getOptsEditorData()
+    _optsEditorMode = mode
+    document.getElementById("btn-opts-text").className = "btn" + (mode === "text" ? " active" : "")
+    document.getElementById("btn-opts-visual").className = "btn" + (mode === "visual" ? " active" : "")
+    document.getElementById("mf-opts").style.display = mode === "text" ? "block" : "none"
+    document.getElementById("opts-visual").style.display = mode === "visual" ? "block" : "none"
+    if (mode === "text") {
+      document.getElementById("mf-opts").value = JSON.stringify(_optsEditorData, null, 2)
+    } else {
+      renderTreeEditor("opts-visual", _optsEditorData, function(v) { _optsEditorData = v })
+    }
+  } catch(e) {
+    toast("Options are invalid: " + e.message, "err")
+  }
+}
+
+function formatOptsEditor(format) {
+  try {
+    var v = getOptsEditorData()
+    _optsEditorData = cloneData(v)
+    setOptsEditorMode("text", true)
+    document.getElementById("mf-opts").value = format === "slon" ? toSlon(v, 0) : JSON.stringify(v, null, 2)
+  } catch(e) {
+    toast("Options are invalid: " + e.message, "err")
+  }
+}
+
+function getOptsEditorData() {
+  var fieldData = readOptionFields()
+  if (_optsEditorMode === "visual") return Object.assign({}, _optsEditorData || {}, fieldData || {})
+  var s = ((document.getElementById("mf-opts") || {}).value || "").trim()
+  var raw = s.length ? parseDataText(s) : {}
+  return Object.assign({}, raw || {}, fieldData || {})
+}
+
+function getTypeInfo(type) {
+  return _types.find(function(t) { return t.type === type }) || {}
+}
+
+function renderTypeInfo(tinfo) {
+  if (!tinfo || (!tinfo.desc && !tinfo.odoc && !tinfo.options)) return ""
+  var count = tinfo.options ? Object.keys(tinfo.options).length : 0
+  var bits = []
+  if (tinfo.desc) bits.push(esc(tinfo.desc))
+  if (tinfo.odoc) bits.push("odoc: " + esc(tinfo.odoc))
+  bits.push(count + " option" + (count === 1 ? "" : "s"))
+  return '<div class="type-help">' + bits.join(" · ") + '</div>'
+}
+
+function mergeTypeInfo(def, tinfo) {
+  var out = Object.assign({}, def)
+  if (tinfo && (tinfo.desc || tinfo.odoc || tinfo.options)) {
+    out.typeInfo = {
+      desc: tinfo.desc,
+      odoc: tinfo.odoc,
+      options: tinfo.options || {}
+    }
+  }
+  return out
+}
+
+function renderOptionFields(tinfo, values) {
+  var opts = (tinfo && tinfo.options) || {}
+  var names = Object.keys(opts)
+  if (names.length === 0) return '<div class="type-help">This channel type has no creation options.</div>'
+  var html = '<div class="option-grid">'
+  names.forEach(function(name) {
+    var spec = opts[name] || {}
+    var id = optionFieldId(name)
+    var val = Object.prototype.hasOwnProperty.call(values, name) ? values[name] : spec.default
+    html += '<div class="option-row">'
+    html += '<div class="option-name">' + esc(name) + (spec.required ? ' <span class="req">*</span>' : '') + '</div>'
+    html += '<div>' + renderOptionInput(id, spec, val)
+    html += '<div class="option-meta">' + esc(spec.type || "string") + (isDefVal(spec.default) ? " · default: " + esc(compactData(spec.default)) : "") + (spec.desc ? " · " + esc(spec.desc) : "") + '</div></div>'
+    html += '</div>'
+  })
+  html += '</div>'
+  return html
+}
+
+function renderOptionInput(id, spec, val) {
+  var type = spec.type || "string"
+  if (type === "boolean") return '<select data-opt-field="1" data-opt-type="boolean" id="' + id + '"><option value=""></option><option value="true"' + (val === true ? " selected" : "") + '>true</option><option value="false"' + (val === false ? " selected" : "") + '>false</option></select>'
+  if (type === "number") return '<input data-opt-field="1" data-opt-type="number" id="' + id + '" value="' + esc(isDefVal(val) ? val : "") + '" />'
+  if (type === "array" || type === "object") return '<input data-opt-field="1" data-opt-type="' + type + '" id="' + id + '" value="' + esc(isDefVal(val) ? compactData(val) : "") + '" placeholder="' + (type === "array" ? "[...]" : "(...)") + '" />'
+  if (type === "function") return '<textarea data-opt-field="1" data-opt-type="function" id="' + id + '" placeholder="function(...) { ... }">' + esc(isDefVal(val) ? String(val) : "") + '</textarea>'
+  return '<input data-opt-field="1" data-opt-type="string" id="' + id + '" value="' + esc(isDefVal(val) ? val : "") + '" />'
+}
+
+function readOptionFields() {
+  var out = {}
+  Array.prototype.slice.call(document.querySelectorAll("[data-opt-field='1']")).forEach(function(el) {
+    var raw = (el.value || "").trim()
+    if (raw === "") return
+    var name = decodeURIComponent(el.id.replace(/^optf-/, ""))
+    var type = el.getAttribute("data-opt-type") || "string"
+    if (type === "boolean") out[name] = raw === "true"
+    else if (type === "number") out[name] = Number(raw)
+    else if (type === "array" || type === "object") out[name] = parseDataText(raw)
+    else out[name] = raw
+  })
+  return out
+}
+
+function optionFieldId(name) {
+  return "optf-" + encodeURIComponent(name)
+}
+
+function isDefVal(v) {
+  return v !== undefined && v !== null
+}
+
+// ── Value editor ──────────────────────────────────────────────────────────────
+function openValModal(key, val) {
+  _valEditKey = key
+  _valEditorMode = "text"
+  _valEditorData = cloneData(val !== null && val !== undefined ? val : {})
+  document.getElementById("val-modal-title").textContent = key ? "Edit Value" : "Set New Value"
+  document.getElementById("val-key-in").value  = key !== null && key !== undefined ? JSON.stringify(key) : ""
+  document.getElementById("val-editor").value  = val !== null && val !== undefined ? JSON.stringify(val, null, 2) : ""
+  document.getElementById("val-editor").style.display = "block"
+  document.getElementById("val-visual").style.display = "none"
+  document.getElementById("btn-val-text").className = "btn active"
+  document.getElementById("btn-val-visual").className = "btn"
+  document.getElementById("val-error").style.display = "none"
+  document.getElementById("val-modal-bg").classList.add("visible")
+}
+
+function closeValModal() {
+  document.getElementById("val-modal-bg").classList.remove("visible")
+}
+
+function formatValEditor(format) {
+  try {
+    var v = getValEditorData()
+    _valEditorData = cloneData(v)
+    setValEditorMode("text", true)
+    document.getElementById("val-editor").value = format === "slon" ? toSlon(v, 0) : JSON.stringify(v, null, 2)
+    document.getElementById("val-error").style.display = "none"
+  } catch(e) {
+    document.getElementById("val-error").textContent = "Invalid JSON/SLON: " + e.message
+    document.getElementById("val-error").style.display = "block"
+  }
+}
+
+function saveVal() {
+  var keyStr = document.getElementById("val-key-in").value.trim()
+  if (!keyStr) { toast("Key is required", "err"); return }
+  var key, val
+  try { key = parseDataText(keyStr) } catch(e) { toast("Key JSON/SLON invalid: " + e.message, "err"); return }
+  try { val = getValEditorData() } catch(e) { toast("Value JSON/SLON invalid: " + e.message, "err"); return }
+  api("POST", "/channels/" + enc(_selected) + "/set", { key: key, value: val })
+    .then(function() { toast("Saved"); closeValModal(); if (_curTab === "keys") loadKeys(); else if (_curTab === "values") loadValues() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function setValEditorMode(mode, keepData) {
+  try {
+    if (!keepData) _valEditorData = getValEditorData()
+    _valEditorMode = mode
+    document.getElementById("btn-val-text").className = "btn" + (mode === "text" ? " active" : "")
+    document.getElementById("btn-val-visual").className = "btn" + (mode === "visual" ? " active" : "")
+    document.getElementById("val-editor").style.display = mode === "text" ? "block" : "none"
+    document.getElementById("val-visual").style.display = mode === "visual" ? "block" : "none"
+    if (mode === "text") {
+      document.getElementById("val-editor").value = JSON.stringify(_valEditorData, null, 2)
+    } else {
+      renderTreeEditor("val-visual", _valEditorData, function(v) { _valEditorData = v })
+    }
+    document.getElementById("val-error").style.display = "none"
+  } catch(e) {
+    document.getElementById("val-error").textContent = "Invalid JSON/SLON: " + e.message
+    document.getElementById("val-error").style.display = "block"
+  }
+}
+
+function getValEditorData() {
+  if (_valEditorMode === "visual") return _valEditorData
+  var s = document.getElementById("val-editor").value.trim()
+  return s.length ? parseDataText(s) : null
+}
+
+// ── Toasts ────────────────────────────────────────────────────────────────────
+function toast(msg, type) {
+  var el = document.createElement("div")
+  el.className = "toast toast-" + (type || "ok")
+  el.textContent = msg
+  document.getElementById("toast-area").appendChild(el)
+  setTimeout(function() { el.remove() }, 3500)
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function parseDataText(s) {
+  s = String(s || "").trim()
+  if (!s) return null
+  try { return JSON.parse(s) } catch(jsonErr) {}
+  return parseSlon(s)
+}
+
+function parseSlon(s) {
+  var i = 0
+  function err(msg) { throw new Error(msg + " at " + i) }
+  function ws() { while (/\s/.test(s.charAt(i))) i++ }
+  function ch(c) { ws(); if (s.charAt(i) !== c) err("Expected '" + c + "'"); i++ }
+  function value() {
+    ws()
+    var c = s.charAt(i)
+    if (c === "(") return map()
+    if (c === "[") return arr()
+    if (c === "'" || c === '"') return quoted()
+    return atom()
+  }
+  function map() {
+    var out = {}
+    ch("("); ws()
+    if (s.charAt(i) === ")") { i++; return out }
+    while (i < s.length) {
+      var k = key()
+      ch(":")
+      out[k] = value()
+      ws()
+      if (s.charAt(i) === ",") { i++; continue }
+      if (s.charAt(i) === ")") { i++; return out }
+      err("Expected ',' or ')'")
+    }
+    err("Unclosed map")
+  }
+  function arr() {
+    var out = []
+    ch("["); ws()
+    if (s.charAt(i) === "]") { i++; return out }
+    while (i < s.length) {
+      out.push(value())
+      ws()
+      if (s.charAt(i) === "|") { i++; continue }
+      if (s.charAt(i) === ",") { i++; continue }
+      if (s.charAt(i) === "]") { i++; return out }
+      err("Expected '|', ',' or ']'")
+    }
+    err("Unclosed array")
+  }
+  function key() {
+    ws()
+    var c = s.charAt(i)
+    if (c === "'" || c === '"') return quoted()
+    var start = i
+    while (i < s.length && !/[:\s]/.test(s.charAt(i))) i++
+    if (i === start) err("Expected key")
+    return s.substring(start, i)
+  }
+  function quoted() {
+    var q = s.charAt(i++), out = ""
+    while (i < s.length) {
+      var c = s.charAt(i++)
+      if (c === q) return out
+      if (c === "\\") {
+        var n = s.charAt(i++)
+        if (n === "n") out += "\n"
+        else if (n === "r") out += "\r"
+        else if (n === "t") out += "\t"
+        else out += n
+      } else out += c
+    }
+    err("Unclosed string")
+  }
+  function atom() {
+    var start = i
+    while (i < s.length && !/[\s,\|\]\)]/.test(s.charAt(i))) i++
+    var raw = s.substring(start, i)
+    if (raw === "") err("Expected value")
+    if (raw === "true") return true
+    if (raw === "false") return false
+    if (raw === "null") return null
+    if (/^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw)) return Number(raw)
+    return raw
+  }
+  var out = value()
+  ws()
+  if (i < s.length) err("Unexpected input")
+  return out
+}
+
+function toSlon(v) {
+  if (v === null) return "null"
+  if (Array.isArray(v)) return "[" + v.map(function(x) { return toSlon(x) }).join(" | ") + "]"
+  if (typeof v === "object") return "(" + Object.keys(v).map(function(k) { return slonKey(k) + ": " + toSlon(v[k]) }).join(", ") + ")"
+  if (typeof v === "number" || typeof v === "boolean") return String(v)
+  return slonString(String(v))
+}
+
+function compactData(v) {
+  if (Array.isArray(v) || (v && typeof v === "object")) return toSlon(v)
+  return JSON.stringify(v)
+}
+
+function slonKey(k) {
+  return /^[^\s:\(\),\[\]\|'"\\]+$/.test(k) ? k : slonString(k)
+}
+
+function slonString(s) {
+  if (/^[^\s:\(\),\[\]\|'"\\]+$/.test(s) && s !== "true" && s !== "false" && s !== "null" && !/^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(s)) return s
+  return "'" + s.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t") + "'"
+}
+
+function isDarkTheme() {
+  return document.documentElement.getAttribute("data-theme") !== "light"
+}
+
+function safeVisualData(v) {
+  if (Array.isArray(v)) return v.map(safeVisualData)
+  if (v && typeof v === "object") {
+    var out = {}
+    Object.keys(v).forEach(function(k) { out[esc(k)] = safeVisualData(v[k]) })
+    return out
+  }
+  if (typeof v === "string") return esc(v)
+  return v
+}
+
+function renderDataViewer(data, mode, setter) {
+  var tabs = '<div class="format-tabs">' +
+    '<button class="btn' + (mode === "json" ? " active" : "") + '" onclick="' + setter + '(\'json\')">JSON</button>' +
+    '<button class="btn' + (mode === "slon" ? " active" : "") + '" onclick="' + setter + '(\'slon\')">SLON</button>' +
+    '<button class="btn' + (mode === "tree" ? " active" : "") + '" onclick="' + setter + '(\'tree\')">Tree</button>' +
+    '<button class="btn' + (mode === "visual" ? " active" : "") + '" onclick="' + setter + '(\'visual\')">Visual</button>' +
+    '</div>'
+  if (mode === "slon") return tabs + '<pre class="data-pre">' + esc(toSlon(data)) + '</pre>'
+  if (mode === "tree") return tabs + '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(data) + '</div>'
+  if (mode === "visual") return tabs + '<div class="njsmap-host viewer-full">' + renderNJSMap(data) + '</div>'
+  return tabs + '<pre class="data-pre">' + esc(JSON.stringify(data, null, 2)) + '</pre>'
+}
+
+function renderNJSMap(data) {
+  if (typeof nJSMap !== "function") return '<pre class="data-pre">' + esc(JSON.stringify(data, null, 2)) + '</pre>'
+  try {
+    return nJSMap(safeVisualData(data), void 0, isDarkTheme())
+  } catch(e) {
+    return '<pre class="data-pre">' + esc(JSON.stringify(data, null, 2)) + '</pre>'
+  }
+}
+
+function renderAsciiTree(data) {
+  var lines = []
+  function valStr(v) {
+    if (v === null) return "null"
+    if (typeof v === "string") return JSON.stringify(v)
+    if (typeof v === "number" || typeof v === "boolean") return String(v)
+    return ""
+  }
+  function walk(node, name, prefix, isLast) {
+    var branch = prefix ? (isLast ? "└─ " : "├─ ") : ""
+    var rowPrefix = prefix ? prefix + branch : ""
+    if (node === null || typeof node !== "object") {
+      lines.push(rowPrefix + name + ": " + valStr(node))
+      return
+    }
+    if (Array.isArray(node)) {
+      lines.push(rowPrefix + name + " [array " + node.length + "]")
+      var nextPrefix = prefix + (isLast ? "   " : "│  ")
+      node.forEach(function(v, i) {
+        walk(v, "[" + i + "]", nextPrefix, i === node.length - 1)
+      })
+      return
+    }
+    var ks = Object.keys(node)
+    lines.push(rowPrefix + name + " {map " + ks.length + "}")
+    var mapPrefix = prefix + (isLast ? "   " : "│  ")
+    ks.forEach(function(k, i) {
+      walk(node[k], k, mapPrefix, i === ks.length - 1)
+    })
+  }
+  walk(data, "root", "", true)
+  return lines.join("\n")
+}
+
+function renderAsciiTreeHtml(data) {
+  function keyHtml(s) { return '<span class="pt-key">' + esc(s) + '</span>' }
+  function valueHtml(v) {
+    if (v === null) return '<span class="pt-null">null</span>'
+    if (typeof v === "number") return '<span class="pt-num">' + esc(String(v)) + '</span>'
+    if (typeof v === "boolean") return '<span class="pt-bool">' + esc(String(v)) + '</span>'
+    if (typeof v === "string") return '<span class="pt-str">' + esc(JSON.stringify(v)) + '</span>'
+    return '<span class="pt-def">' + esc(String(v)) + '</span>'
+  }
+  var lines = []
+  function walk(node, name, prefix, isLast) {
+    var branch = prefix ? (isLast ? "└─ " : "├─ ") : ""
+    var rowPrefix = prefix ? (prefix + branch) : ""
+    if (node === null || typeof node !== "object") {
+      lines.push('<span class="pt-line">' + esc(rowPrefix) + '</span>' + keyHtml(name) + '<span class="pt-sep">: </span>' + valueHtml(node))
+      return
+    }
+    if (Array.isArray(node)) {
+      lines.push('<span class="pt-line">' + esc(rowPrefix) + '</span>' + keyHtml(name) + '<span class="pt-sep"> [array ' + node.length + ']</span>')
+      var nextPrefix = prefix + (isLast ? "   " : "│  ")
+      node.forEach(function(v, i) {
+        walk(v, "[" + i + "]", nextPrefix, i === node.length - 1)
+      })
+      return
+    }
+    var ks = Object.keys(node)
+    lines.push('<span class="pt-line">' + esc(rowPrefix) + '</span>' + keyHtml(name) + '<span class="pt-sep"> {map ' + ks.length + '}</span>')
+    var mapPrefix = prefix + (isLast ? "   " : "│  ")
+    ks.forEach(function(k, i) {
+      walk(node[k], k, mapPrefix, i === ks.length - 1)
+    })
+  }
+  walk(data, "root", "", true)
+  return lines.join("\n")
+}
+
+function refreshSelectedSize() {
+  var subtitle = document.getElementById("ch-subtitle")
+  var topSize = document.getElementById("top-selected-size")
+  if (!_selected) {
+    _selectedSize = null
+    if (topSize) topSize.textContent = ""
+    return
+  }
+  api("GET", "/channels/" + enc(_selected) + "/size")
+    .then(function(r) {
+      applySelectedSize(r.size)
+    })
+    .catch(function() {
+      _selectedSize = null
+      if (topSize) topSize.textContent = _selected ? " · " + _selected + " size: n/a" : ""
+    })
+}
+
+function applySelectedSize(size) {
+  _selectedSize = size
+  var subtitle = document.getElementById("ch-subtitle")
+  var topSize = document.getElementById("top-selected-size")
+  var d = _defs.find(function(x) { return x.name === _selected })
+  if (d && subtitle) subtitle.textContent = d.type + (d.isOpen ? " · open" : " · closed") + " · size " + size
+  if (topSize) topSize.textContent = _selected ? (" · " + _selected + " size: " + size) : ""
+}
+
+function renderTreeEditor(id, data, onChange) {
+  _treeEditors[id] = { data: data, onChange: onChange }
+  document.getElementById(id).innerHTML = renderTreeEditNode(id, [], data, "root")
+}
+
+function renderTreeEditNode(id, path, v, name) {
+  var p = esc(pathToken(path))
+  var html = '<div class="tree-row">'
+  html += '<input class="tree-key-in" value="' + esc(name) + '" ' + (path.length ? 'onchange="treeRename(\'' + id + '\',\'' + p + '\',this.value)"' : 'disabled') + ' />'
+  html += '<select onchange="treeRetype(\'' + id + '\',\'' + p + '\',this.value)">'
+  ;["map","array","string","number","boolean","null"].forEach(function(t) { html += '<option value="' + t + '"' + (valueType(v) === t ? " selected" : "") + '>' + t + '</option>' })
+  html += '</select>'
+  if (v === null || typeof v !== "object") {
+    html += '<input class="tree-val-in" value="' + esc(v === null ? "" : String(v)) + '" onchange="treeSetValue(\'' + id + '\',\'' + p + '\',this.value)" ' + (v === null ? "disabled" : "") + ' />'
+  }
+  if (path.length) html += '<button class="btn btn-err" onclick="treeRemove(\'' + id + '\',\'' + p + '\')">x</button>'
+  html += '</div>'
+  if (v && typeof v === "object") {
+    var keys = Array.isArray(v) ? v.map(function(_, i) { return i }) : Object.keys(v)
+    keys.forEach(function(k) { html += renderTreeEditNode(id, path.concat([k]), v[k], Array.isArray(v) ? "[" + k + "]" : k) })
+    html += '<div class="tree-actions"><button class="btn" onclick="treeAdd(\'' + id + '\',\'' + p + '\')">Add</button></div>'
+  }
+  return html
+}
+
+function treeRename(id, p, newKey) {
+  var path = parsePathToken(p)
+  var ed = _treeEditors[id]
+  if (!ed || path.length === 0) return
+  var parent = getAt(ed.data, path.slice(0, -1))
+  var oldKey = path[path.length - 1]
+  if (Array.isArray(parent)) return
+  if (!newKey || newKey === oldKey) return
+  parent[newKey] = parent[oldKey]
+  delete parent[oldKey]
+  treeCommit(id)
+}
+
+function treeRetype(id, p, type) {
+  var ed = _treeEditors[id], path = parsePathToken(p)
+  if (!ed) return
+  setAt(ed.data, path, defaultForType(type))
+  treeCommit(id)
+}
+
+function treeSetValue(id, p, raw) {
+  var ed = _treeEditors[id], path = parsePathToken(p)
+  if (!ed) return
+  var cur = getAt(ed.data, path)
+  var v = raw
+  if (typeof cur === "number") v = Number(raw)
+  if (typeof cur === "boolean") v = raw === "true"
+  setAt(ed.data, path, v)
+  treeCommit(id)
+}
+
+function treeAdd(id, p) {
+  var ed = _treeEditors[id], path = parsePathToken(p)
+  if (!ed) return
+  var target = getAt(ed.data, path)
+  if (Array.isArray(target)) target.push("")
+  else if (target && typeof target === "object") {
+    var base = "key", n = 1
+    while (Object.prototype.hasOwnProperty.call(target, base + n)) n++
+    target[base + n] = ""
+  }
+  treeCommit(id)
+}
+
+function treeRemove(id, p) {
+  var ed = _treeEditors[id], path = parsePathToken(p)
+  if (!ed || path.length === 0) return
+  var parent = getAt(ed.data, path.slice(0, -1))
+  var key = path[path.length - 1]
+  if (Array.isArray(parent)) parent.splice(Number(key), 1)
+  else delete parent[key]
+  treeCommit(id)
+}
+
+function treeCommit(id) {
+  var ed = _treeEditors[id]
+  if (!ed) return
+  ed.onChange(ed.data)
+  renderTreeEditor(id, ed.data, ed.onChange)
+}
+
+function getAt(data, path) {
+  return path.reduce(function(o, k) { return o[k] }, data)
+}
+
+function setAt(data, path, value) {
+  if (path.length === 0) {
+    var edId = Object.keys(_treeEditors).find(function(id) { return _treeEditors[id].data === data })
+    if (edId) _treeEditors[edId].data = value
+    return
+  }
+  getAt(data, path.slice(0, -1))[path[path.length - 1]] = value
+}
+
+function pathToken(path) { return encodeURIComponent(JSON.stringify(path)) }
+function parsePathToken(p) { return JSON.parse(decodeURIComponent(p)) }
+
+function valueType(v) {
+  if (Array.isArray(v)) return "array"
+  if (v === null) return "null"
+  if (typeof v === "object") return "map"
+  return typeof v
+}
+
+function defaultForType(t) {
+  if (t === "map") return {}
+  if (t === "array") return []
+  if (t === "number") return 0
+  if (t === "boolean") return false
+  if (t === "null") return null
+  return ""
+}
+
+function cloneData(v) {
+  return JSON.parse(JSON.stringify(v))
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return ""
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+}
+
+function enc(s) { return encodeURIComponent(s) }
+</script>
+</body>
+</html>

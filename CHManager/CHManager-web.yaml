@@ -1,0 +1,211 @@
+# Author: Nuno Aguiar
+help:
+  text   : CHManager – OpenAF Channel Manager Web Interface
+  expects:
+  - name     : onport
+    desc     : Port to run the web server on
+    example  : "8090"
+    mandatory: false
+  - name     : libs
+    desc     : Comma-separated extra libraries to load (path or @oPack/file.js)
+    example  : "@MyOPack/channels.js"
+    mandatory: false
+
+include:
+- oJobHTTPd.yaml
+
+todo:
+- CHManager Web Init
+- (httpdStart): "${onport:-8090}"
+  ((mapLibs)): true
+- (httpdHealthz): "${onport:-8090}"
+
+# SSE event stream (registered before / to prevent catch-all match)
+- (httpdSSE): "${onport:-8090}"
+  ((uri)): /api/events
+  ((execSSE)): |
+    try {
+      writer.write("ready", { status: "ok" })
+      while (true) {
+        var _q = global.__sseQueue
+        while (_q.length > 0) { writer.write("event", _q.shift()) }
+        sleep(300)
+      }
+    } catch(e) {}
+
+# Single dispatch route for entire /api namespace (before / catch-all)
+- (httpdService): "${onport:-8090}"
+  ((uri)): /api
+  ((execURI)): |
+    return global.__chmApiHandler(request)
+
+# OpenAF visual map/array assets used by the browser UI
+- (httpdService): "${onport:-8090}"
+  ((uri)): /js/openafsigil.js
+  ((execURI)): |
+    return { data: ow.server.httpd.getFromOpenAF("js/openafsigil.js"), mimetype: "application/javascript; charset=utf-8", status: 200, header: {} }
+
+- (httpdService): "${onport:-8090}"
+  ((uri)): /js/njsmap.js
+  ((execURI)): |
+    return { data: ow.server.httpd.getFromOpenAF("js/njsmap.js"), mimetype: "application/javascript; charset=utf-8", status: 200, header: {} }
+
+- (httpdService): "${onport:-8090}"
+  ((uri)): /css/nJSMap.css
+  ((execURI)): |
+    return { data: ow.server.httpd.getFromOpenAF("css/nJSMap.css"), mimetype: "text/css; charset=utf-8", status: 200, header: {} }
+
+# Static file: serve index.html for / (catch-all — must be last)
+- (httpdService): "${onport:-8090}"
+  ((uri)): /
+  ((execURI)): |
+    return global.__chmServeIndex(request, server)
+
+ojob:
+  daemon      : true
+  loadLibs    :
+  - CHManager.js
+  logToConsole: false
+
+typeArgs:
+  shortcut:
+    name  : ch-manager-web
+    keyArg: onport
+    args  : [libs]
+
+jobs:
+- name: CHManager Web Init
+  exec: |
+    global.__chm      = new CHManager()
+    global.__chm.init({ libs: args.libs })
+    global.__sseQueue = []
+    ow.loadServer()
+
+    var _basePath = io.fileExists("public/index.html") ? io.fileInfo(".").canonicalPath : getOPackPath("CHManager")
+    var _html     = io.readFileBytes(_basePath + "/public/index.html")
+
+    // Serve index.html
+    global.__chmServeIndex = function(request, server) {
+      return { data: _html, mimetype: "text/html; charset=utf-8", status: 200, header: {} }
+    }
+
+    function _r(data, status) {
+      status = status || 200
+      return { data: JSON.stringify(data), mimetype: "application/json; charset=utf-8", status: status, header: {} }
+    }
+
+    // Single API dispatcher
+    global.__chmApiHandler = function(request) {
+      try {
+        var path   = request.uri.replace(/^\/api\/?/, "")
+        var parts  = path.split("/").map(function(p) { return decodeURIComponent(p) })
+        var method = request.method
+        var bodyText = (isDef(request.files) && isDef(request.files.postData)) ? request.files.postData : __
+        if (isUnDef(bodyText) && isDef(request.data)) bodyText = request.data
+        var body   = {}
+        try {
+          var _body = jsonParse(bodyText)
+          if (isMap(_body) || isArray(_body)) body = _body
+          if (isString(_body)) bodyText = _body
+        } catch(ignored) {}
+        if ((!isMap(body) || Object.keys(body).length === 0) && isDef(bodyText)) {
+          try {
+            var _body2 = af.fromJSSLON(bodyText)
+            if (isMap(_body2) || isArray(_body2)) body = _body2
+          } catch(ignored2) {}
+        }
+        var params = isMap(request.params) ? request.params : {}
+
+        if (parts[0] === "ping")  return _r({ status: "ok" })
+        if (parts[0] === "types") return _r(global.__chm.listTypes())
+
+        // /api/channels
+        if (parts[0] === "channels") {
+          if (!parts[1]) {
+            if (method === "POST") {
+              global.__chm.addDef(body.name, body.type, body.options || {}, body.autoOpen === true)
+              return _r({ status: "ok" })
+            }
+            return _r(global.__chm.listDefs())
+          }
+
+          var name = parts[1]
+          var sub  = parts[2] || ""
+
+          if (sub === "") {
+            if (method === "PUT") { global.__chm.editDef(name, body); return _r({ status: "ok" }) }
+            if (method === "DELETE") { global.__chm.removeDef(name); return _r({ status: "ok" }) }
+            var def = global.__chm.getDef(name)
+            if (!def) return _r({ error: "not found" }, 404)
+            return _r(merge({ name: name }, def, { isOpen: global.__chm.isOpen(name) }))
+          }
+
+          if (sub === "open")  { global.__chm.open(name);  return _r({ status: "ok" }) }
+          if (sub === "close") { global.__chm.close(name); return _r({ status: "ok" }) }
+
+          if (sub === "keys") {
+            var pg  = parseInt(params.page || 1)
+            var sz  = parseInt(params.size || 50)
+            var res = global.__chm.getKeys(name, pg, sz)
+            if (isArray(res)) return _r({ keys: res, total: res.length, page: 1, pageSize: res.length })
+            return _r(res)
+          }
+
+          if (sub === "values") {
+            var pg  = parseInt(params.page || 1)
+            var sz  = parseInt(params.size || 50)
+            var res = global.__chm.getAll(name, pg, sz)
+            if (isArray(res)) return _r({ values: res, total: res.length, page: 1, pageSize: res.length })
+            return _r(res)
+          }
+
+          if (sub === "get") {
+            var key = params.key
+            if (!key) return _r({ error: "key param required" }, 400)
+            return _r({ key: key, value: global.__chm.get(name, key) })
+          }
+
+          if (sub === "size")  return _r({ size: global.__chm.size(name) })
+          if (sub === "clear") return _r({ removed: global.__chm.clearAll(name) })
+
+          if (sub === "set") {
+            global.__chm.set(name, JSON.stringify(body.key), JSON.stringify(body.value))
+            return _r({ status: "ok" })
+          }
+          if (sub === "unset") {
+            var key = params.key || body.key
+            if (!key) return _r({ error: "key required" }, 400)
+            global.__chm.unset(name, key)
+            return _r({ status: "ok" })
+          }
+          if (sub === "expose")   { global.__chm.expose(name, parseInt(body.port), body.path); return _r({ status: "ok" }) }
+          if (sub === "unexpose") { global.__chm.unexpose(name); return _r({ status: "ok" }) }
+          if (sub === "peer")     { global.__chm.peer(name, parseInt(body.port), body.path, body.urls); return _r({ status: "ok" }) }
+          if (sub === "unpeer")   { global.__chm.unpeer(name, body.url); return _r({ status: "ok" }) }
+          if (sub === "mirror")   { return _r({ status: "ok", subId: global.__chm.addMirrorSubscriber(name, body.target) }) }
+          if (sub === "housekeep"){ return _r({ status: "ok", subId: global.__chm.addHousekeepSubscriber(name, parseInt(body.maxKeys)) }) }
+          if (sub === "buffer")   { return _r({ status: "ok", subId: global.__chm.addBufferSubscriber(name, body.target, body.idxs, body.byNum, body.byTime) }) }
+          if (sub === "sync")     { global.__chm.syncChannels(body.idxs, name, body.target); return _r({ status: "ok" }) }
+
+          return _r({ error: "unknown sub: " + sub }, 404)
+        }
+
+        return _r({ error: "unknown route: " + path }, 404)
+      } catch(e) {
+        return _r({ error: String(e) }, 500)
+      }
+    }
+
+    // Subscribe all currently-open channels for SSE events
+    global.__chm.listDefs().forEach(function(d) {
+      if (d.isOpen) {
+        try {
+          global.__chm.subscribe(d.name, function(ch, op, key) {
+            global.__sseQueue.push({ channel: ch, op: op, key: key, ts: now() })
+            if (global.__sseQueue.length > 500) global.__sseQueue.shift()
+          }, true)
+        } catch(e) {}
+      }
+    })
+
+    log("CHManager web server starting on port " + (args.onport || 8090))

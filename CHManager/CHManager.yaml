@@ -1,0 +1,37 @@
+# Author: Nuno Aguiar
+help:
+  text   : CHManager – OpenAF Channel Manager TUI
+  expects:
+  - name     : cmd
+    desc     : Optional slash command to run on startup (e.g. /channels)
+    example  : "/channels"
+    mandatory: false
+  - name     : libs
+    desc     : Comma-separated extra libraries to load (path or @oPack/file.js)
+    example  : "@MyOPack/channels.js"
+    mandatory: false
+  - name     : interactive
+    desc     : Stay in interactive mode even when cmd= is given
+    example  : "true"
+    mandatory: false
+    options  : ["true", "false"]
+
+todo:
+- CHManager TUI
+
+ojob:
+  loadLibs:
+  - CHManager.js
+  logToConsole: false
+
+typeArgs:
+  shortcut:
+    name  : ch-manager
+    keyArg: cmd
+    args  : [libs, interactive]
+
+jobs:
+- name: CHManager TUI
+  exec: |
+    var _basePath = (io.fileExists("CHManager-con.js")) ? io.fileInfo(".").canonicalPath : getOPackPath("CHManager")
+    load(_basePath + "/CHManager-con.js")
