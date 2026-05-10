@@ -21,7 +21,7 @@ name: md2email
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260501'
+version: '20260509'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -39,7 +39,7 @@ files:
 - commonmark-ext-ins-0.28.0.jar
 - commonmark-ext-task-list-items-0.28.0.jar
 - commonmark-ext-yaml-front-matter-0.28.0.jar
-- jsvg-2.0.0.jar
+- jsvg-2.1.0.jar
 - md2email.js
 - md2email.yaml
 - tests/autoTestMd2Email.js
@@ -58,7 +58,7 @@ filesHash:
   commonmark-ext-ins-0.28.0.jar: c418babd7b934dd92a520c10d88e692ec8c8c44d
   commonmark-ext-task-list-items-0.28.0.jar: 16044b2f44588c26b59b0060bec008d2bd39a130
   commonmark-ext-yaml-front-matter-0.28.0.jar: c21169ab375ed56396b2845c0ba023a2a6740ac9
-  jsvg-2.0.0.jar: f65d5c3beed92a2d6cdc666185c3e751b887032f
+  jsvg-2.1.0.jar: c1a403f318de302fa81e4403fe8fb4bd6056a41f
   md2email.js: cb70d67c09ce1e0faa3f8a71722e5db3ef1ffa9f
   md2email.yaml: af77e62654f053b484ba78b81ba6721b40c6f779
   tests/autoTestMd2Email.js: 4f6db1cf345fd60edbbf011f58b6f333ec7ecd4c
