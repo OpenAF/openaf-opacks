@@ -29,14 +29,9 @@ dependencies:
   openaf: '>=20230325'
 files:
 - .package.yaml
-- README.md
 - GALLERY.md
+- README.md
 - d3svg.js
-- samples/bar.js
-- samples/line.js
-- samples/pie.js
-- samples/advanced.js
-- tests/test_d3svg.js
 - gallery/area.svg
 - gallery/bar_dark.svg
 - gallery/bar_horizontal.svg
@@ -54,3 +49,34 @@ files:
 - gallery/sparkline.svg
 - gallery/stacked_bar.svg
 - gallery/timeline.svg
+- samples/advanced.js
+- samples/bar.js
+- samples/line.js
+- samples/pie.js
+- tests/test_d3svg.js
+filesHash:
+  GALLERY.md: 7c2c9fb182c22883df6735c1e02833ead7e78837
+  README.md: 533f4ea6470665154dcd3e0785d5d27dd855950b
+  d3svg.js: aa3c2d11e987d77695f3f5eedf698af4b9e3ae9e
+  gallery/area.svg: 5a8b67dfb1b73a5abc9f680243803de35af31a67
+  gallery/bar_dark.svg: af01ea245c411a846991e6d3d8bf5d951f57ecb2
+  gallery/bar_horizontal.svg: f5e475b8888de8b8e514e6fbec2b4d25f9562c51
+  gallery/bar_vertical.svg: 322721ec3de1bb53afd468d39caf40944169ef6e
+  gallery/bullet_chart.svg: 947cd154cf1535eadbb2ce24b8fb93ce1ffd1abf
+  gallery/donut.svg: a06db5413e2a259a5b9cae1101fb5beb6fd9adb4
+  gallery/gauge.svg: 7db19a9d0f1be5cee7a3487b4e82746401714f15
+  gallery/heatmap.svg: 1eb714f5271b700c25deabdadce0602cfca19332
+  gallery/kpi_card.svg: 21ce17f88eec1ad5764e5d771565551aa118d83b
+  gallery/line_multi.svg: 5fec1eb91faae7a4ad2e0c19c1b306fb3bebf2ec
+  gallery/line_single.svg: d3d19bfb36a29bed0d41afdcd7a0402d9d57d00c
+  gallery/pie.svg: 5b397171ea8a98166535b367ddc9b8b94805d742
+  gallery/progress_bar.svg: 698ac429e6cb78e43192baf8bee2e009bee1eb4e
+  gallery/scatter.svg: 30c8e4387fa9c2c241d810318bf90e4feeb1a1fa
+  gallery/sparkline.svg: 2e05c0e99f8fbaade1dfa6d973140b6264a14a8d
+  gallery/stacked_bar.svg: 8b7f26085bd624da63ba194c5a5f5c0c93fdd83e
+  gallery/timeline.svg: 4652df45b2a06700719d474447add8e988514654
+  samples/advanced.js: 9cb98ccb1660e8b14ba270faac9728d2ba1cf104
+  samples/bar.js: 5e88c21e57d9df5c598cd40b5eabf9ae9042b1fc
+  samples/line.js: 50abafe352aeba77c7ee304999a1b133fe724071
+  samples/pie.js: c6432d0c4a7502834790c0d8d2e7b52e76bee0c1
+  tests/test_d3svg.js: f88e27e22599dc2ed49d01dfdd5a15689fae17b2
