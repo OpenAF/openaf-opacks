@@ -204,12 +204,25 @@ CHManager.prototype.exportFile = function(name, file) {
   return data.length
 }
 
+CHManager.prototype._normalizeHttpPath = function(path, fallbackName) {
+  var p = isString(path) ? path : ("/" + String(fallbackName))
+  p = String(p).trim().replace(/\s+/g, "-")
+  if (p.length === 0) p = "/" + String(fallbackName).replace(/\s+/g, "-")
+  if (p.charAt(0) !== "/") p = "/" + p
+  return p
+}
+
+CHManager.prototype._normalizeHttpURI = function(uri) {
+  if (!isString(uri)) return uri
+  return String(uri).trim().replace(/\s+/g, "-")
+}
+
 // ─── Network: expose / peer / remote ─────────────────────────────────────────
 
 CHManager.prototype.expose = function(name, port, path, authFn) {
   this._requireOpen(name)
   ow.loadServer()
-  var p = isString(path) ? path : ("/" + name)
+  var p = this._normalizeHttpPath(path, name)
   var uuid = ow.ch.server.expose(name, port, p, authFn)
   this._exposes[name] = { port: port, path: p, uuid: uuid }
   if (this._defs[name]) {
@@ -232,8 +245,10 @@ CHManager.prototype.unexpose = function(name) {
 CHManager.prototype.peer = function(name, port, path, remoteURLs) {
   this._requireOpen(name)
   ow.loadServer()
-  var p = isString(path) ? path : ("/" + name)
+  var _self = this
+  var p = this._normalizeHttpPath(path, name)
   var urls = isArray(remoteURLs) ? remoteURLs : (isString(remoteURLs) ? remoteURLs.split(",").map(function(s){return s.trim()}) : [])
+  urls = urls.map(function(u) { return _self._normalizeHttpURI(u) }).filter(function(u) { return isString(u) && u.length > 0 })
   var subs = ow.ch.server.peer(name, port, p, urls)
   this._peers[name] = { port: port, path: p, urls: urls, subs: subs }
   if (this._defs[name]) {
@@ -247,9 +262,8 @@ CHManager.prototype.unpeer = function(name, remoteURL) {
   this._requireOpen(name)
   ow.loadServer()
   if (isString(remoteURL)) {
-    ow.ch.server.unpeer(name, remoteURL)
+    ow.ch.server.unpeer(name, this._normalizeHttpURI(remoteURL))
   } else if (this._peers[name] && isArray(this._peers[name].urls)) {
-    var _self = this
     this._peers[name].urls.forEach(function(u) { ow.ch.server.unpeer(name, u) })
   }
   delete this._peers[name]
@@ -261,7 +275,7 @@ CHManager.prototype.unpeer = function(name, remoteURL) {
 
 CHManager.prototype.createRemote = function(defName, url, login, pass) {
   if (!isString(defName) || defName.trim().length === 0) throw "CHManager: defName is required"
-  var opts = { url: url }
+  var opts = { url: this._normalizeHttpURI(url) }
   if (isString(login)) opts.login = login
   if (isString(pass))  opts.password = pass
   this.addDef(defName, "remote", opts, false)

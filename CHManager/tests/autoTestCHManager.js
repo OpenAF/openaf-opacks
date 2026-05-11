@@ -152,6 +152,20 @@
     chm.removeDef("t-remote")
   }
 
+  exports.testNormalizeHttpPathsAndURLs = function() {
+    var chm = makeChm()
+    cleanup(chm)
+
+    ow.test.assert(chm._normalizeHttpPath("/my channel", "ignored"), "/my-channel", "path spaces should become dashes")
+    ow.test.assert(chm._normalizeHttpPath("my channel", "ignored"), "/my-channel", "path should be absolute and sanitized")
+    ow.test.assert(chm._normalizeHttpURI("http://localhost:8092/my channel?a=b c"), "http://localhost:8092/my-channel?a=b-c", "URI spaces should become dashes")
+
+    chm.createRemote("t-remote-space", "http://localhost:8091/my chan")
+    var d = chm.getDef("t-remote-space")
+    ow.test.assert(d.options.url, "http://localhost:8091/my-chan", "remote url should be sanitized")
+    chm.removeDef("t-remote-space")
+  }
+
   exports.testHousekeepSubscriber = function() {
     var chm = makeChm()
     cleanup(chm)

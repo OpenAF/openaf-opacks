@@ -61,11 +61,11 @@ files:
 - tests/autoTestCHManager.yaml
 filesHash:
   .maven.yaml: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
-  CHManager-con.js: cbbdf227fffacbe7bbe44ca5c185bb61e3d9e468
-  CHManager-web.yaml: 37217c71e82b9486636e50e90283229abb6b1615
-  CHManager.js: 617636e7c1ee713d3a693e35c293b6bea985395d
+  CHManager-con.js: 68c056a399a4c5693c4d29f97f55c938e55fdeb3
+  CHManager-web.yaml: 6fd9448d829ac2e375c787b2c6b2d223829007ea
+  CHManager.js: 68fc4612b1984557cababcd6041ae6f4b753f03e
   CHManager.yaml: 9bab91e77e149a8a4d569d6e78859901f6b7697b
-  README.md: c0c40078a172c8fe63db05de92e8aae085a7ad78
-  public/index.html: 08fd0d9737868757bd808b0123105cf04b0aa45b
-  tests/autoTestCHManager.js: bc5eff6641d26fe85c9694d642286accf0b580e6
-  tests/autoTestCHManager.yaml: 3b04521c77b58044d385ecdde13f8caede079eb0
+  README.md: c39db17c358eca93d7d5986bdf765efb279d18fb
+  public/index.html: a8278c149bb685b985001a8a810cbb0608822982
+  tests/autoTestCHManager.js: 8f389b4fd879189576c9093a60630684e7921bfd
+  tests/autoTestCHManager.yaml: adbf5db385c31c41534ede22e5b34f18d2a7a888

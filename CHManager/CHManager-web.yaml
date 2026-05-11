@@ -79,6 +79,7 @@ jobs:
     global.__chm      = new CHManager()
     global.__chm.init({ libs: args.libs })
     global.__sseQueue = []
+    global.__liveSubs = {}
     ow.loadServer()
 
     var _basePath = io.fileExists("public/index.html") ? io.fileInfo(".").canonicalPath : getOPackPath("CHManager")
@@ -92,6 +93,29 @@ jobs:
     function _r(data, status) {
       status = status || 200
       return { data: JSON.stringify(data), mimetype: "application/json; charset=utf-8", status: status, header: {} }
+    }
+
+    global.__liveSubscribe = function(name) {
+      if (!global.__chm.isOpen(name)) throw "CHManager: channel '" + name + "' is not open"
+      if (isDef(global.__liveSubs[name])) return global.__liveSubs[name]
+      var sid = global.__chm.subscribe(name, function(ch, op, key, val) {
+        global.__sseQueue.push({ channel: ch, op: op, key: key, val: val, ts: now() })
+        if (global.__sseQueue.length > 500) global.__sseQueue.shift()
+      }, true)
+      global.__liveSubs[name] = sid
+      return sid
+    }
+    global.__liveUnsubscribe = function(name) {
+      if (!isDef(global.__liveSubs[name])) return
+      try { global.__chm.unsubscribe(name, global.__liveSubs[name]) } catch(e) {}
+      delete global.__liveSubs[name]
+    }
+    global.__liveStatus = function() {
+      var defs = global.__chm.listDefs()
+      return {
+        openChannels: defs.filter(function(d) { return d.isOpen }).map(function(d) { return { name: d.name, type: d.type } }),
+        subscribed : Object.keys(global.__liveSubs).map(function(name) { return { name: name, subId: String(global.__liveSubs[name]) } })
+      }
     }
 
     // Single API dispatcher
@@ -118,6 +142,19 @@ jobs:
 
         if (parts[0] === "ping")  return _r({ status: "ok" })
         if (parts[0] === "types") return _r(global.__chm.listTypes())
+        if (parts[0] === "live") {
+          if (!parts[1] && method === "GET") return _r(global.__liveStatus())
+          if (parts[1] === "subscribe" && method === "POST") {
+            if (!body.name) return _r({ error: "name required" }, 400)
+            return _r({ status: "ok", subId: String(global.__liveSubscribe(body.name)) })
+          }
+          if (parts[1] === "unsubscribe" && method === "POST") {
+            if (!body.name) return _r({ error: "name required" }, 400)
+            global.__liveUnsubscribe(body.name)
+            return _r({ status: "ok" })
+          }
+          return _r({ error: "unknown live route" }, 404)
+        }
 
         // /api/channels
         if (parts[0] === "channels") {
@@ -200,10 +237,7 @@ jobs:
     global.__chm.listDefs().forEach(function(d) {
       if (d.isOpen) {
         try {
-          global.__chm.subscribe(d.name, function(ch, op, key) {
-            global.__sseQueue.push({ channel: ch, op: op, key: key, ts: now() })
-            if (global.__sseQueue.length > 500) global.__sseQueue.shift()
-          }, true)
+          global.__liveSubscribe(d.name)
         } catch(e) {}
       }
     })

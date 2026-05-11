@@ -48,7 +48,8 @@ ch-manager /types
 | `/mirror <src> <target>` | Add mirror subscriber |
 | `/housekeep <name> <maxKeys>` | Add housekeep subscriber |
 | `/buffer <src> <target> <idxs>` | Add buffer subscriber |
-| `/subscribe <name>` | Live-watch channel changes |
+| `/subscribe [name]` | Live-watch channel changes (interactive if omitted) |
+| `/unsubscribe [name] [subId]` | Remove live subscriber (interactive if omitted) |
 | `/sync <src> <target> <idxs>` | Sync two channels |
 | `/import <name> <file>` | Bulk import from JSON/YAML |
 | `/export <name> <file>` | Bulk export to JSON/YAML |
@@ -72,11 +73,12 @@ Open `http://localhost:8090` in your browser.
 
 **Features:**
 - Left sidebar with channel list (type badge, open/closed/exposed/peered status)
-- Keys and Values tabs with pagination and click-to-edit, plus Table/Tree/OpenAF nJSMap visual views
+- Keys and Values tabs with pagination and click-to-edit, plus Table/Tree/Flat/OpenAF nJSMap visual views
+- Keys/Values views support auto-refresh (`off`, fixed seconds, or adaptive `auto`) and reverse order (`newest first`) for live-growing channels
 - JSON inputs also accept SLON, with text or visual map/array editing
 - Add/Edit forms pre-fill known OpenAF channel type options with type, default, required, and odoc-derived descriptions
 - Operations panel: expose, peer, mirror, housekeep, buffer, sync, clear
-- Live tab with real-time SSE event stream
+- Live tab with subscribe/unsubscribe configuration and real-time SSE grid by channel
 - Definition tab showing full channel config and type metadata as JSON, SLON, printTree-like Tree, or an OpenAF nJSMap visual view
 - Add/Edit channel modal with dynamic options form
 - Dark/light theme toggle

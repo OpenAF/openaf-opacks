@@ -26,8 +26,22 @@ try {
       consoleReader  = con.getConsoleReader()
       commandHistory = new Packages.jline.console.history.FileHistory(new java.io.File(histFile))
       consoleReader.setHistory(commandHistory)
+      if (typeof consoleReader.setHistoryEnabled === "function") consoleReader.setHistoryEnabled(true)
     }
   } catch(e) { commandHistory = __ }
+
+  function recordHistoryEntry(input) {
+    if (!isString(input) || input.trim().length === 0) return
+    try {
+      if (isDef(commandHistory) && typeof commandHistory.add === "function") {
+        commandHistory.add(input)
+        if (typeof commandHistory.flush === "function") commandHistory.flush()
+      } else if (isDef(consoleReader) && isDef(consoleReader.getHistory) && typeof consoleReader.getHistory === "function") {
+        var h = consoleReader.getHistory()
+        if (isDef(h) && typeof h.add === "function") h.add(input)
+      }
+    } catch(ignoreHistErr) {}
+  }
 
   // Colour palette
   var C = {
@@ -197,6 +211,88 @@ try {
   // ─── CHManager instance ─────────────────────────────────────────────────────
   var chm = new CHManager()
   chm.init({ libs: args.libs })
+  var liveWatchSubs = {}
+
+  function _liveSubsCount(name) {
+    var arr = liveWatchSubs[name]
+    return isArray(arr) ? arr.length : 0
+  }
+  function _liveTrack(name, id) {
+    if (!liveWatchSubs[name]) liveWatchSubs[name] = []
+    liveWatchSubs[name].push(String(id))
+  }
+  function _liveUntrack(name, id) {
+    if (!liveWatchSubs[name]) return
+    var sid = String(id)
+    liveWatchSubs[name] = liveWatchSubs[name].filter(function(x) { return String(x) !== sid })
+    if (liveWatchSubs[name].length === 0) delete liveWatchSubs[name]
+  }
+  function printLiveChannelsGrid(defs) {
+    if (!isArray(defs) || defs.length === 0) return
+    var rows = defs.map(function(d, i) {
+      return {
+        "#"      : i + 1,
+        Channel  : d.name,
+        Type     : d.type,
+        Status   : d.isOpen ? "open" : "closed",
+        LiveSubs : _liveSubsCount(d.name)
+      }
+    })
+    try {
+      var grid = ow.format.string.grid([[{ type: "table", title: "Live channels", obj: rows }]], __, termWidth(), " ", true)
+      print(grid)
+    } catch(e) {
+      printRows(rows)
+    }
+  }
+  function chooseOpenChannelForLive() {
+    var defs = chm.listDefs().filter(function(d) { return d.isOpen })
+    if (defs.length === 0) {
+      infoMsg("No open channels. Use /open <name> first.")
+      return __
+    }
+    print("")
+    printLiveChannelsGrid(defs)
+    var choice = promptLine("Select channel #", "1")
+    var idx = parseInt(choice)
+    if (isNaN(idx) || idx < 1 || idx > defs.length) {
+      errorMsg("Invalid channel selection")
+      return __
+    }
+    return defs[idx - 1].name
+  }
+  function chooseLiveSubscription() {
+    var channels = Object.keys(liveWatchSubs).filter(function(name) {
+      return isArray(liveWatchSubs[name]) && liveWatchSubs[name].length > 0
+    })
+    if (channels.length === 0) {
+      infoMsg("No live subscriptions to remove.")
+      return __
+    }
+    var rows = channels.map(function(name, i) {
+      return { "#": i + 1, Channel: name, Subs: liveWatchSubs[name].length }
+    })
+    try {
+      var grid = ow.format.string.grid([[{ type: "table", title: "Live subscriptions", obj: rows }]], __, termWidth(), " ", true)
+      print(grid)
+    } catch(e) {
+      printRows(rows)
+    }
+    var cidx = parseInt(promptLine("Select channel #", "1"))
+    if (isNaN(cidx) || cidx < 1 || cidx > channels.length) {
+      errorMsg("Invalid channel selection")
+      return __
+    }
+    var name = channels[cidx - 1]
+    var ids  = liveWatchSubs[name]
+    printRows(ids.map(function(id, i) { return { "#": i + 1, SubId: String(id) } }))
+    var sidx = parseInt(promptLine("Select subId #", "1"))
+    if (isNaN(sidx) || sidx < 1 || sidx > ids.length) {
+      errorMsg("Invalid subId selection")
+      return __
+    }
+    return { name: name, subId: String(ids[sidx - 1]) }
+  }
 
   // ─── Startup banner ─────────────────────────────────────────────────────────
   function printBanner() {
@@ -224,11 +320,13 @@ try {
       {
         icon: "📦", label: "DATA",
         cmds: [
-          ["/keys <name> [page]",       "Browse keys (paginated, 20/page)"],
+          ["/keys <name> [page] [asc|desc]", "Browse keys (paginated, 20/page)"],
           ["/get <name> <key>",         "Get value by JSON key"],
           ["/set <name> <key> <json>",  "Set key/value (JSON)"],
           ["/unset <name> <key>",       "Remove a key"],
-          ["/getall <name> [page]",     "Get all values (paginated)"],
+          ["/getall <name> [page] [asc|desc]", "Get all values (paginated)"],
+          ["/watchkeys <name> [sec|auto] [asc|desc] [table|tree|flat]", "Watch keys (Esc stop, live shortcuts)"],
+          ["/watchvals <name> [sec|auto] [asc|desc] [table|tree|flat]", "Watch values (Esc stop, live shortcuts)"],
           ["/size <name>",              "Number of entries"],
           ["/clear <name>",             "Clear all entries (confirmation required)"]
         ]
@@ -249,8 +347,8 @@ try {
           ["/mirror <src> <target>",          "Add mirror subscriber"],
           ["/housekeep <name> <maxKeys>",     "Add housekeep subscriber"],
           ["/buffer <src> <target> <idxs>",   "Add buffer subscriber (comma-sep idxs)"],
-          ["/subscribe <name>",               "Live watch channel changes (Ctrl-C to stop)"],
-          ["/unsubscribe <name> <subId>",     "Remove a subscriber"],
+          ["/subscribe [name]",               "Live watch channel changes (interactive if omitted)"],
+          ["/unsubscribe [name] [subId]",     "Remove a live subscriber (interactive if omitted)"],
           ["/sync <src> <target> <idxs>",     "Sync two channels"]
         ]
       },
@@ -323,18 +421,199 @@ try {
   }
 
   // ─── Key browser ────────────────────────────────────────────────────────────
-  function printKeyList(name, page) {
+  function parseOrderArg(order) {
+    var s = String(order || "").toLowerCase()
+    return s === "desc" || s === "reverse" || s === "rev" || s === "newest"
+  }
+
+  function normalizeWatchSeconds(raw, fallback) {
+    var n = parseInt(raw)
+    if (isNaN(n) || n < 1) return fallback || 3
+    if (n > 120) return 120
+    return n
+  }
+
+  function autoWatchSeconds(prevTotal, total, lastTs, nowTs) {
+    if (!isNumber(prevTotal) || !isNumber(lastTs)) return 3
+    var dt = Math.max(0.2, (nowTs - lastTs) / 1000)
+    var rate = Math.abs(total - prevTotal) / dt
+    if (rate >= 50) return 1
+    if (rate >= 15) return 2
+    if (rate >= 5) return 3
+    if (rate >= 1.5) return 5
+    return 8
+  }
+
+  function readKeyNonBlocking() {
+    if (isUnDef(con) || typeof con.readCharNB !== "function") return __
+    var rawCode = con.readCharNB()
+    var code = isDef(rawCode) ? Number(rawCode) : NaN
+    if (isNaN(code) || code <= 0) return __
+    return code
+  }
+
+  function isBareEsc(code) {
+    if (code !== 27) return false
+    sleep(40)
+    var followRaw = con.readCharNB()
+    var followCode = isDef(followRaw) ? Number(followRaw) : NaN
+    if (isNaN(followCode) || followCode <= 0) {
+      sleep(40)
+      followRaw = con.readCharNB()
+      followCode = isDef(followRaw) ? Number(followRaw) : NaN
+    }
+    return (isNaN(followCode) || followCode <= 0)
+  }
+
+  function watchModeLabel(mode) {
+    if (mode === "tree") return "tree"
+    if (mode === "flat") return "flat"
+    return "table"
+  }
+
+  function normalizeWatchViewMode(raw) {
+    var s = String(raw || "").toLowerCase()
+    if (s === "tree" || s === "t") return "tree"
+    if (s === "flat" || s === "cols" || s === "columns" || s === "f") return "flat"
+    return "table"
+  }
+
+  function _flatCell(v) {
+    if (isMap(v) || isArray(v)) return toSLON(v)
+    if (v === null) return "null"
+    if (isUnDef(v)) return "undefined"
+    return String(v)
+  }
+
+  function _flatValueMap(v, label) {
+    if (isMap(v)) return v
+    var out = {}
+    out[label] = toSLON(v)
+    return out
+  }
+
+  function buildFlatRows(values, label, startNum, reverse) {
+    var union = {}
+    values.forEach(function(v) {
+      var m = _flatValueMap(v, label)
+      Object.keys(m).forEach(function(k) { union[k] = true })
+    })
+    var cols = Object.keys(union)
+    return values.map(function(v, i) {
+      var row = { "#": reverse ? (startNum - i) : (startNum + i) }
+      var m = _flatValueMap(v, label)
+      cols.forEach(function(c) {
+        row[c] = _flatCell(m[c])
+      })
+      return row
+    })
+  }
+
+  function printKeyList(name, page, reverse) {
     var p = isNumber(parseInt(page)) && !isNaN(parseInt(page)) ? parseInt(page) : 1
     var res = chm.getKeys(name, p, 20)
     var keys = isArray(res) ? res : res.keys
     var total = isArray(res) ? res.length : res.total
+    if (!isArray(res) && reverse === true) {
+      var pages = Math.max(1, Math.ceil(total / 20))
+      var sourcePage = Math.max(1, pages - p + 1)
+      if (sourcePage !== p) {
+        var res2 = chm.getKeys(name, sourcePage, 20)
+        keys = isArray(res2) ? res2 : res2.keys
+      }
+      keys = keys.slice().reverse()
+    }
     print("")
-    infoMsg("🗝 Keys for " + name + (isArray(res) ? "" : " | page " + p + "/" + Math.ceil(total/20) + " | " + total + " total"))
+    infoMsg("🗝 Keys for " + name + (reverse ? " (desc)" : " (asc)") + (isArray(res) ? "" : " | page " + p + "/" + Math.ceil(total/20) + " | " + total + " total"))
     if (keys.length === 0) { infoMsg("(empty)"); return }
     printRows(keys.map(function(k, i) {
-      return { "#": (p-1)*20 + i + 1, Key: toSLON(k) }
+      return { "#": reverse ? (total - ((p-1)*20) - i) : ((p-1)*20 + i + 1), Key: toSLON(k) }
     }))
-    if (!isArray(res) && total > p * 20) infoMsg("Use /keys " + name + " " + (p+1) + " for next page.")
+    if (!isArray(res) && total > p * 20) infoMsg("Use /keys " + name + " " + (p+1) + (reverse ? " desc" : " asc") + " for next page.")
+  }
+
+  function printValueList(name, page, reverse) {
+    var p = isNumber(parseInt(page)) && !isNaN(parseInt(page)) ? parseInt(page) : 1
+    var res = chm.getAll(name, p, 20)
+    var vals = isArray(res) ? res : res.values
+    var total = isArray(res) ? vals.length : res.total
+    if (!isArray(res) && reverse === true) {
+      var pages = Math.max(1, Math.ceil(total / 20))
+      var sourcePage = Math.max(1, pages - p + 1)
+      if (sourcePage !== p) {
+        var res2 = chm.getAll(name, sourcePage, 20)
+        vals = isArray(res2) ? res2 : res2.values
+      }
+      vals = vals.slice().reverse()
+    }
+    print("")
+    infoMsg("📄 Values for " + name + (reverse ? " (desc)" : " (asc)") + " | page " + p + "/" + Math.max(1, Math.ceil(total/20)) + " | " + total + " total")
+    if (vals.length === 0) { infoMsg("(empty)"); return }
+    printRows(vals.map(function(v, i) {
+      return { "#": reverse ? (total - ((p-1)*20) - i) : ((p-1)*20 + i + 1), Value: toSLON(v) }
+    }))
+    if (!isArray(res) && total > p * 20) infoMsg("Use /getall " + name + " " + (p+1) + (reverse ? " desc" : " asc") + " for next page.")
+  }
+
+  function watchPagedList(name, mode, refreshArg, reverse, viewModeArg) {
+    var isKeys = mode === "keys"
+    var viewMode = normalizeWatchViewMode(viewModeArg)
+    var auto = String(refreshArg || "").toLowerCase() === "auto"
+    var fixed = normalizeWatchSeconds(refreshArg, 3)
+    var lastTotal = __
+    var lastTs = __
+    var stopRequested = false
+    for (var i = 0; i < 1000000; i++) {
+      if (stopRequested) break
+      var nowTs = now()
+      var p = 1
+      var res = isKeys ? chm.getKeys(name, p, 20) : chm.getAll(name, p, 20)
+      var values = isKeys ? (isArray(res) ? res : res.keys) : (isArray(res) ? res : res.values)
+      var total = isArray(res) ? values.length : res.total
+      if (!isArray(res) && reverse === true) {
+        var pages = Math.max(1, Math.ceil(total / 20))
+        var sourcePage = Math.max(1, pages - p + 1)
+        if (sourcePage !== p) {
+          var res2 = isKeys ? chm.getKeys(name, sourcePage, 20) : chm.getAll(name, sourcePage, 20)
+          values = isKeys ? (isArray(res2) ? res2 : res2.keys) : (isArray(res2) ? res2 : res2.values)
+        }
+        values = values.slice().reverse()
+      }
+      var label = isKeys ? "Key" : "Value"
+      print("")
+      infoMsg((isKeys ? "🗝 Keys" : "📄 Values") + " for " + name + (reverse ? " (desc)" : " (asc)") + " | " + total + " total")
+      if (values.length === 0) {
+        infoMsg("(empty)")
+      } else if (viewMode === "tree") {
+        printObject(values)
+      } else if (viewMode === "flat") {
+        printRows(buildFlatRows(values, label, reverse ? total : 1, reverse))
+      } else {
+        printRows(values.map(function(v, j) {
+          var row = { "#": reverse ? (total - j) : (j + 1) }
+          row[label] = toSLON(v)
+          return row
+        }))
+      }
+      var waitSec = auto ? autoWatchSeconds(lastTotal, total, lastTs, nowTs) : fixed
+      infoMsg("Refresh " + (auto ? "auto" : (waitSec + "s")) + " | order " + (reverse ? "desc" : "asc") + " | view " + watchModeLabel(viewMode) + " | Esc stop | t table | r tree | f flat | o order | a auto | 1..9 sec")
+      lastTotal = total
+      lastTs = nowTs
+      var waitUntil = now() + waitSec * 1000
+      while (now() < waitUntil) {
+        var code = readKeyNonBlocking()
+        if (isUnDef(code)) { sleep(75); continue }
+        if (isBareEsc(code)) { stopRequested = true; break }
+        var ch = String.fromCharCode(code).toLowerCase()
+        if (ch === "t") viewMode = "table"
+        else if (ch === "r") viewMode = "tree"
+        else if (ch === "f") viewMode = "flat"
+        else if (ch === "o") reverse = !reverse
+        else if (ch === "a") auto = true
+        else if (ch >= "1" && ch <= "9") { auto = false; fixed = normalizeWatchSeconds(ch, fixed) }
+      }
+    }
+    infoMsg("Watch stopped.")
   }
 
   // ─── Value display ──────────────────────────────────────────────────────────
@@ -525,8 +804,8 @@ try {
           break
 
         case "keys":
-          if (!rest[0]) { errorMsg("❌ Usage: /keys <name> [page]"); return }
-          printKeyList(rest[0], rest[1])
+          if (!rest[0]) { errorMsg("❌ Usage: /keys <name> [page] [asc|desc]"); return }
+          printKeyList(rest[0], rest[1], parseOrderArg(rest[2]))
           break
 
         case "get":
@@ -548,18 +827,18 @@ try {
           break
 
         case "getall":
-          if (!rest[0]) { errorMsg("❌ Usage: /getall <name> [page]"); return }
-          var page = rest[1] ? parseInt(rest[1]) : 1
-          var res  = chm.getAll(rest[0], page, 20)
-          var vals = isArray(res) ? res : res.values
-          var tot  = isArray(res) ? res.length : res.total
-          print("")
-          infoMsg("📄 Values for " + rest[0] + " | page " + page + "/" + Math.ceil(tot/20) + " | " + tot + " total")
-          if (vals.length === 0) { infoMsg("(empty)"); return }
-          printRows(vals.map(function(v, i) {
-            return { "#": (page-1)*20+i+1, Value: toSLON(v) }
-          }))
-          if (!isArray(res) && tot > page * 20) infoMsg("Use /getall " + rest[0] + " " + (page+1) + " for next page.")
+          if (!rest[0]) { errorMsg("❌ Usage: /getall <name> [page] [asc|desc]"); return }
+          printValueList(rest[0], rest[1], parseOrderArg(rest[2]))
+          break
+
+        case "watchkeys":
+          if (!rest[0]) { errorMsg("❌ Usage: /watchkeys <name> [sec|auto] [asc|desc] [table|tree|flat]"); return }
+          watchPagedList(rest[0], "keys", rest[1], parseOrderArg(rest[2]), rest[3])
+          break
+
+        case "watchvals":
+          if (!rest[0]) { errorMsg("❌ Usage: /watchvals <name> [sec|auto] [asc|desc] [table|tree|flat]"); return }
+          watchPagedList(rest[0], "values", rest[1], parseOrderArg(rest[2]), rest[3])
           break
 
         case "size":
@@ -626,24 +905,36 @@ try {
           break
 
         case "subscribe":
-          if (!rest[0]) { errorMsg("❌ Usage: /subscribe <name>"); return }
-          infoMsg("📡 Watching " + rest[0] + " - press Ctrl-C to stop...")
+          var liveName = rest[0] || chooseOpenChannelForLive()
+          if (!liveName) return
+          infoMsg("📡 Watching " + liveName + " - use /unsubscribe to stop.")
           var watchStop = false
-          var watchId = chm.subscribe(rest[0], function(ch, op, key, val) {
+          var watchId = chm.subscribe(liveName, function(ch, op, key, val) {
             var isUnset  = op.indexOf("unset") >= 0
             var opColor  = isUnset ? "error" : "ok"
             var opIcon   = isUnset ? "🗑 " : "✏ "
             printBox("[" + new Date().toISOString() + "] " + opIcon + _pad(op, 8) + "  " + toSLON(key) + (isUnset ? "" : " -> " + toSLON(val)), isUnset ? C.error : C.ok, C.dim)
           }, true)
+          _liveTrack(liveName, watchId)
           if (typeof addOnOpenAFShutdown === "function") {
-            addOnOpenAFShutdown(function() { try { chm.unsubscribe(rest[0], watchId) } catch(e) {} })
+            addOnOpenAFShutdown(function() {
+              try { chm.unsubscribe(liveName, watchId); _liveUntrack(liveName, watchId) } catch(e) {}
+            })
           }
-          okMsg("✅ Subscribed (id: " + watchId + "). Detach: /unsubscribe " + rest[0] + " " + watchId)
+          okMsg("✅ Subscribed (id: " + watchId + "). Detach: /unsubscribe " + liveName + " " + watchId)
           break
 
         case "unsubscribe":
-          if (!rest[0] || !rest[1]) { errorMsg("❌ Usage: /unsubscribe <name> <subId>"); return }
-          chm.unsubscribe(rest[0], rest[1])
+          var unsubName = rest[0]
+          var unsubId   = rest[1]
+          if (!unsubName || !unsubId) {
+            var sel = chooseLiveSubscription()
+            if (!sel) return
+            unsubName = sel.name
+            unsubId   = sel.subId
+          }
+          chm.unsubscribe(unsubName, unsubId)
+          _liveUntrack(unsubName, unsubId)
           okMsg("✅ Unsubscribed")
           break
 
@@ -688,7 +979,7 @@ try {
     if (!toBoolean(args.interactive)) java.lang.System.exit(0)
   }
 
-  var slashCommands = Object.keys({channels:1,types:1,add:1,edit:1,info:1,def:1,delete:1,open:1,close:1,keys:1,get:1,set:1,unset:1,getall:1,size:1,clear:1,expose:1,unexpose:1,peer:1,unpeer:1,remote:1,mirror:1,housekeep:1,buffer:1,subscribe:1,unsubscribe:1,sync:1,import:1,export:1,help:1,quit:1,exit:1})
+  var slashCommands = Object.keys({channels:1,types:1,add:1,edit:1,info:1,def:1,delete:1,open:1,close:1,keys:1,watchkeys:1,get:1,set:1,unset:1,getall:1,watchvals:1,size:1,clear:1,expose:1,unexpose:1,peer:1,unpeer:1,remote:1,mirror:1,housekeep:1,buffer:1,subscribe:1,unsubscribe:1,sync:1,import:1,export:1,help:1,quit:1,exit:1})
 
   // Tab completion
   if (isDef(consoleReader)) {
@@ -710,8 +1001,13 @@ try {
       input = readline(prompt)
     }
     if (input === null || input === undefined) break
+    recordHistoryEntry(input)
     dispatch(input.trim())
   }
+
+  try {
+    if (isDef(commandHistory) && typeof commandHistory.flush === "function") commandHistory.flush()
+  } catch(ignoreHistoryFlushErr) {}
 
 } catch(e) {
   printErr("CHManager error: " + e)

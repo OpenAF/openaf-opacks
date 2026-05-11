@@ -28,6 +28,7 @@
   #topbar h1 { font-size: 15px; color: var(--accent); font-weight: 600; margin-right: auto; }
   #topbar h1 span { color: var(--dim); font-weight: 400; font-size: 12px; margin-left: 8px; }
   #top-selected-size { color: var(--badge) !important; }
+  #mobile-menu-btn { display: none; }
   .btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: inherit; }
   .btn:hover { background: var(--hover); }
   .btn-ok { border-color: var(--ok); color: var(--ok); }
@@ -91,8 +92,15 @@
   .field-row input, .field-row select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 3px 6px; border-radius: 3px; font-size: 12px; font-family: inherit; flex: 1; }
 
   /* ── Live view ───────────────────────────────────────────────────── */
-  #live-log { font-size: 11px; max-height: calc(100vh - 200px); overflow-y: auto; }
-  .live-entry { padding: 3px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  #live-config { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .live-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 8px; min-width: 220px; }
+  .live-box h4 { color: var(--accent); font-size: 12px; margin-bottom: 6px; }
+  .live-box select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 4px 6px; border-radius: 4px; font-size: 12px; }
+  #live-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 10px; }
+  .live-grid-cell { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .live-grid-head { padding: 8px; border-bottom: 1px solid var(--border); color: var(--badge); font-size: 12px; font-weight: 700; }
+  .live-log { font-size: 11px; max-height: calc(100vh - 340px); overflow-y: auto; }
+  .live-entry { padding: 4px 8px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
   .live-ts { color: var(--dim); flex-shrink: 0; }
   .live-op { color: var(--badge); width: 60px; flex-shrink: 0; }
   .live-key { color: var(--num); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -160,12 +168,70 @@
 
   #empty-state { color: var(--dim); text-align: center; padding: 40px; font-size: 13px; }
   #empty-state kbd { background: var(--bg3); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    body { font-size: 14px; }
+    #topbar { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+    #mobile-menu-btn { display: inline-block; }
+    #topbar h1 { width: 100%; margin-right: 0; order: -1; }
+    #topbar h1 span { display: inline; }
+    #layout { position: relative; }
+    #sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: min(82vw, 320px);
+      transform: translateX(-100%);
+      transition: transform .2s ease;
+      z-index: 30;
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
+    }
+    #layout.mobile-sidebar-open #sidebar { transform: translateX(0); }
+    #layout.mobile-sidebar-open::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      z-index: 20;
+    }
+    #main-header { flex-wrap: wrap; padding: 8px 10px; }
+    #ch-title { width: 100%; }
+    #tabs {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 0 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab { padding: 8px 12px; font-size: 13px; }
+    #content { padding: 10px; }
+    #panel-keys, #panel-values, #panel-ops, #panel-live, #panel-def { overflow-x: auto; }
+    table { min-width: 620px; }
+    .ops-grid { grid-template-columns: 1fr; max-width: none; }
+    .field-row { flex-wrap: wrap; }
+    .field-row label { width: 100%; }
+    #live-config { gap: 10px; }
+    .live-box { min-width: 0; width: 100%; }
+    #live-grid { grid-template-columns: 1fr; }
+    .viewer-full { height: calc(100vh - 340px); min-height: 260px; }
+    #modal, #val-modal {
+      width: calc(100vw - 16px);
+      max-width: calc(100vw - 16px);
+      padding: 14px;
+      max-height: 92vh;
+    }
+    .option-row { grid-template-columns: 1fr; }
+    .tree-editor .tree-key-in, .tree-editor .tree-val-in { width: 100%; min-width: 0; }
+    #toast-area { left: 10px; right: 10px; bottom: 10px; }
+    .toast { max-width: none; }
+  }
 </style>
 </head>
 <body>
 
 <!-- Top bar -->
 <div id="topbar">
+  <button class="btn" id="mobile-menu-btn" onclick="toggleMobileSidebar()">☰ Channels</button>
   <h1>CHManager <span>OpenAF Channel Manager</span><span id="top-selected-size"></span></h1>
   <button class="btn btn-ok" onclick="openAddModal()">＋ Add Channel</button>
   <button class="btn" onclick="refreshAll()">⟳ Refresh</button>
@@ -205,7 +271,21 @@
       <div id="panel-keys"   style="display:none"></div>
       <div id="panel-values" style="display:none"></div>
       <div id="panel-ops"    style="display:none"></div>
-      <div id="panel-live"   style="display:none"><div id="live-log"></div></div>
+      <div id="panel-live"   style="display:none">
+        <div id="live-config">
+          <div class="live-box">
+            <h4>Open Channels</h4>
+            <select id="live-open" size="6"></select>
+            <div class="field-row" style="margin-top:8px"><button class="btn btn-ok" onclick="liveSubscribeSelected()">Subscribe</button></div>
+          </div>
+          <div class="live-box">
+            <h4>Subscribed Channels</h4>
+            <select id="live-subs" size="6"></select>
+            <div class="field-row" style="margin-top:8px"><button class="btn btn-err" onclick="liveUnsubscribeSelected()">Unsubscribe</button></div>
+          </div>
+        </div>
+        <div id="live-grid"></div>
+      </div>
       <div id="panel-def"    style="display:none"></div>
     </div>
   </div>
@@ -284,6 +364,8 @@ var _valEditKey = null
 var _sseSource  = null
 var _liveActive = false
 var _liveCount  = 0
+var _liveState  = { openChannels: [], subscribed: [] }
+var _liveEvents = {}
 var _defViewMode = "json"
 var _keysViewMode = "table"
 var _valsViewMode = "table"
@@ -294,6 +376,11 @@ var _optsEditorMode = "text"
 var _optsEditorData = {}
 var _treeEditors = {}
 var _optionFieldData = {}
+var _listRefreshCfg = {
+  keys  : { mode: "off", seconds: 3, reverse: false, lastAt: 0, lastTotal: null, nextSeconds: 0 },
+  values: { mode: "off", seconds: 3, reverse: false, lastAt: 0, lastTotal: null, nextSeconds: 0 }
+}
+var _listRefreshTimers = { keys: null, values: null }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", function() {
@@ -302,6 +389,7 @@ window.addEventListener("DOMContentLoaded", function() {
   })
   // Start SSE
   startSSE()
+  bindResponsiveUi()
 })
 
 function toggleTheme() {
@@ -348,6 +436,37 @@ function refreshAll() {
   }).catch(function(e) { toast("Refresh failed: " + e.message, "err") })
 }
 
+function bindResponsiveUi() {
+  var layout = document.getElementById("layout")
+  var main = document.getElementById("main")
+  if (!layout) return
+  layout.addEventListener("click", function(ev) {
+    if (!layout.classList.contains("mobile-sidebar-open")) return
+    if (ev.target !== layout) return
+    closeMobileSidebar()
+  })
+  if (main) {
+    main.addEventListener("click", function() {
+      if (window.innerWidth <= 900) closeMobileSidebar()
+    })
+  }
+  window.addEventListener("resize", function() {
+    if (window.innerWidth > 900) closeMobileSidebar()
+  })
+}
+
+function toggleMobileSidebar() {
+  var layout = document.getElementById("layout")
+  if (!layout) return
+  layout.classList.toggle("mobile-sidebar-open")
+}
+
+function closeMobileSidebar() {
+  var layout = document.getElementById("layout")
+  if (!layout) return
+  layout.classList.remove("mobile-sidebar-open")
+}
+
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 function renderSidebar() {
   var list = document.getElementById("ch-list")
@@ -372,8 +491,11 @@ function selectChannel(name) {
   _selected = name
   _keyPage  = 1
   _valPage  = 1
+  resetListRefreshStats("keys")
+  resetListRefreshStats("values")
   renderSidebar()
   renderMain()
+  closeMobileSidebar()
 }
 
 // ── Main area ─────────────────────────────────────────────────────────────────
@@ -381,6 +503,8 @@ var _curTab = "keys"
 
 function showTab(tab) {
   _curTab = tab
+  stopListRefresh("keys")
+  stopListRefresh("values")
   ;["keys","values","ops","live","def"].forEach(function(t) {
     document.getElementById("tab-" + t).className    = "tab" + (t === tab ? " active" : "")
     document.getElementById("panel-" + t).style.display = t === tab ? "block" : "none"
@@ -391,7 +515,8 @@ function showTab(tab) {
   if (tab === "ops")    renderOps()
   if (tab === "def")    renderDef()
   if (tab === "live") {
-    if (!_liveActive && _selected) startLive()
+    if (!_liveActive) startLive()
+    renderLive()
   }
 }
 
@@ -427,12 +552,17 @@ function loadKeys() {
   if (!d || !d.isOpen) {
     document.getElementById("panel-keys").innerHTML = '<p style="color:var(--dim);padding:20px">Channel is not open. Click <b>Open</b> to activate it.</p>'; return
   }
-  api("GET", "/channels/" + enc(_selected) + "/keys?page=" + _keyPage + "&size=" + _pageSize)
+  loadPagedList("keys", _keyPage, _pageSize)
     .then(function(res) {
       _keyTotal = res.total
       applySelectedSize(res.total)
-      renderKeysTable(res.keys, res.total, res.page)
-    }).catch(function(e) { document.getElementById("panel-keys").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>' })
+      updateListRefreshStats("keys", res.total)
+      renderKeysTable(res.items, res.total, _keyPage)
+      armListRefresh("keys")
+    }).catch(function(e) {
+      stopListRefresh("keys")
+      document.getElementById("panel-keys").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>'
+    })
 }
 
 function renderKeysTable(keys, total, page) {
@@ -441,10 +571,14 @@ function renderKeysTable(keys, total, page) {
   html += '<div class="format-tabs" style="margin-bottom:8px">'
   html += '<button class="btn' + (_keysViewMode === "table" ? " active" : "") + '" onclick="setKeysViewMode(\'table\')">Table</button>'
   html += '<button class="btn' + (_keysViewMode === "tree" ? " active" : "") + '" onclick="setKeysViewMode(\'tree\')">Tree</button>'
+  html += '<button class="btn' + (_keysViewMode === "flat" ? " active" : "") + '" onclick="setKeysViewMode(\'flat\')">Flat</button>'
   html += '<button class="btn' + (_keysViewMode === "visual" ? " active" : "") + '" onclick="setKeysViewMode(\'visual\')">Visual</button>'
   html += '</div>'
+  html += renderRefreshControls("keys")
   if (_keysViewMode === "tree") {
     html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(keys) + '</div>'
+  } else if (_keysViewMode === "flat") {
+    html += renderFlatTable(keys, "Key", "keys", page, total, true)
   } else if (_keysViewMode === "visual") {
     html += '<div class="njsmap-host viewer-full">' + renderNJSMap(keys) + '</div>'
   } else {
@@ -453,7 +587,7 @@ function renderKeysTable(keys, total, page) {
       var ks = JSON.stringify(k)
       var kenc = encodeURIComponent(ks)
       var kd = compactData(k)
-      var idx = (page - 1) * _pageSize + i + 1
+      var idx = computeRowNumber("keys", i, page, total)
       html += '<tr><td class="num-cell">' + idx + '</td>'
       html += '<td class="key-cell" onclick="clickKeyEnc(\'' + kenc + '\')" title="' + esc(kd) + '">' + esc(kd) + '</td>'
       html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="unsetKeyEnc(\'' + kenc + '\')">✕</button></td>'
@@ -502,12 +636,17 @@ function loadValues() {
   if (!d || !d.isOpen) {
     document.getElementById("panel-values").innerHTML = '<p style="color:var(--dim);padding:20px">Channel is not open.</p>'; return
   }
-  api("GET", "/channels/" + enc(_selected) + "/values?page=" + _valPage + "&size=" + _pageSize)
+  loadPagedList("values", _valPage, _pageSize)
     .then(function(res) {
       _valTotal = res.total
       applySelectedSize(res.total)
-      renderValuesTable(res.values, res.total, res.page)
-    }).catch(function(e) { document.getElementById("panel-values").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>' })
+      updateListRefreshStats("values", res.total)
+      renderValuesTable(res.items, res.total, _valPage)
+      armListRefresh("values")
+    }).catch(function(e) {
+      stopListRefresh("values")
+      document.getElementById("panel-values").innerHTML = '<p style="color:var(--err);padding:20px">Error: ' + esc(e.message) + '</p>'
+    })
 }
 
 function renderValuesTable(vals, total, page) {
@@ -515,10 +654,14 @@ function renderValuesTable(vals, total, page) {
   var html  = '<div class="format-tabs" style="margin-bottom:8px">'
   html += '<button class="btn' + (_valsViewMode === "table" ? " active" : "") + '" onclick="setValsViewMode(\'table\')">Table</button>'
   html += '<button class="btn' + (_valsViewMode === "tree" ? " active" : "") + '" onclick="setValsViewMode(\'tree\')">Tree</button>'
+  html += '<button class="btn' + (_valsViewMode === "flat" ? " active" : "") + '" onclick="setValsViewMode(\'flat\')">Flat</button>'
   html += '<button class="btn' + (_valsViewMode === "visual" ? " active" : "") + '" onclick="setValsViewMode(\'visual\')">Visual</button>'
   html += '</div>'
+  html += renderRefreshControls("values")
   if (_valsViewMode === "tree") {
     html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(vals) + '</div>'
+  } else if (_valsViewMode === "flat") {
+    html += renderFlatTable(vals, "Value", "values", page, total, false)
   } else if (_valsViewMode === "visual") {
     html += '<div class="njsmap-host viewer-full">' + renderNJSMap(vals) + '</div>'
   } else {
@@ -527,7 +670,7 @@ function renderValuesTable(vals, total, page) {
       var vs  = JSON.stringify(v)
       var venc = encodeURIComponent(vs)
       var vd  = compactData(v)
-      var idx = (page - 1) * _pageSize + i + 1
+      var idx = computeRowNumber("values", i, page, total)
       html += '<tr><td class="num-cell">' + idx + '</td>'
       html += '<td class="val-cell" onclick="openValFromEnc(\'' + venc + '\')" title="' + esc(vd) + '">' + esc(vd.length > 120 ? vd.substring(0, 120) + "…" : vd) + '</td>'
       html += '</tr>'
@@ -579,21 +722,140 @@ function changePageTo(which, page) {
   }
 }
 
+function resetListRefreshStats(which) {
+  var cfg = _listRefreshCfg[which]
+  cfg.lastAt = 0
+  cfg.lastTotal = null
+  cfg.nextSeconds = 0
+}
+
+function stopListRefresh(which) {
+  if (_listRefreshTimers[which]) clearTimeout(_listRefreshTimers[which])
+  _listRefreshTimers[which] = null
+}
+
+function getListRefreshSeconds(which) {
+  var cfg = _listRefreshCfg[which]
+  if (cfg.mode === "fixed") return Math.max(1, parseInt(cfg.seconds) || 3)
+  if (cfg.mode === "auto") return Math.max(1, parseInt(cfg.nextSeconds) || 3)
+  return 0
+}
+
+function updateListRefreshStats(which, total) {
+  var cfg = _listRefreshCfg[which]
+  var nowMs = Date.now()
+  if (cfg.mode === "auto") {
+    if (cfg.lastAt && cfg.lastTotal !== null) {
+      var dt = Math.max(0.2, (nowMs - cfg.lastAt) / 1000)
+      var rate = Math.abs(total - cfg.lastTotal) / dt
+      if (rate >= 50) cfg.nextSeconds = 1
+      else if (rate >= 15) cfg.nextSeconds = 2
+      else if (rate >= 5) cfg.nextSeconds = 3
+      else if (rate >= 1.5) cfg.nextSeconds = 5
+      else cfg.nextSeconds = 8
+    } else {
+      cfg.nextSeconds = 3
+    }
+  }
+  cfg.lastAt = nowMs
+  cfg.lastTotal = total
+}
+
+function armListRefresh(which) {
+  stopListRefresh(which)
+  if (_curTab !== which) return
+  var sec = getListRefreshSeconds(which)
+  if (sec <= 0) return
+  _listRefreshTimers[which] = setTimeout(function() {
+    if (which === "keys") loadKeys()
+    else loadValues()
+  }, sec * 1000)
+}
+
+function renderRefreshControls(which) {
+  var cfg = _listRefreshCfg[which]
+  var modeLabel = cfg.mode === "auto" ? ("auto (" + getListRefreshSeconds(which) + "s)") : cfg.mode
+  var html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">'
+  html += '<span style="color:var(--dim);font-size:11px">Refresh</span>'
+  html += '<select id="' + which + '-rf-mode" onchange="applyListRefreshControls(\'' + which + '\')" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 5px;border-radius:4px;font-size:11px">'
+  html += '<option value="off"' + (cfg.mode === "off" ? " selected" : "") + '>off</option>'
+  html += '<option value="fixed"' + (cfg.mode === "fixed" ? " selected" : "") + '>fixed</option>'
+  html += '<option value="auto"' + (cfg.mode === "auto" ? " selected" : "") + '>auto</option>'
+  html += '</select>'
+  html += '<input id="' + which + '-rf-sec" type="number" min="1" value="' + cfg.seconds + '" onchange="applyListRefreshControls(\'' + which + '\')" style="width:70px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 5px;border-radius:4px;font-size:11px" />'
+  html += '<span style="color:var(--dim);font-size:11px">sec</span>'
+  html += '<label style="color:var(--dim);font-size:11px"><input id="' + which + '-rf-rev" type="checkbox" ' + (cfg.reverse ? "checked" : "") + ' onchange="applyListRefreshControls(\'' + which + '\')" /> reverse (newest first)</label>'
+  html += '<span style="color:var(--badge);font-size:11px">mode: ' + modeLabel + '</span>'
+  html += '</div>'
+  return html
+}
+
+function applyListRefreshControls(which) {
+  var cfg = _listRefreshCfg[which]
+  var modeEl = document.getElementById(which + "-rf-mode")
+  var secEl  = document.getElementById(which + "-rf-sec")
+  var revEl  = document.getElementById(which + "-rf-rev")
+  if (!modeEl || !secEl || !revEl) return
+  cfg.mode = modeEl.value
+  cfg.seconds = Math.max(1, parseInt(secEl.value) || 3)
+  cfg.reverse = revEl.checked === true
+  resetListRefreshStats(which)
+  if (which === "keys") {
+    _keyPage = 1
+    loadKeys()
+  } else {
+    _valPage = 1
+    loadValues()
+  }
+}
+
+function computeRowNumber(which, i, page, total) {
+  var cfg = _listRefreshCfg[which]
+  if (cfg.reverse) return total - ((page - 1) * _pageSize) - i
+  return (page - 1) * _pageSize + i + 1
+}
+
+function loadPagedList(which, uiPage, pageSize) {
+  var cfg = _listRefreshCfg[which]
+  var base = "/channels/" + enc(_selected) + "/" + (which === "keys" ? "keys" : "values")
+  return api("GET", base + "?page=" + uiPage + "&size=" + pageSize).then(function(res) {
+    var total = res.total || 0
+    var pages = Math.max(1, Math.ceil(total / pageSize))
+    var sourcePage = uiPage
+    if (cfg.reverse) sourcePage = Math.max(1, pages - uiPage + 1)
+    if (!cfg.reverse || sourcePage === uiPage) {
+      var arr = (which === "keys" ? (res.keys || []) : (res.values || [])).slice()
+      if (cfg.reverse) arr.reverse()
+      return { items: arr, total: total, page: uiPage, pages: pages }
+    }
+    return api("GET", base + "?page=" + sourcePage + "&size=" + pageSize).then(function(res2) {
+      var arr2 = (which === "keys" ? (res2.keys || []) : (res2.values || [])).slice()
+      arr2.reverse()
+      return { items: arr2, total: res2.total || total, page: uiPage, pages: pages }
+    })
+  })
+}
+
+function toHttpPathSample(s) {
+  return "/" + String(s || "ch").trim().replace(/\s+/g, "-")
+}
+
 // ── Ops panel ─────────────────────────────────────────────────────────────────
 function renderOps() {
   var html = '<div class="ops-grid">'
+  var pathSample = toHttpPathSample(_selected || "ch")
 
   html += card("Expose via HTTP",
     "Serve this channel over HTTP so remote instances can access it.",
     '<div class="field-row"><label>Port</label><input id="op-exp-port" value="8091" /></div>' +
-    '<div class="field-row"><label>Path</label><input id="op-exp-path" placeholder="/' + (_selected||"ch") + '" /></div>' +
+    '<div class="field-row"><label>Path</label><input id="op-exp-path" placeholder="' + pathSample + '" /></div>' +
     '<button class="btn btn-ok" onclick="doExpose()">Expose</button> ' +
     '<button class="btn btn-err" onclick="doUnexpose()">Remove</button>')
 
   html += card("Peer with remotes",
     "Bidirectional sync with one or more remote channel URLs.",
     '<div class="field-row"><label>Port</label><input id="op-peer-port" value="8092" /></div>' +
-    '<div class="field-row"><label>Path</label><input id="op-peer-path" placeholder="/' + (_selected||"ch") + '" /></div>' +
+    '<div class="field-row"><label>Path</label><input id="op-peer-path" placeholder="' + pathSample + '" /></div>' +
     '<div class="field-row"><label>Remote URLs</label><input id="op-peer-urls" placeholder="http://host:8092/path,..." /></div>' +
     '<button class="btn btn-ok" onclick="doPeer()">Peer</button> ' +
     '<button class="btn btn-err" onclick="doUnpeer()">Unpeer all</button>')
@@ -641,7 +903,7 @@ function card(title, desc, body) {
 
 function doExpose() {
   var port = parseInt(document.getElementById("op-exp-port").value)
-  var path = document.getElementById("op-exp-path").value || ("/" + _selected)
+  var path = document.getElementById("op-exp-path").value || toHttpPathSample(_selected)
   api("POST", "/channels/" + enc(_selected) + "/expose", { port: port, path: path })
     .then(function() { toast("Exposed on port " + port); refreshAll() })
     .catch(function(e) { toast(e.message, "err") })
@@ -655,7 +917,7 @@ function doUnexpose() {
 
 function doPeer() {
   var port = parseInt(document.getElementById("op-peer-port").value)
-  var path = document.getElementById("op-peer-path").value || ("/" + _selected)
+  var path = document.getElementById("op-peer-path").value || toHttpPathSample(_selected)
   var urls = document.getElementById("op-peer-urls").value.split(",").map(function(s){return s.trim()}).filter(Boolean)
   api("POST", "/channels/" + enc(_selected) + "/peer", { port: port, path: path, urls: urls })
     .then(function() { toast("Peered with " + urls.length + " remote(s)"); refreshAll() })
@@ -721,6 +983,94 @@ function doExport() {
 function startLive() {
   _liveActive = true
   _liveCount  = 0
+  loadLiveStatus()
+}
+
+function liveAddEvent(ev) {
+  if (!ev || !ev.channel) return
+  if (!_liveEvents[ev.channel]) _liveEvents[ev.channel] = []
+  _liveEvents[ev.channel].unshift(ev)
+  if (_liveEvents[ev.channel].length > 200) _liveEvents[ev.channel].length = 200
+}
+
+function renderLive() {
+  var openSel = document.getElementById("live-open")
+  var subsSel = document.getElementById("live-subs")
+  var grid    = document.getElementById("live-grid")
+  if (!openSel || !subsSel || !grid) return
+
+  openSel.innerHTML = ""
+  _liveState.openChannels.forEach(function(ch) {
+    var o = document.createElement("option")
+    o.value = ch.name
+    o.textContent = ch.name + " [" + ch.type + "]"
+    openSel.appendChild(o)
+  })
+
+  subsSel.innerHTML = ""
+  _liveState.subscribed.forEach(function(s) {
+    var o = document.createElement("option")
+    o.value = s.name
+    o.textContent = s.name + " (#" + s.subId + ")"
+    subsSel.appendChild(o)
+  })
+
+  grid.innerHTML = ""
+  _liveState.subscribed.forEach(function(s) {
+    var cell = document.createElement("div")
+    cell.className = "live-grid-cell"
+    var head = document.createElement("div")
+    head.className = "live-grid-head"
+    head.textContent = s.name
+    var log = document.createElement("div")
+    log.className = "live-log"
+    var events = _liveEvents[s.name] || []
+    if (events.length === 0) {
+      var empty = document.createElement("div")
+      empty.className = "live-entry"
+      empty.innerHTML = '<span class="live-ts">-</span><span class="live-op">idle</span><span class="live-key">No events yet</span>'
+      log.appendChild(empty)
+    } else {
+      events.forEach(function(ev) {
+        var entry = document.createElement("div")
+        entry.className = "live-entry"
+        var ts = new Date(ev.ts).toISOString().replace("T", " ").replace("Z", "").substring(0, 23)
+        entry.innerHTML = '<span class="live-ts">' + esc(ts) + '</span>'
+          + '<span class="live-op">' + esc(ev.op) + '</span>'
+          + '<span class="live-key">' + esc(compactData(ev.key)) + '</span>'
+          + '<span class="live-val">' + esc(compactData(ev.val)) + '</span>'
+        log.appendChild(entry)
+      })
+    }
+    cell.appendChild(head)
+    cell.appendChild(log)
+    grid.appendChild(cell)
+  })
+}
+
+function loadLiveStatus() {
+  return api("GET", "/live")
+    .then(function(st) {
+      _liveState = st || { openChannels: [], subscribed: [] }
+      renderLive()
+    })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function liveSubscribeSelected() {
+  var sel = document.getElementById("live-open")
+  if (!sel || !sel.value) { toast("Select an open channel", "err"); return }
+  api("POST", "/live/subscribe", { name: sel.value })
+    .then(function() { toast("Subscribed: " + sel.value); return loadLiveStatus() })
+    .catch(function(e) { toast(e.message, "err") })
+}
+
+function liveUnsubscribeSelected() {
+  var sel = document.getElementById("live-subs")
+  if (!sel || !sel.value) { toast("Select a subscribed channel", "err"); return }
+  api("POST", "/live/unsubscribe", { name: sel.value })
+    .then(function() { toast("Unsubscribed: " + sel.value); return loadLiveStatus() })
+    .catch(function(e) { toast(e.message, "err") })
 }
 
 function startSSE() {
@@ -730,18 +1080,9 @@ function startSSE() {
     try {
       var ev = JSON.parse(e.data)
       if (!ev.channel) return
-      var log = document.getElementById("live-log")
-      if (!log) return
-      if (_curTab !== "live" || ev.channel !== _selected) return
-      var entry = document.createElement("div")
-      entry.className = "live-entry"
-      var ts = new Date(ev.ts).toISOString().replace("T", " ").replace("Z", "").substring(0, 23)
-      entry.innerHTML = '<span class="live-ts">' + esc(ts) + '</span>'
-        + '<span class="live-op">' + esc(ev.op) + '</span>'
-        + '<span class="live-key">' + esc(compactData(ev.key)) + '</span>'
-      log.insertBefore(entry, log.firstChild)
+      liveAddEvent(ev)
       _liveCount++
-      if (_liveCount > 200) { var last = log.lastChild; if (last) log.removeChild(last) }
+      if (_curTab === "live") renderLive()
     } catch(err) {}
   }
   _sseSource.onerror = function() { _sseSource = null; setTimeout(startSSE, 3000) }
@@ -1160,6 +1501,49 @@ function toSlon(v) {
 function compactData(v) {
   if (Array.isArray(v) || (v && typeof v === "object")) return toSlon(v)
   return JSON.stringify(v)
+}
+
+function flatCell(v) {
+  if (v === null) return "null"
+  if (v === undefined) return "undefined"
+  if (Array.isArray(v) || (v && typeof v === "object")) return toSlon(v)
+  return String(v)
+}
+
+function flatValueMap(v, fallbackLabel) {
+  if (v && typeof v === "object" && !Array.isArray(v)) return v
+  var out = {}
+  out[fallbackLabel] = v
+  return out
+}
+
+function renderFlatTable(items, fallbackLabel, which, page, total, includeKeyActions) {
+  var union = {}
+  items.forEach(function(v) {
+    var m = flatValueMap(v, fallbackLabel)
+    Object.keys(m).forEach(function(k) { union[k] = true })
+  })
+  var cols = Object.keys(union)
+  var html = '<table><tr><th class="num-cell">#</th>'
+  cols.forEach(function(c) { html += '<th>' + esc(c) + '</th>' })
+  if (includeKeyActions) html += '<th style="width:60px">Actions</th>'
+  html += '</tr>'
+  items.forEach(function(v, i) {
+    var idx = computeRowNumber(which, i, page, total)
+    var m = flatValueMap(v, fallbackLabel)
+    html += '<tr><td class="num-cell">' + idx + '</td>'
+    cols.forEach(function(c) {
+      html += '<td class="val-cell" title="' + esc(flatCell(m[c])) + '">' + esc(flatCell(m[c])) + '</td>'
+    })
+    if (includeKeyActions) {
+      var ks = JSON.stringify(v)
+      var kenc = encodeURIComponent(ks)
+      html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="unsetKeyEnc(\'' + kenc + '\')">✕</button></td>'
+    }
+    html += '</tr>'
+  })
+  html += '</table>'
+  return html
 }
 
 function slonKey(k) {

@@ -15,6 +15,7 @@ todo:
 - CHManager::EditDef
 - CHManager::PersistenceRoundTrip
 - CHManager::CreateRemote
+- CHManager::NormalizeHttpPathsAndURLs
 - CHManager::HousekeepSubscriber
 - CHManager::MirrorSubscriber
 - CHManager::TypeRegistry
@@ -60,6 +61,11 @@ jobs:
   from: CHManager::Init
   to  : oJob Test
   exec: args.func = args.tests.testCreateRemote
+
+- name: CHManager::NormalizeHttpPathsAndURLs
+  from: CHManager::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testNormalizeHttpPathsAndURLs
 
 - name: CHManager::HousekeepSubscriber
   from: CHManager::Init
