@@ -70,6 +70,6 @@ filesHash:
   CHManager.js: 68fc4612b1984557cababcd6041ae6f4b753f03e
   CHManager.yaml: 9bab91e77e149a8a4d569d6e78859901f6b7697b
   README.md: c39db17c358eca93d7d5986bdf765efb279d18fb
-  public/index.html: a8278c149bb685b985001a8a810cbb0608822982
+  public/index.html: a484f9548226f6b432d3ead5caff078d807d62e8
   tests/autoTestCHManager.js: 8f389b4fd879189576c9093a60630684e7921bfd
   tests/autoTestCHManager.yaml: adbf5db385c31c41534ede22e5b34f18d2a7a888
