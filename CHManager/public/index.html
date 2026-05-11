@@ -576,7 +576,7 @@ function renderKeysTable(keys, total, page) {
   html += '</div>'
   html += renderRefreshControls("keys")
   if (_keysViewMode === "tree") {
-    html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(keys) + '</div>'
+    html += renderTreeRows(keys, "keys", page, total, true)
   } else if (_keysViewMode === "flat") {
     html += renderFlatTable(keys, "Key", "keys", page, total, true)
   } else if (_keysViewMode === "visual") {
@@ -659,7 +659,7 @@ function renderValuesTable(vals, total, page) {
   html += '</div>'
   html += renderRefreshControls("values")
   if (_valsViewMode === "tree") {
-    html += '<div class="data-pre tree-pre viewer-full">' + renderAsciiTreeHtml(vals) + '</div>'
+    html += renderTreeRows(vals, "values", page, total, false)
   } else if (_valsViewMode === "flat") {
     html += renderFlatTable(vals, "Value", "values", page, total, false)
   } else if (_valsViewMode === "visual") {
@@ -1531,14 +1531,39 @@ function renderFlatTable(items, fallbackLabel, which, page, total, includeKeyAct
   items.forEach(function(v, i) {
     var idx = computeRowNumber(which, i, page, total)
     var m = flatValueMap(v, fallbackLabel)
-    html += '<tr><td class="num-cell">' + idx + '</td>'
+    var venc = encodeURIComponent(JSON.stringify(v))
+    var cellClick = which === "keys"
+      ? ' onclick="clickKeyEnc(\'' + venc + '\')"'
+      : ' onclick="openValFromEnc(\'' + venc + '\')"'
+    html += '<tr><td class="num-cell"' + cellClick + '>' + idx + '</td>'
     cols.forEach(function(c) {
-      html += '<td class="val-cell" title="' + esc(flatCell(m[c])) + '">' + esc(flatCell(m[c])) + '</td>'
+      html += '<td class="val-cell"' + cellClick + ' title="' + esc(flatCell(m[c])) + '">' + esc(flatCell(m[c])) + '</td>'
     })
     if (includeKeyActions) {
       var ks = JSON.stringify(v)
       var kenc = encodeURIComponent(ks)
-      html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="unsetKeyEnc(\'' + kenc + '\')">✕</button></td>'
+      html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="event.stopPropagation();unsetKeyEnc(\'' + kenc + '\')">✕</button></td>'
+    }
+    html += '</tr>'
+  })
+  html += '</table>'
+  return html
+}
+
+function renderTreeRows(items, which, page, total, includeKeyActions) {
+  var html = '<table><tr><th class="num-cell">#</th><th>' + (which === "keys" ? "Key" : "Value") + '</th>'
+  if (includeKeyActions) html += '<th style="width:60px">Actions</th>'
+  html += '</tr>'
+  items.forEach(function(v, i) {
+    var idx = computeRowNumber(which, i, page, total)
+    var venc = encodeURIComponent(JSON.stringify(v))
+    var rowClick = which === "keys"
+      ? ' onclick="clickKeyEnc(\'' + venc + '\')"'
+      : ' onclick="openValFromEnc(\'' + venc + '\')"'
+    html += '<tr' + rowClick + '><td class="num-cell">' + idx + '</td>'
+    html += '<td class="val-cell"><div class="data-pre tree-pre">' + renderAsciiTreeHtml(v) + '</div></td>'
+    if (includeKeyActions) {
+      html += '<td><button class="btn" style="font-size:10px;padding:1px 5px" onclick="event.stopPropagation();unsetKeyEnc(\'' + venc + '\')">✕</button></td>'
     }
     html += '</tr>'
   })
