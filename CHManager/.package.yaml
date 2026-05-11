@@ -50,6 +50,8 @@ dependencies:
   openaf: '>=20250926'
 files:
 - .maven.yaml
+- .openaf_precompiled/.t8-20260509
+- .openaf_precompiled/CHManager_js.class
 - .package.yaml
 - CHManager-con.js
 - CHManager-web.yaml
@@ -61,6 +63,8 @@ files:
 - tests/autoTestCHManager.yaml
 filesHash:
   .maven.yaml: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
+  .openaf_precompiled/.t8-20260509: da39a3ee5e6b4b0d3255bfef95601890afd80709
+  .openaf_precompiled/CHManager_js.class: 6ced915981abe28a24c0ccc225277e0ebfd3d7f0
   CHManager-con.js: 68c056a399a4c5693c4d29f97f55c938e55fdeb3
   CHManager-web.yaml: 6fd9448d829ac2e375c787b2c6b2d223829007ea
   CHManager.js: 68fc4612b1984557cababcd6041ae6f4b753f03e
