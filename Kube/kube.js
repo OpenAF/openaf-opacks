@@ -1,3 +1,10 @@
+/**
+ * <odoc>
+ * <key>Kube.$kube(aMap) : Map</key>
+ * Creates a convenience wrapper around Kube with cached connections. aMap can include: url, user, pass, token and wstimeout.
+ * The returned map provides chainable helpers such as ns(...), execTimeout(...), get/list/apply/delete and resource-specific shortcuts.
+ * </odoc>
+ */
 var $kube = function(aMap) {
 	aMap = _$(aMap, "aMap").isMap().default({})
 
@@ -208,6 +215,12 @@ var Kube = function (aURLorFile, aUser, aPass, aWSTimeout, aToken) {
 	this.isClosed = false
 };
 
+/**
+ * <odoc>
+ * <key>Kube.close()</key>
+ * Closes the current kubernetes client connection.
+ * </odoc>
+ */
 Kube.prototype.close = function() {
   	this.client.close();
 	this.isClosed = true
@@ -336,7 +349,7 @@ Kube.prototype.scaleWithDeps = function(aNamespace, anArrayScaleWithDeps, scaleD
 /**
  * <odoc>
  * <key>Kube.exec(aNamespace, aPodName, aCommand, aTimeout, doSH, aContainer) : String</key>
- * Tries to executed aCommand on aPodName of aNamespace. If defined, it will wait for the defined aTimeout and/or execute the aCommand on a /bin/sh if doSH = true.
+ * Tries to execute aCommand on aPodName of aNamespace. If defined, it will wait for the defined aTimeout and/or execute the aCommand on a /bin/sh if doSH = true.
  * aCommand can be either a string or an array. Do note that it might be necessary to URL encode some parts of commands.
  * </odoc>
  */
@@ -907,6 +920,12 @@ Kube.prototype.getNodes = function(aNamespace, full) {
 	}
 };
 
+/**
+ * <odoc>
+ * <key>Kube.getNode(aNodeName) : Map</key>
+ * Tries to retrieve the node object for aNodeName.
+ * </odoc>
+ */
 Kube.prototype.getNode = function(aNodeName) {
 	return this.__dR(this.client.nodes().withName(aNodeName))
 }
@@ -1522,10 +1541,22 @@ Kube.prototype.getNames = function (aNamespace, full) {
 	}
 };
 
+/**
+ * <odoc>
+ * <key>Kube.getVersion() : Map</key>
+ * Retrieves the kubernetes server version information for the current cluster.
+ * </odoc>
+ */
 Kube.prototype.getVersion = function() {
 	return this.__dR(this.client.getKubernetesVersion())
 }
 
+/**
+ * <odoc>
+ * <key>Kube.getEvents(aNamespace) : Array</key>
+ * Retrieves events for aNamespace. If aNamespace is not provided it returns events across all namespaces.
+ * </odoc>
+ */
 Kube.prototype.getEvents = function(aNamespace) {
         aNamespace = _$(aNamespace, "namespace").default(__);
 
