@@ -638,4 +638,50 @@
         ow.test.assert(calls.html.split("cid:cid-chart.png").length - 1, 2,
             "setEmailFromMarkdownFile should reuse the same CID for repeated image references")
     }
+
+    exports.testMdEmailSourceValidation = function() {
+        var yaml = io.readFileString("md2email.yaml")
+        ow.test.assert(yaml.indexOf("Please provide exactly one markdown source: either file or markdown.") >= 0, true,
+            "mdemail job should enforce exactly one markdown source")
+        ow.test.assert(yaml.indexOf("var hasFile = isDef(args.file)") >= 0, true,
+            "mdemail job should check file source presence")
+        ow.test.assert(yaml.indexOf("var hasMarkdown = isDef(args.markdown)") >= 0, true,
+            "mdemail job should check markdown source presence")
+    }
+
+    exports.testMdEmailMarkdownPathAndTemplating = function() {
+        var yaml = io.readFileString("md2email.yaml")
+        ow.test.assert(yaml.indexOf('name  : mdemail') >= 0, true,
+            "mdemail shortcut should exist")
+        ow.test.assert(yaml.indexOf('keyArg: subject') >= 0, true,
+            "mdemail shortcut should use subject as key arg")
+        ow.test.assert(yaml.indexOf('new Email(args.server, args.from, args.useSSL, args.useTLS, true);') >= 0, true,
+            "mdemail should always use HTML mode")
+        ow.test.assert(yaml.indexOf('templify(args.subject, args)') >= 0, true,
+            "mdemail should templify subject")
+        ow.test.assert(yaml.indexOf('if (isString(args.to)) args.to = [ String(args.to) ];') >= 0, true,
+            "mdemail should normalize string recipients")
+    }
+
+    exports.testMdEmailFilePathEmbedsRelativeImageAndAltOutput = function() {
+        var yaml = io.readFileString("md2email.yaml")
+        ow.test.assert(yaml.indexOf('m.setEmailFromMarkdownFile(email, args.file, mdOptions)') >= 0, true,
+            "mdemail should route file source through setEmailFromMarkdownFile")
+        ow.test.assert(yaml.indexOf('m.setEmailFromMarkdown(email, $t(args.markdown, args), mdOptions)') >= 0, true,
+            "mdemail should route markdown source through setEmailFromMarkdown")
+        ow.test.assert(yaml.indexOf('var altMessage = _$(args.altOutput).isString().default(args.md2email.text);') >= 0, true,
+            "mdemail should default altOutput to md2email text output")
+    }
+
+    exports.testMdEmailSendExtrasInvocation = function() {
+        var yaml = io.readFileString("md2email.yaml")
+        ow.test.assert(yaml.indexOf("email.embedFile(args.embedFiles[ii].file, args.embedFiles[ii].name);") >= 0, true,
+            "mdemail should invoke embedFiles")
+        ow.test.assert(yaml.indexOf("email.embedURL(args.embedURLs[ii].url, args.embedURLs[ii].name);") >= 0, true,
+            "mdemail should invoke embedURLs")
+        ow.test.assert(yaml.indexOf("email.addAttachment(args.addAttachments[ii].file, args.addAttachments[ii].isInLine, void 0, args.addAttachments[ii].name);") >= 0, true,
+            "mdemail should invoke addAttachments")
+        ow.test.assert(yaml.indexOf("email.addExternalImage(args.addImages[ii]);") >= 0, true,
+            "mdemail should invoke addImages")
+    }
 })()

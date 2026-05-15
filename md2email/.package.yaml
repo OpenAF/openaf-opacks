@@ -21,7 +21,7 @@ name: md2email
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260509'
+version: '20260515'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -40,6 +40,7 @@ files:
 - commonmark-ext-task-list-items-0.28.0.jar
 - commonmark-ext-yaml-front-matter-0.28.0.jar
 - jsvg-2.1.0.jar
+- md2email-svg-0.png
 - md2email.js
 - md2email.yaml
 - tests/autoTestMd2Email.js
@@ -48,7 +49,7 @@ filesHash:
   .maven.yaml: 66cc51c0a27edf4abbaf89ff5a18e5db4d65282a
   .odoc.db: 96cddb05f139e8f8dc67b2b69c2f7bf3df3116ca
   .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
-  README.md: 68433dc0a9d6b9c7a0b838764adde199bc73b65b
+  README.md: cb2a90c720b19402c282f7f34c6e5524f909ed41
   autolink-0.12.0.jar: 917f405aadfe8e315740ffc367b4675a5ff6f2a0
   commonmark-0.28.0.jar: 9fa5c6ea2a17aedfec543c693be35573307750dd
   commonmark-ext-autolink-0.28.0.jar: 175b9cd4441b12dbe45bb442bdb14d4a553ccb46
@@ -59,7 +60,8 @@ filesHash:
   commonmark-ext-task-list-items-0.28.0.jar: 16044b2f44588c26b59b0060bec008d2bd39a130
   commonmark-ext-yaml-front-matter-0.28.0.jar: c21169ab375ed56396b2845c0ba023a2a6740ac9
   jsvg-2.1.0.jar: c1a403f318de302fa81e4403fe8fb4bd6056a41f
+  md2email-svg-0.png: 29b5908ecde559dc672cc696a082ef0d4f0c1f08
   md2email.js: cb70d67c09ce1e0faa3f8a71722e5db3ef1ffa9f
-  md2email.yaml: af77e62654f053b484ba78b81ba6721b40c6f779
-  tests/autoTestMd2Email.js: 4f6db1cf345fd60edbbf011f58b6f333ec7ecd4c
-  tests/autoTestMd2Email.yaml: d385ec22f4a8464bbbefbcab95f2beebdb0bbf56
+  md2email.yaml: a66810b40f9a6dad6eee55b6ebfd3fddf4ec8515
+  tests/autoTestMd2Email.js: 9003a5fd8f9674d28e2edd6ced8dc010db4fb0ec
+  tests/autoTestMd2Email.yaml: 655a31f86f77c6f7326a136f7e00e22804c5a619

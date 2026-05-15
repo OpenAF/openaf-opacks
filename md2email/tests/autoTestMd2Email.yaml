@@ -51,6 +51,10 @@ todo:
 - md2email::SetEmailFromMarkdownEmbedsLocalImage
 - md2email::SetEmailFromMarkdownCustomCharset
 - md2email::SetEmailFromMarkdownFileDeduplicatesImages
+- md2email::MdEmailSourceValidation
+- md2email::MdEmailMarkdownPathAndTemplating
+- md2email::MdEmailFilePathEmbedsRelativeImageAndAltOutput
+- md2email::MdEmailSendExtrasInvocation
 - Test results
 
 jobs:
@@ -279,6 +283,26 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testSetEmailFromMarkdownFileDeduplicatesImages
 
+- name: md2email::MdEmailSourceValidation
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMdEmailSourceValidation
+
+- name: md2email::MdEmailMarkdownPathAndTemplating
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMdEmailMarkdownPathAndTemplating
+
+- name: md2email::MdEmailFilePathEmbedsRelativeImageAndAltOutput
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMdEmailFilePathEmbedsRelativeImageAndAltOutput
+
+- name: md2email::MdEmailSendExtrasInvocation
+  from: md2email::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMdEmailSendExtrasInvocation
+
 - name: Test results
   from: oJob Test Results
   deps:
@@ -323,6 +347,10 @@ jobs:
   - md2email::SetEmailFromMarkdownEmbedsLocalImage
   - md2email::SetEmailFromMarkdownCustomCharset
   - md2email::SetEmailFromMarkdownFileDeduplicatesImages
+  - md2email::MdEmailSourceValidation
+  - md2email::MdEmailMarkdownPathAndTemplating
+  - md2email::MdEmailFilePathEmbedsRelativeImageAndAltOutput
+  - md2email::MdEmailSendExtrasInvocation
   args:
     quiet: true
   exec: |

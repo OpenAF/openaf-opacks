@@ -398,6 +398,349 @@ jobs:
     if (isDef(args.output)) io.writeFileString(args.output, args.html, args.encoding)
 
 # -----------------------------------
+- name : MD2Email Send Email
+  help :
+    text   : Sends an email from Markdown using md2email conversion and CID embedding. Exactly one markdown source must be provided using file or markdown.
+    expects:
+    - name    : server
+      desc    : (String) The email server to use
+      required: true
+    - name    : port
+      desc    : (Number) The email server port to use
+    - name    : from
+      desc    : (String) The email from address
+      required: true
+    - name    : to
+      desc    : (Array/String) The email to addresses
+      required: true
+    - name    : cc
+      desc    : (Array/String) The email cc addresses
+    - name    : bcc
+      desc    : (Array/String) The email bcc addresses
+    - name    : subject
+      desc    : (String) The email subject (a hbs template using args as data)
+      required: true
+    - name    : output
+      desc    : (String) Accepted for shortcut parity but ignored as body source by this job
+    - name    : altOutput
+      desc    : (String) Overrides the text/plain alternative message generated from markdown
+    - name    : credentials
+      desc    : (Map) The email server credentials (user and pass)
+    - name    : useSSL
+      desc    : (Boolean) If the email server uses SSL (default true)
+    - name    : useTLS
+      desc    : (Boolean) If the email server uses TLS (default false)
+    - name    : embedFiles
+      desc    : (Array) Array of maps (with file and name) to embed on the email
+    - name    : addAttachments
+      desc    : (Array) Array of maps (with file, isInLine, name) to attach on the email
+    - name    : addImages
+      desc    : (Array) Array of urls to images
+    - name    : embedURLs
+      desc    : (Array) Array of maps (with url and name) to embed on the email
+    - name    : debug
+      desc    : (Boolean) Determines if it should debug the process
+    - name    : file
+      desc    : Path to a markdown file source (mutually exclusive with markdown)
+    - name    : markdown
+      desc    : Markdown string source (mutually exclusive with file)
+    - name    : encoding
+      desc    : File encoding when file is provided (default UTF-8)
+    - name    : title
+      desc    : Value for HTML title (defaults to subject)
+    - name    : width
+      desc    : Max width of the content column in pixels (default 600)
+    - name    : padding
+      desc    : Inner padding of the content cell (default 32px 40px)
+    - name    : bgColor
+      desc    : Page background colour (default #f5f5f5)
+    - name    : contentBg
+      desc    : Content area background colour (default #ffffff)
+    - name    : borderColor
+      desc    : Header/footer separator colour (default #eeeeee)
+    - name    : fontFamily
+      desc    : Base font family (default Arial,Helvetica,sans-serif)
+    - name    : fontSize
+      desc    : Base font size (default 14px)
+    - name    : header
+      desc    : Raw HTML inserted above the content
+    - name    : footer
+      desc    : Raw HTML inserted below the content
+    - name    : theme
+      desc    : Named theme default or dark
+    - name    : tables
+      desc    : Enable GFM table extension (default true)
+    - name    : strikethrough
+      desc    : Enable GFM strikethrough (default true)
+    - name    : taskListItems
+      desc    : Enable task-list items (default true)
+    - name    : headingAnchor
+      desc    : Add id anchors to headings (default false)
+    - name    : ins
+      desc    : Enable ++underline++ extension (default false)
+    - name    : autolink
+      desc    : Auto-link bare URLs (default false)
+    - name    : sanitizeUrls
+      desc    : Strip javascript/data scheme hrefs (default false)
+    - name    : baseDir
+      desc    : Folder used to resolve relative image paths
+    - name    : emailCharset
+      desc    : Charset passed to Email.setCharset() before content is set (default UTF-8)
+    - name    : embedExternalImages
+      desc    : If true call addExternalImage() for http(s) markdown images
+    - name    : setMessage
+      desc    : If true also call setMessage() with markdown plain-text rendering (default true)
+    - name    : svgToPng
+      desc    : Convert inline SVG blocks to PNG images
+    - name    : svgPngMode
+      desc    : file or embed
+    - name    : svgPngOutDir
+      desc    : Output directory when svgPngMode is file
+    - name    : svgPngBaseName
+      desc    : Prefix for generated PNG filenames
+    - name    : svgNormalizeFonts
+      desc    : Rewrite SVG font aliases before PNG rendering
+    - name    : svgFontFamilyAliases
+      desc    : Override/add SVG font aliases map
+    returns:
+    - name: result
+      desc: Email send result
+    - name: md2email
+      desc: Result map returned by setEmailFromMarkdown* with html/text/embed metadata
+  typeArgs:
+    shortcut:
+      name  : mdemail
+      keyArg: subject
+      args  :
+        server             : server
+        port               : port
+        from               : from
+        to                 : to
+        cc                 : cc
+        bcc                : bcc
+        output             : output
+        altOutput          : altOutput
+        credentials        : credentials
+        useSSL             : useSSL
+        useTLS             : useTLS
+        embedFiles         : embedFiles
+        addAttachments     : addAttachments
+        addImages          : addImages
+        embedURLs          : embedURLs
+        debug              : debug
+        file               : file
+        markdown           : markdown
+        encoding           : encoding
+        title              : title
+        width              : width
+        padding            : padding
+        bgColor            : bgColor
+        contentBg          : contentBg
+        borderColor        : borderColor
+        fontFamily         : fontFamily
+        fontSize           : fontSize
+        header             : header
+        footer             : footer
+        theme              : theme
+        tables             : tables
+        strikethrough      : strikethrough
+        taskListItems      : taskListItems
+        headingAnchor      : headingAnchor
+        ins                : ins
+        autolink           : autolink
+        sanitizeUrls       : sanitizeUrls
+        baseDir            : baseDir
+        emailCharset       : emailCharset
+        embedExternalImages: embedExternalImages
+        setMessage         : setMessage
+        svgToPng           : svgToPng
+        svgPngMode         : svgPngMode
+        svgPngOutDir       : svgPngOutDir
+        svgPngBaseName     : svgPngBaseName
+        svgNormalizeFonts  : svgNormalizeFonts
+        svgFontFamilyAliases: svgFontFamilyAliases
+  check:
+    in:
+      server             : isString.default(__)
+      port               : isNumber.default(__)
+      from               : isString.default(__)
+      to                 : isArray.default(__)
+      cc                 : isArray.default(__)
+      bcc                : isArray.default(__)
+      output             : isString.default(__)
+      altOutput          : isString.default(__)
+      credentials        : isMap.default(__)
+      useSSL             : toBoolean.isBoolean.default(true)
+      useTLS             : toBoolean.isBoolean.default(false)
+      embedFiles         : isArray.default(__)
+      addAttachments     : isArray.default(__)
+      addImages          : isArray.default(__)
+      embedURLs          : isArray.default(__)
+      debug              : toBoolean.isBoolean.default(__)
+      subject            : isString.default(__)
+      file               : isString.default(__)
+      markdown           : isString.default(__)
+      encoding           : isString.default("UTF-8")
+      title              : isString.default(__)
+      width              : isString.default("600")
+      padding            : isString.default("32px 40px")
+      bgColor            : isString.default("#f5f5f5")
+      contentBg          : isString.default("#ffffff")
+      borderColor        : isString.default("#eeeeee")
+      fontFamily         : isString.default("Arial,Helvetica,sans-serif")
+      fontSize           : isString.default("14px")
+      header             : isString.default(__)
+      footer             : isString.default(__)
+      theme              : isString.default("default")
+      tables             : toBoolean.isBoolean.default(true)
+      strikethrough      : toBoolean.isBoolean.default(true)
+      taskListItems      : toBoolean.isBoolean.default(true)
+      headingAnchor      : toBoolean.isBoolean.default(false)
+      ins                : toBoolean.isBoolean.default(false)
+      autolink           : toBoolean.isBoolean.default(false)
+      sanitizeUrls       : toBoolean.isBoolean.default(false)
+      baseDir            : isString.default(__)
+      emailCharset       : isString.default("UTF-8")
+      embedExternalImages: toBoolean.isBoolean.default(false)
+      setMessage         : toBoolean.isBoolean.default(true)
+      svgToPng           : toBoolean.isBoolean.default(true)
+      svgPngMode         : isString.default("file")
+      svgPngOutDir       : isString.default(".")
+      svgPngBaseName     : isString.default("md2email-svg")
+      svgNormalizeFonts  : toBoolean.isBoolean.default(true)
+      svgFontFamilyAliases: isMap.default(__)
+  exec : | #js
+    if (isString(args.to)) args.to = [ String(args.to) ];
+    if (isString(args.cc)) args.cc = [ args.cc ];
+    if (isString(args.bcc)) args.bcc = [ args.bcc ];
+
+    var cL = (l) => {
+      if (isArray(l)) {
+        for(var o in l) {
+          l[o] = String(l[o]);
+        }
+      }
+    };
+
+    _$(args.server).isString().$_("Please provide an email server.");
+    _$(args.from).isString().$_("Please provide a from email address.");
+    _$(args.to).isArray().$_("Please provide the to email addresses.");
+    _$(args.subject).isString().$_("Please provide a subject.");
+
+    var hasFile = isDef(args.file) && String(args.file).length > 0;
+    var hasMarkdown = isDef(args.markdown) && String(args.markdown).length > 0;
+    if ((hasFile && hasMarkdown) || (!hasFile && !hasMarkdown)) {
+      throw "Please provide exactly one markdown source: either file or markdown.";
+    }
+
+    cL(args.to);
+    cL(args.cc);
+    cL(args.bcc);
+
+    args.cc          = _$(args.cc).isArray().default([]);
+    args.bcc         = _$(args.bcc).isArray().default([]);
+    args.debug       = _$(args.debug).isBoolean().default(void 0);
+    args.port        = _$(args.port).isNumber().default(void 0);
+    args.useSSL      = _$(args.useSSL).isBoolean().default(true);
+    args.useTLS      = _$(args.useTLS).isBoolean().default(false);
+    args.embedFiles  = _$(args.embedFiles).isArray().default(void 0);
+    args.embedURLs   = _$(args.embedURLs).isArray().default(void 0);
+    args.addImages   = _$(args.addImages).isArray().default(void 0);
+    args.addAttachments = _$(args.addAttachments).isArray().default(void 0);
+    args.credentials = _$(args.credentials).isMap().default(void 0);
+    args.title       = _$(args.title).isString().default(args.subject);
+
+    plugin("Email");
+    loadLib("md2email.js");
+    var email = new Email(args.server, args.from, args.useSSL, args.useTLS, true);
+    if (isDef(args.port)) email.setPort(args.port);
+    if (isDef(args.emailCharset)) email.setCharset(args.emailCharset);
+
+    if (isDef(args.credentials)) email.setCredentials(args.credentials.user, args.credentials.pass);
+    if (args.debug) email.getEmailObj().setDebug(true);
+
+    if (isDef(args.embedFiles)) {
+      for(var ii in args.embedFiles) {
+        email.embedFile(args.embedFiles[ii].file, args.embedFiles[ii].name);
+      };
+    }
+
+    if (isDef(args.embedURLs)) {
+      for(var ii in args.embedURLs) {
+        email.embedURL(args.embedURLs[ii].url, args.embedURLs[ii].name);
+      };
+    }
+
+    if (isDef(args.addAttachments)) {
+      for(var ii in args.addAttachments) {
+        email.addAttachment(args.addAttachments[ii].file, args.addAttachments[ii].isInLine, void 0, args.addAttachments[ii].name);
+      };
+    }
+
+    if (isDef(args.addImages)) {
+      for(var ii in args.addImages) {
+        email.addExternalImage(args.addImages[ii]);
+      };
+    }
+
+    var mdOptions = {
+      title              : args.title,
+      width              : args.width,
+      padding            : args.padding,
+      bgColor            : args.bgColor,
+      contentBg          : args.contentBg,
+      borderColor        : args.borderColor,
+      fontFamily         : args.fontFamily,
+      fontSize           : args.fontSize,
+      header             : args.header,
+      footer             : args.footer,
+      theme              : args.theme,
+      tables             : args.tables,
+      strikethrough      : args.strikethrough,
+      taskListItems      : args.taskListItems,
+      headingAnchor      : args.headingAnchor,
+      ins                : args.ins,
+      autolink           : args.autolink,
+      sanitizeUrls       : args.sanitizeUrls,
+      baseDir            : args.baseDir,
+      emailCharset       : args.emailCharset,
+      embedExternalImages: args.embedExternalImages,
+      setMessage         : args.setMessage,
+      svgToPng           : args.svgToPng,
+      svgPngMode         : args.svgPngMode,
+      svgPngOutDir       : args.svgPngOutDir,
+      svgPngBaseName     : args.svgPngBaseName,
+      svgNormalizeFonts  : args.svgNormalizeFonts,
+      svgFontFamilyAliases: args.svgFontFamilyAliases
+    };
+    Object.keys(mdOptions).forEach(k => { if (isUnDef(mdOptions[k])) delete mdOptions[k]; });
+
+    var m = new MD2Email({
+      tables        : args.tables,
+      strikethrough : args.strikethrough,
+      taskListItems : args.taskListItems,
+      headingAnchor : args.headingAnchor,
+      ins           : args.ins,
+      autolink      : args.autolink,
+      sanitizeUrls  : args.sanitizeUrls
+    });
+
+    if (hasFile) {
+      args.md2email = m.setEmailFromMarkdownFile(email, args.file, mdOptions);
+    } else {
+      args.md2email = m.setEmailFromMarkdown(email, $t(args.markdown, args), mdOptions);
+    }
+
+    var altMessage = _$(args.altOutput).isString().default(args.md2email.text);
+    if (isDef(args.altOutput) && isDef(altMessage)) email.setMessage(templify(altMessage, args));
+
+    try {
+      args.result = email.send(templify(args.subject, args), templify(altMessage, args), args.to, args.cc, args.bcc, args.from);
+    } catch(e) {
+      e.javaException.printStackTrace();
+    }
+
+# -----------------------------------
 - name : MD2Email Extract Front Matter
   help :
     text   : Extracts YAML front matter metadata from a Markdown string or file.

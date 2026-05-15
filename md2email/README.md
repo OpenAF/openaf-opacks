@@ -354,6 +354,37 @@ var full = md2email.wrapInTemplate("<p>Hi there</p>", {
 
 ---
 
+### `md2email.yaml` oJob shortcut: `mdemail`
+
+`mdemail` sends emails directly from Markdown using the same send arguments as
+`oJob Send email` (`server`, `from`, `to`, `cc`, `bcc`, `credentials`,
+`embedFiles`, `embedURLs`, `addAttachments`, `addImages`, etc.), plus Markdown
+source/render options.
+
+Exactly one source is required:
+
+- `file` for markdown file input
+- `markdown` for inline markdown input
+
+`subject` is required and used as the shortcut key arg.
+
+```bash
+# Send from markdown file (relative images become CID embeds)
+ojob md2email.yaml mdemail subject="Weekly report" \
+  server="smtp.example.com" from="me@example.com" to="you@example.com" \
+  file="report.md" title="Weekly report" useSSL=true
+```
+
+```bash
+# Send from inline markdown with templified subject/body and altOutput override
+ojob md2email.yaml mdemail subject="Status {{env}}" env="prod" \
+  server="smtp.example.com" from="me@example.com" to="ops@example.com" \
+  markdown="# {{env}} status\n\nAll systems operational." \
+  altOutput="Plain status for {{env}}"
+```
+
+---
+
 ## Running the tests
 
 ```bash
