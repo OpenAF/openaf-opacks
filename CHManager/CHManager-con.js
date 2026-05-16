@@ -12,6 +12,10 @@ try {
   var con     = new Console()
   var format  = ow.format
   var sideLineTheme = format.withSideLineThemes().simpleLine
+  var caps = (function() {
+    try { return ow.format.term.getCapabilities() } catch(e) {}
+    return { ansi: false, width: 80, isTTY: false }
+  })()
   function _pad(s, n) { s = String(s || ""); if (n < 0) { n = -n } while (visibleLength(s) < n) s += " "; return s.substring(0, n) }
   var _home   = String(java.lang.System.getProperty("user.home"))
   var histDir = _home + "/.openaf-ch-manager"
@@ -62,21 +66,13 @@ try {
     tag     : "FG(183)"
   }
   function col(color, text) {
+    if (!caps.ansi) return text
     try { return ansiColor(color, text) } catch(e) { return text }
   }
   function hr(ch, n) {
     var s = ""; for (var i = 0; i < (n||60); i++) s += (ch||"─"); return s
   }
-  function termWidth() {
-    try {
-      if (isDef(con) && isDef(con.getTerminal)) return con.getTerminal().getWidth()
-      if (isDef(consoleReader)) return consoleReader.getTerminal().getWidth()
-    } catch(e) {}
-    try {
-      if (isDef(__con) && isDef(__con.getTerminal)) return __con.getTerminal().getWidth()
-    } catch(e2) {}
-    return 80
-  }
+  function termWidth() { return caps.width || 80 }
   function md(text) {
     try { return format.withMD(String(text || ""), "", termWidth()) } catch(e) { return String(text || "") }
   }
@@ -239,7 +235,7 @@ try {
       }
     })
     try {
-      var grid = ow.format.string.grid([[{ type: "table", title: "Live channels", obj: rows }]], __, termWidth(), " ", true)
+      var grid = ow.format.string.grid([[{ type: "table", title: "Live channels", obj: rows }]], __, termWidth(), " ", true, { palette: "auto" })
       print(grid)
     } catch(e) {
       printRows(rows)
@@ -273,7 +269,7 @@ try {
       return { "#": i + 1, Channel: name, Subs: liveWatchSubs[name].length }
     })
     try {
-      var grid = ow.format.string.grid([[{ type: "table", title: "Live subscriptions", obj: rows }]], __, termWidth(), " ", true)
+      var grid = ow.format.string.grid([[{ type: "table", title: "Live subscriptions", obj: rows }]], __, termWidth(), " ", true, { palette: "auto" })
       print(grid)
     } catch(e) {
       printRows(rows)
@@ -556,63 +552,84 @@ try {
   }
 
   function watchPagedList(name, mode, refreshArg, reverse, viewModeArg) {
-    var isKeys = mode === "keys"
-    var viewMode = normalizeWatchViewMode(viewModeArg)
-    var auto = String(refreshArg || "").toLowerCase() === "auto"
-    var fixed = normalizeWatchSeconds(refreshArg, 3)
-    var lastTotal = __
-    var lastTs = __
-    var stopRequested = false
-    for (var i = 0; i < 1000000; i++) {
-      if (stopRequested) break
-      var nowTs = now()
-      var p = 1
-      var res = isKeys ? chm.getKeys(name, p, 20) : chm.getAll(name, p, 20)
+    var isKeys          = mode === "keys"
+    var viewMode        = normalizeWatchViewMode(viewModeArg)
+    var auto            = String(refreshArg || "").toLowerCase() === "auto"
+    var fixed           = normalizeWatchSeconds(refreshArg, 3)
+    var lastTotal, lastTs
+    var lastFrameMs     = 0
+    var frameIntervalMs = fixed * 1000
+    var lastRendered    = ""
+
+    ow.format.viz.live(function() {
+      var code = readKeyNonBlocking()
+      if (isDef(code)) {
+        if (isBareEsc(code)) return null
+        var ch = String.fromCharCode(code).toLowerCase()
+        if      (ch === "t") { viewMode = "table"; lastFrameMs = 0 }
+        else if (ch === "r") { viewMode = "tree";  lastFrameMs = 0 }
+        else if (ch === "f") { viewMode = "flat";  lastFrameMs = 0 }
+        else if (ch === "o") { reverse = !reverse; lastFrameMs = 0 }
+        else if (ch === "a") auto = true
+        else if (ch >= "1" && ch <= "9") {
+          auto = false
+          fixed = normalizeWatchSeconds(ch, fixed)
+          frameIntervalMs = fixed * 1000
+        }
+      }
+
+      var nowMs = now()
+      if (nowMs - lastFrameMs < frameIntervalMs) return lastRendered
+
+      var nowTs  = now()
+      var p      = 1
+      var res    = isKeys ? chm.getKeys(name, p, 20) : chm.getAll(name, p, 20)
       var values = isKeys ? (isArray(res) ? res : res.keys) : (isArray(res) ? res : res.values)
-      var total = isArray(res) ? values.length : res.total
+      var total  = isArray(res) ? values.length : res.total
       if (!isArray(res) && reverse === true) {
-        var pages = Math.max(1, Math.ceil(total / 20))
+        var pages      = Math.max(1, Math.ceil(total / 20))
         var sourcePage = Math.max(1, pages - p + 1)
         if (sourcePage !== p) {
-          var res2 = isKeys ? chm.getKeys(name, sourcePage, 20) : chm.getAll(name, sourcePage, 20)
-          values = isKeys ? (isArray(res2) ? res2 : res2.keys) : (isArray(res2) ? res2 : res2.values)
+          var res2   = isKeys ? chm.getKeys(name, sourcePage, 20) : chm.getAll(name, sourcePage, 20)
+          values     = isKeys ? (isArray(res2) ? res2 : res2.keys) : (isArray(res2) ? res2 : res2.values)
         }
         values = values.slice().reverse()
       }
+
       var label = isKeys ? "Key" : "Value"
-      print("")
-      infoMsg((isKeys ? "🗝 Keys" : "📄 Values") + " for " + name + (reverse ? " (desc)" : " (asc)") + " | " + total + " total")
+      var lines = ["", side((isKeys ? "🗝 Keys" : "📄 Values") + " for " + name + (reverse ? " (desc)" : " (asc)") + " | " + total + " total", C.info, C.dim)]
+
       if (values.length === 0) {
-        infoMsg("(empty)")
+        lines.push(side("(empty)", C.info, C.dim))
       } else if (viewMode === "tree") {
-        printObject(values)
+        try {
+          lines.push(typeof printTreeOrS === "function"
+            ? printTreeOrS(values, termWidth(), { noansi: !caps.ansi, wordWrap: true })
+            : printTree(values, termWidth(), { noansi: !caps.ansi, wordWrap: true }))
+        } catch(e) {
+          lines.push(stringify(values, __, 2))
+        }
       } else if (viewMode === "flat") {
-        printRows(buildFlatRows(values, label, reverse ? total : 1, reverse))
+        lines.push(printTable(buildFlatRows(values, label, reverse ? total : 1, reverse), termWidth(), true, true, "utf", __, true, false, true))
       } else {
-        printRows(values.map(function(v, j) {
+        lines.push(printTable(values.map(function(v, j) {
           var row = { "#": reverse ? (total - j) : (j + 1) }
           row[label] = toSLON(v)
           return row
-        }))
+        }), termWidth(), true, true, "utf", __, true, false, true))
       }
+
       var waitSec = auto ? autoWatchSeconds(lastTotal, total, lastTs, nowTs) : fixed
-      infoMsg("Refresh " + (auto ? "auto" : (waitSec + "s")) + " | order " + (reverse ? "desc" : "asc") + " | view " + watchModeLabel(viewMode) + " | Esc stop | t table | r tree | f flat | o order | a auto | 1..9 sec")
-      lastTotal = total
-      lastTs = nowTs
-      var waitUntil = now() + waitSec * 1000
-      while (now() < waitUntil) {
-        var code = readKeyNonBlocking()
-        if (isUnDef(code)) { sleep(75); continue }
-        if (isBareEsc(code)) { stopRequested = true; break }
-        var ch = String.fromCharCode(code).toLowerCase()
-        if (ch === "t") viewMode = "table"
-        else if (ch === "r") viewMode = "tree"
-        else if (ch === "f") viewMode = "flat"
-        else if (ch === "o") reverse = !reverse
-        else if (ch === "a") auto = true
-        else if (ch >= "1" && ch <= "9") { auto = false; fixed = normalizeWatchSeconds(ch, fixed) }
-      }
-    }
+      frameIntervalMs = waitSec * 1000
+      lines.push(side("Refresh " + (auto ? "auto" : (waitSec + "s")) + " | order " + (reverse ? "desc" : "asc") + " | view " + watchModeLabel(viewMode) + " | Esc stop | t table | r tree | f flat | o order | a auto | 1..9 sec", C.info, C.dim))
+
+      lastTotal    = total
+      lastTs       = nowTs
+      lastFrameMs  = nowMs
+      lastRendered = lines.join("\n")
+      return lastRendered
+    }, { fps: 8, diff: true, autoStart: true, watchResize: true })
+
     infoMsg("Watch stopped.")
   }
 
@@ -1010,6 +1027,7 @@ try {
   } catch(ignoreHistoryFlushErr) {}
 
 } catch(e) {
-  printErr("CHManager error: " + e)
+  var _ansi = (function() { try { return ow.format.term.getCapabilities().ansi } catch(_) { return false } })()
+  printErr((_ansi ? ansiColor("ITALIC,FG(196)", "!!") : "!!") + " CHManager error: " + e)
   if (e.stack) printErr(e.stack)
 }

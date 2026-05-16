@@ -83,7 +83,7 @@
   #pagination .btn { padding: 2px 8px; }
 
   /* ── Ops panel ───────────────────────────────────────────────────── */
-  .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 700px; }
+  .ops-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; max-width: 700px; }
   .ops-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
   .ops-card h3 { font-size: 12px; color: var(--accent); margin-bottom: 8px; }
   .ops-card p { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
@@ -224,6 +224,8 @@
     .tree-editor .tree-key-in, .tree-editor .tree-val-in { width: 100%; min-width: 0; }
     #toast-area { left: 10px; right: 10px; bottom: 10px; }
     .toast { max-width: none; }
+    .btn { min-height: 44px; padding: 10px 16px; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+    .tab { min-height: 44px; display: inline-flex; align-items: center; }
   }
 </style>
 </head>
