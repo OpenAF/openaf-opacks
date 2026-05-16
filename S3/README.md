@@ -18,6 +18,10 @@ var s3 = new S3("https://s3.fr-par.scw.cloud", apiKey, apiSecret, "fr-par"); // 
 var s3 = new S3("https://s3.eu-central-1.amazonaws.com", apiKey, apiSecret, "eu-central-1"); // connecting to AWS S3
 ````
 
+If `aRegion` is omitted for AWS endpoints, the client tries `AWS_REGION`, then
+`AWS_DEFAULT_REGION`, and finally falls back to `us-east-1` to avoid provider
+region auto-detection failures on some S3-compatible responses.
+
 ### Managing files
 
 Upload to a bucket: 

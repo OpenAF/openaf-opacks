@@ -14,14 +14,21 @@ var S3 = function(aURL, aAccessKey, aSecret, aRegion, useVersion1, ignoreCertChe
 
     aURL = _$(aURL).default("https://s3.amazonaws.com")
     this.url = String(aURL).replace(/\/+$/, "")
+    this.region = aRegion
+
+    if (isUnDef(this.region) && this.url.indexOf(".amazonaws.com") > 0) {
+        this.region = _$(getEnv("AWS_REGION")).default(getEnv("AWS_DEFAULT_REGION"))
+        if (isUnDef(this.region)) this.region = "us-east-1"
+    }
 
     this.httpClient = new Packages.okhttp3.OkHttpClient()
 
     if (isDef(aAccessKey)) {
         this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).httpClient(this.httpClient).credentials(Packages.openaf.AFCmdBase.afc.dIP(aAccessKey), Packages.openaf.AFCmdBase.afc.dIP(aSecret))
-        if (isDef(aRegion)) this.s3 = this.s3.region(aRegion)
+        if (isDef(this.region)) this.s3 = this.s3.region(this.region)
     } else {
         this.s3 = Packages.io.minio.MinioClient.builder().endpoint(aURL).httpClient(this.httpClient)
+        if (isDef(this.region)) this.s3 = this.s3.region(this.region)
         if (aURL.indexOf(".amazonaws.com") > 0) {
             var providers = new Packages.io.minio.credentials.ChainedProvider(
                 new Packages.io.minio.credentials.AwsConfigProvider( _$(getEnv("AWS_SHARED_CREDENTIALS_FILE")).default(String(java.lang.System.getProperty("user.home"))+"/.aws/credentials"), _$(getEnv("AWS_PROFILE")).default("default")), 
