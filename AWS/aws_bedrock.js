@@ -236,7 +236,7 @@ ow.ai.__gpttypes.bedrock = {
     aOptions.region = _$(aOptions.region, "aOptions.region").isString().default("us-east-1")
     aOptions.showReasoning = _$(aOptions.showReasoning, "aOptions.showReasoning").isBoolean().default(false)
     aOptions.strictToolMsg = _$(aOptions.strictToolMsg, "aOptions.strictToolMsg").isBoolean().default(
-      _$(aOptions.params.strictToolMsg, "aOptions.params.strictToolMsg").isBoolean().default(false)
+      _$(aOptions.params.strictToolMsg, "aOptions.params.strictToolMsg").isBoolean().default(true)
     )
 
     var aws = new AWS()
