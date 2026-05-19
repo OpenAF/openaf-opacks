@@ -1,7 +1,0 @@
-jdbc-yugabytedb-42.7.3-yb-4.jar:
-  name: BSD-2-Clause
-  url: https://jdbc.postgresql.org/about/license.html
-  version: 42.7.3-yb-4
-  changed from original: false
-  comments: BSD-2-Clause, copyright PostgreSQL Global Development Group
-  license: https://jdbc.postgresql.org/license/
