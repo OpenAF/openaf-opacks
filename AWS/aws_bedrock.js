@@ -235,6 +235,7 @@ ow.ai.__gpttypes.bedrock = {
     aOptions.temperature = _$(aOptions.temperature, "aOptions.temperature").isNumber().default(__)
     aOptions.region = _$(aOptions.region, "aOptions.region").isString().default("us-east-1")
     aOptions.showReasoning = _$(aOptions.showReasoning, "aOptions.showReasoning").isBoolean().default(false)
+    aOptions.promptCaching = _$(toBoolean(aOptions.promptCaching), "aOptions.promptCaching").isBoolean().default(false)
     aOptions.strictToolMsg = _$(aOptions.strictToolMsg, "aOptions.strictToolMsg").isBoolean().default(
       _$(aOptions.params.strictToolMsg, "aOptions.params.strictToolMsg").isBoolean().default(true)
     )
@@ -282,6 +283,8 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
         if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
         if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
+        if (isDef(aResponse.usage.cache_creation_input_tokens) && aResponse.usage.cache_creation_input_tokens > 0) tokens.cacheCreation = aResponse.usage.cache_creation_input_tokens
+        if (isDef(aResponse.usage.cache_read_input_tokens) && aResponse.usage.cache_read_input_tokens > 0) tokens.cacheRead = aResponse.usage.cache_read_input_tokens
         // Handle prompt_tokens and completion_tokens (alternative naming)
         if (isDef(aResponse.usage.prompt_tokens)) tokens.prompt = aResponse.usage.prompt_tokens
         if (isDef(aResponse.usage.completion_tokens)) tokens.completion = aResponse.usage.completion_tokens
@@ -985,6 +988,7 @@ ow.ai.__gpttypes.bedrock = {
             }, aOptions.params.inferenceConfig)
           }
           if (_m.system.length == 0) delete _m.system
+          if (aOptions.promptCaching) _m.promptCachingConfig = { enabled: true }
 
           // Add tool configuration for Nova models
           if (toolsToUse.length > 0) {
@@ -1244,7 +1248,28 @@ ow.ai.__gpttypes.bedrock = {
           }
 
           var sysMsgs = messagesForAPI.filter(m => m.role == "system").map(m => m.content.map(s => s.text).join(""))
-          if (sysMsgs.length > 0) _m.system = sysMsgs.join("\n")
+          if (sysMsgs.length > 0) {
+            var systemPrompt = sysMsgs.join("\n")
+            if (aOptions.promptCaching) {
+              _m.system = [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
+            } else {
+              _m.system = systemPrompt
+            }
+          }
+          if (aOptions.promptCaching) {
+            var foundCachePoint = false
+            for (var apmi = messagesForAPI.length - 1; apmi >= 0 && !foundCachePoint; apmi--) {
+              if (messagesForAPI[apmi].role == "user" && isArray(messagesForAPI[apmi].content)) {
+                for (var apci = messagesForAPI[apmi].content.length - 1; apci >= 0; apci--) {
+                  if (isMap(messagesForAPI[apmi].content[apci]) && messagesForAPI[apmi].content[apci].type == "text") {
+                    messagesForAPI[apmi].content[apci].cache_control = { type: "ephemeral" }
+                    foundCachePoint = true
+                    break
+                  }
+                }
+              }
+            }
+          }
 
           if (toolsToUse.length > 0) {
             _m.tools = toolsToUse.filter(tool => isDef(tool) && isDef(tool.function)).map(tool => ({
@@ -2269,6 +2294,7 @@ ow.ai.__gpttypes.bedrock = {
           if (systemPrompts.length > 0) {
             _m.system = systemPrompts
           }
+          if (aOptions.promptCaching) _m.promptCachingConfig = { enabled: true }
 
           // Add tools if configured
           if (toolsToUse.length > 0) {
@@ -2349,7 +2375,25 @@ ow.ai.__gpttypes.bedrock = {
 
           var systemPrompt = systemPromptParts.join("\n")
           if (systemPrompt.length > 0) {
-            _m.system = systemPrompt
+            if (aOptions.promptCaching) {
+              _m.system = [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
+            } else {
+              _m.system = systemPrompt
+            }
+          }
+          if (aOptions.promptCaching) {
+            var foundCachePoint = false
+            for (var apmi = messagesForAPI.length - 1; apmi >= 0 && !foundCachePoint; apmi--) {
+              if (messagesForAPI[apmi].role == "user" && isArray(messagesForAPI[apmi].content)) {
+                for (var apci = messagesForAPI[apmi].content.length - 1; apci >= 0; apci--) {
+                  if (isMap(messagesForAPI[apmi].content[apci]) && messagesForAPI[apmi].content[apci].type == "text") {
+                    messagesForAPI[apmi].content[apci].cache_control = { type: "ephemeral" }
+                    foundCachePoint = true
+                    break
+                  }
+                }
+              }
+            }
           }
 
           // Add tools if configured
