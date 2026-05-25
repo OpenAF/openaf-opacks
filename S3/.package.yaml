@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260516'
+version: '20260525'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -29,13 +29,13 @@ files:
 - README.md
 - annotations-13.0.jar
 - bcprov-jdk18on-1.84.jar
-- error_prone_annotations-2.41.0.jar
+- error_prone_annotations-2.47.0.jar
 - failureaccess-1.0.3.jar
-- guava-33.5.0-jre.jar
+- guava-33.6.0-jre.jar
 - j2objc-annotations-3.1.jar
 - jspecify-1.0.0.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-9.0.0.jar
+- minio-9.0.1.jar
 - oJobS3.yaml
 - s3-ojob-test.yaml
 - s3-test.yaml
@@ -50,13 +50,13 @@ filesHash:
   README.md: 05bdab708928285816c6329ff8de9bfb1cfe94dd
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
   bcprov-jdk18on-1.84.jar: 2d5651789941d2f8ae9b8771f23356de6b61e96b
-  error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
+  error_prone_annotations-2.47.0.jar: e64e70c8e2b5a30ce7f1b6c9e3eb7016881e0411
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  guava-33.5.0-jre.jar: 8699de25f2f979108d6c1b804a7ba38cda1116bc
+  guava-33.6.0-jre.jar: c376b13067cc99a5774403530953f7b05a91e218
   j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
   jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-9.0.0.jar: 14e9aa679a9f3634ece771ab4fff98a66bfce7c4
+  minio-9.0.1.jar: 88e05a509f3913ac48b702982ff67282ac9e6fcd
   oJobS3.yaml: 1e7ad5e04a410a9758d60bf505c4771b8fba0798
   s3-ojob-test.yaml: 41175a1afbf0ad793545ac07044b30332d38bf02
   s3-test.yaml: a2de40ad76982154cac0cfbda2a0be7adf763754
