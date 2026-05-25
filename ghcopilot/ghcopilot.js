@@ -66,7 +66,7 @@ ow.ai.__gpttypes.ghcopilot = {
         "GitHub Copilot CLI/server protocol is incompatible with the bundled Java SDK.",
         "Bundled SDK protocol version: " + _sdkVersion,
         "The local Copilot CLI/server reports a newer protocol version.",
-        "This opack currently uses the community Java SDK, and that SDK must match the Copilot CLI/server protocol.",
+        "This opack currently uses the official GitHub Java SDK, and that SDK must match the Copilot CLI/server protocol.",
         "Use one of the following:",
         "  - pin or downgrade your Copilot CLI to a version compatible with protocol " + _sdkVersion,
         "  - point options.cliPath to a compatible Copilot CLI binary",
@@ -539,7 +539,7 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.events.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
@@ -610,8 +610,8 @@ ow.ai.__gpttypes.ghcopilot = {
             } catch(e) {}
           }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.events.SessionUsageInfoEvent, usageHandler)
-        var deltaClose = _session.on(Packages.com.github.copilot.sdk.events.AssistantMessageDeltaEvent, deltaHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
+        var deltaClose = _session.on(Packages.com.github.copilot.sdk.generated.AssistantMessageDeltaEvent, deltaHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
@@ -718,7 +718,7 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.events.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
 
         var _tmpFile = __
         try {

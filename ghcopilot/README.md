@@ -1,6 +1,6 @@
 # ghcopilot opack
 
-OpenAF wrapper around the [copilot-sdk-java](https://github.com/copilot-community-sdk/copilot-sdk-java) as an `ow.ai` LLM provider named `ghcopilot`.
+OpenAF wrapper around the official GitHub Java SDK [copilot-sdk-java](https://github.com/github/copilot-sdk) as an `ow.ai` LLM provider named `ghcopilot`.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ OpenAF wrapper around the [copilot-sdk-java](https://github.com/copilot-communit
 
 ## Compatibility note
 
-This opack currently wraps the community Java SDK shipped in this folder. If you see an error like:
+This opack currently wraps the official GitHub Java SDK shipped in this folder. If you see an error like:
 
 ```text
 SDK protocol version mismatch: SDK expects version 2, but server reports version 3
@@ -155,7 +155,7 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `disabledSkills` (array of strings, optional): Skill IDs/names to disable, even if available in configured skill directories.
 - `availableTools` (array of strings, optional): Allowlist of built-in tools the agent is permitted to call.
 - `excludedTools` (array of strings, optional): Blocklist of built-in tools that must not be called.
-- `excludeAllExistingTools` (boolean, default: `false`): Disables all built-in Copilot tools for the session while still allowing tools registered with `setTool(...)`.
+- `excludeAllExistingTools` (boolean, default: `true`): Disables all built-in Copilot tools for the session while still allowing tools registered with `setTool(...)`.
 
 ### All available options
 

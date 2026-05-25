@@ -1,3 +1,4 @@
 artifacts:
-  - id      : copilot-sdk
-    group   : io.github.copilot-community-sdk
+- id      : copilot-sdk-java
+  group   : com.github
+
