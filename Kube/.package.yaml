@@ -27,9 +27,6 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- jackson-annotations-2.21.jar
-- jackson-core-2.21.3.jar
-- jackson-databind-2.21.3.jar
 - jackson-dataformat-yaml-2.21.3.jar
 - jackson-datatype-jsr310-2.21.3.jar
 - kube.js
@@ -73,7 +70,6 @@ files:
 - netty-resolver-dns-4.2.14.Final.jar
 - netty-transport-4.2.14.Final.jar
 - netty-transport-native-unix-common-4.2.14.Final.jar
-- slf4j-api-2.0.17.jar
 - snakeyaml-2.5.jar
 - snakeyaml-engine-3.0.1.jar
 - vertx-auth-common-4.5.27.jar
@@ -86,9 +82,6 @@ filesHash:
   .odoc.db: f8ac7d0c0c30b2e4536107e2c450f0d1d34a421d
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: df81ac6963c01db646c34f04986558cd9a4b81b6
-  jackson-annotations-2.21.jar: b1bc1868bf02dc0bd6c7836257a036a331005309
-  jackson-core-2.21.3.jar: 3358e9345dd0f2537c47bee152c0377df6c81ad5
-  jackson-databind-2.21.3.jar: aa7ccec161c275f3e6332666ab758916f3120714
   jackson-dataformat-yaml-2.21.3.jar: 400fe3e019f87353512e1fec1c4cd61653456676
   jackson-datatype-jsr310-2.21.3.jar: a0958ebdaba836d31e5462ebc37b6349a0725ff9
   kube.js: 1330bb8a3bdb1f66ebbb3a6aa87196c14c789269
@@ -132,7 +125,6 @@ filesHash:
   netty-resolver-dns-4.2.14.Final.jar: 6c3ffd55b36eee779467e8dd2aa3492cc7f90777
   netty-transport-4.2.14.Final.jar: 5b29e388af37da2e3f59f4633d4da0b21dd4f687
   netty-transport-native-unix-common-4.2.14.Final.jar: 5f1012272f0d28a82eeefac48e5352777a559adf
-  slf4j-api-2.0.17.jar: d9e58ac9c7779ba3bf8142aff6c830617a7fe60f
   snakeyaml-2.5.jar: 2d53ddec134280cb384c1e35d094e5f71c1f2316
   snakeyaml-engine-3.0.1.jar: aaa97268dd9fcf97a3e44c96e6a50961d65199dd
   vertx-auth-common-4.5.27.jar: bd072c95659043a6e119831c6f9897c5ca2ffc32
