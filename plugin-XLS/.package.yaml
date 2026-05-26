@@ -18,7 +18,7 @@ name: plugin-XLS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260422'
+version: '20260525'
 dependencies:
   openaf: '>=20250315'
 files:
@@ -28,15 +28,17 @@ files:
 - LICENSES.txt
 - README.md
 - SparseBitSet-1.3.jar
+- ant-1.10.15.jar
+- ant-launcher-1.10.15.jar
 - compile.yaml
 - curvesapi-1.08.jar
-- log4j-api-2.25.4.jar
-- log4j-core-2.25.4.jar
-- plugin-xls.jar
+- log4j-api-2.26.0.jar
+- log4j-core-2.26.0.jar
 - poi-5.5.1.jar
 - poi-excelant-5.5.1.jar
 - poi-ooxml-5.5.1.jar
 - poi-ooxml-full-5.5.1.jar
+- poi-ooxml-lite-5.5.1.jar
 - poi-scratchpad-5.5.1.jar
 - src/openaf/plugins/DOC.java
 - src/openaf/plugins/XLS.java
@@ -46,20 +48,22 @@ files:
 - tests/autoTestAll.XLS.yaml
 - xmlbeans-5.3.0.jar
 filesHash:
-  .maven.yaml: 814a70c40c5209f2d0252011bd6a6c17ef2e58f0
+  .maven.yaml: 746d9fce2d510772fa25865da5c0554bb4d71e5a
   .odoc.db: 7286b5b2de973e04d1594326b9b80233752944bb
   LICENSES.txt: faf762ec68a0163e1ce9a6576a6d0a77b1f37fbf
   README.md: 5e16736ba958c16de4ac6343478421b34f3d46d0
   SparseBitSet-1.3.jar: 533eac055afe3d5f614ea95e333afd6c2bde8f26
+  ant-1.10.15.jar: da854f5503ee061a5a3b2cfcbe98ee27aa4a5ef9
+  ant-launcher-1.10.15.jar: 81431ce614ae38b187de683381f4a35a1db3b1c6
   compile.yaml: bfb9f8b1a3e819da13fbf0080e1fd00c950d4b4a
   curvesapi-1.08.jar: 3d3d36568154059825089b289dcfca481fe44e2c
-  log4j-api-2.25.4.jar: 89ff2217b193fb187b134aa6ebcbfa8a28b018a9
-  log4j-core-2.25.4.jar: b963c3d6bfdf05c61ad47a74e9f9295131607df2
-  plugin-xls.jar: 131ae9a185069545971e29531e04ed2cb08c01cc
+  log4j-api-2.26.0.jar: ad52af0ecf054a7e3f275a2e180ee06d9c490951
+  log4j-core-2.26.0.jar: d267ca60b27ddb075e0b4e75e7875859717bf85f
   poi-5.5.1.jar: 613d253b6f5f0849dd68fed043a7fb4b005e63a0
   poi-excelant-5.5.1.jar: a44623e4ba03a0af4039d95d110283afc7c43614
   poi-ooxml-5.5.1.jar: ff561a9cab46bfe95667d5085580fefb2353fdaf
   poi-ooxml-full-5.5.1.jar: f9073deb8fdba306172e673549a2fdeba48cbf2d
+  poi-ooxml-lite-5.5.1.jar: 2e8c1fbeb661a8c15b033c4b03b2907e9bd0857b
   poi-scratchpad-5.5.1.jar: 3b5d92ccc2ddb9e17946b22b0ea504c5a33126b5
   src/openaf/plugins/DOC.java: 4ee69b1443a3506aa8c0642dcf571b0dc32ea73a
   src/openaf/plugins/XLS.java: 8086050cdbba7fe47a5e7712abb18bdc5aa78764
