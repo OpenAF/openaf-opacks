@@ -18,7 +18,7 @@ name: GCS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260418'
+version: '20260525'
 dependencies:
   OpenAF: '>=20240318'
 files:
