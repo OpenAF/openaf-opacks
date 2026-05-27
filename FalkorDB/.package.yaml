@@ -26,26 +26,32 @@ files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
+- META-INF/MANIFEST.MF
+- META-INF/maven/redis.clients/jedis/pom.properties
+- META-INF/maven/redis.clients/jedis/pom.xml
 - README.md
 - commons-pool2-2.13.1.jar
 - commons-text-1.15.0.jar
 - error_prone_annotations-2.41.0.jar
 - falkordb.js
-- jedis-7.4.0.jar
-- jfalkordb-0.7.0.jar
+- jedis-7.5.0.jar
+- jfalkordb-0.8.0.jar
 - json-20251224.jar
 - oafp_falkordb.js
 - redis-authx-core-0.1.1-beta2.jar
 filesHash:
   .maven.yaml: 6c8d2ea89dfdf33229d506d56df843809e2d8542
   .odoc.db: afd12a94cc2640f0b9feb660c218ef1b5e059ba8
+  META-INF/MANIFEST.MF: a226cf05f5a467b74a3b20e0e993d6ab3be54b08
+  META-INF/maven/redis.clients/jedis/pom.properties: d365c840fbf677b06bb9cc57accb20bfce40ac73
+  META-INF/maven/redis.clients/jedis/pom.xml: 7c5c074568aba67727154e28f5ceb42d4f9a72bd
   README.md: fbdfc94b3c094a0fe88f2b754b7213f1c911706c
   commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
   commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
   error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
   falkordb.js: bb65149de3a5a2d44d009d6a7dc2e58cc40379a2
-  jedis-7.4.0.jar: 6eefc2614699bdd3c1ce16dde040ef578435816f
-  jfalkordb-0.7.0.jar: f0fb4bbb59dd89501adc9c84566b4ef8ecfbbb64
+  jedis-7.5.0.jar: 407baf9e00ae289e50d596804365ba0ac18b7ef0
+  jfalkordb-0.8.0.jar: 3164182919943c1155a2038cc6b84fcc1b6d929d
   json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
   oafp_falkordb.js: 95a2b1281cae7c93a0c1633a4e65f85ae50aa542
   redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
