@@ -57,6 +57,11 @@ S3.prototype._toZonedDateTime = function(aDate) {
     return java.time.ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(aDate.getTime()), java.time.ZoneId.systemDefault());
 };
 
+S3.prototype._normalizeDateString = function(aDateString) {
+    if (isUnDef(aDateString) || isNull(aDateString)) return aDateString;
+    return String(aDateString).replace(/(\.\d{3})\d+Z$/, "$1Z");
+};
+
 S3.prototype._encodeURLPath = function(aPath) {
     return String(aPath).split("/").map(part => String(java.net.URLEncoder.encode(String(part), "UTF-8")).replace(/\+/g, "%20")).join("/");
 };
@@ -208,7 +213,7 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
             filename: _f, 
             filepath: _f,
             canonicalPath: _f,
-            lastModified: (_f.endsWith("/") ? void 0 : Number(new Date(item.lastModified().toString()).getTime())),
+            lastModified: (_f.endsWith("/") ? void 0 : Number(new Date(this._normalizeDateString(item.lastModified().toString())).getTime())),
             size: Number(item.size()),
             storageClass: String(item.storageClass()),
             etag: String(item.etag()).replace(/^"(.+)"$/, "$1"),
@@ -238,7 +243,7 @@ S3.prototype.statObject = function(aBucket, aObjectName) {
     };
     var _stat = this.s3.statObject(Packages.io.minio.StatObjectArgs.builder().bucket(aBucket).object(aObjectName).build());
     res.contentType = _stat.contentType();
-    res.modifiedTime = new Date(_stat.lastModified().toString());
+    res.modifiedTime = new Date(this._normalizeDateString(_stat.lastModified().toString()));
     res.etag = String(_stat.etag()).replace(/^"(.+)"$/, "$1");
     res.meta = this._fromMetadata(_stat.userMetadata());
     res.length = _stat.size();
