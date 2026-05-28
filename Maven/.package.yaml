@@ -7,26 +7,106 @@ scripts:
 keywords:
 - maven
 - maven2
+- maven-resolver
+- maven-model
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
 repository:
   type: http
   backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Maven
   url: https://openaf.io/opacks/Maven.opack
-description: A Maven2 repositories access wrapper to get or update existing artifacts/jars.
+description: A Maven2 repositories access wrapper to get or update existing artifacts/jars, plus advanced programmatic dependency resolver (Aether) and model (pom.xml) wrapper.
 name: Maven
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20181018'
+version: '20260528'
 dependencies:
-  OpenAF: '>=20180601'
+  OpenAF: '>=20241117'
 files:
+- .maven.yaml
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
+- error_prone_annotations-2.48.0.jar
+- httpclient-4.5.14.jar
+- httpcore-4.4.16.jar
+- jcl-over-slf4j-1.7.36.jar
+- maven-api-annotations-4.0.0-rc-5.jar
+- maven-api-core-4.0.0-rc-5.jar
+- maven-api-di-4.0.0-rc-5.jar
+- maven-api-metadata-4.0.0-rc-5.jar
+- maven-api-model-4.0.0-rc-5.jar
+- maven-api-plugin-4.0.0-rc-5.jar
+- maven-api-settings-4.0.0-rc-5.jar
+- maven-api-spi-4.0.0-rc-5.jar
+- maven-api-toolchain-4.0.0-rc-5.jar
+- maven-api-xml-4.0.0-rc-5.jar
+- maven-artifact-4.0.0-rc-5.jar
+- maven-builder-support-4.0.0-rc-5.jar
+- maven-model-4.0.0-rc-5.jar
+- maven-model-builder-4.0.0-rc-5.jar
+- maven-repository-metadata-4.0.0-rc-5.jar
+- maven-resolver-api-2.0.18.jar
+- maven-resolver-connector-basic-2.0.18.jar
+- maven-resolver-impl-2.0.18.jar
+- maven-resolver-named-locks-2.0.18.jar
+- maven-resolver-provider-4.0.0-rc-5.jar
+- maven-resolver-spi-2.0.18.jar
+- maven-resolver-transport-apache-2.0.13.jar
+- maven-resolver-transport-file-2.0.18.jar
+- maven-resolver-transport-http-2.0.0-alpha-2.jar
+- maven-resolver-util-2.0.18.jar
+- maven-support-4.0.0-rc-5.jar
+- maven-xml-4.0.0-rc-5.jar
 - maven.js
+- plexus-interpolation-1.28.jar
+- plexus-utils-4.0.2.jar
+- plexus-xml-4.1.0.jar
+- stax2-api-4.2.2.jar
+- tests/test_resolve.js
+- woodstox-core-7.1.1.jar
 filesHash:
+  .maven.yaml: f10eeccfa2c3ce72218161cab815519cd3459554
   .odoc.db: 0a99ac83d31fcdb75693dd525233261288c37dc5
   .precompile: 4a18627431df72418344ca16b0e89267483a5d92
-  maven.js: a6b99123cfeda491d4a8406b93a9c0aac6c94e7b
+  README.md: 013457c18f3d91e8090975076bb850ff375c76c9
+  error_prone_annotations-2.48.0.jar: bbe30942a31d1778c74cb272321267eca82dc708
+  httpclient-4.5.14.jar: 1194890e6f56ec29177673f2f12d0b8e627dec98
+  httpcore-4.4.16.jar: 51cf043c87253c9f58b539c9f7e44c8894223850
+  jcl-over-slf4j-1.7.36.jar: d877e195a05aca4a2f1ad2ff14bfec1393af4b5e
+  maven-api-annotations-4.0.0-rc-5.jar: acea1e7a144da8eee886bc7675f32518cc306ab8
+  maven-api-core-4.0.0-rc-5.jar: daa505a0493d62b6fa77fb6509a8e531e93aed26
+  maven-api-di-4.0.0-rc-5.jar: 8a3cb63eaa983fc9f2dda7d3140506ecb9b0a17b
+  maven-api-metadata-4.0.0-rc-5.jar: b54a0454ee696822c44be5114a1b1596b542946e
+  maven-api-model-4.0.0-rc-5.jar: b35053f2671b45a56b9c1cabb573c3ad6eace225
+  maven-api-plugin-4.0.0-rc-5.jar: f076cb01121c4b6fabf1e9f54dc3f331d7d05f14
+  maven-api-settings-4.0.0-rc-5.jar: 962ba9781e4664c60173387c38c45f2fccc058b3
+  maven-api-spi-4.0.0-rc-5.jar: d8518b272b30ef1ba5dde56b6961caa2dff34d8c
+  maven-api-toolchain-4.0.0-rc-5.jar: d2b05a3e1dbe76ac06612b0aa547b6bf89407540
+  maven-api-xml-4.0.0-rc-5.jar: ce8ed38969c0a74b1f55c2851385cc35b7ad90c0
+  maven-artifact-4.0.0-rc-5.jar: afa9001a10382b55d519ae6d21cf216fc28dc9cf
+  maven-builder-support-4.0.0-rc-5.jar: 11ed962ad8a6987f902ca2780ad869ff911aefe9
+  maven-model-4.0.0-rc-5.jar: 94662227aabcec10832c69eb4c21fa232e998ca5
+  maven-model-builder-4.0.0-rc-5.jar: 8bdd555e81bd6c71a9a765f614d640ef4b42dce9
+  maven-repository-metadata-4.0.0-rc-5.jar: 28aec8861b6af9b3b25bdeaf0c4366c9251d628d
+  maven-resolver-api-2.0.18.jar: fa2fb3d6c6d0b52fa85f2a728726df6f0a3fe984
+  maven-resolver-connector-basic-2.0.18.jar: 46dba9bc4b5319e567da48dc4b2c0bb8c9dda2ff
+  maven-resolver-impl-2.0.18.jar: 5944c5b4499da47dc53364598001f5f63b036b39
+  maven-resolver-named-locks-2.0.18.jar: 58cf4bdeea3e5bc847972886de93b4f83319b343
+  maven-resolver-provider-4.0.0-rc-5.jar: dcb35044a902b86133224a872e9fd9e593cf75b2
+  maven-resolver-spi-2.0.18.jar: 0c2ab339faefec5b6c127c567a8c48f3155d898c
+  maven-resolver-transport-apache-2.0.13.jar: 573199c5ea9ea49a12b9ea72755f86175b79dd28
+  maven-resolver-transport-file-2.0.18.jar: b72a733e5b7ebfa6a6ab41a924902768cd8b2c25
+  maven-resolver-transport-http-2.0.0-alpha-2.jar: 3040d5c5d709ed325aec764d5ce4a2a0d6517321
+  maven-resolver-util-2.0.18.jar: 6fcca3afc732e0a48ccae0dfb7df8f21a417f6d6
+  maven-support-4.0.0-rc-5.jar: a667c6929d152ae40b2452a24e9134659af5b489
+  maven-xml-4.0.0-rc-5.jar: 7d1d56eada2b4f1bc83bbc1c5dc40925f2ac3c2d
+  maven.js: 2f1db2dba3a112d95b70d6af22184a7c779c4225
+  plexus-interpolation-1.28.jar: 90d3608cd99f21717a581f036a1c69ff762f5ed6
+  plexus-utils-4.0.2.jar: 9526a9548b302572f23337fcc217fb4cc713b9c3
+  plexus-xml-4.1.0.jar: 32595f415fe9fc87d92be9058e0274dad8631e7d
+  stax2-api-4.2.2.jar: b0d746cadea928e5264f2ea294ea9a1bf815bbde
+  tests/test_resolve.js: d42a0bd5b603b8a016721e40cb622c2c8cf6294e
+  woodstox-core-7.1.1.jar: 76baad1b94513ea896e0a17388890a4c81edd0e0

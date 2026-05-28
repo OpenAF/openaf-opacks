@@ -1,0 +1,21 @@
+artifacts:
+  - group: org.apache.maven.resolver
+    id: maven-resolver-api
+  - group: org.apache.maven.resolver
+    id: maven-resolver-spi
+  - group: org.apache.maven.resolver
+    id: maven-resolver-util
+  - group: org.apache.maven.resolver
+    id: maven-resolver-impl
+  - group: org.apache.maven.resolver
+    id: maven-resolver-connector-basic
+  - group: org.apache.maven.resolver
+    id: maven-resolver-transport-file
+  - group: org.apache.maven.resolver
+    id: maven-resolver-transport-http
+  - group: org.apache.maven
+    id: maven-resolver-provider
+  - group: org.apache.maven
+    id: maven-model
+  - group: org.apache.maven
+    id: maven-model-builder
