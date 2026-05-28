@@ -46,7 +46,7 @@
   |**MDB**|<img src=".github/badges/MDB.svg"><br>Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
   |**MSBot**|<img src=".github/badges/MSBot.svg"><br>Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |**Mac**|<img src=".github/badges/Mac.svg"><br>Wrapper around Mac functionality.|
-  |**Maven**|<img src=".github/badges/Maven.svg"><br>A Maven2 repositories access wrapper to get or update existing artifacts/jars.|
+  |**Maven**|<img src=".github/badges/Maven.svg"><br>A Maven2 repositories access wrapper to get or update existing artifacts/jars, plus advanced programmatic dependency resolver (Aether) and model (pom.xml) wrapper.|
   |**Mermaid**|<img src=".github/badges/Mermaid.svg"><br>Wrapper for Mermaid JS library|
   |**Mongo**|<img src=".github/badges/Mongo.svg"><br>An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
   |**Morse**|<img src=".github/badges/Morse.svg"><br>Simple morse code translator|
