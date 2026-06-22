@@ -9,6 +9,7 @@ ow.ai.__gpttypes.ghcopilot = {
     aOptions.params           = _$(aOptions.params,           "aOptions.params").isMap().default({})
     aOptions.model            = _$(aOptions.model,            "aOptions.model").isString().default("gpt-4.1")
     aOptions.mode             = _$(aOptions.mode,             "aOptions.mode").isString().default(__)
+    aOptions.agentMode        = _$(aOptions.agentMode,        "aOptions.agentMode").isString().default(__)
     aOptions.timeout          = _$(aOptions.timeout,          "aOptions.timeout").isNumber().default(120000)
     aOptions.cliPath          = _$(aOptions.cliPath,          "aOptions.cliPath").isString().default(__)
     aOptions.cliUrl           = _$(aOptions.cliUrl,           "aOptions.cliUrl").isString().default(__)
@@ -59,7 +60,7 @@ ow.ai.__gpttypes.ghcopilot = {
     var _buildProtocolMismatchError = (aErr) => {
       var _sdkVersion = "2"
       try {
-        _sdkVersion = String(Packages.com.github.copilot.sdk.SdkProtocolVersion.get())
+        _sdkVersion = String(Packages.com.github.copilot.SdkProtocolVersion.get())
       } catch(pe) {}
 
       var lines = [
@@ -225,6 +226,26 @@ ow.ai.__gpttypes.ghcopilot = {
       return l
     }
 
+    // SDK 1.0.1 separates send mode (enqueue/immediate) from agent mode.
+    // Preserve older wrapper configs that supplied agent modes through `mode`.
+    var _applyMessageMode = (aMessageOptions) => {
+      var agentMode = isString(aOptions.agentMode) ? aOptions.agentMode.toLowerCase() : __
+      var sendMode  = isString(aOptions.mode) ? aOptions.mode.toLowerCase() : __
+      var agentModes = [ "interactive", "plan", "autopilot", "shell" ]
+
+      if (isUnDef(agentMode) && agentModes.indexOf(sendMode) >= 0) {
+        agentMode = sendMode
+        sendMode  = __
+      }
+      if (isString(agentMode)) {
+        if (agentModes.indexOf(agentMode) < 0)
+          throw "aOptions.agentMode needs to be one of: " + agentModes.join(", ")
+        aMessageOptions.setAgentMode(Packages.com.github.copilot.rpc.AgentMode.fromValue(agentMode))
+      }
+      if (isString(sendMode)) aMessageOptions.setMode(sendMode)
+      return aMessageOptions
+    }
+
     // Extract concatenated system message content from conversation
     var _getSystemContent = () => {
       return _conversation
@@ -261,7 +282,7 @@ ow.ai.__gpttypes.ghcopilot = {
     var _ensureClient = () => {
       if (isDef(_client)) return
 
-      var co = new Packages.com.github.copilot.sdk.json.CopilotClientOptions()
+      var co = new Packages.com.github.copilot.rpc.CopilotClientOptions()
       var _cliDetected = __
       if (isUnDef(aOptions.cliUrl)) {
         _cliDetected = _resolveCliPath()
@@ -284,7 +305,7 @@ ow.ai.__gpttypes.ghcopilot = {
       }
       if (isDef(aOptions.useLoggedInUser)) co.setUseLoggedInUser(aOptions.useLoggedInUser)
 
-      _client = new Packages.com.github.copilot.sdk.CopilotClient(co)
+      _client = new Packages.com.github.copilot.CopilotClient(co)
       try {
         _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
       } catch(e) {
@@ -314,20 +335,20 @@ ow.ai.__gpttypes.ghcopilot = {
 
       _ensureClient()
 
-      var sc = new Packages.com.github.copilot.sdk.json.SessionConfig().setModel(aOptions.model)
+      var sc = new Packages.com.github.copilot.rpc.SessionConfig().setModel(aOptions.model)
       if (isString(aOptions.cwd))            sc.setWorkingDirectory(aOptions.cwd)
       if (isString(aOptions.reasoningEffort)) sc.setReasoningEffort(aOptions.reasoningEffort)
-      if (isString(aOptions.configDir))       sc.setConfigDir(aOptions.configDir)
+      if (isString(aOptions.configDir))       sc.setConfigDirectory(aOptions.configDir)
       sc.setStreaming(_wantStreaming)
       try {
-        sc.setOnPermissionRequest(Packages.com.github.copilot.sdk.json.PermissionHandler.APPROVE_ALL)
+        sc.setOnPermissionRequest(Packages.com.github.copilot.rpc.PermissionHandler.APPROVE_ALL)
       } catch(e) {}
 
       // System message — use the SDK's native SystemMessageConfig
       if (_currentSysMsg.length > 0) {
-        var smc = new Packages.com.github.copilot.sdk.json.SystemMessageConfig()
+        var smc = new Packages.com.github.copilot.rpc.SystemMessageConfig()
         smc.setContent(_currentSysMsg)
-        smc.setMode(Packages.com.github.copilot.sdk.SystemMessageMode.APPEND)
+        smc.setMode(Packages.com.github.copilot.SystemMessageMode.APPEND)
         sc.setSystemMessage(smc)
       }
 
@@ -336,7 +357,7 @@ ow.ai.__gpttypes.ghcopilot = {
       Object.keys(_tools).forEach(tName => {
         var t   = _tools[tName]
         var _fn = t.fn
-        var handler = new JavaAdapter(Packages.com.github.copilot.sdk.json.ToolHandler, {
+        var handler = new JavaAdapter(Packages.com.github.copilot.rpc.ToolHandler, {
           invoke: function(invocation) {
             var cf = new java.util.concurrent.CompletableFuture()
             try {
@@ -353,7 +374,7 @@ ow.ai.__gpttypes.ghcopilot = {
         var params = isMap(t.function) && isDef(t.function.parameters)
           ? _toJavaMap(t.function.parameters)
           : new java.util.LinkedHashMap()
-        toolDefs.add(Packages.com.github.copilot.sdk.json.ToolDefinition.create(
+        toolDefs.add(Packages.com.github.copilot.rpc.ToolDefinition.create(
           String(t.function.name),
           String(t.function.description),
           params,
@@ -539,20 +560,20 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
           if (toBoolean(aJsonFlag)) p += "\n\nReply strictly with valid JSON."
 
-          var mo = new Packages.com.github.copilot.sdk.json.MessageOptions().setPrompt(p)
-          if (isString(aOptions.mode)) mo.setMode(aOptions.mode)
+          var mo = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
 
           _setDebug("client", {
             vendor      : "ghcopilot",
             model       : aOptions.model,
             jsonFlag    : toBoolean(aJsonFlag),
             mode        : aOptions.mode,
+            agentMode   : aOptions.agentMode,
             instructions: _getSystemContent(),
             tools       : Object.keys(_tools),
             prompt      : p
@@ -610,21 +631,21 @@ ow.ai.__gpttypes.ghcopilot = {
             } catch(e) {}
           }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
-        var deltaClose = _session.on(Packages.com.github.copilot.sdk.generated.AssistantMessageDeltaEvent, deltaHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
+        var deltaClose = _session.on(Packages.com.github.copilot.generated.AssistantMessageDeltaEvent, deltaHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
           if (toBoolean(aJsonFlag)) p += "\n\nReply strictly with valid JSON."
 
-          var mo = new Packages.com.github.copilot.sdk.json.MessageOptions().setPrompt(p)
-          if (isString(aOptions.mode)) mo.setMode(aOptions.mode)
+          var mo = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
 
           _setDebug("client", {
             vendor      : "ghcopilot",
             model       : aOptions.model,
             jsonFlag    : toBoolean(aJsonFlag),
             mode        : aOptions.mode,
+            agentMode   : aOptions.agentMode,
             streaming   : true,
             instructions: _getSystemContent(),
             tools       : Object.keys(_tools),
@@ -718,26 +739,25 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.sdk.generated.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
 
         var _tmpFile = __
         try {
           var ptxt = isString(aPrompt) ? aPrompt : stringify(aPrompt, __, "")
           var p    = _buildPrompt([{ role: aRole.toLowerCase(), content: ptxt }])
-          var mo   = new Packages.com.github.copilot.sdk.json.MessageOptions().setPrompt(p)
-          if (isString(aOptions.mode)) mo.setMode(aOptions.mode)
+          var mo   = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
 
           // Attach the image via SDK Attachment (path-based) instead of embedding base64 in text
           var attList = new java.util.ArrayList()
           if (io.fileExists(aImage)) {
             var _fname = String(new java.io.File(aImage).getName())
-            attList.add(new Packages.com.github.copilot.sdk.json.Attachment("image", aImage, _fname))
+            attList.add(new Packages.com.github.copilot.rpc.Attachment("image", aImage, _fname))
           } else if (isString(aImage)) {
             // Base64 string: write to a temp file, attach, then clean up
             var _tmpJFile = java.io.File.createTempFile("ghcopilot_img_", ".jpg")
             _tmpFile      = String(_tmpJFile.getAbsolutePath())
             io.writeFileBytes(_tmpFile, af.fromBase64(aImage))
-            attList.add(new Packages.com.github.copilot.sdk.json.Attachment("image", _tmpFile, "image.jpg"))
+            attList.add(new Packages.com.github.copilot.rpc.Attachment("image", _tmpFile, "image.jpg"))
           } else {
             throw "aImage should be a file path or a base64 string"
           }
@@ -747,6 +767,7 @@ ow.ai.__gpttypes.ghcopilot = {
             vendor      : "ghcopilot",
             model       : aOptions.model,
             mode        : aOptions.mode,
+            agentMode   : aOptions.agentMode,
             instructions: _getSystemContent(),
             prompt      : p,
             hasImage    : true

@@ -137,7 +137,8 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `params` (map, optional): Reserved for provider/API compatibility. Keep empty unless another integration explicitly requires it.
 - `model` (string, default: `gpt-4.1`): Model ID used for generation (for example `gpt-4.1`, `gpt-4o`, etc.).
 - `timeout` (number in ms, default: `120000`): Maximum wait time for a response before the request is aborted.
-- `mode` (string, optional): Advanced request mode forwarded to `MessageOptions.setMode`.
+- `mode` (string, optional): Send scheduling mode (`enqueue` or `immediate`). For compatibility, agent-mode values supplied here are routed to `agentMode`.
+- `agentMode` (string, optional): Copilot agent mode: `interactive`, `plan`, `autopilot`, or `shell`.
 - `token` (string, optional): Preferred authentication token for Copilot CLI sessions.
 - `githubToken` (string, optional): Legacy alias for `token` (use `token` in new configs).
 - `cliPath` (string, optional): Absolute path to the `copilot` executable when it is not available in `PATH`.
@@ -165,6 +166,7 @@ The following options are supported:
 - `model`
 - `timeout`
 - `mode`
+- `agentMode`
 - `token`
 - `githubToken`
 - `cliPath`
