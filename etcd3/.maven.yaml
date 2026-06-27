@@ -1,4 +1,4 @@
 artifacts:
-- group  : com.ibm.etcd
-  id     : etcd-java
-  version: 0.0.24
+- group  : io.etcd
+  id     : jetcd-core
+  version: 0.8.6
