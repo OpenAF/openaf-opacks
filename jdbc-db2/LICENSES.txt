@@ -1,7 +1,7 @@
-jcc-12.1.4.0.jar:
+jcc-12.1.5.0.jar:
   name: International Program License Agreement (IPLA)
-  url: https://www.ibm.com/support/customer/csol/terms/?ref=L-XFLK-S5N8U5-01-03-2026-zz-en
-  version: 12.1.4.0
+  url: https://www.ibm.com/support/customer/csol/terms/?ref=L-HJHH-A2W6TH-01-06-2026-zz-en
+  version: 12.1.5.0
   changed from original: false
   comments: You can use this JDBC driver for Java applications that access the Db2 LUW database server
   license: |-
