@@ -32,6 +32,7 @@ files:
 - lib/pdfbox-3.0.5.jar
 - lib/pdfbox-io-3.0.5.jar
 - lib/xchart-4.0.2.jar
+- test/test.html
 - xchart.js
 filesHash:
   .odoc.db: c1f8cc5cf6ec6ddfb40d5e0c00b502a4f5847381
@@ -46,4 +47,5 @@ filesHash:
   lib/pdfbox-3.0.5.jar: c34109061c3a0d85d871d9edc469ac0682f81856
   lib/pdfbox-io-3.0.5.jar: 402151a8d1aa427ea879cc7160e9227e9f5088ba
   lib/xchart-4.0.2.jar: d7cb0bb308bfddf98f4d6f8c33301e89d0b1b3e2
+  test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
   xchart.js: a760d5988cad354ad1d402cf07bbdb26e3d7daf9
