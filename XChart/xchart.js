@@ -21,8 +21,8 @@ var XChart = function(aJson) {
    var x = (isDef(aJson.x) ? aJson.x : 640);
    var y = (isDef(aJson.y) ? aJson.y : 480);
    var title = (isDef(aJson.title) ? aJson.title : "Chart");
-   var xAxis = (isDef(aJson.xAxis) ? aJson.xaxis : "X");
-   var yAxis = (isDef(aJson.yAxis) ? aJson.yaxis : "Y");
+   var xAxis = (isDef(aJson.xAxis) ? aJson.xAxis : "X");
+   var yAxis = (isDef(aJson.yAxis) ? aJson.yAxis : "Y");
 
    this.c = new Packages.org.knowm.xchart.CategoryChartBuilder().width(x).height(y).title(title).xAxisTitle(xAxis).yAxisTitle(yAxis).build();
 
@@ -35,6 +35,12 @@ XChart.prototype.__addData = function() {
    }
 };
 
+XChart.prototype.__getSeries = function(aSeries) {
+   var series = this.getXChart().getSeries(aSeries);
+   if (isUnDef(series)) throw "XChart series '" + aSeries + "' was not found.";
+   return series;
+};
+
 /**
  * <odoc>
  * <key>XChart.setSeriesRenderStyle(aSeries, aStyle)</key>
@@ -42,19 +48,22 @@ XChart.prototype.__addData = function() {
  * </odoc>
  */
 XChart.prototype.setSeriesRenderStyle = function(aSeries, aStyle) {
+    var series = this.__getSeries(aSeries);
     switch(aStyle.toLowerCase()) {
-    case "line"      : this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Line); break;
-    case "area"      : this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Area); break;
-    case "bar"       : this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Bar); break;
-    case "stick"     : this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Stick); break;
-    case "scatter"   : this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Scatter); break;
-    case "steppedbar": this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.SteppedBar); break;
-    default: this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Line);
+    case "line"      : series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Line); break;
+    case "area"      : series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Area); break;
+    case "bar"       : series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Bar); break;
+    case "stick"     : series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Stick); break;
+    case "scatter"   : series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Scatter); break;
+    case "steppedbar": series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.SteppedBar); break;
+    default: series.setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Line);
     }
+    return this;
 };
 
 XChart.prototype.setSeriesToArea = function(aSeries) {
-    this.getXChart().getSeriesMap().get(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Area);
+    this.__getSeries(aSeries).setChartCategorySeriesRenderStyle(Packages.org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Area);
+    return this;
 };
 
 XChart.prototype.savePNG = function(aFile) {
