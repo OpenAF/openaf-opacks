@@ -1,0 +1,54 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch: printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+
+jobs:
+- name: Redis::Init
+  exec: |
+    args.tests = require("tests/tests.js")
+
+- name: Redis::LibraryLoads
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testLibraryLoads
+
+- name: Redis::PackageFilesExist
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPackageFilesExist
+
+- name: Redis::RoundTrip
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testRedisRoundTrip
+
+- name: Redis::ChannelRoundTrip
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testChannelRoundTrip
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - Redis::LibraryLoads
+  - Redis::PackageFilesExist
+  - Redis::RoundTrip
+  - Redis::ChannelRoundTrip
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED: {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED: {{fail}}/{{count}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }
+
+todo:
+- Redis::LibraryLoads
+- Redis::PackageFilesExist
+- Redis::RoundTrip
+- Redis::ChannelRoundTrip
+- Test results
