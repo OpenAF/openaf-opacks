@@ -33,6 +33,8 @@ files:
 - json-20251224.jar
 - redis-authx-core-0.1.1-beta2.jar
 - redis.js
+- tests/tests.js
+- tests/tests.yaml
 filesHash:
   .maven.yaml: 1e82e1741847165472f2bc71b47be7a61d322ee9
   .odoc.db: a361200d42fcc7e708fb62afd2ff08d660abc44e
@@ -44,3 +46,5 @@ filesHash:
   json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
   redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
   redis.js: c31a2c25d453cacfb0763485c37e3c8d253d82e7
+  tests/tests.js: 3b85a029647810c902ce5b4378e88d4718628d43
+  tests/tests.yaml: 331dced8f866b73272fca15f6214788eac4f66bd
