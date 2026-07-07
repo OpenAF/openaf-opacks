@@ -226,6 +226,95 @@ ow.ai.__gpttypes.ghcopilot = {
       return l
     }
 
+    var _call = (obj, fn) => {
+      if (isUnDef(obj) || obj === null) return __
+      try {
+        var v = fn(obj)
+        return v === null ? __ : v
+      } catch(e) {
+        return __
+      }
+    }
+
+    var _javaListToArray = (list) => {
+      if (isUnDef(list) || list === null) return __
+      return af.fromJavaArray(list.toArray()).map(v => String(v))
+    }
+
+    var _num = (v) => isUnDef(v) || v === null ? __ : Number(v)
+    var _str = (v) => isUnDef(v) || v === null ? __ : String(v)
+
+    var _compactMap = (m) => {
+      Object.keys(m).forEach(k => {
+        if (isUnDef(m[k])) delete m[k]
+      })
+      return Object.keys(m).length === 0 ? __ : m
+    }
+
+    var _modelVisionLimits = (vision) => _compactMap({
+      supportedMediaTypes: _javaListToArray(_call(vision, v => v.getSupportedMediaTypes())),
+      maxPromptImages   : _num(_call(vision, v => v.getMaxPromptImages())),
+      maxPromptImageSize: _num(_call(vision, v => v.getMaxPromptImageSize()))
+    })
+
+    var _modelCapabilities = (capabilities) => {
+      var supports = _call(capabilities, c => c.getSupports())
+      var limits   = _call(capabilities, c => c.getLimits())
+      return _compactMap({
+        supports: _compactMap({
+          vision         : _call(supports, s => s.isVision()),
+          reasoningEffort: _call(supports, s => s.isReasoningEffort())
+        }),
+        limits: _compactMap({
+          maxPromptTokens       : _num(_call(limits, l => l.getMaxPromptTokens())),
+          maxContextWindowTokens: _num(_call(limits, l => l.getMaxContextWindowTokens())),
+          vision                : _modelVisionLimits(_call(limits, l => l.getVision()))
+        })
+      })
+    }
+
+    var _modelPolicy = (policy) => _compactMap({
+      state: _str(_call(policy, p => p.getState())),
+      terms: _str(_call(policy, p => p.getTerms()))
+    })
+
+    var _modelTokenPricesLongContext = (prices) => _compactMap({
+      inputPrice      : _num(_call(prices, p => p.inputPrice())),
+      outputPrice     : _num(_call(prices, p => p.outputPrice())),
+      cachePrice      : _num(_call(prices, p => p.cachePrice())),
+      cacheReadPrice  : _num(_call(prices, p => p.cacheReadPrice())),
+      cacheWritePrice : _num(_call(prices, p => p.cacheWritePrice())),
+      contextMax      : _num(_call(prices, p => p.contextMax())),
+      maxPromptTokens : _num(_call(prices, p => p.maxPromptTokens()))
+    })
+
+    var _modelTokenPrices = (prices) => _compactMap({
+      inputPrice      : _num(_call(prices, p => p.inputPrice())),
+      outputPrice     : _num(_call(prices, p => p.outputPrice())),
+      cachePrice      : _num(_call(prices, p => p.cachePrice())),
+      cacheReadPrice  : _num(_call(prices, p => p.cacheReadPrice())),
+      cacheWritePrice : _num(_call(prices, p => p.cacheWritePrice())),
+      batchSize       : _num(_call(prices, p => p.batchSize())),
+      contextMax      : _num(_call(prices, p => p.contextMax())),
+      maxPromptTokens : _num(_call(prices, p => p.maxPromptTokens())),
+      longContext     : _modelTokenPricesLongContext(_call(prices, p => p.longContext()))
+    })
+
+    var _modelBilling = (billing) => _compactMap({
+      multiplier : _num(_call(billing, b => b.getMultiplier())),
+      tokenPrices: _modelTokenPrices(_call(billing, b => b.getTokenPrices()))
+    })
+
+    var _modelInfo = (m) => _compactMap({
+      id                       : _str(_call(m, x => x.getId())),
+      name                     : _str(_call(m, x => x.getName())),
+      policy                   : _modelPolicy(_call(m, x => x.getPolicy())),
+      capabilities             : _modelCapabilities(_call(m, x => x.getCapabilities())),
+      billing                  : _modelBilling(_call(m, x => x.getBilling())),
+      supportedReasoningEfforts: _javaListToArray(_call(m, x => x.getSupportedReasoningEfforts())),
+      defaultReasoningEffort   : _str(_call(m, x => x.getDefaultReasoningEffort()))
+    })
+
     // SDK 1.0.1 separates send mode (enqueue/immediate) from agent mode.
     // Preserve older wrapper configs that supplied agent modes through `mode`.
     var _applyMessageMode = (aMessageOptions) => {
@@ -822,7 +911,7 @@ ow.ai.__gpttypes.ghcopilot = {
       getModels: () => {
         _ensureClient()
         return af.fromJavaArray(_client.listModels().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS).toArray())
-          .map(m => ({ id: String(m.getId()), name: String(m.getName()) }))
+          .map(m => _modelInfo(m))
       }
     }
 

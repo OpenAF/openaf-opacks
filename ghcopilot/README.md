@@ -198,6 +198,8 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 - `rawPromptStreamWithStats(...)`
 - `close()`
 
+`getModels()` returns the Copilot SDK model list with `id` and `name` plus available SDK metadata, including `policy`, `capabilities`, `billing`, `supportedReasoningEfforts`, and `defaultReasoningEffort`. Use `policy.state` to inspect model availability/entitlement hints when a model appears in the list but `session.create` rejects it.
+
 ## Docker
 
 A sample `Dockerfile` is included in this folder and is based on `openaf/oaf:edge-t8`, adding Node.js/npm plus the `@github/copilot` binary.
