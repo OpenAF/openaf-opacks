@@ -21,7 +21,7 @@ name: md2email
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260515'
+version: '20260706'
 dependencies:
   openaf: '>=20221216'
 files:
@@ -31,14 +31,14 @@ files:
 - .precompile
 - README.md
 - autolink-0.12.0.jar
-- commonmark-0.28.0.jar
-- commonmark-ext-autolink-0.28.0.jar
-- commonmark-ext-gfm-strikethrough-0.28.0.jar
-- commonmark-ext-gfm-tables-0.28.0.jar
-- commonmark-ext-heading-anchor-0.28.0.jar
-- commonmark-ext-ins-0.28.0.jar
-- commonmark-ext-task-list-items-0.28.0.jar
-- commonmark-ext-yaml-front-matter-0.28.0.jar
+- commonmark-0.29.0.jar
+- commonmark-ext-autolink-0.29.0.jar
+- commonmark-ext-gfm-strikethrough-0.29.0.jar
+- commonmark-ext-gfm-tables-0.29.0.jar
+- commonmark-ext-heading-anchor-0.29.0.jar
+- commonmark-ext-ins-0.29.0.jar
+- commonmark-ext-task-list-items-0.29.0.jar
+- commonmark-ext-yaml-front-matter-0.29.0.jar
 - jsvg-2.1.0.jar
 - md2email-svg-0.png
 - md2email.js
@@ -51,14 +51,14 @@ filesHash:
   .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
   README.md: cb2a90c720b19402c282f7f34c6e5524f909ed41
   autolink-0.12.0.jar: 917f405aadfe8e315740ffc367b4675a5ff6f2a0
-  commonmark-0.28.0.jar: 9fa5c6ea2a17aedfec543c693be35573307750dd
-  commonmark-ext-autolink-0.28.0.jar: 175b9cd4441b12dbe45bb442bdb14d4a553ccb46
-  commonmark-ext-gfm-strikethrough-0.28.0.jar: 580c26b1ee6ea4938affa623515be51f75b9e6ec
-  commonmark-ext-gfm-tables-0.28.0.jar: ca0cde4d8816a9cf6051e636fb3148034b545073
-  commonmark-ext-heading-anchor-0.28.0.jar: 16318baea14b9044950896df9fa3b2ed0f8617c9
-  commonmark-ext-ins-0.28.0.jar: c418babd7b934dd92a520c10d88e692ec8c8c44d
-  commonmark-ext-task-list-items-0.28.0.jar: 16044b2f44588c26b59b0060bec008d2bd39a130
-  commonmark-ext-yaml-front-matter-0.28.0.jar: c21169ab375ed56396b2845c0ba023a2a6740ac9
+  commonmark-0.29.0.jar: afd6755ebe69fc302f8cfbbd4a6bc056ac73ba94
+  commonmark-ext-autolink-0.29.0.jar: a9f5937f823525d5feb5c475b1f4a47d9b9238a0
+  commonmark-ext-gfm-strikethrough-0.29.0.jar: 4a7a86e5166926d3dea973ceb4129ba0bd23a167
+  commonmark-ext-gfm-tables-0.29.0.jar: da367fd37e477053302559e40c4f4151b971bab2
+  commonmark-ext-heading-anchor-0.29.0.jar: 798131fe0df6e582ce0ea570456934a7df58deef
+  commonmark-ext-ins-0.29.0.jar: bb9c32daa7a87e4015898e344c516ae0f2ff1bac
+  commonmark-ext-task-list-items-0.29.0.jar: 85c72ff2cc6a227abf5ed96c625cac8cddd3ddbb
+  commonmark-ext-yaml-front-matter-0.29.0.jar: f1019866b4f2e0839e14ca4ff3551dbe2156abad
   jsvg-2.1.0.jar: c1a403f318de302fa81e4403fe8fb4bd6056a41f
   md2email-svg-0.png: 29b5908ecde559dc672cc696a082ef0d4f0c1f08
   md2email.js: cb70d67c09ce1e0faa3f8a71722e5db3ef1ffa9f
