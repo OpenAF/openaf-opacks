@@ -3,24 +3,7 @@ jobs:
   exec: |
     if (io.fileExists(args.filepath + "/.package.yaml") || io.fileExists(args.filepath + "/.package.json")) {
       tlog("updating {{filepath}}...", args)
-      var _opack = args.filepath.replace(/\/$/, "").split("/").pop()
-      if (_opack == "ghcopilot") {
-        var _package = args.filepath + "/.package.yaml"
-        var _pad = function(n) { return (n < 10 ? "0" : "") + n }
-        var _date = new Date()
-        var _version = String(_date.getFullYear()) + _pad(_date.getMonth() + 1) + _pad(_date.getDate())
-        var _pack = io.readFileYAML(_package)
-
-        sh("cd " + args.filepath + " && rm *.jar")
-        sh("cd " + args.filepath + " && ojob ojob.io/oaf/mavenGetJars folder=.")
-        sh("cd " + args.filepath + " && ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true")
-
-        _pack.version = _version
-        io.writeFileYAML(_package, _pack)
-        sh("cd " + args.filepath + " && " + getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
-      } else {
-        sh("cd " + args.filepath + " && " + getOpenAFPath() + "opack genpack .")
-      }
+      sh("cd " + args.filepath + " && " + getOpenAFPath() + "opack genpack .")
     } else {
       tlogErr("No .packege file found in '{{filepath}}'", args)
     }
