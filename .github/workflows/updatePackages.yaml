@@ -20,29 +20,6 @@ jobs:
         key : oaf-t8
         path: /tmp/oaf
 
-    - name: Update ghcopilot dependencies
-      uses: openaf/ojob-action@v7
-      with:
-        script: |
-          var filepath = "ghcopilot"
-          var packageFile = filepath + "/.package.yaml"
-          var opack = io.readFileYAML(packageFile)
-
-          $sh("rm *.jar")
-          .sh([getOpenAFPath() + "ojob", "ojob.io/oaf/mavenGetJars", "folder=."])
-          .sh([getOpenAFPath() + "ojob", "ojob.io/oaf/checkOAFJars", "path=.", "remove=true", "versioninsensitive=true"])
-          .pwd(filepath)
-          .get()
-
-          opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-          io.writeFileYAML(packageFile, opack)
-
-          $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
-          .pwd(filepath)
-          .prefix("opack")
-          .get()
-        dist: t8
-
     - name: Run updatePacks
       uses: openaf/ojob-action@v7
       with:
