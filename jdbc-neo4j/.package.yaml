@@ -16,13 +16,13 @@ name: jdbc-neo4j
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260617'
+version: '20260715'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - jdbc-neo4j.js
-- neo4j-jdbc-full-bundle-6.13.1.jar
+- neo4j-jdbc-full-bundle-6.14.0.jar
 filesHash:
   jdbc-neo4j.js: 85178bee7bc0fb6b1fdd77ab3cde8ee517c799ae
-  neo4j-jdbc-full-bundle-6.13.1.jar: 847791abd5d7c95147eef0cfabecdfa47915499e
+  neo4j-jdbc-full-bundle-6.14.0.jar: 5e643c90456461c1b284f68fcb05d75126163957
