@@ -29,8 +29,8 @@ jobs:
           var opack = io.readFileYAML(packageFile)
 
           $sh("rm *.jar")
-          .sh(getOpenAFPath() + "ojob ojob.io/oaf/mavenGetJars folder=ghcopilot")
-          .sh(getOpenAFPath() + "ojob ojob.io/oaf/checkOAFJars path=ghcopilot remove=true versioninsensitive=true")
+          .sh(getOpenAFPath() + "ojob ojob.io/oaf/mavenGetJars folder=.")
+          .sh(getOpenAFPath() + "ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true")
           .pwd(filepath)
           .get()
 
