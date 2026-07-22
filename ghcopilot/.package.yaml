@@ -20,7 +20,7 @@ name: ghcopilot
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260707'
+version: '20260721'
 dependencies:
   OpenAF: '>=20260312'
 files:
@@ -28,13 +28,13 @@ files:
 - .package.yaml
 - Dockerfile
 - README.md
-- copilot-sdk-java-1.0.6-preview.1.jar
+- copilot-sdk-java-1.0.8-preview.0.jar
 - ghcopilot.js
 - jackson-datatype-jsr310-2.22.0.jar
 filesHash:
   .maven.yaml: 4a70941a8dd2f5ed3d2aa83041652fa7eb508c0f
   Dockerfile: 6bb1c386f43d37ea2b7f6f1a5dc55f410eb67025
   README.md: 9644ab127b747fef339b24715eaefdd947903778
-  copilot-sdk-java-1.0.6-preview.1.jar: 6b6d24db4788a073c576a02f406a86ea19b28188
+  copilot-sdk-java-1.0.8-preview.0.jar: f67bfb08db01fb172daabb052099ae1a42c6e462
   ghcopilot.js: cdfcf79c90512b20a6dc6ffa15e3d53f824e46ba
   jackson-datatype-jsr310-2.22.0.jar: 6aa58b1174d2888ad7f3941e8d9e2fd62775edc3
