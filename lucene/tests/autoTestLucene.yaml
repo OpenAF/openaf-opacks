@@ -9,6 +9,7 @@ ojob:
 todo:
 - lucene::VectorDB
 - lucene::SearchDBChannel
+- lucene::SearchDBVectors
 - lucene::SearchDBAdvanced
 - lucene::SearchDBHelper
 - lucene::SearchDBHelperFileOps
@@ -35,6 +36,11 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testSearchDBAdvanced
 
+- name: lucene::SearchDBVectors
+  from: lucene::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSearchDBVectors
+
 - name: lucene::SearchDBHelper
   from: lucene::Init
   to  : oJob Test
@@ -50,6 +56,7 @@ jobs:
   deps:
   - lucene::VectorDB
   - lucene::SearchDBChannel
+  - lucene::SearchDBVectors
   - lucene::SearchDBAdvanced
   - lucene::SearchDBHelper
   - lucene::SearchDBHelperFileOps

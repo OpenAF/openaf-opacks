@@ -468,6 +468,46 @@ ow.ch.__types.searchdb = {
         if (isUnDef(v)) return []
         return isArray(v) ? v : [v]
     },
+    __vectorEnabled: function(channel) {
+        return isDef(channel.options.vectorDimension)
+    },
+    __vectorSimilarity: function(name) {
+        switch(String(name || "cosine").toLowerCase()) {
+        case "dot":
+        case "dot_product":
+            return Packages.org.apache.lucene.index.VectorSimilarityFunction.DOT_PRODUCT
+        case "l2":
+        case "euclidean":
+            return Packages.org.apache.lucene.index.VectorSimilarityFunction.EUCLIDEAN
+        case "cos":
+        case "cosine":
+            return Packages.org.apache.lucene.index.VectorSimilarityFunction.COSINE
+        default:
+            throw new Error("Unsupported vector similarity '" + name + "'. Use cosine, dot_product or euclidean.")
+        }
+    },
+    __validateVector: function(channel, vector, label) {
+        label = label || "vector"
+        if (!this.__vectorEnabled(channel)) throw new Error("Vector search is not enabled for this searchdb index. Set options.vectorDimension when creating it.")
+        if (!isArray(vector)) throw new Error(label + " must be an array of finite numbers.")
+        if (vector.length != channel.options.vectorDimension) throw new Error(label + " dimension mismatch. Expected " + channel.options.vectorDimension + " but got " + vector.length + ".")
+        var out = java.lang.reflect.Array.newInstance(java.lang.Float.TYPE, vector.length)
+        for (var i = 0; i < vector.length; i++) {
+            if (!isNumber(vector[i]) || !isFinite(Number(vector[i]))) throw new Error(label + " contains a non-finite number at position " + i + ".")
+            out[i] = java.lang.Float.valueOf(Number(vector[i])).floatValue()
+        }
+        return out
+    },
+    __providedVector: function(channel, value, content) {
+        var vector = (this.__isObj(value) && isDef(value.vector)) ? value.vector : __
+        if (isUnDef(vector) && isDef(channel.options.embeddingProvider)) {
+            var provider = channel.options.embeddingProvider
+            if (isFunction(provider)) vector = provider(content, value)
+            else if (this.__isObj(provider) && isFunction(provider.embed)) vector = provider.embed(content)
+            else throw new Error("options.embeddingProvider must be a function or an object with an embed(text) function.")
+        }
+        return vector
+    },
     __toAnalyzer: function(opts) {
         var a = this.__isObj(opts.analyzer) ? opts.analyzer : { preset: opts.analyzer }
         var preset = String(_$(a.preset, "analyzer.preset").default("standard")).toLowerCase()
@@ -508,7 +548,7 @@ ow.ch.__types.searchdb = {
                 var keys = Object.keys(value)
                 for (var i = 0; i < keys.length; i++) {
                     var k = keys[i]
-                    if (k == contentField || k == "content" || k == "text" || k == "payload" || k == "fields" || k == "facets" || k == channel.options.idField) continue
+                    if (k == contentField || k == "content" || k == "text" || k == "payload" || k == "fields" || k == "facets" || k == channel.options.idField || (this.__vectorEnabled(channel) && k == "vector")) continue
                     payload[k] = value[k]
                 }
             }
@@ -533,7 +573,7 @@ ow.ch.__types.searchdb = {
             }
         }
 
-        return { content: content, payload: payload, fields: fields, facets: facets }
+        return { content: content, payload: payload, fields: fields, facets: facets, vector: this.__providedVector(channel, value, content) }
     },
     __addTypedField: function(doc, fieldName, fieldType, fieldValue) {
         if (isUnDef(fieldValue)) return
@@ -582,6 +622,10 @@ ow.ch.__types.searchdb = {
         doc.add(new Packages.org.apache.lucene.document.StringField(channel.options.idField, keyValue, Packages.org.apache.lucene.document.Field.Store.YES))
         doc.add(new Packages.org.apache.lucene.document.TextField(channel.options.contentField, extracted.content, Packages.org.apache.lucene.document.Field.Store.YES))
         doc.add(new Packages.org.apache.lucene.document.StoredField(channel.options.payloadField, stringify(extracted.payload, void 0, "")))
+        if (isDef(extracted.vector)) {
+            var vector = this.__validateVector(channel, extracted.vector, "document vector")
+            doc.add(new Packages.org.apache.lucene.document.KnnFloatVectorField(channel.options.vectorField, vector, channel.vectorSimilarity))
+        }
 
         var fieldKeys = Object.keys(extracted.fields)
         for (var i = 0; i < fieldKeys.length; i++) {
@@ -1071,6 +1115,8 @@ ow.ch.__types.searchdb = {
         if (isDef(hybrid.vectorResults) && isArray(hybrid.vectorResults)) vectorHits = hybrid.vectorResults
         else if (isDef(hybrid.vectorChannel) && isDef(hybrid.vector) && isArray(hybrid.vector)) {
             vectorHits = $ch(String(hybrid.vectorChannel)).getAll({ vector: hybrid.vector, k: Number(_$(hybrid.kVector, "hybrid.kVector").default(50)) })
+        } else if (isDef(hybrid.vector) && isArray(hybrid.vector) && this.__vectorEnabled(channel)) {
+            vectorHits = this.vectorSearch(aName, hybrid.vector, Number(_$(hybrid.kVector, "hybrid.kVector").default(hybrid.k || 50)))
         }
 
         for (i = 0; i < vectorHits.length; i++) {
@@ -1160,6 +1206,14 @@ ow.ch.__types.searchdb = {
         options.defaultSortField = _$(options.defaultSortField, "options.defaultSortField").default(__)
         options.analyzer = _$(options.analyzer, "options.analyzer").default("standard")
         options.taxonomyPath = _$(options.taxonomyPath, "options.taxonomyPath").isString().default(options.path + "/_taxonomy")
+        if (isDef(options.dimension) && isUnDef(options.vectorDimension)) options.vectorDimension = options.dimension
+        if (isDef(options.vectorDimension)) {
+            options.vectorDimension = Number(options.vectorDimension)
+            if (!isFinite(options.vectorDimension) || options.vectorDimension <= 0 || Math.floor(options.vectorDimension) != options.vectorDimension) throw new Error("options.vectorDimension must be a positive integer.")
+            options.vectorField = _$(options.vectorField, "options.vectorField").isString().default("vector")
+            options.vectorSimilarity = _$(options.vectorSimilarity, "options.vectorSimilarity").default("cosine")
+            if (isDef(options.embeddingProvider) && !isFunction(options.embeddingProvider) && !(this.__isObj(options.embeddingProvider) && isFunction(options.embeddingProvider.embed))) throw new Error("options.embeddingProvider must be a function or an object with an embed(text) function.")
+        }
 
         if (!io.fileExists(options.path)) io.mkdir(options.path)
         if (options.facetFields.length > 0 && !io.fileExists(options.taxonomyPath)) io.mkdir(options.taxonomyPath)
@@ -1188,7 +1242,8 @@ ow.ch.__types.searchdb = {
             facetsConfig: facetsConfig,
             taxoDirectory: taxoDirectory,
             taxoWriter: taxoWriter,
-            options: options
+            options: options,
+            vectorSimilarity: isDef(options.vectorDimension) ? this.__vectorSimilarity(options.vectorSimilarity) : __
         }
     },
     destroy: function(aName) {
@@ -1218,6 +1273,7 @@ ow.ch.__types.searchdb = {
     getAll: function(aName, full) {
         var channel = this.__ensureChannel(aName)
         if (this.__isObj(full) && this.__isObj(full.hybrid)) return this.__withMeta(this.__runHybrid(aName, full))
+        if (this.__isObj(full) && isDef(full.vector) && isUnDef(full.query)) return this.vectorSearch(aName, full.vector, full.k)
         this.__refresh(channel)
         var searcher = channel.searcherManager.acquire()
         try {
@@ -1336,6 +1392,37 @@ ow.ch.__types.searchdb = {
         var full = { query: (isString(q) ? String(q) : q), limit: Number(isDef(limit) ? limit : 20) }
         var r = this.getAll(aName, full)
         return this.__isObj(r) ? r.hits : r
+    },
+    vectorSearch: function(aName, vector, k) {
+        var channel = this.__ensureChannel(aName)
+        var queryVector = this.__validateVector(channel, vector, "query vector")
+        k = Number(isDef(k) ? k : 10)
+        if (!isFinite(k) || k <= 0 || Math.floor(k) != k) throw new Error("k must be a positive integer.")
+        this.__refresh(channel)
+        var searcher = channel.searcherManager.acquire()
+        try {
+            var query = new Packages.org.apache.lucene.search.KnnFloatVectorQuery(channel.options.vectorField, queryVector, k)
+            var topDocs
+            try {
+                topDocs = searcher.search(query, k)
+            } catch(e) {
+                throw new Error("Unable to search vector field '" + channel.options.vectorField + "'. The existing index may be incompatible with the configured vector dimension or similarity: " + e)
+            }
+            var out = []
+            for (var i = 0; i < topDocs.scoreDocs.length; i++) {
+                var doc = this.__getDocument(searcher, topDocs.scoreDocs[i].doc)
+                if (isDef(doc)) out.push(this.__toObj(channel, doc, topDocs.scoreDocs[i].score))
+            }
+            return out
+        } finally {
+            channel.searcherManager.release(searcher)
+        }
+    },
+    hybridSearch: function(aName, options) {
+        options = _$(options, "options").isMap().$_()
+        if (isUnDef(options.vector)) throw new Error("options.vector is required for hybrid search.")
+        var full = { query: options.query, hybrid: { textQuery: options.query, vector: options.vector, kText: options.kText || options.k, kVector: options.kVector || options.k, weights: options.weights }, limit: options.limit || options.k || 20 }
+        return this.__runHybrid(aName, full).hits
     }
 }
 
