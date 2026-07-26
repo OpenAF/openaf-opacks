@@ -99,6 +99,40 @@
     }
   }
 
+  exports.testSearchDBVectors = function() {
+    var chName = "luceneSearchdbVectorsTest"
+    var dbPath = basePath + "/searchdb-vectors"
+
+    cleanPath(basePath)
+    io.mkdir(basePath)
+    $ch(chName).create("searchdb", {
+      path: dbPath,
+      vectorDimension: 3,
+      embeddingProvider: { embed: function(text) { return text.indexOf("alpha") >= 0 ? [1, 0, 0] : [0, 1, 0] } }
+    })
+
+    try {
+      $ch(chName).set({ id: "doc-a" }, { content: "alpha document", payload: { kind: "direct" }, vector: [1, 0, 0] })
+      $ch(chName).set({ id: "doc-b" }, { content: "beta document", payload: { kind: "provider" } })
+
+      var vectorHits = ow.ch.__types.searchdb.vectorSearch(chName, [0, 1, 0], 2)
+      ow.test.assert(String(vectorHits[0].id), "doc-b", "integrated vector search should rank the provider vector first")
+
+      var getAllHits = $ch(chName).getAll({ vector: [1, 0, 0], k: 1 })
+      ow.test.assert(String(getAllHits[0].id), "doc-a", "getAll should expose optional vector search")
+
+      var hybrid = ow.ch.__types.searchdb.hybridSearch(chName, { query: "alpha", vector: [0, 1, 0], k: 2 })
+      ow.test.assert(hybrid.length, 2, "hybrid search should merge text and vector candidates")
+
+      var dimensionError = false
+      try { ow.ch.__types.searchdb.vectorSearch(chName, [1, 0], 1) } catch(e) { dimensionError = String(e).indexOf("Expected 3") >= 0 }
+      ow.test.assert(dimensionError, true, "vector search should clearly reject a dimension mismatch")
+    } finally {
+      $ch(chName).destroy()
+      cleanPath(basePath)
+    }
+  }
+
   exports.testSearchDBAdvanced = function() {
     var chName = "luceneSearchdbAdvancedTest"
     var dbPath = basePath + "/searchdb-advanced"
