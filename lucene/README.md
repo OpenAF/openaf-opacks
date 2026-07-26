@@ -24,17 +24,8 @@ $ch("embeddings").create("vectordb", {
 })
 
 var embedText = function(text) {
-  var llm
-  try {
-    // Example: OAF_MODEL="(type: ollama, model: 'embeddinggemma:latest', url: 'http://ollama.local:11434', timeout: 900000)"
-    llm = $llm(af.fromJSSLON(getEnv("OAF_MODEL")))
-    var r = llm.getEmbeddings(text, 384)
-    if (isDef(r) && isDef(r.data) && isDef(r.data[0].embedding)) return r.data[0].embedding
-    if (isDef(r) && isDef(r.embeddings)) return r.embeddings[0]
-    return r
-  } finally {
-    if (isDef(llm)) llm.close()
-  }
+  // Supplied by the application. It may call any local or remote embedding service.
+  return applicationEmbeddingProvider.embed(text)
 }
 
 $ch("embeddings").set({ id: "doc-1" }, {
@@ -112,6 +103,73 @@ cprint(hits)
 - `analyzer` *(String|Map, optional; default `standard`)*: Analyzer preset (`standard`, `keyword`, `whitespace`, `english`).
 - `autoCommit` *(Boolean, optional; default `true`)*: Commit on writes.
 - `autoRefresh` *(Boolean, optional; default `true`)*: Refresh searcher on writes.
+
+### Optional vectors in `searchdb`
+
+Text-only indexes remain the default. To add vectors to the same documents, explicitly
+set `vectorDimension`. This adds a Lucene `KnnFloatVectorField` without changing the
+existing ID, content, payload, typed-field, facet, or BM25 behavior.
+
+```javascript
+var provider = {
+  embed: function(text) {
+    // Embedding generation belongs to the application; return a plain number array.
+    return applicationEmbeddingFunction(text)
+  }
+}
+
+$ch("docs").create("searchdb", {
+  path: "./data/docs-index",
+  vectorDimension: 384,
+  vectorField: "vector",             // optional; default "vector"
+  vectorSimilarity: "cosine",        // cosine, dot_product, or euclidean
+  embeddingProvider: provider         // optional function or { embed: function(text) }
+})
+
+// Supply a vector directly. Documents are still indexed for normal text search.
+$ch("docs").set({ id: "doc-1" }, {
+  content: "Apache Lucene supports text and vector retrieval.",
+  payload: { source: "guide" },
+  vector: provider.embed("Apache Lucene supports text and vector retrieval.")
+})
+
+// When embeddingProvider is configured, omitting vector embeds the document content.
+$ch("docs").set({ id: "doc-2" }, {
+  content: "The application controls embedding generation."
+})
+```
+
+Documents may omit vectors when no provider is configured; they remain available to
+text search but are not k-NN candidates. Vector dimensions and all elements are
+validated. Opening an existing text-only index with vector options is supported, but
+only newly written vector-bearing documents participate in vector retrieval.
+
+Use `getAll({ vector, k })` through the channel API, or call the channel type's explicit
+methods when building a lower-level wrapper:
+
+```javascript
+var queryVector = provider.embed("combined retrieval")
+
+// Existing BM25 API is unchanged.
+var textHits = $ch("docs").getAll({ query: "combined retrieval", limit: 10 })
+
+// k-NN search.
+var vectorHits = $ch("docs").getAll({ vector: queryVector, k: 10 })
+// Equivalent low-level method:
+var sameHits = ow.ch.__types.searchdb.vectorSearch("docs", queryVector, 10)
+
+// Merge and normalize BM25 and vector scores, then rerank with equal weights.
+var hybridHits = ow.ch.__types.searchdb.hybridSearch("docs", {
+  query: "combined retrieval",
+  vector: queryVector,
+  k: 20,
+  weights: { text: 0.5, vector: 0.5 }
+})
+```
+
+The existing advanced `getAll({ hybrid: ... })` form remains supported, including a
+separate `vectorChannel`. When the current `searchdb` is vector-enabled, `hybrid.vector`
+is searched locally if no `vectorChannel` or precomputed `vectorResults` is supplied.
 
 ### `searchdb` advanced write format
 
