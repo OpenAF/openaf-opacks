@@ -1,0 +1,5 @@
+artifacts:
+- id: rocksdbjni
+  group: org.rocksdb
+  version: 10.10.1
+  template: rocksdbjni-{{version}}-linux32.jar
