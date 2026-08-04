@@ -356,7 +356,7 @@ jobs:
               values     : {
                 "Version"  : v.version || "",
                 "Status"   : v.status || "",
-                "Published": isDef(v.publishedTime) ? new Date(v.publishedTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                "Published": isDef(v.publishedTime) ? new Date(v.publishedTime*1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
               }
             }
           }), reqPage, reqPageSize)
