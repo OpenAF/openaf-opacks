@@ -331,7 +331,7 @@ jobs:
           .sh(getOpenAFPath() + "ojob ojob.io/oaf/mavenGetJars folder=.")
           .sh(getOpenAFPath() + "ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true")
           .pwd(filepath)
-          .get()
+          .exec()
 
           opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
           io.writeFileYAML(packageFile, opack)
@@ -339,7 +339,7 @@ jobs:
           $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
           .pwd(filepath)
           .prefix("opack")
-          .get()
+          .exec()
         dist: t8
 
     - name: Commit ghcopilot

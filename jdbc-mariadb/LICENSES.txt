@@ -1,6 +1,6 @@
-mariadb-java-client-3.5.9.jar:
+mariadb-java-client-3.5.10.jar:
   name: LGPL-2.1-or-later
-  version: 3.5.9
+  version: 3.5.10
   changed from original: false
   comments: ''
   license: ''

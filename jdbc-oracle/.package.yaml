@@ -16,15 +16,15 @@ name: jdbc-oracle
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260513'
+version: '20260729'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-oracle.js
-- ojdbc8-23.26.2.0.0.jar
+- ojdbc8-23.26.3.0.0.jar
 filesHash:
-  LICENSES.txt: fbbdb8f6f7f2704a9880058a9b9e559a0bf090c5
+  LICENSES.txt: ef5bfa97fa797a715b5a7f80aafa8489b317b6ff
   jdbc-oracle.js: 25acc28ce88e897154135224c91ddbea37bca01e
-  ojdbc8-23.26.2.0.0.jar: f347163fed52f09eb36c311ebcc422d6e2facfe8
+  ojdbc8-23.26.3.0.0.jar: 0b98d982b902cafc710b24d24b66ef6af17bd1dc
