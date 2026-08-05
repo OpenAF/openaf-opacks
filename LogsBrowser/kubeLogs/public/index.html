@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KubeLogs</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header id="topbar">
+  <h1>KubeLogs</h1>
+
+  <div class="field">
+    <label for="namespace">Namespace</label>
+    <select id="namespace"><option value="">Loading&hellip;</option></select>
+  </div>
+
+  <div class="field">
+    <label for="transform">Pipe through</label>
+    <select id="transform"><option value="none">none</option></select>
+  </div>
+
+  <div class="field">
+    <label for="tailLines">Backlog lines</label>
+    <input id="tailLines" type="number" min="0" step="50" value="200">
+  </div>
+
+  <button id="startBtn" class="primary">Start live tracking</button>
+  <button id="stopBtn" disabled>Stop</button>
+
+  <span id="status" class="status">idle</span>
+</header>
+
+<div id="body">
+  <aside id="targets-panel">
+    <div class="targets-head">
+      <strong>Pods / containers</strong>
+      <div class="targets-actions">
+        <button id="selectAllBtn" class="link">all</button>
+        <button id="selectNoneBtn" class="link">none</button>
+      </div>
+    </div>
+    <div id="targets">
+      <p class="hint">Pick a namespace to list pods.</p>
+    </div>
+  </aside>
+
+  <main id="log-panel">
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Filter (substring)&hellip;">
+      <button id="orderBtn" title="Toggle chronological order">Oldest first</button>
+      <button id="clearBtn" title="Clear the buffered lines">Clear</button>
+      <button id="exportBtn" title="Download the currently filtered/ordered lines">Export</button>
+      <span id="counts" class="counts"></span>
+    </div>
+    <div id="log" tabindex="0"></div>
+  </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

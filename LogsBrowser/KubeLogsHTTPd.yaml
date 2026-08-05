@@ -1,0 +1,280 @@
+# Template          : Kubernetes pod log browser / live-tail
+# Author            : Nuno Aguiar
+# How to run        : ojob KubeLogsHTTPd.yaml (run from opack so 'kubeLogs' resolves,
+#                      or pass basePath=/absolute/path/to/kubeLogs)
+# oPack dependencies: latest oJob-common; latest Kube;
+
+init:
+  # NOTE: unlike the other init: values below, port can't be overridden via
+  # CLI/env args -- it's used directly as a YAML anchor in several route
+  # registrations, which are resolved before any argsFromEnvs/CLI merging
+  # happens. To change it, edit this default (matches the same limitation in
+  # this directory's transformJSON.yaml).
+  port: &PORT 8095
+
+  # Folder (relative to the current working directory, or absolute) containing
+  # logSources.js and the public/ static assets.
+  basePath: kubeLogs
+
+  # Optional kubeconfig context name to pin. Leave empty to use the current
+  # kubectl context (default kubeconfig resolution: KUBECONFIG env or ~/.kube/config).
+  kubeContext: ""
+
+  # Optional namespace pre-selected in the UI on load.
+  namespace: ""
+
+  # Default backlog lines requested per container when a tail starts.
+  tailLines: 200
+
+  # Server-side per-session queue cap; beyond this, oldest lines are dropped
+  # (the UI is told via a "dropped" event).
+  maxSessionQueue: 5000
+
+  # Seconds of inactivity before an abandoned session (e.g. a closed browser
+  # tab that never called stop) is force-cleaned by the sweeper.
+  staleSessionSecs: 120
+
+  pid: &PID kubeLogsHTTPd.pid
+
+  # Whitelist of named transforms selectable from the UI dropdown. The UI can
+  # only pick a NAME from this list -- raw shell commands are never accepted
+  # from the browser, so this list is the entire security boundary for the
+  # "pipe through an external process" feature.
+  #
+  # IMPORTANT: commands must be explicitly line-buffered (stdbuf -oL ...,
+  # grep --line-buffered, awk with fflush()) or "live" output will silently
+  # stall until several KB accumulate, since most Unix filters block-buffer
+  # stdout the moment it isn't a tty.
+  pipeTransforms:
+    none: ""
+    # strip-ansi : "stdbuf -oL sed -u 's/\x1b\[[0-9;]*m//g'"
+    # json-pretty: "stdbuf -oL jq -c ."
+    # errors-only: "grep --line-buffered -i error"
+
+ojob:
+  daemon      : true
+  opacks      :
+  - openaf     : 20250315
+  - oJob-common
+  - Kube       : 20260706
+  unique      :
+    pidFile     : *PID
+    killPrevious: false
+  argsFromEnvs: true
+
+include:
+  - oJobHTTPd.yaml
+
+help:
+  text   : Web UI to browse and live-tail Kubernetes pod logs for a namespace (search, order toggle, export, whitelisted pipe transforms).
+  expects:
+  - name: port
+    desc: "The port to use (default 8095)"
+  - name: basePath
+    desc: "Folder containing logSources.js and public/ (default 'kubeLogs', resolved relative to the current working directory)"
+  - name: kubeContext
+    desc: "Optional kubeconfig context name to pin (default: current context)"
+  - name: namespace
+    desc: "Optional namespace pre-selected in the UI"
+  - name: tailLines
+    desc: "Default backlog lines per container when a tail starts (default 200)"
+  - name: maxSessionQueue
+    desc: "Server-side per-session queue cap (default 5000)"
+  - name: staleSessionSecs
+    desc: "Seconds of inactivity before an abandoned session is force-cleaned (default 120)"
+
+jobs:
+- name: Prepare Log Source
+  exec: | #js
+    global.init = args.init
+    global.init.kubeContext      = String(isDef(args.kubeContext) ? args.kubeContext : global.init.kubeContext)
+    global.init.namespace        = String(isDef(args.namespace) ? args.namespace : global.init.namespace)
+    global.init.basePath         = String(isDef(args.basePath) ? args.basePath : (getOPackPath("LogsBrowser") || ".") + "/kubeLogs")
+    global.init.tailLines        = Number(isDef(args.tailLines) ? args.tailLines : global.init.tailLines) || 200
+    global.init.maxSessionQueue  = Number(isDef(args.maxSessionQueue) ? args.maxSessionQueue : global.init.maxSessionQueue) || 5000
+    global.init.staleSessionSecs = Number(isDef(args.staleSessionSecs) ? args.staleSessionSecs : global.init.staleSessionSecs) || 120
+    if (!isMap(global.init.pipeTransforms)) global.init.pipeTransforms = {}
+    if (isUnDef(global.init.pipeTransforms.none)) global.init.pipeTransforms.none = ""
+
+    if (!io.fileExists(global.init.basePath + "/logSources.js")) {
+      throw "KubeLogsHTTPd: can't find '" + global.init.basePath + "/logSources.js' -- run this ojob from inside httpServers/ (so 'kubeLogs' resolves), or pass basePath=/absolute/path/to/kubeLogs"
+    }
+
+    loadLib(global.init.basePath + "/logSources.js")
+
+    global.__kubeLogs = {
+      transforms      : global.init.pipeTransforms,
+      tailLines       : global.init.tailLines,
+      maxSessionQueue : global.init.maxSessionQueue,
+      staleSessionSecs: global.init.staleSessionSecs,
+      sessions        : {}
+    }
+
+    global.__logSources.kube.init({
+      kubeContext: (global.init.kubeContext.length > 0) ? global.init.kubeContext : __
+    })
+
+    // Cache the static SPA assets once at startup (re-reading them per request is wasteful).
+    global.__kubeLogsAssets = {
+      html: io.readFileString(global.init.basePath + "/public/index.html"),
+      js  : io.readFileString(global.init.basePath + "/public/app.js"),
+      css : io.readFileString(global.init.basePath + "/public/style.css")
+    }
+
+    // Backstop sweeper: force-cleans sessions whose SSE loop died without
+    // cleanly calling stop (e.g. the browser tab was closed and the write
+    // failure that would normally trigger cleanup never happened).
+    $doV(function() {
+      while (true) {
+        sleep(Math.max(5000, (global.__kubeLogs.staleSessionSecs * 1000) / 2))
+        try {
+          var cutoff = Date.now() - (global.__kubeLogs.staleSessionSecs * 1000)
+          for (var uuid in global.__kubeLogs.sessions) {
+            var sess = global.__kubeLogs.sessions[uuid]
+            if (!sess.closed && sess.lastActivity < cutoff) {
+              logErr("KubeLogsHTTPd: sweeping stale session " + uuid)
+              global.__logSessions.stop(uuid)
+              delete global.__kubeLogs.sessions[uuid]
+            }
+          }
+        } catch(e) {
+          logErr("KubeLogsHTTPd sweeper error: " + String(e))
+        }
+      }
+    })
+
+todo:
+- Prepare Log Source
+- (httpdStart): *PORT
+
+# ---- Static SPA assets ----
+- (httpdService): *PORT
+  ((uri       )): /
+  ((execURI   )): |
+    return ow.server.httpd.reply(global.__kubeLogsAssets.html, 200, "text/html; charset=utf-8")
+
+- (httpdService): *PORT
+  ((uri       )): /app.js
+  ((execURI   )): |
+    return ow.server.httpd.reply(global.__kubeLogsAssets.js, 200, "application/javascript; charset=utf-8")
+
+- (httpdService): *PORT
+  ((uri       )): /style.css
+  ((execURI   )): |
+    return ow.server.httpd.reply(global.__kubeLogsAssets.css, 200, "text/css; charset=utf-8")
+
+# ---- JSON API ----
+- (httpdService): *PORT
+  ((uri       )): /api/config
+  ((execURI   )): |
+    return ow.server.httpd.reply({ namespace: global.init.namespace, tailLines: global.__kubeLogs.tailLines })
+
+- (httpdService): *PORT
+  ((uri       )): /api/namespaces
+  ((execURI   )): |
+    try {
+      return ow.server.httpd.reply({ namespaces: global.__logSources.kube.listNamespaces() })
+    } catch(e) {
+      return ow.server.httpd.reply({ error: String(e) }, 500)
+    }
+
+- (httpdService): *PORT
+  ((uri       )): /api/pods
+  ((execURI   )): |
+    try {
+      var p = request.params || {}
+      if (isUnDef(p.namespace) || String(p.namespace).length == 0) return ow.server.httpd.reply({ error: "namespace is required" }, 400)
+      return ow.server.httpd.reply({ pods: global.__logSources.kube.listPods(String(p.namespace)) })
+    } catch(e) {
+      return ow.server.httpd.reply({ error: String(e) }, 500)
+    }
+
+- (httpdService): *PORT
+  ((uri       )): /api/log
+  ((execURI   )): |
+    var p = request.params || {}
+    if (isUnDef(p.namespace) || isUnDef(p.pod) || isUnDef(p.container)) {
+      return ow.server.httpd.reply({ lines: [], error: "namespace, pod and container are required" })
+    }
+    try {
+      var lines = global.__logSources.kube.getLog(String(p.namespace), String(p.pod), String(p.container), {
+        tailLines: isDef(p.tailLines) ? Number(p.tailLines) : global.__kubeLogs.tailLines,
+        order    : p.order
+      })
+      return ow.server.httpd.reply({ lines: lines })
+    } catch(e) {
+      return ow.server.httpd.reply({ lines: [], error: String(e) })
+    }
+
+- (httpdService): *PORT
+  ((uri       )): /api/transforms
+  ((execURI   )): |
+    return ow.server.httpd.reply({ transforms: Object.keys(global.__kubeLogs.transforms) })
+
+- (httpdService): *PORT
+  ((uri       )): /api/session
+  ((execURI   )): |
+    try {
+      var body = global.__logSessions.readBody(request)
+      var uuid = global.__logSessions.create(body)
+      return ow.server.httpd.reply({ uuid: uuid })
+    } catch(e) {
+      return ow.server.httpd.reply({ error: String(e) }, 400)
+    }
+
+- (httpdService): *PORT
+  ((uri       )): /api/session/update
+  ((execURI   )): |
+    try {
+      var p = request.params || {}
+      var body = global.__logSessions.readBody(request)
+      global.__logSessions.update(String(p.uuid), body.add, body.remove)
+      return ow.server.httpd.reply({ ok: true })
+    } catch(e) {
+      return ow.server.httpd.reply({ error: String(e) }, 400)
+    }
+
+- (httpdService): *PORT
+  ((uri       )): /api/session/stop
+  ((execURI   )): |
+    try {
+      var p = request.params || {}
+      global.__logSessions.stop(String(p.uuid))
+      return ow.server.httpd.reply({ ok: true })
+    } catch(e) {
+      return ow.server.httpd.reply({ error: String(e) }, 400)
+    }
+
+# ---- Live tail (Server-Sent Events) ----
+- (httpdSSE): *PORT
+  ((uri       )): /stream
+  ((execSSE   )): |
+    var uuid = (isDef(request.params) ? request.params.uuid : __)
+    var sess = isDef(uuid) ? global.__kubeLogs.sessions[uuid] : __
+    if (isUnDef(sess)) { writer.write("error", { message: "unknown session" }); return }
+
+    writer.write("ready", { uuid: uuid })
+    var lastPing = Date.now()
+    try {
+      while (true) {
+        var line
+        while ((line = sess.queue.poll()) != null) {
+          writer.write("line", line)
+          lastPing = Date.now()
+        }
+        if (sess.droppedCount > 0) {
+          writer.write("dropped", { count: sess.droppedCount })
+          sess.droppedCount = 0
+        }
+        if (sess.closed) break
+        if ((Date.now() - lastPing) > 15000) {
+          writer.write("ping", { ts: Date.now() })
+          lastPing = Date.now()
+        }
+        sleep(100)
+      }
+    } catch(e) {
+      // writer.write() threw -> the browser disconnected. Stop watchers now
+      // instead of waiting for the stale-session sweeper.
+      global.__logSessions.stop(uuid)
+    }

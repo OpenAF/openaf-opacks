@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- logs
+- browser
+- kube
+bugs:
+  url: https://github.com/openaf/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/LogsBrowser.opack
+description: An interactive browser for Kubernetes logs, allowing users to view and filter logs from various sources within a Kubernetes cluster.
+name: LogsBrowser
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260804'
+dependencies:
+  openaf: '>=20260728'
+  kube: '>=20260706'
+  oJob-common: '>=20260803'
+files:
+- .package.yaml
+- KubeLogsHTTPd.yaml
+- kubeLogs/logSources.js
+- kubeLogs/public/app.js
+- kubeLogs/public/index.html
+- kubeLogs/public/style.css
+filesHash:
+  KubeLogsHTTPd.yaml: f8f796533c76aeecfa434384ffb2b8b3d9a21d1a
+  kubeLogs/logSources.js: 27960cb0b77b22c7a5be5dd0413d0c7f7d51793d
+  kubeLogs/public/app.js: e93ec4c39bfa2a508598c53a1a1ba35e80a19d13
+  kubeLogs/public/index.html: 8b6441334e4b9e4d6b824985422f1326d62d189b
+  kubeLogs/public/style.css: 39603089ba8030b5add2afd7da8ef71cfd913a81
