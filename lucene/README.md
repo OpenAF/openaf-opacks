@@ -104,6 +104,58 @@ cprint(hits)
 - `autoCommit` *(Boolean, optional; default `true`)*: Commit on writes.
 - `autoRefresh` *(Boolean, optional; default `true`)*: Refresh searcher on writes.
 
+## Model-free enhanced lexical retrieval
+
+`lexicalEnhanced` combines Lucene BM25 with language morphology, phrase/proximity
+structure, multi-word shingles, optional character n-grams, configured synonyms,
+and optional local index-statistics expansion. It never calls an embedding provider,
+model, or external API. Enhanced lexical retrieval can improve concept matching
+through morphology, synonyms, phrase structure, index statistics, and local query
+expansion, but it is not equivalent to neural semantic embeddings.
+
+```javascript
+$ch("docs").create("searchdb", {
+  path: "./data/docs",
+  contentField: "content",
+  lexical: {
+    language: "english",
+    bm25: { k1: 1.2, b: 0.75 },
+    synonyms: { enabled: true, expand: true, rules: [
+      "car, automobile, vehicle",
+      "password reset, account recovery"
+    ]},
+    phrases: { enabled: true, boost: 2, slop: 2 },
+    shingles: { enabled: true, minSize: 2, maxSize: 3, boost: 1.25 },
+    characterNGrams: { enabled: true, minGram: 3, maxGram: 10, boost: 0.35 },
+    queryExpansion: { enabled: false, maxTerms: 8, minDocFreq: 2, boost: 0.4 },
+    pseudoRelevanceFeedback: { enabled: false, topDocuments: 5, maxTerms: 10 },
+    fusion: { method: "rrf", rrfK: 60 }
+  }
+})
+
+var hits = ow.ch.__types.searchdb.search("docs", {
+  mode: "lexicalEnhanced", query: "database storage outage", k: 10,
+  lexical: { phrases: { boost: 3 }, queryExpansion: { enabled: false } }
+})
+```
+
+Analyzer presets are `standard`, `english`, `portuguese`, `spanish`, `french`,
+`german`, `italian`, `keyword`, and `whitespace`. Synonyms also accept a `map`,
+for example `{ car: ["automobile", "vehicle"] }`. Stemming is enabled by default;
+phrase matching and 2–3 word shingles are enabled conservatively. Character
+n-grams, query expansion, and pseudo-relevance feedback are disabled by default
+because they increase index size or require an extra local search. Fusion supports
+normalized `weighted` scores and reciprocal-rank fusion (`rrf`). `debug: true`
+adds component scores; `explain: true` adds component ranks and raw scores.
+
+This mode is intended for hundreds or thousands of local documents. Expansion is
+implemented with Lucene MoreLikeThis and term statistics and never scans every
+stored document. Changing the language analyzer, stemming, synonym, shingle, or
+n-gram configuration changes indexed terms and therefore requires rebuilding the
+index. Existing plain lexical, vector, hybrid, filters, facets, and sorting APIs are
+unchanged; generated `__phrase`, `__shingle`, and `__ngram` fields are not stored or
+returned.
+
 ### Optional vectors in `searchdb`
 
 Text-only indexes remain the default. To add vectors to the same documents, explicitly

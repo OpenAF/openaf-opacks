@@ -99,6 +99,31 @@
     }
   }
 
+  exports.testEnhancedLexical = function() {
+    var chName = "luceneEnhancedTest", dbPath = basePath + "/enhanced"
+    cleanPath(basePath); io.mkdir(basePath)
+    $ch(chName).create("searchdb", { path: dbPath, lexical: {
+      language: "english",
+      synonyms: { enabled: true, rules: ["car, automobile, vehicle", "password reset, account recovery"] },
+      characterNGrams: { enabled: true, minGram: 3, maxGram: 10 },
+      fusion: { method: "weighted" }
+    }})
+    try {
+      $ch(chName).set({ id: "exact" }, { content: "database storage outage OpenAFMiniA car password reset" })
+      $ch(chName).set({ id: "loose" }, { content: "database notes place storage records far from an outage" })
+      $ch(chName).set({ id: "stem" }, { content: "systems are connecting reliably" })
+      var phrase = ow.ch.__types.searchdb.search(chName, { mode: "lexicalEnhanced", query: "database storage outage", k: 3 })
+      ow.test.assert(String(phrase[0].id), "exact", "enhanced phrase scoring should rank the exact phrase first")
+      var synonym = ow.ch.__types.searchdb.search(chName, { mode: "lexicalEnhanced", query: "automobile", k: 3 })
+      ow.test.assert(String(synonym[0].id), "exact", "configured synonyms should retrieve car without embeddings")
+      var stem = ow.ch.__types.searchdb.search(chName, { mode: "lexicalEnhanced", query: "connected", k: 3 })
+      ow.test.assert(String(stem[0].id), "stem", "English stemming should match inflections")
+      var partial = ow.ch.__types.searchdb.search(chName, { mode: "lexicalEnhanced", query: "MiniA", k: 3, lexical: { fusion: { method: "rrf" } }, debug: true })
+      ow.test.assert(String(partial[0].id), "exact", "character n-grams and RRF should match a partial identifier")
+      ow.test.assert(isDef(partial[0].scoreDetails), true, "debug enhanced search should expose score details")
+    } finally { $ch(chName).destroy(); cleanPath(basePath) }
+  }
+
   exports.testSearchDBVectors = function() {
     var chName = "luceneSearchdbVectorsTest"
     var dbPath = basePath + "/searchdb-vectors"
