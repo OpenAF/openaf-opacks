@@ -43,6 +43,7 @@
   |**KaTeX**|<img src=".github/badges/KaTeX.svg"><br>Wrapper for KaTeX library|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
+  |**LogsBrowser**|<img src=".github/badges/LogsBrowser.svg"><br>An interactive browser for Kubernetes logs, allowing users to view and filter logs from various sources within a Kubernetes cluster.|
   |**MDB**|<img src=".github/badges/MDB.svg"><br>Provides hability to read MS Access (mdb) files as a JDBC database or directly using jackcess.|
   |**MSBot**|<img src=".github/badges/MSBot.svg"><br>Provides a wrapper to access the MS Bot Framework to allow for skype, slack and others interaction.|
   |**Mac**|<img src=".github/badges/Mac.svg"><br>Wrapper around Mac functionality.|
