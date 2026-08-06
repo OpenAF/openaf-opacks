@@ -519,13 +519,106 @@ ow.ch.__types.searchdb = {
                 return new Packages.org.apache.lucene.analysis.core.WhitespaceAnalyzer()
             case "english":
                 return new Packages.org.apache.lucene.analysis.en.EnglishAnalyzer()
+            case "portuguese":
+                return new Packages.org.apache.lucene.analysis.pt.PortugueseAnalyzer()
+            case "spanish":
+                return new Packages.org.apache.lucene.analysis.es.SpanishAnalyzer()
+            case "french":
+                return new Packages.org.apache.lucene.analysis.fr.FrenchAnalyzer()
+            case "german":
+                return new Packages.org.apache.lucene.analysis.de.GermanAnalyzer()
+            case "italian":
+                return new Packages.org.apache.lucene.analysis.it.ItalianAnalyzer()
             case "standard":
-            default:
                 return new Packages.org.apache.lucene.analysis.standard.StandardAnalyzer()
+            default:
+                throw new Error("Unsupported language analyzer '" + preset + "'. Use standard, english, portuguese, spanish, french, german, italian, keyword or whitespace.")
             }
         } catch(e) {
-            return new Packages.org.apache.lucene.analysis.standard.StandardAnalyzer()
+            if (String(e).indexOf("Unsupported language analyzer") >= 0) throw e
+            throw new Error("Unable to create Lucene analyzer '" + preset + "': " + e)
         }
+    },
+    __mergeMap: function(base, override) {
+        var out = {}, k
+        base = this.__isObj(base) ? base : {}
+        override = this.__isObj(override) ? override : {}
+        var keys = Object.keys(base)
+        for (var i = 0; i < keys.length; i++) {
+            k = keys[i]
+            out[k] = this.__isObj(base[k]) ? this.__mergeMap(base[k], {}) : base[k]
+        }
+        keys = Object.keys(override)
+        for (var j = 0; j < keys.length; j++) {
+            k = keys[j]
+            out[k] = this.__isObj(override[k]) && this.__isObj(out[k]) ? this.__mergeMap(out[k], override[k]) : override[k]
+        }
+        return out
+    },
+    __lexicalOptions: function(value) {
+        var defaults = {
+            language: "standard", asciiFolding: true,
+            bm25: { k1: 1.2, b: 0.75 },
+            stemming: { enabled: true }, synonyms: { enabled: false, expand: true, rules: [] },
+            phrases: { enabled: true, boost: 2.0, slop: 1 },
+            shingles: { enabled: true, minSize: 2, maxSize: 3, boost: 1.25 },
+            characterNGrams: { enabled: false, minGram: 3, maxGram: 10, boost: 0.35 },
+            queryExpansion: { enabled: false, maxTerms: 8, minDocFreq: 2, maxDocFreqRatio: 0.25, boost: 0.4 },
+            pseudoRelevanceFeedback: { enabled: false, topDocuments: 5, maxTerms: 10, minTermFreq: 1, minDocFreq: 2, boost: 0.35 },
+            fusion: { method: "weighted", lexicalWeight: 1, phraseWeight: 0.7, shingleWeight: 0.5, ngramWeight: 0.2, expansionWeight: 0.3, rrfK: 60 }
+        }
+        var o = this.__mergeMap(defaults, value)
+        var aliases = { useSynonyms: "synonyms", useStemming: "stemming", usePhrases: "phrases", useShingles: "shingles", useCharacterNGrams: "characterNGrams", useQueryExpansion: "queryExpansion", usePseudoRelevanceFeedback: "pseudoRelevanceFeedback" }
+        var aks = Object.keys(aliases)
+        for (var ai = 0; ai < aks.length; ai++) if (isDef(o[aks[ai]])) o[aliases[aks[ai]]].enabled = (o[aks[ai]] == true)
+        this.__validateLexicalOptions(o)
+        return o
+    },
+    __validateLexicalOptions: function(o) {
+        if (!(Number(o.bm25.k1) > 0)) throw new Error("lexical.bm25.k1 must be greater than zero.")
+        if (Number(o.bm25.b) < 0 || Number(o.bm25.b) > 1) throw new Error("lexical.bm25.b must be between zero and one.")
+        if (Number(o.shingles.minSize) < 2 || Number(o.shingles.maxSize) < Number(o.shingles.minSize)) throw new Error("Invalid lexical shingle sizes: minSize must be >= 2 and maxSize >= minSize.")
+        if (Number(o.characterNGrams.minGram) < 1 || Number(o.characterNGrams.maxGram) < Number(o.characterNGrams.minGram)) throw new Error("Invalid lexical character n-gram sizes.")
+        if (String(o.fusion.method) != "weighted" && String(o.fusion.method) != "rrf") throw new Error("Invalid lexical fusion method '" + o.fusion.method + "'. Use weighted or rrf.")
+        var boosts = [o.phrases.boost, o.shingles.boost, o.characterNGrams.boost, o.queryExpansion.boost, o.pseudoRelevanceFeedback.boost]
+        for (var i = 0; i < boosts.length; i++) if (Number(boosts[i]) < 0) throw new Error("Lexical boosts cannot be negative.")
+        var rules = this.__synonymRules(o.synonyms)
+        for (var r = 0; r < rules.length; r++) if (rules[r].length < 2) throw new Error("Malformed synonym rule: each rule needs at least two non-empty terms.")
+    },
+    __synonymRules: function(s) {
+        var out = [], i, k, parts
+        if (!this.__isObj(s)) return out
+        var rules = this.__asArray(s.rules)
+        for (i = 0; i < rules.length; i++) {
+            if (!isString(rules[i])) throw new Error("Malformed synonym rule at position " + i + ": expected a comma-separated string.")
+            parts = String(rules[i]).split(",").map(function(v){ return String(v).trim() }).filter(function(v){ return v.length > 0 })
+            if (parts.length < 2) throw new Error("Malformed synonym rule '" + rules[i] + "'.")
+            out.push(parts)
+        }
+        if (this.__isObj(s.map)) {
+            var keys = Object.keys(s.map)
+            for (i = 0; i < keys.length; i++) {
+                k = keys[i]; parts = [String(k)]
+                var vals = this.__asArray(s.map[k])
+                for (var j = 0; j < vals.length; j++) if (String(vals[j]).trim().length > 0) parts.push(String(vals[j]).trim())
+                if (parts.length < 2) throw new Error("Malformed synonym mapping for '" + k + "'.")
+                out.push(parts)
+            }
+        }
+        return out
+    },
+    __customAnalyzer: function(kind, o) {
+        var b = Packages.org.apache.lucene.analysis.custom.CustomAnalyzer.builder().withTokenizer("standard").addTokenFilter("lowercase")
+        if (o.asciiFolding) b = b.addTokenFilter("asciifolding")
+        var p = new java.util.HashMap()
+        if (kind == "shingle") {
+            p.put("minShingleSize", String(o.shingles.minSize)); p.put("maxShingleSize", String(o.shingles.maxSize)); p.put("outputUnigrams", "false")
+            b = b.addTokenFilter("shingle", p)
+        } else if (kind == "ngram") {
+            p.put("minGramSize", String(o.characterNGrams.minGram)); p.put("maxGramSize", String(o.characterNGrams.maxGram)); p.put("preserveOriginal", "true")
+            b = b.addTokenFilter("ngram", p)
+        }
+        return b.build()
     },
     __extractValue: function(channel, value) {
         var contentField = channel.options.contentField
@@ -621,6 +714,9 @@ ow.ch.__types.searchdb = {
         var doc = new Packages.org.apache.lucene.document.Document()
         doc.add(new Packages.org.apache.lucene.document.StringField(channel.options.idField, keyValue, Packages.org.apache.lucene.document.Field.Store.YES))
         doc.add(new Packages.org.apache.lucene.document.TextField(channel.options.contentField, extracted.content, Packages.org.apache.lucene.document.Field.Store.YES))
+        if (channel.lexical.phrases.enabled) doc.add(new Packages.org.apache.lucene.document.TextField(channel.options.contentField + "__phrase", extracted.content, Packages.org.apache.lucene.document.Field.Store.NO))
+        if (channel.lexical.shingles.enabled) doc.add(new Packages.org.apache.lucene.document.TextField(channel.options.contentField + "__shingle", extracted.content, Packages.org.apache.lucene.document.Field.Store.NO))
+        if (channel.lexical.characterNGrams.enabled) doc.add(new Packages.org.apache.lucene.document.TextField(channel.options.contentField + "__ngram", extracted.content, Packages.org.apache.lucene.document.Field.Store.NO))
         doc.add(new Packages.org.apache.lucene.document.StoredField(channel.options.payloadField, stringify(extracted.payload, void 0, "")))
         if (isDef(extracted.vector)) {
             var vector = this.__validateVector(channel, extracted.vector, "document vector")
@@ -1147,6 +1243,92 @@ ow.ch.__types.searchdb = {
         }
         return { hits: out, total: all.length, nextSearchAfter: __, facetCounts: __ }
     },
+    __enhancedComponent: function(channel, searcher, query, count) {
+        var td = searcher.search(query, count), out = []
+        for (var i = 0; i < td.scoreDocs.length; i++) {
+            var d = this.__getDocument(searcher, td.scoreDocs[i].doc)
+            if (isDef(d)) out.push({ docId: Number(td.scoreDocs[i].doc), id: String(d.get(channel.options.idField)), rawScore: Number(td.scoreDocs[i].score), doc: d })
+        }
+        return out
+    },
+    __synonymQuery: function(channel, text, o) {
+        var rules = this.__synonymRules(o.synonyms), b = new Packages.org.apache.lucene.search.BooleanQuery.Builder(), found = false
+        var lower = String(text).toLowerCase()
+        for (var i = 0; i < rules.length; i++) {
+            for (var j = 0; j < rules[i].length; j++) if (lower.indexOf(String(rules[i][j]).toLowerCase()) >= 0) {
+                for (var k = 0; k < rules[i].length; k++) if (k != j || o.synonyms.expand) {
+                    var p = new Packages.org.apache.lucene.queryparser.classic.QueryParser(channel.options.contentField, channel.primaryAnalyzer)
+                    b.add(p.parse(Packages.org.apache.lucene.queryparser.classic.QueryParser.escape(String(rules[i][k]))), Packages.org.apache.lucene.search.BooleanClause.Occur.SHOULD); found = true
+                }
+            }
+        }
+        return found ? b.build() : __
+    },
+    __fuseLexical: function(channel, sets, o, limit, debug, explain) {
+        var weights = { baseLexical: Number(o.fusion.lexicalWeight), phrase: Number(o.fusion.phraseWeight) * Number(o.phrases.boost), shingle: Number(o.fusion.shingleWeight) * Number(o.shingles.boost), ngram: Number(o.fusion.ngramWeight) * Number(o.characterNGrams.boost), expansion: Number(o.fusion.expansionWeight) * Number(o.queryExpansion.enabled ? o.queryExpansion.boost : o.pseudoRelevanceFeedback.boost) }
+        var byId = {}, names = Object.keys(sets), i, j, row, name
+        for (i = 0; i < names.length; i++) {
+            name = names[i]; var max = sets[name].length ? sets[name][0].rawScore : 1
+            if (max <= 0) max = 1
+            for (j = 0; j < sets[name].length; j++) {
+                row = sets[name][j]
+                if (isUnDef(byId[row.id])) byId[row.id] = { id: row.id, doc: row.doc, score: 0, details: {}, components: {} }
+                var part = o.fusion.method == "rrf" ? weights[name] / (Number(o.fusion.rrfK) + j + 1) : weights[name] * row.rawScore / max
+                byId[row.id].score += part; byId[row.id].details[name] = part
+                byId[row.id].components[name] = { rank: j + 1, rawScore: row.rawScore }
+            }
+        }
+        var all = Object.keys(byId).map(function(k){ return byId[k] })
+        all.sort(function(a,b){ var d = b.score-a.score; return d != 0 ? d : (a.id < b.id ? -1 : 1) })
+        var out = []
+        for (i = 0; i < all.length && i < limit; i++) {
+            var ex = explain ? { mode: "lexicalEnhanced", fusion: o.fusion.method, components: all[i].components } : __
+            var obj = this.__toObj(channel, all[i].doc, all[i].score, ex)
+            if (debug) {
+                obj.scoreDetails = { baseLexical: Number(all[i].details.baseLexical || 0), phrase: Number(all[i].details.phrase || 0), shingle: Number(all[i].details.shingle || 0), ngram: Number(all[i].details.ngram || 0), expansion: Number(all[i].details.expansion || 0), fused: all[i].score }
+            }
+            out.push(obj)
+        }
+        return out
+    },
+    __enhancedLexicalSearch: function(aName, full) {
+        var channel = this.__ensureChannel(aName)
+        if (isUnDef(full.query) || !isString(full.query) || String(full.query).trim().length == 0) throw new Error("A non-empty query is required for lexicalEnhanced search.")
+        var o = this.__lexicalOptions(this.__mergeMap(channel.lexical, full.lexical)), text = String(full.query), limit = Number(isDef(full.k) ? full.k : (isDef(full.limit) ? full.limit : 20))
+        this.__refresh(channel)
+        var searcher = channel.searcherManager.acquire()
+        try {
+            searcher.setSimilarity(new Packages.org.apache.lucene.search.similarities.BM25Similarity(Number(o.bm25.k1), Number(o.bm25.b)))
+            if ((o.queryExpansion.enabled || o.pseudoRelevanceFeedback.enabled) && searcher.getIndexReader().numDocs() == 0) throw new Error("Cannot run lexical feedback against an empty index.")
+            var candidateCount = Math.max(limit, Number(o.pseudoRelevanceFeedback.topDocuments), 20), sets = {}
+            var parser = new Packages.org.apache.lucene.queryparser.classic.QueryParser(channel.options.contentField, channel.primaryAnalyzer)
+            var base = parser.parse(Packages.org.apache.lucene.queryparser.classic.QueryParser.escape(text))
+            var sq = o.synonyms.enabled ? this.__synonymQuery(channel, text, o) : __
+            if (isDef(sq)) { var bb = new Packages.org.apache.lucene.search.BooleanQuery.Builder(); bb.add(base, Packages.org.apache.lucene.search.BooleanClause.Occur.SHOULD); bb.add(sq, Packages.org.apache.lucene.search.BooleanClause.Occur.SHOULD); base = bb.build() }
+            sets.baseLexical = this.__enhancedComponent(channel, searcher, base, candidateCount)
+            if (o.phrases.enabled) {
+                var pp = new Packages.org.apache.lucene.queryparser.classic.QueryParser(channel.options.contentField + "__phrase", channel.primaryAnalyzer)
+                pp.setPhraseSlop(Number(o.phrases.slop)); sets.phrase = this.__enhancedComponent(channel, searcher, pp.parse("\"" + Packages.org.apache.lucene.queryparser.classic.QueryParser.escape(text) + "\""), candidateCount)
+            }
+            if (o.shingles.enabled) { var sp = new Packages.org.apache.lucene.queryparser.classic.QueryParser(channel.options.contentField + "__shingle", channel.shingleAnalyzer); sets.shingle = this.__enhancedComponent(channel, searcher, sp.parse(Packages.org.apache.lucene.queryparser.classic.QueryParser.escape(text)), candidateCount) }
+            if (o.characterNGrams.enabled) { var np = new Packages.org.apache.lucene.queryparser.classic.QueryParser(channel.options.contentField + "__ngram", channel.ngramAnalyzer); sets.ngram = this.__enhancedComponent(channel, searcher, np.parse(Packages.org.apache.lucene.queryparser.classic.QueryParser.escape(text)), candidateCount) }
+            if (o.queryExpansion.enabled || o.pseudoRelevanceFeedback.enabled) {
+                try {
+                    var mlt = new Packages.org.apache.lucene.queries.mlt.MoreLikeThis(searcher.getIndexReader()), fields = java.lang.reflect.Array.newInstance(java.lang.String, 1); fields[0] = channel.options.contentField
+                    mlt.setAnalyzer(channel.primaryAnalyzer); mlt.setFieldNames(fields); mlt.setMinTermFreq(Number(o.pseudoRelevanceFeedback.minTermFreq)); mlt.setMinDocFreq(Number(o.queryExpansion.minDocFreq)); mlt.setMaxQueryTerms(Number(o.queryExpansion.maxTerms))
+                    var eq
+                    if (o.pseudoRelevanceFeedback.enabled && sets.baseLexical.length > 0) {
+                        var eb = new Packages.org.apache.lucene.search.BooleanQuery.Builder(), topN = Math.min(Number(o.pseudoRelevanceFeedback.topDocuments), sets.baseLexical.length)
+                        mlt.setMinDocFreq(Number(o.pseudoRelevanceFeedback.minDocFreq)); mlt.setMaxQueryTerms(Number(o.pseudoRelevanceFeedback.maxTerms))
+                        for (var mi = 0; mi < topN; mi++) eb.add(mlt.like(sets.baseLexical[mi].docId), Packages.org.apache.lucene.search.BooleanClause.Occur.SHOULD)
+                        eq = eb.build()
+                    } else eq = mlt.like(channel.options.contentField, new java.io.StringReader(text))
+                    sets.expansion = this.__enhancedComponent(channel, searcher, eq, candidateCount)
+                } catch(e) { throw new Error("Lexical query expansion requires the Lucene lucene-queries module: " + e) }
+            }
+            return this.__fuseLexical(channel, sets, o, limit, full.debug == true, full.explain == true)
+        } finally { channel.searcherManager.release(searcher) }
+    },
     __refresh: function(channel, force) {
         if (channel.options.autoRefresh || force === true) channel.searcherManager.maybeRefreshBlocking()
     },
@@ -1205,6 +1387,8 @@ ow.ch.__types.searchdb = {
         options.facetFields = _$(options.facetFields, "options.facetFields").isArray().default([])
         options.defaultSortField = _$(options.defaultSortField, "options.defaultSortField").default(__)
         options.analyzer = _$(options.analyzer, "options.analyzer").default("standard")
+        options.lexical = this.__lexicalOptions(options.lexical)
+        if (isDef(options.lexical.language)) options.analyzer = options.lexical.language
         options.taxonomyPath = _$(options.taxonomyPath, "options.taxonomyPath").isString().default(options.path + "/_taxonomy")
         if (isDef(options.dimension) && isUnDef(options.vectorDimension)) options.vectorDimension = options.dimension
         if (isDef(options.vectorDimension)) {
@@ -1218,9 +1402,16 @@ ow.ch.__types.searchdb = {
         if (!io.fileExists(options.path)) io.mkdir(options.path)
         if (options.facetFields.length > 0 && !io.fileExists(options.taxonomyPath)) io.mkdir(options.taxonomyPath)
 
-        var analyzer = this.__toAnalyzer(options)
+        var primaryAnalyzer = this.__toAnalyzer({ analyzer: options.lexical.stemming.enabled ? options.lexical.language : "standard" })
+        var analyzer = primaryAnalyzer
+        var shingleAnalyzer = __, ngramAnalyzer = __
+        var perField = new java.util.HashMap()
+        if (options.lexical.shingles.enabled) { shingleAnalyzer = this.__customAnalyzer("shingle", options.lexical); perField.put(options.contentField + "__shingle", shingleAnalyzer) }
+        if (options.lexical.characterNGrams.enabled) { ngramAnalyzer = this.__customAnalyzer("ngram", options.lexical); perField.put(options.contentField + "__ngram", ngramAnalyzer) }
+        if (perField.size() > 0) analyzer = new Packages.org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper(primaryAnalyzer, perField)
         var directory = Packages.org.apache.lucene.store.FSDirectory.open(java.nio.file.Paths.get(options.path))
         var iwc = new Packages.org.apache.lucene.index.IndexWriterConfig(analyzer)
+        iwc.setSimilarity(new Packages.org.apache.lucene.search.similarities.BM25Similarity(Number(options.lexical.bm25.k1), Number(options.lexical.bm25.b)))
         iwc.setOpenMode(Packages.org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
         var writer = new Packages.org.apache.lucene.index.IndexWriter(directory, iwc)
         var searcherManager = new Packages.org.apache.lucene.search.SearcherManager(writer, true, true, null)
@@ -1235,6 +1426,10 @@ ow.ch.__types.searchdb = {
 
         this.__channels[aName] = {
             analyzer: analyzer,
+            primaryAnalyzer: primaryAnalyzer,
+            shingleAnalyzer: shingleAnalyzer,
+            ngramAnalyzer: ngramAnalyzer,
+            lexical: options.lexical,
             directory: directory,
             writer: writer,
             searcherManager: searcherManager,
@@ -1253,6 +1448,7 @@ ow.ch.__types.searchdb = {
             channel.searcherManager.close()
             channel.writer.close()
             channel.directory.close()
+            channel.analyzer.close()
             if (channel.hasFacets) {
                 channel.taxoWriter.close()
                 channel.taxoDirectory.close()
@@ -1388,6 +1584,7 @@ ow.ch.__types.searchdb = {
         return keys[0]
     },
     search: function(aName, queryText, limit) {
+        if (this.__isObj(queryText) && String(queryText.mode).toLowerCase() == "lexicalenhanced") return this.__enhancedLexicalSearch(aName, queryText)
         var q = _$(queryText, "queryText").default("*:*")
         var full = { query: (isString(q) ? String(q) : q), limit: Number(isDef(limit) ? limit : 20) }
         var r = this.getAll(aName, full)
