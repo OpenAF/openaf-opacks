@@ -22,6 +22,7 @@ keywords:
 - bedrock
 - secrets
 - cognito
+- kms
 - browse
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
@@ -33,7 +34,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260704'
+version: '20260806'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -55,6 +56,7 @@ files:
 - aws_eks.js
 - aws_events.js
 - aws_iam.js
+- aws_kms.js
 - aws_lambda.js
 - aws_organizations.js
 - aws_pi.js
@@ -74,7 +76,7 @@ files:
 filesHash:
   .odoc.db: 00582f8d0d0d89d3f846288b5b3c8ae9e7778df8
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  aws.js: 6662a02d389c419aaa664f9e40748364bbebd99b
+  aws.js: 101cfdf438a975bcc99e7c6eea64d3cca0397e20
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: 81d0ad4a17b4892c9ddaa7d4c7168802ee2b2080
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
@@ -89,6 +91,7 @@ filesHash:
   aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
+  aws_kms.js: 41a4ecdc5c681ea2678a06fd12a210c7cbac3ca3
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
