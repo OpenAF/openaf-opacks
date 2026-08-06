@@ -20,7 +20,7 @@ name: ghcopilot
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260805'
+version: '20260806'
 dependencies:
   OpenAF: '>=20260312'
 files:
@@ -30,6 +30,9 @@ files:
 - README.md
 - copilot-sdk-java-1.0.9-preview.3.jar
 - ghcopilot.js
+- jackson-annotations-2.22.jar
+- jackson-core-2.22.1.jar
+- jackson-databind-2.22.1.jar
 - jackson-datatype-jsr310-2.22.1.jar
 filesHash:
   .maven.yaml: 4a70941a8dd2f5ed3d2aa83041652fa7eb508c0f
@@ -37,4 +40,7 @@ filesHash:
   README.md: 9644ab127b747fef339b24715eaefdd947903778
   copilot-sdk-java-1.0.9-preview.3.jar: 774043b48a59136f18db03df129b7de0beb1c273
   ghcopilot.js: cdfcf79c90512b20a6dc6ffa15e3d53f824e46ba
+  jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
+  jackson-core-2.22.1.jar: da7ffb60088d7e8f37ecdd3b617520971cc7b9bf
+  jackson-databind-2.22.1.jar: 9e2fb91831cce9cb9262909cd76647508949f232
   jackson-datatype-jsr310-2.22.1.jar: 3377a0589c1b0e62bbe245ac8e9f56fa7d7b8bb9
