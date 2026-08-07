@@ -989,8 +989,16 @@ ow.ai.__gpttypes.bedrock = {
               temperature: aTemperature
             }, aOptions.params.inferenceConfig)
           }
+          if (aOptions.promptCaching && systemMessages.length > 0) systemMessages.push({ cachePoint: { type: "default" } })
           if (_m.system.length == 0) delete _m.system
-          if (aOptions.promptCaching) _m.promptCachingConfig = { enabled: true }
+          if (aOptions.promptCaching) {
+            for (var nvmi = _m.messages.length - 1; nvmi >= 0; nvmi--) {
+              if (_m.messages[nvmi].role == "user" && isArray(_m.messages[nvmi].content)) {
+                _m.messages[nvmi].content.push({ cachePoint: { type: "default" } })
+                break
+              }
+            }
+          }
 
           // Add tool configuration for Nova models
           if (toolsToUse.length > 0) {
@@ -2293,10 +2301,18 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
 
+          if (aOptions.promptCaching && systemPrompts.length > 0) systemPrompts.push({ cachePoint: { type: "default" } })
           if (systemPrompts.length > 0) {
             _m.system = systemPrompts
           }
-          if (aOptions.promptCaching) _m.promptCachingConfig = { enabled: true }
+          if (aOptions.promptCaching) {
+            for (var nvsi = messagesForAPI.length - 1; nvsi >= 0; nvsi--) {
+              if (messagesForAPI[nvsi].role == "user" && isArray(messagesForAPI[nvsi].content)) {
+                messagesForAPI[nvsi].content.push({ cachePoint: { type: "default" } })
+                break
+              }
+            }
+          }
 
           // Add tools if configured
           if (toolsToUse.length > 0) {
