@@ -130,7 +130,7 @@
         <dependency>
             <groupId>org.knowm.xchart</groupId>
             <artifactId>xchart</artifactId>
-            <version>4.0.3</version>
+            <version>4.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.github.jai-imageio</groupId>
@@ -220,32 +220,32 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http2</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-dns</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-socks</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler-proxy</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns</artifactId>
-            <version>4.2.16.Final</version>
+            <version>4.2.17.Final</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.plist</groupId>
@@ -355,17 +355,17 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-resolver-provider</artifactId>
-            <version>4.0.0-rc-5</version>
+            <version>4.0.0-rc-6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>4.0.0-rc-5</version>
+            <version>4.0.0-rc-6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model-builder</artifactId>
-            <version>4.0.0-rc-5</version>
+            <version>4.0.0-rc-6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
