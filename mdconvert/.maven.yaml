@@ -1,0 +1,16 @@
+artifacts:
+- group  : com.vladsch.flexmark
+  id     : flexmark
+  #version: 0.64.8
+
+- group  : com.vladsch.flexmark
+  id     : flexmark-html2md-converter
+  #version: 0.64.8
+
+- group  : com.vladsch.flexmark
+  id     : flexmark-pdf-converter
+  #version: 0.64.8
+
+- group  : com.vladsch.flexmark
+  id     : flexmark-docx-converter
+  #version: 0.64.8
