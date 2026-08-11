@@ -88,6 +88,7 @@ files:
 - log4j-core-2.20.0.jar
 - mbassador-1.3.2.jar
 - mdconvert.js
+- oafp_mdconvert.js
 - openhtmltopdf-core-1.0.10.jar
 - openhtmltopdf-pdfbox-1.0.10.jar
 - openhtmltopdf-rtl-support-1.0.10.jar
@@ -104,10 +105,10 @@ files:
 - xmlgraphics-commons-2.7.jar
 - xmpbox-2.0.24.jar
 filesHash:
-  .maven.yaml: 45f71ef7d1e5c2d4386a836c15fcdae598deb538
+  .maven.yaml: b8404da067448557539ea5c03e9514adb8e51cba
   .odoc.db: 9143cbeceb6e6c83709611964b8277ca6bcd8a30
   .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
-  README.md: cc9390a309c8a36a6483541e9bae3e7c1fa58b02
+  README.md: 7711f93db56d860d39e9e696db9be0dea3dc2bd2
   annotations-24.0.1.jar: 13c5c75c4206580aa4d683bffee658caae6c9f43
   antlr-2.7.7.jar: 83cd2cd674a217ade95a4bb83a8a14f351f48bd0
   antlr-runtime-3.5.2.jar: cd9cd41361c155f3af0f653009dcecb08d8b4afd
@@ -165,6 +166,7 @@ filesHash:
   log4j-core-2.20.0.jar: eb2a9a47b1396e00b5eee1264296729a70565cc0
   mbassador-1.3.2.jar: 4ebb2c5f853bf8a5f87147b186a9758d2e2ec0af
   mdconvert.js: daaee51fde4d3125af6546b2f6afe3535d732512
+  oafp_mdconvert.js: 6661bc70ca59b13c8160a90647abee74cc88e2e3
   openhtmltopdf-core-1.0.10.jar: cab5dcb31834bd86ffb1b1f82811a37fcea63cd2
   openhtmltopdf-pdfbox-1.0.10.jar: 4041442fda47e760985cea8005d51a830031420f
   openhtmltopdf-rtl-support-1.0.10.jar: 074232c12ffb569ae287c6d0d983811880d7172f
