@@ -14,3 +14,7 @@ artifacts:
 - group  : com.vladsch.flexmark
   id     : flexmark-docx-converter
   #version: 0.64.8
+
+- group  : com.sun.activation
+  id     : jakarta.activation
+  #version: 2.0.1

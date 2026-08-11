@@ -17,6 +17,38 @@ Key features:
 opack install mdconvert
 ```
 
+## Using the oAFp
+
+This opack also registers an [oafp](https://github.com/OpenAF/oafp) library
+adding Markdown/HTML/PDF/DOCX conversions to the `oafp` pipeline.
+
+Check all options by executing:
+
+```bash
+oafp libs=mdconvert help=mdconvert
+```
+
+| Direction | in/out | Description |
+|---|---|---|
+| Input | `in=md2html` | Markdown text → HTML fragment (`.md`/`.markdown` files are auto-detected) |
+| Output | `out=html2md` | HTML input → Markdown text (`html2mdfile=` to write to a file) |
+| Output | `out=md2pdf` | Markdown input → PDF file (`md2pdffile=` required) |
+| Output | `out=md2docx` | Markdown input → DOCX file (`md2docxfile=` required) |
+
+```bash
+# Markdown -> HTML
+oafp libs=mdconvert file=report.md out=text
+
+# HTML -> Markdown
+echo "<h1>Hello</h1>" | oafp libs=mdconvert in=raw out=html2md
+
+# Markdown -> PDF
+oafp libs=mdconvert file=report.md in=raw out=md2pdf md2pdffile=report.pdf
+
+# Markdown -> DOCX
+cat report.md | oafp libs=mdconvert in=raw out=md2docx md2docxfile=report.docx
+```
+
 ## Quick start
 
 ```javascript
@@ -162,13 +194,14 @@ to `plugin-XLS`, the repo's other binary-document opack).
 | `flexmark-pdf-converter` | Markdown/HTML → PDF |
 | `flexmark-docx-converter` | Markdown → DOCX |
 | `openhtmltopdf-*`, `pdfbox`, `fontbox`, `xmpbox` | PDF rendering engine (used by `flexmark-pdf-converter`) |
-| `docx4j-*`, `icu4j`, `jaxb-*`, `jakarta.*` | DOCX rendering engine (used by `flexmark-docx-converter`) |
+| `docx4j-*`, `icu4j`, `jaxb-*`, `jakarta.*`, `jakarta.activation` | DOCX rendering engine (used by `flexmark-docx-converter`) |
 | `jsoup` | HTML parsing (used by `flexmark-html2md-converter`) |
 
 **Note:** `flexmark-docx-converter`/docx4j require `jakarta.activation`
 (the `jakarta.*` namespace), while OpenAF's own bundled `openaf.jar` only
-provides the older `javax.activation` namespace. Running
-`ojob ojob.io/oaf/checkOAFJars ... remove=true` against this opack will
+provides the older `javax.activation` namespace. This opack bundles
+`jakarta.activation-2.0.1.jar` explicitly for that reason. Running
+`ojob ojob.io/oaf/checkOAFJars ... remove=true` against this opack may
 incorrectly flag `jakarta.activation-*.jar` as a duplicate and remove it —
 if that happens, DOCX conversion breaks with a
 `NoClassDefFoundError: jakarta/activation/DataSource`. Re-fetch just that
