@@ -96,6 +96,8 @@ files:
 - qdox-1.12.jar
 - slf4j-api-2.0.0-alpha6.jar
 - stringtemplate-3.2.1.jar
+- tests/autoTestMdConvert.js
+- tests/autoTestMdConvert.yaml
 - txw2-3.0.2.jar
 - wmf2svg-0.9.8.jar
 - xalan-interpretive-11.0.0.jar
@@ -172,6 +174,8 @@ filesHash:
   qdox-1.12.jar: 466993f8362511ecc42e6508d3db1880bfcd5c56
   slf4j-api-2.0.0-alpha6.jar: 4dbe258ca244936b915f15bc6006cb4224421390
   stringtemplate-3.2.1.jar: 59ec8083721eae215c6f3caee944c410d2be34de
+  tests/autoTestMdConvert.js: 3fe5116c825ff7d22803923f6aac070ca6ceb9ba
+  tests/autoTestMdConvert.yaml: b86ba04be59b63be3e387d6f84108237db2e5e5b
   txw2-3.0.2.jar: 8c448a44cdcdbb5dd48ff2eb88cab858ed52cf91
   wmf2svg-0.9.8.jar: 365614a3ee72ec475d9032f906d37b753fbe2bfa
   xalan-interpretive-11.0.0.jar: 7494b62aced4c3d0ffa259e59c435dc9bd7f07b3
