@@ -1,0 +1,184 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- markdown
+- html
+- pdf
+- docx
+- flexmark
+- converter
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/mdconvert
+  url: https://openaf.io/opacks/mdconvert.opack
+description: HTML/Markdown document converter. Wraps flexmark-java 0.64.8 to convert HTML to Markdown, and Markdown to HTML, PDF (via openhtmltopdf) and DOCX (via docx4j).
+name: mdconvert
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260811'
+dependencies:
+  openaf: '>=20221216'
+files:
+- .maven.yaml
+- .odoc.db
+- .package.yaml
+- .precompile
+- README.md
+- annotations-24.0.1.jar
+- antlr-2.7.7.jar
+- antlr-runtime-3.5.2.jar
+- checker-qual-2.8.1.jar
+- docx4j-JAXB-ReferenceImpl-11.4.9.jar
+- docx4j-core-11.4.9.jar
+- docx4j-openxml-objects-11.4.9.jar
+- docx4j-openxml-objects-pml-11.4.9.jar
+- docx4j-openxml-objects-sml-11.4.9.jar
+- error_prone_annotations-2.3.3.jar
+- flexmark-0.64.8.jar
+- flexmark-docx-converter-0.64.8.jar
+- flexmark-ext-aside-0.64.8.jar
+- flexmark-ext-attributes-0.64.8.jar
+- flexmark-ext-definition-0.64.8.jar
+- flexmark-ext-emoji-0.64.8.jar
+- flexmark-ext-enumerated-reference-0.64.8.jar
+- flexmark-ext-footnotes-0.64.8.jar
+- flexmark-ext-gfm-strikethrough-0.64.8.jar
+- flexmark-ext-gitlab-0.64.8.jar
+- flexmark-ext-ins-0.64.8.jar
+- flexmark-ext-jekyll-tag-0.64.8.jar
+- flexmark-ext-macros-0.64.8.jar
+- flexmark-ext-superscript-0.64.8.jar
+- flexmark-ext-tables-0.64.8.jar
+- flexmark-ext-toc-0.64.8.jar
+- flexmark-ext-wikilink-0.64.8.jar
+- flexmark-html2md-converter-0.64.8.jar
+- flexmark-jira-converter-0.64.8.jar
+- flexmark-pdf-converter-0.64.8.jar
+- flexmark-util-0.64.8.jar
+- flexmark-util-ast-0.64.8.jar
+- flexmark-util-builder-0.64.8.jar
+- flexmark-util-collection-0.64.8.jar
+- flexmark-util-data-0.64.8.jar
+- flexmark-util-dependency-0.64.8.jar
+- flexmark-util-format-0.64.8.jar
+- flexmark-util-html-0.64.8.jar
+- flexmark-util-misc-0.64.8.jar
+- flexmark-util-options-0.64.8.jar
+- flexmark-util-sequence-0.64.8.jar
+- flexmark-util-visitor-0.64.8.jar
+- fontbox-2.0.24.jar
+- graphics2d-0.32.jar
+- icu4j-72.1.jar
+- istack-commons-runtime-4.0.1.jar
+- jakarta.xml.bind-api-3.0.1.jar
+- jaxb-core-3.0.2.jar
+- jaxb-runtime-3.0.2.jar
+- jaxb-svg11-11.4.0.jar
+- jcl-over-slf4j-2.0.0-alpha5.jar
+- jsoup-1.15.4.jar
+- log4j-1.2-api-2.20.0.jar
+- log4j-api-2.20.0.jar
+- log4j-core-2.20.0.jar
+- mbassador-1.3.2.jar
+- mdconvert.js
+- oafp_mdconvert.js
+- openhtmltopdf-core-1.0.10.jar
+- openhtmltopdf-pdfbox-1.0.10.jar
+- openhtmltopdf-rtl-support-1.0.10.jar
+- pdfbox-2.0.24.jar
+- qdox-1.12.jar
+- slf4j-api-2.0.0-alpha6.jar
+- stringtemplate-3.2.1.jar
+- tests/autoTestMdConvert.js
+- tests/autoTestMdConvert.yaml
+- txw2-3.0.2.jar
+- wmf2svg-0.9.8.jar
+- xalan-interpretive-11.0.0.jar
+- xalan-serializer-11.0.0.jar
+- xmlgraphics-commons-2.7.jar
+- xmpbox-2.0.24.jar
+filesHash:
+  .maven.yaml: b8404da067448557539ea5c03e9514adb8e51cba
+  .odoc.db: 9143cbeceb6e6c83709611964b8277ca6bcd8a30
+  .precompile: 99168379722f565f536a2d273f3d46b7e7971f07
+  README.md: 7711f93db56d860d39e9e696db9be0dea3dc2bd2
+  annotations-24.0.1.jar: 13c5c75c4206580aa4d683bffee658caae6c9f43
+  antlr-2.7.7.jar: 83cd2cd674a217ade95a4bb83a8a14f351f48bd0
+  antlr-runtime-3.5.2.jar: cd9cd41361c155f3af0f653009dcecb08d8b4afd
+  checker-qual-2.8.1.jar: eb2e8ab75598548cc8acf9a1ca227e480e01881e
+  docx4j-JAXB-ReferenceImpl-11.4.9.jar: b325336e351f724eea8c8efaa20d47b84449c505
+  docx4j-core-11.4.9.jar: 4c3855df63b2ff485b002010cab224e68e36652c
+  docx4j-openxml-objects-11.4.9.jar: 6f2ff83606eb25f632d44f2899b8d352b3f25485
+  docx4j-openxml-objects-pml-11.4.9.jar: 3003d2323d360ca9baa98ef694acdb2c3b8d423a
+  docx4j-openxml-objects-sml-11.4.9.jar: cb2585eca5172e8cecf5ca0594959c6440e8e5c9
+  error_prone_annotations-2.3.3.jar: 42aa5155a54a87d70af32d4b0d06bf43779de0e2
+  flexmark-0.64.8.jar: e82621ebed3a6cfa31c52900aaf9a9b6dd3c859d
+  flexmark-docx-converter-0.64.8.jar: a926e9e212e39fbcd3bf438dd8459dec95d52f6b
+  flexmark-ext-aside-0.64.8.jar: ac3ace7ae720f271b0651aa376a4b57638ac1926
+  flexmark-ext-attributes-0.64.8.jar: a8d631a5cd89dcad3b6fcaac308a18dc74a5d74a
+  flexmark-ext-definition-0.64.8.jar: 409addcdf68da7dc543378a95f10c22e9b5b3267
+  flexmark-ext-emoji-0.64.8.jar: eefbf6a1fb644fa14c3fb74017cf9c97a4879a7c
+  flexmark-ext-enumerated-reference-0.64.8.jar: 6b05a576f99d94455c473c9ec2136187afc25b3e
+  flexmark-ext-footnotes-0.64.8.jar: e63be9e0cf662ff4e4132a7754b3220452370106
+  flexmark-ext-gfm-strikethrough-0.64.8.jar: 1851e124c6d85c5c7f3fdbbe066d30a76ad6be44
+  flexmark-ext-gitlab-0.64.8.jar: d8c86f170f5bd8030fccfc9c11632f15a820ffa5
+  flexmark-ext-ins-0.64.8.jar: 7d095adeebf934f6424d9444af2ec0b2553fecfd
+  flexmark-ext-jekyll-tag-0.64.8.jar: 2e9c732179a6488eb588fbbd17cf68af326e4c57
+  flexmark-ext-macros-0.64.8.jar: 614890570310ede904d42ab61122430a3a17774b
+  flexmark-ext-superscript-0.64.8.jar: e5d22f3ec35ac64504cbc238b0f5c63349815a7f
+  flexmark-ext-tables-0.64.8.jar: 018e37d2e67a346c7c2694dd91944eefd5028608
+  flexmark-ext-toc-0.64.8.jar: 5299f82caf5cb5b2deb60f1ae7d6551c8e71e4b9
+  flexmark-ext-wikilink-0.64.8.jar: f443092e4eda97537c449f0ad6c74022f8d5746a
+  flexmark-html2md-converter-0.64.8.jar: a4b9dc984710931e98fdf62479784f789c0f5e6d
+  flexmark-jira-converter-0.64.8.jar: 6a1997f1b8c2ef8426c0330d9be41f3f32edb82c
+  flexmark-pdf-converter-0.64.8.jar: 3a0f46e644e2a7f8ba932b8cd3211553a97ef30c
+  flexmark-util-0.64.8.jar: e7aad89229a58c9ac56e09c04a8f9b012d137bff
+  flexmark-util-ast-0.64.8.jar: 9904d6c8e7c9e2ec63b77e9313e518918758dd84
+  flexmark-util-builder-0.64.8.jar: 79f4593ce00d99b786425cabb12cc13bf785374b
+  flexmark-util-collection-0.64.8.jar: 40e82ad00bb159ee878557fa8312ed7d95f4b297
+  flexmark-util-data-0.64.8.jar: a3f92abd0acbb4d1f12dfd3d6128f73d245d6ba9
+  flexmark-util-dependency-0.64.8.jar: 392bc415728aee6fdb9aded0004b0bf6c15e80ac
+  flexmark-util-format-0.64.8.jar: 12bb34f8d1d3d3678b540cb75726414eb910e327
+  flexmark-util-html-0.64.8.jar: 1ed09f6b6a57be2797aee9c9dfcbeab06afa120b
+  flexmark-util-misc-0.64.8.jar: 6d0b133faee38c41368ee3c67f0df4498ffe3c25
+  flexmark-util-options-0.64.8.jar: 4b17bc1639c2a874d93a5bb89f78bf0765e3e4c7
+  flexmark-util-sequence-0.64.8.jar: 985913246df64fe7e768eb0664b45dedea7536cf
+  flexmark-util-visitor-0.64.8.jar: a8178ba6dfd7a958353a60b3a51fe7edb1578b49
+  fontbox-2.0.24.jar: df8ecb3006dfcd52355a5902096e5ec34f06112e
+  graphics2d-0.32.jar: d8892871a9a1446e94f25eb625a7eec3bfa31b15
+  icu4j-72.1.jar: bc9057df4b5efddf7f6d1880bf7f3399f4ce5633
+  istack-commons-runtime-4.0.1.jar: 4e25c41d338aad4a2c92d0020c9ae0335fad5099
+  jakarta.xml.bind-api-3.0.1.jar: 5257932df36ff3e4e6de50429dde946490a6a800
+  jaxb-core-3.0.2.jar: e83d0b0005525ddd8b8642bd0bb02227fcf871f1
+  jaxb-runtime-3.0.2.jar: 9897322f5de201bfbfcd1f4f46ffdd4204673b3c
+  jaxb-svg11-11.4.0.jar: 1213219395e7b6c3ab6affdc7b343ded7a044140
+  jcl-over-slf4j-2.0.0-alpha5.jar: b7bf757b84f08ee7449da3122aa1ad5462ab6eec
+  jsoup-1.15.4.jar: cd56eb47dcd4590ef6451f87e5ec33bddd1a9a51
+  log4j-1.2-api-2.20.0.jar: 689151374756cb809cb029f2501015bdc7733179
+  log4j-api-2.20.0.jar: 1fe6082e660daf07c689a89c94dc0f49c26b44bb
+  log4j-core-2.20.0.jar: eb2a9a47b1396e00b5eee1264296729a70565cc0
+  mbassador-1.3.2.jar: 4ebb2c5f853bf8a5f87147b186a9758d2e2ec0af
+  mdconvert.js: daaee51fde4d3125af6546b2f6afe3535d732512
+  oafp_mdconvert.js: 6661bc70ca59b13c8160a90647abee74cc88e2e3
+  openhtmltopdf-core-1.0.10.jar: cab5dcb31834bd86ffb1b1f82811a37fcea63cd2
+  openhtmltopdf-pdfbox-1.0.10.jar: 4041442fda47e760985cea8005d51a830031420f
+  openhtmltopdf-rtl-support-1.0.10.jar: 074232c12ffb569ae287c6d0d983811880d7172f
+  pdfbox-2.0.24.jar: cb562ee5f43e29415af4477e62fbe668ef88d18b
+  qdox-1.12.jar: 466993f8362511ecc42e6508d3db1880bfcd5c56
+  slf4j-api-2.0.0-alpha6.jar: 4dbe258ca244936b915f15bc6006cb4224421390
+  stringtemplate-3.2.1.jar: 59ec8083721eae215c6f3caee944c410d2be34de
+  tests/autoTestMdConvert.js: 3fe5116c825ff7d22803923f6aac070ca6ceb9ba
+  tests/autoTestMdConvert.yaml: b86ba04be59b63be3e387d6f84108237db2e5e5b
+  txw2-3.0.2.jar: 8c448a44cdcdbb5dd48ff2eb88cab858ed52cf91
+  wmf2svg-0.9.8.jar: 365614a3ee72ec475d9032f906d37b753fbe2bfa
+  xalan-interpretive-11.0.0.jar: 7494b62aced4c3d0ffa259e59c435dc9bd7f07b3
+  xalan-serializer-11.0.0.jar: 7a6b5802bdba3d3b12e935b8a0ae2e020d839cfd
+  xmlgraphics-commons-2.7.jar: 336ddd6d0a244cdebf26a298fb7c3a5fd45449db
+  xmpbox-2.0.24.jar: df8b7a6a363281f9f1365ed4b37580aa5d3f38f1

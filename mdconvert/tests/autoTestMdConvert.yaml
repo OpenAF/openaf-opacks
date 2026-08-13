@@ -1,0 +1,191 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- mdconvert::Html2mdHeading
+- mdconvert::Html2mdBoldAndItalic
+- mdconvert::Html2mdLink
+- mdconvert::Html2mdList
+- mdconvert::Html2mdRequiresString
+- mdconvert::Md2htmlBasic
+- mdconvert::Md2htmlInlineMarkup
+- mdconvert::Md2htmlTables
+- mdconvert::Md2htmlTablesDisabled
+- mdconvert::ParseAndRender
+- mdconvert::PdfBytesValid
+- mdconvert::PdfFileWrite
+- mdconvert::DocxBytesValid
+- mdconvert::DocxFileWrite
+- mdconvert::ShortcutHtml2md
+- mdconvert::ShortcutMd2html
+- mdconvert::ShortcutMd2pdf
+- mdconvert::ShortcutMd2docx
+- mdconvert::ShortcutMd2pdfFile
+- mdconvert::ShortcutMd2docxFile
+- mdconvert::EmptyStringHtml2md
+- mdconvert::EmptyStringMd2html
+- mdconvert::UnicodeContent
+- Test results
+
+jobs:
+- name: mdconvert::Init
+  exec: |
+    loadLib("mdconvert.js")
+    args.tests = require("tests/autoTestMdConvert.js")
+
+- name: mdconvert::Html2mdHeading
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHtml2mdHeading
+
+- name: mdconvert::Html2mdBoldAndItalic
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHtml2mdBoldAndItalic
+
+- name: mdconvert::Html2mdLink
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHtml2mdLink
+
+- name: mdconvert::Html2mdList
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHtml2mdList
+
+- name: mdconvert::Html2mdRequiresString
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testHtml2mdRequiresString
+
+- name: mdconvert::Md2htmlBasic
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2htmlBasic
+
+- name: mdconvert::Md2htmlInlineMarkup
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2htmlInlineMarkup
+
+- name: mdconvert::Md2htmlTables
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2htmlTables
+
+- name: mdconvert::Md2htmlTablesDisabled
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMd2htmlTablesDisabled
+
+- name: mdconvert::ParseAndRender
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testParseAndRender
+
+- name: mdconvert::PdfBytesValid
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPdfBytesValid
+
+- name: mdconvert::PdfFileWrite
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPdfFileWrite
+
+- name: mdconvert::DocxBytesValid
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDocxBytesValid
+
+- name: mdconvert::DocxFileWrite
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDocxFileWrite
+
+- name: mdconvert::ShortcutHtml2md
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutHtml2md
+
+- name: mdconvert::ShortcutMd2html
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutMd2html
+
+- name: mdconvert::ShortcutMd2pdf
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutMd2pdf
+
+- name: mdconvert::ShortcutMd2docx
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutMd2docx
+
+- name: mdconvert::ShortcutMd2pdfFile
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutMd2pdfFile
+
+- name: mdconvert::ShortcutMd2docxFile
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testShortcutMd2docxFile
+
+- name: mdconvert::EmptyStringHtml2md
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testEmptyStringHtml2md
+
+- name: mdconvert::EmptyStringMd2html
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testEmptyStringMd2html
+
+- name: mdconvert::UnicodeContent
+  from: mdconvert::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnicodeContent
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - mdconvert::Html2mdHeading
+  - mdconvert::Html2mdBoldAndItalic
+  - mdconvert::Html2mdLink
+  - mdconvert::Html2mdList
+  - mdconvert::Html2mdRequiresString
+  - mdconvert::Md2htmlBasic
+  - mdconvert::Md2htmlInlineMarkup
+  - mdconvert::Md2htmlTables
+  - mdconvert::Md2htmlTablesDisabled
+  - mdconvert::ParseAndRender
+  - mdconvert::PdfBytesValid
+  - mdconvert::PdfFileWrite
+  - mdconvert::DocxBytesValid
+  - mdconvert::DocxFileWrite
+  - mdconvert::ShortcutHtml2md
+  - mdconvert::ShortcutMd2html
+  - mdconvert::ShortcutMd2pdf
+  - mdconvert::ShortcutMd2docx
+  - mdconvert::ShortcutMd2pdfFile
+  - mdconvert::ShortcutMd2docxFile
+  - mdconvert::EmptyStringHtml2md
+  - mdconvert::EmptyStringMd2html
+  - mdconvert::UnicodeContent
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }
