@@ -28,6 +28,23 @@ Check the active CLI with:
 copilot --version
 ```
 
+### Model "X" is not available (but works in the interactive CLI)
+
+If `createSession`/`prompt` fails with an error like:
+
+```text
+Model "gpt-5.6-luna" is not available.
+```
+
+even though the same model works when you run `copilot` interactively, this is usually an **authentication identity mismatch**, not a stale/unsupported model. `getModels()` lists the general Copilot model catalog, but `session.create` validates the requested model against whichever identity the spawned `copilot` process actually authenticates as — and new/preview models are often gated per-account (plan tier, org policy, preview enrollment).
+
+When `token`/`githubToken` is set, the SDK exports it to the Copilot subprocess as `GH_TOKEN`/`GITHUB_TOKEN`, so the process authenticates as *that token's* identity instead of reusing your interactively logged-in `copilot` session — and that token's identity may not have the same model entitlements.
+
+Fixes:
+
+- Set `useLoggedInUser: true` and drop `token`/`githubToken` so the SDK reuses your existing `copilot auth login` session, or
+- Refresh/re-authenticate the token being used, e.g. `gh auth refresh`
+
 ## Install GitHub Copilot CLI
 
 Use one of the following options:
@@ -147,7 +164,7 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `useStdio` (boolean, default: `true`): Communicates with Copilot CLI over stdio (recommended/default transport).
 - `autoStart` (boolean, default: `true`): Automatically starts a CLI session on first request.
 - `autoRestart` (boolean, default: `false`): Automatically recreates the session after failures or disconnects.
-- `useLoggedInUser` (boolean, optional): Prefer the local Copilot logged-in account/session instead of explicit token-only auth.
+- `useLoggedInUser` (boolean, optional): Prefer the local Copilot logged-in account/session instead of explicit token-only auth. Set this to `true` if a model works in the interactive `copilot` CLI but session creation reports it as unavailable — see [Model "X" is not available](#model-x-is-not-available-but-works-in-the-interactive-cli).
 - `logLevel` (string, optional): SDK/CLI logging verbosity for troubleshooting (for example `debug`, `info`, `warn`, `error`).
 - `reasoningEffort` (string, optional): Reasoning intensity hint forwarded to `SessionConfig.setReasoningEffort`.
 - `configDir` (string, optional): Custom configuration directory forwarded to `SessionConfig.setConfigDir`.
@@ -198,7 +215,7 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 - `rawPromptStreamWithStats(...)`
 - `close()`
 
-`getModels()` returns the Copilot SDK model list with `id` and `name` plus available SDK metadata, including `policy`, `capabilities`, `billing`, `supportedReasoningEfforts`, and `defaultReasoningEffort`. Use `policy.state` to inspect model availability/entitlement hints when a model appears in the list but `session.create` rejects it.
+`getModels()` returns the Copilot SDK model list with `id` and `name` plus available SDK metadata, including `policy`, `capabilities`, `billing`, `supportedReasoningEfforts`, and `defaultReasoningEffort`. Use `policy.state` to inspect model availability/entitlement hints when a model appears in the list but `session.create` rejects it — and check the authentication identity in use, since `getModels()` reflects the general catalog regardless of which account will actually authenticate the session (see [Model "X" is not available](#model-x-is-not-available-but-works-in-the-interactive-cli)).
 
 ## Docker
 
