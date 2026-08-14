@@ -117,10 +117,11 @@ jobs:
       }
 
       try {
-        if (origLst.length > 0) { 
-          if (isDef(fdefault) && $from(lst).equals("filepath", rfuri + "/" + fdefault).any()) {
-              return (fdefault.endsWith(".md") ? 
-                      ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, path + puri), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + puri), uri, request.uri + "/" + fdefault))
+        if (origLst.length > 0) {
+          var _defaultKey = path + (puri == "/" ? "" : puri).replace(/^\//, "") + String(fdefault)
+          if (isDef(fdefault) && $from(lst).equals("filepath", _defaultKey).any()) {
+              return (fdefault.endsWith(".md") ?
+                      ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, _defaultKey), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, _defaultKey), uri, request.uri + "/" + fdefault))
           } else {
               if (shouldBrowse) { 
                 content += tmplh({ puri: (puri == "" ? "/" : puri) })
@@ -305,7 +306,7 @@ jobs:
     shortcut: &httpBrowseS3TypeArgs
       name  : S3Browse
       keyArg: port
-      args  : 
+      args  : &httpBrowseS3Args
         url      : url
         bucket   : bucket
         accessKey: accessKey
@@ -321,6 +322,24 @@ jobs:
         cache    : cache
         sortTab  : sortTab
         options  : options
+  check:
+    in:
+      url      : isString
+      bucket   : isString
+      accessKey: isString.default(__)
+      secret   : isString.default(__)
+      region   : isString.default(__)
+      port     : toNumber.isNumber.default(8091)
+      uri      : isString.default("/")
+      path     : isString.default("")
+      browse   : toBoolean.isBoolean.default(true)
+      default  : isString.default(__)
+      logo     : isString.default("/fonts/openaf_small.png")
+      restrict : default(__)
+      incURI   : toBoolean.isBoolean.default(false)
+      cache    : toNumber.isNumber.default(__)
+      sortTab  : toBoolean.isBoolean.default(false)
+      options  : isMap.default({})
   exec    : &httpBrowseS3Exec | #js
     args.options = merge(args.options, {
       showURI: args.incURI,
@@ -345,7 +364,7 @@ jobs:
 
         //print(`_s3p = ${_s3p}`)
         if (isDef(args.cache)) {
-          _cache = "__oJobS3_" + md5(args.url + args.bucket)
+          var _cache = "__oJobS3_" + md5(args.url + args.bucket)
           lst = $cache(_cache).get({ puri: _s3p })
         } else {
           lst = s3.listObjects(args.bucket, _s3p)
@@ -362,7 +381,7 @@ jobs:
             isList: true,
             fields: [ "Object", "Last modified", "Size", "Size in bytes" ],
             alignFields: [ "left", "left", "right", "right" ],
-            key: [ "Object" ],
+            key: "Object",
             list: lst.filter(r => r.filename != "/").map(f => {
               var _f = f.filename.replace(/\/$/, "").replace(new RegExp("^.+/"), "")
               if (isDef(options.parentPath)) _f = _f.replace(new RegExp("^" + options.parentPath), "")
@@ -419,16 +438,58 @@ jobs:
           return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
         }
       },
+      search: (request, options) => {
+        const uri = request.uri
+        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+
+        var q = _$(request.params.q, "q").isString().default(_$(request.params.search).isString().default(""))
+        var maxResults = Number(_$(request.params.maxResults).default(200))
+
+        var _fields      = [ "Object", "Last modified", "Size", "Size in bytes" ]
+        var _alignFields = [ "left", "left", "right", "right" ]
+        if (q.length == 0) return { isList: true, fields: _fields, alignFields: _alignFields, key: "Object", list: [] }
+
+        var _s3p = options.parentPath + puri
+        _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
+        _s3p = _s3p.replace(/^\//, "")
+
+        var lst = s3.listObjects(args.bucket, _s3p, false, true)
+
+        if (isDef(args.restrict)) {
+          if (isString(args.restrict)) args.restrict = [ args.restrict ]
+          lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
+        }
+
+        var _rel = f => String(f.filename).replace(new RegExp("^" + _s3p), "")
+        var _q = q.toLowerCase()
+        var _hits = lst.filter(f => f.isFile && _rel(f).toLowerCase().indexOf(_q) >= 0)
+        var _total = _hits.length
+        if (_hits.length > maxResults) _hits = _hits.slice(0, maxResults)
+
+        return {
+          isList: true, fields: _fields, alignFields: _alignFields, key: "Object",
+          pageInfo: { total: _total, truncated: _total > maxResults },
+          list: _hits.map(f => ({
+            isDirectory: false,
+            values: {
+              Object: _rel(f),
+              "Last modified": isUnDef(f.lastModified) ? "" : ow.format.fromDate(new Date(f.lastModified), "yyyy-MM-dd HH:mm:ss"),
+              Size: ow.format.toBytesAbbreviation(f.size),
+              "Size in bytes": f.size
+            }
+          }))
+        }
+      },
       init  : () => {
         var _cache
-        
+
         if (isNumber(args.cache)) {
           _cache = "__oJobS3_" + md5(args.url + args.bucket)
           log("Creating cache " + _cache + "...")
           $cache(_cache)
           .ttl(args.cache)
           .fn(k => {
-            log("  cache get " + af.toSLON(k)) 
+            log("  cache get " + af.toSLON(k))
             var _r = s3.listObjects(args.bucket, k.puri)
             if (k.puri.length > 1) _r = _r.filter(r => r.filename != k.puri)
             return _r
@@ -440,10 +501,31 @@ jobs:
 
 # --------------------------------
 - name    : HTTP Browse - s3 - API
-  to      : HTTP Browse API 
-  typeArgs: 
-    noLog   : false 
+  to      : HTTP Browse API
+  typeArgs:
+    noLog   : false
     shortcut:
       <<    : *httpBrowseS3TypeArgs
       name  : S3BrowseAPI
+      args  :
+        <<        : *httpBrowseS3Args
+        browseUri : browseUri
+  check:
+    in:
+      url      : isString
+      bucket   : isString
+      accessKey: isString.default(__)
+      secret   : isString.default(__)
+      region   : isString.default(__)
+      port     : toNumber.isNumber.default(8091)
+      path     : isString.default("")
+      browse   : toBoolean.isBoolean.default(true)
+      default  : isString.default(__)
+      logo     : isString.default("/fonts/openaf_small.png")
+      restrict : default(__)
+      incURI   : toBoolean.isBoolean.default(false)
+      cache    : toNumber.isNumber.default(__)
+      sortTab  : toBoolean.isBoolean.default(false)
+      options  : isMap.default({})
+      browseUri: isString.default(__)
   exec    : *httpBrowseS3Exec
