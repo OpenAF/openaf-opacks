@@ -1,0 +1,37 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- mcp
+- auth
+- jwt
+- oauth
+- security
+- ojob
+- server
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/MCPAuthd.opack
+description: Standalone HTTP MCP Auth server that validates a JWT bearer credential against a $ch of id records, for use as one or more oJobMCP.yaml servers' authapiurl (or as a generic nginx/Traefik forward-auth endpoint).
+name: MCPAuthd
+main: ''
+mainJob: MCPAuthd.yaml
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260815'
+dependencies:
+  openaf: '>=20250915'
+  oJob-common: '>=20250914'
+files:
+- .package.yaml
+- MCPAuthd.yaml
+- README.md
+- oJobMCPAuth.yaml
+filesHash:
+  MCPAuthd.yaml: 1dd19cfa3ac20e149666b9f8b320d8d080c6dd1c
+  README.md: 9a1bfb9519ed5becee526960bf4f9fdb0699eb07
+  oJobMCPAuth.yaml: be85e24c05d026b532abeae57cb7bd02b6bfaaf5
