@@ -1,0 +1,140 @@
+# Template          : MCP Auth server
+# Author            : Nuno Aguiar
+# How to run        : ojob MCPAuthd.yaml secret="a-very-long-shared-secret-of-32-bytes+"
+# oPack dependencies: latest ojob-common;
+
+init:
+  port: &PORT 8092
+  uri : &URI  "/auth"
+  pid : &PID  MCPAuthd.pid
+
+ojob:
+  daemon      : true
+  opacks      :
+  - openaf     : 20250915
+  - oJob-common: 20250914
+  catch       : printErrnl("[" + job.name + "] "); $err(exception, __, __, job.exec)
+  logToConsole: false
+  argsFromEnvs: true
+  unique      :
+    pidFile     : *PID
+    killPrevious: false
+
+include:
+- oJobMCPAuth.yaml
+
+help:
+  text   : Starts a standalone HTTP MCP Auth server (see ../ai/oJobMCPAuth.yaml) that validates a JWT bearer credential against a $ch of id records, for use as one or more oJobMCP.yaml servers' "authapiurl" (or as a generic nginx/Traefik forward-auth endpoint). Runs on its own port, separate from the MCP server(s) it protects. Id records are provisioned separately with oJobMCPAuth.yaml's "mcpAuthSetId"/"mcpAuthSign" jobs against the same channel.
+  expects:
+  - name: port
+    desc: The port where the auth server should be made available (default is 8092)
+    mandatory: false
+  - name: uri
+    desc: The URI to handle validation requests on (default is /auth)
+    mandatory: false
+  - name: chName
+    desc: The $ch channel name used to store id records (default is mcpauth)
+    mandatory: false
+  - name: chType
+    desc: The $ch type to use -- file, dynamo, or any other registered $ch type (default is file)
+    mandatory: false
+  - name: chArgs
+    desc: 'JSSLON/JSON map with the $ch args (default is a local mcpauth.yaml file for chType=file; required for chType=dynamo, e.g. "(tableName: mcpauth, region: eu-west-1)")'
+    mandatory: false
+  - name: chKey
+    desc: The $ch key field used to look up an id's record (default is key)
+    mandatory: false
+  - name: authheader
+    desc: The request header to read the credential from (default is authorization, or env OJOB_MCPAUTH_HEADER)
+    mandatory: false
+  - name: authscheme
+    desc: The scheme prefix expected before the token (default is Bearer, or env OJOB_MCPAUTH_SCHEME)
+    mandatory: false
+  - name: authrealm
+    desc: The realm reported in the WWW-Authenticate challenge (default is MCP)
+    mandatory: false
+  - name: keytype
+    desc: How to resolve the verification key -- secret, pubkey or kms (default is secret)
+    mandatory: false
+  - name: secret
+    desc: The HS* shared secret, used when keytype=secret (or env OJOB_MCPAUTH_SECRET)
+    mandatory: false
+  - name: pubkey
+    desc: A PEM or base64 DER-encoded public key, used when keytype=pubkey
+    mandatory: false
+  - name: pubkeyfile
+    desc: A file path to read the public key from, alternative to pubkey
+    mandatory: false
+  - name: kmsregion
+    desc: The AWS region of the KMS key, used when keytype=kms (or env OJOB_MCPAUTH_KMS_REGION)
+    mandatory: false
+  - name: kmskeyid
+    desc: The KMS key id or ARN, used when keytype=kms (or env OJOB_MCPAUTH_KMS_KEYID)
+    mandatory: false
+  - name: idclaim
+    desc: The JWT claim carrying the id to look up (default is sub)
+    mandatory: false
+  - name: issuer
+    desc: If defined, the token's iss claim must equal this value
+    mandatory: false
+  - name: audience
+    desc: If defined, the token's aud claim must contain this value
+    mandatory: false
+  - name: cachettl
+    desc: If greater than 0, caches a decision (per token + uri) for this many milliseconds (default is 0, disabled)
+    mandatory: false
+  - name: audit
+    desc: If true (default, or env OJOB_MCPAUTH_AUDIT), logs every allow/deny decision
+    mandatory: false
+  - name: auditdenyonly
+    desc: If true, only denials are logged (default is false)
+    mandatory: false
+  - name: debug
+    desc: If true, extra detail is logged on denials (default is false)
+    mandatory: false
+
+jobs: []
+
+todo:
+- name: HTTP Start Server
+  args: |
+    ({ port: (isDef(args.port) ? Number(args.port) : global.args.init.port) })
+
+- name: HTTP Healthz
+  args: |
+    ({ port: (isDef(args.port) ? Number(args.port) : global.args.init.port) })
+
+- name: HTTP Metrics
+  args: |
+    ({ port  : (isDef(args.port) ? Number(args.port) : global.args.init.port),
+       prefix: "mcpauthd" })
+
+- name: MCP Auth Channel
+  args: |
+    ({ chName: args.chName,
+       chType: args.chType,
+       chArgs: (isString(args.chArgs) ? af.fromJSSLON(args.chArgs) : args.chArgs),
+       chKey : args.chKey })
+
+- name: HTTP MCP Auth Server
+  args: |
+    ({ port         : (isDef(args.port) ? Number(args.port) : global.args.init.port),
+       uri          : args.uri,
+       chName       : args.chName,
+       chKey        : args.chKey,
+       authheader   : args.authheader,
+       authscheme   : args.authscheme,
+       authrealm    : args.authrealm,
+       keytype      : args.keytype,
+       secret       : args.secret,
+       pubkey       : args.pubkey,
+       pubkeyfile   : args.pubkeyfile,
+       kmsregion    : args.kmsregion,
+       kmskeyid     : args.kmskeyid,
+       idclaim      : args.idclaim,
+       issuer       : args.issuer,
+       audience     : args.audience,
+       cachettl     : (isDef(args.cachettl) ? Number(args.cachettl) : __),
+       audit        : args.audit,
+       auditdenyonly: args.auditdenyonly,
+       debug        : args.debug })

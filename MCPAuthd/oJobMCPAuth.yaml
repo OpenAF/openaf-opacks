@@ -1,0 +1,579 @@
+# Copyright 2026 Nuno Aguiar
+#
+# oJobMCPAuth
+#
+# Implements the server side of oJobMCP's "authapiurl" contract. See README.md for the full
+# documentation (audit log format, id record format, HS* algorithm notes, KMS signing caveats and
+# usage examples).
+#
+# Jobs: MCP Auth Channel, HTTP MCP Auth Server, MCP Auth Set Id, MCP Auth Sign Token -- see each
+# job's help block below for its arguments.
+
+include:
+- oJobHTTPd.yaml
+
+jobs:
+# --------------------------
+- name    : MCP Auth Channel
+  typeArgs:
+    noLog   : false
+    shortcut:
+      name  : mcpAuthCh
+      keyArg: chName
+      args  :
+        chType: chType
+        chArgs: chArgs
+        chKey : chKey
+        chLib : chLib
+  help    :
+    text: Creates (or reuses) the $ch channel used to store MCP auth id records. Must run before HTTP MCP Auth Server and MCP Auth Set Id -- both simply read the channel by name and fail loudly if it doesn't exist, so that a channel's type/args are only ever set once, here.
+    expects:
+    - name: chName
+      desc: (String) The name of the $ch channel to create/reuse. Default is "mcpauth".
+    - name: chType
+      desc: (String) The $ch type to use (e.g. "file", "dynamo", or any other registered $ch type). Default is "file".
+    - name: chArgs
+      desc: (Map) The options passed to $ch(...).create() for the chosen chType. Defaults to a local "mcpauth.yaml" file for "file", or {} for "dynamo" (requires at least tableName).
+    - name: chKey
+      desc: (String) The $ch key field name used to look up an id's record. Default is "key" (matches the "file" type's key option, which maps a domain field onto a plain top-level key). For "dynamo" use the table's hash-key attribute name (e.g. "id").
+    - name: chLib
+      desc: (String) Optionally a lib to loadLib() before creating the channel (e.g. a custom $ch type). "aws.js" is loaded automatically when chType is "dynamo".
+  check   :
+    in:
+      chName: isString.default("mcpauth")
+      chType: isString.default("file")
+      chArgs: isMap.default(__)
+      chKey : isString.default("key")
+      chLib : isString.default(__)
+  exec    : | #js
+    if (isString(args.chLib)) loadLib(args.chLib)
+    if (args.chType == "dynamo") loadLib("aws.js")
+
+    if (isUnDef(args.chArgs)) {
+      if (args.chType == "file") {
+        args.chArgs = { file: "mcpauth.yaml", yaml: true, lock: "mcpauth.lock" }
+      } else {
+        args.chArgs = {}
+      }
+    }
+
+    if (isUnDef(global.__ojobMCPAuth)) global.__ojobMCPAuth = {}
+
+    if ($ch().list().indexOf(args.chName) < 0) {
+      $ch(args.chName).create(1, args.chType, args.chArgs)
+    }
+
+    global.__ojobMCPAuth[args.chName] = { chName: args.chName, chKey: args.chKey }
+
+# ------------------------------
+- name    : HTTP MCP Auth Server
+  typeArgs:
+    noLog   : false
+    shortcut:
+      name  : httpdMCPAuth
+      keyArg: port
+      args  :
+        uri            : uri
+        chName         : chName
+        chKey          : chKey
+        authheader     : authheader
+        authscheme     : authscheme
+        authrealm      : authrealm
+        authchallenge  : authchallenge
+        algs           : algs
+        keytype        : keytype
+        secret         : secret
+        pubkey         : pubkey
+        pubkeyfile     : pubkeyfile
+        kmsregion      : kmsregion
+        kmskeyid       : kmskeyid
+        kmsaccesskey   : kmsaccesskey
+        kmssecretkey   : kmssecretkey
+        kmsttl         : kmsttl
+        idclaim        : idclaim
+        issuer         : issuer
+        audience       : audience
+        uriheader      : uriheader
+        urifallback    : urifallback
+        validfield     : validfield
+        urisfield      : urisfield
+        enabledfield   : enabledfield
+        cachettl       : cachettl
+        audit          : audit
+        auditdenyonly  : auditdenyonly
+        audittemplate  : audittemplate
+        debug          : debug
+  help    :
+    text: Starts a HTTP endpoint that validates a JWT bearer credential against a $ch of id records, for use as oJobMCP.yaml's "authapiurl" (or as a generic nginx/Traefik forward-auth endpoint). Requires MCP Auth Channel to have already created the "chName" channel. Fails closed on any error, missing credential, expired token, expired/disabled record or unauthorized URI.
+    expects:
+    - name: port
+      desc: (Number) The port where the server was made available.
+    - name: uri
+      desc: (String) The URI to handle validation requests. Default is "/auth".
+    - name: chName
+      desc: (String) The $ch channel (created by MCP Auth Channel) holding id records. Default is "mcpauth".
+    - name: chKey
+      desc: (String) The $ch key field used to look up an id's record. Default is "key".
+    - name: authheader
+      desc: (String) The request header to read the credential from (default "authorization", or env OJOB_MCPAUTH_HEADER). Must match the "authheader" configured on the oJobMCP side.
+    - name: authscheme
+      desc: (String) The scheme prefix expected before the token (default "Bearer", or env OJOB_MCPAUTH_SCHEME).
+    - name: authrealm
+      desc: (String) The realm reported in the WWW-Authenticate challenge (default "MCP").
+    - name: authchallenge
+      desc: (Boolean) If true (default), 401 responses include a WWW-Authenticate header.
+    - name: algs
+      desc: (Array) Allow-list of accepted JWT "alg" header values. Default ["RS256","ES256","HS256","HS384","HS512"] -- all three HS* sizes are allowed by default because OpenAF's jjwt-backed signer auto-selects HS256/384/512 from the shared secret's padded byte length (32/48/64), so the actual alg a given secret produces isn't obvious upfront. Any alg outside the family implied by keytype is rejected regardless of this list (e.g. HS* is always rejected when keytype isn't "secret").
+    - name: keytype
+      desc: (String) How to resolve the verification key -- "secret" (HS*), "pubkey" (RS*/PS*/ES* via a configured public key) or "kms" (RS*/PS*/ES* via an AWS KMS asymmetric key's public key). Default "secret".
+    - name: secret
+      desc: (String) The HS* shared secret (or env OJOB_MCPAUTH_SECRET). Used when keytype is "secret". Note OpenAF NUL-pads short string secrets to 32/48/64 bytes before use -- the issuer must pad identically.
+    - name: pubkey
+      desc: (String) A PEM or base64 DER-encoded public key. Used when keytype is "pubkey".
+    - name: pubkeyfile
+      desc: (String) A file path to read the public key from, alternative to pubkey.
+    - name: kmsregion
+      desc: (String) The AWS region of the KMS key (or env OJOB_MCPAUTH_KMS_REGION). Used when keytype is "kms".
+    - name: kmskeyid
+      desc: (String) The KMS key id or ARN (or env OJOB_MCPAUTH_KMS_KEYID). Used when keytype is "kms".
+    - name: kmsaccesskey
+      desc: (String) Optional AWS access key for KMS_GetPublicKey; otherwise the standard AWS credential chain is used.
+    - name: kmssecretkey
+      desc: (String) Optional AWS secret key for KMS_GetPublicKey.
+    - name: kmsttl
+      desc: (Number) Milliseconds to cache the KMS-fetched public key. Default 3600000 (1 hour).
+    - name: idclaim
+      desc: (String) The JWT claim carrying the id to look up (falls back to "id", then "jti" if unset). Default "sub".
+    - name: issuer
+      desc: (String) If defined, the token's "iss" claim must equal this value.
+    - name: audience
+      desc: (String) If defined, the token's "aud" claim must contain this value.
+    - name: uriheader
+      desc: (String) The primary header carrying the URI being authorized. Default "x-ojob-mcp-uri" (what oJobMCP.yaml sends).
+    - name: urifallback
+      desc: (Array) Additional headers checked, in order, if uriheader is absent. Default ["x-original-uri","x-forwarded-uri"] (for nginx/Traefik forward-auth use).
+    - name: validfield
+      desc: (String) The id record field holding the validation/expiry date (ISO-8601 string or epoch millis/seconds). Default "validUntil". Absent means never expires; unparseable means denied.
+    - name: urisfield
+      desc: (String) The id record field holding the array of authorized URI patterns ("*", "/a/*" globs, or "/re/.../" regex). Default "uris". Patterns match X-OJob-MCP-URI verbatim, i.e. oJobMCP's configured "uri" argument -- if that server also sets uriPrefix, write patterns against the unprefixed value.
+    - name: enabledfield
+      desc: (String) The id record field that, only when explicitly false, disables the id. Default "enabled".
+    - name: cachettl
+      desc: (Number) If greater than 0, caches a decision (keyed by token hash + uri) for this many milliseconds. Default 0 (disabled).
+    - name: audit
+      desc: (Boolean) If true (default, or env OJOB_MCPAUTH_AUDIT), logs every decision (allow and deny).
+    - name: auditdenyonly
+      desc: (Boolean) If true, only denials are logged. Default false.
+    - name: audittemplate
+      desc: (String) A handlebars template for the audit line. See help text for available fields.
+    - name: debug
+      desc: (Boolean) If true, extra detail is logged on denials. Default false.
+  check   :
+    in:
+      uri            : isString.default("/auth")
+      chName         : isString.default("mcpauth")
+      chKey          : isString.default("key")
+      authheader     : isString.default(__)
+      authscheme     : isString.default(__)
+      authrealm      : isString.default("MCP")
+      authchallenge  : toBoolean.isBoolean.default(true)
+      algs           : isArray.default(["RS256", "ES256", "HS256", "HS384", "HS512"])
+      keytype        : isString.default("secret")
+      secret         : isString.default(__)
+      pubkey         : isString.default(__)
+      pubkeyfile     : isString.default(__)
+      kmsregion      : isString.default(__)
+      kmskeyid       : isString.default(__)
+      kmsaccesskey   : isString.default(__)
+      kmssecretkey   : isString.default(__)
+      kmsttl         : toNumber.isNumber.default(3600000)
+      idclaim        : isString.default("sub")
+      issuer         : isString.default(__)
+      audience       : isString.default(__)
+      uriheader      : isString.default("x-ojob-mcp-uri")
+      urifallback    : isArray.default(["x-original-uri", "x-forwarded-uri"])
+      validfield     : isString.default("validUntil")
+      urisfield      : isString.default("uris")
+      enabledfield   : isString.default("enabled")
+      cachettl       : toNumber.isNumber.default(0)
+      audit          : default(__)
+      auditdenyonly  : toBoolean.isBoolean.default(false)
+      audittemplate  : isString.default("AUDIT MCPAUTH | {{result}} {{status}} id={{id}} uri={{uri}} reason={{reason}} tid={{tid}} ({{ip}}; {{ua}}) {{ms}}ms cached={{cached}}")
+      debug          : toBoolean.isBoolean.default(false)
+  deps    :
+  - HTTP Start Server
+  exec    : | #js
+    ow.loadServer()
+
+    args.authheader = String(_$(args.authheader).default(getEnv("OJOB_MCPAUTH_HEADER") || "authorization")).toLowerCase()
+    args.authscheme = _$(args.authscheme).default(getEnv("OJOB_MCPAUTH_SCHEME") || "Bearer")
+    args.secret     = _$(args.secret).default(getEnv("OJOB_MCPAUTH_SECRET"))
+    args.kmsregion  = _$(args.kmsregion).default(getEnv("OJOB_MCPAUTH_KMS_REGION"))
+    args.kmskeyid   = _$(args.kmskeyid).default(getEnv("OJOB_MCPAUTH_KMS_KEYID"))
+    args.audit      = toBoolean(_$(args.audit).default(getEnv("OJOB_MCPAUTH_AUDIT") || "true"))
+
+    if (isUnDef(global.__ojobMCPAuth) || isUnDef(global.__ojobMCPAuth[args.chName])) {
+      throw "HTTP MCP Auth Server: channel '" + args.chName + "' does not exist -- run (mcpAuthCh) with the same chName before (httpdMCPAuth)."
+    }
+    var _ch = global.__ojobMCPAuth[args.chName]
+
+    if (isUnDef(global.__ojobMCPAuthKeys)) global.__ojobMCPAuthKeys = {}
+
+    // ---- header helpers (case-insensitive; both httpd impls lowercase header keys, this is defensive) ----
+    var _getHeader = (req, name) => {
+      if (!isMap(req) || !isMap(req.header)) return __
+      var _k = Object.keys(req.header).filter(k => k.toLowerCase() == name.toLowerCase())
+      return _k.length > 0 ? req.header[_k[0]] : __
+    }
+
+    var _getURI = req => {
+      var _headers = [args.uriheader].concat(args.urifallback)
+      for(var i = 0; i < _headers.length; i++) {
+        var _v = _getHeader(req, _headers[i])
+        if (isString(_v) && _v.length > 0) return _v.split("?")[0]
+      }
+      return __
+    }
+
+    var _sanitizeAuditVal = v => isString(v) ? v.replace(/[\r\n]/g, " ").substring(0, 256) : __
+    var _getClientMeta = req => {
+      var _xff = _getHeader(req, "x-forwarded-for")
+      var _ip  = isString(_xff) ? _xff.split(",")[0].trim() : _getHeader(req, "remote-addr")
+      var _hip = _getHeader(req, "http-client-ip")
+      var _ua  = _getHeader(req, "user-agent")
+      return { ip: _sanitizeAuditVal(_ip), hip: _sanitizeAuditVal(_hip), ua: _sanitizeAuditVal(_ua) }
+    }
+
+    // ---- key resolution ----
+    var _algFamily = alg => (isString(alg) && alg.startsWith("HS")) ? "secret" : "asym"
+    var _pemToDer = pem => af.fromBase64(pem.replace(/-----BEGIN [^-]+-----/, "").replace(/-----END [^-]+-----/, "").replace(/\s+/g, ""))
+
+    var _resolveKey = alg => {
+      var _family = _algFamily(alg)
+      if (_family == "secret" && args.keytype != "secret") throw "alg '" + alg + "' not allowed for keytype '" + args.keytype + "'"
+      if (_family == "asym"   && args.keytype == "secret")  throw "alg '" + alg + "' not allowed for keytype 'secret'"
+
+      if (args.keytype == "secret") {
+        if (!isString(args.secret) || args.secret.length == 0) throw "no secret configured"
+        return args.secret
+      }
+
+      var _kty = alg.startsWith("ES") ? "EC" : "RSA"
+
+      if (args.keytype == "pubkey") {
+        var _pub = args.pubkey
+        if (!isString(_pub) && isString(args.pubkeyfile)) _pub = io.readFileString(args.pubkeyfile)
+        if (!isString(_pub)) throw "no pubkey/pubkeyfile configured"
+        var _der = _pemToDer(_pub)
+        var _kf  = java.security.KeyFactory.getInstance(_kty)
+        return _kf.generatePublic(new java.security.spec.X509EncodedKeySpec(_der))
+      }
+
+      if (args.keytype == "kms") {
+        if (!isString(args.kmskeyid) || !isString(args.kmsregion)) throw "no kmskeyid/kmsregion configured"
+        var _cached = global.__ojobMCPAuthKeys[args.kmskeyid]
+        if (isDef(_cached) && _cached.exp > now()) return _cached.key
+
+        loadLib("aws.js")
+        var _aws = new AWS(args.kmsaccesskey, args.kmssecretkey, __, args.kmsregion)
+        var _res = _aws.KMS_GetPublicKey(args.kmsregion, args.kmskeyid)
+        var _spec = _$(_res.KeySpec).default(_res.CustomerMasterKeySpec)
+        var _keyType = (isString(_spec) && _spec.indexOf("ECC") == 0) ? "EC" : "RSA"
+        var _kf = java.security.KeyFactory.getInstance(_keyType)
+        var _key = _kf.generatePublic(new java.security.spec.X509EncodedKeySpec(af.fromBase64(_res.PublicKey)))
+
+        global.__ojobMCPAuthKeys[args.kmskeyid] = { key: _key, exp: now() + args.kmsttl }
+        return _key
+      }
+
+      throw "unknown keytype '" + args.keytype + "'"
+    }
+
+    // ---- URI pattern matching ----
+    var _uriMatch = (pattern, uri) => {
+      if (pattern == "*") return true
+      if (pattern == uri) return true
+      if (pattern.length > 1 && pattern.startsWith("/") && pattern.endsWith("/")) {
+        return new RegExp(pattern.substring(1, pattern.length - 1)).test(uri)
+      }
+      var _re = "^" + pattern.replace(/\*\*|\*|[.+^${}()|[\]\\]/g, m => {
+        if (m == "**") return ".*"
+        if (m == "*")  return "[^/]*"
+        return "\\" + m
+      }) + "$"
+      return new RegExp(_re).test(uri)
+    }
+
+    // ---- reply/audit helpers ----
+    var _deny = (status, err, hdrs) => {
+      hdrs = _$(hdrs).isMap().default({})
+      if (args.authchallenge && status == 401) hdrs["WWW-Authenticate"] = args.authscheme + " realm=\"" + args.authrealm + "\""
+      return {
+        data    : stringify({ active: false, error: err }, __, ""),
+        mimetype: "application/json",
+        status  : status,
+        header  : hdrs
+      }
+    }
+
+    var _allow = (id, uri, claims) => ({
+      data    : stringify({ active: true, id: id, uri: uri, exp: claims.exp, iss: claims.iss }, __, ""),
+      mimetype: "application/json",
+      status  : 200,
+      header  : {}
+    })
+
+    var _audit = (result, status, reason, id, uri, token, req, ms, cached) => {
+      try {
+        if (!args.audit) return
+        if (args.auditdenyonly && result == "ALLOW") return
+        var _client = _getClientMeta(req)
+        var _entry = {
+          result : result,
+          status : status,
+          reason : reason,
+          id     : _sanitizeAuditVal(isString(id) ? id : "-"),
+          uri    : _sanitizeAuditVal(isString(uri) ? uri : "-"),
+          tid    : isString(token) ? sha512(token).substring(0, 12) : "-",
+          ip     : isString(_client.ip) ? _client.ip : "-",
+          hip    : isString(_client.hip) ? _client.hip : "-",
+          ua     : isString(_client.ua) ? _client.ua : "-",
+          ms     : ms,
+          cached : cached === true,
+          port   : args.port
+        }
+        var _line = $t(args.audittemplate, _entry)
+        if (result == "DENY") logWarn(_line); else log(_line)
+      } catch(e) {
+        // Auditing must never turn a decision into an error
+      }
+    }
+
+    var _cache = {}
+
+    var fns = {}
+    fns[args.uri] = req => {
+      var _t0 = now()
+      var _token, _uri, _id
+      try {
+        var _hdr = _getHeader(req, args.authheader)
+        if (!isString(_hdr)) {
+          _audit("DENY", 401, "no_credential", __, __, __, req, now() - _t0)
+          return _deny(401, "invalid_token")
+        }
+
+        var _m = _hdr.match(new RegExp("^" + args.authscheme + "\\s+(.+)$", "i"))
+        if (isNull(_m)) {
+          _audit("DENY", 401, "no_credential", __, __, __, req, now() - _t0)
+          return _deny(401, "invalid_token")
+        }
+        _token = _m[1]
+        _uri = _getURI(req)
+
+        if (args.cachettl > 0) {
+          var _ck = sha512(_token) + "|" + String(_uri)
+          var _cached = _cache[_ck]
+          if (isDef(_cached) && _cached.exp > now()) {
+            _audit(_cached.result, _cached.status, _cached.reason, _cached.id, _uri, _token, req, now() - _t0, true)
+            return _cached.reply
+          }
+        }
+
+        var _decode = ow.server.jwt.decode(_token)
+        var _alg = isMap(_decode) && isMap(_decode.headers) ? _decode.headers.alg : __
+        if (!isString(_alg) || args.algs.indexOf(_alg) < 0) {
+          throw { mcpAuthReason: "bad_alg" }
+        }
+
+        var _key = _resolveKey(_alg)
+        var _verified
+        try {
+          _verified = ow.server.jwt.verify(_key, _token)
+        } catch(e) {
+          throw { mcpAuthReason: "invalid_signature" }
+        }
+        var _claims = _verified.claims
+
+        if (isString(args.issuer) && _claims.iss != args.issuer) throw { mcpAuthReason: "invalid_signature" }
+        if (isString(args.audience)) {
+          var _aud = isArray(_claims.aud) ? _claims.aud : [_claims.aud]
+          if (_aud.indexOf(args.audience) < 0) throw { mcpAuthReason: "invalid_signature" }
+        }
+
+        _id = _claims[args.idclaim] || _claims.id || _claims.jti
+        if (!isString(_id) || _id.length == 0) throw { mcpAuthReason: "invalid_signature" }
+
+        var _key4Get = {}
+        _key4Get[_ch.chKey] = _id
+        var _rec = $ch(_ch.chName).get(_key4Get)
+        if (!isMap(_rec)) throw { mcpAuthReason: "unknown_id", status: 401, err: "invalid_token" }
+
+        if (_rec[args.enabledfield] === false) throw { mcpAuthReason: "disabled", status: 403, err: "insufficient_scope" }
+
+        if (isDef(_rec[args.validfield])) {
+          var _dv = _rec[args.validfield]
+          var _d = isNumber(_dv) ? (_dv < 1e12 ? _dv * 1000 : _dv) : new Date(_dv).getTime()
+          if (isNaN(_d) || _d < now()) throw { mcpAuthReason: "record_expired", status: 403, err: "token_expired" }
+        }
+
+        if (!isString(_uri)) throw { mcpAuthReason: "uri_required", status: 403, err: "insufficient_scope" }
+
+        var _uris = isArray(_rec[args.urisfield]) ? _rec[args.urisfield] : []
+        var _matched = _uris.some(p => _uriMatch(p, _uri))
+        if (!_matched) throw { mcpAuthReason: "insufficient_scope", status: 403, err: "insufficient_scope" }
+
+        var _reply = _allow(_id, _uri, _claims)
+        if (args.cachettl > 0) {
+          var _ck2 = sha512(_token) + "|" + String(_uri)
+          _cache[_ck2] = { reply: _reply, result: "ALLOW", status: 200, reason: "ok", id: _id, exp: now() + args.cachettl }
+        }
+        _audit("ALLOW", 200, "ok", _id, _uri, _token, req, now() - _t0)
+        return _reply
+      } catch(e) {
+        var _reason = (isMap(e) && isString(e.mcpAuthReason)) ? e.mcpAuthReason : "error"
+        var _status = (isMap(e) && isNumber(e.status)) ? e.status : 401
+        var _err    = (isMap(e) && isString(e.err)) ? e.err : "invalid_token"
+        if (args.debug && !(isMap(e) && isString(e.mcpAuthReason))) logErr("MCP auth error: " + String(e))
+
+        var _reply = _deny(_status, _err)
+        if (args.cachettl > 0 && isString(_token)) {
+          var _ck3 = sha512(_token) + "|" + String(_uri)
+          _cache[_ck3] = { reply: _reply, result: "DENY", status: _status, reason: _reason, id: _id, exp: now() + args.cachettl }
+        }
+        _audit("DENY", _status, _reason, _id, _uri, _token, req, now() - _t0)
+        return _reply
+      }
+    }
+
+    ow.server.httpd.route(global.__ojobHttp[args.port], merge(global.__ojobRoutes[args.port], fns))
+    log("READY [" + args.port + "] " + args.uri)
+
+# -------------------------
+- name    : MCP Auth Set Id
+  typeArgs:
+    noLog   : false
+    shortcut:
+      name  : mcpAuthSetId
+      keyArg: id
+      args  :
+        uris      : uris
+        validUntil: validUntil
+        enabled   : enabled
+        chName    : chName
+        chKey     : chKey
+  help    :
+    text: Provisioning/test helper that creates or updates an id record on the MCP auth channel. Requires MCP Auth Channel to have already created the "chName" channel.
+    expects:
+    - name: id
+      desc: (String) The id to set (matches the JWT's idclaim/id/jti claim).
+    - name: uris
+      desc: (Array) The list of authorized URI patterns for this id (e.g. ["/mcp", "/mcp/*"]).
+    - name: validUntil
+      desc: (String/Number) The validation date (ISO-8601 string, or epoch millis/seconds). Omit for an id that never expires.
+    - name: enabled
+      desc: (Boolean) Set to false to disable the id without removing it. Default true.
+    - name: chName
+      desc: (String) The $ch channel to write to. Default is "mcpauth".
+    - name: chKey
+      desc: (String) The $ch key field. Default is "key".
+  check   :
+    in:
+      id        : isString
+      uris      : isArray.default([])
+      validUntil: default(__)
+      enabled   : toBoolean.isBoolean.default(true)
+      chName    : isString.default("mcpauth")
+      chKey     : isString.default("key")
+  exec    : | #js
+    if (isUnDef(global.__ojobMCPAuth) || isUnDef(global.__ojobMCPAuth[args.chName])) {
+      throw "MCP Auth Set Id: channel '" + args.chName + "' does not exist -- run (mcpAuthCh) with the same chName first."
+    }
+    var _ch = global.__ojobMCPAuth[args.chName]
+
+    var _rec = { enabled: args.enabled, uris: args.uris }
+    if (isDef(args.validUntil)) _rec.validUntil = args.validUntil
+
+    var _key = {}
+    _key[_ch.chKey] = args.id
+    $ch(_ch.chName).set(_key, _rec)
+
+# -----------------------------
+- name    : MCP Auth Sign Token
+  typeArgs:
+    noLog   : false
+    shortcut:
+      name  : mcpAuthSign
+      keyArg: id
+      args  :
+        secret    : secret
+        privkey   : privkey
+        privkeyfile: privkeyfile
+        alg       : alg
+        idclaim   : idclaim
+        expiresIn : expiresIn
+        issuer    : issuer
+        audience  : audience
+        print     : print
+  help    :
+    text: Test/provisioning helper that signs a JWT for a given id, using a local secret or PEM private key. KMS signing is deliberately not supported here -- AWS KMS's ECDSA_SHA_* signatures are DER-encoded while JOSE ES* requires raw R||S, so a KMS-EC-signed token would not verify; for KMS-backed verification use an RSA key and sign externally, or convert DER to R||S. Sets args.token.
+    expects:
+    - name: id
+      desc: (String) The id to embed in the token (as the "sub" claim, or idclaim if provided).
+    - name: secret
+      desc: (String) A HS* shared secret. Mutually exclusive with privkey/privkeyfile.
+    - name: privkey
+      desc: (String) A PEM PKCS8 private key. Mutually exclusive with secret.
+    - name: privkeyfile
+      desc: (String) A file path to read the PEM private key from, alternative to privkey.
+    - name: alg
+      desc: (String) The algorithm used to parse privkey/privkeyfile as "RSA" (RS*/PS*) or "EC" (ES*) -- e.g. "RS256" or "ES256". Default "RS256". Ignored when secret is used -- OpenAF's signer picks HS256/384/512 by itself from the secret's padded byte length (32/48/64 bytes), so the resulting token's alg depends on the secret's length, not on this argument.
+    - name: idclaim
+      desc: (String) The claim name to embed the id under. Default "sub".
+    - name: expiresIn
+      desc: (Number) Milliseconds until the token expires. Default 3600000 (1 hour).
+    - name: issuer
+      desc: (String) Optional "iss" claim.
+    - name: audience
+      desc: (String) Optional "aud" claim.
+    - name: print
+      desc: (Boolean) If true, prints the generated token. Default false.
+  check   :
+    in:
+      id         : isString
+      secret     : isString.default(__)
+      privkey    : isString.default(__)
+      privkeyfile: isString.default(__)
+      alg        : isString.default(__)
+      idclaim    : isString.default("sub")
+      expiresIn  : toNumber.isNumber.default(3600000)
+      issuer     : isString.default(__)
+      audience   : isString.default(__)
+      print      : toBoolean.isBoolean.default(false)
+  exec    : | #js
+    ow.loadServer()
+
+    var _key
+    if (isString(args.secret)) {
+      args.alg = _$(args.alg).default("HS256")
+      _key = args.secret
+    } else {
+      args.alg = _$(args.alg).default("RS256")
+      var _pem = args.privkey
+      if (!isString(_pem) && isString(args.privkeyfile)) _pem = io.readFileString(args.privkeyfile)
+      if (!isString(_pem)) throw "MCP Auth Sign Token: provide either secret or privkey/privkeyfile"
+      var _der = af.fromBase64(_pem.replace(/-----BEGIN [^-]+-----/, "").replace(/-----END [^-]+-----/, "").replace(/\s+/g, ""))
+      var _kty = args.alg.startsWith("ES") ? "EC" : "RSA"
+      var _kf  = java.security.KeyFactory.getInstance(_kty)
+      _key = _kf.generatePrivate(new java.security.spec.PKCS8EncodedKeySpec(_der))
+    }
+
+    var _data = {
+      expiration: new Date(now() + args.expiresIn),
+      claims    : {}
+    }
+    _data.claims[args.idclaim] = args.id
+    if (isString(args.issuer))   _data.issuer   = args.issuer
+    if (isString(args.audience)) _data.audience = args.audience
+
+    args.token = ow.server.jwt.sign(_key, _data)
+    if (args.print) print(args.token)
