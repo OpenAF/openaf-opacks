@@ -67,6 +67,7 @@ Using the same unix “pipe” mechanism it’s possible to apply different cate
 | at(idx) | 20241205 | Returns the array index entry | [].at(5) |
 | ceil(number) | base | Returns the smallest integer that is equal or less than a specific numeric field value | [].ceil(y) |
 | ch(name, op, arg1, args2) | 20240801 | Wrapper for OpenAF's channel functions over a 'name' channel, an 'op' operation between get, set, unset, size, getAll, getKeys, unsetAll; depending on the 'op', 'arg1' and 'arg2' can be provided with values as objects or JSON/SLON | ch('a', 'set', 'a', 'abc').ch('a', 'get', 'a', __) |
+| chq(name, op, max, value) | 20260423 | Wrapper for OpenAF's channel functions in queue mode over a 'name' channel, an 'op' operation between push/add (adds entry removing oldest if over 'max'), pop (removes/returns last), shift (removes/returns first), size (returns count), get/all (returns all entries); 'max' set to -1 for unlimited | chq('myq', 'push', `10`, @) |
 | concat(x, y) | 20240209 | Concats arrays or strings | concat('abc', '123') |
 | contains(string/array, any) | base | Returns true of false if a string field contains a specific value | files[?contains(filename, 'openaf.jar') == `true` |
 | count_by(arr, 'field') | all | Returns a count by array with the '_count' per value of the provided 'field' | count_by([], 'isFile') |

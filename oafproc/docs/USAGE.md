@@ -32,7 +32,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | outfile | If defined all output will be written to the provided file |
 | outfileappend | If 'true' and outfile=true the output will be appended on the provided file |
 | parallel | If 'true' and input supports parallel processing it will try to process the input in parallel disregarding input order |
-| pause  | If 'true' will try to pause contents in alternative to _less -r_ |
+| pause  | If 'true' (or `-p`) will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |
 | urlmethod | If 'url' is provided defines the http method to use if different from GET | 

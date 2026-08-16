@@ -244,7 +244,11 @@ const _print = (m) => {
                     oafp(_m)
                 }
             } else {
-                print(m)
+                if (toBoolean(params.pause) && isDef(ow.format.string.pauseString) && isString(m)) {
+                    ow.format.string.pauseString(m)
+                } else {
+                    print(m)
+                }
             }
         } else {
             if ("undefined" === typeof global.__oafp_streams) global.__oafp_streams = {}
@@ -549,7 +553,7 @@ const showVersion = () => {
 if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "undefined" == typeof params.data && "undefined" == typeof params.url) {
     let _found = __
     for (let key in params) {
-        if ("undefined" == typeof _found && params[key] === "" && key != "-debug" && key != "-v" && key != "-examples") {
+        if ("undefined" == typeof _found && params[key] === "" && key != "-debug" && key != "-v" && key != "-examples" && key != "-p") {
             _found = key
             break;
         }
@@ -560,6 +564,7 @@ if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "un
 
 if (typeof params.debug !== "undefined") params.debug = toBoolean(params.debug)
 if (isDef(params["-debug"])) params.debug = true
+if (isDef(params["-p"])) params.pause = true
 
 // Verify the data param
 if ("[object Object]" == Object.prototype.toString.call(params.data) || Array.isArray(params.data)) {
