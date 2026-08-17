@@ -29,9 +29,9 @@ dependencies:
 files:
 - .package.yaml
 - MCPAuthd.yaml
-- oJobMCPAuth.yaml
 - README.md
+- oJobMCPAuth.yaml
 filesHash:
   MCPAuthd.yaml: 1dd19cfa3ac20e149666b9f8b320d8d080c6dd1c
-  oJobMCPAuth.yaml: be85e24c05d026b532abeae57cb7bd02b6bfaaf5
   README.md: 9a1bfb9519ed5becee526960bf4f9fdb0699eb07
+  oJobMCPAuth.yaml: be85e24c05d026b532abeae57cb7bd02b6bfaaf5
