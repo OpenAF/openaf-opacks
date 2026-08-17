@@ -36,7 +36,7 @@ files:
 - tests/tests.js
 - tests/tests.yaml
 filesHash:
-  .maven.yaml: 31381578c6153e852c9c6490c4f7592eb54b271d
+  .maven.yaml: 34ebd6c2faf25d374f02ebb59a294107319db5df
   .odoc.db: a361200d42fcc7e708fb62afd2ff08d660abc44e
   .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   README.md: 295ddaa3cb4b1f3607c42996c0bfe4788bde8608
