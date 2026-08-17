@@ -18,7 +18,7 @@ name: Redis
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260707'
+version: '20260817'
 dependencies:
   openaf: '>=20250725'
 files:
@@ -27,23 +27,23 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- commons-pool2-2.12.1.jar
-- error_prone_annotations-2.41.0.jar
-- jedis-7.5.3.jar
-- json-20251224.jar
+- commons-pool2-2.13.1.jar
+- error_prone_annotations-2.48.0.jar
+- jedis-8.0.0.jar
+- json-20260719.jar
 - redis-authx-core-0.1.1-beta2.jar
 - redis.js
 - tests/tests.js
 - tests/tests.yaml
 filesHash:
-  .maven.yaml: 1e82e1741847165472f2bc71b47be7a61d322ee9
+  .maven.yaml: 31381578c6153e852c9c6490c4f7592eb54b271d
   .odoc.db: a361200d42fcc7e708fb62afd2ff08d660abc44e
   .precompile: 81b3f5d9f08b3f87e49405c70d13c10c4d7be732
   README.md: 295ddaa3cb4b1f3607c42996c0bfe4788bde8608
-  commons-pool2-2.12.1.jar: e5c7b6c9f5a4b59be2bba213fbec70b413376fc1
-  error_prone_annotations-2.41.0.jar: 4381275efdef6ddfae38f002c31e84cd001c97f0
-  jedis-7.5.3.jar: ca4df67acac1fd12140ce69c2404f2057c136473
-  json-20251224.jar: 758adfe5ff5c3cc286d62c9d097cbca84f870536
+  commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
+  error_prone_annotations-2.48.0.jar: bbe30942a31d1778c74cb272321267eca82dc708
+  jedis-8.0.0.jar: 0e849578cd3d019203aaa12cad5c1f2e0de4eafd
+  json-20260719.jar: 82390308e0b67205bf0d0d507dc48e0d71410bf7
   redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
   redis.js: c31a2c25d453cacfb0763485c37e3c8d253d82e7
   tests/tests.js: 3b85a029647810c902ce5b4378e88d4718628d43
