@@ -37,6 +37,8 @@ files:
 - lucene-sandbox-10.5.1.jar
 - lucene.js
 - oJobLucene.yaml
+- tests/autoTestLucene.js
+- tests/autoTestLucene.yaml
 filesHash:
   .maven.yaml: 48f5d8aadf0c10d084c09f69a76a20eda561b796
   .odoc.db: 7b8dfc21edad884f6a066b7db024cdd12e2deb8d
@@ -49,3 +51,5 @@ filesHash:
   lucene-sandbox-10.5.1.jar: 2b799275b67e01257a2c18e4a2078e6eec04cda7
   lucene.js: e1f57798e7c4249d11678ff86746e7a92e99e38e
   oJobLucene.yaml: 91bb37c691b95e357c0518a790ce12951593bffb
+  tests/autoTestLucene.js: 67a07806c8d06ea8c8439f2d3e30491b3a3ed7c2
+  tests/autoTestLucene.yaml: ab9e5da57b6087040ee90319afc883e74f18e1cf
