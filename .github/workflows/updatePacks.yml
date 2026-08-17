@@ -51,7 +51,7 @@ jobs:
             io.writeFileYAML("GooglePhoneNumber/.package.yaml", opack)
 
             // Update pack
-            $sh(getOpenAFPath() + "opack genpack .")
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
             .pwd("GooglePhoneNumber")
             .prefix("opack")
             .get()
