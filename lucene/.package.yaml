@@ -29,27 +29,23 @@ files:
 - .odoc.db
 - .package.yaml
 - README.md
-- lucene-analysis-common-10.5.0.jar
-- lucene-core-10.5.0.jar
-- lucene-facet-10.5.0.jar
-- lucene-queries-10.5.0.jar
-- lucene-queryparser-10.5.0.jar
-- lucene-sandbox-10.5.0.jar
+- lucene-analysis-common-10.5.1.jar
+- lucene-core-10.5.1.jar
+- lucene-facet-10.5.1.jar
+- lucene-queries-10.5.1.jar
+- lucene-queryparser-10.5.1.jar
+- lucene-sandbox-10.5.1.jar
 - lucene.js
 - oJobLucene.yaml
-- tests/autoTestLucene.js
-- tests/autoTestLucene.yaml
 filesHash:
   .maven.yaml: 48f5d8aadf0c10d084c09f69a76a20eda561b796
   .odoc.db: 7b8dfc21edad884f6a066b7db024cdd12e2deb8d
   README.md: c83411ed6bd79c7589a5556639c24ac570227d9b
-  lucene-analysis-common-10.5.0.jar: 2b314f57f18f3d9ad855f611f6f391519ac78a8d
-  lucene-core-10.5.0.jar: 383deeee9b44ef15daaf7541d57ea5183d52a7b5
-  lucene-facet-10.5.0.jar: cd4d1febfe5c3afa1d5baf8e2e33425784d0a7a6
-  lucene-queries-10.5.0.jar: c96555ec32a411d860527ea13add388d72a614b2
-  lucene-queryparser-10.5.0.jar: dea0c58101825f086127abf5adce13ced0bd0fc2
-  lucene-sandbox-10.5.0.jar: 928527693dc814ba0125659b07316e260713e38f
+  lucene-analysis-common-10.5.1.jar: 461fbd2772df41469b8a158a6ebe0ed6819d49a1
+  lucene-core-10.5.1.jar: 9cf36fb7aaa63a1c994b653f317499ae7d87efbe
+  lucene-facet-10.5.1.jar: 87a170ae7ba56d7c6ce090507c7968d872c5de15
+  lucene-queries-10.5.1.jar: 171318c12d7560fb1e6f82562f2089a742df98f7
+  lucene-queryparser-10.5.1.jar: 02d53a97c255537177b7c24d9c54bba32ff3f90d
+  lucene-sandbox-10.5.1.jar: 2b799275b67e01257a2c18e4a2078e6eec04cda7
   lucene.js: e1f57798e7c4249d11678ff86746e7a92e99e38e
   oJobLucene.yaml: 91bb37c691b95e357c0518a790ce12951593bffb
-  tests/autoTestLucene.js: 67a07806c8d06ea8c8439f2d3e30491b3a3ed7c2
-  tests/autoTestLucene.yaml: ab9e5da57b6087040ee90319afc883e74f18e1cf
