@@ -113,7 +113,7 @@ jobs:
             io.writeFileJSON("GoogleCompiler/.package.json", opack)
 
             // Update pack
-            $sh(getOpenAFPath() + "opack genpack .")
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
             .pwd("GoogleCompiler")
             .prefix("opack")
             .get()
@@ -176,7 +176,7 @@ jobs:
             io.writeFileYAML("BouncyCastle/.package.yaml", opack)
 
             // Update pack
-            $sh(getOpenAFPath() + "opack genpack .")
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
             .pwd("BouncyCastle")
             .prefix("opack")
             .get()
@@ -241,7 +241,7 @@ jobs:
             io.writeFileYAML("rocksdb/.package.yaml", opack)
 
             // Update pack
-            $sh(getOpenAFPath() + "opack genpack .")
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
             .pwd("rocksdb")
             .prefix("opack")
             .get()
