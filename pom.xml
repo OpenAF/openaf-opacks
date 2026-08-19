@@ -18,6 +18,11 @@
             <version>1.12.1</version>
         </dependency>
         <dependency>
+            <artifactId>parquet-floor</artifactId>
+            <groupId>blue.strategic.parquet</groupId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.bertramlabs.plugins</groupId>
             <artifactId>hcl4j</artifactId>
             <version>0.9.8</version>

@@ -1,0 +1,121 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- Parquet::WriteReadRoundTrip
+- Parquet::InferredTypesAreNative
+- Parquet::DateFieldsBecomeISOStrings
+- Parquet::MissingFieldsReadAsNull
+- Parquet::ExplicitSchemaOverride
+- Parquet::ForEachVisitsEveryRow
+- Parquet::FieldMapperSkipsField
+- Parquet::FieldMapperRenamesField
+- Parquet::GetSchema
+- Parquet::GetMeta
+- Parquet::GetStats
+- Parquet::LoadFileThrowsWhenMissing
+- Parquet::GetSchemaThrowsWithoutLoadFile
+- Test results
+
+jobs:
+- name: Parquet::Init
+  exec: |
+    loadLib("parquet.js")
+    args.tests = require("tests/autoTestParquet.js")
+
+- name: Parquet::WriteReadRoundTrip
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testWriteReadRoundTrip
+
+- name: Parquet::InferredTypesAreNative
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testInferredTypesAreNative
+
+- name: Parquet::DateFieldsBecomeISOStrings
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDateFieldsBecomeISOStrings
+
+- name: Parquet::MissingFieldsReadAsNull
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testMissingFieldsReadAsNull
+
+- name: Parquet::ExplicitSchemaOverride
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testExplicitSchemaOverride
+
+- name: Parquet::ForEachVisitsEveryRow
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testForEachVisitsEveryRow
+
+- name: Parquet::FieldMapperSkipsField
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testFieldMapperSkipsField
+
+- name: Parquet::FieldMapperRenamesField
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testFieldMapperRenamesField
+
+- name: Parquet::GetSchema
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSchema
+
+- name: Parquet::GetMeta
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetMeta
+
+- name: Parquet::GetStats
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetStats
+
+- name: Parquet::LoadFileThrowsWhenMissing
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testLoadFileThrowsWhenMissing
+
+- name: Parquet::GetSchemaThrowsWithoutLoadFile
+  from: Parquet::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSchemaThrowsWithoutLoadFile
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - Parquet::WriteReadRoundTrip
+  - Parquet::InferredTypesAreNative
+  - Parquet::DateFieldsBecomeISOStrings
+  - Parquet::MissingFieldsReadAsNull
+  - Parquet::ExplicitSchemaOverride
+  - Parquet::ForEachVisitsEveryRow
+  - Parquet::FieldMapperSkipsField
+  - Parquet::FieldMapperRenamesField
+  - Parquet::GetSchema
+  - Parquet::GetMeta
+  - Parquet::GetStats
+  - Parquet::LoadFileThrowsWhenMissing
+  - Parquet::GetSchemaThrowsWithoutLoadFile
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

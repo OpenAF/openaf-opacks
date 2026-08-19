@@ -1,0 +1,3 @@
+artifacts:
+  - id      : parquet-floor
+    group   : blue.strategic.parquet
