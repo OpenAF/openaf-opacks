@@ -56,6 +56,7 @@
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build the lambda layers to run OpenAF lambda functions|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**PEG**|<img src=".github/badges/PEG.svg"><br>Wrapper around the Peggy javascript library allowing the parsing of grammars.|
+  |**Parquet**|<img src=".github/badges/Parquet.svg"><br>Provides a wrapper around handling Parquet files.|
   |**PasteBin**|<img src=".github/badges/PasteBin.svg"><br>Wrapper around PasteBin functionality.|
   |**Prolog**|<img src=".github/badges/Prolog.svg"><br>Wrapper for the projob library to add prolog functionality.|
   |**QR**|<img src=".github/badges/QR.svg"><br>Generates and reads QR codes|
