@@ -17,7 +17,7 @@ name: Avro
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260818'
+version: '20260819'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -41,6 +41,8 @@ files:
 - snappy-java-1.1.10.8.jar
 - tests/autoTestAvro.js
 - tests/autoTestAvro.yaml
+- tests/autoTestAvroChannel.js
+- tests/autoTestAvroChannel.yaml
 - trevni-avro-1.12.1.jar
 - trevni-core-1.12.1.jar
 - velocity-engine-core-2.4.1.jar
@@ -48,11 +50,11 @@ files:
 - zstd-jni-1.5.7-7.jar
 filesHash:
   .maven.yaml: 51ae688939c061357afb2b56214554d535ee9203
-  README.md: 2ccbaca87d70bcc8556c847b6460dede85acbc8d
+  README.md: 853714f54ab0995b6c3c50ae8abec4dca1d7aa79
   avro-1.12.1.jar: 1c6294ac1d67ce396f51827c87ba2e01de304500
   avro-compiler-1.12.1.jar: 0bf929636c1392073f797f0559f45ce4f2575cd4
   avro-mapred-1.12.1.jar: 4b11d31fdc87f6240b573cb2a68fe6dead007650
-  avro.js: ff07c10d66d0fd25f40240874c79d99609cc0cc3
+  avro.js: ee592f8c9390f454c83e717dacde30ef811b40a5
   commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   javax.servlet-api-3.1.0.jar: 3cd63d075497751784b2fa84be59432f4905bf7c
@@ -66,6 +68,8 @@ filesHash:
   snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
   tests/autoTestAvro.js: 88cd326ef9bfc1cd3327598b32af7d0e6ec11f9d
   tests/autoTestAvro.yaml: 120f88f0a492a4be6a3dbfc739645af7b2769b11
+  tests/autoTestAvroChannel.js: 7531027ea746f4d6d617f8197353e76faf90cdba
+  tests/autoTestAvroChannel.yaml: b7311d1339337f7ea7c80ab63444c0c8968511a8
   trevni-avro-1.12.1.jar: 850646adffe2f43a6c6236390d3ba674ef7fe29c
   trevni-core-1.12.1.jar: 443d53fe1c98cf5f94b22d9b3cb8828a712ed291
   velocity-engine-core-2.4.1.jar: 0b662837e8006d5c383bd128503ea86ef5b4d361
