@@ -1,0 +1,163 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- Avro::WriteReadRoundTrip
+- Avro::InferredTypesAreNative
+- Avro::DateFieldsBecomeISOStrings
+- Avro::SchemaInferenceUsesNullableUnion
+- Avro::ExplicitSchemaOverride
+- Avro::DefaultCodecIsSnappy
+- Avro::DeflateCodec
+- Avro::UnrecognizedCodecIsSilentlyIgnored
+- Avro::ForEachVisitsEveryRow
+- Avro::ForEachDontConvertReturnsRawJavaRecord
+- Avro::LoadStream
+- Avro::GetMeta
+- Avro::GetSchema
+- Avro::GetStats
+- Avro::GetStreamReader
+- Avro::ReadTwitterSample
+- Avro::ReadUserdataSample
+- Avro::LoadFileThrowsWhenMissing
+- Avro::GetSchemaThrowsWithoutLoadFile
+- Test results
+
+jobs:
+- name: Avro::Init
+  exec: |
+    loadLib("avro.js")
+    args.tests = require("tests/autoTestAvro.js")
+
+- name: Avro::WriteReadRoundTrip
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testWriteReadRoundTrip
+
+- name: Avro::InferredTypesAreNative
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testInferredTypesAreNative
+
+- name: Avro::DateFieldsBecomeISOStrings
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDateFieldsBecomeISOStrings
+
+- name: Avro::SchemaInferenceUsesNullableUnion
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSchemaInferenceUsesNullableUnion
+
+- name: Avro::ExplicitSchemaOverride
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testExplicitSchemaOverride
+
+- name: Avro::DefaultCodecIsSnappy
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDefaultCodecIsSnappy
+
+- name: Avro::DeflateCodec
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testDeflateCodec
+
+- name: Avro::UnrecognizedCodecIsSilentlyIgnored
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnrecognizedCodecIsSilentlyIgnored
+
+- name: Avro::ForEachVisitsEveryRow
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testForEachVisitsEveryRow
+
+- name: Avro::ForEachDontConvertReturnsRawJavaRecord
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testForEachDontConvertReturnsRawJavaRecord
+
+- name: Avro::LoadStream
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testLoadStream
+
+- name: Avro::GetMeta
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetMeta
+
+- name: Avro::GetSchema
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSchema
+
+- name: Avro::GetStats
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetStats
+
+- name: Avro::GetStreamReader
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetStreamReader
+
+- name: Avro::ReadTwitterSample
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testReadTwitterSample
+
+- name: Avro::ReadUserdataSample
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testReadUserdataSample
+
+- name: Avro::LoadFileThrowsWhenMissing
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testLoadFileThrowsWhenMissing
+
+- name: Avro::GetSchemaThrowsWithoutLoadFile
+  from: Avro::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSchemaThrowsWithoutLoadFile
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - Avro::WriteReadRoundTrip
+  - Avro::InferredTypesAreNative
+  - Avro::DateFieldsBecomeISOStrings
+  - Avro::SchemaInferenceUsesNullableUnion
+  - Avro::ExplicitSchemaOverride
+  - Avro::DefaultCodecIsSnappy
+  - Avro::DeflateCodec
+  - Avro::UnrecognizedCodecIsSilentlyIgnored
+  - Avro::ForEachVisitsEveryRow
+  - Avro::ForEachDontConvertReturnsRawJavaRecord
+  - Avro::LoadStream
+  - Avro::GetMeta
+  - Avro::GetSchema
+  - Avro::GetStats
+  - Avro::GetStreamReader
+  - Avro::ReadTwitterSample
+  - Avro::ReadUserdataSample
+  - Avro::LoadFileThrowsWhenMissing
+  - Avro::GetSchemaThrowsWithoutLoadFile
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

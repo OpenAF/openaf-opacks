@@ -69,8 +69,8 @@ Avro.prototype.getMeta = function() {
 
     var _meta = {}
     this._sr.getMetaKeys().forEach(k => {
-        _meta[k] = this._sr.getMetaString(k)
-        if (_meta[k].startsWith("{")) _meta[k] = jsonParse("[" + _meta[k] + "]")[0]
+        var v = String(this._sr.getMetaString(k))
+        _meta[String(k)] = v.startsWith("{") ? jsonParse("[" + v + "]")[0] : v
     })
     return _meta
 }
@@ -94,11 +94,13 @@ Avro.prototype.getStats = function() {
         this._sr.nextBlock()
     }
 
+    var _codec = this._sr.getMetaString("avro.codec")
+
     var _r = {
         blockCount: _c,
         sizeInBytes: _s,
         avgSizePerBlockInBytes: Math.round(_s / _c),
-        codec: this._sr.getMetaString("avro.codec"),
+        codec: _codec == null ? null : String(_codec),
         fileSizeInBytes: _fileSize
     }
 

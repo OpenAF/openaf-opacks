@@ -95,7 +95,7 @@ List of options to use when _out=avro_:
 | avrocodec  | String | One of the following options: snappy, bzip2, deflate, xz or zstandard |
 | avroschema | Map | A JSON/SLON string to force the schema to use. |
 
-> Example of a schema: avroschema="(type: record, name: my-record, fields: [(name: id, type: int) | (name: value, type: string)])"
+> Example of a schema: avroschema="(type: record, name: my_record, fields: [(name: id, type: double) | (name: value, type: string)])"
 `
         }
 
