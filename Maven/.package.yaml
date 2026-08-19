@@ -65,7 +65,6 @@ files:
 - plexus-utils-4.0.2.jar
 - plexus-xml-4.1.0.jar
 - stax2-api-4.2.2.jar
-- tests/test_resolve.js
 - woodstox-core-7.1.1.jar
 filesHash:
   .maven.yaml: f10eeccfa2c3ce72218161cab815519cd3459554
@@ -108,5 +107,4 @@ filesHash:
   plexus-utils-4.0.2.jar: 9526a9548b302572f23337fcc217fb4cc713b9c3
   plexus-xml-4.1.0.jar: 32595f415fe9fc87d92be9058e0274dad8631e7d
   stax2-api-4.2.2.jar: b0d746cadea928e5264f2ea294ea9a1bf815bbde
-  tests/test_resolve.js: d42a0bd5b603b8a016721e40cb622c2c8cf6294e
   woodstox-core-7.1.1.jar: 76baad1b94513ea896e0a17388890a4c81edd0e0
