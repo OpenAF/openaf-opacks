@@ -26,7 +26,6 @@ files:
 - lib/.maven.yaml
 - lib/LICENSE
 - lib/xchart-4.0.4.jar
-- test/test.html
 - xchart.js
 filesHash:
   .odoc.db: c1f8cc5cf6ec6ddfb40d5e0c00b502a4f5847381
@@ -35,5 +34,4 @@ filesHash:
   lib/.maven.yaml: d4c601d7ee214535c35c6e791aad55d425dd16ec
   lib/LICENSE: 3809b4e8be6b906334959cac98d49bb09e6ba93f
   lib/xchart-4.0.4.jar: 1a4f8effe2ccb010c8b08fc64d2c62816dba461a
-  test/test.html: bd8103c4c6c487039e082d1189abb03058067c8d
   xchart.js: a760d5988cad354ad1d402cf07bbdb26e3d7daf9
