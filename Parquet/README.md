@@ -118,10 +118,68 @@ written for that field, which is how parquet-floor represents an `OPTIONAL` fiel
 Returns the raw underlying `java.io.File` currently loaded, for anything not covered by the
 wrapper above.
 
+## OpenAF channels
+
+The opack registers a Parquet-backed `$ch` type. Records are kept as a full in-memory table backed by a
+single Parquet file: every mutating operation (`set`/`setAll`/`unset`/`unsetAll`/`pop`/`shift`) rewrites the
+whole file, so this channel type is best suited for small/medium sized tables rather than high write
+throughput. Map and array field values are stored as JSON strings and automatically parsed back on read.
+
+```javascript
+loadLib("parquet.js")
+
+$ch("users").create(1, "parquet", {
+  file: "users.parquet",
+  key : "id"   // optional: use a single field as the record's identity (otherwise the whole record is the key)
+})
+
+$ch("users").set({ id: 1 }, { id: 1, name: "John", tags: [ "admin" ] })
+print($ch("users").get({ id: 1 }).name)
+print($ch("users").size())
+$ch("users").destroy()
+```
+
+Creation options:
+
+| Option | Type | Description |
+|--------|------|--------------|
+| `file` | String | The local Parquet file to use (required unless `s3` is provided) |
+| `key` | String | Optional field name to use as the record's unique key |
+| `schema` | Array | Optional explicit Parquet schema (`[{ name, type }, ...]`, type one of `DOUBLE`, `BOOLEAN` or `STRING`) instead of inferring one from the union of all record fields |
+| `s3` | Map | Optional, keep the Parquet file in a S3 bucket instead of a local file (see below) |
+
+### Keeping the Parquet file in S3
+
+Instead of (or besides) a local file, the channel can read/write its Parquet file directly to a
+S3-compatible bucket, using the [S3 opack](../S3). Provide either an already created `S3` client
+(`options.s3.client`) or the connection parameters to create one automatically:
+
+```javascript
+loadLib("parquet.js")
+
+$ch("users").create(1, "parquet", {
+  key: "id",
+  s3: {
+    bucket   : "my-bucket",
+    object   : "tables/users.parquet",
+    url      : "https://s3.amazonaws.com",
+    accessKey: "...",
+    secret   : "..."
+    // region, useVersion1, ignoreCertCheck are also supported
+    // or provide an already built S3 instance instead: client: mys3
+  }
+})
+
+$ch("users").set({ id: 1 }, { id: 1, name: "John" })
+// the Parquet file was downloaded on create() and is re-uploaded to S3 on every mutation
+$ch("users").destroy()
+```
+
 ## Running the tests
 
 ```bash
 ojob tests/autoTestParquet.yaml
+ojob tests/autoTestParquetChannel.yaml
 ```
 
 ## oafp usage

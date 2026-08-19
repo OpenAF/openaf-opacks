@@ -1,0 +1,93 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- AvroChannel::SetGetSize
+- AvroChannel::PersistenceAcrossReload
+- AvroChannel::UnsetRemovesRecordAndEmptiesFile
+- AvroChannel::SetAllUnsetAll
+- AvroChannel::GetAllGetKeysForEach
+- AvroChannel::PopShift
+- AvroChannel::GetSet
+- AvroChannel::NestedValuesRoundTrip
+- AvroChannel::S3BackedChannel
+- Test results
+
+jobs:
+- name: AvroChannel::Init
+  exec: |
+    loadLib("avro.js")
+    args.tests = require("tests/autoTestAvroChannel.js")
+
+- name: AvroChannel::SetGetSize
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetGetSize
+
+- name: AvroChannel::PersistenceAcrossReload
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPersistenceAcrossReload
+
+- name: AvroChannel::UnsetRemovesRecordAndEmptiesFile
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnsetRemovesRecordAndEmptiesFile
+
+- name: AvroChannel::SetAllUnsetAll
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetAllUnsetAll
+
+- name: AvroChannel::GetAllGetKeysForEach
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetAllGetKeysForEach
+
+- name: AvroChannel::PopShift
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPopShift
+
+- name: AvroChannel::GetSet
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSet
+
+- name: AvroChannel::NestedValuesRoundTrip
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testNestedValuesRoundTrip
+
+- name: AvroChannel::S3BackedChannel
+  from: AvroChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testS3BackedChannel
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - AvroChannel::SetGetSize
+  - AvroChannel::PersistenceAcrossReload
+  - AvroChannel::UnsetRemovesRecordAndEmptiesFile
+  - AvroChannel::SetAllUnsetAll
+  - AvroChannel::GetAllGetKeysForEach
+  - AvroChannel::PopShift
+  - AvroChannel::GetSet
+  - AvroChannel::NestedValuesRoundTrip
+  - AvroChannel::S3BackedChannel
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

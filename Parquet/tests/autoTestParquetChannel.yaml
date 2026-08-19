@@ -1,0 +1,93 @@
+include:
+- oJobTest.yaml
+
+ojob:
+  catch : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+  opacks:
+  - oJob-common
+
+todo:
+- ParquetChannel::SetGetSize
+- ParquetChannel::PersistenceAcrossReload
+- ParquetChannel::UnsetRemovesRecordAndEmptiesFile
+- ParquetChannel::SetAllUnsetAll
+- ParquetChannel::GetAllGetKeysForEach
+- ParquetChannel::PopShift
+- ParquetChannel::GetSet
+- ParquetChannel::NestedValuesRoundTrip
+- ParquetChannel::S3BackedChannel
+- Test results
+
+jobs:
+- name: ParquetChannel::Init
+  exec: |
+    loadLib("parquet.js")
+    args.tests = require("tests/autoTestParquetChannel.js")
+
+- name: ParquetChannel::SetGetSize
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetGetSize
+
+- name: ParquetChannel::PersistenceAcrossReload
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPersistenceAcrossReload
+
+- name: ParquetChannel::UnsetRemovesRecordAndEmptiesFile
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testUnsetRemovesRecordAndEmptiesFile
+
+- name: ParquetChannel::SetAllUnsetAll
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testSetAllUnsetAll
+
+- name: ParquetChannel::GetAllGetKeysForEach
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetAllGetKeysForEach
+
+- name: ParquetChannel::PopShift
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testPopShift
+
+- name: ParquetChannel::GetSet
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testGetSet
+
+- name: ParquetChannel::NestedValuesRoundTrip
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testNestedValuesRoundTrip
+
+- name: ParquetChannel::S3BackedChannel
+  from: ParquetChannel::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testS3BackedChannel
+
+- name: Test results
+  from: oJob Test Results
+  deps:
+  - ParquetChannel::SetGetSize
+  - ParquetChannel::PersistenceAcrossReload
+  - ParquetChannel::UnsetRemovesRecordAndEmptiesFile
+  - ParquetChannel::SetAllUnsetAll
+  - ParquetChannel::GetAllGetKeysForEach
+  - ParquetChannel::PopShift
+  - ParquetChannel::GetSet
+  - ParquetChannel::NestedValuesRoundTrip
+  - ParquetChannel::S3BackedChannel
+  args:
+    quiet: true
+  exec: |
+    tprint("Tests PASSED : {{pass}}/{{count}}", args.results)
+    tprint("Tests FAILED : {{fail}}/{{count}}", args.results)
+    tprint("Tests ASSERTS: {{asserts}}", args.results)
+    if (args.results.fail > 0) {
+      printErr("There are failed tests")
+      exit(-1)
+    }

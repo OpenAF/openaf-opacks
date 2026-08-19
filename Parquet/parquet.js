@@ -265,3 +265,252 @@ Parquet.prototype.fromArray = function(aFile, aArray, aSchema) {
 Parquet.prototype.getFile = function() {
     return this._file
 }
+
+ow.loadCh()
+// parquet implementation
+//
+/**
+* <odoc>
+* <key>ow.ch.types.parquet</key>
+* The parquet channel OpenAF simplistic implementation keeps a full table of records, in memory, backed by
+* a single Parquet file (either local or in a S3 bucket). Every mutating operation (set/setAll/unset/unsetAll/
+* pop/shift) rewrites the entire Parquet file so this channel type is best suited for small/medium sized tables.
+* The creation options are:\
+* \
+*    - file    (String)  The local Parquet file to use (required unless options.s3 is provided).\
+*    - key     (String)  Optional field name to use as the record's unique key (otherwise the whole record is used as the key).\
+*    - schema  (Array)   Optional explicit Parquet schema (an array of { name, type } where type is one of DOUBLE, BOOLEAN or STRING) to use instead of inferring one from the union of all record fields.\
+*    - s3      (Map)     Optional map to keep the Parquet file in a S3 bucket instead of a local file:\
+*       - bucket          (String)  The S3 bucket name.\
+*       - object          (String)  The S3 object name/path to use for the Parquet file.\
+*       - client          (Object)  Optional, an already created S3 object (see the S3 opack). If not provided one will be created with the following options.\
+*       - url             (String)  The S3 service URL.\
+*       - accessKey       (String)  The S3 access key.\
+*       - secret          (String)  The S3 secret key.\
+*       - region          (String)  Optional S3 region.\
+*       - useVersion1     (Boolean) Optional, use S3 API version 1 where possible.\
+*       - ignoreCertCheck (Boolean) Optional, ignore SSL certificate checks.\
+* \
+* Map or array field values are stored as JSON strings and automatically parsed back on read (fields that read back as text
+* starting/ending with "{"/"}" or "["/"]" are parsed as JSON).\
+* \
+* </odoc>
+*/
+ow.ch.__types.parquet = {
+    __channels: {},
+    __id: function(o, aK) {
+        if (isDef(o.key) && isMap(aK) && isDef(aK[o.key])) aK = { key: aK[o.key] }
+        if (isMap(aK) && isDef(aK.key)) return String(aK.key)
+        return stringify(sortMapKeys(aK), __, "")
+    },
+    __encode: function(row) {
+        var r = {}
+        Object.keys(row).forEach(k => {
+            var v = row[k]
+            r[k] = (isMap(v) || isArray(v)) ? stringify(v, __, "") : v
+        })
+        return r
+    },
+    __decode: function(row) {
+        var r = {}
+        Object.keys(row).forEach(k => {
+            var v = row[k]
+            if (isString(v) &&
+                ((v.startsWith("{") && v.endsWith("}")) || (v.startsWith("[") && v.endsWith("]")))) {
+                try { v = jsonParse(v, true) } catch(e) {}
+            }
+            r[k] = v
+        })
+        return r
+    },
+    __buildSchema: function(rows) {
+        var order = [], sample = {}
+        rows.forEach(row => {
+            Object.keys(row).forEach(k => {
+                if (order.indexOf(k) < 0) order.push(k)
+                if (isUnDef(sample[k]) && isDef(row[k]) && row[k] !== null) sample[k] = row[k]
+            })
+        })
+
+        return order.map(k => {
+            var jsType = descType(sample[k])
+            var fType
+            switch(jsType) {
+            case "number" : fType = "DOUBLE" ; break
+            case "boolean": fType = "BOOLEAN"; break
+            default       : fType = "STRING" ; break
+            }
+            return { name: k, type: fType }
+        })
+    },
+    __load: function(aName) {
+        var o = this.__channels[aName]
+        o.data = {}
+        o.keys = {}
+
+        if (isDef(o.s3)) {
+            if (o.s3.client.objectExists(o.s3.bucket, o.s3.object)) {
+                o.s3.client.getObject(o.s3.bucket, o.s3.object, o._local)
+            } else {
+                return
+            }
+        }
+
+        if (!io.fileExists(o._local) || io.fileInfo(o._local).size <= 0) return
+
+        var rows = new Parquet().loadFile(o._local).toArray()
+        var parent = this
+        rows.forEach(row => {
+            var r  = parent.__decode(row)
+            var aK = isDef(o.key) ? { key: r[o.key] } : r
+            var id = parent.__id(o, aK)
+            o.keys[id] = aK
+            o.data[id] = r
+        })
+    },
+    __flush: function(aName) {
+        var o = this.__channels[aName]
+        var rows = Object.keys(o.data).map(id => this.__encode(o.data[id]))
+
+        if (rows.length == 0) {
+            if (io.fileExists(o._local)) io.rm(o._local)
+        } else {
+            var schema = isDef(o.schema) ? o.schema : this.__buildSchema(rows)
+            new Parquet().fromArray(o._local, rows, schema)
+        }
+
+        if (isDef(o.s3)) {
+            if (rows.length == 0) {
+                if (o.s3.client.objectExists(o.s3.bucket, o.s3.object)) o.s3.client.removeObject(o.s3.bucket, o.s3.object)
+            } else {
+                o.s3.client.putObject(o.s3.bucket, o.s3.object, o._local)
+            }
+        }
+    },
+    create       : function(aName, shouldCompress, options) {
+        options = _$(options, "options").isMap().default({})
+
+        var o = {}
+        o.key    = _$(options.key, "options.key").isString().default(__)
+        o.schema = _$(options.schema, "options.schema").default(__)
+
+        if (isDef(options.s3)) {
+            var s3cfg = _$(options.s3, "options.s3").isMap().$_()
+            _$(s3cfg.bucket, "options.s3.bucket").isString().$_()
+            _$(s3cfg.object, "options.s3.object").isString().$_()
+
+            o.s3 = {}
+            o.s3.bucket = s3cfg.bucket
+            o.s3.object = s3cfg.object
+            if (isDef(s3cfg.client)) {
+                o.s3.client = s3cfg.client
+                o.s3.ownClient = false
+            } else {
+                loadLib("s3.js")
+                o.s3.client = new S3(s3cfg.url, s3cfg.accessKey, s3cfg.secret, s3cfg.region, s3cfg.useVersion1, s3cfg.ignoreCertCheck)
+                o.s3.ownClient = true
+            }
+            o._local = io.createTempFile("parquet-ch-", ".parquet")
+            io.rm(o._local)
+        } else {
+            o.file = _$(options.file, "options.file").isString().$_()
+            o._local = o.file
+        }
+
+        this.__channels[aName] = o
+        this.__load(aName)
+    },
+    destroy      : function(aName) {
+        var o = this.__channels[aName]
+        if (isDef(o.s3)) {
+            if (o.s3.ownClient) o.s3.client.close()
+            if (io.fileExists(o._local)) io.rm(o._local)
+        }
+        delete this.__channels[aName]
+    },
+    size         : function(aName) {
+        return Object.keys(this.__channels[aName].data).length
+    },
+    forEach      : function(aName, aFunction) {
+        var o = this.__channels[aName]
+        Object.keys(o.data).forEach(id => aFunction(o.keys[id], o.data[id]))
+    },
+    getAll       : function(aName, full) {
+        var o = this.__channels[aName]
+        return Object.keys(o.data).map(id => o.data[id])
+    },
+    getKeys      : function(aName, full) {
+        var o = this.__channels[aName]
+        return Object.keys(o.data).map(id => o.keys[id])
+    },
+    getSortedKeys: function(aName, full) {
+        return this.getKeys(aName, full)
+    },
+    getSet       : function getSet(aName, aMatch, aK, aV, aTimestamp)  {
+        var res = this.get(aName, aK)
+        if ($stream([res]).anyMatch(aMatch)) {
+            return this.set(aName, aK, aV, aTimestamp)
+        }
+        return __
+    },
+    set          : function(aName, aK, aV, aTimestamp) {
+        var o  = this.__channels[aName]
+        var id = this.__id(o, aK)
+        o.keys[id] = aK
+        o.data[id] = aV
+        this.__flush(aName)
+        return aK
+    },
+    setAll       : function(aName, aKs, aVs, aTimestamp) {
+        ow.loadObj()
+        var o = this.__channels[aName]
+        aVs.forEach(v => {
+            var aK = ow.obj.filterKeys(aKs, v)
+            var id = this.__id(o, aK)
+            o.keys[id] = aK
+            o.data[id] = v
+        })
+        this.__flush(aName)
+    },
+    unsetAll     : function(aName, aKs, aVs, aTimestamp) {
+        ow.loadObj()
+        var o = this.__channels[aName]
+        aVs.forEach(v => {
+            var aK = ow.obj.filterKeys(aKs, v)
+            var id = this.__id(o, aK)
+            delete o.data[id]
+            delete o.keys[id]
+        })
+        this.__flush(aName)
+    },
+    get          : function(aName, aK) {
+        var o  = this.__channels[aName]
+        var id = this.__id(o, aK)
+        return o.data[id]
+    },
+    pop          : function(aName) {
+        // ow.ch.pop() calls this to get a key, then does its own get(key)+unset(key), so
+        // this must return the key (not the value) and must not mutate state itself.
+        var o  = this.__channels[aName]
+        var ks = Object.keys(o.data)
+        if (ks.length == 0) return __
+        return o.keys[ks[ks.length - 1]]
+    },
+    shift        : function(aName) {
+        // ow.ch.shift() calls this to get a key, then does its own get(key)+unset(key), so
+        // this must return the key (not the value) and must not mutate state itself.
+        var o  = this.__channels[aName]
+        var ks = Object.keys(o.data)
+        if (ks.length == 0) return __
+        return o.keys[ks[0]]
+    },
+    unset        : function(aName, aK, aTimestamp) {
+        var o  = this.__channels[aName]
+        var id = this.__id(o, aK)
+        var v  = o.data[id]
+        delete o.data[id]
+        delete o.keys[id]
+        this.__flush(aName)
+        return v
+    }
+}
