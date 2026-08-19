@@ -40,10 +40,6 @@ files:
 - poi-scratchpad-5.5.1.jar
 - src/openaf/plugins/DOC.java
 - src/openaf/plugins/XLS.java
-- tests/autoTestAll.DOC.js
-- tests/autoTestAll.DOC.yaml
-- tests/autoTestAll.XLS.js
-- tests/autoTestAll.XLS.yaml
 - xmlbeans-5.3.0.jar
 filesHash:
   .maven.yaml: 746d9fce2d510772fa25865da5c0554bb4d71e5a
@@ -63,8 +59,4 @@ filesHash:
   poi-scratchpad-5.5.1.jar: 3b5d92ccc2ddb9e17946b22b0ea504c5a33126b5
   src/openaf/plugins/DOC.java: 4ee69b1443a3506aa8c0642dcf571b0dc32ea73a
   src/openaf/plugins/XLS.java: 8086050cdbba7fe47a5e7712abb18bdc5aa78764
-  tests/autoTestAll.DOC.js: 7c4949acc1aa155506986b5b770d7f16aea079dc
-  tests/autoTestAll.DOC.yaml: b423211694d2f92ab40eadb5eced03da6aa94ef0
-  tests/autoTestAll.XLS.js: d187ea75619f7615f9ca411c51cdb216b663a487
-  tests/autoTestAll.XLS.yaml: 8178f14a7f5fb165c1817e906f99d191c8ea3b8d
   xmlbeans-5.3.0.jar: f93c3ba820d7240b7fec4ec5bc35e7223cc6fc1f
