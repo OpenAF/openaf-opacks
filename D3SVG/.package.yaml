@@ -53,7 +53,6 @@ files:
 - samples/bar.js
 - samples/line.js
 - samples/pie.js
-- tests/test_d3svg.js
 filesHash:
   GALLERY.md: 7c2c9fb182c22883df6735c1e02833ead7e78837
   README.md: 533f4ea6470665154dcd3e0785d5d27dd855950b
@@ -79,4 +78,3 @@ filesHash:
   samples/bar.js: 5e88c21e57d9df5c598cd40b5eabf9ae9042b1fc
   samples/line.js: 50abafe352aeba77c7ee304999a1b133fe724071
   samples/pie.js: c6432d0c4a7502834790c0d8d2e7b52e76bee0c1
-  tests/test_d3svg.js: f88e27e22599dc2ed49d01dfdd5a15689fae17b2
