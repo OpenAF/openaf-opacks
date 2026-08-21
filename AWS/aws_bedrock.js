@@ -222,6 +222,92 @@ AWS.prototype.BEDROCK_InvokeModelStream = function(aRegion, aModelId, aInput, aO
   }
 }
 
+/**
+ * <odoc>
+ * <key>AWS.BEDROCK_OpenAIResponses(aRegion, aInput) : Map</key>
+ * Calls the OpenAI-compatible Responses API. OpenAI GPT-5.6 models use Mantle
+ * for in-region requests in supported US regions and Bedrock Runtime for
+ * cross-region inference profile requests.
+ * </odoc>
+ */
+AWS.prototype.BEDROCK_OpenAIResponses = function(aRegion, aInput) {
+  aRegion = _$(aRegion, "aRegion").isString().default(this.region)
+  _$(aInput, "aInput").$_()
+
+  var uri = "/openai/v1/responses"
+  var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aRegion) >= 0 &&
+                  !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
+  var service = useMantle ? "bedrock-mantle" : "bedrock"
+  var aURL = useMantle ?
+    "https://bedrock-mantle." + aRegion + ".api.aws" + uri :
+    "https://bedrock-runtime." + aRegion + ".amazonaws.com" + uri
+  var url = new java.net.URL(aURL)
+  var aHost = String(url.getHost())
+
+  return this.postURLEncoded(aURL, uri, __, aInput, service, aHost, aRegion, __, __, "application/json", true)
+}
+
+/**
+ * <odoc>
+ * <key>AWS.BEDROCK_OpenAIResponsesStream(aRegion, aInput, aOnChunk) : Map</key>
+ * Streams OpenAI-compatible Responses API events from Amazon Bedrock.
+ * aOnChunk receives each decoded Server-Sent Event data object.
+ * </odoc>
+ */
+AWS.prototype.BEDROCK_OpenAIResponsesStream = function(aRegion, aInput, aOnChunk) {
+  aRegion = _$(aRegion, "aRegion").isString().default(this.region)
+  _$(aInput, "aInput").$_()
+  _$(aOnChunk, "aOnChunk").isFunction().$_()
+
+  var uri = "/openai/v1/responses"
+  var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aRegion) >= 0 &&
+                  !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
+  var service = useMantle ? "bedrock-mantle" : "bedrock"
+  var aURL = useMantle ?
+    "https://bedrock-mantle." + aRegion + ".api.aws" + uri :
+    "https://bedrock-runtime." + aRegion + ".amazonaws.com" + uri
+  var url = new java.net.URL(aURL)
+  var aHost = String(url.getHost())
+  var payload = stringify(aInput, __, "")
+  var headers = this.__getRequest("post", uri, service, aHost, aRegion, "", payload, __, __, "application/json")
+  headers["Content-Type"] = "application/json"
+  headers["Accept"] = "text/event-stream"
+
+  ow.loadObj()
+  var events = []
+  try {
+    var h = new ow.obj.http(aURL, "POST", payload, headers, false, 30000, true, { delayBuild: true })
+    h.setThrowExceptions(false)
+    if (isDef(h.client.build)) h.client = h.client.build()
+    h.exec(aURL, "POST", payload, headers, false, 30000, true)
+
+    var responseCode = h.responseCode()
+    if (responseCode != 200) return { error: "HTTP " + responseCode + ": " + h.response(), events: [] }
+
+    var rstream = h.responseStream()
+    if (isUnDef(rstream)) return { error: "Failed to get response stream", events: [] }
+    try {
+      ioStreamReadLines(rstream, function(line) {
+        if (!isString(line) || !line.startsWith("data:")) return
+        var data = line.substring(5).trim()
+        if (data == "[DONE]" || data.length == 0) return
+        try {
+          var event = jsonParse(data)
+          events.push(event)
+          aOnChunk(event)
+        } catch (parseError) {
+          // Ignore malformed SSE data while retaining the completed stream.
+        }
+      })
+    } finally {
+      try { rstream.close() } catch (closeError) {}
+    }
+  } catch (httpError) {
+    return { error: "HTTP error: " + String(httpError), events: events }
+  }
+  return { events: events }
+}
+
 ow.loadAI()
 ow.ai.__gpttypes.bedrock = {
   create: _p => {
@@ -247,6 +333,78 @@ ow.ai.__gpttypes.bedrock = {
     var _temperature = aOptions.temperature
     var _lastStats = __
     var _debugCh = __
+    var _isOpenAIResponsesModel = aModelName => {
+      return isString(aModelName) && String(aModelName).toLowerCase().indexOf("openai.gpt-5.6-") >= 0
+    }
+    var _openAIResponsesModelId = aModelName => {
+      var modelName = String(aModelName)
+      var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aOptions.region) >= 0 &&
+                      !/^(global|us|eu|apac)\./i.test(modelName)
+      return useMantle ? modelName.replace(/^(global|us|eu|apac)\./i, "") : modelName
+    }
+    var _openAIResponsesText = response => {
+      if (!isMap(response)) return ""
+      if (isString(response.output_text)) return response.output_text
+      var texts = []
+      var collect = value => {
+        if (isUnDef(value) || value === null) return
+        if (isString(value)) { texts.push(value); return }
+        if (isArray(value)) { value.forEach(collect); return }
+        if (!isMap(value)) return
+        if (value.type == "output_text" && isString(value.text)) { texts.push(value.text); return }
+        if (isDef(value.content)) collect(value.content)
+      }
+      collect(response.output)
+      return texts.join("")
+    }
+    var _buildOpenAIResponsesInput = (aPrompt, aModelName, aTemperature, toolsToUse) => {
+      if (isArray(aPrompt)) _r.conversation = aPrompt
+      else if (isString(aPrompt) && aPrompt.length > 0) _r.conversation.push({ role: "user", content: aPrompt })
+
+      var input = []
+      _r.conversation.forEach(msg => {
+        if (!isMap(msg)) {
+          input.push({ role: "user", content: String(msg) })
+          return
+        }
+        if (String(msg.role || "").toLowerCase() == "tool") {
+          input.push({ type: "function_call_output", call_id: msg.tool_call_id || msg.call_id, output: isString(msg.content) ? msg.content : JSON.stringify(msg.content) })
+          return
+        }
+        if (isArray(msg.tool_calls)) {
+          msg.tool_calls.forEach(call => {
+            if (!isMap(call) || !isMap(call.function)) return
+            input.push({ type: "function_call", call_id: call.id, name: call.function.name, arguments: call.function.arguments || "{}" })
+          })
+        }
+        var role = String(msg.role || "user").toLowerCase()
+        if (role == "system") role = "developer"
+        if (role != "developer" && role != "user" && role != "assistant") role = "user"
+        if (isDef(msg.content) && (!isArray(msg.tool_calls) || msg.content !== "")) {
+          input.push({ role: role, content: isString(msg.content) ? msg.content : JSON.stringify(msg.content) })
+        }
+      })
+
+      var request = {
+        model: _openAIResponsesModelId(aModelName),
+        input: input,
+        store: _$(toBoolean(aOptions.responsesStore), "aOptions.responsesStore").isBoolean().default(false)
+      }
+      if (isDef(aTemperature)) request.temperature = aTemperature
+      var maxOutputTokens = aOptions.params.max_output_tokens
+      if (isUnDef(maxOutputTokens)) maxOutputTokens = aOptions.params.max_completion_tokens
+      if (isUnDef(maxOutputTokens)) maxOutputTokens = aOptions.params.max_tokens
+      if (isNumber(maxOutputTokens)) request.max_output_tokens = maxOutputTokens
+      if (isArray(toolsToUse) && toolsToUse.length > 0) {
+        request.tools = toolsToUse.filter(tool => isMap(tool) && isMap(tool.function)).map(tool => ({
+          type: "function",
+          name: tool.function.name,
+          description: tool.function.description || "",
+          parameters: tool.function.parameters || { type: "object", properties: {} }
+        }))
+      }
+      return request
+    }
     var _normalizePortableRole = role => {
       if (!isString(role)) return "user"
       role = String(role).toLowerCase()
@@ -830,6 +988,25 @@ ow.ai.__gpttypes.bedrock = {
 
         //if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
         // JSON instructions are now handled per-model to avoid persisting in conversation history
+
+        if (_isOpenAIResponsesModel(aModel)) {
+          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse)
+          if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client'}, merge({_t:nowNano(),_f:'client'}, responsesInput))
+          var responsesResult = aws.BEDROCK_OpenAIResponses(aOptions.region, responsesInput)
+          if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm'}, merge({_t:nowNano(),_f:'llm'}, responsesResult))
+          _captureStats(responsesResult, aModel)
+          if (isDef(responsesResult.error)) return responsesResult
+
+          var responsesText = _openAIResponsesText(responsesResult)
+          if (!aOptions.showReasoning) responsesText = _stripReasoningTags(responsesText)
+          if (responsesText.length > 0) _r.conversation.push({ role: "assistant", content: responsesText })
+          if (aJsonFlag) {
+            responsesResult.response = responsesText
+            responsesResult.message = { content: responsesText }
+            return responsesResult
+          }
+          return responsesText
+        }
 
         var _m = {}
 
@@ -2216,6 +2393,102 @@ ow.ai.__gpttypes.bedrock = {
           if (isDef(tool.function.func) && isUnDef(tool.fn)) tool.fn = tool.function.func
           if (isDef(tool.fn)) toolRegistry[toolName] = tool
         })
+
+        if (_isOpenAIResponsesModel(aModel)) {
+          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse)
+          responsesInput.stream = true
+          if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client-stream'}, merge({_t:nowNano(),_f:'client-stream'}, responsesInput))
+
+          var fullContent = ""
+          var events = []
+          var completedResponse = __
+          var responsesStreamResult = aws.BEDROCK_OpenAIResponsesStream(aOptions.region, responsesInput, function(event) {
+            events.push(event)
+            if (event.type == "response.output_text.delta" && isString(event.delta)) {
+              fullContent += event.delta
+              if (isDef(aOnDelta)) aOnDelta(event.delta, event)
+            }
+            if (event.type == "response.completed" && isMap(event.response)) completedResponse = event.response
+          })
+          if (isDef(responsesStreamResult.error)) {
+            if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(responsesStreamResult.error)})
+            return { error: responsesStreamResult.error, content: fullContent, events: events }
+          }
+          if (fullContent.length == 0 && isDef(completedResponse)) fullContent = _openAIResponsesText(completedResponse)
+          if (!aOptions.showReasoning) fullContent = _stripReasoningTags(fullContent)
+          if (isDef(completedResponse)) _captureStats(completedResponse, aModel)
+
+          // Responses streams deliver function calls as output items, not text deltas.
+          // Keep them in the same OpenAI chat-completions shape used by the generic
+          // streaming path so they can be executed and their results sent back.
+          var responseToolCalls = []
+          var responseToolCallIds = {}
+          var collectResponseToolCalls = value => {
+            if (isUnDef(value) || value === null) return
+            if (isArray(value)) {
+              value.forEach(collectResponseToolCalls)
+              return
+            }
+            if (!isMap(value)) return
+            if (value.type == "function_call" && isString(value.name) && value.name.length > 0) {
+              var callId = value.call_id || value.id || value.name
+              if (!responseToolCallIds[callId]) {
+                responseToolCallIds[callId] = true
+                responseToolCalls.push({
+                  id: callId,
+                  type: "function",
+                  function: {
+                    name: value.name,
+                    arguments: isString(value.arguments) ? value.arguments : stringify(value.arguments || {}, __, "")
+                  }
+                })
+              }
+            }
+            if (isDef(value.output)) collectResponseToolCalls(value.output)
+            if (isDef(value.response)) collectResponseToolCalls(value.response)
+          }
+          collectResponseToolCalls(completedResponse)
+
+          if (fullContent.length > 0 || responseToolCalls.length > 0) {
+            var responseMessage = { role: "assistant", content: fullContent }
+            if (responseToolCalls.length > 0) responseMessage.tool_calls = responseToolCalls
+            _r.conversation.push(responseMessage)
+          }
+          if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream'}, {_t:nowNano(),_f:'llm-stream', content: fullContent, events: events.length})
+
+          if (responseToolCalls.length > 0) {
+            var toolResults = []
+            var responseToolResultToText = function(value) {
+              if (isString(value)) return value
+              if (isNumber(value) || isBoolean(value)) return String(value)
+              if (isArray(value) || isMap(value)) return stringify(value, __, "")
+              if (isUnDef(value)) return ""
+              return String(value)
+            }
+            responseToolCalls.forEach(function(call) {
+              var toolName = call.function.name
+              var toolInput = call.function.arguments
+              try { toolInput = JSON.parse(toolInput) } catch (parseError) { }
+              var tool = toolRegistry[toolName] || _r.tools[toolName]
+              var toolFn = isDef(tool) ? (tool.fn || (isMap(tool.function) ? tool.function.func : __)) : __
+              var toolContent
+              try {
+                toolContent = isFunction(toolFn) ? responseToolResultToText(toolFn(toolInput)) : "Tool " + toolName + " is not available."
+              } catch (toolError) {
+                toolContent = "Error executing tool: " + toolError.message
+              }
+              toolResults.push({ role: "tool", tool_call_id: call.id, content: toolContent })
+            })
+            if (toolResults.length > 0) {
+              toolResults.forEach(function(result) { _r.conversation.push(result) })
+              return _r.rawPromptStream(_r.conversation, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
+            }
+          }
+
+          var response = { content: fullContent, events: events, finishReason: isDef(completedResponse) ? completedResponse.status : __ }
+          if (responseToolCalls.length > 0) response.toolCalls = responseToolCalls
+          return response
+        }
 
         // Build input using existing logic from rawPrompt
         // This reuses the same message normalization for all model families
