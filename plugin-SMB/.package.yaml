@@ -36,8 +36,6 @@ files:
 - plugin-smb.jar
 - src/openaf/plugins/SMB.class
 - src/openaf/plugins/SMB.java
-- tests/autoTestSMB.js
-- tests/autoTestSMB.yaml
 filesHash:
   .maven.yaml: 096e2e9f8933644a0624dbb5eb2c0d3e98fb0c0b
   .odoc.db: 56fe586e3373b0d93514a6df0316c1cdcad2b670
@@ -49,5 +47,3 @@ filesHash:
   plugin-smb.jar: ca4eb73645efa1ac3ee7eadfb42a023231dadec4
   src/openaf/plugins/SMB.class: 774b43d662ce074f31704002e09fa8934c076b7a
   src/openaf/plugins/SMB.java: 2830c601409b9058dbe70f7d077359fa9496cc3d
-  tests/autoTestSMB.js: bfeb9b25141899d25b2e6dad15ab7e4a9b7b1fff
-  tests/autoTestSMB.yaml: 77b7ed45a34253b0d8015b68b74b4bff49039d33
