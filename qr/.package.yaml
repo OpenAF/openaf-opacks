@@ -32,8 +32,6 @@ files:
 - lib/javase-3.5.4.jar
 - oafp_qr.js
 - qr.js
-- tests/tests.js
-- tests/tests.yaml
 filesHash:
   .maven.yaml: ecf6b270b9c8c89a4ab3e48a10dabdabdf54cf50
   .odoc.db: ff36ff6713ef41ea3d53d9c7cb35add0cce164d2
@@ -44,5 +42,3 @@ filesHash:
   lib/javase-3.5.4.jar: 5393a868b60694a181a8470a85f89a4bec3dce2e
   oafp_qr.js: d5d3cdd301053ad3ad08b4342e2d7d6946bf7950
   qr.js: 79931628007963980262f8f2e8e77a6fd62f0c82
-  tests/tests.js: 2ae8b56524a46102d1d6306a3b71ab53997948af
-  tests/tests.yaml: 9c2e74850b49e8af7a50ff86d8abb6ecb561569b
