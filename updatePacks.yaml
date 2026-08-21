@@ -3,7 +3,7 @@ jobs:
   exec: |
     if (io.fileExists(args.filepath + "/.package.yaml") || io.fileExists(args.filepath + "/.package.json")) {
       tlog("updating {{filepath}}...", args)
-      sh("cd " + args.filepath + " && " + getOpenAFPath() + "opack genpack .")
+      sh("cd " + args.filepath + " && " + getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
     } else {
       tlogErr("No .packege file found in '{{filepath}}'", args)
     }
