@@ -42,6 +42,62 @@ AWS.prototype.__s3XmlEscape = function(aStr) {
    return String(aStr).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
+AWS.prototype.__s3SelectSerializationXML = function(aKind, aSerialization) {
+   aSerialization = _$(aSerialization).isMap().default({});
+   var type = String(_$(aSerialization.type).isString().default("CSV")).toUpperCase();
+   var xml = "<" + aKind + "Serialization>";
+   var value = (aName, aDefault) => this.__s3XmlEscape(_$(aSerialization[aName]).default(aDefault));
+
+   if (aKind == "Input" && type == "PARQUET") return xml + "<CompressionType>NONE</CompressionType><Parquet/></InputSerialization>";
+   if (["CSV", "JSON"].indexOf(type) < 0) throw "Unsupported S3 Select " + aKind.toLowerCase() + " serialization type '" + type + "'.";
+
+   if (aKind == "Input") {
+      xml += "<CompressionType>" + value("compression", "NONE") + "</CompressionType>";
+      if (type == "CSV") {
+         xml += "<CSV><FileHeaderInfo>" + value("fileHeaderInfo", "USE") + "</FileHeaderInfo>" +
+            "<FieldDelimiter>" + value("fieldDelimiter", ",") + "</FieldDelimiter>" +
+            "<QuoteCharacter>" + value("quoteCharacter", '\"') + "</QuoteCharacter>" +
+            "<QuoteEscapeCharacter>" + value("quoteEscapeCharacter", '\"') + "</QuoteEscapeCharacter>" +
+            "<RecordDelimiter>" + value("recordDelimiter", "\n") + "</RecordDelimiter>" +
+            (isDef(aSerialization.comments) ? "<Comments>" + value("comments", "#") + "</Comments>" : "") +
+            (isDef(aSerialization.allowQuotedRecordDelimiter) ? "<AllowQuotedRecordDelimiter>" + value("allowQuotedRecordDelimiter", false) + "</AllowQuotedRecordDelimiter>" : "") + "</CSV>";
+      } else {
+         xml += "<JSON><Type>" + value("jsonType", "LINES") + "</Type></JSON>";
+      }
+   } else if (type == "CSV") {
+      xml += "<CSV><FieldDelimiter>" + value("fieldDelimiter", ",") + "</FieldDelimiter>" +
+         "<QuoteCharacter>" + value("quoteCharacter", '\"') + "</QuoteCharacter>" +
+         "<QuoteEscapeCharacter>" + value("quoteEscapeCharacter", '\"') + "</QuoteEscapeCharacter>" +
+         "<QuoteFields>" + value("quoteFields", "ASNEEDED") + "</QuoteFields>" +
+         "<RecordDelimiter>" + value("recordDelimiter", "\n") + "</RecordDelimiter></CSV>";
+   } else {
+      xml += "<JSON><RecordDelimiter>" + value("recordDelimiter", "\n") + "</RecordDelimiter></JSON>";
+   }
+
+   return xml + "</" + aKind + "Serialization>";
+};
+
+AWS.prototype.__s3SelectEventHeaders = function(aBytes, aStart, aLength) {
+   var headers = {}, pos = aStart, end = aStart + aLength;
+   while (pos < end) {
+      var nameLength = aBytes[pos++] & 0xff;
+      var name = af.fromBytes2String(af.fromArray2Bytes(aBytes.slice(pos, pos + nameLength)));
+      pos += nameLength;
+      var type = aBytes[pos++] & 0xff, length = 0;
+      if (type == 7) {
+         length = ((aBytes[pos] & 0xff) << 8) | (aBytes[pos + 1] & 0xff);
+         pos += 2;
+         headers[name] = af.fromBytes2String(af.fromArray2Bytes(aBytes.slice(pos, pos + length)));
+         pos += length;
+      } else if (type == 6) {
+         headers[name] = aBytes[pos++] != 0;
+      } else {
+         throw "Unsupported S3 Select event-stream header type " + type;
+      }
+   }
+   return headers;
+};
+
 AWS.prototype.__s3ContentMD5 = function(aBody) {
    var hex = md5(aBody);
    var bytes = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, hex.length / 2);
@@ -162,6 +218,91 @@ AWS.prototype.S3_DeleteObject = function(aRegion, aBucket, aKey) {
    aKey    = _$(aKey, "aKey").isString().$_();
 
    return this.delete("s3", aRegion, "/" + aBucket + "/" + this.S3_EncodeKey(aKey), "", __, {}, __, __);
+};
+
+/**
+ * <odoc>
+ * <key>AWS.S3_SelectObjectContent(aRegion, aBucket, aKey, aSQLExpression, aInputSerialization, aOutputSerialization, aOptions) : Map</key>
+ * Runs an S3 Select SQL expression against aKey and returns { Records, Stats, Progress, Events }. Input serialization
+ * supports CSV (default), JSON and Parquet; output serialization supports CSV (default) and JSON. aOptions supports
+ * requestProgress, scanStartRange, scanEndRange and onRecord(aRecordChunk), which is called as Records events arrive.
+ * </odoc>
+ */
+AWS.prototype.S3_SelectObjectContent = function(aRegion, aBucket, aKey, aSQLExpression, aInputSerialization, aOutputSerialization, aOptions) {
+   aRegion              = _$(aRegion).isString().default(this.region);
+   aBucket              = _$(aBucket, "aBucket").isString().$_();
+   aKey                 = _$(aKey, "aKey").isString().$_();
+   aSQLExpression       = _$(aSQLExpression, "aSQLExpression").isString().$_();
+   aInputSerialization  = _$(aInputSerialization).isMap().default({});
+   aOutputSerialization = _$(aOutputSerialization).isMap().default({});
+   aOptions             = _$(aOptions).isMap().default({});
+
+   var query = this.__s3SortedQuery({ select: "", "select-type": 2 });
+   var loc = this.__s3URL(aRegion, aBucket, aKey, query);
+   var body = '<?xml version="1.0" encoding="UTF-8"?><SelectObjectContentRequest xmlns="http://s3.amazonaws.com/doc/2006-03-01/">' +
+      '<Expression>' + this.__s3XmlEscape(aSQLExpression) + '</Expression><ExpressionType>SQL</ExpressionType>' +
+      this.__s3SelectSerializationXML("Input", aInputSerialization) +
+      this.__s3SelectSerializationXML("Output", aOutputSerialization) +
+      '<RequestProgress><Enabled>' + (_$(aOptions.requestProgress).isBoolean().default(false) ? 'true' : 'false') + '</Enabled></RequestProgress>' +
+      ((isDef(aOptions.scanStartRange) || isDef(aOptions.scanEndRange)) ? '<ScanRange>' +
+         (isDef(aOptions.scanStartRange) ? '<Start>' + _$(aOptions.scanStartRange).isNumber().$_() + '</Start>' : '') +
+         (isDef(aOptions.scanEndRange) ? '<End>' + _$(aOptions.scanEndRange).isNumber().$_() + '</End>' : '') + '</ScanRange>' : '') +
+      '</SelectObjectContentRequest>';
+   var headers = this.__getRequest("post", loc.URI, "s3", loc.Host, aRegion, query, body, __, __, "application/xml");
+   headers["Accept"] = "application/vnd.amazon.eventstream";
+
+   ow.loadObj();
+   var result = { Records: "", Stats: __, Progress: [], Events: [] }, stream, pending = [];
+   var readUInt32BE = (arr, idx) => (((arr[idx] & 0xff) << 24) | ((arr[idx + 1] & 0xff) << 16) | ((arr[idx + 2] & 0xff) << 8) | (arr[idx + 3] & 0xff)) >>> 0;
+   var processPending = () => {
+      while (pending.length >= 12) {
+         var totalLength = readUInt32BE(pending, 0);
+         if (totalLength < 16) throw "Invalid S3 Select event-stream frame length " + totalLength;
+         if (pending.length < totalLength) return;
+
+         var headersLength = readUInt32BE(pending, 4);
+         var payloadStart = 12 + headersLength, payloadLength = totalLength - headersLength - 16;
+         if (payloadLength < 0) throw "Invalid S3 Select event-stream headers length";
+         var eventHeaders = this.__s3SelectEventHeaders(pending, 12, headersLength);
+         var payload = af.fromBytes2String(af.fromArray2Bytes(pending.slice(payloadStart, payloadStart + payloadLength)));
+         var event = { type: eventHeaders[":event-type"], messageType: eventHeaders[":message-type"] };
+
+         if (event.messageType == "error" || event.messageType == "exception") {
+            throw "S3 Select " + (eventHeaders[":error-code"] || event.type || "error") + ": " + (eventHeaders[":error-message"] || payload);
+         }
+         if (event.type == "Records") {
+            result.Records += payload;
+            if (isFunction(aOptions.onRecord)) aOptions.onRecord(payload);
+         } else if (event.type == "Stats") {
+            result.Stats = af.fromXML2Obj(payload);
+         } else if (event.type == "Progress") {
+            result.Progress.push(af.fromXML2Obj(payload));
+         }
+         result.Events.push(event);
+         pending = pending.slice(totalLength);
+      }
+   };
+
+   try {
+      var h = new ow.obj.http(loc.URL, "POST", body, headers, false, 30000, true, { delayBuild: true });
+      h.setThrowExceptions(false);
+      if (isDef(h.client.build)) h.client = h.client.build();
+      h.exec(loc.URL, "POST", body, headers, false, 30000, true);
+      if (h.responseCode() != 200) return { error: "HTTP " + h.responseCode() + ": " + h.response(), Records: "", Events: [] };
+      stream = h.responseStream();
+      if (isUnDef(stream)) return { error: "Failed to get S3 Select response stream", Records: "", Events: [] };
+      ioStreamReadBytes(stream, buffer => {
+         for (var i = 0; i < buffer.length; i++) pending.push(buffer[i]);
+         processPending();
+      });
+      if (pending.length > 0) return { error: "Incomplete S3 Select event stream", Records: result.Records, Events: result.Events };
+   } catch(e) {
+      return { error: String(e), Records: result.Records, Stats: result.Stats, Progress: result.Progress, Events: result.Events };
+   } finally {
+      if (isDef(stream)) try { stream.close(); } catch(e) {}
+   }
+
+   return result;
 };
 
 /**

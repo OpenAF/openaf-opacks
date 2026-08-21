@@ -98,7 +98,7 @@ filesHash:
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
-  aws_s3.js: 6644f366561429275ecfda2a0cd6acdf160add2f
+  aws_s3.js: e05deefee5ef5423e0dc3a5645ea39ef0b67706b
   aws_scheduler.js: f741e27d96325c1f839ce535a6ffc5b8b0c2c6d9
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
@@ -107,6 +107,6 @@ filesHash:
   oJobCodeArtifact.yaml: 177034be9ec45d5cbecfe0cc0d1c2ad4ed4ce371
   oJobECR.yaml: f15b791f50c38d1507b1b034337beb3b4ab41542
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
-  oafp_aws.js: aa347aafb81a42b03448ce79f1f9af104de152ec
+  oafp_aws.js: d71ff1c00d292d16442321e78eccf470fc0c1be1
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9
