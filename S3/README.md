@@ -51,6 +51,74 @@ var readStream = s3.getObjectStream("my_bucket", "/my/folder/on/bucket/my_file.c
 var readStream = s3.getObjectStream("my_bucket", "/my/folder/on/bucket/my_file.csv", 12345, 128);
 ````
 
+### Querying objects with S3 Select
+
+`selectObjectContent` executes an S3 Select SQL expression server-side and returns a Java input stream. Close the stream after consuming it; `stats()` is available on the returned stream after it has been fully read.
+
+Input serialization maps accept `type: "CSV"`, `"JSON"`, or `"PARQUET"`. CSV accepts `compression` (`NONE`, `GZIP`, `BZIP2`), `allowQuotedRecordDelimiter`, `fieldDelimiter`, `recordDelimiter`, `fileHeaderInfo` (`USE`, `IGNORE`, `NONE`), `quoteCharacter`, `quoteEscapeCharacter`, and `comments`. JSON accepts `compression` and `jsonType` (`LINES` or `DOCUMENT`). Output maps accept `type: "CSV"` or `"JSON"`; CSV accepts `fieldDelimiter`, `recordDelimiter`, `quoteCharacter`, `quoteFields` (`ALWAYS` or `ASNEEDED`), and `quoteEscapeCharacter`; JSON accepts `recordDelimiter`. Each delimiter or quote option is a single character. An optional sixth map supports `requestProgress`, `scanStartRange`, and `scanEndRange`.
+
+CSV and JSON (`jsonType: "LINES"`) work against both AWS S3 and MinIO. Parquet is supported by AWS S3 but not enabled by default on MinIO servers.
+
+CSV in, CSV out:
+
+````javascript
+// data/people.csv contains: name,age\nAna,17\nBob,21\n
+var result = s3.selectObjectContent(
+  "my_bucket",
+  "data/people.csv",
+  "SELECT s.name, s.age FROM S3Object s WHERE CAST(s.age AS INT) >= 18",
+  { type: "CSV", fileHeaderInfo: "USE" },
+  { type: "CSV" }
+);
+
+try {
+  var csv = af.fromInputStream2String(result);
+  print(csv); // Bob,21
+  sprint(result.stats());
+} finally {
+  result.close();
+}
+````
+
+JSON Lines in, JSON out:
+
+````javascript
+// data/people.jsonl contains one JSON object per line:
+// {"name":"Ana","age":17}
+// {"name":"Bob","age":21}
+var result = s3.selectObjectContent(
+  "my_bucket",
+  "data/people.jsonl",
+  "SELECT s.name FROM S3Object s WHERE s.age >= 18",
+  { type: "JSON", jsonType: "LINES" },
+  { type: "JSON" }
+);
+
+try {
+  print(af.fromInputStream2String(result)); // {"name":"Bob"}
+} finally {
+  result.close();
+}
+````
+
+Parquet in, JSON out (AWS S3 only):
+
+````javascript
+var result = s3.selectObjectContent(
+  "my_bucket",
+  "data/people.parquet",
+  "SELECT s.name FROM S3Object s WHERE CAST(s.age AS INT) >= 18",
+  { type: "PARQUET" },
+  { type: "JSON" }
+);
+
+try {
+  print(af.fromInputStream2String(result)); // {"name":"Bob"}
+} finally {
+  result.close();
+}
+````
+
 Getting object metadata:
 
 ````javascript

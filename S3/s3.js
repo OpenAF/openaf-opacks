@@ -450,6 +450,87 @@ S3.prototype.getObjectStreamByURL = function(aURL, offset, len) {
 
 /**
  * <odoc>
+ * <key>S3.selectObjectContent(aBucket, aObjectName, aSQLExpression, aInputSerialization, aOutputSerialization, aOptions) : JavaStream</key>
+ * Runs an S3 Select SQL expression against aBucket/aObjectName and returns a SelectResponseStream.
+ * aInputSerialization supports CSV (the default), JSON and Parquet. aOutputSerialization supports CSV (the default) and JSON.
+ * For CSV input/output, delimiter and quote values must be one-character strings. See the S3 opack README for the supported maps.
+ * aOptions can include requestProgress, scanStartRange and scanEndRange.
+ * </odoc>
+ */
+S3.prototype.selectObjectContent = function(aBucket, aObjectName, aSQLExpression, aInputSerialization, aOutputSerialization, aOptions) {
+    _$(aBucket, "aBucket").isString().$_("Please provide a bucket name.");
+    _$(aObjectName, "aObjectName").isString().$_("Please provide an object name.");
+    _$(aSQLExpression, "aSQLExpression").isString().$_("Please provide a S3 Select SQL expression.");
+    aInputSerialization = _$(aInputSerialization, "aInputSerialization").isMap().default({});
+    aOutputSerialization = _$(aOutputSerialization, "aOutputSerialization").isMap().default({});
+    aOptions = _$(aOptions, "aOptions").isMap().default({});
+
+    var input = Packages.io.minio.messages.InputSerialization;
+    var output = Packages.io.minio.messages.OutputSerialization;
+    var asChar = function(aValue, aName) {
+        if (isUnDef(aValue) || aValue === null) return null;
+        aValue = String(aValue);
+        if (aValue.length != 1) throw "Please provide a one-character " + aName + ".";
+        return new java.lang.Character(aValue.charAt(0));
+    };
+    var inputType = String(_$(aInputSerialization.type).default("CSV")).toUpperCase();
+    var outputType = String(_$(aOutputSerialization.type).default("CSV")).toUpperCase();
+    var inputSerialization;
+    var outputSerialization;
+
+    switch(inputType) {
+    case "CSV":
+        inputSerialization = input.newCSV(
+            Packages.io.minio.messages.InputSerialization$CompressionType.valueOf(String(_$(aInputSerialization.compression).default("NONE")).toUpperCase()),
+            _$(aInputSerialization.allowQuotedRecordDelimiter).isBoolean().default(false),
+            asChar(_$(aInputSerialization.comments).default("#"), "CSV input comments"),
+            asChar(_$(aInputSerialization.fieldDelimiter).default(","), "CSV input fieldDelimiter"),
+            Packages.io.minio.messages.InputSerialization$FileHeaderInfo.valueOf(String(_$(aInputSerialization.fileHeaderInfo).default("USE")).toUpperCase()),
+            asChar(_$(aInputSerialization.quoteCharacter).default('"'), "CSV input quoteCharacter"),
+            asChar(_$(aInputSerialization.quoteEscapeCharacter).default('"'), "CSV input quoteEscapeCharacter"),
+            asChar(_$(aInputSerialization.recordDelimiter).default("\n"), "CSV input recordDelimiter")
+        );
+        break;
+    case "JSON":
+        inputSerialization = input.newJSON(
+            Packages.io.minio.messages.InputSerialization$CompressionType.valueOf(String(_$(aInputSerialization.compression).default("NONE")).toUpperCase()),
+            Packages.io.minio.messages.InputSerialization$JsonType.valueOf(String(_$(aInputSerialization.jsonType).default("LINES")).toUpperCase())
+        );
+        break;
+    case "PARQUET":
+        inputSerialization = input.newParquet();
+        break;
+    default:
+        throw "Unsupported S3 Select input serialization type '" + inputType + "'. Use CSV, JSON or PARQUET.";
+    }
+
+    switch(outputType) {
+    case "CSV":
+        outputSerialization = output.newCSV(
+            asChar(_$(aOutputSerialization.fieldDelimiter).default(","), "CSV output fieldDelimiter"),
+            asChar(_$(aOutputSerialization.quoteCharacter).default('"'), "CSV output quoteCharacter"),
+            asChar(_$(aOutputSerialization.quoteEscapeCharacter).default('"'), "CSV output quoteEscapeCharacter"),
+            Packages.io.minio.messages.OutputSerialization$QuoteFields.valueOf(String(_$(aOutputSerialization.quoteFields).default("ASNEEDED")).toUpperCase()),
+            asChar(_$(aOutputSerialization.recordDelimiter).default("\n"), "CSV output recordDelimiter")
+        );
+        break;
+    case "JSON":
+        outputSerialization = output.newJSON(asChar(_$(aOutputSerialization.recordDelimiter).default("\n"), "JSON output recordDelimiter"));
+        break;
+    default:
+        throw "Unsupported S3 Select output serialization type '" + outputType + "'. Use CSV or JSON.";
+    }
+
+    var args = Packages.io.minio.SelectObjectContentArgs.builder().bucket(aBucket).object(aObjectName).sqlExpression(aSQLExpression).inputSerialization(inputSerialization).outputSerialization(outputSerialization);
+    args = args.requestProgress(_$(aOptions.requestProgress, "aOptions.requestProgress").isBoolean().default(false));
+    if (isDef(aOptions.scanStartRange)) args = args.scanStartRange(new java.lang.Long(_$(aOptions.scanStartRange, "aOptions.scanStartRange").isNumber().$_("Please provide a numeric scanStartRange.")));
+    if (isDef(aOptions.scanEndRange)) args = args.scanEndRange(new java.lang.Long(_$(aOptions.scanEndRange, "aOptions.scanEndRange").isNumber().$_("Please provide a numeric scanEndRange.")));
+
+    return this.s3.selectObjectContent(args.build());
+};
+
+/**
+ * <odoc>
  * <key>S3.getObject(aBucket, aObjectName, aRemotePath)</key>
  * Gets aObjectName from aBucket storing the file locally in aRemotePath.
  * </odoc>
