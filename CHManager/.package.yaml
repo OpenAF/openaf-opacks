@@ -57,8 +57,6 @@ files:
 - CHManager.yaml
 - README.md
 - public/index.html
-- tests/autoTestCHManager.js
-- tests/autoTestCHManager.yaml
 filesHash:
   .maven.yaml: adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
   CHManager-con.js: 97cae4f7626ec01185df9e0566facd9335b7df64
@@ -67,5 +65,3 @@ filesHash:
   CHManager.yaml: 9bab91e77e149a8a4d569d6e78859901f6b7697b
   README.md: c39db17c358eca93d7d5986bdf765efb279d18fb
   public/index.html: 3a23f3740254367ef87117048ad9b4f24cbf8d0f
-  tests/autoTestCHManager.js: 8f389b4fd879189576c9093a60630684e7921bfd
-  tests/autoTestCHManager.yaml: adbf5db385c31c41534ede22e5b34f18d2a7a888
