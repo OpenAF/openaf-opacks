@@ -4,7 +4,7 @@ const oafp = params => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
 // Process secBuckets
-if (isDef($sec().procMap)) params = $sec().procMap(params)
+if (isDef(params.secKey)) params = $sec().procMap(params)
 
 // --- Util functions
 // Util functions
@@ -2139,7 +2139,7 @@ var _outputFns = new Map([
             if (params.ch.type == "remote") {
                 $ch("oafp::outdata").createRemote(params.ch.url)
             } else {
-                $ch("oafp::outdata").create(params.ch.type, isDef($sec().procMap) ? $sec().procMap(params.ch.options) : params.ch.options)
+                $ch("oafp::outdata").create(params.ch.type, (isMap(params.ch.options) && isDef(params.ch.options.secKey)) ? $sec().procMap(params.ch.options) : params.ch.options)
             }
 
             if (toBoolean(params.chunset)) {
@@ -2987,7 +2987,7 @@ var _inputFns = new Map([
             if (params.inch.type == "remote") {
                 $ch("oafp::indata").createRemote(params.inch.url)
             } else {
-                $ch("oafp::indata").create(params.inch.type, isDef($sec().procMap) ? $sec().procMap(params.inch.options) : params.inch.options) 
+                $ch("oafp::indata").create(params.inch.type, (isMap(params.inch.options) && isDef(params.inch.options.secKey)) ? $sec().procMap(params.inch.options) : params.inch.options)
             }
 
             var _r = _fromJSSLON(r, true)
