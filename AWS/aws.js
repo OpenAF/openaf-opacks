@@ -1,6 +1,7 @@
 // Author: Nuno Aguiar
 
 loadLib("aws_core.js");
+loadLib("aws_s3.js");
 loadLib("aws_codeartifact.js")
 loadLib("aws_cloudwatch.js");
 loadLib("aws_dynamo.js");

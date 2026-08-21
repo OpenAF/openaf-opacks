@@ -393,8 +393,9 @@ AWS.prototype.__getSignedHeaders = function(key, dateStamp, regionName, serviceN
    return ow.format.string.toHex(this.__getSignatureKey(key, dateStamp, regionName, serviceName), "").toLowerCase();
 };
 
-AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType, altGet) {
+AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, aRequestParams, aPayload, aAmzFields, aDate, aContentType, altGet, altGetExpiresInSeconds) {
    altGet = _$(altGet).isBoolean().default(false)
+   altGetExpiresInSeconds = _$(altGetExpiresInSeconds).isNumber().default(60)
    aPayload = _$(aPayload).isString().default("");
    aRequestParams = _$(aRequestParams).isString().default("");
    aURI = _$(aURI).isString().default("/");
@@ -413,20 +414,30 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
 
    var can_uri = encodeURI(aURI);
    var can_querystring = aRequestParams; // must be sorted by name
-   //var can_headers = (aMethod == "GET" ? "content-type:" + content_type + "\n" + "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n" + (isDef(aAmzTarget) ? "x-amz-target:" + aAmzTarget + "\n" : "") : "host:" + aHost + "\n" + "x-amz-date:" + amzdate + "\n");
-   var can_headers = (isDef(content_type) && content_type.length > 0 ? "content-type:" + content_type + "\n" : "") + "host:" + aHost + "\n" + (altGet ? "" : "x-amz-date:" + amzdate + "\n");
+   var payload_hash = sha256(aPayload);
 
-   var amzFieldsHeaders = Object.keys(aAmzFields), amzHeaders = [];
+   // Canonical headers must be sorted by lowercase name (required by services like S3 that also
+   // require x-amz-content-sha256 to be present and signed, e.g. AWS.S3_* in aws_s3.js).
+   var headerList = [];
+   if (isDef(content_type) && content_type.length > 0) headerList.push(["content-type", content_type]);
+   headerList.push(["host", aHost]);
+   if (!altGet) {
+      headerList.push(["x-amz-date", amzdate]);
+      headerList.push(["x-amz-content-sha256", payload_hash]);
+   }
+
+   var amzFieldsHeaders = Object.keys(aAmzFields);
    for (var amzFieldI in amzFieldsHeaders) {
       request[amzFieldsHeaders[amzFieldI]] = aAmzFields[amzFieldsHeaders[amzFieldI]];
       if (amzFieldsHeaders[amzFieldI] != "X-Amz-Security-Token") {
-         amzHeaders.push(amzFieldsHeaders[amzFieldI].toLowerCase());
-         can_headers += amzFieldsHeaders[amzFieldI].toLowerCase() + ":" + aAmzFields[amzFieldsHeaders[amzFieldI]] + "\n";
+         headerList.push([amzFieldsHeaders[amzFieldI].toLowerCase(), aAmzFields[amzFieldsHeaders[amzFieldI]]]);
       }
    }
 
-   var signed_headers = (isDef(content_type) && content_type.length > 0 ? "content-type;" : "") + "host" + (altGet ? "" : ";x-amz-date") + (amzHeaders.length > 0 ? ";" + amzHeaders.join(";") : "");
-   var payload_hash = sha256(aPayload);
+   headerList.sort((a, b) => a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0));
+
+   var can_headers = headerList.map(h => h[0] + ":" + h[1] + "\n").join("");
+   var signed_headers = headerList.map(h => h[0]).join(";");
 
    // Part 2
    var credential_scope = datestamp + "/" + aRegion + "/" + aService + "/" + "aws4_request";
@@ -436,15 +447,17 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
          "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
          "X-Amz-Credential": encodeURIComponent(Packages.openaf.AFCmdBase.afc.dIP(this.accessKey) + "/" + credential_scope),
          "X-Amz-Date": amzdate,
-         "X-Amz-Expires": 60,
+         "X-Amz-Expires": altGetExpiresInSeconds,
          "X-Amz-Security-Token": (isDef(this.stoken) ? encodeURIComponent(this.stoken) : __),
          "X-Amz-SignedHeaders": encodeURIComponent(signed_headers)
       }
       //can_querystring = can_querystring + "&" + $rest().query(altGetFields)
       if (this.__debug) cprint(altGetFields)
-      can_querystring = can_querystring + "&" + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}{{#if X-Amz-Security-Token}}&X-Amz-Security-Token={{X-Amz-Security-Token}}{{/if}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
+      can_querystring = (can_querystring.length > 0 ? can_querystring + "&" : "") + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}{{#if X-Amz-Security-Token}}&X-Amz-Security-Token={{X-Amz-Security-Token}}{{/if}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
    }
-   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + payload_hash
+   // Presigned (query-string authenticated) requests must use the literal "UNSIGNED-PAYLOAD" placeholder here, not
+   // the actual payload hash (required by S3 and other services for altGet, see AWS.S3_GetPresignedURL).
+   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + (altGet ? "UNSIGNED-PAYLOAD" : payload_hash)
    if (this.__debug) { cprint(can_Request); print("----") }
    var string_to_sign = "AWS4-HMAC-SHA256" + "\n" + amzdate + "\n" + credential_scope + "\n" + sha256(can_Request);
    if (this.__debug) { cprint(string_to_sign); print("++++") }
@@ -469,6 +482,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
         request = merge(request, {
          "Content-Type": (isString(aContentType) && aContentType.length > 0 ? aContentType : __),
          "X-Amz-Date": amzdate,
+         "x-amz-content-sha256": payload_hash,
          "Authorization": authorization_header
         })
 
@@ -478,6 +492,7 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
       request = merge(request, {
          "Content-Type": (isString(aContentType) && aContentType.length > 0 ? aContentType : __),
          "x-amz-date": amzdate,
+         "x-amz-content-sha256": payload_hash,
          "Authorization": authorization_header,
       });
       //if (isUnDef(aContentType) || aContentType.length == 0) delete request["Content-Type"]
@@ -509,6 +524,31 @@ AWS.prototype.postURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aH
       urlEncode: (aContentType.startsWith("application/x-www-form-urlencoded")),
       requestHeaders: extra
    }).post(aURL, aArgs);
+};
+
+/**
+ * <odoc>
+ * <key>AWS.putURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType, noUTF8) : Object</key>
+ * Tries to send a PUT http request given aURL, aURI, ordered aParams, an object or raw string aArgs, an AWS aService, aHost, an AWS aRegion, an optional aAmzFields, an optional aDate and an optional aContentType (defaults to application/x-www-form-urlencoded).
+ * Returns the object returned by the API.
+ * </odoc>
+ */
+AWS.prototype.putURLEncoded = function(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType, noUTF8) {
+   var params = _$(aParams).isString().default(""), payload = "";
+   aContentType = _$(aContentType).isString().default("application/x-www-form-urlencoded");
+
+   if (aContentType.length > 0 && !aContentType.endsWith("charset=utf-8") && !noUTF8) aContentType = aContentType + "; charset=utf-8"
+
+   if (aContentType.startsWith("application/x-www-form-urlencoded"))
+      payload = ow.obj.rest.writeQuery(aArgs);
+   else
+      payload = isString(aArgs) ? aArgs : stringify(aArgs, void 0, "");
+   var extra = this.__getRequest("put", aURI, aService, aHost, aRegion, params, payload, aAmzFields, aDate, (aContentType == '' ? __ : aContentType));
+
+   return $rest({
+      urlEncode: (aContentType.startsWith("application/x-www-form-urlencoded")),
+      requestHeaders: extra
+   }).put(aURL, aArgs);
 };
 
 /**
@@ -660,4 +700,31 @@ AWS.prototype.delete = function(aService, aRegion, aPartURI, aParams, aArgs, aAm
       urlEncode: (aContentType == "application/x-www-form-urlencoded"),
       requestHeaders: extra
    }).delete(aURL, aArgs);
+};
+
+AWS.prototype.put = function(aService, aRegion, aPartURI, aParams, aArgs, aAmzFields, aDate, aContentType) {
+   aPartURI = _$(aPartURI).default("/");
+   var aURL = "https://" + aService + "." + aRegion + ".amazonaws.com" + aPartURI;
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   return this.putURLEncoded(aURL, aURI, aParams, aArgs, aService, aHost, aRegion, aAmzFields, aDate, aContentType);
+};
+
+AWS.prototype.head = function(aService, aRegion, aPartURI, aParams, aAmzFields, aDate, aContentType) {
+   aPartURI = _$(aPartURI).default("/");
+   var aURL = "https://" + aService + "." + aRegion + ".amazonaws.com" + aPartURI;
+   var url = new java.net.URL(aURL);
+   var aHost = String(url.getHost());
+   var aURI = String(url.getPath());
+
+   if (isObject(aParams)) aParams = $rest().query(aParams);
+   var params = _$(aParams).isString().default("");
+
+   var extra = this.__getRequest("head", aURI, aService, aHost, aRegion, params, "", aAmzFields, aDate, aContentType);
+
+   return $rest({
+      requestHeaders: extra
+   }).head(aURL);
 };

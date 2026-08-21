@@ -41,7 +41,6 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
-- audit.json
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
@@ -63,12 +62,12 @@ files:
 - aws_pi.js
 - aws_rds.js
 - aws_route53.js
+- aws_s3.js
 - aws_scheduler.js
 - aws_secrets.js
 - aws_secrets_sec.js
 - aws_sqs.js
 - aws_sts.js
-- debug.json
 - oJobCodeArtifact.yaml
 - oJobECR.yaml
 - oJobLambda.yaml
@@ -76,16 +75,15 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 392879c5ed649861e4566a76a1fdf9a1bda2793e
+  .odoc.db: 69629605b4cd27d89dec81eff20b6bdeddf77977
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  audit.json: 1b5f1dd9d38d5c76c16d9582096dc76618f08831
-  aws.js: 101cfdf438a975bcc99e7c6eea64d3cca0397e20
-  aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
+  aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
+  aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
   aws_bedrock.js: b10108524ee133409e0d36bd7d53c60bfad7fe4d
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
-  aws_core.js: aea7e34120709126ddf18d6254a9b0f2372a17e5
+  aws_core.js: 798363fb0c1cd463e5ec11da2f0ac931166fb231
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
@@ -100,15 +98,15 @@ filesHash:
   aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
   aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
+  aws_s3.js: 6644f366561429275ecfda2a0cd6acdf160add2f
   aws_scheduler.js: f741e27d96325c1f839ce535a6ffc5b8b0c2c6d9
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
-  debug.json: 970aebdb2b1a6df3c579c3ab7bade77b6a280ad8
   oJobCodeArtifact.yaml: 177034be9ec45d5cbecfe0cc0d1c2ad4ed4ce371
   oJobECR.yaml: f15b791f50c38d1507b1b034337beb3b4ab41542
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
-  oafp_aws.js: ceeed9106866b917553b25597e76b14d2bfbce09
+  oafp_aws.js: aa347aafb81a42b03448ce79f1f9af104de152ec
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9
