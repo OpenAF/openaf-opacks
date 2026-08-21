@@ -41,7 +41,6 @@ files:
 - .odoc.db
 - .package.yaml
 - .precompile
-- audit.json
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
@@ -68,7 +67,6 @@ files:
 - aws_secrets_sec.js
 - aws_sqs.js
 - aws_sts.js
-- debug.json
 - oJobCodeArtifact.yaml
 - oJobECR.yaml
 - oJobLambda.yaml
@@ -78,7 +76,6 @@ files:
 filesHash:
   .odoc.db: 392879c5ed649861e4566a76a1fdf9a1bda2793e
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  audit.json: 1b5f1dd9d38d5c76c16d9582096dc76618f08831
   aws.js: 101cfdf438a975bcc99e7c6eea64d3cca0397e20
   aws_athena.js: 253b648d25e1f3e5c9511915c9693f85ffd9834f
   aws_bedrock.js: b10108524ee133409e0d36bd7d53c60bfad7fe4d
@@ -105,7 +102,6 @@ filesHash:
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
-  debug.json: 970aebdb2b1a6df3c579c3ab7bade77b6a280ad8
   oJobCodeArtifact.yaml: 177034be9ec45d5cbecfe0cc0d1c2ad4ed4ce371
   oJobECR.yaml: f15b791f50c38d1507b1b034337beb3b4ab41542
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1

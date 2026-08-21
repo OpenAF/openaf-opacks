@@ -45,7 +45,6 @@ files:
 - peg.js
 - plugins/ActionsPlugin.js
 - plugins/DebugPlugin.js
-- tests/autoTest.yaml
 filesHash:
   .odoc.db: d59b72b2e9f8a9cdd1a69e5a788e19e20a130821
   .precompile: 67eb079eb05d9e2ce81d85af5637893f46a71ea5
@@ -67,4 +66,3 @@ filesHash:
   peg.js: 666beebe1de7f1ff2b18d49f698b33fba53ec181
   plugins/ActionsPlugin.js: 2d3fd1cb0ae4a2f03d49a38201edbb6afefdb61e
   plugins/DebugPlugin.js: 996101483af5d34a96f058f804b26ac95e3aea47
-  tests/autoTest.yaml: 29e87cecbbc519e90811d178153d6799736414e3
