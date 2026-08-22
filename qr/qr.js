@@ -63,6 +63,170 @@ QR.prototype.write2Stream = function(aText, aStream, aW, aH, aType) {
 
 /**
  * <odoc>
+ * <key>QR.getBitMatrix(aText, aOptions) : Object</key>
+ * Given aText will produce a ZXing BitMatrix for the QR code. aOptions can be a map with:
+ *   - margin (Number) : Quiet zone margin in modules (default: 2).
+ *   - ecc    (String) : Error correction level ('L', 'M', 'Q', 'H', default: 'L').
+ * </odoc>
+ */
+QR.prototype.getBitMatrix = function(aText, aOptions) {
+   _$(aText, "text").isString().$_();
+   aOptions = _$(aOptions, "options").isMap().default({});
+
+   var hints = new java.util.HashMap();
+   if (isDef(aOptions.margin)) {
+      hints.put(com.google.zxing.EncodeHintType.MARGIN, java.lang.Integer.valueOf(Number(aOptions.margin)));
+   }
+   if (isDef(aOptions.ecc)) {
+      switch(String(aOptions.ecc).toUpperCase()) {
+      case "L": hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.L); break;
+      case "M": hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.M); break;
+      case "Q": hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.Q); break;
+      case "H": hints.put(com.google.zxing.EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H); break;
+      }
+   }
+
+   var qrCodeWriter = new com.google.zxing.qrcode.QRCodeWriter();
+   return qrCodeWriter.encode(aText, com.google.zxing.BarcodeFormat.QR_CODE, 0, 0, hints);
+};
+
+/**
+ * <odoc>
+ * <key>QR.getASCII(aText, aOptions, aInvert, aMargin, aAnsi, aECC) : String</key>
+ * Given aText will produce an ASCII/Unicode string representation of a QR code suitable for terminal or text output.
+ * aOptions can be a map (or aOptions can be a boolean for compact mode):
+ *   - compact   (Boolean) : Uses Unicode half-block characters (▀, ▄, █, space) to fit 2 rows per line (default: true).
+ *   - invert    (Boolean) : Inverts black and white modules (default: false).
+ *   - ansi      (Boolean) : Uses ANSI escape color sequences (default: false).
+ *   - margin    (Number)  : Quiet zone margin in modules (default: 4).
+ *   - ecc       (String)  : Error correction level ('L', 'M', 'Q', 'H', default: 'M').
+ *   - charBlack (String)  : Character(s) for black modules in non-compact mode (default: '  ').
+ *   - charWhite (String)  : Character(s) for white modules in non-compact mode (default: '██').
+ * </odoc>
+ */
+QR.prototype.getASCII = function(aText, aOptions, aInvert, aMargin, aAnsi, aECC) {
+   _$(aText, "text").isString().$_();
+
+   var options = {};
+   if (isMap(aOptions)) {
+      options = aOptions;
+   } else {
+      if (isDef(aOptions)) options.compact = aOptions;
+      if (isDef(aInvert))  options.invert  = aInvert;
+      if (isDef(aMargin))  options.margin  = aMargin;
+      if (isDef(aAnsi))    options.ansi    = aAnsi;
+      if (isDef(aECC))     options.ecc     = aECC;
+   }
+
+   var compact   = _$(options.compact, "compact").isBoolean().default(true);
+   var invert    = _$(options.invert, "invert").isBoolean().default(false);
+   var ansi      = _$(options.ansi, "ansi").isBoolean().default(false);
+   var margin    = _$(options.margin, "margin").isNumber().default(4);
+   var ecc       = _$(options.ecc, "ecc").isString().default("M");
+   var charBlack = _$(options.charBlack, "charBlack").isString().default("  ");
+   var charWhite = _$(options.charWhite, "charWhite").isString().default("██");
+
+   var bitMatrix = this.getBitMatrix(aText, { margin: margin, ecc: ecc });
+   var w = bitMatrix.getWidth();
+   var h = bitMatrix.getHeight();
+
+   var out = "";
+   if (compact) {
+      for (var y = 0; y < h - 1; y += 2) {
+         for (var x = 0; x < w; x++) {
+            var top = bitMatrix.get(x, y);
+            var bottom = bitMatrix.get(x, y + 1);
+
+            if (ansi) {
+               if (invert) {
+                  top = !top;
+                  bottom = !bottom;
+               }
+               var fg = top ? "30" : "37";
+               var bg = bottom ? "40" : "47";
+               out += "\u001b[" + fg + ";" + bg + "m▀";
+            } else {
+               if (top === bottom) {
+                  if (top !== invert) {
+                     out += " ";
+                  } else {
+                     out += "█";
+                  }
+               } else {
+                  if (top !== invert) {
+                     out += "▄";
+                  } else {
+                     out += "▀";
+                  }
+               }
+            }
+         }
+         if (ansi) out += "\u001b[0m";
+         out += "\n";
+      }
+
+      if (h % 2 === 1) {
+         var y = h - 1;
+         for (var x = 0; x < w; x++) {
+            var top = bitMatrix.get(x, y);
+            if (ansi) {
+               if (invert) top = !top;
+               var fg = top ? "30" : "37";
+               out += "\u001b[" + fg + ";49m▀";
+            } else {
+               if (top !== invert) {
+                  out += " ";
+               } else {
+                  out += "▀";
+               }
+            }
+         }
+         if (ansi) out += "\u001b[0m";
+         out += "\n";
+      }
+   } else {
+      for (var y = 0; y < h; y++) {
+         for (var x = 0; x < w; x++) {
+            var val = bitMatrix.get(x, y);
+            if (ansi) {
+               if (invert) val = !val;
+               out += val ? "\u001b[40m  " : "\u001b[47m  ";
+            } else {
+               if (val !== invert) {
+                  out += charBlack;
+               } else {
+                  out += charWhite;
+               }
+            }
+         }
+         if (ansi) out += "\u001b[0m";
+         out += "\n";
+      }
+   }
+
+   return out;
+};
+
+/**
+ * <odoc>
+ * <key>QR.write2ASCII(aText, aOptions, aInvert, aMargin, aAnsi, aECC) : String</key>
+ * Alias of QR.getASCII.
+ * </odoc>
+ */
+QR.prototype.write2ASCII = QR.prototype.getASCII;
+
+/**
+ * <odoc>
+ * <key>QR.printASCII(aText, aOptions, aInvert, aMargin, aAnsi, aECC)</key>
+ * Prints the ASCII/Unicode representation of a QR code to the console/stdout. See QR.getASCII for options.
+ * </odoc>
+ */
+QR.prototype.printASCII = function(aText, aOptions, aInvert, aMargin, aAnsi, aECC) {
+   print(this.getASCII(aText, aOptions, aInvert, aMargin, aAnsi, aECC));
+};
+
+/**
+ * <odoc>
  * <key>QR.read4File(aFilePath) : Object</key>
  * Tries to decode a QR code on a provided aFilePath returning a reader object.
  * </odoc>

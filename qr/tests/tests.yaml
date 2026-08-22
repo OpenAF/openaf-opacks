@@ -19,6 +19,20 @@ jobs:
     to  : oJob Test
     exec: args.func = args.tests.testFile;
 
+  #--------------------
+  - name: TestBitMatrix
+    from: Init
+    to  : oJob Test
+    exec: args.func = args.tests.testBitMatrix;
+
+  #----------------
+  - name: TestASCII
+    from: Init
+    to  : oJob Test
+    exec: args.func = args.tests.testASCII;
+
 todo:
   - TestStream
   - TestFile
+  - TestBitMatrix
+  - TestASCII
