@@ -254,26 +254,31 @@ QR.prototype.read4Stream = function(aStream) {
 /**
  * <odoc>
  * <key>QR.genWifiString(aSSID, aPassword, aType, isHidden) : String</key>
- * Produces the QR text for sharing a wifi network details. aType can be "WPA" or "WEP" or nothing.
+ * Produces the QR text for sharing a Wi-Fi network configuration.
+ * aType can be "WPA", "WPA2", "WPA3", "WEP", "nopass", or undefined (defaults to "WPA" if password provided, "nopass" otherwise).
  * The boolean isHidden defaults to false.
  * </odoc>
  */
 QR.prototype.genWifiString = function(ssid, password, type, hidden) {
    _$(ssid, "ssid").isString().$_();
    password = _$(password, "password").isString().default(void 0);
-   type = _$(type, "type").oneOf(["WEP", "WPA"]).isString().default(void 0);
+   type = _$(type, "type").isString().default(void 0);
    hidden = _$(hidden, "isHidden").isBoolean().default(false);
 
    var out = "WIFI:";
    out += "S:" + ssid + ";";
    if (isDef(type) && type.length > 0) {
       out += "T:" + type.toUpperCase() + ";";
+   } else if (isDef(password) && password.length > 0) {
+      out += "T:WPA;";
+   } else {
+      out += "T:nopass;";
    }
    if (isDef(password) && password.length > 0) {
       out += "P:" + password + ";";
    }
    if (hidden) {
-      out += "H:true";
+      out += "H:true;";
    }
    out += ";";
    return out;
@@ -282,15 +287,15 @@ QR.prototype.genWifiString = function(ssid, password, type, hidden) {
 /**
  * <odoc>
  * <key>QR.genSMSString(aNumber, aMessage) : String</key>
- * Produces the QR text for sending a SMS aMessage to aNumber.
+ * Produces the QR text for sending an SMS to aNumber with optional aMessage.
  * </odoc>
  */
 QR.prototype.genSMSString = function(aNumber, aMessage) {
    _$(aNumber, "aNumber").isString().$_();
-   _$(aMessage, "aMessage").isString().$_();
+   aMessage = _$(aMessage, "aMessage").isString().default("");
    var out = "smsto:";
 
-   out += aNumber + ":" + aMessage;
+   out += aNumber + (aMessage.length > 0 ? ":" + aMessage : "");
    return out;
 };
 
@@ -303,112 +308,120 @@ QR.prototype.genSMSString = function(aNumber, aMessage) {
 QR.prototype.genTelString = function(aNumber) {
    _$(aNumber, "aNumber").isString().$_();
 
-   var out = "tel:";
-   out += aNumber;
-
-   return out;
+   return "tel:" + aNumber;
 };
 
 /**
  * <odoc>
  * <key>QR.genGeoString(aLat, aLon, aQuery) : String</key>
- * Produces the QR text for a geolocation query. You can provide aLat and aLong as the decimal coordinates of (0, 0) 
- * with aQuery. aQuery should be a map composed of:\
- * \
- *    q     (String) Optional query text\
- *    z     (Number) Optional zoom level (from 1 (zoom out) to 20 (zoom in))\
- *    t     (String) Optional map type (m - map, k - satelite, h - hybrid, p - terrain, e - google earth, 8 - 8-bit)\
- *    layer (String) Optional layer type (t - traffic, c - street view)\
- * \
+ * Produces the QR text for a geolocation coordinate. You can provide aLat and aLon as decimal coordinates.
+ * aQuery can be a string query (e.g. "Lisbon") or an object composed of:
+ *    q     (String) Optional query text
+ *    z     (Number) Optional zoom level (from 1 (zoom out) to 20 (zoom in))
+ *    t     (String) Optional map type (m - map, k - satellite, h - hybrid, p - terrain, e - google earth, 8 - 8-bit)
+ *    layer (String) Optional layer type (t - traffic, c - street view)
  * </odoc>
  */
 QR.prototype.genGeoString = function(aLat, aLon, aQuery) {
    aLat = _$(aLat, "lat").isNumber().default(0);
    aLon = _$(aLon, "long").isNumber().default(0);
-   aQuery = _$(aQuery, "query").isMap().default({});
-   var out = "geo:";
+   var out = "geo:" + aLat + "," + aLon;
 
-   out += aLat + "," + aLon + (isDef(aQuery) ? "?" + $rest().query(aQuery) : "");
-};
-
-/**
- * <odoc>
- * <key>QR.genEmailString(toAddress, aSubject, aCCList, aBody) : String</key>
- * Produces the QR text for sending an email. The toAddress and aCCList can be strings or arrays of addresses.
- * </odoc>
- */
-QR.prototype.genEmailString = function(toAddress, aSubject, aCCList, aBody) {
-   _$(toAddress, "toAddress").$_();
-   _$(aSubject, "aSubject").$_();
-   aCCList = _$(aCCList, "aCCList").default(void 0);
-   _$(aBody, "aBody").$_();
-
-   var out = "mailto:";
-
-   var list2str = (aTxt) => {
-      if (isArray(aTxt)) 
-         return aTxt.join(",");
-      else
-         return aTxt;
-   };
-
-   out += list2str(toAddress) + "?" + $rest().query({
-      subject: list2str(aSubject),
-      cc: list2str(aCCList),
-      body: list2str(aBody)
-   });
-
+   if (isMap(aQuery) && Object.keys(aQuery).length > 0) {
+      out += "?" + $rest().query(aQuery);
+   } else if (isString(aQuery) && aQuery.length > 0) {
+      out += "?q=" + encodeURIComponent(aQuery);
+   }
    return out;
 };
 
 /**
  * <odoc>
+ * <key>QR.genEmailString(toAddress, aSubject, aCCList, aBody) : String</key>
+ * Produces the QR text for composing an email. toAddress and aCCList can be strings or arrays of addresses.
+ * </odoc>
+ */
+QR.prototype.genEmailString = function(toAddress, aSubject, aCCList, aBody) {
+   _$(toAddress, "toAddress").$_();
+   aSubject = _$(aSubject, "aSubject").isString().default("");
+   aCCList  = _$(aCCList, "aCCList").default(void 0);
+   aBody    = _$(aBody, "aBody").isString().default("");
+
+   var list2str = (aTxt) => {
+      if (isArray(aTxt)) 
+         return aTxt.join(",");
+      else if (isDef(aTxt))
+         return String(aTxt);
+      else
+         return void 0;
+   };
+
+   var q = {};
+   if (isDef(aSubject) && aSubject.length > 0) q.subject = aSubject;
+   if (isDef(aCCList) && (isArray(aCCList) ? aCCList.length > 0 : String(aCCList).length > 0)) q.cc = list2str(aCCList);
+   if (isDef(aBody) && aBody.length > 0) q.body = aBody;
+
+   var qs = Object.keys(q).length > 0 ? "?" + $rest().query(q) : "";
+   return "mailto:" + list2str(toAddress) + qs;
+};
+
+/**
+ * <odoc>
  * <key>QR.genContactString(aType, aContactMap) : String</key>
- * Produces the QR text to share a contact. aType can be either "mecard" or "vcard".
- * aContactMap can contain the following keys: name, company, tel, url, email, address, address2, title (only on vcard) and memo.
+ * Produces the QR text to share a contact card. aType can be either "mecard" or "vcard" (defaults to "vcard").
+ * aContactMap can contain: name, fn (formatted name), company (or org), title, tel (or phone), url, email, address, address2, memo (or note).
  * </odoc>
  */
 QR.prototype.genContactString = function(aType, aContactMap) {
+   aType = _$(aType, "aType").isString().default("vcard").toLowerCase();
+   _$(aContactMap, "aContactMap").isMap().$_();
+
    var out = "";
    var pV = (value) => {
-      value = value.replace("([\\\\:;])", "\\\\$1");
-      value = value.replace("\\n", "");
+      if (isUnDef(value)) return "";
+      value = String(value).replace(/([\\:;])/g, "\\$1");
+      value = value.replace(/\r?\n/g, " ");
       return value;
    };
 
    switch(aType){
    case "mecard":   
-      if (isMap(aContactMap)) {
-         out = "MECARD:";
-         var addr = "";
-         if (isDef(aContactMap.name))    out += "N:" + pV(aContactMap.name.replace(",", "")) + ";";
-         if (isDef(aContactMap.company)) out += "ORG:" + pV(aContactMap.company) + ";";
-         if (isDef(aContactMap.tel))     out += "TEL:" + pV(aContactMap.tel.replace("[^0-9+]+", "")) + ";";
-         if (isDef(aContactMap.url))     out += "URL:" + pV(aContactMap.url) + ";";
-         if (isDef(aContactMap.email))   out += "EMAIL:" + pV(aContactMap.email) + ";";
-         if (isDef(aContactMap.address))  addr += aContactMap.address;
-         if (isDef(aContactMap.address2)) addr += " " + aContactMap.address2;
-         out += "ADR:" + pV(addr) + ";";
-         if (isDef(aContactMap.memo))    out += "NOTE:" + pV(aContactMap.memo) + ";";
-      }
+      out = "MECARD:";
+      var addr = "";
+      if (isDef(aContactMap.name))    out += "N:" + pV(aContactMap.name.replace(/,/g, "")) + ";";
+      if (isDef(aContactMap.company)) out += "ORG:" + pV(aContactMap.company) + ";";
+      else if (isDef(aContactMap.org)) out += "ORG:" + pV(aContactMap.org) + ";";
+      if (isDef(aContactMap.tel))     out += "TEL:" + pV(aContactMap.tel) + ";";
+      else if (isDef(aContactMap.phone)) out += "TEL:" + pV(aContactMap.phone) + ";";
+      if (isDef(aContactMap.url))     out += "URL:" + pV(aContactMap.url) + ";";
+      if (isDef(aContactMap.email))   out += "EMAIL:" + pV(aContactMap.email) + ";";
+      if (isDef(aContactMap.address))  addr += aContactMap.address;
+      if (isDef(aContactMap.address2)) addr += (addr.length > 0 ? " " : "") + aContactMap.address2;
+      if (addr.length > 0)             out += "ADR:" + pV(addr) + ";";
+      if (isDef(aContactMap.memo))    out += "NOTE:" + pV(aContactMap.memo) + ";";
+      else if (isDef(aContactMap.note)) out += "NOTE:" + pV(aContactMap.note) + ";";
+      out += ";";
       break;
    case "vcard":
-      if (isMap(aContactMap)) {
-         out = "BEGIN:VCARD\nVERSION:3.0\n";
-
-         var addr = "";
-         if (isDef(aContactMap.name))    out += "N:" + pV(aContactMap.name.replace(",", "")) + "\n";
-         if (isDef(aContactMap.company)) out += "ORG:" + pV(aContactMap.company) + "\n";
-         if (isDef(aContactMap.title))   out += "TITLE:" + pV(aContactMap.title) + "\n";
-         if (isDef(aContactMap.tel))     out += "TEL:" + pV(aContactMap.tel.replace("[^0-9+]+", "")) + "\n";
-         if (isDef(aContactMap.url))     out += "URL:" + pV(aContactMap.url) + "\n";
-         if (isDef(aContactMap.email))   out += "EMAIL:" + pV(aContactMap.email) + "\n";
-         if (isDef(aContactMap.address))  addr += aContactMap.address;
-         if (isDef(aContactMap.address2)) addr += " " + aContactMap.address2;
-         out += "ADR:" + pV(addr) + "\n";
-         if (isDef(aContactMap.memo))    out += "NOTE:" + pV(aContactMap.memo) + "\n";
-         out += "END:VCARD";
-      }
+   default:
+      out = "BEGIN:VCARD\nVERSION:3.0\n";
+      if (isDef(aContactMap.name))    out += "N:" + pV(aContactMap.name) + "\n";
+      if (isDef(aContactMap.fn))      out += "FN:" + pV(aContactMap.fn) + "\n";
+      else if (isDef(aContactMap.name)) out += "FN:" + pV(aContactMap.name.replace(/;/g, " ")) + "\n";
+      if (isDef(aContactMap.company)) out += "ORG:" + pV(aContactMap.company) + "\n";
+      else if (isDef(aContactMap.org)) out += "ORG:" + pV(aContactMap.org) + "\n";
+      if (isDef(aContactMap.title))   out += "TITLE:" + pV(aContactMap.title) + "\n";
+      if (isDef(aContactMap.tel))     out += "TEL:" + pV(aContactMap.tel) + "\n";
+      else if (isDef(aContactMap.phone)) out += "TEL:" + pV(aContactMap.phone) + "\n";
+      if (isDef(aContactMap.url))     out += "URL:" + pV(aContactMap.url) + "\n";
+      if (isDef(aContactMap.email))   out += "EMAIL:" + pV(aContactMap.email) + "\n";
+      var vAddr = "";
+      if (isDef(aContactMap.address))  vAddr += aContactMap.address;
+      if (isDef(aContactMap.address2)) vAddr += (vAddr.length > 0 ? " " : "") + aContactMap.address2;
+      if (vAddr.length > 0)            out += "ADR:;;" + pV(vAddr) + ";;;;\n";
+      if (isDef(aContactMap.memo))    out += "NOTE:" + pV(aContactMap.memo) + "\n";
+      else if (isDef(aContactMap.note)) out += "NOTE:" + pV(aContactMap.note) + "\n";
+      out += "END:VCARD";
       break;
    }
    return out;
@@ -417,9 +430,8 @@ QR.prototype.genContactString = function(aType, aContactMap) {
 /**
  * <odoc>
  * <key>QR.genCalString(aName, aBeginDate, aEndDate, aLocation, aDescription) : String</key>
- * Produces the QR text to share a calendar event named aName between aBeginDate and aEndDate
- * at aLocation with aDescription. For all day events please provide a string aBeginDate and aEndDate with the 
- * format 'yyyymmdd' where aEndDate is one day after aBeginDate.
+ * Produces the QR text to share a calendar event (iCalendar / vEvent) named aName between aBeginDate and aEndDate
+ * at aLocation with aDescription. For all day events provide string dates in 'yyyyMMdd' format.
  * </odoc>
  */
 QR.prototype.genCalString = function(aName, aBeginDate, aEndDate, aLocation, aDescription) {
@@ -433,64 +445,271 @@ QR.prototype.genCalString = function(aName, aBeginDate, aEndDate, aLocation, aDe
 
    ow.loadFormat();
    out += "SUMMARY:" + aName + "\r\n";
-   if (isString(aBeginDate) && isString(aEndDate)) {
+   if (isString(aBeginDate) && isString(aEndDate) && aBeginDate.length === 8 && aEndDate.length === 8) {
       out += "DTSTART;VALUE=DATE:" + aBeginDate + "\r\n" + "DTEND;VALUE=DATE:" + aEndDate + "\r\n";
    } else {
-      if (isDate(aBeginDate)) aBeginDate = ow.format.fromDate(aBeginDate, "yyyyMMdd'T'hhmmss'Z'");
-      if (isDate(aEndDate))   aEndDate   = ow.format.fromDate(aEndDate, "yyyyMMdd'T'hhmmss'Z'");
-      out += "DTSTART:" + aBeginDate + "\r\nDTEND:" + aEndDate + "\r\n";
+      var startStr = isDate(aBeginDate) ? ow.format.fromDate(aBeginDate, "yyyyMMdd'T'HHmmss'Z'", "UTC") : String(aBeginDate);
+      var endStr   = isDate(aEndDate)   ? ow.format.fromDate(aEndDate, "yyyyMMdd'T'HHmmss'Z'", "UTC") : String(aEndDate);
+      out += "DTSTART:" + startStr + "\r\nDTEND:" + endStr + "\r\n";
    }
-   out += "LOCATION:" + aLocation + "\r\n";
-   out += "DESCRIPTION:" + aDescription + "\r\n";
+   if (aLocation.length > 0)    out += "LOCATION:" + aLocation + "\r\n";
+   if (aDescription.length > 0) out += "DESCRIPTION:" + aDescription + "\r\n";
    out += "END:VEVENT\r\n";
    return out;
 };
 
 /**
  * <odoc>
+ * <key>QR.genURLString(aURL) : String</key>
+ * Produces the QR text for opening a URL in a browser. Prepends https:// if no scheme is specified.
+ * </odoc>
+ */
+QR.prototype.genURLString = function(aURL) {
+   _$(aURL, "aURL").isString().$_();
+   if (!aURL.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//)) {
+      aURL = "https://" + aURL;
+   }
+   return aURL;
+};
+
+/**
+ * <odoc>
+ * <key>QR.genBookmarkString(aTitle, aURL) : String</key>
+ * Produces the QR text for saving a browser bookmark using the MEBKM format.
+ * </odoc>
+ */
+QR.prototype.genBookmarkString = function(aTitle, aURL) {
+   _$(aTitle, "aTitle").isString().$_();
+   _$(aURL, "aURL").isString().$_();
+   return "MEBKM:TITLE:" + aTitle.replace(/;/g, "") + ";URL:" + aURL + ";;";
+};
+
+/**
+ * <odoc>
  * <key>QR.genYTString(aVideoId) : String</key>
- * Produces the QR text to share a YouTube video
+ * Produces the QR text to share a YouTube video.
  * </odoc>
  */
 QR.prototype.genYTString = function(aVideoId) {
-   var out = "";
-   out += "youtube://" + aVideoId;
-   return out;
+   _$(aVideoId, "videoId").isString().$_();
+   if (aVideoId.startsWith("http://") || aVideoId.startsWith("https://") || aVideoId.startsWith("youtube://")) {
+      return aVideoId;
+   }
+   return "https://www.youtube.com/watch?v=" + aVideoId;
 };
 
 /**
  * <odoc>
  * <key>QR.genFTString(aId, onlyAudio) : String</key>
- * Produces the QR test to share a FaceTime call to aId optionally onlyAudio (true/false)
+ * Produces the QR text to start a FaceTime video or audio call to aId.
  * </odoc>
  */
 QR.prototype.genFTString = function(aId, onlyAudio) {
-   var out = "";
-   out += "facetime" + (onlyAudio ? "-audio" : "") + ":" + aId;
-   return out;
+   _$(aId, "aId").isString().$_();
+   onlyAudio = _$(onlyAudio, "onlyAudio").isBoolean().default(false);
+   return "facetime" + (onlyAudio ? "-audio" : "") + ":" + aId;
 };
 
 /**
  * <odoc>
- * <key>QR.genOTPAuth(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod) : String</key>
- * Produces the QR test to share an OTP (One-Time-Password) for aAccountName, aIssuerName, aSecret, aAlg (e.g. SHA1), aDigits and aPeriod.
+ * <key>QR.genWhatsAppString(aPhone, aMessage) : String</key>
+ * Produces the QR text (wa.me link) to start a WhatsApp chat with aPhone and optional prefilled aMessage.
  * </odoc>
  */
-QR.prototype.genOTPAuth = function(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod) {
-   var out = "";
-   aDigits = _$(aDigits).isNumber().default(6);
-   aPeriod = _$(aPeriod).isNumber().default(30);
-   aAlg    = _$(aAlg).isString().default("SHA1");
-   aIssuerName = _$(aIssuerName).isString().default("na");
-   aAccountName = _$(aAccountName).isString().default("na");
+QR.prototype.genWhatsAppString = function(aPhone, aMessage) {
+   aPhone   = _$(aPhone, "aPhone").isString().default("");
+   aMessage = _$(aMessage, "aMessage").isString().default("");
 
-   out += "otpauth://totp/" + aAccountName + ":" + aIssuerName + "?" + $rest.query({
-      secret: aSecret,
-      issuer: aIssuerName,
+   var cleanPhone = aPhone.replace(/[^0-9]/g, "");
+   var url = "https://wa.me/" + cleanPhone;
+   if (aMessage.length > 0) {
+      url += "?text=" + encodeURIComponent(aMessage);
+   }
+   return url;
+};
+
+QR.prototype.genWAString = QR.prototype.genWhatsAppString;
+
+/**
+ * <odoc>
+ * <key>QR.genTelegramString(aUsername, aMessage) : String</key>
+ * Produces the QR text (t.me link) to open a Telegram user/channel or share a message.
+ * </odoc>
+ */
+QR.prototype.genTelegramString = function(aUsername, aMessage) {
+   aUsername = _$(aUsername, "aUsername").isString().default("");
+   aMessage  = _$(aMessage, "aMessage").isString().default("");
+
+   var cleanUser = aUsername.replace(/^@/, "");
+   if (cleanUser.length > 0 && aMessage.length === 0) {
+      return "https://t.me/" + cleanUser;
+   } else if (cleanUser.length > 0 && aMessage.length > 0) {
+      return "https://t.me/" + cleanUser + "?text=" + encodeURIComponent(aMessage);
+   } else if (aMessage.length > 0) {
+      return "https://t.me/share/url?text=" + encodeURIComponent(aMessage);
+   }
+   return "https://t.me/";
+};
+
+/**
+ * <odoc>
+ * <key>QR.genOTPAuth(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod, aType) : String</key>
+ * Produces the QR text (Key URI Format) to configure an OTP authenticator app (e.g. Google Authenticator, Authy, 1Password).
+ * aType can be "totp" (default) or "hotp".
+ * </odoc>
+ */
+QR.prototype.genOTPAuth = function(aAccountName, aIssuerName, aSecret, aAlg, aDigits, aPeriod, aType) {
+   aDigits      = _$(aDigits, "digits").isNumber().default(6);
+   aPeriod      = _$(aPeriod, "period").isNumber().default(30);
+   aAlg         = _$(aAlg, "algorithm").isString().default("SHA1");
+   aIssuerName  = _$(aIssuerName, "issuerName").isString().default("na");
+   aAccountName = _$(aAccountName, "accountName").isString().default("na");
+   aType        = _$(aType, "type").isString().default("totp");
+
+   var q = {
+      secret   : aSecret,
+      issuer   : aIssuerName,
       algorithm: aAlg,
-      digits: aDigits,
-      period: aPeriod
-   });
+      digits   : aDigits
+   };
+   if (aType.toLowerCase() === "totp") {
+      q.period = aPeriod;
+   }
 
-   return out;
+   return "otpauth://" + aType.toLowerCase() + "/" + encodeURIComponent(aIssuerName) + ":" + encodeURIComponent(aAccountName) + "?" + $rest().query(q);
+};
+
+/**
+ * <odoc>
+ * <key>QR.genCryptoString(aCoin, aAddress, aAmount, aLabel, aMessage) : String</key>
+ * Produces the QR text for cryptocurrency payment URIs (bitcoin, ethereum, litecoin, monero, or custom coins).
+ * </odoc>
+ */
+QR.prototype.genCryptoString = function(aCoin, aAddress, aAmount, aLabel, aMessage) {
+   _$(aCoin, "aCoin").isString().$_();
+   _$(aAddress, "aAddress").isString().$_();
+   aCoin = aCoin.toLowerCase();
+
+   var q = {};
+   switch(aCoin) {
+   case "bitcoin":
+   case "btc":
+      if (isDef(aAmount) && Number(aAmount) > 0) q.amount = Number(aAmount);
+      if (isDef(aLabel) && aLabel.length > 0) q.label = aLabel;
+      if (isDef(aMessage) && aMessage.length > 0) q.message = aMessage;
+      return "bitcoin:" + aAddress + (Object.keys(q).length > 0 ? "?" + $rest().query(q) : "");
+   case "ethereum":
+   case "eth":
+      if (isDef(aAmount) && Number(aAmount) > 0) q.value = String(aAmount);
+      return "ethereum:" + aAddress + (Object.keys(q).length > 0 ? "?" + $rest().query(q) : "");
+   case "litecoin":
+   case "ltc":
+      if (isDef(aAmount) && Number(aAmount) > 0) q.amount = Number(aAmount);
+      if (isDef(aLabel) && aLabel.length > 0) q.label = aLabel;
+      return "litecoin:" + aAddress + (Object.keys(q).length > 0 ? "?" + $rest().query(q) : "");
+   case "monero":
+   case "xmr":
+      if (isDef(aAmount) && Number(aAmount) > 0) q.tx_amount = Number(aAmount);
+      if (isDef(aLabel) && aLabel.length > 0) q.recipient_name = aLabel;
+      if (isDef(aMessage) && aMessage.length > 0) q.tx_description = aMessage;
+      return "monero:" + aAddress + (Object.keys(q).length > 0 ? "?" + $rest().query(q) : "");
+   default:
+      if (isDef(aAmount) && Number(aAmount) > 0) q.amount = Number(aAmount);
+      if (isDef(aLabel) && aLabel.length > 0) q.label = aLabel;
+      if (isDef(aMessage) && aMessage.length > 0) q.message = aMessage;
+      return aCoin + ":" + aAddress + (Object.keys(q).length > 0 ? "?" + $rest().query(q) : "");
+   }
+};
+
+/**
+ * <odoc>
+ * <key>QR.genBitcoinString(aAddress, aAmount, aLabel, aMessage) : String</key>
+ * Produces the QR text for a Bitcoin payment URI (BIP 21).
+ * </odoc>
+ */
+QR.prototype.genBitcoinString = function(aAddress, aAmount, aLabel, aMessage) {
+   return this.genCryptoString("bitcoin", aAddress, aAmount, aLabel, aMessage);
+};
+
+/**
+ * <odoc>
+ * <key>QR.genEthereumString(aAddress, aAmount) : String</key>
+ * Produces the QR text for an Ethereum payment URI (EIP 681).
+ * </odoc>
+ */
+QR.prototype.genEthereumString = function(aAddress, aAmount) {
+   return this.genCryptoString("ethereum", aAddress, aAmount);
+};
+
+/**
+ * <odoc>
+ * <key>QR.genEPCString(aIBAN, aName, aAmount, aBIC, aRemittance, aRemittanceRef, aPurpose) : String</key>
+ * Produces the European Payments Council SEPA QR code standard (EPC069-12 / GiroCode) for bank transfers in Europe.
+ * </odoc>
+ */
+QR.prototype.genEPCString = function(aIBAN, aName, aAmount, aBIC, aRemittance, aRemittanceRef, aPurpose) {
+   _$(aIBAN, "aIBAN").isString().$_();
+   _$(aName, "aName").isString().$_();
+   
+   var cleanIBAN = aIBAN.replace(/\s+/g, "").toUpperCase();
+   var cleanBIC  = isDef(aBIC) ? aBIC.replace(/\s+/g, "").toUpperCase() : "";
+   var amt       = isDef(aAmount) && Number(aAmount) > 0 ? "EUR" + Number(aAmount).toFixed(2) : "";
+   var purpose   = isDef(aPurpose) ? aPurpose : "";
+   var ref       = isDef(aRemittanceRef) ? aRemittanceRef : "";
+   var rem       = isDef(aRemittance) ? aRemittance : "";
+
+   var lines = [
+      "BCD",
+      "002",
+      "1",
+      "SCT",
+      cleanBIC,
+      aName.substring(0, 70),
+      cleanIBAN,
+      amt,
+      purpose.substring(0, 4),
+      ref,
+      rem.substring(0, 140)
+   ];
+
+   return lines.join("\n");
+};
+
+QR.prototype.genSEPAString = QR.prototype.genEPCString;
+QR.prototype.genGiroCodeString = QR.prototype.genEPCString;
+
+/**
+ * <odoc>
+ * <key>QR.genUPIString(aVPA, aName, aAmount, aNote, aCurrency, aMerchantCode, aTransactionRef) : String</key>
+ * Produces the Unified Payments Interface (UPI) payment QR text.
+ * </odoc>
+ */
+QR.prototype.genUPIString = function(aVPA, aName, aAmount, aNote, aCurrency, aMerchantCode, aTransactionRef) {
+   _$(aVPA, "aVPA").isString().$_();
+   aName     = _$(aName, "aName").isString().default("");
+   aCurrency = _$(aCurrency, "aCurrency").isString().default("INR");
+
+   var q = {
+      pa: aVPA,
+      cu: aCurrency
+   };
+   if (aName.length > 0) q.pn = aName;
+   if (isDef(aAmount) && Number(aAmount) > 0) q.am = Number(aAmount).toFixed(2);
+   if (isDef(aNote) && aNote.length > 0) q.tn = aNote;
+   if (isDef(aMerchantCode) && aMerchantCode.length > 0) q.mc = aMerchantCode;
+   if (isDef(aTransactionRef) && aTransactionRef.length > 0) q.tr = aTransactionRef;
+
+   return "upi://pay?" + $rest().query(q);
+};
+
+/**
+ * <odoc>
+ * <key>QR.genSkypeString(aUsername, aAction) : String</key>
+ * Produces the QR text for a Skype action ("call" or "chat").
+ * </odoc>
+ */
+QR.prototype.genSkypeString = function(aUsername, aAction) {
+   _$(aUsername, "aUsername").isString().$_();
+   aAction = _$(aAction, "aAction").isString().default("call");
+   return "skype:" + aUsername + "?" + aAction.toLowerCase();
 }; 

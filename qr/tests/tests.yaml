@@ -31,8 +31,15 @@ jobs:
     to  : oJob Test
     exec: args.func = args.tests.testASCII;
 
+  #------------------
+  - name: TestFormats
+    from: Init
+    to  : oJob Test
+    exec: args.func = args.tests.testFormats;
+
 todo:
   - TestStream
   - TestFile
   - TestBitMatrix
   - TestASCII
+  - TestFormats

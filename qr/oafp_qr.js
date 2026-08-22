@@ -13,6 +13,12 @@
             })
 
             switch(_m.type) {
+            case "url":
+                _qr = qr.genURLString(_m.url)
+                break
+            case "bookmark":
+                _qr = qr.genBookmarkString(_m.title, _m.url)
+                break
             case "wifi": 
                 _qr = qr.genWifiString(_m.ssid, _m.password, _m.authType || _m.wifiType || (_m.type !== "wifi" ? _m.type : void 0), _m.hidden)
                 break
@@ -26,22 +32,48 @@
                 _qr = qr.genGeoString(_m.lat, _m.lon, _m.query)
                 break
             case "email":
-                _qr = qr.genEmailString(_m.address, _m.cclist, _m.subject, _m.body)
+                _qr = qr.genEmailString(_m.address, _m.subject, _m.cclist, _m.body)
                 break
             case "contact":
-                _qr = qr.genContactString(_m.cardType, { name: _m.name, company: _m.company, title: _m.title, tel: _m.tel, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo })
+                _qr = qr.genContactString(_m.cardType || "vcard", { name: _m.name, fn: _m.fn, company: _m.company || _m.org, title: _m.title, tel: _m.tel || _m.phone, email: _m.email, address: _m.address, address2: _m.address2, url: _m.url, memo: _m.memo || _m.note })
                 break
             case "cal":
-                _qr = qr.genCalString(_m.name, _m.beginDate, _m.endDate, _m.location, _m.description)
+                _qr = qr.genCalString(_m.name || _m.summary, _m.beginDate || _m.start, _m.endDate || _m.end, _m.location, _m.description)
+                break
+            case "whatsapp":
+                _qr = qr.genWhatsAppString(_m.phone || _m.number, _m.message || _m.text)
+                break
+            case "telegram":
+                _qr = qr.genTelegramString(_m.username || _m.user, _m.message || _m.text)
                 break
             case "youtube":
-                _qr = qr.genYTString(_m.videoId)
+                _qr = qr.genYTString(_m.videoId || _m.id || _m.url)
                 break
             case "facetime":
-                _qr = qr.genFTString(_m.id, _m.onlyAudio)
+                _qr = qr.genFTString(_m.id || _m.number || _m.email, _m.onlyAudio)
                 break
             case "otp":
-                _qr = qr.genOTPAuth(_m.accountName, _m.issuer, _m.secret, _m.algorithm, _m.digits, _m.period)
+                _qr = qr.genOTPAuth(_m.accountName || _m.account, _m.issuer || _m.issuerName, _m.secret, _m.algorithm || _m.alg, _m.digits, _m.period, _m.otpType || _m.type)
+                break
+            case "crypto":
+                _qr = qr.genCryptoString(_m.coin || _m.cryptoType, _m.address, _m.amount, _m.label, _m.message)
+                break
+            case "bitcoin":
+                _qr = qr.genBitcoinString(_m.address, _m.amount, _m.label, _m.message)
+                break
+            case "ethereum":
+                _qr = qr.genEthereumString(_m.address, _m.amount)
+                break
+            case "epc":
+            case "sepa":
+            case "girocode":
+                _qr = qr.genEPCString(_m.iban, _m.name, _m.amount, _m.bic, _m.remittance, _m.remittanceRef, _m.purpose)
+                break
+            case "upi":
+                _qr = qr.genUPIString(_m.vpa, _m.name, _m.amount, _m.note, _m.currency, _m.merchantCode, _m.transactionRef)
+                break
+            case "skype":
+                _qr = qr.genSkypeString(_m.username, _m.action)
                 break
             default:
                 _qr = isString(_m) ? _m : stringify(_m, __, "")
@@ -80,38 +112,66 @@
 
                     if (isMap(r) && Object.keys(r).length <= 1) {
                         switch(r.type) {
+                        case "url": 
+                            _m = { type: "url", url: "https://openaf.io" }
+                            break
+                        case "bookmark": 
+                            _m = { type: "bookmark", title: "OpenAF", url: "https://openaf.io" }
+                            break
                         case "wifi": 
-                            _m = { type: "wifi", ssid: "test", password: "test", authType: "WPA", hidden: false }
+                            _m = { type: "wifi", ssid: "MyNetwork", password: "SecretPassword", authType: "WPA", hidden: false }
                             break
                         case "sms": 
-                            _m = { type: "sms", number: "123456789", message: "test" }
+                            _m = { type: "sms", number: "+1234567890", message: "Hello from OpenAF" }
                             break
                         case "tel": 
-                            _m = { type: "tel", number: "123456789" }
+                            _m = { type: "tel", number: "+1234567890" }
                             break
                         case "geo": 
-                            _m = { type: "geo", lat: 0, lon: 0, query: { q: "query", z: "zoom from 1 (zoom out) to 20 (zoom in)", t: "m - map, k - satelite, h - hybrid, p - terrain, e - google earth, 8 - 8-bit", layer: "t - traffic, c - street view" } }
+                            _m = { type: "geo", lat: 38.7223, lon: -9.1393, query: { q: "Lisbon", z: 15 } }
                             break
                         case "email": 
-                            _m = { type: "email", address: "a@b.c,x@y.z", cclist: "c@b.a,z@y.x", subject: "test", body: "test" }
+                            _m = { type: "email", address: "user@example.com", cclist: "cc@example.com", subject: "Hello", body: "Message text" }
                             break
                         case "contact": 
-                            _m = { type: "contact", cardType: "mecard or vcard", name: "testing;test", company: "test", title: "onlyVcard", tel: "123456789", email: "a@b.c", address: "test", address2: "test", url: "http://test.com", memo: "test" }
+                            _m = { type: "contact", cardType: "vcard", name: "Doe;John", fn: "John Doe", company: "Acme Corp", title: "Software Engineer", tel: "+1234567890", email: "john.doe@example.com", address: "123 Main St", address2: "Apt 4", url: "https://example.com", memo: "Notes" }
                             break
                         case "cal": 
-                            _m = { type: "cal", name: "name", beginDate: "yyyyMMdd'T'hhmmss'Z'", endDate: "yyyyMMdd'T'hhmmss'Z'", location: "location", description: "description" }
+                            _m = { type: "cal", name: "Project Kickoff", beginDate: "20260901T090000Z", endDate: "20260901T100000Z", location: "Meeting Room A", description: "Discuss project roadmap" }
+                            break
+                        case "whatsapp": 
+                            _m = { type: "whatsapp", phone: "+1234567890", message: "Hello" }
+                            break
+                        case "telegram": 
+                            _m = { type: "telegram", username: "username", message: "Hello" }
                             break
                         case "youtube": 
-                            _m = { type: "youtube", videoId: "test" }
+                            _m = { type: "youtube", videoId: "dQw4w9WgXcQ" }
                             break
                         case "facetime": 
-                            _m = { type: "facetime", id: "a@b.c", onlyAudio: false }
+                            _m = { type: "facetime", id: "user@example.com", onlyAudio: false }
                             break
-                        case "otp":
-                            _m = { type: "otp", accountName: "test", issuer: "test", secret: "test", algorithm: "SHA1", digits: 6, period: 30 }
+                        case "otp": 
+                            _m = { type: "otp", accountName: "user@example.com", issuer: "MyApp", secret: "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ", algorithm: "SHA1", digits: 6, period: 30, otpType: "totp" }
+                            break
+                        case "crypto": 
+                            _m = { type: "crypto", coin: "bitcoin", address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", amount: 0.005, label: "Donation", message: "Thank you" }
+                            break
+                        case "epc": 
+                        case "sepa": 
+                        case "girocode": 
+                            _m = { type: "epc", iban: "PT50000000000000000000000", name: "John Doe", amount: 25.50, bic: "TESTPTPL", remittance: "Invoice 123", remittanceRef: "", purpose: "" }
+                            break
+                        case "upi": 
+                            _m = { type: "upi", vpa: "john@upi", name: "John Doe", amount: 500.00, note: "Dinner", currency: "INR", merchantCode: "", transactionRef: "" }
+                            break
+                        case "skype": 
+                            _m = { type: "skype", username: "echo123", action: "call" }
                             break
                         default:
                             _m = [
+                                { type: "url" },
+                                { type: "bookmark" },
                                 { type: "wifi" },
                                 { type: "sms" },
                                 { type: "tel" },
@@ -119,9 +179,15 @@
                                 { type: "email" },
                                 { type: "contact" },
                                 { type: "cal" },
+                                { type: "whatsapp" },
+                                { type: "telegram" },
                                 { type: "youtube" },
                                 { type: "facetime" },
-                                { type: "otp" }
+                                { type: "otp" },
+                                { type: "crypto" },
+                                { type: "epc" },
+                                { type: "upi" },
+                                { type: "skype" }
                             ]
                         }
                     } else {
@@ -192,7 +258,27 @@ oafp libs=qr in=qr data="my-qr.png"
 Use with _in=qrtemplate_:
 
 * If no option is provided, a list of available templates will be shown.
-* If a map is provided with only the type, a template for the corresponding type will be shown.
+* If a map is provided with only the type (e.g. \`data="(type: wifi)"\`), a template for the corresponding type will be shown.
+
+Available template types:
+- \`url\`: Open URL in web browser
+- \`bookmark\`: Save browser bookmark (MEBKM format)
+- \`wifi\`: Connect to Wi-Fi network (WPA/WEP/nopass)
+- \`sms\`: Send SMS text message
+- \`tel\`: Make a phone call
+- \`geo\`: Geolocation map coordinate / search query
+- \`email\`: Compose email (mailto)
+- \`contact\`: Add contact to address book (vCard 3.0 / MeCard)
+- \`cal\`: Add event to calendar (iCalendar / vEvent)
+- \`whatsapp\`: Open WhatsApp chat (wa.me)
+- \`telegram\`: Open Telegram user/channel or share
+- \`youtube\`: Open YouTube video
+- \`facetime\`: FaceTime video or audio call
+- \`otp\`: 2-Factor Authentication setup (TOTP/HOTP)
+- \`crypto\`: Cryptocurrency payment (Bitcoin, Ethereum, Litecoin, Monero)
+- \`epc\`: European Payments Council SEPA wire transfer (GiroCode)
+- \`upi\`: Unified Payments Interface payment
+- \`skype\`: Skype call or chat
 
 ---
 
@@ -206,7 +292,7 @@ Extra output formats added by the QR lib:
 | qrascii       | Output an ASCII QR in console (or text file if qrfile is set) |
 
 If the input format is a map it's expected to follow one of the formats generated by in=qrtemplate.
-If text (e.g. a VCARD) is provided, it will be used as the QR content.
+If text (e.g. a VCARD or raw URL) is provided, it will be used as the QR content.
 
 ---
 
