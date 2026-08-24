@@ -333,6 +333,9 @@ ow.ai.__gpttypes.bedrock = {
     var _temperature = aOptions.temperature
     var _lastStats = __
     var _debugCh = __
+    // Some model APIs (e.g. the OpenAI-compatible Responses API) always include an
+    // 'error' key set to null on success, so only treat non-null values as errors.
+    var _hasError = aValue => isMap(aValue) && isDef(aValue.error) && aValue.error !== null
     var _isOpenAIResponsesModel = aModelName => {
       return isString(aModelName) && String(aModelName).toLowerCase().indexOf("openai.gpt-5.6-") >= 0
     }
@@ -995,7 +998,7 @@ ow.ai.__gpttypes.bedrock = {
           var responsesResult = aws.BEDROCK_OpenAIResponses(aOptions.region, responsesInput)
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm'}, merge({_t:nowNano(),_f:'llm'}, responsesResult))
           _captureStats(responsesResult, aModel)
-          if (isDef(responsesResult.error)) return responsesResult
+          if (_hasError(responsesResult)) return responsesResult
 
           var responsesText = _openAIResponsesText(responsesResult)
           if (!aOptions.showReasoning) responsesText = _stripReasoningTags(responsesText)
@@ -1636,7 +1639,7 @@ ow.ai.__gpttypes.bedrock = {
         var res = aws.BEDROCK_InvokeModel(aOptions.region, aModel, aInput)
         if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm'}, merge({_t:nowNano(),_f:'llm'}, res))
         _captureStats(res, aModel)
-        if (isDef(res.error)) return res
+        if (_hasError(res)) return res
         var handledOpenAI = false
         var handledMistralMessages = false
 
@@ -2410,7 +2413,7 @@ ow.ai.__gpttypes.bedrock = {
             }
             if (event.type == "response.completed" && isMap(event.response)) completedResponse = event.response
           })
-          if (isDef(responsesStreamResult.error)) {
+          if (_hasError(responsesStreamResult)) {
             if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(responsesStreamResult.error)})
             return { error: responsesStreamResult.error, content: fullContent, events: events }
           }
@@ -2875,7 +2878,7 @@ ow.ai.__gpttypes.bedrock = {
           events = events.concat(result.events)
 
           // Check for errors in result
-          if (isDef(result.error)) {
+          if (_hasError(result)) {
             if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(result.error)})
             return { error: result.error, content: fullContent, events: events }
           }
@@ -3136,7 +3139,7 @@ ow.ai.__gpttypes.bedrock = {
        */
       promptStream: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
         var result = _r.rawPromptStream(aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta)
-        if (isDef(result.error)) return result
+        if (_hasError(result)) return result
         return result.content
       },
 
@@ -3187,7 +3190,7 @@ ow.ai.__gpttypes.bedrock = {
        */
       promptStreamJSON: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
         var text = _r.promptStream(aPrompt, aModel, aTemperature, true, aTools, aOnDelta)
-        if (isDef(text.error)) return text
+        if (_hasError(text)) return text
         try {
           return jsonParse(text)
         } catch(e) {
