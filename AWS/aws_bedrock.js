@@ -422,6 +422,78 @@ ow.ai.__gpttypes.bedrock = {
              aModelName.indexOf("mistral.devstral-") >= 0
     }
     var _resetStats = () => { _lastStats = __ }
+    // Collects every usage-like map found in a list of streaming events and merges them into a
+    // single usage map, keeping the highest value seen for each counter. Bedrock's
+    // amazon-bedrock-invocationMetrics keys are normalized to their Converse equivalents.
+    var _mergeStreamUsage = aEvents => {
+      if (!isArray(aEvents)) return __
+      var _invMetricsMap = {
+        inputTokenCount          : "inputTokens",
+        outputTokenCount         : "outputTokens",
+        cacheReadInputTokenCount : "cacheReadInputTokens",
+        cacheWriteInputTokenCount: "cacheWriteInputTokens"
+      }
+      // Equivalent spellings per counter, used to decide whether the Bedrock invocation metrics
+      // (which are only a fallback) would duplicate a counter the model already reported. Mixing
+      // both spellings is unsafe: it is not guaranteed that inputTokenCount and input_tokens
+      // account for cache-read tokens the same way.
+      var _equivalents = {
+        inputTokens          : [ "input_tokens", "inputTokens", "prompt_tokens" ],
+        outputTokens         : [ "output_tokens", "outputTokens", "completion_tokens" ],
+        cacheReadInputTokens : [ "cache_read_input_tokens", "cacheReadInputTokens", "cacheReadInputTokenCount" ],
+        cacheWriteInputTokens: [ "cache_creation_input_tokens", "cacheWriteInputTokens", "cacheWriteInputTokenCount" ]
+      }
+      var merged = {}, found = false
+      var _add = aUsage => {
+        if (!isMap(aUsage)) return
+        Object.keys(aUsage).forEach(k => {
+          var v = aUsage[k]
+          if (isNumber(v)) {
+            if (isUnDef(merged[k]) || v > merged[k]) merged[k] = v
+            found = true
+          } else if (isMap(v)) {
+            // e.g. prompt_tokens_details / input_tokens_details
+            if (!isMap(merged[k])) merged[k] = {}
+            Object.keys(v).forEach(sk => {
+              if (isNumber(v[sk]) && (isUnDef(merged[k][sk]) || v[sk] > merged[k][sk])) {
+                merged[k][sk] = v[sk]
+                found = true
+              }
+            })
+          }
+        })
+      }
+      var invMetrics = []
+      aEvents.forEach(e => {
+        if (!isMap(e)) return
+        _add(e.usage)
+        if (isMap(e.message)) _add(e.message.usage)
+        if (isMap(e.metadata)) _add(e.metadata.usage)
+        if (isMap(e.response)) _add(e.response.usage)
+        if (isMap(e["amazon-bedrock-invocationMetrics"])) invMetrics.push(e["amazon-bedrock-invocationMetrics"])
+      })
+      // Bedrock's own invocation metrics only fill counters the model itself did not report
+      invMetrics.forEach(inv => {
+        var normalized = {}
+        Object.keys(_invMetricsMap).forEach(k => {
+          if (!isNumber(inv[k])) return
+          var target = _invMetricsMap[k]
+          if (_equivalents[target].filter(alias => isNumber(merged[alias])).length > 0) return
+          normalized[target] = inv[k]
+        })
+        _add(normalized)
+      })
+      return found ? merged : __
+    }
+    // Returns the first defined, positive number of a list of candidate values (or __)
+    var _firstPositive = aList => {
+      if (!isArray(aList)) return __
+      for (var _fpi = 0; _fpi < aList.length; _fpi++) {
+        var _v = aList[_fpi]
+        if (isNumber(_v) && _v > 0) return _v
+      }
+      return __
+    }
     var _captureStats = (aResponse, aModelName) => {
       if (!isMap(aResponse)) {
         _lastStats = __
@@ -438,19 +510,43 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(aResponse.usage.inputTokens)) tokens.prompt = aResponse.usage.inputTokens
         if (isDef(aResponse.usage.outputTokens)) tokens.completion = aResponse.usage.outputTokens
         if (isDef(aResponse.usage.totalTokens)) tokens.total = aResponse.usage.totalTokens
-        // Calculate total if not provided
-        if (isUnDef(tokens.total) && isDef(tokens.prompt) && isDef(tokens.completion)) {
-          tokens.total = tokens.prompt + tokens.completion
-        }
         // Also handle alternative token field names (snake_case for OpenAI/Mistral)
         if (isDef(aResponse.usage.input_tokens)) tokens.prompt = aResponse.usage.input_tokens
         if (isDef(aResponse.usage.output_tokens)) tokens.completion = aResponse.usage.output_tokens
         if (isDef(aResponse.usage.total_tokens)) tokens.total = aResponse.usage.total_tokens
-        if (isDef(aResponse.usage.cache_creation_input_tokens) && aResponse.usage.cache_creation_input_tokens > 0) tokens.cacheCreation = aResponse.usage.cache_creation_input_tokens
-        if (isDef(aResponse.usage.cache_read_input_tokens) && aResponse.usage.cache_read_input_tokens > 0) tokens.cacheRead = aResponse.usage.cache_read_input_tokens
+        // Prompt caching counters. Anthropic-style (cache_creation/cache_read) and the Bedrock
+        // camelCase variants (Converse/Nova/invocation metrics) are billed *in addition* to the
+        // reported input tokens, so they map to cacheCreation/cacheRead. OpenAI-style cached_tokens
+        // is a *subset* of the input tokens, so it maps to a separate 'cached' counter.
+        var _cacheWrite = _firstPositive([
+          aResponse.usage.cache_creation_input_tokens,
+          aResponse.usage.cacheWriteInputTokens,
+          aResponse.usage.cacheWriteInputTokenCount,
+          aResponse.usage.cache_write_input_tokens
+        ])
+        var _cacheRead = _firstPositive([
+          aResponse.usage.cache_read_input_tokens,
+          aResponse.usage.cacheReadInputTokens,
+          aResponse.usage.cacheReadInputTokenCount
+        ])
+        var _cached = _firstPositive([
+          aResponse.usage.cached_tokens,
+          isMap(aResponse.usage.prompt_tokens_details) ? aResponse.usage.prompt_tokens_details.cached_tokens : __,
+          isMap(aResponse.usage.input_tokens_details) ? aResponse.usage.input_tokens_details.cached_tokens : __,
+          isMap(aResponse.usage.promptTokensDetails) ? aResponse.usage.promptTokensDetails.cachedTokens : __,
+          isMap(aResponse.usage.inputTokensDetails) ? aResponse.usage.inputTokensDetails.cachedTokens : __,
+          aResponse.usage.cachedContentTokenCount
+        ])
+        if (isDef(_cacheWrite)) tokens.cacheCreation = _cacheWrite
+        if (isDef(_cacheRead)) tokens.cacheRead = _cacheRead
+        if (isDef(_cached)) tokens.cached = _cached
         // Handle prompt_tokens and completion_tokens (alternative naming)
         if (isDef(aResponse.usage.prompt_tokens)) tokens.prompt = aResponse.usage.prompt_tokens
         if (isDef(aResponse.usage.completion_tokens)) tokens.completion = aResponse.usage.completion_tokens
+        // Calculate total if not provided (after every alias has been resolved)
+        if (isUnDef(tokens.total) && isDef(tokens.prompt) && isDef(tokens.completion)) {
+          tokens.total = tokens.prompt + tokens.completion
+        }
         if (Object.keys(tokens).length > 0) stats.tokens = tokens
         stats.usage = aResponse.usage
       }
@@ -2419,7 +2515,14 @@ ow.ai.__gpttypes.bedrock = {
           }
           if (fullContent.length == 0 && isDef(completedResponse)) fullContent = _openAIResponsesText(completedResponse)
           if (!aOptions.showReasoning) fullContent = _stripReasoningTags(fullContent)
-          if (isDef(completedResponse)) _captureStats(completedResponse, aModel)
+          if (isDef(completedResponse)) {
+            _captureStats(completedResponse, aModel)
+          } else {
+            // No response.completed event (e.g. response.incomplete or a truncated stream): still
+            // recover whatever usage the events carried so token/cache counters are not lost
+            var responsesUsage = _mergeStreamUsage(events)
+            if (isDef(responsesUsage)) _captureStats({ usage: responsesUsage }, aModel)
+          }
 
           // Responses streams deliver function calls as output items, not text deltas.
           // Keep them in the same OpenAI chat-completions shape used by the generic
@@ -2985,24 +3088,17 @@ ow.ai.__gpttypes.bedrock = {
           _r.conversation.push(storedMessage)
         }
 
-        // Capture stats from streaming events
-        // Nova models put usage in metadata.usage in the final event
+        // Capture stats from streaming events.
+        // Usage is spread across several events depending on the model family: Anthropic reports
+        // input/cache counters on message_start (nested in message.usage) and the final output
+        // counter on message_delta (top-level usage); Nova reports everything on metadata.usage;
+        // Bedrock itself appends amazon-bedrock-invocationMetrics to the last chunk. Merging them
+        // all (keeping the highest value seen per counter) avoids losing input and cache tokens.
         if (events.length > 0) {
-          // Look for event with usage information
-          var usageEvent = events.find(e => isDef(e.usage))
-
-          // For Nova, usage is in metadata.usage
-          if (isUnDef(usageEvent)) {
-            var metadataEvent = events.find(e => isDef(e.metadata) && isDef(e.metadata.usage))
-            if (isDef(metadataEvent)) {
-              // Extract usage to top level for _captureStats
-              usageEvent = {usage: metadataEvent.metadata.usage}
-              // Also include stop reason if present
-              if (isDef(finishReason)) usageEvent.stopReason = finishReason
-            }
-          }
-
-          if (isDef(usageEvent)) {
+          var mergedUsage = _mergeStreamUsage(events)
+          if (isDef(mergedUsage)) {
+            var usageEvent = { usage: mergedUsage }
+            if (isDef(finishReason)) usageEvent.stopReason = finishReason
             _captureStats(usageEvent, aModel)
           }
         }
