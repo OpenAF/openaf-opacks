@@ -20,7 +20,7 @@ name: h3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260323'
+version: '20260824'
 dependencies:
   openaf: '>=20220101'
 files:
@@ -28,11 +28,11 @@ files:
 - .odoc.db
 - .package.yaml
 - README.md
-- h3-4.4.0.jar
+- h3-4.5.0.jar
 - h3.js
 filesHash:
   .maven.yaml: 02942fdb56903c58075dbe09924e36d97f5ae0b7
   .odoc.db: 9f77917506ddd4be99755603e93645b3e5d2bb3d
   README.md: 7109530db9a7c0374a10500e3e8471166b8b3456
-  h3-4.4.0.jar: 48fb9f368c298a52aedc896e9f81d5e9a711e240
+  h3-4.5.0.jar: 5be56dcb91cc8bf08cbf985fb16a14584ee33f9f
   h3.js: 4bbc742a365c2c3786efe6e3a50f1df4e1fca837
