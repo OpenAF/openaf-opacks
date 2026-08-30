@@ -1,5 +1,0 @@
-h2-2.4.240.jar:
-  version: 2.4.240
-  changed from original: false
-  comments: ''
-  license: ''
