@@ -365,7 +365,7 @@
         <dependency>
             <groupId>com.github</groupId>
             <artifactId>copilot-sdk-java</artifactId>
-            <version>1.0.12-preview.0</version>
+            <version>1.0.13-preview.1</version>
         </dependency>
         <dependency>
             <groupId>com.uber</groupId>
