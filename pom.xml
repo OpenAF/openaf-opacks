@@ -430,7 +430,7 @@
         <dependency>
 	    <groupId>io.etcd</groupId>
 	    <artifactId>jetcd-core</artifactId>
-	    <version>0.8.6</version>
+	    <version>0.8.7</version>
 	</dependency>
 </dependencies>
 </project>
