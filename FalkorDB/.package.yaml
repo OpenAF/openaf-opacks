@@ -19,41 +19,35 @@ name: FalkorDB
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20260817
+version: 20260901
 dependencies:
   openaf: '>=20240318'
 files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
-- META-INF/MANIFEST.MF
-- META-INF/maven/redis.clients/jedis/pom.properties
-- META-INF/maven/redis.clients/jedis/pom.xml
 - README.md
 - commons-pool2-2.13.1.jar
 - commons-text-1.15.0.jar
 - error_prone_annotations-2.48.0.jar
 - falkordb.js
-- jedis-8.0.0.jar
-- jfalkordb-0.11.0.jar
-- json-20260719.jar
+- jedis-8.1.0-beta1.jar
+- jfalkordb-0.11.1.jar
+- json-20260814.jar
 - jspecify-1.0.1.jar
 - oafp_falkordb.js
-- redis-authx-core-0.1.1-beta2.jar
+- redis-authx-core-0.2.0.jar
 filesHash:
   .maven.yaml: 6c8d2ea89dfdf33229d506d56df843809e2d8542
   .odoc.db: afd12a94cc2640f0b9feb660c218ef1b5e059ba8
-  META-INF/MANIFEST.MF: a226cf05f5a467b74a3b20e0e993d6ab3be54b08
-  META-INF/maven/redis.clients/jedis/pom.properties: d365c840fbf677b06bb9cc57accb20bfce40ac73
-  META-INF/maven/redis.clients/jedis/pom.xml: 7c5c074568aba67727154e28f5ceb42d4f9a72bd
   README.md: fbdfc94b3c094a0fe88f2b754b7213f1c911706c
   commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
   commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
   error_prone_annotations-2.48.0.jar: bbe30942a31d1778c74cb272321267eca82dc708
   falkordb.js: bb65149de3a5a2d44d009d6a7dc2e58cc40379a2
-  jedis-8.0.0.jar: 0e849578cd3d019203aaa12cad5c1f2e0de4eafd
-  jfalkordb-0.11.0.jar: 536787380f7fc123063a5ebc4a122481912b105f
-  json-20260719.jar: 82390308e0b67205bf0d0d507dc48e0d71410bf7
+  jedis-8.1.0-beta1.jar: 6eac90782c0580c847b837176e0ea3a189ec463e
+  jfalkordb-0.11.1.jar: f7803d8ba955d40e872884f72265ae840bc31dff
+  json-20260814.jar: a1d979d4b336516526d00ff423e4a8d4ba27670f
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
   oafp_falkordb.js: 95a2b1281cae7c93a0c1633a4e65f85ae50aa542
-  redis-authx-core-0.1.1-beta2.jar: 4037345ff29fb22c737bab2ed116a34262718ae5
+  redis-authx-core-0.2.0.jar: f89ca03edd1dc04b1c8705ebbbc6f343a5c61595
