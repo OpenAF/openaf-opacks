@@ -20,7 +20,7 @@ name: ghcopilot
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260901'
+version: '20260902'
 dependencies:
   OpenAF: '>=20260312'
 files:
