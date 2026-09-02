@@ -321,8 +321,9 @@ ow.ai.__gpttypes.bedrock = {
     aOptions.temperature = _$(aOptions.temperature, "aOptions.temperature").isNumber().default(__)
     aOptions.region = _$(aOptions.region, "aOptions.region").isString().default("us-east-1")
     aOptions.showReasoning = _$(aOptions.showReasoning, "aOptions.showReasoning").isBoolean().default(false)
+    var _isAnthropicModelId = aOptions.model.indexOf("anthropic.") >= 0 || aOptions.model.indexOf("claude") >= 0
     aOptions.promptCaching = _$(toBoolean(aOptions.promptCaching), "aOptions.promptCaching").isBoolean().default(
-      _$(toBoolean(aOptions.params.promptCaching), "aOptions.params.promptCaching").isBoolean().default(false)
+      _$(toBoolean(aOptions.params.promptCaching), "aOptions.params.promptCaching").isBoolean().default(_isAnthropicModelId)
     )
     aOptions.strictToolMsg = _$(aOptions.strictToolMsg, "aOptions.strictToolMsg").isBoolean().default(
       _$(aOptions.params.strictToolMsg, "aOptions.params.strictToolMsg").isBoolean().default(true)
