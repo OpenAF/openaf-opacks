@@ -16,15 +16,15 @@ name: jdbc-sqlite
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260726'
+version: '20260902'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
 - jdbc-sqlite.js
-- sqlite-jdbc-3.53.2.1.jar
+- sqlite-jdbc-3.53.4.0.jar
 filesHash:
-  LICENSES.txt: 08eade8d2ad6ae7a2101ef5fc7e99a80dc9d82dd
+  LICENSES.txt: cfaf3fe69d5aabe939915148a302dd517c7a573d
   jdbc-sqlite.js: 422313634ed7164995df1635f62c4166b8089250
-  sqlite-jdbc-3.53.2.1.jar: 13b01a41289286bd3211e8158864d132f9bac3b0
+  sqlite-jdbc-3.53.4.0.jar: 47e21dd53efe1524fe0df6965cb65003ffe17172
