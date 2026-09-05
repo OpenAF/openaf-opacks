@@ -44,6 +44,7 @@ ojob MCPAuthd.yaml secret="a-very-long-shared-secret-of-32-bytes+"
 | `authheader` | The request header to read the credential from | `authorization` (or env `OJOB_MCPAUTH_HEADER`) |
 | `authscheme` | The scheme prefix expected before the token | `Bearer` (or env `OJOB_MCPAUTH_SCHEME`) |
 | `authrealm` | The realm reported in the `WWW-Authenticate` challenge | `MCP` |
+| `statictokensfile` | Optional YAML file containing static bearer tokens accepted alongside JWTs | disabled |
 | `keytype` | How to resolve the verification key -- `secret`, `pubkey` or `kms` | `secret` |
 | `secret` | The HS* shared secret, used when `keytype=secret` | (or env `OJOB_MCPAUTH_SECRET`) |
 | `pubkey` | A PEM or base64 DER-encoded public key, used when `keytype=pubkey` | |
@@ -57,6 +58,55 @@ ojob MCPAuthd.yaml secret="a-very-long-shared-secret-of-32-bytes+"
 | `audit` | If true, logs every allow/deny decision | `true` (or env `OJOB_MCPAUTH_AUDIT`) |
 | `auditdenyonly` | If true, only denials are logged | `false` |
 | `debug` | If true, extra detail is logged on denials | `false` |
+
+### Optional static tokens alongside JWTs
+
+Keep JWT verification and the existing ID channel configuration, and add:
+
+```bash
+ojob MCPAuthd.yaml secret="a-very-long-shared-secret-of-32-bytes+" statictokensfile=tokens.yaml
+```
+
+The `tokens.yaml` file can contain a simple list:
+
+```yaml
+tokens:
+  - "<replace-with-a-long-random-token>"
+  - "<replace-with-another-long-random-token>"
+```
+
+Clients send these as `Authorization: Bearer <token>`, just like JWTs. Plain entries
+allow every endpoint URI and do not expire. A URI header is still required. For
+individual restrictions, mix strings with records:
+
+```yaml
+tokens:
+  - "<replace-with-a-long-random-token>"
+  - token: "<replace-with-a-restricted-random-token>"
+    id: build-agent
+    uris: ["/mcp"]
+    enabled: true
+    validUntil: "2027-01-01T00:00:00Z"
+```
+
+Record fields are optional: `uris` defaults to `["*"]`, `enabled` to enabled,
+and omitted `validUntil` means no expiry. An explicit empty `uris` list denies
+all endpoints. Without `id`, responses and audit logs use a token hash prefix.
+Static records do not need matching entries in the JWT ID channel.
+
+JWTs continue to use signature, claims, and channel authorization checks. Credentials
+with three dot-separated segments are reserved for JWTs and cannot be static entries.
+Store JWT authorization records in `mcpauth.yaml` as before; `tokens.yaml` holds
+only static credentials. The library shortcut accepts `((statictokensfile)): tokens.yaml`.
+
+The static file is read on each uncached static-token request. Removing a token,
+setting `enabled: false`, or changing its restrictions takes effect on the next
+uncached request. `cachettl` and any MCP-side `authapicachettl` can delay changes.
+A missing, malformed, or invalid static file denies static authentication; JWT
+authentication remains independent. Duplicate tokens invalidate the static list.
+Use `tokens: []` to disable all static tokens. Protect this file as a secret and
+do not commit real tokens to source control. No JWT signing secret is needed if
+only static tokens are used (the daemon still initializes its ID channel).
 
 ## Using it as a library (oJobMCPAuth.yaml)
 
@@ -325,13 +375,19 @@ Sample output:
 
 The "reason" taxonomy (`ok`, `no_credential`, `bad_alg`, `invalid_signature`, `token_expired`,
 `unknown_id`, `disabled`, `record_expired`, `uri_required`, `insufficient_scope`, `key_unavailable`,
-`error`) is internal to the log only -- the HTTP response body always carries the coarse
+`unknown_token`, `static_config_invalid`, `error`) is internal to the log only -- the HTTP response body always carries the coarse
 `invalid_token` / `insufficient_scope` / `token_expired` error code, so the wire response never
 reveals whether an id exists. The token itself, the secret, and any signature material are never
 logged -- only a `sha512(token)` prefix (`tid`), so repeated failures from one credential can be
 correlated without the credential being recoverable from the log. Header values (id, uri,
 user-agent, IP) are sanitized (`\r`/`\n` stripped, capped at 256 chars) before being logged, so a
 crafted header can't forge a second log line.
+
+### Regression checks
+
+Run `oaf -f tests/static-tokens.js` from this directory. These checks exercise the
+actual auth handler with OpenAF JWT signing/verification and temporary YAML files,
+with HTTP route registration stubbed out; they do not require a listening server.
 
 ### Note on HS* algorithms
 

@@ -79,6 +79,7 @@ jobs:
         authheader     : authheader
         authscheme     : authscheme
         authrealm      : authrealm
+        statictokensfile: statictokensfile
         authchallenge  : authchallenge
         algs           : algs
         keytype        : keytype
@@ -120,6 +121,8 @@ jobs:
       desc: (String) The scheme prefix expected before the token (default "Bearer", or env OJOB_MCPAUTH_SCHEME).
     - name: authrealm
       desc: (String) The realm reported in the WWW-Authenticate challenge (default "MCP").
+    - name: statictokensfile
+      desc: (String) Optional YAML file containing a tokens array of opaque strings or records with token, id, uris, enabled and validUntil. JWT-shaped credentials always use JWT verification. Reloaded for each uncached request.
     - name: authchallenge
       desc: (Boolean) If true (default), 401 responses include a WWW-Authenticate header.
     - name: algs
@@ -176,6 +179,7 @@ jobs:
       authheader     : isString.default(__)
       authscheme     : isString.default(__)
       authrealm      : isString.default("MCP")
+      statictokensfile: isString.default(__)
       authchallenge  : toBoolean.isBoolean.default(true)
       algs           : isArray.default(["RS256", "ES256", "HS256", "HS384", "HS512"])
       keytype        : isString.default("secret")
@@ -351,6 +355,36 @@ jobs:
 
     var _cache = {}
 
+    // Static credentials use the same record policy checks as JWT identities.
+    var _staticRecord = token => {
+      var _config = io.readFileYAML(args.statictokensfile)
+      if (!isMap(_config) || !isArray(_config.tokens)) throw { mcpAuthReason: "static_config_invalid" }
+      var _seen = {}
+      var _found
+      var _tokenHash = af.fromString2Bytes(sha512(token))
+      _config.tokens.forEach(entry => {
+        var _record = isString(entry) ? { token: entry, uris: ["*"] } : entry
+        if (!isMap(_record) || !isString(_record.token) || _record.token.length == 0 || /\s/.test(_record.token) || _record.token.split(".").length == 3) {
+          throw { mcpAuthReason: "static_config_invalid" }
+        }
+        if (isDef(_record.id) && (!isString(_record.id) || _record.id.length == 0)) throw { mcpAuthReason: "static_config_invalid" }
+        if (isDef(_record.enabled) && !isBoolean(_record.enabled)) throw { mcpAuthReason: "static_config_invalid" }
+        if (isDef(_record.uris) && (!isArray(_record.uris) || !_record.uris.every(p => isString(p)))) throw { mcpAuthReason: "static_config_invalid" }
+        var _hash = sha512(_record.token)
+        if (_seen[_hash]) throw { mcpAuthReason: "static_config_invalid" }
+        _seen[_hash] = true
+        if (java.security.MessageDigest.isEqual(af.fromString2Bytes(_hash), _tokenHash)) {
+          _found = {}
+          _found[args.enabledfield] = _record.enabled
+          _found[args.validfield] = _record.validUntil
+          _found[args.urisfield] = isDef(_record.uris) ? _record.uris : ["*"]
+          _found.staticId = isString(_record.id) ? _record.id : "static-" + _hash.substring(0, 12)
+        }
+      })
+      if (isUnDef(_found)) throw { mcpAuthReason: "unknown_token" }
+      return _found
+    }
+
     var fns = {}
     fns[args.uri] = req => {
       var _t0 = now()
@@ -379,34 +413,41 @@ jobs:
           }
         }
 
-        var _decode = ow.server.jwt.decode(_token)
-        var _alg = isMap(_decode) && isMap(_decode.headers) ? _decode.headers.alg : __
-        if (!isString(_alg) || args.algs.indexOf(_alg) < 0) {
-          throw { mcpAuthReason: "bad_alg" }
+        var _claims = {}
+        var _rec
+        if (isString(args.statictokensfile) && _token.split(".").length != 3) {
+          _rec = _staticRecord(_token)
+          _id = _rec.staticId
+        } else {
+          var _decode = ow.server.jwt.decode(_token)
+          var _alg = isMap(_decode) && isMap(_decode.headers) ? _decode.headers.alg : __
+          if (!isString(_alg) || args.algs.indexOf(_alg) < 0) {
+            throw { mcpAuthReason: "bad_alg" }
+          }
+
+          var _key = _resolveKey(_alg)
+          var _verified
+          try {
+            _verified = ow.server.jwt.verify(_key, _token)
+          } catch(e) {
+            throw { mcpAuthReason: "invalid_signature" }
+          }
+          _claims = _verified.claims
+
+          if (isString(args.issuer) && _claims.iss != args.issuer) throw { mcpAuthReason: "invalid_signature" }
+          if (isString(args.audience)) {
+            var _aud = isArray(_claims.aud) ? _claims.aud : [_claims.aud]
+            if (_aud.indexOf(args.audience) < 0) throw { mcpAuthReason: "invalid_signature" }
+          }
+
+          _id = _claims[args.idclaim] || _claims.id || _claims.jti
+          if (!isString(_id) || _id.length == 0) throw { mcpAuthReason: "invalid_signature" }
+
+          var _key4Get = {}
+          _key4Get[_ch.chKey] = _id
+          _rec = $ch(_ch.chName).get(_key4Get)
+          if (!isMap(_rec)) throw { mcpAuthReason: "unknown_id", status: 401, err: "invalid_token" }
         }
-
-        var _key = _resolveKey(_alg)
-        var _verified
-        try {
-          _verified = ow.server.jwt.verify(_key, _token)
-        } catch(e) {
-          throw { mcpAuthReason: "invalid_signature" }
-        }
-        var _claims = _verified.claims
-
-        if (isString(args.issuer) && _claims.iss != args.issuer) throw { mcpAuthReason: "invalid_signature" }
-        if (isString(args.audience)) {
-          var _aud = isArray(_claims.aud) ? _claims.aud : [_claims.aud]
-          if (_aud.indexOf(args.audience) < 0) throw { mcpAuthReason: "invalid_signature" }
-        }
-
-        _id = _claims[args.idclaim] || _claims.id || _claims.jti
-        if (!isString(_id) || _id.length == 0) throw { mcpAuthReason: "invalid_signature" }
-
-        var _key4Get = {}
-        _key4Get[_ch.chKey] = _id
-        var _rec = $ch(_ch.chName).get(_key4Get)
-        if (!isMap(_rec)) throw { mcpAuthReason: "unknown_id", status: 401, err: "invalid_token" }
 
         if (_rec[args.enabledfield] === false) throw { mcpAuthReason: "disabled", status: 403, err: "insufficient_scope" }
 
@@ -433,7 +474,7 @@ jobs:
         var _reason = (isMap(e) && isString(e.mcpAuthReason)) ? e.mcpAuthReason : "error"
         var _status = (isMap(e) && isNumber(e.status)) ? e.status : 401
         var _err    = (isMap(e) && isString(e.err)) ? e.err : "invalid_token"
-        if (args.debug && !(isMap(e) && isString(e.mcpAuthReason))) logErr("MCP auth error: " + String(e))
+        if (args.debug && !(isMap(e) && isString(e.mcpAuthReason))) logErr("MCP auth validation error")
 
         var _reply = _deny(_status, _err)
         if (args.cachettl > 0 && isString(_token)) {

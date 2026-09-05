@@ -53,6 +53,9 @@ help:
   - name: authrealm
     desc: The realm reported in the WWW-Authenticate challenge (default is MCP)
     mandatory: false
+  - name: statictokensfile
+    desc: Optional YAML file containing a tokens list, accepted alongside verified JWTs
+    mandatory: false
   - name: keytype
     desc: How to resolve the verification key -- secret, pubkey or kms (default is secret)
     mandatory: false
@@ -125,6 +128,7 @@ todo:
        authheader   : args.authheader,
        authscheme   : args.authscheme,
        authrealm    : args.authrealm,
+       statictokensfile: args.statictokensfile,
        keytype      : args.keytype,
        secret       : args.secret,
        pubkey       : args.pubkey,

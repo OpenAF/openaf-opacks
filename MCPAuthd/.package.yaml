@@ -17,7 +17,7 @@ bugs:
 repository:
   type: http
   url: https://openaf.io/opacks/MCPAuthd.opack
-description: Standalone HTTP MCP Auth server that validates a JWT bearer credential against a $ch of id records, for use as one or more oJobMCP.yaml servers' authapiurl (or as a generic nginx/Traefik forward-auth endpoint).
+description: Standalone HTTP MCP Auth server that validates JWT bearer credentials against a $ch of id records and optionally accepts static tokens from YAML, for use as oJobMCP.yaml authapiurl or a generic forward-auth endpoint.
 name: MCPAuthd
 main: ''
 mainJob: MCPAuthd.yaml
@@ -30,10 +30,10 @@ files:
 - .package.yaml
 - MCPAuthd.yaml
 - README.md
-- generateJWT.yaml
+- generateMCPJWT.yaml
 - oJobMCPAuth.yaml
 filesHash:
-  MCPAuthd.yaml: 1dd19cfa3ac20e149666b9f8b320d8d080c6dd1c
-  README.md: 8e2592e9af5b71470915f409dc5f29a2ada02729
-  generateJWT.yaml: 2df16730d4d2e14cad651bc761ac111823c0c6a0
-  oJobMCPAuth.yaml: be85e24c05d026b532abeae57cb7bd02b6bfaaf5
+  MCPAuthd.yaml: 88c3456e4208e4d5c26e2df7584482d78dce4517
+  README.md: f36779deb184d013b32032ad737fe5e7cd3530d4
+  generateMCPJWT.yaml: 2df16730d4d2e14cad651bc761ac111823c0c6a0
+  oJobMCPAuth.yaml: ddd915216ac1ef1907af93a50cef84c57af39a53
