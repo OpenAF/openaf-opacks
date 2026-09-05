@@ -22,7 +22,7 @@ name: MCPAuthd
 main: ''
 mainJob: MCPAuthd.yaml
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260815'
+version: '20260905'
 dependencies:
   openaf: '>=20250915'
   oJob-common: '>=20250914'
@@ -30,8 +30,10 @@ files:
 - .package.yaml
 - MCPAuthd.yaml
 - README.md
+- generateJWT.yaml
 - oJobMCPAuth.yaml
 filesHash:
   MCPAuthd.yaml: 1dd19cfa3ac20e149666b9f8b320d8d080c6dd1c
-  README.md: 9a1bfb9519ed5becee526960bf4f9fdb0699eb07
+  README.md: 8e2592e9af5b71470915f409dc5f29a2ada02729
+  generateJWT.yaml: 2df16730d4d2e14cad651bc761ac111823c0c6a0
   oJobMCPAuth.yaml: be85e24c05d026b532abeae57cb7bd02b6bfaaf5

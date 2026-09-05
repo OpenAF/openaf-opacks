@@ -1,0 +1,87 @@
+# Copyright 2026 Nuno Aguiar
+#
+# Generates a JWT accepted by MCPAuthd using OpenAF's native JWT implementation.
+
+help:
+  text: Generates and prints a JWT for MCPAuthd using a shared secret or a PEM private key.
+  expects:
+  - name: id
+    desc: The id to embed in the token (as the sub claim, or idclaim if provided).
+    mandatory: true
+  - name: secret
+    desc: An HS* shared secret. Mutually exclusive with privkey/privkeyfile.
+    mandatory: false
+  - name: privkey
+    desc: A PEM PKCS8 private key. Mutually exclusive with secret.
+    mandatory: false
+  - name: privkeyfile
+    desc: A file path containing a PEM PKCS8 private key, as an alternative to privkey.
+    mandatory: false
+  - name: alg
+    desc: The RSA/EC algorithm used with a private key, for example RS256 or ES256. Ignored for shared secrets.
+    mandatory: false
+  - name: idclaim
+    desc: The claim name carrying the id. Defaults to sub.
+    mandatory: false
+  - name: expiresIn
+    desc: Milliseconds until expiry. Defaults to 3600000 (one hour).
+    mandatory: false
+  - name: issuer
+    desc: Optional iss claim; configure MCPAuthd issuer to enforce it.
+    mandatory: false
+  - name: audience
+    desc: Optional aud claim; configure MCPAuthd audience to enforce it.
+    mandatory: false
+
+ojob:
+  opacks:
+  - openaf: 20250915
+
+todo:
+- Generate JWT
+
+jobs:
+- name: Generate JWT
+  check:
+    in:
+      id         : isString
+      secret     : isString.default(__)
+      privkey    : isString.default(__)
+      privkeyfile: isString.default(__)
+      alg        : isString.default(__)
+      idclaim    : isString.default("sub")
+      expiresIn  : toNumber.isNumber.default(3600000)
+      issuer     : isString.default(__)
+      audience   : isString.default(__)
+  exec: | #js
+    if (isString(args.secret) && (isString(args.privkey) || isString(args.privkeyfile))) {
+      throw "Generate JWT: secret is mutually exclusive with privkey/privkeyfile"
+    }
+
+    ow.loadServer()
+
+    var _key
+    if (isString(args.secret)) {
+      _key = args.secret
+    } else {
+      var _pem = args.privkey
+      if (!isString(_pem) && isString(args.privkeyfile)) _pem = io.readFileString(args.privkeyfile)
+      if (!isString(_pem)) throw "Generate JWT: provide either secret or privkey/privkeyfile"
+
+      var _alg = _$(args.alg).default("RS256")
+      var _der = af.fromBase64(_pem.replace(/-----BEGIN [^-]+-----/, "").replace(/-----END [^-]+-----/, "").replace(/\s+/g, ""))
+      var _kty = _alg.startsWith("ES") ? "EC" : "RSA"
+      var _kf  = java.security.KeyFactory.getInstance(_kty)
+      _key = _kf.generatePrivate(new java.security.spec.PKCS8EncodedKeySpec(_der))
+    }
+
+    var _data = {
+      expiration: new Date(now() + args.expiresIn),
+      claims    : {}
+    }
+    _data.claims[args.idclaim] = args.id
+    if (isString(args.issuer))   _data.issuer   = args.issuer
+    if (isString(args.audience)) _data.audience = args.audience
+
+    args.token = ow.server.jwt.sign(_key, _data)
+    print(args.token)

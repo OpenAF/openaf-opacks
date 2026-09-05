@@ -134,6 +134,146 @@ todo:
 For a DynamoDB-backed channel: `chType: dynamo`, `chArgs: { tableName: mcpauth, region: eu-west-1 }`,
 `chKey: id` (requires the AWS opack).
 
+### Managing the `$ch` and rotating credentials
+
+The channel contains authorization records, not JWT strings. The JWT identifies a record (by
+`sub`, or by the configured `idclaim`) and has its own `exp` expiry. Keep the same `chName`,
+`chType`, `chArgs`, and `chKey` in the daemon and in every provisioning job. `mcpAuthCh` creates
+the channel if needed and reuses it on later runs; a channel's type and arguments are not changed
+when it is reused.
+
+The usual file-backed provisioning job is:
+
+````yaml
+include:
+- oJobHTTPd.yaml
+- oJobMCPAuth.yaml
+
+todo:
+- (mcpAuthCh)   : mcpauth
+  ((chType))    : file
+  ((chArgs))    : { file: "mcpauth.yaml", yaml: true, lock: "mcpauth.lock" }
+- (mcpAuthSetId): agent-alpha
+  ((uris))      : ["/mcp"]
+  ((validUntil)): "2027-01-01T00:00:00Z"
+- (mcpAuthSign) : agent-alpha
+  ((secret))    : "a-very-long-shared-secret-of-32-bytes+"
+  ((expiresIn)) : 3600000
+  ((print))     : true
+````
+
+Run it as a short-lived provisioning command, for example `ojob manage-auth.yaml`. Store the
+printed token in the client configuration or secret store; do not put it in `mcpauth.yaml` or
+commit it to source control. The same pattern works with DynamoDB, using the same `chArgs` as the
+daemon and `chKey: id`:
+
+````yaml
+- (mcpAuthCh)   : mcpauth
+  ((chType))    : dynamo
+  ((chArgs))    : { tableName: mcpauth, region: eu-west-1 }
+  ((chKey))     : id
+````
+
+To add an ID, run `mcpAuthSetId` with its URI patterns and optional `validUntil`, then issue a
+token with `mcpAuthSign` (or `generateMCPJWT.yaml`). Updating `mcpAuthSetId` for an existing ID
+replaces that record, so it can be used to change its URI permissions, extend its authorization
+date, or re-enable it with `enabled: true`.
+
+To replace an expired JWT, issue a new token for the same ID with `mcpAuthSign` or
+`generateMCPJWT.yaml`; the `$ch` record normally does not need to change. The token lifetime and the
+record's `validUntil` are independent, and both must still be valid. Issuing a new JWT does not
+invalidate an older, still-unexpired JWT for the same ID. To revoke all tokens for an ID, disable
+the record:
+
+````yaml
+- (mcpAuthSetId): agent-alpha
+  ((uris))      : ["/mcp"]
+  ((enabled))   : false
+````
+
+Alternatively, set `validUntil` to a time in the past. If `cachettl` is enabled, a previously
+allowed decision can remain effective until that cache entry expires; use `cachettl: 0` when
+immediate record changes are required, or keep it shorter than the required revocation window.
+To rotate without briefly sharing an ID, provision a new ID, issue its token, update the client,
+then disable the old ID. Since the channel key is the ID, changing `chKey` or moving between
+backends requires a separately named channel and coordinated daemon/client cutover.
+
+### Managing it from `oafc` / `openaf-console`
+
+The same operations can be performed interactively. Start either `oafc` or `openaf-console`, then
+open the channel in that console process. For the default file backend:
+
+````bash
+oafc
+````
+
+````javascript
+var authCh = $ch("mcpauth")
+if ($ch().list().indexOf("mcpauth") < 0) {
+  authCh.create(1, "file", { file: "mcpauth.yaml", yaml: true, lock: "mcpauth.lock" })
+}
+````
+
+The channel must be opened in the console even when MCPAuthd is already running in another
+process; `$ch` registrations are process-local, while the file backend and its lock coordinate
+access to the shared file. For DynamoDB, load the AWS library and create/open the channel with the
+same table, region, and key configuration:
+
+````javascript
+loadLib("aws.js")
+var authCh = $ch("mcpauth")
+if ($ch().list().indexOf("mcpauth") < 0) {
+  authCh.create(1, "dynamo", { tableName: "mcpauth", region: "eu-west-1" })
+}
+````
+
+With `chKey: key` (the file default), add or replace an authorization record with `set`:
+
+````javascript
+authCh.set({ key: "agent-alpha" }, {
+  enabled: true,
+  validUntil: "2027-01-01T00:00:00Z",
+  uris: [ "/mcp", "/mcp/*" ]
+})
+authCh.get({ key: "agent-alpha" })
+authCh.getAll()
+````
+
+Use the actual key field for other backends, for example `authCh.set({ id: "agent-alpha" },
+{ ... })` when `chKey` is `id`. To disable an ID without deleting its record, set `enabled: false`;
+to remove it entirely, use `authCh.unset({ key: "agent-alpha" })`. These changes affect all
+tokens whose ID resolves to that record. They do not replace an individual JWT.
+
+To issue or replace a token directly in the console:
+
+````javascript
+ow.loadServer()
+var token = ow.server.jwt.sign("a-very-long-shared-secret-of-32-bytes+", {
+  expiration: new Date(now() + 3600000),
+  claims: { sub: "agent-alpha" }
+})
+print(token)
+````
+
+Copy the token to the client secret store. The secret, token, and private key must not be saved in
+the channel file or committed to source control. For asymmetric signing, pass a Java private-key
+object instead of the string secret, or use `mcpAuthSign`/`generateMCPJWT.yaml` as described below.
+
+### Generating a token directly
+
+`generateMCPJWT.yaml` is a standalone ojob that prints a token compatible with MCPAuthd. It uses
+OpenAF's native `ow.server.jwt.sign` implementation and supports the same shared-secret or PEM
+private-key signing modes as `mcpAuthSign`:
+
+````bash
+ojob generateMCPJWT.yaml id=agent-alpha secret="a-very-long-shared-secret-of-32-bytes+"
+````
+
+For asymmetric verification, provide a PKCS8 PEM private key and select its algorithm (for example
+`alg=RS256`); configure MCPAuthd with the corresponding public key. `expiresIn` is in milliseconds
+and defaults to one hour. The `idclaim`, `issuer`, and `audience` arguments map to the claims
+checked by MCPAuthd.
+
 ## Jobs (and shortcuts)
 
 Each job's full argument list is available via its `help` block (e.g. `ojob oJobMCPAuth.yaml --help "HTTP MCP Auth Server"`).
