@@ -16,7 +16,7 @@ name: jdbc-mariadb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260802'
+version: '20260906'
 dependencies:
   openaf: '>=20240318'
 files:
