@@ -4034,7 +4034,8 @@ var options = {
     __opath: params.opath,
     __csv: params.csv, 
     __pause: params.pause, 
-    __key: params.__key 
+    __key: params.__key,
+    mdformat: params.mdformat
 }
 // csv options
 if (isDef(params.inputcsv)) {

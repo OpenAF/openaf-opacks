@@ -929,6 +929,7 @@ List of options to use when _out=md_:
 | Option | Type | Description |
 |--------|------|-------------|
 | mdtemplate | Boolean | If true will apply a template output without any input data |
+| mdformat | String | For map or array values: `structured` (default) renders headings, scalar tables, and lists; `json` or `yaml` emits the value in a fenced code block. |
 
 ---
 
