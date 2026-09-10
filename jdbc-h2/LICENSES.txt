@@ -1,5 +1,5 @@
-h2-2.4.240.jar:
-  version: 2.4.240
+h2-2.5.250.jar:
+  version: 2.5.250
   changed from original: false
   comments: ''
   license: ''
