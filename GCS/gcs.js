@@ -125,7 +125,7 @@ GCS.prototype.statObject = function(aBucket, aObjectName) {
 GCS.prototype.objectExists = function(aBucket, aObjectName) {
   // TODO
   var l = this.listObjects(aBucket, aObjectName)
-  if (isArray(l) && l.length == 1) return true; else return false
+  return isArray(l) && l.some(function(obj) { return obj.filename == aObjectName; })
 }
 
 /**
@@ -417,7 +417,7 @@ GCS.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
                       })
                   }
               } else {
-                  print("Conflict with the same modified dates: " + sfname + " (" + slst[sf].lastModified + ") vs " + sf + " (" + rlsft[sfname].lastModified + ") ")
+                  print("Conflict with the same modified dates: " + sfname + " (" + slst[sf].lastModified + ") vs " + sf + " (" + rlst[sfname].lastModified + ") ")
               }
           }
       } else {
@@ -479,7 +479,7 @@ GCS.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
 * to execute the returned actions.
 * </odoc>
 */
-GCS.prototype.deleteFolderActions = function(aBucket, aPrefix) {
+GCS.prototype.deleteFolderActions = function(aBucket, aPrefix, beRecursive) {
   _$(aBucket).isString().$_("Please provide a bucket name.")
   _$(aPrefix).isString().$_("Please provide a prefix.")
 
