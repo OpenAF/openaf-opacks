@@ -16,11 +16,13 @@ name: Morse
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220827'
+version: '20260918'
 dependencies:
   openaf: '>=20211229'
 files:
 - .package.yaml
+- README.md
 - morse.js
 filesHash:
-  morse.js: 8c53a392b6b6cee7dbeb97b5cc71ea92da85cfff
+  README.md: cab24c58b7613f88f995010bac1427054afa5f27
+  morse.js: ed7b35c44577bc2e478dc5d574e8fab0f7046cc6
