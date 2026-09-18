@@ -34,13 +34,18 @@ jobs:
           .pwd(filepath)
           .get()
 
-          opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-          io.writeFileYAML(packageFile, opack)
+          load(".github/scripts/packageUpdates.js")
+          if (packageUpdates.hasPayloadChanges(filepath)) {
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML(packageFile, opack)
 
-          $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
-          .pwd(filepath)
-          .prefix("opack")
-          .get()
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
+            .pwd(filepath)
+            .prefix("opack")
+            .get()
+          } else {
+            log("No ghcopilot payload changes. Keeping the existing package version.")
+          }
         dist: t8
 
     - name: Run updatePacks

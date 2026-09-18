@@ -287,14 +287,11 @@ jobs:
           $sh(getOpenAFPath() + "ojob ojob.io/db/getDriver op=list __format=json | " + getOpenAFPath() + "oafp out=cmd path=\"[].db\" outcmd=\"" + getOpenAFPath() + "ojob ojob.io/db/getDriver op=builddir db={}\" outcmdparam=true").prefix("jdbc").get(0)
 
           io.rm(".github/action")
-          $from( 
-            $sql( 
-              $sh("git status --porcelain").get(0).stdout.split("\n").filter(r => r.match(".. jdbc-") && !r.endsWith(" .github/action/") && r.length > 0).map(r => 
-                $path(r.replace(/^.. /,"").split("/"), "{ pack: [0], file: [1]}") 
-              ), 
-              "select \"pack\", count(1) \"c\" where \"file\" <> '\''LICENSES.txt'\'' group by \"pack\""
-            ) 
-          ).equals("c", 1).select(r => $sh("git restore " + r.pack).exec() )
+          load(".github/scripts/packageUpdates.js")
+          $from(io.listFiles(".").files)
+          .equals("isDirectory", true)
+          .starts("filename", "jdbc-")
+          .select(r => packageUpdates.restoreUnchangedJdbc(r.filename))
 
     - name: Commit JDBC
       env :
@@ -333,13 +330,18 @@ jobs:
           .pwd(filepath)
           .exec()
 
-          opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-          io.writeFileYAML(packageFile, opack)
+          load(".github/scripts/packageUpdates.js")
+          if (packageUpdates.hasPayloadChanges(filepath)) {
+            opack.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
+            io.writeFileYAML(packageFile, opack)
 
-          $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
-          .pwd(filepath)
-          .prefix("opack")
-          .exec()
+            $sh(getOpenAFPath() + "opack genpack . --exclude .claude,.github,.openaf_precompiled,tests,test")
+            .pwd(filepath)
+            .prefix("opack")
+            .exec()
+          } else {
+            log("No ghcopilot payload changes. Keeping the existing package version.")
+          }
         dist: t8
 
     - name: Commit ghcopilot
