@@ -18,35 +18,447 @@ name: plugin-Ignite
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251122'
+version: '20260918'
 dependencies:
-  openaf: '>=20210515'
+  openaf: '>=20260918'
 files:
 - .maven.yaml
 - .odoc.db
 - .package.yaml
 - LICENSES.txt
 - README.md
-- annotations-24.1.0.jar
-- cache-api-1.1.1.jar
+- accessors-smart-2.5.0.jar
+- aggdesigner-algorithm-6.0.jar
+- annotations-26.0.2-1.jar
+- apiguardian-api-1.1.2.jar
+- asm-9.9.jar
+- asm-analysis-9.9.jar
+- asm-tree-9.9.jar
+- asm-util-9.9.jar
+- auto-service-annotations-1.1.1.jar
+- avatica-core-1.26.0.jar
+- caffeine-3.2.0.jar
+- calcite-core-1.40.0.jar
+- calcite-linq4j-1.40.0.jar
+- checker-qual-3.43.0.jar
+- commons-compiler-3.1.12.jar
+- commons-dbcp2-2.11.0.jar
+- commons-lang-2.4.jar
+- commons-pool2-2.12.0.jar
+- commons-text-1.11.0.jar
 - compile.yaml
-- ignite-core-2.17.0.jar
+- config-1.4.5.jar
+- disruptor-4.0.0.jar
+- error_prone_annotations-2.36.0.jar
+- failureaccess-1.0.3.jar
+- fastutil-core-8.5.16.jar
+- flexmark-0.62.2.jar
+- flexmark-ext-emoji-0.62.2.jar
+- flexmark-ext-gfm-strikethrough-0.62.2.jar
+- flexmark-ext-ins-0.62.2.jar
+- flexmark-ext-superscript-0.62.2.jar
+- flexmark-ext-tables-0.62.2.jar
+- flexmark-ext-wikilink-0.62.2.jar
+- flexmark-html2md-converter-0.62.2.jar
+- flexmark-jira-converter-0.62.2.jar
+- flexmark-util-0.62.2.jar
+- flexmark-util-ast-0.62.2.jar
+- flexmark-util-builder-0.62.2.jar
+- flexmark-util-collection-0.62.2.jar
+- flexmark-util-data-0.62.2.jar
+- flexmark-util-dependency-0.62.2.jar
+- flexmark-util-format-0.62.2.jar
+- flexmark-util-html-0.62.2.jar
+- flexmark-util-misc-0.62.2.jar
+- flexmark-util-options-0.62.2.jar
+- flexmark-util-sequence-0.62.2.jar
+- flexmark-util-visitor-0.62.2.jar
+- guava-33.5.0-jre.jar
+- httpclient5-5.4.1.jar
+- httpcore5-h2-5.3.1.jar
+- ignite-api-3.1.0.jar
+- ignite-binary-tuple-3.1.0.jar
+- ignite-bytecode-3.1.0.jar
+- ignite-catalog-3.1.0.jar
+- ignite-catalog-compaction-3.1.0.jar
+- ignite-catalog-dsl-3.1.0.jar
+- ignite-client-3.1.0.jar
+- ignite-client-common-3.1.0.jar
+- ignite-client-handler-3.1.0.jar
+- ignite-cluster-management-3.1.0.jar
+- ignite-cluster-metrics-3.1.0.jar
+- ignite-code-deployment-3.1.0.jar
+- ignite-compute-3.1.0.jar
+- ignite-configuration-3.1.0.jar
+- ignite-configuration-api-3.1.0.jar
+- ignite-configuration-presentation-3.1.0.jar
+- ignite-configuration-root-3.1.0.jar
+- ignite-configuration-storage-3.1.0.jar
+- ignite-configuration-system-3.1.0.jar
+- ignite-core-3.1.0.jar
+- ignite-distribution-zones-3.1.0.jar
+- ignite-error-code-annotation-processor-3.1.0.jar
+- ignite-eventlog-3.1.0.jar
+- ignite-failure-handler-3.1.0.jar
+- ignite-file-io-3.1.0.jar
+- ignite-index-3.1.0.jar
+- ignite-low-watermark-3.1.0.jar
+- ignite-marshaller-common-3.1.0.jar
+- ignite-metastorage-3.1.0.jar
+- ignite-metastorage-api-3.1.0.jar
+- ignite-metastorage-cache-3.1.0.jar
+- ignite-metrics-3.1.0.jar
+- ignite-metrics-exporter-otlp-3.1.0.jar
+- ignite-network-3.1.0.jar
+- ignite-network-api-3.1.0.jar
+- ignite-page-memory-3.1.0.jar
+- ignite-partition-distribution-3.1.0.jar
+- ignite-partition-replicator-3.1.0.jar
+- ignite-placement-driver-3.1.0.jar
+- ignite-placement-driver-api-3.1.0.jar
+- ignite-raft-3.1.0.jar
+- ignite-raft-api-3.1.0.jar
+- ignite-replicator-3.1.0.jar
+- ignite-rest-3.1.0.jar
+- ignite-rest-api-3.1.0.jar
+- ignite-rocksdb-common-3.1.0.jar
+- ignite-runner-3.1.0.jar
+- ignite-schema-3.1.0.jar
+- ignite-security-3.1.0.jar
+- ignite-security-api-3.1.0.jar
+- ignite-sql-engine-3.1.0.jar
+- ignite-sql-engine-api-3.1.0.jar
+- ignite-storage-api-3.1.0.jar
+- ignite-storage-page-memory-3.1.0.jar
+- ignite-storage-rocksdb-3.1.0.jar
+- ignite-system-disaster-recovery-3.1.0.jar
+- ignite-system-disaster-recovery-api-3.1.0.jar
+- ignite-system-view-3.1.0.jar
+- ignite-system-view-api-3.1.0.jar
+- ignite-table-3.1.0.jar
+- ignite-transactions-3.1.0.jar
+- ignite-vault-3.1.0.jar
+- ignite-workers-3.1.0.jar
+- ignite.sh
+- j2objc-annotations-3.1.jar
+- jackson-dataformat-yaml-2.15.1.jar
+- jackson-datatype-jdk8-2.15.0.jar
+- jackson-datatype-jsr310-2.15.1.jar
+- jakarta.annotation-api-2.0.0.jar
+- jakarta.inject-api-2.0.0.jar
+- jakarta.transaction-api-1.3.3.jar
+- janino-3.1.12.jar
+- javadoc-parser-0.3.1.jar
+- javapoet-1.13.0.jar
+- javassist-3.30.2-GA.jar
+- javax.annotation-api-1.3.2.jar
+- jctools-core-4.0.5.jar
+- json-path-2.9.0.jar
+- json-simple-1.1.1.jar
+- json-smart-2.5.0.jar
+- jsoup-1.16.1.jar
+- jspecify-1.0.0.jar
+- jsr305-3.0.2.jar
+- jts-core-1.19.0.jar
+- jts-io-common-1.19.0.jar
+- listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+- memory-0.9.0.jar
+- metrics-core-4.2.37.jar
+- micronaut-aop-3.10.4.jar
+- micronaut-buffer-netty-3.10.4.jar
+- micronaut-context-3.10.4.jar
+- micronaut-core-3.10.4.jar
+- micronaut-core-reactive-3.10.4.jar
+- micronaut-http-3.10.4.jar
+- micronaut-http-client-3.8.6.jar
+- micronaut-http-client-core-3.8.6.jar
+- micronaut-http-netty-3.10.4.jar
+- micronaut-http-server-3.10.4.jar
+- micronaut-http-server-netty-3.10.4.jar
+- micronaut-inject-3.10.4.jar
+- micronaut-jackson-core-3.10.4.jar
+- micronaut-jackson-databind-3.10.4.jar
+- micronaut-json-core-3.10.4.jar
+- micronaut-openapi-4.10.0.jar
+- micronaut-picocli-4.4.0.jar
+- micronaut-reactor-2.6.0.jar
+- micronaut-reactor-http-client-2.6.0.jar
+- micronaut-router-3.10.4.jar
+- micronaut-runtime-3.10.4.jar
+- micronaut-security-3.11.1.jar
+- micronaut-security-annotations-3.11.1.jar
+- micronaut-validation-3.10.4.jar
+- micronaut-websocket-3.10.4.jar
+- msgpack-core-0.8.24.jar
+- netty-buffer-4.2.6.Final.jar
+- netty-codec-4.2.6.Final.jar
+- netty-codec-base-4.2.6.Final.jar
+- netty-codec-compression-4.2.6.Final.jar
+- netty-codec-http-4.1.108.Final.jar
+- netty-codec-http2-4.1.108.Final.jar
+- netty-codec-marshalling-4.2.6.Final.jar
+- netty-codec-protobuf-4.2.6.Final.jar
+- netty-codec-socks-4.1.87.Final.jar
+- netty-common-4.2.6.Final.jar
+- netty-handler-4.2.6.Final.jar
+- netty-handler-proxy-4.1.87.Final.jar
+- netty-resolver-4.2.6.Final.jar
+- netty-transport-4.2.6.Final.jar
+- netty-transport-native-unix-common-4.2.6.Final.jar
+- opentelemetry-api-1.54.1.jar
+- opentelemetry-common-1.54.1.jar
+- opentelemetry-context-1.54.1.jar
+- opentelemetry-exporter-common-1.54.1.jar
+- opentelemetry-exporter-otlp-1.54.1.jar
+- opentelemetry-exporter-otlp-common-1.54.1.jar
+- opentelemetry-exporter-sender-okhttp-1.54.1.jar
+- opentelemetry-sdk-1.54.1.jar
+- opentelemetry-sdk-common-1.54.1.jar
+- opentelemetry-sdk-extension-autoconfigure-spi-1.54.1.jar
+- opentelemetry-sdk-metrics-1.54.1.jar
+- picocli-4.7.5.jar
 - plugin-ignite.jar
-- src/openaf/plugins/Ignite$1.class
-- src/openaf/plugins/Ignite$2.class
+- proj4j-1.2.2.jar
+- protobuf-java-3.25.5.jar
+- reactive-streams-1.0.4.jar
+- reactor-core-3.5.0.jar
+- rocksdbjni-10.2.1.jar
+- scalecube-cluster-2.6.15.jar
+- scalecube-cluster-api-2.6.15.jar
+- scalecube-commons-1.0.22.jar
+- scalecube-transport-api-2.6.15.jar
+- sketches-core-0.9.0.jar
+- snakeyaml-2.0.jar
+- src/openaf/plugins/Ignite$Cache.class
+- src/openaf/plugins/Ignite$Handle.class
+- src/openaf/plugins/Ignite$OpenAFJob.class
 - src/openaf/plugins/Ignite.class
 - src/openaf/plugins/Ignite.java
+- swagger-annotations-2.2.38.jar
+- swagger-models-2.2.15.jar
+- tests/logging.properties
+- tests/regression.js
+- tests/run.sh
+- uzaygezen-core-0.2.jar
+- validation-api-2.0.1.Final.jar
+- value-annotations-2.11.4.jar
 filesHash:
-  .maven.yaml: a08382ff1ce8e205ede7e18a89a32b5cf79a4aec
-  .odoc.db: 933b6105b031945a3516683e51102bb474870385
-  LICENSES.txt: d7ce9e985cc6d97abbbea1e8422417783f4fb773
-  README.md: 022e192a9cfcd5ac4ecce9ab7dcf765e232a61a6
-  annotations-24.1.0.jar: 7af6a669488450c4a07c2c3254e2151df42d7d04
-  cache-api-1.1.1.jar: c56fb980eb5208bfee29a9a5b9d951aba076bd91
-  compile.yaml: f730870ffe1ac8c7cef2aad9ca7ee4c0d5bff83e
-  ignite-core-2.17.0.jar: 443cc9e4dcc6bd55ea0e5137dbcb1bc1a2831dcf
-  plugin-ignite.jar: 3b07c1950ccdc423b42318ea4f117e2ee26895e7
-  src/openaf/plugins/Ignite$1.class: 791040f341ab4ae4cc57c569a00fb070a541c5f8
-  src/openaf/plugins/Ignite$2.class: 98a0232612da0a3e34ae6adee05f4a2cecfeb013
-  src/openaf/plugins/Ignite.class: 270fb566ba96dc80e357fe9967ad8aad9cd64e0e
-  src/openaf/plugins/Ignite.java: ffa5ac5bf69d8264e3aab6b39dd8ac77b0e00eef
+  .maven.yaml: ec1e12afcf432aa98aefa5bd3870987e80394d99
+  .odoc.db: 32b8e6f30b84584bf457f304d40e8fe99033a1e0
+  LICENSES.txt: 8778144d7931431d136ea973eaf2d810ec3d297d
+  README.md: a2f9cb4c9a2846d59d2541c409302a914bcae103
+  accessors-smart-2.5.0.jar: aca011492dfe9c26f4e0659028a4fe0970829dd8
+  aggdesigner-algorithm-6.0.jar: bd0cd7ad1e3791a8a0929df0dcdbffc02fd0bab4
+  annotations-26.0.2-1.jar: c7ce3cdeda3d18909368dfe5977332dfad326c6d
+  apiguardian-api-1.1.2.jar: a231e0d844d2721b0fa1b238006d15c6ded6842a
+  asm-9.9.jar: c29635c8a7afa03d74b33c1884df8abb2b3f3dcc
+  asm-analysis-9.9.jar: 0bf4fa6e66638851c1cd22c2caea0c3ee5d5f437
+  asm-tree-9.9.jar: f8de6eead6d24dd0f45bd065bbe112b2cda6ea21
+  asm-util-9.9.jar: 42fdfc0508b43807c8078d6e82ecff2ce2112ae8
+  auto-service-annotations-1.1.1.jar: da12a15cd058ba90a0ff55357fb521161af4736d
+  avatica-core-1.26.0.jar: eae147405533f3170ed0fe8815f4ee1b0f34de34
+  caffeine-3.2.0.jar: 35eba09997476a39492ac7f7b2bb0e8292c09d17
+  calcite-core-1.40.0.jar: 1fbbd4cf9bccf6bbdc515b71cfa4fdbc053204c0
+  calcite-linq4j-1.40.0.jar: 0f04c0e36670b3c1029318efd2df32c7490379c7
+  checker-qual-3.43.0.jar: 9425eee39e56b116d2b998b7c2cebcbd11a3c98b
+  commons-compiler-3.1.12.jar: 0501779107b06a981ff359eab7369ff7a2bf077e
+  commons-dbcp2-2.11.0.jar: 5553126edbdc3d2dd24118f687d09d6d066fca1b
+  commons-lang-2.4.jar: 16313e02a793435009f1e458fa4af5d879f6fb11
+  commons-pool2-2.12.0.jar: 458563f69fbdaebf7daadfe10dc3a22e42a7de50
+  commons-text-1.11.0.jar: 2bb044b7717ec2eccaf9ea7769c1509054b50e9a
+  compile.yaml: d04317bb45091b628bc1f3158c8a67ad5b25f779
+  config-1.4.5.jar: 0cc25b497ded7068a861517a815546fb472f9e58
+  disruptor-4.0.0.jar: 9e77a6b0b1d3d0dac3e9f7f63535dad8ef217cbc
+  error_prone_annotations-2.36.0.jar: 227d4d4957ccc3dc5761bd897e3a0ee587e750a7
+  failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
+  fastutil-core-8.5.16.jar: 09a7e5c035c06d904fee369c8f8615655dd66e01
+  flexmark-0.62.2.jar: 606a88e1d15aa8debd97cb5dfdf788ddc6fb5b5e
+  flexmark-ext-emoji-0.62.2.jar: c1f1b1909bfb6c0f4301a9227745a3ab33b0d08f
+  flexmark-ext-gfm-strikethrough-0.62.2.jar: 7c0657d663269223c7a5bf29f12982d38d382168
+  flexmark-ext-ins-0.62.2.jar: 234bf93924c93ee2d6d948da5ed82120b0e455c9
+  flexmark-ext-superscript-0.62.2.jar: 4bbdbed56d2da352177fdd5ae1c64ac07ace52d9
+  flexmark-ext-tables-0.62.2.jar: c95068a1450835c2695750ece82c996a7b57bbd3
+  flexmark-ext-wikilink-0.62.2.jar: e07a39268a2091451f3456cb5d9e955bf276f3f4
+  flexmark-html2md-converter-0.62.2.jar: 55631ad20431c090d404c3945b692eaceedb6fc5
+  flexmark-jira-converter-0.62.2.jar: c172ad9cde6317d84fc15fae53f8eab42d982ade
+  flexmark-util-0.62.2.jar: 6e38dcd6bb4ccfc13d513aaba350404977fa85bd
+  flexmark-util-ast-0.62.2.jar: c0b998d5570295f104a4ffee4f8eec305d7db327
+  flexmark-util-builder-0.62.2.jar: 22c85efb51d4aa25540b8b0d880be7ad4a8baec1
+  flexmark-util-collection-0.62.2.jar: 85253a62761533ce7709f81b0c581c8473f825ec
+  flexmark-util-data-0.62.2.jar: 2df8ce1abab2e40edc7d340962025ee1dd09fe02
+  flexmark-util-dependency-0.62.2.jar: ae5afa76a669e06b3a65255c2ed775ede5cd3eb1
+  flexmark-util-format-0.62.2.jar: 058548be1fc0682698721c0c278451a41f361d3a
+  flexmark-util-html-0.62.2.jar: 6d830cb37e48fd9dca44bf15fbc3a86aa7d82c5a
+  flexmark-util-misc-0.62.2.jar: 18133dd81887c512e2f56feb3c14a8a1210f30ea
+  flexmark-util-options-0.62.2.jar: d871763fff2226c271cc3333e98729ce6211065c
+  flexmark-util-sequence-0.62.2.jar: 87af2803a63b5b07cc42d9c1d98f8ecd4f83fbcc
+  flexmark-util-visitor-0.62.2.jar: ca49bd94860a5ccedd82bde96ece831f16c66ff1
+  guava-33.5.0-jre.jar: 8699de25f2f979108d6c1b804a7ba38cda1116bc
+  httpclient5-5.4.1.jar: ce913081e592ee8eeee35c4e577d7dce13cba7a4
+  httpcore5-h2-5.3.1.jar: 760c34db3ba41b0ffa07e956bc308d3a12356915
+  ignite-api-3.1.0.jar: 41ad20bb1b135e504b1484165a7e6e1052ff4e0d
+  ignite-binary-tuple-3.1.0.jar: dae044f616443d2be59bc943e3e45a2ffc1d9e29
+  ignite-bytecode-3.1.0.jar: cf7d5dbd9e41e3ab00c8be5c872a0c135c1da005
+  ignite-catalog-3.1.0.jar: 65bd07803f6ee6fc70491d284e6a4a918831808c
+  ignite-catalog-compaction-3.1.0.jar: 44892850a18724f097a46a3aceb8c3d187b6eafe
+  ignite-catalog-dsl-3.1.0.jar: 400f056edc53d5638d5337639ee0a07dcfee072b
+  ignite-client-3.1.0.jar: fbb2bcc85285b9154dc93a6271b9bf8e5b7bd10d
+  ignite-client-common-3.1.0.jar: 17a48ecad3df6127d397e16baa4174bbb9c2271e
+  ignite-client-handler-3.1.0.jar: d3dcdddee7d503e1d77b36865f494345f07e4ec7
+  ignite-cluster-management-3.1.0.jar: a5597223e02c07321c200c395d6f2026d4c6a86c
+  ignite-cluster-metrics-3.1.0.jar: f6b5792e3c6fa28519bf86304ac1691994bc8777
+  ignite-code-deployment-3.1.0.jar: 95079d95f746aaac2b083dcabb204ca8bc184b5f
+  ignite-compute-3.1.0.jar: 018fdf77f02e003c3bb6ccf3c158c7c1c78b1ea4
+  ignite-configuration-3.1.0.jar: d6a2231f6ec381636360541b4416fb93d46c2c04
+  ignite-configuration-api-3.1.0.jar: 213eb39b859fb846e469ecdc63c4d3aa63d93a2f
+  ignite-configuration-presentation-3.1.0.jar: 2c424b7ca96aefec648e68872f47fe75a5de7094
+  ignite-configuration-root-3.1.0.jar: ae7a173af656710af2bcb5ea1a947f8457f7f476
+  ignite-configuration-storage-3.1.0.jar: cb72b06e6bfdf0ee8f6d04f8fd32c2c735b31c49
+  ignite-configuration-system-3.1.0.jar: 24f8b3bb74649a762ac81b9f4e5e01dc8ccf3442
+  ignite-core-3.1.0.jar: a4c14ce97387542bb7c3cc6bba158031a61116d0
+  ignite-distribution-zones-3.1.0.jar: 5c33378fed8d1b8108e9f4bb316d93fa6185d908
+  ignite-error-code-annotation-processor-3.1.0.jar: 2aba50cd5fd1650950ccea1993d6b68a13e1b4eb
+  ignite-eventlog-3.1.0.jar: 567de77eea124897b8ff974c3593dad2f1a76d8f
+  ignite-failure-handler-3.1.0.jar: 88f1fd97e0ef8ce2e5678bd8dc73a601bdaf9122
+  ignite-file-io-3.1.0.jar: dca067cb26f5393dcb93611e0f0949a9a9cb0ba8
+  ignite-index-3.1.0.jar: 6b4ab70432b1d49b48eb0a296583b08a32648ebc
+  ignite-low-watermark-3.1.0.jar: 25a26be349bd80da025579ad3c7573290aabdcce
+  ignite-marshaller-common-3.1.0.jar: ecb953da333d0d86b050d4a8b1408d6a5846371b
+  ignite-metastorage-3.1.0.jar: 8407e61d6d90cee792f81070a81d91d6926ace3e
+  ignite-metastorage-api-3.1.0.jar: 78db6f313ecff04a2f24e196fda7844038f5b6d8
+  ignite-metastorage-cache-3.1.0.jar: c6764ad971c528b1eb1c3c95b6cb7d55d1687b04
+  ignite-metrics-3.1.0.jar: 6ccaf81f89f3f44924e4302ee636bcd0af4da908
+  ignite-metrics-exporter-otlp-3.1.0.jar: 9230c0c52abaae5ed4715570854ad476c54f5e21
+  ignite-network-3.1.0.jar: 426285597395e1eb572fc3031a0979d42f368832
+  ignite-network-api-3.1.0.jar: 5e2b1380b1d3dab9054253cc10429f70f3875eb3
+  ignite-page-memory-3.1.0.jar: 664324a5b03558119eaa1d4d40353746df187e60
+  ignite-partition-distribution-3.1.0.jar: 13b592d81090a138ca76a10583c5cc9cca05cb5c
+  ignite-partition-replicator-3.1.0.jar: a8de6d405ae2d58df653e49ffab81c986cbffbee
+  ignite-placement-driver-3.1.0.jar: 5c1c77b0826145722b13b3fbb998d42d3d1117a2
+  ignite-placement-driver-api-3.1.0.jar: 468ef04fd0646a4ab12d1ab81a553d1fcdbd5b25
+  ignite-raft-3.1.0.jar: f46ca26b300e309e38e669e8f8717bb63ce8de61
+  ignite-raft-api-3.1.0.jar: d98537c3ae27ed779f811e3402fca243302eca39
+  ignite-replicator-3.1.0.jar: c26590797de8983c328597bf6966df8465109439
+  ignite-rest-3.1.0.jar: 62de869b81c3622ddd17b32a6983bd827cffeef5
+  ignite-rest-api-3.1.0.jar: c6c98cb8e7a374adc99ad1d7512b0ba0b6ea6dfb
+  ignite-rocksdb-common-3.1.0.jar: 1c0c91cb9e6dad0d2906e457b379640dbc5e77b4
+  ignite-runner-3.1.0.jar: 4cdb8adbabc1b3cd27d019209a1375480346baf6
+  ignite-schema-3.1.0.jar: 7c71b31fd6d13a60d0eedac4fa6e26548996028e
+  ignite-security-3.1.0.jar: b3065ed791e7b976c8719c0e0963031923b574e6
+  ignite-security-api-3.1.0.jar: ff6bb3a33da414892aac3a9a83d286660d626670
+  ignite-sql-engine-3.1.0.jar: d332ea482d9c87eeaf9c1f9b3da08c5743558695
+  ignite-sql-engine-api-3.1.0.jar: 08644bc64bd2b663a3a8575157bcd30f4a4e5404
+  ignite-storage-api-3.1.0.jar: f81433a47b212c7422c47f3f90d8175e46a239aa
+  ignite-storage-page-memory-3.1.0.jar: dd8a6fe29bf0a6bdc58b527087364e5ebfb8bedc
+  ignite-storage-rocksdb-3.1.0.jar: 854c29467f94121b9b8f1ddcac1cbcb78d676906
+  ignite-system-disaster-recovery-3.1.0.jar: 9507773894f127c71589658971cd8de4b45ff8ff
+  ignite-system-disaster-recovery-api-3.1.0.jar: 4a5af5c7eee228ab999c48b5c5cdc907d39ed8f9
+  ignite-system-view-3.1.0.jar: 10ed71b7ede024dd7b799c2b58c235534c647b81
+  ignite-system-view-api-3.1.0.jar: a5b9a64d035cae942cb08d37620525df7eeb58e7
+  ignite-table-3.1.0.jar: 31e5b2ff83b36d7187ce4d06e0fde6ea750da044
+  ignite-transactions-3.1.0.jar: c65c83306571cf1b1e5163d1f2e571526ff8e285
+  ignite-vault-3.1.0.jar: 370592fb38235d135f0497a80d41af4258e26338
+  ignite-workers-3.1.0.jar: d38dbeac6c88edae98404703ce6640f057a65fdd
+  ignite.sh: d12cde52483c2f0c2500c6b1e4fee46d833f1024
+  j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
+  jackson-dataformat-yaml-2.15.1.jar: 97a9c5867fbacd44a1791c2d0a00bd4f3f061b77
+  jackson-datatype-jdk8-2.15.0.jar: ddfd375d4df3a4c149bf7d5d71c45b91909cf31f
+  jackson-datatype-jsr310-2.15.1.jar: 21300ba63a6408bbd3505af4287d1b9a911a9718
+  jakarta.annotation-api-2.0.0.jar: f3cd84cc45f583a0fdc42a8156d6c5b98d625c1a
+  jakarta.inject-api-2.0.0.jar: 46fc8560b6fd17b78396d88f39c1a730457671f0
+  jakarta.transaction-api-1.3.3.jar: c4179d48720a1e87202115fbed6089bdc4195405
+  janino-3.1.12.jar: ffcd3dfa84057ef76092b6b66c53871a97ae40b8
+  javadoc-parser-0.3.1.jar: 29bf2a6bafb5413027527403009b74315690d3bf
+  javapoet-1.13.0.jar: d6562d385049f35eb50403fa86bb11cce76b866a
+  javassist-3.30.2-GA.jar: 284580b5e42dfa1b8267058566435d9e93fae7f7
+  javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
+  jctools-core-4.0.5.jar: 9ab38ca19877236986db4894ef1400a7ca23db80
+  json-path-2.9.0.jar: 37fe2217f577b0b68b18e62c4d17a8858ecf9b69
+  json-simple-1.1.1.jar: c9ad4a0850ab676c5c64461a05ca524cdfff59f1
+  json-smart-2.5.0.jar: 57a64f421b472849c40e77d2e7cce3a141b41e99
+  jsoup-1.16.1.jar: ae551410a16433984cd4a8603622fafa9d8299f0
+  jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
+  jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
+  jts-core-1.19.0.jar: 3ff3baa0074445384f9e0068df81fbd0a168395a
+  jts-io-common-1.19.0.jar: 4c7018119aeb66335746e6748456c821e304d3a2
+  listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
+  memory-0.9.0.jar: 010a7f4c09076d5c5d5d7a3f0546b71764ec5704
+  metrics-core-4.2.37.jar: 2d7ecb8e2b4d292c7eb87ab28cda586cb9773056
+  micronaut-aop-3.10.4.jar: 7404b7c829b284aba657450ddd5d587c31ed6ef8
+  micronaut-buffer-netty-3.10.4.jar: 94cfc0f7400dc10542634aac3307ef33e6deef8d
+  micronaut-context-3.10.4.jar: c1c3e7eb99f8673e45032fba0b7710f5676103b2
+  micronaut-core-3.10.4.jar: cf2c6039b748eb83b22871526cfb05e36560884d
+  micronaut-core-reactive-3.10.4.jar: c7434fef81194fdf5389e3f1f1302fdb2f0f3564
+  micronaut-http-3.10.4.jar: 88fc8dca4fa92d0ee28482995f59b8b8f58e0068
+  micronaut-http-client-3.8.6.jar: 0761a1b74d566318265256e5b701c3503a874944
+  micronaut-http-client-core-3.8.6.jar: 2528d77a464f5241fa739c0215a1826cdea7730f
+  micronaut-http-netty-3.10.4.jar: 1eae3a8e1f5094929f47f524c1ceea2092866804
+  micronaut-http-server-3.10.4.jar: 77e11fb87e39959d21343578047d0353e9578afa
+  micronaut-http-server-netty-3.10.4.jar: c62a07ade6f9a838e5f55d3f4301d0bdd53416a1
+  micronaut-inject-3.10.4.jar: 60e638df148d1240bda7fb603ad7cf2f420f9f26
+  micronaut-jackson-core-3.10.4.jar: 88c1137ecd3f5203ae9e1300d2e7c987029a4bf5
+  micronaut-jackson-databind-3.10.4.jar: 6ab04c5814b3363ca758769660bd323b770e0599
+  micronaut-json-core-3.10.4.jar: 46d880bf151f370cc9000224eee8958857cc9517
+  micronaut-openapi-4.10.0.jar: fa7f818b1e1fe217a9c4e257b5c3de60d3037b49
+  micronaut-picocli-4.4.0.jar: c33fbe6903d3c08d4cf921291e94b5581c1d0b64
+  micronaut-reactor-2.6.0.jar: 7b7f42acfb106d4fe6cf9fb325f5076f0009b650
+  micronaut-reactor-http-client-2.6.0.jar: e01aeae7d3972597dcfc4e1d0c8797175e2ebda1
+  micronaut-router-3.10.4.jar: a09a0211b98dd2241edd4b6405ab17963ebc7348
+  micronaut-runtime-3.10.4.jar: 3af181c7976c6d62a9433ec56862fffc6ef7ac93
+  micronaut-security-3.11.1.jar: 404112ad026df46989f52b88a49f22989325a3ea
+  micronaut-security-annotations-3.11.1.jar: 6ffba116736cd02ccd2c82241962cf1b7a092f55
+  micronaut-validation-3.10.4.jar: 6c8367c6312e65c47a357b603723baa2bfaf64c4
+  micronaut-websocket-3.10.4.jar: b0101e55b02b0a38b9105dce22a4b2d81c71b2c3
+  msgpack-core-0.8.24.jar: ca2a88b45943a80806261a18980d7928d39ed5df
+  netty-buffer-4.2.6.Final.jar: 4dfa898e145ea6910b9e99388f35e0ad483a6dfa
+  netty-codec-4.2.6.Final.jar: d3c3d384843eb12f8d33d92efd0e4e0ec305cd23
+  netty-codec-base-4.2.6.Final.jar: fd6ff9613696f99857daeca37d4cfed22b1eb69e
+  netty-codec-compression-4.2.6.Final.jar: fadf334ce949ae99b96b4b9d95d59c30a5dc2614
+  netty-codec-http-4.1.108.Final.jar: dd44733e94f3f6237c896f2bbe9927c1eba48543
+  netty-codec-http2-4.1.108.Final.jar: ed90430e545529a2df7c1db6c94568ea00867a61
+  netty-codec-marshalling-4.2.6.Final.jar: 3c2d0708c1cc6cc866c02d04e1db26c23d2f82a3
+  netty-codec-protobuf-4.2.6.Final.jar: e460fdf098e22030e84d0fa0eaa33892e1831a1d
+  netty-codec-socks-4.1.87.Final.jar: 109027470b72d56914d76154e947f9bd5844bb9b
+  netty-common-4.2.6.Final.jar: 5746874869298a07b468dd50b5991f457e773620
+  netty-handler-4.2.6.Final.jar: 311ea62f27b26685b306dc24c4bbf765bc1950d9
+  netty-handler-proxy-4.1.87.Final.jar: 8079f16d6209e10f5d3a09522e7aa9ffb217e17e
+  netty-resolver-4.2.6.Final.jar: 121223f223094539282b916c303ac52c7875b9aa
+  netty-transport-4.2.6.Final.jar: 15af02f1735db36455f2af2fd11b64e9f4499008
+  netty-transport-native-unix-common-4.2.6.Final.jar: cacd60c080051c74b9487074cf89d28ec892d71c
+  opentelemetry-api-1.54.1.jar: d01bbdf6427e3d88c32a10aae2cfb32bbf9ed3d5
+  opentelemetry-common-1.54.1.jar: fd3cb351f092212ff792e7ea906949ab20b1b9b2
+  opentelemetry-context-1.54.1.jar: 5fb479d490407d9d07ebe87b4c187511dd4c33b4
+  opentelemetry-exporter-common-1.54.1.jar: 72acafff4b6f159a16ff7213a50bb410a1d8f3d3
+  opentelemetry-exporter-otlp-1.54.1.jar: 83e99b038a1382382ce3b71fd534e0413e476809
+  opentelemetry-exporter-otlp-common-1.54.1.jar: dd3b9df6a33102ff5bf2fdc42b1ca67f819989e4
+  opentelemetry-exporter-sender-okhttp-1.54.1.jar: e8772765bf4a3aefabcee43f0df5a5768519eddb
+  opentelemetry-sdk-1.54.1.jar: 01e10a46db8709b5c8f5e013ab2d1372ff0ef880
+  opentelemetry-sdk-common-1.54.1.jar: 992943cbc7f214e737eba13289bfd336faed081b
+  opentelemetry-sdk-extension-autoconfigure-spi-1.54.1.jar: b980dc3a65c3c8c43c14498f6e08366f125b2bd0
+  opentelemetry-sdk-metrics-1.54.1.jar: f9ca62c8eadbd92077876ac604afdb27c50d98d2
+  picocli-4.7.5.jar: a6f99ec0a97aeb3be63a9f55703b28f2cf08788f
+  plugin-ignite.jar: 332318a26a0253a2534c90c50f3bee5c387529d0
+  proj4j-1.2.2.jar: 6eb2c27f1b7d048a6912a42a0637e470cdc46562
+  protobuf-java-3.25.5.jar: 5ae5c9ec39930ae9b5a61b32b93288818ec05ec1
+  reactive-streams-1.0.4.jar: 3864a1320d97d7b045f729a326e1e077661f31b7
+  reactor-core-3.5.0.jar: 83749d14f5795905e5b8e8c258c917d4707b586c
+  rocksdbjni-10.2.1.jar: 381243de9230cb91a1c9d62e55003fe60dd23097
+  scalecube-cluster-2.6.15.jar: 7106ac98daccd630a824e3c91adbdfd3642c8fc8
+  scalecube-cluster-api-2.6.15.jar: 75256adf033fcb805773cf66ad769dffcfd87f70
+  scalecube-commons-1.0.22.jar: 985eaa45cb12cba8044ee5b1fe6a63c2f41f48ac
+  scalecube-transport-api-2.6.15.jar: 9aa918e09495d3ac6c35ebe66b6bdf2c29d60974
+  sketches-core-0.9.0.jar: ba592b4cca8eb7dd425721acc1b5d4c034e34fa0
+  snakeyaml-2.0.jar: 3aab2116756442bf0d4cd1c089b24d34c3baa253
+  src/openaf/plugins/Ignite$Cache.class: 3eb64b741c53553ad0c09fad23d374b6e5bee38a
+  src/openaf/plugins/Ignite$Handle.class: b2b35fac67f179d86e77a507975ad28cf38ff355
+  src/openaf/plugins/Ignite$OpenAFJob.class: 2f4e3612b740c98a2213df93a31a3d0035dbd701
+  src/openaf/plugins/Ignite.class: 1e330d225fb44fd2f1fafd7509ded0246167430b
+  src/openaf/plugins/Ignite.java: 5ae0c9d25bb6d4825f01960dcabec0075d161983
+  swagger-annotations-2.2.38.jar: c1aa0dbed16d5780f088332f63d62bbf3c402e42
+  swagger-models-2.2.15.jar: 87a8d5f62d2b5390bd5ce8b4e01796aca59db4bb
+  tests/logging.properties: 29a36faa5c8efd8defae2ee8ff53fb68698add2e
+  tests/regression.js: 823ed8bdcf88baf94fe9982c5d09a74d5fb7c163
+  tests/run.sh: 8359718482c2cc6657a50ba21911647e26a516a5
+  uzaygezen-core-0.2.jar: 611b82d4c4b4f67cc3d83cf0697ec660fcee2fff
+  validation-api-2.0.1.Final.jar: cb855558e6271b1b32e716d24cb85c7f583ce09e
+  value-annotations-2.11.4.jar: c8657533d56be625550dcfb1319dacf2c2e12cff

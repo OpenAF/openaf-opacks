@@ -2,7 +2,7 @@ consts:
   outputDir: &OUTPUT_DIR .
 
 ojob:
-  async: true
+  async: false
 
 todo:
   - Clean up
@@ -34,12 +34,8 @@ jobs:
     args:
       - outputDir: *OUTPUT_DIR
     exec: |
-      //ow.loadJava();
-      //var arts = io.readFileYAML(".maven.yaml");
-      //var maven = new ow.java.maven();
-      //maven.processMavenFile(args.outputDir);
       oJobRunFile("ojob.io/oaf/mavenGetJars", {}, nowNano(), __, true)
-      $sh("ojob ojob.io/oaf/checkOAFJars remove=true path=.").exec()
+      $sh("ojob ojob.io/oaf/checkOAFJars remove=true versioninsensitive=true path=.").exec()
 
   ##########################
   - name: Compile Ignite plugin
@@ -53,7 +49,8 @@ jobs:
       classpath.push(getOpenAFJar());
       var sources = $path(listFilesRecursive(args.outputDir + "/src"), "[?ends_with(filename, '.java')].filepath");
       var sep = java.io.File.pathSeparator;
-      sh("javac -source 1.8 -target 1.8 -Xlint:deprecation -cp \"" + classpath.join(sep) + "\" " + sources.join(" "), void 0, void 0, true, args.outputDir, true);
+      var result = sh("javac --release 11 -proc:none -Xlint:deprecation -cp \"" + classpath.join(sep) + "\" " + sources.join(" "), void 0, void 0, true, args.outputDir, true);
+      if (result.exitcode != 0) throw new Error("Ignite compilation failed: " + result.exitcode);
  
   ####################### 
   - name: Prepare Ignite jar

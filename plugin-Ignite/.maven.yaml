@@ -1,17 +1,7 @@
 artifacts:
-
-  - id     : ignite-core
-    group  : org.apache.ignite
-    version: 2.17.0
-
-  #- id     : ignite-shmem
-  #  group  : org.gridgain
-  #  version: 1.0.0
-  
-  - id     : cache-api
-    group  : javax.cache
-    version: 1.1.1
-
-  - id     : annotations
-    group  : org.jetbrains
-    version: 24.1.0
+  - group: org.apache.ignite
+    id: ignite-runner
+    version: 3.1.0
+  - group: org.apache.ignite
+    id: ignite-client
+    version: 3.1.0
