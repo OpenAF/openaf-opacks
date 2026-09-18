@@ -33,7 +33,7 @@ function id2MD(aId, aPath, aHBS, aOutputFile, aTranslationMap) {
     }
 
     var data = {
-        id: isDef(aTranslationMap[aId]) ? aTranslationMap[aId] : aId,
+        id: isDef(aTranslationMap) && isDef(aTranslationMap[aId]) ? aTranslationMap[aId] : aId,
         items: items
     };
 
@@ -53,6 +53,7 @@ function index2MD(aList, aHBS, aOutputFile, aTranslationMap) {
     var items = [];
 
     for(var i in list) {
+        var tmp;
         if (isDef(aTranslationMap) && isDef(aTranslationMap[list[i]])) 
             tmp = aTranslationMap[list[i]];
         else

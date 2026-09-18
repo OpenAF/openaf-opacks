@@ -17,19 +17,23 @@ name: oDoc2MD
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20171228
+version: '20260918'
 dependencies:
   OpenAF: '>=20170701'
 files:
 - .odoc.db
 - .package.yaml
+- README.md
 - odoc2md.js
 - odoc2md.yaml
 - odocId.md.hbs
 - odocIndex.md.hbs
+- tests/regression.js
 filesHash:
   .odoc.db: 75a7e0590b6981d4cf91334d32d3410e5174ef24
-  odoc2md.js: 9afa0ddae4a558f9e1b56a258aa50185a8649991
+  README.md: 9fff91516405f870505422d75fb0c885c06cc484
+  odoc2md.js: 42d8bcc6ea66fcf195a9a611d3ee3ec3f94ec9ba
   odoc2md.yaml: e2f8607c604bf531cc6b2f5e62efbabfbd11347b
   odocId.md.hbs: 1e5b9a6dd861f8cff3c2a1e50118a1dbafcdba68
   odocIndex.md.hbs: d3a7c56b3ec8f9e356da55b67e192b657438f2f5
+  tests/regression.js: c5014383ad4f2bf938a70656b593b8d5e8275a1d
