@@ -12,7 +12,7 @@ loadLib("aws_core.js");
  * </odoc>
  */
 AWS.prototype.PI_GetDimensionKeyDetails = function(aRegion, aIdentifier, aGroupIdentifier) {
-    aRegion    = _$(aRegion).isString().default(aws.region);
+    aRegion    = _$(aRegion).isString().default(this.region);
     var aURL   = "https://pi." + aRegion + ".amazonaws.com/";
     var url    = new java.net.URL(aURL);
     var aHost  = String(url.getHost());

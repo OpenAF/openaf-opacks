@@ -314,7 +314,7 @@ ow.ai.__gpttypes.bedrock = {
     if (isDef(_p) && isNumber(_p.timeout)) __flags.HTTP_CON_TIMEOUT = _p.timeout
 
     ow.loadObj()
-    aOptions = _$(_p.options, "aOptions").isMap().$_()
+    var aOptions = _$(_p.options, "aOptions").isMap().$_()
     aOptions.params = _$(aOptions.params, "aOptions.params").isMap().default({})
     //aOptions.timeout = _$(aOptions.timeout, "aOptions.timeout").isNumber().default(5 * 60000)
     aOptions.model = _$(aOptions.model, "aOptions.model").isString().default("amazon.titan-text-express-v1")

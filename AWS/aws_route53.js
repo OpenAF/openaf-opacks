@@ -68,13 +68,19 @@ AWS.prototype.ROUTE53_ListResourceRecordSets = function(aIdentifier) {
     var aHost  = String(url.getHost())
     var aURI   = String(url.getPath())
 
-    var __r = [], _r = {}
+    var __r = [], _r = {}, params = {}
     do {
-        var aExtra = $rest().query({marker: __r.NextMarker})
-        var _r = af.fromXML2Obj(aws.getURLEncoded(aURL + aExtra, aURI + aExtra, "", {}, "route53", aHost, "us-east-1", __))
-        if (isDef(_r) && isDef(_r.error)) return _r; else _r = _r.ListResourceRecordSetsResponse
-        __r = __r.concat(_r.ResourceRecordSets.ResourceRecordSet)
-    } while(isDef(__r) && __r.IsTruncated)
+        var query = $rest().query(params)
+        _r = this.getURLEncoded(aURL + (query ? "?" + query : ""), aURI, query, {}, "route53", aHost, "us-east-1", __)
+        if (isMap(_r) && isDef(_r.error)) return _r
+        if (isString(_r)) _r = af.fromXML2Obj(_r)
+        if (isDef(_r.error)) return _r
+        _r = _r.ListResourceRecordSetsResponse
+        if (isMap(_r.ResourceRecordSets) && isDef(_r.ResourceRecordSets.ResourceRecordSet))
+            __r = __r.concat(_r.ResourceRecordSets.ResourceRecordSet)
+        params = { name: _r.NextRecordName, type: _r.NextRecordType }
+        if (isDef(_r.NextRecordIdentifier)) params.identifier = _r.NextRecordIdentifier
+    } while(String(_r.IsTruncated) == "true")
 
     // ListResourceRecordSetsResponse
     return __r
@@ -116,13 +122,16 @@ AWS.prototype.ROUTE53_ListHostedZones = function() {
     var aHost  = String(url.getHost())
     var aURI   = String(url.getPath())
 
-    var _r = [], __r = {}
+    var _r = [], __r = {}, params = {}
     do {
-        var __r = af.fromXML2Obj( this.getURLEncoded(aURL + "/" + $rest().query({marker: __r.NextMarker}), aURI + "/" + $rest().query({marker: __r.NextMarker}), "", { }, "route53", aHost, "us-east-1", __) )
-        if (isMap(__r) && isDef(__r.ListHostedZonesResponse)) 
-            _r = _r.concat(__r.ListHostedZonesResponse.HostedZones.HostedZone)
-        else
-            throw __r
-    } while(isDef(__r) && __r.IsTruncated)
+        var query = $rest().query(params)
+        __r = this.getURLEncoded(aURL + (query ? "?" + query : ""), aURI, query, {}, "route53", aHost, "us-east-1", __)
+        if (isString(__r)) __r = af.fromXML2Obj(__r)
+        if (!isMap(__r) || !isDef(__r.ListHostedZonesResponse)) throw __r
+        __r = __r.ListHostedZonesResponse
+        if (isMap(__r.HostedZones) && isDef(__r.HostedZones.HostedZone))
+            _r = _r.concat(__r.HostedZones.HostedZone)
+        params = { marker: __r.NextMarker }
+    } while(String(__r.IsTruncated) == "true")
     return _r
 }

@@ -11,7 +11,7 @@ loadLib("aws_core.js");
  * of these maps up to 10 elements.
  * </odoc>
  */
-AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGroupdId, aMessageDeduplicationId) {
+AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGroupId, aMessageDeduplicationId) {
     aRegion = _$(aRegion).isString().default(this.region);
     var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\/+/, "").replace(/\/+$/, "");
     var url = new java.net.URL(aURL);
@@ -37,7 +37,7 @@ AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGrou
           Action: "SendMessage", 
           MessageBody: aMessageBody, 
           MessageDeduplicationId: (aEndPoint.endsWith(".fifo") ? aMessageDeduplicationId : void 0), 
-          MessageGroupId: (aEndPoint.endsWith(".fifo") ? aMessageGroupdId : void 0), 
+          MessageGroupId: (aEndPoint.endsWith(".fifo") ? aMessageGroupId : void 0),
           Version: "2012-11-05" 
        }, "sqs", aHost, aRegion);
     }
@@ -56,7 +56,7 @@ AWS.prototype.SQS_Send = function(aEndPoint, aRegion, aMessageBody, aMessageGrou
   */
  AWS.prototype.SQS_Receive = function(aEndPoint, aRegion, aVisibilityTimeout, aWaitTimeSeconds, maxMessage, aAttrList) {
     aRegion = _$(aRegion).isString().default(this.region);
-    aMaxMessage = _$(aMaxMessage, "aMaxMessage").isNumber().default(__)
+    maxMessage = _$(maxMessage, "maxMessage").isNumber().default(__)
     aAttrList = _$(aAttrList, "aAttrList").default([])
 
     var aURL = "https://sqs." + aRegion + ".amazonaws.com/" + aEndPoint.replace(/^\//, "");

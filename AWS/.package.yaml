@@ -34,13 +34,14 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260901'
+version: '20260918'
 dependencies:
   OpenAF: '>=20250315'
 files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
@@ -77,9 +78,10 @@ files:
 filesHash:
   .odoc.db: 69629605b4cd27d89dec81eff20b6bdeddf77977
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
+  README.md: 5f25ba91069ccf26a0086ce335ae286ccfb31862
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
-  aws_bedrock.js: 7140d374e7bb6af1b49ffc7ca95217d5bdf40499
+  aws_bedrock.js: e182d7d04ea4c7f59b56071d804a7e7b8ba83d57
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
@@ -95,14 +97,14 @@ filesHash:
   aws_kms.js: 41a4ecdc5c681ea2678a06fd12a210c7cbac3ca3
   aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
-  aws_pi.js: 03d829b7e5aab30ead5a67d39c96d460df9433dd
+  aws_pi.js: b94cd1b86f4cbb88e706a1c629100f2310511ba1
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
-  aws_route53.js: dfb4d672be62649f3b4fd45db67b03f132644ee3
+  aws_route53.js: f0481429305bd958d10551a7b8fd21952b79df84
   aws_s3.js: e05deefee5ef5423e0dc3a5645ea39ef0b67706b
   aws_scheduler.js: f741e27d96325c1f839ce535a6ffc5b8b0c2c6d9
   aws_secrets.js: 6973d7cc88ad8fb1afc2fff27f22f07d4ba41cd9
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
-  aws_sqs.js: 24818b763f14d4e3ab60d8ed0165c7eb89e6d5a0
+  aws_sqs.js: a3a603829c5c8d51cf032cdb1ffc02250db7cb9b
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
   oJobCodeArtifact.yaml: 177034be9ec45d5cbecfe0cc0d1c2ad4ed4ce371
   oJobECR.yaml: f15b791f50c38d1507b1b034337beb3b4ab41542
