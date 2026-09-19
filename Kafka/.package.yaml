@@ -1,0 +1,44 @@
+author: Nuno Aguiar
+scripts:
+  preinstall: ''
+  postinstall: ''
+  preerase: ''
+  posterase: ''
+keywords:
+- kafka
+- streaming
+- channel
+- oafp
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/Kafka
+  url: https://openaf.io/opacks/Kafka.opack
+description: Apache Kafka producer and consumer wrapper, stream channel and oafp input/output.
+name: Kafka
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260919'
+dependencies:
+  openaf: '>=20250725'
+files:
+- .maven.yaml
+- .package.yaml
+- README.md
+- kafka-clients-4.1.2.jar
+- kafka.js
+- lz4-java-1.10.1.jar
+- oafp_kafka.js
+- snappy-java-1.1.10.7.jar
+- zstd-jni-1.5.6-10.jar
+filesHash:
+  .maven.yaml: 45ddd7bbc23da953f5beddd4b37009ca7c99af34
+  README.md: 2eeb652df9805c55abeff1fa1f87d59babd1c1c2
+  kafka-clients-4.1.2.jar: c40bae292ab9f94f6c41c17dfda5f365700a59ad
+  kafka.js: ea0484e7b11ed8a5b2df208740a17bb0f0aa0816
+  lz4-java-1.10.1.jar: f541d7f910fe3d76f38f799c507c48cc81b12ecb
+  oafp_kafka.js: c3e25c37921ea456d20bc817cd6f785d3b6a5993
+  snappy-java-1.1.10.7.jar: 3049f95640f4625a945cfab85715f603fa4c8f80
+  zstd-jni-1.5.6-10.jar: 7e146ecb598af55d1f64d1c118af27569a848558
