@@ -1,0 +1,16 @@
+From: sender@example.test
+To: reader@example.test
+Subject: Attachment fixture
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="tika-boundary"
+
+--tika-boundary
+Content-Type: text/plain; charset=UTF-8
+
+Main email body
+--tika-boundary
+Content-Type: text/plain; charset=UTF-8; name="attachment.txt"
+Content-Disposition: attachment; filename="attachment.txt"
+
+UNIQUE_ATTACHMENT_CONTENT
+--tika-boundary--

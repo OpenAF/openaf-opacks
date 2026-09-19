@@ -1,0 +1,7 @@
+From: sender@example.test
+To: reader@example.test
+Subject: Tika mail fixture
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+
+Hello OpenAF email
