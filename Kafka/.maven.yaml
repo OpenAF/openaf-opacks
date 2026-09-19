@@ -1,0 +1,4 @@
+artifacts:
+- group: org.apache.kafka
+  id: kafka-clients
+  version: 4.1.2
