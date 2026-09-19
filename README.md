@@ -57,6 +57,7 @@
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build the lambda layers to run OpenAF lambda functions|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.|
+  |**OpenTelemetry**|<img src=".github/badges/OpenTelemetry.svg"><br>OTLP HTTP/JSON traces, metrics and logs exporter for OpenAF generic instrumentation.|
   |**PEG**|<img src=".github/badges/PEG.svg"><br>Wrapper around the Peggy javascript library allowing the parsing of grammars.|
   |**Parquet**|<img src=".github/badges/Parquet.svg"><br>Provides a wrapper around handling Parquet files.|
   |**PasteBin**|<img src=".github/badges/PasteBin.svg"><br>Wrapper around PasteBin functionality.|
