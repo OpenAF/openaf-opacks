@@ -74,6 +74,7 @@
   |**SocksServer**|<img src=".github/badges/SocksServer.svg"><br>Provides a wrapper around a Java SocksServer implementation|
   |**SysBench**|<img src=".github/badges/SysBench.svg"><br>Wrapper around SysBench to perform cpu, io and memory benchmark tests.|
   |**Terraform**|<img src=".github/badges/Terraform.svg"><br>OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
+  |**Tika**|<img src=".github/badges/Tika.svg"><br>Apache Tika text and metadata extraction from documents, files and streams, with an oafp input.|
   |**TimeLive**|<img src=".github/badges/TimeLive.svg"><br>Wrapper for TimeLive timesheets API|
   |**Tunnels**|<img src=".github/badges/Tunnels.svg"><br>Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
   |**UnixPAM**|<img src=".github/badges/UnixPAM.svg"><br>Provides UNIX PAM based authentication|
