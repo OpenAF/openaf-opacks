@@ -25,10 +25,8 @@ files:
 - README.md
 - jdbc-yugabytedb-42.7.3-yb-6.jar
 - jdbc-yugabytedb.js
-- tests/regression.js
 filesHash:
   LICENSES.txt: 53372c471c14eebc145129c35f6e38a05859b0f6
   README.md: 76e9a154bd4cd0963adbc65b3599a14e32ddfa3e
   jdbc-yugabytedb-42.7.3-yb-6.jar: bcf8942b569271c2739a2d8d9eca2a67320aa683
   jdbc-yugabytedb.js: 57f126d8b60e5c403151e327a68afcf617258e10
-  tests/regression.js: 6393209dee5a29bd2e68bc717b6799e3d8dad953

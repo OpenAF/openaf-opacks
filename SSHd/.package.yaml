@@ -29,7 +29,6 @@ files:
 - sshd-common-2.19.0.jar
 - sshd-core-2.19.0.jar
 - sshd.js
-- tests/regression.js
 filesHash:
   .maven.yaml: ee0f29c0f33f7f1d12702a35f85608037d9e91ce
   .odoc.db: 88d56dd8174b836f3d33d3c897d0553588c64dd4
@@ -38,4 +37,3 @@ filesHash:
   sshd-common-2.19.0.jar: 5f871c9c88ba810d6ac21b14a1279c1fce21d5b2
   sshd-core-2.19.0.jar: e1524d99feece8d50db0a75f43f99818c649dd97
   sshd.js: cf04cad1991f1c25ca03faf08745a21192aeaa84
-  tests/regression.js: 66c9559b0284a1c114e475e5919505a35a484d02

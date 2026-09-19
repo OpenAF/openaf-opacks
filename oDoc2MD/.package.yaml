@@ -28,7 +28,6 @@ files:
 - odoc2md.yaml
 - odocId.md.hbs
 - odocIndex.md.hbs
-- tests/regression.js
 filesHash:
   .odoc.db: 75a7e0590b6981d4cf91334d32d3410e5174ef24
   README.md: 9fff91516405f870505422d75fb0c885c06cc484
@@ -36,4 +35,3 @@ filesHash:
   odoc2md.yaml: e2f8607c604bf531cc6b2f5e62efbabfbd11347b
   odocId.md.hbs: 1e5b9a6dd861f8cff3c2a1e50118a1dbafcdba68
   odocIndex.md.hbs: d3a7c56b3ec8f9e356da55b67e192b657438f2f5
-  tests/regression.js: c5014383ad4f2bf938a70656b593b8d5e8275a1d
