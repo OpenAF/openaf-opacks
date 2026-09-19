@@ -30,17 +30,21 @@ name: APIs
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20220515'
+version: '20260918'
 dependencies:
   openaf: '>=20211229'
 files:
 - .odoc.db
 - .package.yaml
 - .precompile
+- README.md
 - apiYFinance.js
 - apis.js
+- tests/regression.js
 filesHash:
   .odoc.db: 37e4c7f26a99df6cb922abe29746b51d52349da9
   .precompile: d1cd5d57e3a52a9d6e1aa6d4486e9d9dfa733639
+  README.md: 2c34397c5885084aa52e72ad4b9fb058064e42ad
   apiYFinance.js: 300dcc9493f4fc6a85199319424d30358607b1e0
-  apis.js: 0e0a39f9018f9dc7a69b70a4ecd4db02813caf0d
+  apis.js: efd819cac113c9d4d9f7b1c1043959d00c90dc26
+  tests/regression.js: 68bbde65e6583fe5cb55a771eda7aa545330123c
