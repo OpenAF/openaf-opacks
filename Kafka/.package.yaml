@@ -32,9 +32,6 @@ files:
 - lz4-java-1.10.1.jar
 - oafp_kafka.js
 - snappy-java-1.1.10.7.jar
-- tests/integration.js
-- tests/oafp.js
-- tests/regression.js
 - zstd-jni-1.5.6-10.jar
 filesHash:
   .maven.yaml: 45ddd7bbc23da953f5beddd4b37009ca7c99af34
@@ -44,7 +41,4 @@ filesHash:
   lz4-java-1.10.1.jar: f541d7f910fe3d76f38f799c507c48cc81b12ecb
   oafp_kafka.js: c3e25c37921ea456d20bc817cd6f785d3b6a5993
   snappy-java-1.1.10.7.jar: 3049f95640f4625a945cfab85715f603fa4c8f80
-  tests/integration.js: 871c5a9507ce5890156b1e92f4d2e3c2ed4f954d
-  tests/oafp.js: 6bf8a994aa23abcd0e54b9da9c743a990200a785
-  tests/regression.js: 6cfd5157c76dbd35238ca02177f10931716b83de
   zstd-jni-1.5.6-10.jar: 7e146ecb598af55d1f64d1c118af27569a848558
