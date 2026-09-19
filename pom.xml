@@ -220,7 +220,7 @@
         <dependency>
             <groupId>org.projog</groupId>
             <artifactId>projog-core</artifactId>
-            <version>0.11.0</version>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.projog</groupId>
@@ -275,7 +275,7 @@
         <dependency>
             <groupId>org.projog</groupId>
             <artifactId>projog-core</artifactId>
-            <version>0.11.0</version>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
