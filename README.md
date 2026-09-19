@@ -41,6 +41,7 @@
   |**Jira**|<img src=".github/badges/Jira.svg"><br>Wrapper for the JIRA REST API|
   |**Jsoup**|<img src=".github/badges/Jsoup.svg"><br>Simple wrapper around the Java Jsoup library|
   |**KaTeX**|<img src=".github/badges/KaTeX.svg"><br>Wrapper for KaTeX library|
+  |**Kafka**|<img src=".github/badges/Kafka.svg"><br>Apache Kafka producer and consumer wrapper, stream channel and oafp input/output.|
   |**KeepAlive**|<img src=".github/badges/KeepAlive.svg"><br>Keeps AF connections alive so that they don&#x27;t timeout by sending pings regularly (useful with OpenAF-console)|
   |**Kube**|<img src=".github/badges/Kube.svg"><br>Kubernetes REST API access wrapper|
   |**LogsBrowser**|<img src=".github/badges/LogsBrowser.svg"><br>An interactive browser for Kubernetes logs, allowing users to view and filter logs from various sources within a Kubernetes cluster.|
@@ -55,6 +56,7 @@
   |**Notifications**|<img src=".github/badges/Notifications.svg"><br>Provides libraries to use notifications services. Currently pushover.js.|
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build the lambda layers to run OpenAF lambda functions|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
+  |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.|
   |**PEG**|<img src=".github/badges/PEG.svg"><br>Wrapper around the Peggy javascript library allowing the parsing of grammars.|
   |**Parquet**|<img src=".github/badges/Parquet.svg"><br>Provides a wrapper around handling Parquet files.|
   |**PasteBin**|<img src=".github/badges/PasteBin.svg"><br>Wrapper around PasteBin functionality.|
