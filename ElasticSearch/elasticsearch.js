@@ -573,7 +573,7 @@ ElasticSearch.prototype.getSettings = function() {
 
 ElasticSearch.prototype.getIndexSettings = function(aIndex) {
 	_$(aIndex, "aIndex").isString().$_();
-	return $rest(this.restmap).get(this.url + "/" + aIndex + "_settings");
+	return $rest(this.restmap).get(this.url + "/" + aIndex + "/_settings");
 };
 
 /**
@@ -890,7 +890,7 @@ ElasticSearch.prototype.importStream2Index = function(aFnIndex, rstream, aMap) {
 	var data = "", cdata = 0;
 
 	batchSize = _$(batchSize).isNumber().default(9 * 1024 * 1024);
-	aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
+	var aIndex = (isFunction(aFnIndex) ? aFnIndex : () => { return aFnIndex; });
 	aFnId = _$(aFnId).isFunction().default((j) => { return sha1(stringify(sortMapKeys(j), __, "")); });
 	if (!noType) idKey = _$(idKey).default("id");
 	_$(aTransformFn).isFunction();

@@ -273,3 +273,15 @@ Main methods exposed by `elasticsearch.js`:
 - For AWS IAM authentication the `AWS` oPack must expose `restPreActionOpenSearch`.
 - `import*2Index` expects NDJSON input.
 - For recent ElasticSearch versions that do not support `_type`, use `noType: true` on import operations.
+
+## Corrections (2026-09-18)
+
+`getIndexSettings(index)` requests `/<index>/_settings`. Bulk import index selectors are local to each import, avoiding interference between concurrent imports.
+
+Run the service-independent regression checks from this directory:
+
+```sh
+oaf -f tests/regression.js
+```
+
+These checks use local fixtures and test doubles; they do not verify a live external service.

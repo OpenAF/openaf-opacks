@@ -258,20 +258,20 @@ Kube.prototype.scale = function(aNamespace, aType, aName, aValue) {
 
 /**
  * <odoc>
- * <key>Kube.scaleWithDeps(aNamespace, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) : Number</key>
+ * <key>Kube.scaleWithDeps(aNamespace, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) : Map</key>
  * Tries to scale a set of deployments and/or statefulsets on aNamespace based on the provided anArrayScaleWithDeps. Each element of the array should be a map with the following
  * structure: { ns: "namespace", t: "deploy", n: "name", r: replicas, id: "id", d: [ "id1", "id2" ] }. If scaleDown is true it will scale down instead of up. The aTimeout
- * defines the maximum time to wait for all dependencies to be met and the aScanWait defines the time to wait between scans. Returns the number of elements that were scaled.
+ * defines the maximum time to wait for all dependencies to be met and the aScanWait defines the time to wait between scans. Returns a map of resource IDs to their observed readiness.
  * </odoc>
  */
 Kube.prototype.scaleWithDeps = function(aNamespace, anArrayScaleWithDeps, scaleDown, aTimeout, aScanWait) {
 	aNamespace = _$(aNamespace, "aNamespace").isString().default("default")
-	aScaleDown = _$(scaleDown, "scaleDown").isBoolean().default(false)
+	scaleDown  = _$(scaleDown, "scaleDown").isBoolean().default(false)
 	aTimeout   = _$(aTimeout, "aTimeout").isNumber().default(1000 * 60 * 30) // 30 minutes default
 	aScanWait  = _$(aScanWait, "aScanWait").isNumber().default(1000 * 1) // 1 second default
 
 	// Check array and assign defaults
-	anArrayScaleWithDeps.forEach(_s => {
+	anArrayScaleWithDeps = anArrayScaleWithDeps.map(_s => {
 		// If string assign a default map
 		if (isString(_s)) _s = { ns: aNamespace, t: "deploy", n: _s, id: aNamespace + "::" + _s }
 		// If entry is a valid map
@@ -289,6 +289,7 @@ Kube.prototype.scaleWithDeps = function(aNamespace, anArrayScaleWithDeps, scaleD
 				return _d
 			})
 		}
+		return _s
 	})
 
 	// Scan function to determine current state
@@ -363,7 +364,7 @@ Kube.prototype.exec = function (aNamespace, aPod, aCommand, aTimeout, doSH, aCon
 	for(var ii in pre) { cmd[ii] = new java.lang.String(pre[ii]); }
 
 	var error, gI = genUUID()
-	aw = $await(gI)
+	var aw = $await(gI)
 	var watch = this.client.pods()
 				.inNamespace(aNamespace)
 				.withName(aPod)

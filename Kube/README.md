@@ -87,3 +87,15 @@ $kube().deleteObject({
   namespaced: true
 }, "guestbook", "argocd")
 ```
+
+## Corrections (2026-09-18)
+
+`scaleWithDeps` accepts resource maps or deployment-name strings and defaults `scaleDown` to `false`. Pod exec calls keep their completion waiters local to each call.
+
+Run the service-independent regression checks from this directory:
+
+```sh
+oaf -f tests/regression.js
+```
+
+These checks use local fixtures and test doubles; they do not verify a live external service.
