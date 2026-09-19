@@ -756,7 +756,7 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
                         });
                     }
                 } else {
-                    print("Conflict with the same modified dates: " + sfname + " (" + slst[sf].lastModified + ") vs " + sf + " (" + rlsft[sfname].lastModified + ") ");
+                    print("Conflict with the same modified dates: " + sfname + " (" + slst[sf].lastModified + ") vs " + sf + " (" + rlst[sfname].lastModified + ") ");
                 }
             }
         } else {
@@ -818,7 +818,7 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
  * to execute the returned actions.
  * </odoc>
  */
-S3.prototype.deleteFolderActions = function(aBucket, aPrefix) {
+S3.prototype.deleteFolderActions = function(aBucket, aPrefix, beRecursive) {
     _$(aBucket).isString().$_("Please provide a bucket name.");
     _$(aPrefix).isString().$_("Please provide a prefix.");
 

@@ -210,3 +210,15 @@ _to be documented_
 * S3 (public)
 * MinIO
 * ScaleWay Object Storage
+
+## Corrections (2026-09-18)
+
+`deleteFolderActions(bucket, prefix, beRecursive)` forwards the optional recursion flag to `listObjects`. The default remains nonrecursive; inspect the returned action list before executing it. Sync conflict reporting handles equal timestamps with different sizes.
+
+Run the service-independent regression checks from this directory:
+
+```sh
+oaf -f tests/regression.js
+```
+
+These checks use local fixtures and test doubles; they do not verify a live external service.
