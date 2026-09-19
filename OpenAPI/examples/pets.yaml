@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: Pets example (local test service)
+  version: '1.0'
+servers:
+- url: http://127.0.0.1:18087/v1
+paths:
+  /pets/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: getPet
+      summary: Read one pet
+      parameters:
+      - name: tags
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Pet details
+    patch:
+      operationId: updatePet
+      summary: Update one pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+      responses:
+        '200':
+          description: Updated pet
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]

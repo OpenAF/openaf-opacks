@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preinstall: ''
+  postinstall: ''
+  preerase: ''
+  posterase: ''
+keywords:
+- openapi
+- rest
+- ojob
+- mcp
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/OpenAPI.opack
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/OpenAPI
+description: OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.
+name: OpenAPI
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260919'
+dependencies:
+  openaf: '>=20241117'
+files:
+- .package.yaml
+- README.md
+- examples/pets.yaml
+- openapi.js
+- tests/integration_http.py
+- tests/regression.js
+filesHash:
+  README.md: 20513c82f04137f17ed617e7c4b95c3cfcec4bb9
+  examples/pets.yaml: 2da4bdfbc95ef75ad01062335eae88ce7006461c
+  openapi.js: d49b1b027ebf2dff540a5bc6032620c5d6a9116c
+  tests/integration_http.py: a6696a9f3f510538dfb935b64aa7974a5fe1bbfe
+  tests/regression.js: 35c1d5408b5b0008bfa646f7575fadd4e4b40fd1
