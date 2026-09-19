@@ -18,7 +18,7 @@ name: GCS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260805'
+version: '20260918'
 dependencies:
   OpenAF: '>=20240318'
 files:
@@ -109,7 +109,7 @@ files:
 - woodstox-core-7.0.0.jar
 filesHash:
   .maven.yaml: f0b45d6ed3970513249dd2987d5039c0b2277517
-  README.md: 771ac30ff6b3e4470204dbbbf60ede2d6d1688da
+  README.md: 68c8ee1bdf0a1af42c7d024a4e8393f5eeb485b3
   animal-sniffer-annotations-1.27.jar: c8dc3113676f4d40d4cec38366d4e02ebb8c70cb
   annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   api-common-2.66.0.jar: 4c84be5a666044546fd024bbb101fb700beb856d
@@ -124,7 +124,7 @@ filesHash:
   gax-2.83.0.jar: b6f4ddcf84e106bbd833541aad5ead50feb7d3e7
   gax-grpc-2.83.0.jar: 0109627cc4fffab86291c27813842e9669eb5ca8
   gax-httpjson-2.83.0.jar: 00cd6c63e021f92c357af2b6079271405efb5122
-  gcs.js: 3557effe860857cacf15680f8ed0efa85bca3539
+  gcs.js: 2030ad4ad3aba9ae264ff792244d6cd22890be59
   google-api-client-2.7.2.jar: 495d58d6e31c2c5e24a707a50d6355ba92dd3d0c
   google-api-services-storage-v1-rev20260524-2.0.0.jar: 418e5e14864a415bd83e0011f5a7474a6fd071f5
   google-auth-library-credentials-1.50.0.jar: ab4b3f13b658ed03793e1ced1303a021e745b071
