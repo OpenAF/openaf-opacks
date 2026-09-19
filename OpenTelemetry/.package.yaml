@@ -1,0 +1,38 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- telemetry
+- otlp
+- instrumentation
+- traces
+- metrics
+- logs
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/OpenTelemetry
+  url: https://openaf.io/opacks/OpenTelemetry.opack
+description: OTLP HTTP/JSON traces, metrics and logs exporter for OpenAF generic instrumentation.
+name: OpenTelemetry
+main: opentelemetry.js
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20260919'
+dependencies:
+  openaf: '>=20260919'
+files:
+- .package.yaml
+- README.md
+- examples/channels.js
+- examples/collector-smoke.js
+- opentelemetry.js
+filesHash:
+  README.md: ddb170c2c5c6e66a82a48867eccb55eda091f1f5
+  examples/channels.js: cdd7ef25852f91baad9976fcb14aadd86be15d4b
+  examples/collector-smoke.js: a48dac6b0044d7b4855fc4a9e1d9b48e5ddf7c28
+  opentelemetry.js: 3193dd1b921829818c420b1b53539b625536ee6e
