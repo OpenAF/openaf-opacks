@@ -31,14 +31,8 @@ files:
 - examples/channels.js
 - examples/collector-smoke.js
 - opentelemetry.js
-- tests/VALIDATION.md
-- tests/collector.yaml
-- tests/regression.js
 filesHash:
   README.md: ddb170c2c5c6e66a82a48867eccb55eda091f1f5
   examples/channels.js: cdd7ef25852f91baad9976fcb14aadd86be15d4b
   examples/collector-smoke.js: a48dac6b0044d7b4855fc4a9e1d9b48e5ddf7c28
   opentelemetry.js: 3193dd1b921829818c420b1b53539b625536ee6e
-  tests/VALIDATION.md: aff5eb5690eecdac36ca971ea551f64db3634479
-  tests/collector.yaml: 8b4d10e7fb5725642f01821e36ea4e5781a67a50
-  tests/regression.js: d0fc785522c7575e2e54455a301045051fec15ba
