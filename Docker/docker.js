@@ -465,10 +465,10 @@ Docker.prototype.extraBind = function(aExtra, aBindExpression) {
  */
 Docker.prototype.extraNetwork = function(aExtra, aNetwork) {
    if (isUnDef(aExtra)) aExtra = {};
-   if (isUnDef(aExtra.NetworkingConfig) || (!(isArray(aExtra.NetworkingConfig)))) aExtra.NetworkingConfig = {};
+   if (isUnDef(aExtra.NetworkingConfig) || (!(isMap(aExtra.NetworkingConfig)))) aExtra.NetworkingConfig = {};
    if (isUnDef(aExtra.NetworkingConfig.EndpointsConfig) || (!(isMap(aExtra.NetworkingConfig.EndpointsConfig)))) aExtra.NetworkingConfig.EndpointsConfig = {};
    
-   args.extra.NetworkingConfig.EndpointsConfig[aNetwork] = {};
+   aExtra.NetworkingConfig.EndpointsConfig[aNetwork] = _$(aExtra.NetworkingConfig.EndpointsConfig[aNetwork]).isMap().default({});
 
    return aExtra;
 };

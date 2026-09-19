@@ -63,3 +63,15 @@ docker.start(container.Id);
 print(docker.logs(container.Id));
 docker.remove(container.Id);
 ````
+
+## Corrections (2026-09-18)
+
+`extraNetwork(config, network)` creates missing configuration and preserves existing endpoints and aliases when adding another network.
+
+Run the service-independent regression checks from this directory:
+
+```sh
+oaf -f tests/regression.js
+```
+
+These checks use local fixtures and test doubles; they do not verify a live external service.

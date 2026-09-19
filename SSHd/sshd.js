@@ -27,7 +27,7 @@ var SSHd = function(aPort) {
  */
 SSHd.prototype.start = function() {
    if (!this._checkList.keypair) this.sshd.setKeyPairProvider(new Packages.org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider())
-   if (!this._checkList.pwd)     this.sshd.setPasswordAuthenticator(new Packages.org.apache.sshd.server.auth.password.StaticPasswordAuthenticator(true))
+   if (!this._checkList.pwd)     this.sshd.setPasswordAuthenticator(new Packages.org.apache.sshd.server.auth.password.StaticPasswordAuthenticator(false))
    if (!this._checkList.pk)      this.sshd.setPublickeyAuthenticator(new Packages.org.apache.sshd.server.config.keys.DefaultAuthorizedKeysAuthenticator(true))
    if (!this._checkList.shell)   this.sshd.setShellFactory(new Packages.org.apache.sshd.server.shell.InteractiveProcessShellFactory())
    this.sshd.start()
@@ -41,7 +41,7 @@ SSHd.prototype.start = function() {
  */
 SSHd.prototype.genServerCert = function(aFile) {
    aFile = _$(aFile, "aFile").isString().default("hostkey.ser")
-   this.sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get(aFile)))
+   this.sshd.setKeyPairProvider(new Packages.org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider(java.nio.file.Paths.get(aFile)))
    this._checkList.keypair = true
 }
 
@@ -111,7 +111,7 @@ SSHd.prototype.setShellFactory = function(aShellFactory) {
  * </odoc>
  */
 SSHd.prototype.setShellFactoryCmd = function(aCommand, aArgs) {
-   this.sshd.setShellFactory(new org.apache.sshd.server.command.ProcessShellFactory(aCommand, aArgs))
+   this.sshd.setShellFactory(new Packages.org.apache.sshd.server.shell.ProcessShellFactory(aCommand, aArgs))
    this._checkList.shell = true
 }
 

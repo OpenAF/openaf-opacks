@@ -136,3 +136,17 @@ REDIS_TEST_HOST=localhost REDIS_TEST_PORT=6379 REDIS_TEST_DB=15 ojob tests/tests
 ```
 
 The integration tests clean up keys matching `openaf-test:*` in the selected database before and after each Redis-backed test.
+
+## Corrections (2026-09-18)
+
+List pops use the single-item Jedis overload. `set(key, [{ element: "member", score: 3 }])` writes sorted-set members with their scores. Increment one member with `sortedSets_increment(key, amount, member)`; the amount defaults to 1 when omitted using `__`.
+
+`select(dbid)` also updates the database used by subsequent `getCh` calls. Channel reads support hashes and lists, and public `$ch` pop/shift operations return and remove the selected value.
+
+Run the service-independent regression checks from this directory:
+
+```sh
+oaf -f tests/regression.js
+```
+
+These checks use local fixtures and test doubles; they do not verify a live external service.

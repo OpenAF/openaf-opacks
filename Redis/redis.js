@@ -23,7 +23,9 @@ var Redis = function(aHost, aPort, aDBId) {
  * </odoc>
  */
 Redis.prototype.select = function(aDBId) {
-    return this.jedis.select(aDBId);
+    var result = this.jedis.select(aDBId);
+    this.dbid = aDBId;
+    return result;
 };
 
 /**
@@ -173,7 +175,7 @@ Redis.prototype.set = function(aKeyName, aValue, aType) {
         break;
     case "zset"  :
         for(var el in aValue) {
-            this.sortedSets_set(aKeyName, aValue[el]);
+            this.sortedSets_set(aKeyName, aValue[el].element, aValue[el].score);
         }
         break;
     case "string": 
@@ -294,7 +296,7 @@ Redis.prototype.lists_push = function(aKeyName, aValue) {
 };
 
 Redis.prototype.lists_pop = function(aKeyName) {
-    return this.jedis.lpop(aKeyName, aValue);
+    return this.jedis.lpop(aKeyName);
 };
 
 Redis.prototype.lists_size = function(aKeyName) {
@@ -348,9 +350,10 @@ Redis.prototype.sortedSets_size = function(aKeyName) {
     return this.jedis.zcount(aKeyName, java.lang.Double.NEGATIVE_INFINITY, java.lang.Double.POSITIVE_INFINITY)
 };
 
-Redis.prototype.sortedSets_increment = function(aKeyName, howMuch) {
+Redis.prototype.sortedSets_increment = function(aKeyName, howMuch, aValue) {
     howMuch = _$(howMuch).isNumber().default(1);
-    return this.jedis.zincrby(aKeyName, howMuch);
+    _$(aValue, "aValue").isString().$_();
+    return this.jedis.zincrby(aKeyName, howMuch, aValue);
 };
 
 Redis.prototype.sortedSets_toArray = function(aKeyName) {
@@ -473,28 +476,17 @@ ow.ch.__types.redis = {
         if (isMap(aK) && isDef(aK.key)) aK = aK.key
         if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
         var _v = this.__channels[aName].r.get(aK)
-        if (isDef(_v))
+        if (isString(_v))
             if ((String(_v.trim()).startsWith("{") && String(_v.trim()).endsWith("}")) || (String(_v.trim()).startsWith("[") && String(_v.trim()).endsWith("]"))) 
                 _v = jsonParse(String(_v), true)
         return _v
     },
     pop          : function(aName) {
-        var _lst = this.getKeys(aName)
-        if (_lst.length > 0) {
-          var _v = this.get(_lst[_lst.size-1])
-          this.unset(_lst[_lst.size-1])
-          return _v
-        }
-        return __
+      var keys = this.getKeys(aName)
+      return keys[keys.length - 1]
     },
     shift        : function(aName) {
-      var _lst = this.getKeys(aName)
-      if (_lst.length > 0) {
-        var _v = this.get(_lst[0])
-        this.unset(_lst[0])
-        return _v
-      }
-      return __
+      return this.getKeys(aName)[0]
     },
     unset        : function(aName, aK, aTimestamp) {
         if (isMap(aK) && isDef(aK.key)) aK = aK.key
