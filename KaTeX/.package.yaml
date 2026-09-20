@@ -19,12 +19,14 @@ name: KaTeX
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260616'
+version: '20260920'
 dependencies:
   openaf: '>=20230521'
 files:
 - .package.yaml
+- README.md
 - katex.js
+- lib/KATEX-LICENSE
 - lib/auto-render.min.js
 - lib/fonts/KaTeX_AMS-Regular.ttf
 - lib/fonts/KaTeX_AMS-Regular.woff
@@ -89,9 +91,12 @@ files:
 - lib/katex.min.css
 - lib/katex.min.js
 - lib/showdown-katex.min.js
+- upstream.json
 filesHash:
+  README.md: 510df0a08342a676ecfcd8cf2c715d2566dc4c22
   katex.js: 6e78b3491aa3831973ad0e8296406e2c2530cec5
-  lib/auto-render.min.js: 4169ff59087666a21f545d76c0ee7c59f2a8873f
+  lib/KATEX-LICENSE: 9814a9f17b2b57e576c7edee6fe894e059ca4c90
+  lib/auto-render.min.js: 82dca940482676e2b0245087045d260fad1cdaba
   lib/fonts/KaTeX_AMS-Regular.ttf: 1dfd0ee6e30f8a1c23999d9d965db8700b5a9f2e
   lib/fonts/KaTeX_AMS-Regular.woff: 99ada2de3200e795143d639232c3444b08018235
   lib/fonts/KaTeX_AMS-Regular.woff2: 34494743736fda757197d16fcc6a6e1a79317c86
@@ -152,6 +157,7 @@ filesHash:
   lib/fonts/KaTeX_Typewriter-Regular.ttf: 629b99faf18d97529f21a1b1018093e60bcd058f
   lib/fonts/KaTeX_Typewriter-Regular.woff: f5e729fa4ff466fc07e0c7ab1979ad70c45fa5d5
   lib/fonts/KaTeX_Typewriter-Regular.woff2: 7a08883fffc6958c71cc01a75a0b99cca3e4b475
-  lib/katex.min.css: f93c672c792cee11a447e3ad2368e13d8a25667e
-  lib/katex.min.js: 8935cc5ee5dc7596f71543b9c906df2a2800f9a9
+  lib/katex.min.css: 7621bbf7f093b260974d15b0813fb77fde4ea935
+  lib/katex.min.js: 05c27c9c1809ae27ed349eedd7433846b55764d9
   lib/showdown-katex.min.js: ddde9917233428f9fc7a5e312e360d5ef5272fbd
+  upstream.json: 5fb4794753500da6f151277bb96e6d2982ab2538

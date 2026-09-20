@@ -1,0 +1,11 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "katex": {
+      "version": "0.18.7",
+      "tarball": "https://registry.npmjs.org/katex/-/katex-0.18.7.tgz",
+      "integrity": "sha512-h+UCwkZ+4Jz8WQ7MLGfj7UVFrRCizGb912fwF4luGdYsC5paYG1vx+jy+KRcC/XkpjGva/P7nAWuxNnPzRvzHw=="
+    }
+  },
+  "notes": "Bundles KaTeX 0.18.7 with its matching auto-render helper, CSS and all fonts. The local showdown-katex adapter is preserved. Assets are served from the opack and do not require a CDN."
+}
