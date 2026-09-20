@@ -57,6 +57,7 @@
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build the lambda layers to run OpenAF lambda functions|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.|
+  |**OpenTelemetry**|<img src=".github/badges/OpenTelemetry.svg"><br>OTLP HTTP/JSON traces, metrics and logs exporter for OpenAF generic instrumentation.|
   |**PEG**|<img src=".github/badges/PEG.svg"><br>Wrapper around the Peggy javascript library allowing the parsing of grammars.|
   |**Parquet**|<img src=".github/badges/Parquet.svg"><br>Provides a wrapper around handling Parquet files.|
   |**PasteBin**|<img src=".github/badges/PasteBin.svg"><br>Wrapper around PasteBin functionality.|
@@ -74,6 +75,7 @@
   |**SocksServer**|<img src=".github/badges/SocksServer.svg"><br>Provides a wrapper around a Java SocksServer implementation|
   |**SysBench**|<img src=".github/badges/SysBench.svg"><br>Wrapper around SysBench to perform cpu, io and memory benchmark tests.|
   |**Terraform**|<img src=".github/badges/Terraform.svg"><br>OpenAF&#x27;s wrapper around Terraform&#x27;s functionality (e.g. converts HCL/TF to JSON and JSON to HCL/TF)|
+  |**Tika**|<img src=".github/badges/Tika.svg"><br>Apache Tika text and metadata extraction from documents, files and streams, with an oafp input.|
   |**TimeLive**|<img src=".github/badges/TimeLive.svg"><br>Wrapper for TimeLive timesheets API|
   |**Tunnels**|<img src=".github/badges/Tunnels.svg"><br>Set a configuration file to automatically connect reusable SSH tunnels (port forwarding) whenever you need them.|
   |**UnixPAM**|<img src=".github/badges/UnixPAM.svg"><br>Provides UNIX PAM based authentication|
