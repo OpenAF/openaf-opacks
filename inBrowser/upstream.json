@@ -1,0 +1,30 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "chart.js": {
+      "version": "2.9.4",
+      "tarball": "https://registry.npmjs.org/chart.js/-/chart.js-2.9.4.tgz",
+      "integrity": "sha512-B07aAzxcrikjAPyV+01j7BmOpxtQETxTSlQ26BEYJ+3iUkbNKaOJ/nDbT6JjyqYxseM0ON12COHYdU2cTIjC7A=="
+    },
+    "jquery-contextmenu": {
+      "version": "2.10.2",
+      "tarball": "https://registry.npmjs.org/jquery-contextmenu/-/jquery-contextmenu-2.10.2.tgz",
+      "integrity": "sha512-zzLQP0EsUy5t2dDUt+yikMfWyLl7wys7PVR8DKgw9zHCstv6XppAZQigcXugmFHQCHrquMK1/tNaJ9QvC+sQNQ=="
+    },
+    "jquery-ui": {
+      "version": "1.14.2",
+      "tarball": "https://registry.npmjs.org/jquery-ui/-/jquery-ui-1.14.2.tgz",
+      "integrity": "sha512-1gSl7PUjyipa2adSr780Ujk16faicrV7PjPPzPtvWk7tTqBnsqp67NNV9jZK2+BIxUPXWSnIUU/LBCgwgGZE+Q=="
+    },
+    "ace-builds": {
+      "version": "1.44.0",
+      "tarball": "https://registry.npmjs.org/ace-builds/-/ace-builds-1.44.0.tgz",
+      "integrity": "sha512-PFNMSYqFdEUkul2Ntud0HvA09AgY+F1ag0UYdpMH60wNI/qOA8cB8tlTgoALMEwIdUPJK2CjrIQ7OnbiSS/ugQ=="
+    }
+  },
+  "notes": "Bundles Ace 1.44.0 (all minified noconflict modes, themes, workers and extensions in ace.zip), Chart.js 2.9.4 (the all-in-one bundle including Moment), jquery-contextmenu 2.10.2 with matching CSS/fonts, and jQuery UI Position 1.14.2. Chart.js stays on 2.x to preserve existing chartOptions; 4.x requires an API migration. Position is minified from the upstream source. jQuery itself is supplied by OpenAF. Default bundled functionality works with local assets; optional Ace extensions that integrate external services still require their own local configuration.",
+  "transforms": [
+    "Concatenate jquery-ui/ui/version.js and ui/position.js, then minify using Google Closure Compiler SIMPLE.",
+    "ZIP all ace-builds/src-min-noconflict/*.js at the archive root."
+  ]
+}

@@ -112,3 +112,10 @@ When using the main editors for YAML and JSON there are a couple of custom keybo
    * **Ctrl-Alt-B / Ctrl-Option-B** will try to beautify the current content (in editor mode)
 
 Of course all the keyboard shortcuts for the ACE editor are still available including multicursor, find/replace, etc. Check them out on https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts.
+
+
+## Bundled JavaScript (2026-09-20)
+
+Bundles Ace 1.44.0 (all minified noconflict modes, themes, workers and extensions in ace.zip), Chart.js 2.9.4 (the all-in-one bundle including Moment), jquery-contextmenu 2.10.2 with matching CSS/fonts, and jQuery UI Position 1.14.2. Chart.js stays on 2.x to preserve existing chartOptions; 4.x requires an API migration. Position is minified from the upstream source. jQuery itself is supplied by OpenAF. Default bundled functionality works with local assets; optional Ace extensions that integrate external services still require their own local configuration.
+
+The release versions, archive URLs and npm integrity checksums are recorded in upstream.json. Upstream license notices are retained. Maintenance downloads are not required at runtime.

@@ -21,7 +21,7 @@ name: inBrowser
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20191016'
+version: '20260920'
 dependencies:
   openaf: '>=20180507'
 files:
@@ -45,27 +45,37 @@ files:
 - gui/_js/Chart.bundle.min.js
 - gui/_js/jquery.contextMenu.min.js
 - gui/_js/jquery.ui.position.min.js
+- gui/licenses/ACE-LICENSE
+- gui/licenses/CHARTJS-LICENSE
+- gui/licenses/CONTEXTMENU-LICENSE
+- gui/licenses/JQUERYUI-LICENSE
 - inBrowser.hbs
 - inBrowser.js
+- upstream.json
 filesHash:
   .odoc.db: 26bd5f82b68542f997ef27600446e8365a425088
   .precompile: 3e4ff6370cb69cf1ecdc99d9da3ca180c566021c
-  README.md: 8ce2bf2fa79cea953a8e2615a14ffc6af0666859
+  README.md: cbd38daf4962220e7a24d186bf1179fdd427623e
   docs/chart-example.png: 3b4646ef09e9d57e7a3813af915cbde6bec3670a
   docs/example1.png: b9127b290381313da1bc7913a79ea58a74b767b1
   docs/example2.png: b7684b94a4f5c11d09b8b04ef5a9f0df8998d5cd
   docs/right-click.png: 96488e59a63b8a1b740a7fa7bbf7f75fa313a428
   docs/table-example.png: 716faf901fe6db5cbf7036c8a6eaff5db3ea4891
-  gui/_ace/ace.zip: e45bcb16753920bea75b495f273a71a94624ee91
-  gui/_css/font/context-menu-icons.eot: 21929f70a396694d9341b5ef5b97b7348aff22ef
-  gui/_css/font/context-menu-icons.ttf: 85caaf81a2af9178ef4f650e0caf1d0834a415ad
-  gui/_css/font/context-menu-icons.woff: 7be3d02b4e2196fe434c13741e6553e898365446
-  gui/_css/font/context-menu-icons.woff2: fc6e3bb6ba0ad9e04ed6b973ea7e022ff56c044d
-  gui/_css/jquery.contextMenu.min.css: ae2278d861e88262493d9e06686534885d0a8c9a
+  gui/_ace/ace.zip: cb70983711d44c0d45850a1dbe42216f8a426328
+  gui/_css/font/context-menu-icons.eot: 1e0bb220f690ece26b2b1dd1fc176d735f5ff2ed
+  gui/_css/font/context-menu-icons.ttf: 8e715cb910cdcee5a6d773bd537ce83398eb4b6f
+  gui/_css/font/context-menu-icons.woff: 735bda06350f5e6df883c43dce16554d434d0e60
+  gui/_css/font/context-menu-icons.woff2: be029e5d3316dc3af3acdad5361ae448dc965aba
+  gui/_css/jquery.contextMenu.min.css: bb8bdc38a915b180c51c06609765b21535494375
   gui/_images/openaf.ico: 544d110dcb3ba387ea206011ede749f51393b134
   gui/_images/openaf.png: 2287f19313c67b8c7b0952fe501fcc199ff4fc2b
-  gui/_js/Chart.bundle.min.js: 81639a5f38c61eda919d85f55cddc5befec6946b
-  gui/_js/jquery.contextMenu.min.js: 1a73df2d8f96958510ffab5d15e011741e5d3099
-  gui/_js/jquery.ui.position.min.js: 85b72273211ca22fab44f0ec6822b4dbe5d21469
+  gui/_js/Chart.bundle.min.js: 304d5742ff744fb950a3e8bfc26226539e97a67f
+  gui/_js/jquery.contextMenu.min.js: 5bc48ace88d5fd92c0e91773c75ea631adec6390
+  gui/_js/jquery.ui.position.min.js: 2ea42888a1d6d9a569821e4e48e974455812bc70
+  gui/licenses/ACE-LICENSE: bd077e65d4090e7db560d16dac1255ee36297c66
+  gui/licenses/CHARTJS-LICENSE: 6a190f7891b160f2319ea2f2f001e469843e9a55
+  gui/licenses/CONTEXTMENU-LICENSE: e2497d015856c0693f35afc3b303b443e14fcbb2
+  gui/licenses/JQUERYUI-LICENSE: d5d70a29df19925f574a44a6e90a9d4dd1b96733
   inBrowser.hbs: a8770e252cad7a7c4eb15fe567020662c3b8ccf2
   inBrowser.js: 16fc209be97d3460335cf375b25413d1e2052d65
+  upstream.json: 088132b926df29dbf47cceb3939e30c38f7507aa
