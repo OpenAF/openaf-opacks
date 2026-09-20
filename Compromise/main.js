@@ -9,7 +9,7 @@ if (isDef(params.update)) {
 
       plugin("HTTP");
       var check = md5(io.readFileStream(LIB + "/compromise.js"));
-      var newVersion = (new HTTP("https://raw.githubusercontent.com/nlp-compromise/compromise/master/builds/compromise.min.js")).response();
+      var newVersion = (new HTTP("https://cdn.jsdelivr.net/npm/compromise@10.7.2/builds/compromise.min.js")).response();
       if (md5(newVersion) != check) { 
          log("Need to update...");
          io.writeFileString(LIB + "/compromise.js.tmp", newVersion);

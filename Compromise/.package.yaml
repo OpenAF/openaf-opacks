@@ -20,15 +20,21 @@ name: Compromise
 main: main.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20170429'
+version: '20260920'
 dependencies:
   openaf: '>=20170401'
 files:
 - .package.yaml
 - .precompile
+- COMPROMISE-LICENSE
+- README.md
 - compromise.js
 - main.js
+- upstream.json
 filesHash:
   .precompile: 5e2756018d274b90e0601a53f00be70cfcdd85ac
-  compromise.js: 4369b00388ee993ad632fa506f5a67f1c8931a17
-  main.js: 72ef7e68ea04014281ca8d0a875e5728395a6cbc
+  COMPROMISE-LICENSE: 8b4c56da7e249eb5bd7edeec47eafc9346b2f6f9
+  README.md: 9551ad50a8a023568a1e9859becae7b75bff0806
+  compromise.js: d6f19d98988ee006493f1c0af42141bd9591026d
+  main.js: 477bf0b9ea14831030aa2b49a541f3cd93ea29d0
+  upstream.json: 2d93acdf39c4deaa0f3b958edfc867144b1b2557

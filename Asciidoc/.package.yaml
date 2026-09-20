@@ -17,21 +17,25 @@ name: Asciidoc
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20250312'
+version: '20260920'
 dependencies:
   openaf: '>=20211229'
 files:
 - .package.yaml
 - README.adoc
 - asciidoc.js
+- lib/HIGHLIGHT-LICENSE
 - lib/asciidoctor.css
 - lib/asciidoctor.min.js
 - lib/highlight.css
 - lib/highlight.min.js
+- upstream.json
 filesHash:
-  README.adoc: 766d2d19895de790486da3305fee574fb60b550d
-  asciidoc.js: fdc741a2e0e79230d7579f2c7868989bd346f36d
-  lib/asciidoctor.css: 720f4b4c8c7b89b92d6327ae1359c1943f8ad288
-  lib/asciidoctor.min.js: c659cbfa6ed0082fc6429cb2cce7a2e1c9434b6b
+  README.adoc: 75085b108f88970c14f9a026f750be37bbca0eb6
+  asciidoc.js: 0a357850b66e894c50e456578fad37e8b5b9e39a
+  lib/HIGHLIGHT-LICENSE: 00990dad3f28f5503fad9835bd7291524301574c
+  lib/asciidoctor.css: 94ba8057916588bc6e03743d89a9fde4c53ea2d9
+  lib/asciidoctor.min.js: 4c7cd7b856b7662f1c20fb3bfb4d78e4bfce9920
   lib/highlight.css: 9dafcb6d23472adb90f9c9f55bd9dbd590392953
-  lib/highlight.min.js: d264ad16bdf39cfec2b06c20223b87fcb37ad27b
+  lib/highlight.min.js: c039a299315c3c25be9d66bcdbea3b6af6cf22bc
+  upstream.json: fef77375b7aa171ce98dd1239afa360d9a27bfec

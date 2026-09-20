@@ -1,0 +1,14 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "compromise": {
+      "version": "10.7.2",
+      "tarball": "https://registry.npmjs.org/compromise/-/compromise-10.7.2.tgz",
+      "integrity": "sha512-9ZtwbzgK4T07Kc+xCVuGaVi5CpGo4ZIgtwM5Zs0cm62/95XTi3fLAqxSco2MXjjcIQ4r3c7MM1rZACbedQBHlw=="
+    }
+  },
+  "notes": "Bundles Compromise 10.7.2, the newest 10.x release, preserving the values().data() and verbs().data() APIs. Compromise 14.17.0 contains class syntax rejected by the current OpenAF Rhino runtime and changes these APIs. Load compromise.js to use the bundled library offline. The optional update=true maintenance action needs network access and is pinned to 10.7.2.",
+  "transforms": [
+    "The 10.7.2 tarball has no separate license file; COMPROMISE-LICENSE is the upstream MIT notice from 14.17.0."
+  ]
+}

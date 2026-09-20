@@ -4,7 +4,8 @@ ow.loadServer()
 OpenWrap.server.prototype.httpd.replyAsciidoc = function(aHTTPd, aBaseFilePath, aBaseURI, aURI, aOptions, notFoundFunction, documentRootArray, mapOfHeaders) {
 	aOptions = _$(aOptions, "aOptions").isMap().default()
 	aOptions = merge({ standalone: true, attributes: { 
-		nofooter: true, 
+		nofooter: true,
+		webfonts: false,
 		"safe": "server"
 	} }, aOptions)
 
@@ -41,9 +42,10 @@ OpenWrap.server.prototype.httpd.replyAsciidoc = function(aHTTPd, aBaseFilePath, 
 					return aHTTPd.replyOKHTML(asciidoctor.convert(io.readFileString(furi), { 
 						standalone: true, 
 						attributes: { 
-							nofooter: true 
+							nofooter: true,
+							webfonts: false
 						}
-					}).replace('<link rel="stylesheet" href="./asciidoctor.css">', '<link rel="stylesheet" href="/_asciidoc/asciidoctor.css"><link rel="stylesheet" href="/_asciidoc/highlight.css"><script src="/_asciidoc/highlight.js"></script><script>hljs.initHighlightingOnLoad()</script>'))
+					}).replace('<link rel="stylesheet" href="./asciidoctor.css">', '<link rel="stylesheet" href="/_asciidoc/asciidoctor.css"><link rel="stylesheet" href="/_asciidoc/highlight.css"><script src="/_asciidoc/highlight.js"></script><script>hljs.highlightAll()</script>'))
 				} else {
 					return aHTTPd.replyBytes(io.readFileBytes(furi), ow.server.httpd.getMimeType(furi), __, mapOfHeaders)
 				}
@@ -55,9 +57,10 @@ OpenWrap.server.prototype.httpd.replyAsciidoc = function(aHTTPd, aBaseFilePath, 
 				return aHTTPd.replyOKHTML(asciidoctor.convert(af.fromInputStream2String(aBaseFilePath), {
 					standalone: true, 
 					attributes: { 
-						nofooter: true 
+						nofooter: true,
+						webfonts: false
 					}
-				}).replace('<link rel="stylesheet" href="./asciidoctor.css">', '<link rel="stylesheet" href="/_asciidoc/asciidoctor.css"><link rel="stylesheet" href="/_asciidoc/highlight.css"><script src="/_asciidoc/highlight.js"></script><script>hljs.initHighlightingOnLoad()</script>'))
+				}).replace('<link rel="stylesheet" href="./asciidoctor.css">', '<link rel="stylesheet" href="/_asciidoc/asciidoctor.css"><link rel="stylesheet" href="/_asciidoc/highlight.css"><script src="/_asciidoc/highlight.js"></script><script>hljs.highlightAll()</script>'))
 			} catch(e) {
 				return notFoundFunction(aHTTPd, aBaseFilePath, aBaseURI, aURI, e)
 			}

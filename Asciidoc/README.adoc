@@ -7,7 +7,7 @@ Using it for direct conversion:
 
 [source,javascript]
 ----
-loadLib("asciidoctor.js")
+loadLib("asciidoc.js")
 
 print( asciidoctor.convert('Hello *world_*!', { standalone: true }) )
 ----
@@ -16,7 +16,7 @@ Using in an internal OpenAF web server:
 
 [source,javascript]
 ----
-loadLib("asciidoctor.js")
+loadLib("asciidoc.js")
 
 var hs = ow.server.httpd.start(17878)
 ow.server.httpd.route(hs, ow.server.httpd.mapRoutesWithLibs(hs, { 
@@ -27,3 +27,9 @@ ow.server.httpd.route(hs, ow.server.httpd.mapRoutesWithLibs(hs, {
 ----
 
 Please check more about asciidoc syntax in https://powerman.name/doc/asciidoc.
+
+== Bundled JavaScript (2026-09-20)
+
+Bundles Asciidoctor.js 3.0.4 and highlight.js 11.12.0 with matching stylesheets. The minified Asciidoctor browser bundle has a CommonJS export adapter appended for OpenAF. Version 4 uses a different ESM API and is not a drop-in replacement. replyAsciidoc disables remote webfonts and serves its JavaScript and CSS locally. For direct standalone conversion use attributes: { webfonts: false } to suppress Google Fonts links.
+
+The release versions, archive URLs and npm integrity checksums are recorded in upstream.json. Upstream license notices are retained. Maintenance downloads are not required at runtime.

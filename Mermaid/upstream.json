@@ -1,0 +1,11 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "mermaid": {
+      "version": "12.0.0",
+      "tarball": "https://registry.npmjs.org/mermaid/-/mermaid-12.0.0.tgz",
+      "integrity": "sha512-/wQXC9iBxoGV8p3erbvaXs9h77VyLDBH6GdayVjj3hEcSQhFU4N1WUhUppotCEqlIxI2pRMwjwBSwTB1MfZBgQ=="
+    }
+  },
+  "notes": "Mermaid 12.0.0 uses the upstream all-in-one minified browser bundle. No ESM chunks are needed. Load mermaid.js before generating OpenAF Markdown HTML. Diagrams that explicitly reference remote images or icon services still need those resources supplied locally."
+}

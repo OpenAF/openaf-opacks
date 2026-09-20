@@ -1,0 +1,11 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "asciinema-player": {
+      "version": "3.17.0",
+      "tarball": "https://registry.npmjs.org/asciinema-player/-/asciinema-player-3.17.0.tgz",
+      "integrity": "sha512-JbjNJmA2TLIeYNaOEja+kVSzXadKoqpIzVVmfBGNj2DmdtE/vExBCnkE8NYEcpaQcDvUYg8Ltt0urT80frACmw=="
+    }
+  },
+  "notes": "Bundles asciinema-player 3.17.0 as the all-in-one minified browser build, including its embedded WebAssembly payload, plus matching CSS. No separate worker or WASM download is needed. Serve recordings locally for offline use. The OpenAF embedding helper is preserved."
+}
