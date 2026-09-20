@@ -23,8 +23,6 @@ files:
 - .package.yaml
 - README.md
 - morse.js
-- tests/regression.js
 filesHash:
   README.md: cab24c58b7613f88f995010bac1427054afa5f27
   morse.js: ed7b35c44577bc2e478dc5d574e8fab0f7046cc6
-  tests/regression.js: cd7d117af8b40d03f45283914ff7b196b9ee5d4a

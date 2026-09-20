@@ -48,7 +48,6 @@ files:
 - lib/jnr-posix-3.1.20.jar
 - lib/jnr-unixsocket-0.38.23.jar
 - lib/jnr-x86asm-1.0.2.jar
-- tests/regression.js
 filesHash:
   .odoc.db: 27f658edb007cd50d76b15c39faddd18f2436ffa
   .precompile: 50f1497451674055d9bcb80190944413f7cede6f
@@ -75,4 +74,3 @@ filesHash:
   lib/jnr-posix-3.1.20.jar: 07f9f3a34bec049bc8e1c4899fee18a85010d608
   lib/jnr-unixsocket-0.38.23.jar: c0ba598b0e26e5f9093df8f765d0742a7a0cc9a3
   lib/jnr-x86asm-1.0.2.jar: 006936bbd6c5b235665d87bd450f5e13b52d4b48
-  tests/regression.js: 399af860f4801b4d2e52c1225f73aaa094fb493b

@@ -73,7 +73,6 @@ files:
 - netty-transport-native-unix-common-4.2.18.Final.jar
 - snakeyaml-2.5.jar
 - snakeyaml-engine-3.0.1.jar
-- tests/regression.js
 - vertx-auth-common-4.5.31.jar
 - vertx-core-4.5.31.jar
 - vertx-web-client-4.5.31.jar
@@ -130,7 +129,6 @@ filesHash:
   netty-transport-native-unix-common-4.2.18.Final.jar: b9dbd51d2802e447630ef2b8bba56bb5aaad1f82
   snakeyaml-2.5.jar: 2d53ddec134280cb384c1e35d094e5f71c1f2316
   snakeyaml-engine-3.0.1.jar: aaa97268dd9fcf97a3e44c96e6a50961d65199dd
-  tests/regression.js: 821b27faeb40f0d686012ede7718d52b3779fcae
   vertx-auth-common-4.5.31.jar: ce206cf586f6f880d483a14c078c09344f33938c
   vertx-core-4.5.31.jar: 468726e6d694bd689e6b898153511628e014e6a1
   vertx-web-client-4.5.31.jar: f675def450fc6a331e01f956dfdd827616165ae1

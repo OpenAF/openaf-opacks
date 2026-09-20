@@ -64,12 +64,6 @@ files:
 - poi-5.5.1.jar
 - poi-ooxml-5.5.1.jar
 - poi-scratchpad-5.5.1.jar
-- tests/fixtures/attachment.eml
-- tests/fixtures/sample.docx
-- tests/fixtures/sample.eml
-- tests/fixtures/sample.html
-- tests/fixtures/sample.pdf
-- tests/regression.js
 - tika-core-4.0.0.jar
 - tika-encoding-detector-mojibuster-4.0.0.jar
 - tika-ml-core-4.0.0.jar
@@ -130,12 +124,6 @@ filesHash:
   poi-5.5.1.jar: 613d253b6f5f0849dd68fed043a7fb4b005e63a0
   poi-ooxml-5.5.1.jar: ff561a9cab46bfe95667d5085580fefb2353fdaf
   poi-scratchpad-5.5.1.jar: 3b5d92ccc2ddb9e17946b22b0ea504c5a33126b5
-  tests/fixtures/attachment.eml: 90e406487e252c52570f1b8df424c2dea728401e
-  tests/fixtures/sample.docx: f619a732e285cca09eb5ddb6d4e071f6b1930690
-  tests/fixtures/sample.eml: b47c394ecb242ffa43783693023fdc3e179793cb
-  tests/fixtures/sample.html: fcf7313702ca9693866f22ac318bc9c47c9af0c7
-  tests/fixtures/sample.pdf: 55f7147eedbdbab1963154a564e5b49de015d8b3
-  tests/regression.js: af6fa7c8b99d4cdcc366bc55c2085a0692434404
   tika-core-4.0.0.jar: f370d8619de9e19329b2cc117943c83468c2ff9f
   tika-encoding-detector-mojibuster-4.0.0.jar: 86894a44760764ff078c7e8c73253383f506a2bc
   tika-ml-core-4.0.0.jar: a40b51f820cd958e0a785ff52282fee038c3ebab
