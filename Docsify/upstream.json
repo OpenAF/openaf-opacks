@@ -1,0 +1,30 @@
+{
+  "updated": "2026-09-20",
+  "libraries": {
+    "mermaid": {
+      "version": "12.0.0",
+      "tarball": "https://registry.npmjs.org/mermaid/-/mermaid-12.0.0.tgz",
+      "integrity": "sha512-/wQXC9iBxoGV8p3erbvaXs9h77VyLDBH6GdayVjj3hEcSQhFU4N1WUhUppotCEqlIxI2pRMwjwBSwTB1MfZBgQ=="
+    },
+    "docsify": {
+      "version": "4.13.1",
+      "tarball": "https://registry.npmjs.org/docsify/-/docsify-4.13.1.tgz",
+      "integrity": "sha512-BsDypTBhw0mfslw9kZgAspCMZSM+sUIIDg5K/t1hNLkvbem9h64ZQc71e1IpY+iWsi/KdeqfazDfg52y2Lmm0A=="
+    },
+    "docsify-copy-code": {
+      "version": "3.0.2",
+      "tarball": "https://registry.npmjs.org/docsify-copy-code/-/docsify-copy-code-3.0.2.tgz",
+      "integrity": "sha512-OQEtQjcGiJLJrPsQr9IE5wqAwMx8R4wTt8ZIshRRewltJbJEEFHZHzD/7CvHDGYmz0vndbRTpQ5ri4ISQAuJRw=="
+    },
+    "prismjs": {
+      "version": "1.30.0",
+      "tarball": "https://registry.npmjs.org/prismjs/-/prismjs-1.30.0.tgz",
+      "integrity": "sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw=="
+    }
+  },
+  "notes": "Bundles Docsify 4.13.1, Mermaid 12.0.0, PrismJS 1.30.0 and docsify-copy-code 3.0.2. Docsify stays on 4.x to preserve the existing themes and renderer API; migrating to Docsify 5 requires a separate wrapper/theme migration. Mermaid runs asynchronously after each page renders. genStaticVersion embeds Markdown through static.js rather than rewriting minified Docsify internals. Google Fonts imports are removed from the bundled themes so system font fallbacks work offline. Optional plugins or user content referencing external services must be configured with local resources.",
+  "transforms": [
+    "Remove Google Fonts @import directives from lib/themes/*.css.",
+    "Minify prismjs/prism.js using Google Closure Compiler with WHITESPACE_ONLY."
+  ]
+}

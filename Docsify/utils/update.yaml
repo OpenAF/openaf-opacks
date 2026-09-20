@@ -13,9 +13,9 @@ jobs:
   each: Download files
   args:
     DIR  : docsify
-    URL  : https://unpkg.com/docsify@latest/lib/
+    URL  : https://unpkg.com/docsify@4.13.1/lib/
     extra:
-      "plugins/docsify-copy-code.min.js": https://unpkg.com/docsify-copy-code@latest/dist/docsify-copy-code.min.js
+      "plugins/docsify-copy-code.min.js": https://unpkg.com/docsify-copy-code@3.0.2/dist/docsify-copy-code.min.js
   exec: |
     args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
 
@@ -25,7 +25,9 @@ jobs:
   each: Download files
   args:
     DIR: prismjs
-    URL: https://unpkg.com/prismjs@latest/components/
+    URL: https://unpkg.com/prismjs@1.30.0/components/
+    extra:
+      "prism.min.js": https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/prism.min.js
   exec: |
     args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
 
@@ -35,7 +37,7 @@ jobs:
   each: Download files
   args:
     DIR: mermaid
-    URL: https://unpkg.com/mermaid@latest/dist/
+    URL: https://unpkg.com/mermaid@12.0.0/dist/
   exec: |
     args._list.map(r => each({ f: r, DIR: args.DIR, URL: args.URL, extra: args.extra }));
 
@@ -45,6 +47,7 @@ jobs:
   exec: |
     args._list = $from( listFilesRecursive(args.DIR) )
                  .equals("isFile", true)
+                 .filter(r => /\.(js|css)$/.test(r.filename))
                  .select(r => r.filepath.replace(new RegExp("^" + args.DIR + "/"), ""));
 
 # ---------------------
@@ -61,6 +64,10 @@ jobs:
 
     try {
       $rest().get2File(args.DIR + "/" + args.f, url);
+      if (/\.css$/.test(args.f)) {
+        var file = args.DIR + "/" + args.f;
+        io.writeFileString(file, io.readFileString(file).replace(/@import\s+url\("https:\/\/fonts\.googleapis\.com\/[^"\n]*"\);/g, ""));
+      }
       log("Downloaded " + args.DIR + "/" + args.f + " <- " + url + "...");
       if (io.fileInfo(args.DIR + "/" + args.f).size == 0) logWarn("Zero sized file "+ args.DIR + "/" + args.f);
     } catch(e) {

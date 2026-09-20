@@ -17,7 +17,7 @@ name: Docsify
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20211212'
+version: '20260920'
 dependencies:
   openaf: '>=20200508'
 files:
@@ -40,6 +40,10 @@ files:
 - docsify/themes/pure.css
 - docsify/themes/vue.css
 - index.hbs
+- licenses/docsify-LICENSE
+- licenses/docsify-copy-code-LICENSE
+- licenses/prismjs-LICENSE
+- mermaid/MERMAID-LICENSE
 - mermaid/mermaid.min.js
 - prismjs/prism-bash.min.js
 - prismjs/prism-css.min.js
@@ -65,49 +69,57 @@ files:
 - prismjs/prism-velocity.min.js
 - prismjs/prism-yaml.min.js
 - prismjs/prism.min.js
+- static.js
+- upstream.json
 - utils/update.yaml
 filesHash:
   .odoc.db: 9846ac6855a89eaa0b5e20993e0cc237d423237b
   .precompile: c31c80b263e1224bf48f1099e88bc898579cceea
-  README.md: 945074de174c1b0e00d56932eeb3866a3cfb3a0e
-  docsify.js: fae0b2f3621d64260dd59291526dd3d787ee81ae
-  docsify/docsify.min.js: 23974339ef3af28c3003663a4cf101ebd3a4c491
-  docsify/plugins/docsify-copy-code.min.js: 559174811196e1c0c72c95711f9d6f7bce18119f
-  docsify/plugins/emoji.min.js: 551481df43a1720428100e0f10ff51c9547bb5a8
+  README.md: c62cc895eca428e48a746a33b1be26810955ee60
+  docsify.js: ed6ec0ab05953fad3ac5772624ae7fe938bc9ea6
+  docsify/docsify.min.js: 4576a4d74296a74dcf001767640b1fbecc5fc238
+  docsify/plugins/docsify-copy-code.min.js: 857d1fd3cc6ddbb78ab77425f088dd2448787b4e
+  docsify/plugins/emoji.min.js: 84d21033fabd1f99d77d335374a2a5a5f74b0586
   docsify/plugins/external-script.min.js: 2454c96d1587adf64ca6e8f5f227a2d9e8c8bebf
-  docsify/plugins/front-matter.min.js: 98acd33c11ec16ca90ffb4a9c040420043669adc
+  docsify/plugins/front-matter.min.js: 8bd85fdbbe41a175b013ae65cf3c9175971c1aa1
   docsify/plugins/ga.min.js: c7784477c676e52fdb82bc61dd1091b80c94313d
-  docsify/plugins/search.min.js: 5c8a22cd7f45a44a54ebc0f7f28986c05539685a
-  docsify/plugins/zoom-image.min.js: 08148a87c1bb09958194a1ba79f3c1023337e9b3
-  docsify/themes/buble.css: b3a74e544bd0582fafc974b5b258636aeb8e02bc
-  docsify/themes/dark.css: 782a5736e5a9bc65b34acbc09f48dbbcd0a79bd2
-  docsify/themes/dolphin.css: 2397c7184f309b4ef3c4aecae08f067a0b375492
-  docsify/themes/pure.css: 7f187937e918cc28292ab1122713315a6a6e0467
-  docsify/themes/vue.css: 9341ef5c9c38372fe4e8522f75860516a194c012
-  index.hbs: d7b7b29e3fc057a9524e4ac91fac4b98b2a4fdf1
-  mermaid/mermaid.min.js: 06beb645b38a0d6c0cbe719b98ceaf24ef276257
-  prismjs/prism-bash.min.js: b2f4328309d7223314847fd4f2ca6d7b1f406837
-  prismjs/prism-css.min.js: 46566648755622f627c36609caa683b7ee3e995a
-  prismjs/prism-docker.min.js: ad6728c502e16d372e8953035563cef3d23870c5
-  prismjs/prism-go.min.js: ce0d7220babf51c325bd2c7593c5d2fb82e59db7
-  prismjs/prism-handlebars.min.js: 43ee763d551c65e0925a839053782ab2d88bf856
-  prismjs/prism-http.min.js: c2b17f535ea107fe8c1960652393adc99cc884e0
-  prismjs/prism-java.min.js: dc3232c5d14a9f531f75fb0c3f707573c080fdf0
-  prismjs/prism-javascript.min.js: dcf514c251f01e084bd4fcfe88027392393610b1
-  prismjs/prism-javastacktrace.min.js: cbbf4e9b63261e809068c5fae2e49212728b5ef1
-  prismjs/prism-json.min.js: 730582c8ebf1a65a890a3450dee6a79c95f93fb1
-  prismjs/prism-markdown.min.js: 580dc8cfaae5dc5235679047c3221987f82c8402
-  prismjs/prism-nginx.min.js: 6142f0af76ef3f3d96b80ee6c18db8b4cbf280f6
-  prismjs/prism-perl.min.js: 290ce394244b8004f9f91076287e33b4f5543409
-  prismjs/prism-plsql.min.js: be31f697fd96edacf010667b128d815081f7171f
-  prismjs/prism-powershell.min.js: d919509b4412371a44ea75616903296497c3963c
-  prismjs/prism-properties.min.js: b9006f745797fd1f1d6b417e535ca746c3a31ed8
-  prismjs/prism-python.min.js: 49336730e10dc4b8018bd5da053bad5590776993
-  prismjs/prism-r.min.js: 4fd4610c1663636b2471b335c9a0b924b3b51c55
-  prismjs/prism-regex.min.js: 54a538d72987b2b6600f9758a77bb41412b571b7
-  prismjs/prism-sql.min.js: e1912f2e8edf1e73c82725074548a53b647a9835
-  prismjs/prism-typescript.min.js: a6cd0a3274fb2c74a2480a9e55c7acd979bc5c6b
-  prismjs/prism-velocity.min.js: fbe7a448623a4965924e65e06271bc7694664995
-  prismjs/prism-yaml.min.js: d3ae5eafe8f32ba49a06aad939a04f30910c23c5
-  prismjs/prism.min.js: 0306d09b11d80b2045f91dae8795532fe2ca7133
-  utils/update.yaml: 7cfa34196d641a37f118263c56bbd7eae6d56ce5
+  docsify/plugins/search.min.js: 1fbad2860ee8f40a2516454587fe6f9f66252cbd
+  docsify/plugins/zoom-image.min.js: 540779e6cad6fc66998fcfe9719ed87391a869ec
+  docsify/themes/buble.css: 767b02973e1d46231c5473576a5bd7d29dd91e09
+  docsify/themes/dark.css: 1b08d1c66413e6a1277d05e4c16103b6a797133a
+  docsify/themes/dolphin.css: 316da8903a510405e88a5161b2a2fc3d46a81f09
+  docsify/themes/pure.css: 96da2f4fe0e41668db57f03974cfaace3a7a91fe
+  docsify/themes/vue.css: 9e7c5d0ec552372832fc930f34cfaa27245bd469
+  index.hbs: 6421d221855978c8570e6491d588ddf89240f82f
+  licenses/docsify-LICENSE: 9d44ad64ce8aea3e88c338695fc10e2041813a47
+  licenses/docsify-copy-code-LICENSE: 4fc361dca91da6605d38e2e0698e449b368c989b
+  licenses/prismjs-LICENSE: 732b613a6e35790a0b3f95080dcfea58b696e75a
+  mermaid/MERMAID-LICENSE: b281599a2d4161f6c9430618bf96c9a1a919bece
+  mermaid/mermaid.min.js: 66eb4be9851a083647b66031ee74403db62b882e
+  prismjs/prism-bash.min.js: 8d8bc10d25f255c65ed43e33550c98fd9837e37f
+  prismjs/prism-css.min.js: e8b77ae3456699670a58d61a99a6fec62eca8286
+  prismjs/prism-docker.min.js: 9e93ecdc4f084651cb2581736f0d326a19f44359
+  prismjs/prism-go.min.js: 4af8389c819b36b4c07eb8db53b06807778e8838
+  prismjs/prism-handlebars.min.js: 7c128b1c8ed720577e4dfe84fdcc4abb47ac14a3
+  prismjs/prism-http.min.js: bfe60371634ca7e4af3375faf196977a3725e546
+  prismjs/prism-java.min.js: ac830ecd50f8051848b3c7f99615320fecb7c2a9
+  prismjs/prism-javascript.min.js: 714fad921b277c473f6f05e08d7f87203b8ad1f0
+  prismjs/prism-javastacktrace.min.js: aab474920b47c27f0f3b906e2f4f8232d78177a5
+  prismjs/prism-json.min.js: 1b9aad7622319ccb2228b37a4eac6a57ae592c56
+  prismjs/prism-markdown.min.js: 70c15568fecde533fe7f414837569fc5ffeceb7a
+  prismjs/prism-nginx.min.js: 957f895a7764cecf4af7c73c883ce2ad8eccf1ef
+  prismjs/prism-perl.min.js: 030b273431852515a568391782fe4a3b6422a94f
+  prismjs/prism-plsql.min.js: 0f4384d432a78f26f6d7f7b0a43bf96aac7df8a1
+  prismjs/prism-powershell.min.js: 3491a1b6b3bf551d98c3d233335afc77a6d2eeda
+  prismjs/prism-properties.min.js: 101f9bc10bb18b4bce04934ce7067760511fb6bf
+  prismjs/prism-python.min.js: 815a3572601c952e7199659c181ac9110f8c4698
+  prismjs/prism-r.min.js: c2395ed30980ddfb126912914f7449f1db2aedb8
+  prismjs/prism-regex.min.js: c62948d48935a429d75d520db15bc8cf30a08e37
+  prismjs/prism-sql.min.js: 9e10edb02916bdec81f54a8e4c8f6f4b69acb4f2
+  prismjs/prism-typescript.min.js: 06ae3db4879cafb3e41f7d5dfc770ec26e2fff94
+  prismjs/prism-velocity.min.js: 1517435f4c62985c12f268d61ae22e04960bf747
+  prismjs/prism-yaml.min.js: 92c6537089f29b8ac499a62094c4f119ae383a89
+  prismjs/prism.min.js: 56a60c6864c2508accee964360ede81c9db3ff65
+  static.js: 6b446c2ec7516f91cd2ad7fc5e2c6d7a736cf865
+  upstream.json: 005d8447dfb310b86a101fa666a72509333153f3
+  utils/update.yaml: 5e672f03455bae5f5a9f561e9d98041ee2df27cf

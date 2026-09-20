@@ -370,3 +370,9 @@ io.writeFileString("README.html", docsify.genStaticVersion({
 ## How to update
 
 There is an oJob "utils/update.yaml" to help on updating the existing content from the UnPKG CDN. Please run it directly on the oPack folder but be carefull that new versions might break existing functionality (specially the generation of static versions).
+
+## Bundled JavaScript (2026-09-20)
+
+Bundles Docsify 4.13.1, Mermaid 12.0.0, PrismJS 1.30.0 and docsify-copy-code 3.0.2. Docsify stays on 4.x to preserve the existing themes and renderer API; migrating to Docsify 5 requires a separate wrapper/theme migration. Mermaid runs asynchronously after each page renders. genStaticVersion embeds Markdown through static.js rather than rewriting minified Docsify internals. Google Fonts imports are removed from the bundled themes so system font fallbacks work offline. Optional plugins or user content referencing external services must be configured with local resources.
+
+The release versions, archive URLs and npm integrity checksums are recorded in upstream.json. Upstream license notices are retained. Maintenance downloads are not required at runtime.

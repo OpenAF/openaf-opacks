@@ -102,11 +102,12 @@ Docsify.prototype.genStaticVersion = function(aMapMDs, options) {
         }
     }
 
-    var cont = stringify(aMapMDs, void 0, "");
-    var res  = af.fromString2Bytes(io.readFileString(this.pth + "/docsify/docsify.min.js")
-               .replace("var F={};function L", "var F=" + cont + ";function L")
-               .replace("var s=new XMLHttpRequest,r=F[a]", "var s=new XMLHttpRequest,r=F[a.substring(window.location.href.indexOf(\"#\")-7)]")
-               );
+    // Embed documents through an XHR adapter instead of patching minified variable names.
+    var cont = stringify(aMapMDs, void 0, "").replace(/</g, "\\u003c");
+    var preload = "<script>window.__docsifyStaticDocuments=" + cont + ";" +
+                  io.readFileString(this.pth + "static.js") + "</script>";
+    output = output.replace("<head>", "<head>" + preload);
+    var res = af.fromString2Bytes(io.readFileString(this.pth + "/docsify/docsify.min.js"));
 
     output = output.replace("\"/_d/docsify.min.js", "\"docsify.js");
     output = output.replace("\"/_m/mermaid.min.js", "\"" + this.pth + "/mermaid/mermaid.min.js");
