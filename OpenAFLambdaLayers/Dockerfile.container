@@ -1,0 +1,49 @@
+# Build with one platform only, for example:
+# docker build --platform linux/amd64 --provenance=false -t openaf-lambda .
+FROM public.ecr.aws/lambda/provided:al2023 AS build
+
+ARG TARGETARCH
+ARG JAVA_VERSION=25
+ARG OPENAFDIST=
+ARG OPACKS=ElasticSearch,Notifications,Kube,aws,s3,rss,oJob-common,Mongo
+
+RUN dnf install -y tar gzip \
+ && dnf clean all
+
+RUN set -eux; \
+    case "${TARGETARCH:-amd64}" in \
+      amd64) jre_arch=x64 ;; \
+      arm64) jre_arch=aarch64 ;; \
+      *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac; \
+    mkdir -p /opt/jre /opt/openaf; \
+    curl -fsSL "https://api.adoptium.net/v3/binary/latest/${JAVA_VERSION}/ga/linux/${jre_arch}/jre/hotspot/normal/eclipse" -o /tmp/jre.tgz; \
+    tar -xzf /tmp/jre.tgz -C /opt/jre --strip-components=1; \
+    rm /tmp/jre.tgz
+
+RUN set -eux; \
+    export OAF_HOME=/opt/openaf; \
+    curl -fsSL "https://openaf.io/${OPENAFDIST:+${OPENAFDIST}/}openaf.jar.repacked" -o /opt/openaf/openaf.jar; \
+    cd /opt/openaf; \
+    if [ -n "${OPACKS}" ]; then \
+      opacks=$(printf '%s' "${OPACKS}" | tr ',' ' '); \
+      for opack in ${opacks}; do \
+        /opt/jre/bin/java -jar openaf.jar --opack -e "install ${opack}"; \
+      done; \
+    fi; \
+    chmod -R a+rX /opt
+
+FROM public.ecr.aws/lambda/provided:al2023
+
+COPY --from=build /opt /opt
+COPY bootstrap /var/runtime/bootstrap
+COPY lambda.js /opt/lambda.js
+COPY function/ /var/task/
+
+RUN chmod 755 /var/runtime/bootstrap \
+ && chmod -R a+rX /opt /var/task
+
+ENV OAF_HOME=/tmp/openaf \
+    TMPDIR=/tmp
+WORKDIR /var/task
+CMD ["main.js"]

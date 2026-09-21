@@ -15,6 +15,10 @@ COPY bootstrap /opt/bootstrap
 COPY build.yaml /opt/build.yaml
 COPY lambda.js /opt/lambda.js
 COPY Dockerfile.lambda /opt/Dockerfile.lambda
+COPY Dockerfile.container /opt/Dockerfile.container
+COPY bootstrap.container /opt/bootstrap.container
+COPY dockerignore.container /opt/dockerignore.container
+COPY main.js.example /opt/main.js.example
 
 WORKDIR /opt
 ENTRYPOINT [ "/openaf/ojob", "/opt/build.yaml" ]

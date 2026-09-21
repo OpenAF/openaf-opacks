@@ -13,28 +13,36 @@ bugs:
 repository:
   type: http
   url: https://openaf.io/opacks/OpenAFLambdaLayers.opack
-description: Build the lambda layers to run OpenAF lambda functions
+description: Build AWS Lambda layers or a compatible OpenAF container build context
 name: OpenAFLambdaLayers
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20251008'
+version: '20260921'
 dependencies:
   openaf: '>=20220822'
 files:
 - .package.yaml
 - Dockerfile
+- Dockerfile.container
 - Dockerfile.lambda
 - README.md
 - bootstrap
+- bootstrap.container
 - build.yaml
+- dockerignore.container
 - lambda.js
 - lambda.orig.js
+- main.js.example
 filesHash:
-  Dockerfile: 5d83acd41a539546bff9f1120055845f0d416b8a
+  Dockerfile: d32f9358f88dac21b90055c0c7a044c8cc5c91d5
+  Dockerfile.container: f06e6df09ffb08d6fd449dfc983d2b1cde109cc5
   Dockerfile.lambda: feb2169b375f60a26347e5383c6812a64963794c
-  README.md: c4cbb0c15eb5c7acb2ebf8b59499680a5fbf516d
+  README.md: 2782b713740b06a839cff5acb6a09ba3a989a020
   bootstrap: a945e2603fb5d5b0233dd8cdc0e85f423fc2646c
-  build.yaml: 30ed2677a5cbd5c1cc03afd8e5066777a8dd4c5d
-  lambda.js: 89dd76d96fff06b4fa07a9e361116d1517a7fc6b
-  lambda.orig.js: 70ca3aad284e3030c079f5e55f90dc011903d688
+  bootstrap.container: 37e934d34be976f2661fd646ddbea112a24eaf19
+  build.yaml: e0062803c9796569e09ddd945d47c08beca30bff
+  dockerignore.container: 64676640f60802832280c64b1cc6b6aa94ff1de0
+  lambda.js: 0dfcab8d4ac30a5a48f02598caecc2d53f3667d9
+  lambda.orig.js: c80deab9d69979e70229acc47c9feaf95e48a29a
+  main.js.example: bec6dc9e3b149d9de3617ad0f50c39801c9095b5

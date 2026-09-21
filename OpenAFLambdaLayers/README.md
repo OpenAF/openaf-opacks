@@ -30,6 +30,46 @@ $ docker run -ti --rm -v $(pwd)/output:/output openaflambdabuilder OPACKS=oJob-c
 
 Note: please be aware that AWS imposes a maximum limit to the uncompressed size of each layer.
 
+## How to build an AWS Lambda container image
+
+The builder can instead generate a standalone Docker build context. The generated image contains the JRE, OpenAF, the selected oPacks and the OpenAF Lambda custom runtime. It does not require the layer ZIP files.
+
+```bash
+$ docker run -ti --rm -v $(pwd)/output:/output openaflambdabuilder MODE=container
+$ cd output/container
+$ docker build --platform linux/amd64 --provenance=false -t openaf-lambda .
+```
+
+Container mode writes `output/container` once and refuses to overwrite it. Set `OUTPUT` to use a different mounted output directory. Replace `function/main.js` with the function code before building. The default `CMD ["main.js"]` can be overridden with a JavaScript handler or an oJob definition:
+
+```bash
+$ docker build --platform linux/arm64 --provenance=false \
+  --build-arg OPACKS=oJob-common,aws,Mongo \
+  --build-arg OPENAFDIST=nightly \
+  -t openaf-lambda:arm64 .
+$ docker run --rm -p 9000:8080 openaf-lambda
+$ curl -sS -X POST http://localhost:9000/2015-03-31/functions/function/invocations \
+  -d '{"name":"Lambda"}'
+```
+
+Build each image for exactly one architecture: use `linux/amd64` for Lambda `x86_64` functions or `linux/arm64` for Lambda `arm64` functions. `--provenance=false` avoids publishing a multi-manifest image. At execution time the root filesystem is read-only; OpenAF’s mutable home and temporary files are placed under `/tmp`.
+
+To publish manually, substitute your own region, account, repository, tag and execution role:
+
+```bash
+$ aws ecr create-repository --repository-name openaf-lambda --region eu-west-1
+$ aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.eu-west-1.amazonaws.com
+$ docker tag openaf-lambda ACCOUNT.dkr.ecr.eu-west-1.amazonaws.com/openaf-lambda:latest
+$ docker push ACCOUNT.dkr.ecr.eu-west-1.amazonaws.com/openaf-lambda:latest
+$ aws lambda create-function --function-name openaf-container \
+  --package-type Image \
+  --code ImageUri=ACCOUNT.dkr.ecr.eu-west-1.amazonaws.com/openaf-lambda:latest \
+  --role arn:aws:iam::ACCOUNT:role/LambdaExecutionRole \
+  --architectures x86_64 --region eu-west-1
+```
+
+The ECR repository and Lambda function must be in the same region. A Lambda function using ZIP/layer deployment cannot be converted in place to an image deployment; create a separate image-based function.
+
 ## How to add/update the layers
 
 On your target AWS region, select the Layers screen and create a new layer or click on an existing one to update it.
@@ -110,6 +150,4 @@ getEnv("AWS_LAMBDA_FUNCTION_NAME");
 
 ## How to create an OpenAF AWS Lambda container
 
-1. Use the output _Dockerfile_ and zip files to build the base container.
-2. Extend the Dockerfile image by copying your code and artifacts to /var/task on the _Dockerfile_
-3. Add, on the CMD override, the main handler (e.g. main.js or main.yaml or alike).
+Use container mode above. It produces a complete Docker context with the handler source in `function/`; a separate extension Dockerfile is not needed.

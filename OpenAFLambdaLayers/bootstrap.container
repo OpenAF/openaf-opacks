@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+export OAF_HOME="${OAF_HOME:-/tmp/openaf}"
+export TMPDIR="${TMPDIR:-/tmp}"
+mkdir -p "$OAF_HOME"
+
+exec /opt/jre/bin/java \
+  -Xshare:off \
+  -XX:+IgnoreUnrecognizedVMOptions \
+  -XX:+UseContainerSupport \
+  -XX:MinRAMPercentage=80.0 \
+  -XX:MaxRAMPercentage=80.0 \
+  -XX:+IdleTuningCompactOnIdle \
+  -XX:+IdleTuningGcOnIdle \
+  -Djava.system.class.loader=openaf.OAFdCL \
+  -jar /opt/openaf/openaf.jar \
+  -f /opt/lambda.js

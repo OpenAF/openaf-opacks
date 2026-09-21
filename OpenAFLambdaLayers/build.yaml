@@ -6,12 +6,38 @@ ojob:
   #async       : true
 
 todo:
-  - Get jvm
-  - Build minijvm layer
-  - Build openaf layer
-  - Move layers to output
+  - Build output
 
 jobs:
+  #------------------
+  - name: Build output
+    exec: | #js
+      args.MODE = _$(args.MODE, "MODE").isString().default("layers").toLowerCase();
+      args.OUTPUT = _$(args.OUTPUT, "OUTPUT").isString().default("/output");
+      if (args.MODE == "layers") {
+        oJobRunJob("Move layers to output", args);
+      } else if (args.MODE == "container") {
+        oJobRunJob("Generate Lambda container context", args);
+      } else {
+        throw "MODE needs to be either 'layers' or 'container'.";
+      }
+
+  #-------------------------------------
+  - name: Generate Lambda container context
+    exec: | #js
+      var output = args.OUTPUT;
+      var target = output + "/container";
+      if (io.fileExists(target)) throw "Refusing to overwrite existing container context: " + target;
+      if (!io.fileExists(output)) io.mkdir(output);
+      io.mkdir(target);
+      io.mkdir(target + "/function");
+      io.cp("Dockerfile.container", target + "/Dockerfile");
+      io.cp("bootstrap.container", target + "/bootstrap");
+      io.cp("lambda.js", target + "/lambda.js");
+      io.cp("dockerignore.container", target + "/.dockerignore");
+      io.cp("main.js.example", target + "/function/main.js");
+      log("Generated Lambda container build context in " + target + ".");
+
   #-------------------
   - name : Download JRE
     check:
@@ -174,7 +200,9 @@ jobs:
       - Build openaf layer
       - Build minijvm layer
     exec : |
-      io.cp("openaf.zip", "/output/openaf_" + args.arch + ".zip");
-      io.cp("openaf-opacks.zip", "/output/openaf-opacks_" + args.arch + ".zip");
-      io.cp("minijvm.zip", "/output/minijvm_" + args.arch + ".zip");
-      io.cp("Dockerfile.lambda", "/output/Dockerfile");
+      var output = _$(args.OUTPUT, "OUTPUT").isString().default("/output");
+      if (!io.fileExists(output)) io.mkdir(output);
+      io.cp("openaf.zip", output + "/openaf_" + args.arch + ".zip");
+      io.cp("openaf-opacks.zip", output + "/openaf-opacks_" + args.arch + ".zip");
+      io.cp("minijvm.zip", output + "/minijvm_" + args.arch + ".zip");
+      io.cp("Dockerfile.lambda", output + "/Dockerfile");

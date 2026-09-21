@@ -1,0 +1,3 @@
+// Receives the Lambda event map through __pmIn and returns __pmOut.
+var name = _$(__pmIn.name).default("world");
+__pmOut = { Hello: name + "!" };
