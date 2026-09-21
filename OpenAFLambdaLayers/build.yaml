@@ -27,15 +27,16 @@ jobs:
     exec: | #js
       var output = args.OUTPUT;
       var target = output + "/container";
-      if (io.fileExists(target)) throw "Refusing to overwrite existing container context: " + target;
       if (!io.fileExists(output)) io.mkdir(output);
-      io.mkdir(target);
-      io.mkdir(target + "/function");
+      if (!io.fileExists(target)) io.mkdir(target);
+      if (!io.fileExists(target + "/function")) io.mkdir(target + "/function");
       io.cp("Dockerfile.container", target + "/Dockerfile");
       io.cp("bootstrap.container", target + "/bootstrap");
       io.cp("lambda.js", target + "/lambda.js");
       io.cp("dockerignore.container", target + "/.dockerignore");
-      io.cp("main.js.example", target + "/function/main.js");
+      if (!io.fileExists(target + "/function/main.js")) {
+        io.cp("main.js.example", target + "/function/main.js");
+      }
       log("Generated Lambda container build context in " + target + ".");
 
   #-------------------

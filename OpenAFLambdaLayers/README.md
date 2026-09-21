@@ -40,7 +40,7 @@ $ cd output/container
 $ docker build --platform linux/amd64 --provenance=false -t openaf-lambda .
 ```
 
-Container mode writes `output/container` once and refuses to overwrite it. Set `OUTPUT` to use a different mounted output directory. Replace `function/main.js` with the function code before building. The default `CMD ["main.js"]` can be overridden with a JavaScript handler or an oJob definition:
+Container mode can be run again to refresh the generated runtime files. Existing files under `function/`, including `function/main.js`, are preserved. Set `OUTPUT` to use a different mounted output directory. Replace `function/main.js` with the function code before building. The default `CMD ["main.js"]` can be overridden with a JavaScript handler or an oJob definition:
 
 ```bash
 $ docker build --platform linux/arm64 --provenance=false \
