@@ -3,7 +3,7 @@ scripts:
   preerase: ''
   posterase: ''
   preinstall: ''
-  postinstall: 'log("Check https://github.com/yugabyte/jdbc-yugabytedb. To use it just: loadLib(\"jdbc-yugabytedb.js\"); var db = new DB(\"jdbc:yugabytedb://{{host}}:{{port}}/{{database}}\", ...) ");'
+  postinstall: 'log("Check https://github.com/yugabyte/jdbc-yugabytedb. To use it just: loadLib(\"jdbc-yugabytedb.js\"); var db = new DB(\"jdbc:postgresql://{{host}}:{{port}}/{{database}}\", ...) ");'
 keywords:
 - DB
 - JDBC
@@ -16,17 +16,15 @@ name: jdbc-yugabytedb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260918'
+version: '20260922'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- README.md
 - jdbc-yugabytedb-42.7.3-yb-6.jar
 - jdbc-yugabytedb.js
 filesHash:
   LICENSES.txt: 53372c471c14eebc145129c35f6e38a05859b0f6
-  README.md: 76e9a154bd4cd0963adbc65b3599a14e32ddfa3e
   jdbc-yugabytedb-42.7.3-yb-6.jar: bcf8942b569271c2739a2d8d9eca2a67320aa683
-  jdbc-yugabytedb.js: 57f126d8b60e5c403151e327a68afcf617258e10
+  jdbc-yugabytedb.js: 19faaaa5093b34cae6f3566fa150833fac334473
