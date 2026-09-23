@@ -34,7 +34,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260918'
+version: '20260923'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -78,20 +78,20 @@ files:
 filesHash:
   .odoc.db: 69629605b4cd27d89dec81eff20b6bdeddf77977
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  README.md: 5f25ba91069ccf26a0086ce335ae286ccfb31862
+  README.md: 4c9e642ccb51985a3ed50b3b136f2f1b58fe0fa7
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
   aws_bedrock.js: e182d7d04ea4c7f59b56071d804a7e7b8ba83d57
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
-  aws_core.js: 798363fb0c1cd463e5ec11da2f0ac931166fb231
+  aws_core.js: c0094ebb4b63e1ee3f3faf8e98adca5298c8a7b7
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
   aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws_ecr.js: f11c2b59e461fb615a54a947981b2ada62ebb30b
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
-  aws_eks.js: 1eceaf95280805a181f5207fdd24e763ff8e7e76
+  aws_eks.js: 3d7dd5307f534a7f9810a9f6b50b7aa82978d6b6
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_kms.js: 41a4ecdc5c681ea2678a06fd12a210c7cbac3ca3

@@ -455,9 +455,8 @@ AWS.prototype.__getRequest = function(aMethod, aURI, aService, aHost, aRegion, a
       if (this.__debug) cprint(altGetFields)
       can_querystring = (can_querystring.length > 0 ? can_querystring + "&" : "") + templify("X-Amz-Algorithm={{X-Amz-Algorithm}}&X-Amz-Credential={{X-Amz-Credential}}&X-Amz-Date={{X-Amz-Date}}&X-Amz-Expires={{X-Amz-Expires}}{{#if X-Amz-Security-Token}}&X-Amz-Security-Token={{X-Amz-Security-Token}}{{/if}}&X-Amz-SignedHeaders={{X-Amz-SignedHeaders}}", altGetFields)
    }
-   // Presigned (query-string authenticated) requests must use the literal "UNSIGNED-PAYLOAD" placeholder here, not
-   // the actual payload hash (required by S3 and other services for altGet, see AWS.S3_GetPresignedURL).
-   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + (altGet ? "UNSIGNED-PAYLOAD" : payload_hash)
+   // S3 presigning uses UNSIGNED-PAYLOAD; other services (including STS) sign the payload hash.
+   var can_Request = aMethod + "\n" + can_uri + "\n" + can_querystring + "\n" + can_headers + "\n" + signed_headers + "\n" + (altGet && aService == "s3" ? "UNSIGNED-PAYLOAD" : payload_hash)
    if (this.__debug) { cprint(can_Request); print("----") }
    var string_to_sign = "AWS4-HMAC-SHA256" + "\n" + amzdate + "\n" + credential_scope + "\n" + sha256(can_Request);
    if (this.__debug) { cprint(string_to_sign); print("++++") }
