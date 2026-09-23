@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <version>1.5.6-10</version>
+            <version>1.5.7-17</version>
         </dependency>
         <dependency>
             <artifactId>sshd-core</artifactId>
@@ -265,7 +265,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.62.0</version>
+            <version>1.63.0</version>
         </dependency>
         <dependency>
             <groupId>org.rocksdb</groupId>
