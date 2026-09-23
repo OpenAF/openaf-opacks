@@ -2,6 +2,8 @@
 
 OpenAF wrapper around the official JFalkorDB Java client.
 
+The bundled Java libraries use JFalkorDB 0.13.0 and Jedis 8.0.1. Maven coordinates are pinned in `.maven.yaml`; `opack genpack .` records the downloaded JARs in `.package.yaml`. The OpenAF JAR cleanup task removes libraries already supplied by OpenAF.
+
 ## Usage
 
 ```javascript

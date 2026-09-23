@@ -1,12 +1,16 @@
 artifacts:
 - group: com.falkordb
   id: jfalkordb
+  version: 0.13.0
 - group: redis.clients
   id: jedis
+  version: 8.0.1
 - group: org.apache.commons
   id: commons-pool2
+  version: 2.13.1
 - group: org.apache.commons
   id: commons-text
+  version: 1.15.0
 - group: org.apache.commons
   id: commons-lang3
-
+  version: 3.20.0
