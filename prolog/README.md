@@ -1,5 +1,7 @@
 # Prolog
 
+This opack bundles Projog Core 0.12.0 and Projog CLP 0.3.0.
+
 ## Usage
 
 _tbc_
