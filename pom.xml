@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>4.1.2</version>
+            <version>4.3.1</version>
         </dependency>
         <dependency>
             <groupId>at.yawk.lz4</groupId>
@@ -470,32 +470,32 @@
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-api</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-spi</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-util</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-impl</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-connector-basic</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-transport-file</artifactId>
-            <version>2.0.22</version>
+            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
