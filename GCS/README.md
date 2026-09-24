@@ -30,6 +30,9 @@ methods let you probe object existence, read metadata, and generate presigned UR
 The oPack bundles all transitive dependencies required by the `google-cloud-storage` Java client. No manual classpath management is
 necessary—once the oPack is installed every OpenAF runtime can immediately leverage the Storage API.
 
+The 20260924 package bundles google-cloud-storage 2.73.0 and its matching
+Google API and gRPC dependencies.
+
 ## Corrections (2026-09-18)
 
 `deleteFolderActions(bucket, prefix, beRecursive)` forwards the optional recursion flag to `listObjects`. The default remains nonrecursive; inspect the returned action list before executing it. `objectExists` checks for an exact object name, even when other objects share the prefix. Sync conflict reporting handles equal timestamps with different sizes.

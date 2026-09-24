@@ -1,5 +1,6 @@
 artifacts:
 - group  : com.google.cloud
   id     : google-cloud-storage
+  version: 2.73.0
 #- group  : com.google.cloud
 #  id     : google-cloud-nio

@@ -37,4 +37,4 @@ artifacts:
 
 - group  : com.github.weisj
   id     : jsvg
-  #version: 1.7.0
+  version: 2.2.0

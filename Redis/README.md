@@ -4,6 +4,8 @@ Wrapper around the [Jedis](https://github.com/redis/jedis) client to provide a c
 exposing the underlying Jedis object, the oPack includes helpers to manage keys, hashes, lists, sets, and sorted sets with native
 JavaScript data structures.
 
+The 20260924 package bundles Jedis 8.0.1.
+
 ## Installation
 
 ```bash

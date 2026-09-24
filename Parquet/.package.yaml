@@ -17,7 +17,7 @@ name: Parquet
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260819'
+version: '20260924'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -28,32 +28,40 @@ files:
 - javax.annotation-api-1.3.2.jar
 - jts-core-1.20.0.jar
 - oafp_parquet.js
-- parquet-column-1.18.0.jar
-- parquet-common-1.18.0.jar
-- parquet-encoding-1.18.0.jar
-- parquet-floor-2.2.jar
-- parquet-format-structures-1.18.0.jar
-- parquet-hadoop-1.18.0.jar
-- parquet-jackson-1.18.0.jar
+- parquet-column-1.18.1.jar
+- parquet-common-1.18.1.jar
+- parquet-encoding-1.18.1.jar
+- parquet-floor-2.3.jar
+- parquet-format-structures-1.18.1.jar
+- parquet-hadoop-1.18.1.jar
+- parquet-jackson-1.18.1.jar
 - parquet.js
 - samples/sample.parquet
 - snappy-java-1.1.10.8.jar
-- zstd-jni-1.5.7-11.jar
+- tests/autoTestParquet.js
+- tests/autoTestParquet.yaml
+- tests/autoTestParquetChannel.js
+- tests/autoTestParquetChannel.yaml
+- zstd-jni-1.5.7-15.jar
 filesHash:
-  .maven.yaml: 3b5ffb3da1956cc9beda5d2e7eb3c977aa7d3046
-  README.md: efd0f9b31891ccc5ee955b579eb5d04e82765607
+  .maven.yaml: 5f84ef19c0515e6095105e09e7cb2974a516363b
+  README.md: 61f8e04c840801fc5801545d258307c1835e7768
   aircompressor-2.0.3.jar: d7032ede4ff2c124d4913807ebd6868af66f1721
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   jts-core-1.20.0.jar: 25b72c9548a328cb1aea8a6b89d710a31ade5403
   oafp_parquet.js: 978290e5a36d5a8ddd12efab9977b0b42e4f03a0
-  parquet-column-1.18.0.jar: 844dbd5b35f55042fe390dfe2806f02e89524a33
-  parquet-common-1.18.0.jar: 6c17015c41013639e2aa2e5504156a7a98a4d66f
-  parquet-encoding-1.18.0.jar: be301d6d544de06e52387bf2c31f84312a45b3c3
-  parquet-floor-2.2.jar: b397a3bdf6704c21d076c6d2bdb6d6b7ec263c2c
-  parquet-format-structures-1.18.0.jar: ef37f56d0d88a5eb87533eae336f8dc58f11df62
-  parquet-hadoop-1.18.0.jar: c1f5eacef11499276b83d61c0a91cd285733a80a
-  parquet-jackson-1.18.0.jar: 414bac539cb2141828051db520f02cd3ed793ab1
+  parquet-column-1.18.1.jar: 0320adcc8e349f66b162963a1ba81417ce60f0bb
+  parquet-common-1.18.1.jar: 1eea5ca8cd78b3b5ea303104d23d949b1c682a8c
+  parquet-encoding-1.18.1.jar: fa2a6a5b5b4deb82d6ba1ce8dbeaf8945991f4b1
+  parquet-floor-2.3.jar: 56b01ce1a88f713cab6512cfa6565f7084b925ef
+  parquet-format-structures-1.18.1.jar: b517993cbce0398f0b62e8da40b5336ede3176c8
+  parquet-hadoop-1.18.1.jar: 4a1bef6a5b9003889d02d141e0da82f885b9ddc3
+  parquet-jackson-1.18.1.jar: 4f2fb5d17948e73bce31724c41deb088df0e19ed
   parquet.js: 2aa075b17efa526b7773589ea955b4a54459ee75
   samples/sample.parquet: 553dab9fad15a14c269a7d4ccd167f7a16b84e40
   snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
-  zstd-jni-1.5.7-11.jar: 4e88b2ca784e3530070c074dc38052876e74b9ab
+  tests/autoTestParquet.js: b5242e5f5282b031bf06367f4255248f01bcf503
+  tests/autoTestParquet.yaml: c522c863432f2fb71a6deb8e218d3a21f73a3d2f
+  tests/autoTestParquetChannel.js: 639a88d202a61dd1e4e60a100441c42a60e4bda6
+  tests/autoTestParquetChannel.yaml: 3186aa47f8d1409f8d9aafc249f84ee2a7fad602
+  zstd-jni-1.5.7-15.jar: 7a3774ad80cf7644eb41b2981010d47b20e31bc4

@@ -4,6 +4,8 @@ Extra Java [BouncyCastle](https://www.bouncycastle.org/java.html) cryptography a
 adds the `bcprov`, `bcpkix`, and `bcutil` JARs to the runtime so that OpenAF automations can use newer TLS ciphers and PKI helpers
 without needing to manage the classpath manually.
 
+The 20260924 package pins the BouncyCastle JARs to version 1.86.
+
 ## Installation
 
 ```bash

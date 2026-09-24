@@ -1,5 +1,7 @@
 # SocksServer
 
+The 20260924 package pins Lombok 1.18.48.
+
 A high-performance SOCKS proxy server for OpenAF with advanced filtering capabilities, comprehensive metrics, and IPv4/IPv6 support.
 
 ## Features

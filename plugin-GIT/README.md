@@ -3,6 +3,8 @@
 Provides an OpenAF plugin wrapping [JGit](https://www.eclipse.org/jgit/) so that repositories can be cloned, checked out, and
 managed from scripts. It supports initialising repositories, pushing/pulling with credentials, and inspecting status information.
 
+The 20260924 package bundles JGit 7.8.0.202609011348-r.
+
 ## Installation
 
 ```bash

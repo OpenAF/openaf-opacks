@@ -1,7 +1,7 @@
 # Kafka oPack
 
 Apache Kafka producer/consumer wrapper, an OpenAF **stream channel**, and an
-`oafp` input/output library. Uses the official Kafka Java client 4.1.2.
+`oafp` input/output library. Uses the official Kafka Java client 4.3.1.
 Requires Java 11 or later and OpenAF 20250725 or later.
 
 ```sh
@@ -172,4 +172,5 @@ Dependencies are pinned in `.maven.yaml`. Refresh with
 `ojob ojob.io/oaf/mavenGetJars folder=.`, normalize with
 `ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true`, then
 run `opack genpack .`. OpenAF supplies SLF4J; the opack bundles Kafka and its three
-compression libraries. Version: **20260919**.
+compression libraries. The 20260924 package pins snappy-java 1.1.10.8,
+lz4-java 1.11.3, and zstd-jni 1.5.7-17.

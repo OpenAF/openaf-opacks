@@ -1,3 +1,4 @@
 artifacts:
   - id      : jedis 
     group   : redis.clients
+    version : 8.0.1

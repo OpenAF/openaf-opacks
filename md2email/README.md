@@ -1,6 +1,7 @@
 # md2email OpenAF OPack
 
-Convert CommonMark/Markdown to **email-ready HTML** using [commonmark-java 0.24](https://github.com/commonmark/commonmark-java).
+Convert CommonMark/Markdown to **email-ready HTML** using [commonmark-java 0.30](https://github.com/commonmark/commonmark-java).
+The 20260924 package bundles JSVG 2.2.0 for inline SVG rendering.
 
 Key features:
 

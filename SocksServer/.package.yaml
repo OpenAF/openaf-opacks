@@ -17,7 +17,7 @@ name: SocksServer
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260901'
+version: '20260924'
 dependencies:
   openaf: '>=20250725'
 files:
@@ -30,10 +30,10 @@ files:
 - lombok-1.18.48.jar
 - socksServer.js
 filesHash:
-  .maven.yaml: 5d86a7561d199b1accddfaead8f5527588e14d38
+  .maven.yaml: 8c75e776fa19fb2a143ea90b101a97c9b690328d
   .odoc.db: 824651e11a11412515bb303ddb5398a97bda243e
   LICENSES.txt: adef8f697505f8376e6597fc422cf0880aff8044
-  README.md: d52deedb83a47aeb766fdb96970c10d270981803
+  README.md: 749f3fd54ee2f7b84b16f36d673775703d8f4448
   java-socks-proxy-server-2.2.0.jar: 293b2d96c332fb3dbfe356126a45a4151b04378f
   lombok-1.18.48.jar: 6858f13541bab505384f07053c5a7b539bbfd3e3
   socksServer.js: 7b2f811b7cdefacbf54d1a70b4cbb73214ef622f
