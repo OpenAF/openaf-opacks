@@ -21,7 +21,7 @@ name: lucene
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260805'
+version: '20260925'
 dependencies:
   openaf: '>=20250926'
 files:
