@@ -38,10 +38,6 @@ files:
 - parquet.js
 - samples/sample.parquet
 - snappy-java-1.1.10.8.jar
-- tests/autoTestParquet.js
-- tests/autoTestParquet.yaml
-- tests/autoTestParquetChannel.js
-- tests/autoTestParquetChannel.yaml
 - zstd-jni-1.5.7-15.jar
 filesHash:
   .maven.yaml: 5f84ef19c0515e6095105e09e7cb2974a516363b
@@ -60,8 +56,4 @@ filesHash:
   parquet.js: 2aa075b17efa526b7773589ea955b4a54459ee75
   samples/sample.parquet: 553dab9fad15a14c269a7d4ccd167f7a16b84e40
   snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
-  tests/autoTestParquet.js: b5242e5f5282b031bf06367f4255248f01bcf503
-  tests/autoTestParquet.yaml: c522c863432f2fb71a6deb8e218d3a21f73a3d2f
-  tests/autoTestParquetChannel.js: 639a88d202a61dd1e4e60a100441c42a60e4bda6
-  tests/autoTestParquetChannel.yaml: 3186aa47f8d1409f8d9aafc249f84ee2a7fad602
   zstd-jni-1.5.7-15.jar: 7a3774ad80cf7644eb41b2981010d47b20e31bc4

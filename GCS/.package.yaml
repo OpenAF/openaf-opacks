@@ -108,7 +108,6 @@ files:
 - runtime-0.13.0.jar
 - shared-resourcemapping-0.33.0.jar
 - stax2-api-4.2.2.jar
-- tests/regression.js
 - threeten-extra-1.8.0.jar
 - threetenbp-1.7.0.jar
 - woodstox-core-7.0.0.jar
@@ -198,7 +197,6 @@ filesHash:
   runtime-0.13.0.jar: 4dca217f6a1866797c5d21f85a4f3cd384d8e496
   shared-resourcemapping-0.33.0.jar: 9c4f5ed770ccf34c3e78adadd979227fb9105de3
   stax2-api-4.2.2.jar: b0d746cadea928e5264f2ea294ea9a1bf815bbde
-  tests/regression.js: 7a80cf2d402b30abe28b5b728704a02156451450
   threeten-extra-1.8.0.jar: d3b1ac7e361b642132e529f562622aac7dfea752
   threetenbp-1.7.0.jar: 8703e893440e550295aa358281db468625bc9a05
   woodstox-core-7.0.0.jar: beb19c02e7e28a8a4acf4a9cc8c3280ec3b94722
