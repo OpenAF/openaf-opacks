@@ -16,15 +16,15 @@ name: jdbc-h2
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260910'
+version: '20261002'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- h2-2.5.250.jar
+- h2-2.5.252.jar
 - jdbc-h2.js
 filesHash:
-  LICENSES.txt: d76d1f599bff42a899996364f10ac773893cbc0d
-  h2-2.5.250.jar: c04a84d307abe871451edbcc71e00b43a2a3ee33
+  LICENSES.txt: 5031d6d92aef113104c9f5c58e263a30cadbc853
+  h2-2.5.252.jar: 993ba74eafa574df15f4809f8082a12f67cad34b
   jdbc-h2.js: 0de9c23c3c1b74b0f6430b85c4c5bd7f1be0eb2d
