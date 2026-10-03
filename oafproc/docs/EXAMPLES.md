@@ -243,3 +243,7 @@ Dhaka      │18568373  │Bangladesh
 # Processes each json file in /some/data creating and updating the data.xlsx file with a sheet for each file 
 find /some/data -name "*.json" | xargs -I '{}' /bin/sh -c 'oafp file={} output=xls xlsfile=data.xlsx xlsopen=false xlssheet=$(echo {} | sed "s/.*\/\(.*\)\.json/\1/g" )'
 ```
+
+## JSON Schema validation
+
+See [JSON Schema](JSON-SCHEMA.md) for validation examples, Ajv options, draft selection, v8 error fields and sample generation.

@@ -140,6 +140,7 @@ These options will change the parsed input data included any filters provided.
 | forcearray | Boolean | If true and if the input is a map it will force it to be an array with that map as the only element |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
+| jsonschemaoptions | String/Map | JSON/SLON Ajv options for jsonschema or jsonschemacmd, merged with allErrors=true; see [JSON Schema](JSON-SCHEMA.md) |
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
 | kmeans | Number | Given an array of 'normalized' data will cluster data into the number of centroids provided |
 | llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
@@ -1125,6 +1126,7 @@ pipe:
 | help=filters | Provides more details regarding the use of "path=", "from=" and "sql=" |
 | help=template | Provides more details regarding the use of "output=template" |
 | help=examples | Provide several examples |
+| help=jsonschema | JSON Schema validation, options, drafts and sample generation |
 | help=readme | Returns this document |
 
 > You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands

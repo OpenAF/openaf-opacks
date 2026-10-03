@@ -456,6 +456,7 @@ const showHelp = () => {
     case "filters" : _ff = "docs/FILTERS.md"; break
     case "template": _ff = "docs/TEMPLATE.md"; break
     case "examples": _ff = "docs/EXAMPLES.md"; break
+    case "jsonschema": _ff = "docs/JSON-SCHEMA.md"; break
     case "readme"  :
     case "usage"   : _ff = "docs/USAGE.md"; break
     default        : 
@@ -1112,7 +1113,13 @@ var _transformFns = {
             _s = io.readFileJSON(params.jsonschema)
         }
         if (!isMap(_s)) _exit(-1, "The schema provided is not a valid JSON schema.")
-        ow.obj.schemaInit({allErrors: true})
+        var _schemaOptions = { allErrors: true }
+        if (isDef(params.jsonschemaoptions)) {
+            var _providedOptions = _fromJSSLON(params.jsonschemaoptions)
+            if (!isMap(_providedOptions)) _exit(-1, "jsonschemaoptions must be a JSON/SLON map.")
+            _schemaOptions = merge(_schemaOptions, _providedOptions)
+        }
+        ow.obj.schemaInit(_schemaOptions)
         var validate = ow.obj.schemaCompile(_s)
         var res = validate(r)
         return { valid: res, errors: validate.errors}

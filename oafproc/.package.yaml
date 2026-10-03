@@ -121,18 +121,20 @@ files:
 - buildStaticOAFP.yaml
 - docs/EXAMPLES.md
 - docs/FILTERS.md
+- docs/JSON-SCHEMA.md
 - docs/TEMPLATE.md
 - docs/USAGE.md
 - oafp.js
 - oafp.yaml
 - src/oafp.source.js
 filesHash:
-  README.md: 39e6d4633258b4b425d406177947f9f0b296fccc
+  README.md: 6f9517035f62b1a7d1653cb3674b350725e3ff38
   buildStaticOAFP.yaml: 791ff6e12542fef38b6082e044913e07dc0556b8
-  docs/EXAMPLES.md: bc27a8cd4ce83f7f73397fdcc790169ade94e2b9
+  docs/EXAMPLES.md: 2dbcc1db2bc71cb0760b28d7d8e3a972d2b53b15
   docs/FILTERS.md: 34146533ccdb806046b10b1ff8282f8a8ee85fa6
+  docs/JSON-SCHEMA.md: d1555c9526b284a23f8249757eb4f159a563b51c
   docs/TEMPLATE.md: 1870a1d6b9e90594eb62e0f33aaaab25084fe59a
-  docs/USAGE.md: 040a2d8c0a4adaaf77151301473105c6189e395f
-  oafp.js: 0b6d182a20ddd8e620698d019038ae76e127cf66
+  docs/USAGE.md: 78d2edc045b2df7afab129be62cc377c36bd3d6a
+  oafp.js: b55445a910beeb25bdf37d6d9616ceec5fa4ff78
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 76418bfbc0a9026a6c2703d9c31cedea94033852
+  src/oafp.source.js: 5b8b60d787ee890bad4b135ec4818cd7928558ed
