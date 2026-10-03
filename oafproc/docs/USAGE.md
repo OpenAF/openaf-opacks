@@ -79,7 +79,7 @@ List of data input types that can be auto-detected (through the file extension o
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
-| javas | Tries to list java processes running locally (javainception=true to include itself) |
+| javas | Tries to list java processes running locally (javasinception=true to include itself). Adds the hsperf file path when the process id matches ow.java.getLocalJavaPIDs() |
 | javagc | The Java GC log lines text format |
 | javathread | The Java Thread stack dump lines text format |
 | jfr | The Java Flight Recorder format |
@@ -321,6 +321,16 @@ List of options to use when _in=javathread_:
 > (*) This requires running openaf/oafp with a Java JDK. Keep in mind that it will interrupt the target application to dump the necessary data.
 
 > You can extract the input text data by executing ```kill -3 pid```
+
+---
+
+### 🧾 HSPERF input options
+
+List of options to use when _in=hsperf_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| hsperfmetadata | Boolean | With in=hsperf, returns {values, header, entries}, including header and per-counter metadata. Defaults to false; requires an updated OpenAF runtime. |
 
 ---
 
@@ -1118,3 +1128,7 @@ pipe:
 | help=readme | Returns this document |
 
 > You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands
+
+### HotSpot perfdata metadata
+
+Use `oafp file=/tmp/hsperfdata_user/123 in=hsperf hsperfmetadata=true out=json` to include metadata. This also works with `cmd=` input. Use `path=header` or `path=entries` to inspect metadata; use `path=values.java` for Java counters and enrichment in metadata mode. Without the option, existing paths such as `path=java` remain unchanged. Counter longs are exact decimal strings. Missing counter groups are omitted; timer calculations require the reported frequency. Nonzero header overflow means some counters were not stored by the JVM.

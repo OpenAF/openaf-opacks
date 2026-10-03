@@ -3513,44 +3513,55 @@ var _inputFns = new Map([
         if (isDef(params.file) || isDef(params.cmd)) {
             _showTmpMsg()
             ow.loadJava()
-            var data = isDef(params.cmd) ? ow.java.parseHSPerf(_runCmd2Bytes(params.cmd)) : ow.java.parseHSPerf(params.file)
-            // Enrich data
+            if (!isBoolean(params.hsperfmetadata)) params.hsperfmetadata = _$(toBoolean(params.hsperfmetadata), "hsperfmetadata").isBoolean().default(false)
+            var result = ow.java.parseHSPerf(isDef(params.cmd) ? _runCmd2Bytes(params.cmd) : params.file, false, { metadata: params.hsperfmetadata })
+            if (!isMap(result)) _exit(-1, "Invalid, inaccessible or unsupported hsperf data.")
+            if (params.hsperfmetadata && (!isMap(result.values) || !isMap(result.header) || !isMap(result.entries)))
+                _exit(-1, "hsperfmetadata requires an updated OpenAF runtime with parseHSPerf metadata support.")
+            var data = params.hsperfmetadata ? result.values : result
             data.__ts = new Date()
-
-            var r = { max: 0, total: 0, used: 0, free: 0 }
-            data.sun.gc.generation.forEach(gen => {
-                gen.space.forEach(space => {
-                    r.max   = (r.max < Number(space.maxCapacity)) ? Number(space.maxCapacity) : r.max
-                    r.used  = r.used + Number(space.used)
-                    r.total = isNumber(space.capacity) ? r.total + Number(space.capacity) : r.total
-                    data.sun.gc["__percUsed_" + space.name] = (100 * space.used) / space.capacity
+            var sun = data.sun || {}, gc = sun.gc, hrt = (sun.os || {}).hrt || {}
+            var valid = v => isDef(v) && isFinite(Number(v))
+            var seconds = valid(hrt.frequency) && Number(hrt.frequency) > 0 ? 1 / Number(hrt.frequency) : __
+            var r = { total: 0, used: 0 }, hasSpace = false
+            if (isMap(gc)) {
+                (gc.generation || []).forEach(gen => {
+                    (gen.space || []).forEach(space => {
+                        hasSpace = true
+                        if (valid(space.used)) r.used += Number(space.used)
+                        if (valid(space.capacity)) r.total += Number(space.capacity)
+                        if (valid(space.used) && valid(space.capacity) && Number(space.capacity) > 0)
+                            gc["__percUsed_" + space.name] = 100 * Number(space.used) / Number(space.capacity)
+                    })
                 })
-            })
-            data.sun.gc.__percUsed_meta = (100 * data.sun.gc.metaspace.used) / data.sun.gc.metaspace.capacity
-            data.sun.gc.__percUsed_ccs = (100 * data.sun.gc.compressedclassspace.used) / data.sun.gc.compressedclassspace.capacity
-
-            // Java 8
-            var _ygc = $from(data.sun.gc.collector).equals("name", "PSScavenge").at(0)
-            data.sun.gc.__ygc = isDef(_ygc) ? Number(_ygc.invocations) : 0
-            data.sun.gc.__ygct = isDef(_ygc) ? Number(_ygc.time / 1000000000) : 0
-            
-            var _fgc = $from(data.sun.gc.collector).equals("name", "PSParallelCompact").orEquals("name", "").at(0)
-            data.sun.gc.__fgc = isDef(_fgc) ? Number(_fgc.invocations) : 0
-            data.sun.gc.__fgct = isDef(_fgc) ? Number(_fgc.time / 1000000000) : 0
-
-            data.sun.gc.__gct = $from(data.sun.gc.collector).sum("time") / 1000000000
-
-            data.java.__mem = {
-            total    : r.total,
-            used     : r.used,
-            free     : r.total - r.used,
-            metaMax  : data.sun.gc.metaspace.maxCapacity,
-            metaTotal: data.sun.gc.metaspace.capacity,
-            metaUsed : data.sun.gc.metaspace.used,
-            metaFree : data.sun.gc.metaspace.capacity - data.sun.gc.metaspace.used
+                ;[["metaspace", "meta"], ["compressedclassspace", "ccs"]].forEach(pair => {
+                    var space = gc[pair[0]]
+                    if (isMap(space) && valid(space.used) && valid(space.capacity) && Number(space.capacity) > 0)
+                        gc["__percUsed_" + pair[1]] = 100 * Number(space.used) / Number(space.capacity)
+                })
+                var collectors = (gc.collector || []).filter(isMap)
+                var young = collectors.filter(c => c.name == "PSScavenge")[0]
+                var full = collectors.filter(c => c.name == "PSParallelCompact" || c.name == "")[0]
+                ;[[young, "ygc"], [full, "fgc"]].forEach(pair => {
+                    if (pair[0]) {
+                        if (valid(pair[0].invocations)) gc["__" + pair[1]] = Number(pair[0].invocations)
+                        if (isDef(seconds) && valid(pair[0].time)) gc["__" + pair[1] + "t"] = Number(pair[0].time) * seconds
+                    }
+                })
+                var times = collectors.filter(c => valid(c.time))
+                if (isDef(seconds) && times.length) gc.__gct = times.reduce((sum, c) => sum + Number(c.time) * seconds, 0)
             }
-
-            _$o( data, options )
+            var meta = (gc || {}).metaspace || {}
+            if (hasSpace || Object.keys(meta).length) {
+                if (!isMap(data.java)) data.java = {}
+                data.java.__mem = {
+                    total: hasSpace ? r.total : __, used: hasSpace ? r.used : __,
+                    free: hasSpace ? r.total - r.used : __,
+                    metaMax: meta.maxCapacity, metaTotal: meta.capacity, metaUsed: meta.used,
+                    metaFree: valid(meta.capacity) && valid(meta.used) ? Number(meta.capacity) - Number(meta.used) : __
+                }
+            }
+            _$o(result, options)
         } else {
             _exit(-1, "hsperf is only supported with either 'file' or 'cmd' defined.")
         }
@@ -3767,11 +3778,20 @@ var _inputFns = new Map([
         params.javasinception = toBoolean(params.javasinception)
         _showTmpMsg()
         plugin("JMX")
+	ow.loadJava()
         var jmx = new JMX()
         var _r = jmx.getLocals().Locals
         if (!params.javasinception) {
             _r = _r.filter(r => r.id != getPid())
         }
+        // Perfdata may be absent (for example, -XX:-UsePerfData or another user).
+        var paths = {}
+        try {
+            ow.java.getLocalJavaPIDs().forEach(r => { paths[String(r.pid)] = r.path })
+        } catch(e) { /* Keep the JMX process list when perfdata cannot be listed. */ }
+        _r.forEach(r => {
+            if (isDef(paths[String(r.id)])) r.path = paths[String(r.id)]
+        })
         _$o(_r, options)
     }],
     ["jmx", (_res, options) => {
