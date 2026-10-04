@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://repo.maven.apache.org/maven2",
+  "holds": {},
+  "opacks": {
+    "plugin-GIT": {
+      "build": [
+        "ojob",
+        "compile.yaml"
+      ],
+      "expected": [
+        "plugin-GIT.jar"
+      ],
+      "cleanClasses": true,
+      "stableArchives": [
+        ".odoc.db"
+      ]
+    },
+    "plugin-SVN": {
+      "build": [
+        "ojob",
+        "compile.yaml"
+      ],
+      "expected": [
+        "plugin-svn.jar"
+      ],
+      "cleanClasses": true,
+      "stableArchives": [
+        ".odoc.db"
+      ]
+    },
+    "plugin-SMB": {
+      "build": [
+        "ojob",
+        "compile.yaml"
+      ],
+      "expected": [
+        "plugin-smb.jar"
+      ],
+      "cleanClasses": true,
+      "stableArchives": [
+        ".odoc.db"
+      ]
+    },
+    "plugin-Ignite": {
+      "build": [
+        "ojob",
+        "compile.yaml"
+      ],
+      "expected": [
+        "plugin-ignite.jar"
+      ],
+      "cleanClasses": true,
+      "stableArchives": [
+        ".odoc.db"
+      ]
+    },
+    "plugin-XLS": {
+      "build": [
+        "ojob",
+        "compile.yaml"
+      ],
+      "expected": [
+        "plugin-xls.jar"
+      ],
+      "cleanClasses": true,
+      "stableArchives": [
+        ".odoc.db"
+      ]
+    },
+    "Redis": {
+      "tests": [
+        {
+          "command": [
+            "ojob",
+            "tests/tests.yaml"
+          ],
+          "external": true,
+          "prerequisites": "REDIS_TEST_HOST, Redis test server, and oJob-common; see Redis/README.md",
+          "requiredEnv": [
+            "REDIS_TEST_HOST"
+          ]
+        }
+      ]
+    },
+    "qr": {
+      "manifests": {
+        ".maven.yaml": {
+          "swapCoordinates": true,
+          "outputDir": "lib"
+        }
+      }
+    },
+    "Docker": {
+      "manifests": {
+        "lib/.maven.yaml": {
+          "additionalArtifacts": [
+            {
+              "group": "com.amihaiemil.web",
+              "id": "docker-java-api"
+            }
+          ]
+        }
+      }
+    },
+    "GoogleCompiler": {
+      "blockedReason": "GoogleCompiler ships separate Java baseline compiler.jar/compiler11.jar outputs. A reviewed adapter is required to preserve their runtime selection before automatic updates."
+    }
+  }
+}

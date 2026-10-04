@@ -137,7 +137,7 @@ These options will change the parsed input data included any filters provided.
 | field2str | String | A comma delimited list of fields whose value should be converted to a string representation |
 | field4map | Boolean | A comma delimited list of fields whose value should be converted from JSON/SLON string representation to a map |
 | flatmap | Boolean | If true a map structure will be flat to just one level (optionally flatmapsep=[char] to use a different separator that '.') |
-| getlist | Number | If true will try to find the first array on the input value (if number will stop only after the number of checks) |
+| getlist | Boolean/Number | If true, selects the first nested array; a positive number selects the nth nested array in traversal order. If disabled or no matching array is found, preserves the input, including scalar values. |
 | forcearray | Boolean | If true and if the input is a map it will force it to be an array with that map as the only element |
 | jsonschema | String | The JSON schema file to use for validation returning a map with a boolean valid and errors if exist |
 | jsonschemacmd | String | Alternative option to 'jsonschema' to retrieve the JSON schema data to use for validation returning a map with a boolean valid and errors if exist |
@@ -153,13 +153,13 @@ These options will change the parsed input data included any filters provided.
 | numformat | String | For all number values applies a java.util.Formatter format (e.g. %,d) |
 | oaf | String | An OpenAF scripting code or OpenAF scripting file to execute taking input as 'data' and returning the transformed data |
 | regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
-| removedups | Boolean | If true will try to remove duplicates from an array |
+| removedups | Boolean | Removes duplicate array entries, retaining the first occurrence. Map key order is ignored recursively; array order and the distinction between arrays and maps are preserved. |
 | removeempty | Boolean | If true will remove array/list entries that are either null or undefined |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
 | searchkeys | String | Will return a map with only keys that match the provided string |
 | searchvalues | String | Will return am map with only values that match the provided string |
-| set | String | Performs set operations (intersection by default) over an 'a' and 'b' path to an array defined in a JSON/SLON map |
-| sortmapkeys | Boolean | If true the resulting map keys will be sorted |
+| set | String | Performs set operations (intersection by default) over an 'a' and 'b' path to an array defined in a JSON/SLON map. Comparisons ignore map key order recursively while preserving array order and distinguishing arrays from maps. |
+| sortmapkeys | Boolean | Recursively sorts map keys, including maps inside arrays. Preserves arrays, their element order, and scalar values. |
 | spacekeys | String | Replaces spaces in keys with the provided string (for example, helpful for XML output) |
 | trim | Boolean | If true all the strings of the result map/list will be trimmed |
 | val2icon | String | If defined will transform undefined, null and boolean values to emoticons (values can be 'default' or 'simple') |
@@ -301,12 +301,20 @@ List of options to use when _in=dsv_:
 | indsvquote | String | The quote character to use (default is '"') |
 | indsvescape | String | The escape character to use for double-quotes |
 | indsvcomment | String | The comment character to use (default is '#') |
-| indsvheader | Boolean | If true will try to use the first line as header (default is true) |
-| indsvtrim | Boolean | If true will trim all values (default is true) |
-| indsvjoin | Boolean | If true it will return an array with each processed line |
-| indsvfields | String | Comma separated list of fields to use as header (overrides indsvheader) |
+| indsvheader | Boolean | Uses the first non-comment line as column names (default is true). When false, provide indsvfields. |
+| indsvtrim | Boolean | Trims header names and values (default is true). Set false to preserve leading and trailing whitespace. |
+| indsvjoin | Boolean | Returns one array of records when true; otherwise emits each record once (default is false). Applies to stdin, file, cmd and data input. |
+| indsvfields | String | Comma separated column names. When provided, every non-comment line is data, including the first; no input header is consumed. |
 
-> Support parallel=true if indsvjoin=false or not defined
+DSV input splits each physical line on `indsvsep` (or `indsvsepre`) before removing surrounding quotes. Embedded separators and multiline quoted fields are not supported; use `in=csv` for CSV records with quoted separators.
+
+For a headerless semicolon-separated file:
+
+```bash
+oafp in=dsv file=data.txt indsvsep=';' indsvfields=name,score indsvheader=false indsvjoin=true out=json
+```
+
+> Supports parallel=true if indsvjoin=false or not defined. Supply indsvfields for parallel processing so workers do not need to infer a shared header.
 
 ---
 
@@ -883,11 +891,17 @@ List of options to use when _out=dsv_:
 | Option | Type | Description |
 |--------|------|-------------|
 | dsvsep | String | The separator to use (default is ',') |
-| dsvquote | String | The quote character to use (default is '"') |
-| dsvfields | String | Comma separated list of fields to use as header (overrides dsvheader) |
+| dsvquote | String | Replacement for double quotes inside serialized object/array cells (default is a backslash followed by a double quote). String cells and headers always use double quotes, with embedded quotes doubled. |
+| dsvfields | String | Comma separated output columns in the requested order. Defaults to the first row's keys for the whole table. Missing values are empty; additional keys in later rows are omitted. Does not override dsvheader=false. |
 | dsvuseslon | Boolean | If true the output of value objects will be in SLON format (default is false) |
 | dsvheader | Boolean | If true will try to output the first line as header (default is true) |
 | dsvnl | String | Newline sequence to use (default is '\n') |
+
+`dsvsep` applies to both the header and data rows. Column order remains fixed even if later objects list their keys in a different order. Specify `dsvfields` to include columns that are absent from the first row.
+
+```bash
+oafp in=json file=records.json out=dsv dsvsep=';' dsvfields=name,score
+```
 
 ---
 

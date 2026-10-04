@@ -873,6 +873,9 @@ var _inputLineFns = {
         if (isUnDef(params.indsvtrim)) params.indsvtrim = true
         if (isUnDef(params.indsvjoin)) params.indsvjoin = false
         if (isUnDef(params.indsvfields)) params.indsvfields = __
+        params.indsvheader = toBoolean(params.indsvheader)
+        params.indsvtrim = toBoolean(params.indsvtrim)
+        params.indsvjoin = toBoolean(params.indsvjoin)
 
         if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
         if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
@@ -891,9 +894,9 @@ var _inputLineFns = {
             if (toBoolean(params.indsvheader)) {
                 if (isUnDef(params.indsvfields)) {
                     if (isUnDef(params.indsvsepre)) {
-                        params.indsvfields = rs.trim().split(params.indsvsep)
+                        params.indsvfields = rs.split(params.indsvsep)
                     } else {
-                        params.indsvfields = rs.trim().split(new RegExp(params.indsvsepre))
+                        params.indsvfields = rs.split(new RegExp(params.indsvsepre))
                     }
                     params.indsvfields = params.indsvfields.map(f => {
                         if (params.indsvtrim) f = f.trim()
@@ -939,11 +942,11 @@ var _inputLineFns = {
         }
 
         if (!params.indsvjoin) {
+            noFurtherOutput = true
             r = String(r)
-            if (r.length > 0 && r.trim().substring(0, 1) != params.indsvcomment) {
+            if (r.length > 0 && !r.trim().startsWith(params.indsvcomment)) {
                 var _rs = _dsvproc(r)
                 if (isDef(_rs)) _$o(_rs, options, true)
-                return true
             }
         } else {
             return true
@@ -968,6 +971,19 @@ if (typeof _resolveLLMEnvName === "undefined") {
         }
         return _env
     }
+}
+
+// Canonicalize map keys without changing array shape or element order.
+var _sortTransformKeys = value => {
+    if (isArray(value)) return value.map(_sortTransformKeys)
+    if (!isMap(value) || isDate(value)) return value
+    var result = {}
+    Object.keys(value).sort().forEach(key => {
+        Object.defineProperty(result, key, {
+            value: _sortTransformKeys(value[key]), enumerable: true, writable: true, configurable: true
+        })
+    })
+    return result
 }
 
 var _transformFns = {
@@ -1125,36 +1141,7 @@ var _transformFns = {
         return { valid: res, errors: validate.errors}
     },
     "sortmapkeys"   : _r => {
-        if (toBoolean(params.sortmapkeys) && isObject(_r)) {
-            let _sortMapKeys = (aMap, moreLevels) => {
-                let keys = Object.keys(aMap).sort()
-                let result = {}
-            
-                for(let i = 0; i < keys.length; i++) {
-                    let key = keys[i]
-                    let value = aMap[key]
-            
-                    if (Array.isArray(value)) {
-                        result[key] = value.map(item => {
-                            if (typeof item === 'object' && item !== null && item !== undefined) {
-                                return sortMapKeys(item, moreLevels)
-                            } else {
-                                return item
-                            }
-                        })
-                    } else if (moreLevels && typeof value === 'object' && value !== null && value !== undefined) {
-                        result[key] = _sortMapKeys(value, moreLevels)
-                    } else {
-                        result[key] = value
-                    }
-                }
-            
-                return result
-            }
-            return _sortMapKeys(_r, true)
-        } else {
-            return _r
-        }
+        return toBoolean(params.sortmapkeys) ? _sortTransformKeys(_r) : _r
     },
     "searchkeys"    : _r => (isObject(_r) ? searchKeys(_r, params.searchkeys) : _r),
     "searchvalues"  : _r => (isObject(_r) ? searchValues(_r, params.searchvalues) : _r),
@@ -1229,7 +1216,7 @@ var _transformFns = {
                 var _r2 = []
                 _r.forEach(r => {
                     var rs = r
-                    if (isObject(r)) rs = sortMapKeys(rs)
+                    if (isObject(r)) rs = _sortTransformKeys(rs)
                     rs = stringify(rs, __, true)
                     if (!_dups.has(rs)) {
                         _dups.add(rs)
@@ -1387,6 +1374,7 @@ var _transformFns = {
             else
                 return _r
         }
+        return _r
     },
     "set": _r => {
         var _d = _fromJSSLON(params.set)
@@ -1404,10 +1392,10 @@ var _transformFns = {
         if (isString(params.setkeys)) {
             ow.loadObj()
             var _ks = params.setkeys.split(",").map(r => r.trim())
-            toOrdStr  = r => stringify(isObject(r) ? sortMapKeys(ow.obj.filterKeys(_ks, r), true) : r, __, "")
+            toOrdStr  = r => stringify(isObject(r) ? _sortTransformKeys(ow.obj.filterKeys(_ks, r)) : r, __, "")
             toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
         } else {
-            toOrdStr  = r => stringify(isObject(r) ? sortMapKeys(r, true) : r, __, "")
+            toOrdStr  = r => stringify(isObject(r) ? _sortTransformKeys(r) : r, __, "")
             toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
         }
 
@@ -2340,42 +2328,24 @@ var _outputFns = new Map([
         if (isUnDef(params.dsvnl))      params.dsvnl = "\n"
         if (isUnDef(params.dsvheader))  params.dsvheader = true
 
-        if (isDef(params.dsvfields)) params.dsvfields = String(params.dsvfields).split(",")
+        if (isString(params.dsvfields)) params.dsvfields = params.dsvfields.split(",").map(f => f.trim())
+        params.dsvuseslon = toBoolean(params.dsvuseslon)
 
         if (isMap(r)) {
             r = [ r ]
         }
         if (isArray(r)) {
             var _out = []
-            if (toBoolean(params.dsvheader) && isArray(r) && r.length > 0) {
-                if (isDef(params.dsvfields) && isArray(params.dsvfields)) {
-                    _out.push(params.dsvfields.map(f => {
-                        if (isString(f)) {
-                            f = f.replace(/"/g, '""')
-                            f = `"${f}"`
-                        } else if (isNull(f)) {
-                            f = ""
-                        }
-                        return f
-                    }))
-                } else {
-                    _out.push(Object.keys(r[0]).map(f => {
-                        if (isString(f)) {
-                            f = f.replace(/"/g, '""')
-                            f = `"${f}"`
-                        } else if (isNull(f)) {
-                            f = ""
-                        }
-                        return f
-                    }))
-                }
+            // Use one schema for the entire table, regardless of each row's key order.
+            var _fields = isArray(params.dsvfields) ? params.dsvfields : (r.length > 0 ? Object.keys(r[0]) : [])
+            if (toBoolean(params.dsvheader) && r.length > 0) {
+                _out.push(_fields.map(f => '"' + String(f).replace(/"/g, '""') + '"').join(params.dsvsep))
                 if (params.dsvnl.length > 0) _out.push(params.dsvnl)
             }
-            if (!isArray(params.dsvfields)) params.dsvfields = __
 
             r.forEach((row, i) => {
                 if (i > 0) _out.push(params.dsvnl)
-                var _row = pForEach(isDef(params.dsvfields) ? params.dsvfields : Object.keys(row), k => {
+                var _row = pForEach(_fields, k => {
                     var v = row[k]
                     if (isString(v)) {
                         v = v.replace(/"/g, '""')
@@ -2703,6 +2673,9 @@ var _inputFns = new Map([
         if (isUnDef(params.indsvtrim)) params.indsvtrim = true
         if (isUnDef(params.indsvjoin)) params.indsvjoin = false
         if (isUnDef(params.indsvfields)) params.indsvfields = __
+        params.indsvheader = toBoolean(params.indsvheader)
+        params.indsvtrim = toBoolean(params.indsvtrim)
+        params.indsvjoin = toBoolean(params.indsvjoin)
 
         if (isString(params.indsvfields)) params.indsvfields = params.indsvfields.trim().split(",").map(f => f.trim())
         if (isDef(params.indsvfields) && !isArray(params.indsvfields)) params.indsvfields = __
@@ -2720,9 +2693,9 @@ var _inputFns = new Map([
             if (toBoolean(params.indsvheader)) {
                 if (isUnDef(params.indsvfields)) {
                     if (isUnDef(params.indsvsepre)) {
-                        params.indsvfields = r.trim().split(params.indsvsep)
+                        params.indsvfields = r.split(params.indsvsep)
                     } else {
-                        params.indsvfields = r.trim().split(new RegExp(params.indsvsepre))
+                        params.indsvfields = r.split(new RegExp(params.indsvsepre))
                     }
                     params.indsvfields = params.indsvfields.map(f => {
                         if (params.indsvtrim) f = f.trim()
