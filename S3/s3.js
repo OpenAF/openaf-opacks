@@ -717,6 +717,11 @@ S3.prototype.copyObject = function(aSourceBucket, aObjectName, aTargetBucket, aD
  * </odoc>
  */
 S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
+    return this._compare(aBucket, aPrefix, aLocalPath);
+};
+
+// aSource selects the authoritative side for one-way mirror plans.
+S3.prototype._compare = function(aBucket, aPrefix, aLocalPath, aSource) {
     _$(aBucket).isString().$_("Please provide a bucket name.");
     aPrefix = _$(aPrefix).isString().default("");
     _$(aLocalPath).isString().$_("Please provide a local path.");
@@ -737,8 +742,8 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
         var sfname = aPrefix + sf.substring(realLocalPath.length, sf.length);
         if (isDef(rlst[sfname])) {
             if (slst[sf].size != rlst[sfname].size || slst[sf].lastModified != rlst[sfname].lastModified) {
-                if (slst[sf].lastModified != rlst[sfname].lastModified) {
-                    if (slst[sf].lastModified > rlst[sfname].lastModified) {
+                if (isDef(aSource) || slst[sf].lastModified != rlst[sfname].lastModified) {
+                    if (aSource == "local" || (aSource != "remote" && slst[sf].lastModified > rlst[sfname].lastModified)) {
                         actions.push({
                             cmd: "put",
                             status: "replace",
@@ -775,8 +780,8 @@ S3.prototype.compare = function(aBucket, aPrefix, aLocalPath) {
         var rsname = realLocalPath + rf.substring(aPrefix.length, rf.length);
         if (isDef(slst[rsname])) {
             if (rlst[rf].size != slst[rsname].size || rlst[rf].lastModified != slst[rsname].lastModified) {
-                if (rlst[rf].lastModified != slst[rsname].lastModified) {
-                    if (slst[rsname].lastModified > rlst[rf].lastModified) {
+                if (isDef(aSource) || rlst[rf].lastModified != slst[rsname].lastModified) {
+                    if (aSource == "local" || (aSource != "remote" && slst[rsname].lastModified > rlst[rf].lastModified)) {
                         actions.push({
                             cmd: "put",
                             status: "replace",
@@ -861,7 +866,7 @@ S3.prototype.renameFolderActions = function(aBucket, aPrefix, aTargetBucket, aTa
             cmd: "copy",
             source: v.filename,
             sourceBucket: aBucket,
-            target: v.filename.replace(new RegExp("^" + aPrefix), aTargetPrefix),
+            target: aTargetPrefix + v.filename.substring(aPrefix.length),
             targetBucket: aTargetBucket
         });
         delActions.push({
@@ -881,26 +886,10 @@ S3.prototype.renameFolderActions = function(aBucket, aPrefix, aTargetBucket, aTa
  * </odoc>
  */
 S3.prototype.squashLocalActions = function(aBucket, aPrefix, aLocalPath) {
-    var actions = this.compare(aBucket, aPrefix, aLocalPath);
-    $from(actions)
-    .equals("cmd", "put")
-    .equals("status", "new")
-    .select((r) => { r.cmd = "delLocal"; });
-
-    $from(actions)
-    .equals("cmd", "put")
-    .equals("status", "replace")
-    .select((r) => { r.cmd = "void"; });
-
-    var ractions = [];
-    for(var ii in actions) { 
-        if (actions[ii].cmd != "void") {
-            ractions.push(actions[ii]);
-            delete actions[ii];
-        } 
-    }
-
-    return ractions;
+    return this._compare(aBucket, aPrefix, aLocalPath, "remote").map(function(action) {
+        if (action.cmd == "put" && action.status == "new") action.cmd = "delLocal";
+        return action;
+    });
 };
 
 /**
@@ -912,26 +901,10 @@ S3.prototype.squashLocalActions = function(aBucket, aPrefix, aLocalPath) {
  */
 
 S3.prototype.squashRemoteActions = function(aBucket, aPrefix, aLocalPath) {
-    var actions = this.compare(aBucket, aPrefix, aLocalPath);
-    $from(actions)
-    .equals("cmd", "get")
-    .equals("status", "new")
-    .select((r) => { r.cmd = "delRemote"; });
-
-    $from(actions)
-    .equals("cmd", "get")
-    .equals("status", "replace")
-    .select((r) => { r.cmd = "void"; });
-
-    var ractions = [];
-    for(var ii in actions) { 
-        if (actions[ii].cmd != "void") {
-            ractions.push(actions[ii]);
-            delete actions[ii];
-        } 
-    }
-
-    return ractions;
+    return this._compare(aBucket, aPrefix, aLocalPath, "local").map(function(action) {
+        if (action.cmd == "get" && action.status == "new") action.cmd = "delRemote";
+        return action;
+    });
 };
 
 /**
@@ -952,12 +925,14 @@ S3.prototype.syncActions = function(aBucket, aPrefix, aLocalPath) {
 
 /**
  * <odoc>
- * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads, ignoreActions)</key>
+ * <key>S3.execActions(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads, ignoreActions) : Boolean</key>
  * Given anArrayOfActions produce by other S3.*Actions functions will execute them in parallel recording changes with,
  * optionally, the provided aLogFunction and aLogErrorFunction (that receive a text message). To execute actions with a 
  * given order (for example: first copy then delete) each element of anArrayOfActions should be an array of actions (e.g.
  * an array of copy actions on the first element and an array of delete actions on the second element). Optionally you 
- * can provide the number of threads.
+ * can provide the number of threads. Returns true only when every action completes successfully.
+ * Failed, ignored or unknown actions return false and prevent subsequent ordered groups from running.
+ * Actions already running within a parallel group are not rolled back.
  * </odoc>
  */
 S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFunction, numThreads, ignoreActions) {
@@ -970,16 +945,17 @@ S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFun
 
     if (isArray(anArrayOfActions[0])) {
         for(var ii in anArrayOfActions) {
-            this.execActions(anArrayOfActions[ii], aLogFunction, aLogErrorFunction, numThreads, ignoreActions)
+            if (!this.execActions(anArrayOfActions[ii], aLogFunction, aLogErrorFunction, numThreads, ignoreActions)) return false;
         }
-        return
+        return true;
     }
 
-    parallel4Array(anArrayOfActions, function(action) {
+    if (!anArrayOfActions.length) return true;
+    var results = parallel4Array(anArrayOfActions, function(action) {
         try {
             if (ignoreActions.indexOf(action.cmd) >= 0) {
                 aLogFunction("Ignoring action: " + af.toSLON(action))
-                return true
+                return false
             }
 
             switch(action.cmd) {
@@ -1001,12 +977,15 @@ S3.prototype.execActions = function(anArrayOfActions, aLogFunction, aLogErrorFun
                 break;
             case 'delLocal':
                 aLogFunction("Local delete '" + action.source + "'");
-                io.rm(action.source);
+                if (!io.rm(action.source)) throw new Error("Unable to delete local file: " + action.source);
                 break;
+            default:
+                throw new Error("Unknown S3 action: " + action.cmd);
             }
             return true;
         } catch(e) { aLogErrorFunction(e); return false; }
     }, numThreads);
+    return results.length == anArrayOfActions.length && results.every(function(result) { return result === true; });
 };
 
 /**

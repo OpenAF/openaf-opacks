@@ -197,12 +197,88 @@ print("Use this command on the next 4 hours to upload new data: curl -XPOST " + 
 
 ### Syncing local folders with remote buckets
 
-_to be documented_
+The planning methods return actions without uploading, downloading or deleting
+anything. Review the plan before passing it to `execActions`.
+
+| Method | Behavior |
+|---|---|
+| `compare(bucket, prefix, localPath)` / `syncActions(...)` | Plan transfers in both directions. For files present on both sides, the newer modification time wins. Files present on only one side are copied to the other. |
+| `squashLocalActions(bucket, prefix, localPath)` | Make the local folder match the remote prefix: download changed or missing files and delete local-only files. The remote side is authoritative even if the local copy is newer. |
+| `squashRemoteActions(bucket, prefix, localPath)` | Make the remote prefix match the local folder: upload changed or missing files and delete remote-only objects. The local side is authoritative even if the remote copy is newer. |
+
+Comparison uses file size and modification time, not content hashes. Equal sizes
+and timestamps are treated as equal. If timestamps match but sizes differ,
+bidirectional sync reports a conflict and leaves that file unchanged; one-way
+sync uses the authoritative side. Transfers can change modification times, so a
+subsequent plan may propose another transfer even when content is unchanged.
+The local folder must exist. Plans do not lock either side or provide a snapshot.
+
+```javascript
+loadLib("s3.js")
+var s3 = new S3(endpoint, accessKey, secret, region)
+try {
+  // Recursive comparison under backups/, with /data/export as the source.
+  var actions = s3.squashRemoteActions("my-bucket", "backups", "/data/export")
+  print(actions) // Review, especially delRemote actions.
+  // Execute only after reviewing the plan:
+  // if (!s3.execActions(actions)) throw new Error("Incomplete S3 sync")
+} finally {
+  s3.close()
+}
+```
+
+Nonempty prefixes are normalized to end with `/`; an empty prefix selects the
+whole bucket. One-way sync deletes entries missing from its authoritative side.
+Within a flat action list, work can run in parallel. Ordered groups such as
+`[copyActions, deleteActions]` run one group at a time; a failed or ignored action
+prevents subsequent groups. Already completed changes are not rolled back.
+
+### Folder move and deletion plans
+
+`renameFolderActions(sourceBucket, sourcePrefix, targetBucket, targetPrefix)`
+returns `[copyActions, deleteActions]`. Keep these groups intact when calling
+`execActions` so deletion follows successful copying. Prefixes are literal strings.
+Use distinct, non-overlapping prefixes for moves within the same bucket; the
+planner does not detect collisions or protect existing destination objects.
+
+`deleteFolderActions(bucket, prefix, recursive)` returns deletion actions. Set
+`recursive` to `true` to include nested objects; omission keeps nonrecursive
+listing behavior. Review the returned keys before execution.
+
+### oJob sync and copy jobs
+
+Include `s3.yaml` to use `S3 Sync folder` and `S3 Copy object`. For example, save
+this job beside the installed library or resolve `s3.yaml` through your oJob path:
+
+```yaml
+include:
+- s3.yaml
+todo:
+- name: S3 Sync folder
+  args:
+    url: https://s3.example.com
+    bucket: my-bucket
+    prefix: backups
+    localPath: /data/export
+    squash: remote
+    execute: false
+```
+
+Supply `accessKey`, `secret` and `region` through your normal runtime configuration.
+`execute` defaults to `false`, returning the plan in `args.actions`. Omit `squash`
+for bidirectional sync, use `remote` to overwrite/delete remote entries, or
+`local` to overwrite/delete local entries. Set `execute: true` to apply the plan.
+`numThreads` controls parallelism; `ignore` is an array of action commands to skip
+(`get`, `put`, `copy`, `delLocal`, `delRemote`). Skipped or failed execution is
+reported as a job error, and the client closes on both success and failure.
+
+`S3 Copy object` takes `sourceBucket`, `sourceObject`, `targetBucket` and
+`targetObject`, plus the same endpoint/credential options. It does not require a
+separate `bucket` argument. Optional `meta` and `copyOptions` are forwarded to
+`copyObject`.
 
 ## ToDo
 
-* oJob library
-* Automated tests
 * More examples and documentation on this file
 
 ## Tested on
@@ -219,6 +295,24 @@ Run the service-independent regression checks from this directory:
 
 ```sh
 oaf -f tests/regression.js
+oaf -f tests/legacy.js
 ```
 
 These checks use local fixtures and test doubles; they do not verify a live external service.
+
+## Corrections (2026-10-04)
+
+`renameFolderActions` treats source and destination prefixes literally, including
+regular-expression characters and dollar signs.
+
+`execActions` returns `true` only if all actions complete successfully. A failed,
+ignored or unknown action returns `false`; no subsequent ordered action group is
+started. In particular, a failed or ignored copy phase prevents the delete phase
+of a folder move. Actions within a group can still run in parallel, and completed
+changes are not rolled back. Check the result and logged errors before retrying.
+
+The 20261004 package also corrects longstanding one-way sync planning: changed
+files now follow the chosen source even when its timestamp is older, including
+equal-timestamp size conflicts. The normal sync oJob passes all three planning
+arguments correctly, and the copy oJob accepts its documented bucket arguments.
+The local tests exercise these planners and job bodies without contacting S3.

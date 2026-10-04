@@ -491,7 +491,6 @@ jobs:
     check:
       in:
         url         : isString
-        bucket      : isString
         accessKey   : isString.default(__)
         secret      : isString.default(__)
         region      : isString.default(__)
@@ -504,8 +503,11 @@ jobs:
     exec : |
       loadLib("s3.js");
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region);
-      s3.copyObject(args.sourceBucket, args.sourceObject, args.targetBucket, args.targetObject, args.meta, args.copyOptions);
-      s3.close()
+      try {
+        s3.copyObject(args.sourceBucket, args.sourceObject, args.targetBucket, args.targetObject, args.meta, args.copyOptions);
+      } finally {
+        s3.close()
+      }
 
   # ---------------------
   - name : S3 Sync folder
@@ -530,13 +532,13 @@ jobs:
         desc    : The local path
         required: true
       - name    : squash
-        desc    : If defined and squash=remote it will take the local state and overwrite/delete on the S3 bucket. If squash=lost it will take the remote state and overwrite/delete on the local path.
+        desc    : If defined and squash=remote it will take the local state and overwrite/delete on the S3 bucket. If squash=local it will take the remote state and overwrite/delete on the local path.
       - name    : execute
         desc    : If execute=true the actions will be executed
       - name    : numThreads
         desc    : If defined it will force the number of threads to use if execute=true
       - name    : ignore
-        desc    : An array of actions to ignore
+        desc    : An array of action commands to skip. Skipped or failed actions make execution incomplete and raise a job error.
       returns:
       - name: actions
         desc: List of sync actions
@@ -554,6 +556,7 @@ jobs:
           localPath   : localPath
           execute     : execute
           numThreads  : numThreads
+          ignore      : ignore
     check:
       in:
         url         : isString
@@ -571,19 +574,21 @@ jobs:
       loadLib("s3.js")
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
 
-      switch(args.squash.toLowerCase()) {
-      case "remote":
-        args.actions = s3.squashRemoteActions(args.bucket, args.prefix, args.localPath)
-        break
-      case "local" :
-        args.actions = s3.squashLocalActions(args.bucket, args.prefix, args.localPath)
-        break
-      default      :
-        args.actions = s3.syncActions(args.bucket, args.prefix. args.localPath)
-      }
+      try {
+        switch(args.squash.toLowerCase()) {
+        case "remote":
+          args.actions = s3.squashRemoteActions(args.bucket, args.prefix, args.localPath)
+          break
+        case "local" :
+          args.actions = s3.squashLocalActions(args.bucket, args.prefix, args.localPath)
+          break
+        default      :
+          args.actions = s3.syncActions(args.bucket, args.prefix, args.localPath)
+        }
 
-      if (args.execute) {
-        s3.execActions(args.actions, __, __, args.numThreads, args.ignore)
+        if (args.execute && !s3.execActions(args.actions, __, __, args.numThreads, args.ignore)) {
+          throw new Error("S3 sync actions did not all complete; inspect the action log")
+        }
+      } finally {
+        s3.close()
       }
-      
-      s3.close()
