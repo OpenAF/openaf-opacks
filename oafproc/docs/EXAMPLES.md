@@ -247,3 +247,168 @@ find /some/data -name "*.json" | xargs -I '{}' /bin/sh -c 'oafp file={} output=x
 ## JSON Schema validation
 
 See [JSON Schema](JSON-SCHEMA.md) for validation examples, Ajv options, draft selection, v8 error fields and sample generation.
+
+## Stateless LLM decisions: Gemini and Ollama
+
+Generate the request files below automatically, then edit state and questions:
+
+```sh
+oafp in=llmdecide llmdecidesample=gemini out=yaml > gemini-request.yaml
+oafp in=llmdecide llmdecidesample=ollama out=yaml > ollama-request.yaml
+```
+
+Sample output also supports `out=json` and requires no inference,
+input stream or credentials. Replace the explicit model/key placeholders below with your configuration.
+Both providers use the same named question syntax; each command evaluates the
+whole state once. Alternatively set `OAFP_MODEL` (or `OAF_DECIDE_MODEL`, then `OAF_MODEL` as fallback),
+use `llmenv=YOUR_CONFIG_ENV`, or use the existing sBucket fields in `llmoptions`
+(`secRepo`, `secBucket`, `secPass`, `secMainPass`, `secFile`) and their
+`OAFP_SEC*` environment counterparts. See `oafp help=usage` for secret setup.
+
+### Gemini structured decisions
+
+Save this complete request as `gemini-request.yaml`:
+
+```yaml
+state:
+  ticket: The customer was charged twice.
+questions:
+  route:
+    type: choice
+    instructions: Select the responsible team.
+    criteria:
+      billing: Charges, payments, and refunds
+      technical: Software errors and outages
+  urgent:
+    type: boolean
+    instructions: Does this require immediate attention?
+  priority:
+    type: score
+    instructions: Assess the urgency.
+    criteria:
+      - Routine
+      - Soon
+      - Urgent
+options:
+  strategy: structured
+```
+
+```sh
+export OAFP_MODEL="(type: gemini, model: YOUR_GEMINI_MODEL, key: YOUR_GEMINI_API_KEY)"
+oafp in=llmdecide file=gemini-request.yaml out=json
+oafp in=llmdecide file=gemini-request.yaml llmdecidestats=true out=json
+# Alternatively supply the configuration directly:
+oafp in=llmdecide file=gemini-request.yaml out=json llmoptions="(type: gemini, model: YOUR_GEMINI_MODEL, key: YOUR_GEMINI_API_KEY)"
+```
+
+Gemini uses schema-constrained structured output. Probability fields are null;
+`requireProbabilities: true` is unsupported. Optional request settings (replace
+the `options` block above) include explicit selection of the legacy schema:
+
+```yaml
+options:
+  strategy: structured
+  providerOptions:
+    schemaProfile: legacy-schema
+    temperature: 0
+    maxOutputTokens: 1024
+```
+
+The default `schemaProfile` is `response-format`; `legacy-schema` explicitly
+selects the older Schema format. Profiles do not mix or retry. Temperature is
+0–2; maxOutputTokens is a positive integer.
+
+### Ollama native decisions
+
+Save this complete request as `ollama-request.yaml`:
+
+```yaml
+state:
+  ticket: The customer was charged twice.
+questions:
+  route:
+    type: choice
+    instructions: Select the responsible team.
+    criteria:
+      billing: Charges, payments, and refunds
+      technical: Software errors and outages
+  urgent:
+    type: boolean
+    instructions: Does this require immediate attention?
+  priority:
+    type: score
+    instructions: Assess the urgency.
+    criteria:
+      - Routine
+      - Soon
+      - Urgent
+options:
+  strategy: native
+  requireProbabilities: true
+  providerOptions:
+    keepAlive: 0
+```
+
+```sh
+export OAFP_MODEL="(type: ollama, url: 'http://localhost:11434', model: YOUR_DECISION_MODEL)"
+oafp in=llmdecide file=ollama-request.yaml out=json
+oafp in=llmdecide file=ollama-request.yaml path=answers.route.value out=raw
+# Alternatively supply the configuration directly:
+oafp in=llmdecide file=ollama-request.yaml out=json llmoptions="(type: ollama, url: 'http://localhost:11434', model: YOUR_DECISION_MODEL)"
+```
+
+Native decisions require Ollama v0.35.0+ and compatible scoring-capable GGUF
+weights/runner; an arbitrary chat model is insufficient. Choice and score
+questions support 2–26 criteria. The text-only serialized UTF-8 request body must
+be at most 65,536 bytes; state is never truncated. Root URLs and URLs ending in
+`/v1` are supported; a base ending in `/api` is rejected. Models must already be
+available; decisions do not download or warm them up. `keepAlive` is optional
+and accepts a duration string or finite seconds, including zero.
+
+Score levels are zero-based (`Routine` = 0, `Soon` = 1, `Urgent` = 2).
+`selectedProbability` measures the selected alternative's probability;
+`providerConfidence` measures distribution concentration independently;
+`expectedScore` is the expectation and may differ from the selected level.
+Provider errors and invalid answers remain visible without strategy/model
+fallback. These examples describe the API contract, not verified live inference.
+
+### Ollama image decisions
+
+Use Ollama v0.35.1+ with CLEF/CLEF Flash vision weights and an updated OpenAF
+runtime. Every question receives the same ordered images; state is required.
+For one local PNG, JPEG or WebP file:
+
+```json
+{
+  "state": "Inspect the screenshot for a visible error message.",
+  "questions": {
+    "error": { "type": "boolean", "instructions": "Is an error message visible?" }
+  },
+  "options": { "strategy": "native" }
+}
+```
+
+Save this as `image-request.json`, then run:
+
+```sh
+oafp in=llmdecide file=image-request.json llmimage=screenshot.png out=json llmoptions="(type: ollama, url: 'http://localhost:11434', model: YOUR_VISION_DECISION_MODEL)"
+```
+
+For multiple images, place raw base64 strings in `options.images` in your request
+JSON/SLON/YAML. For example, generate a request with OpenAF:
+
+```javascript
+var request = {
+  state: "Compare the screenshots in order.",
+  questions: { changed: { type: "boolean", instructions: "Did the visible error disappear in the second screenshot?" } },
+  options: { strategy: "native", images: ["before.png", "after.png"].map(file =>
+    af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(file)))) }
+}
+io.writeFileString("image-request.json", stringify(request))
+```
+
+Run that request without `llmimage`; combining the shortcut with `options.images`
+is rejected. `llmdecidestats=true` supports both forms. URLs and data URLs are
+unsupported. OpenAF rejects image options on other providers, while Ollama
+validates image contents and vision support. Image requests may be up to 32 MiB
+including base64 and JSON; images are never truncated.

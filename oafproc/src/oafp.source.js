@@ -3733,6 +3733,59 @@ var _inputFns = new Map([
         }
         _$o(_r, options)
     }],
+    ["llmdecide", (_res, options) => {
+        ["llmconversation", "llmcontext", "llmprompt"].forEach(key => {
+            if (isDef(params[key])) _exit(-1, "in=llmdecide does not support " + key)
+        })
+        if (isDef(params.llmdecidesample)) {
+            if (["gemini", "ollama"].indexOf(params.llmdecidesample) < 0)
+                _exit(-1, "llmdecidesample must be gemini or ollama")
+            var sample = {
+                state: { ticket: "The customer was charged twice." },
+                questions: {
+                    route: { type: "choice", instructions: "Select the responsible team.", criteria: {
+                        billing: "Charges, payments, and refunds", technical: "Software errors and outages"
+                    } },
+                    urgent: { type: "boolean", instructions: "Does this require immediate attention?" },
+                    priority: { type: "score", instructions: "Assess the urgency.", criteria: ["Routine", "Soon", "Urgent"] }
+                },
+                options: params.llmdecidesample == "gemini" ? { strategy: "structured" } : {
+                    strategy: "native", requireProbabilities: true, providerOptions: { keepAlive: 0 }
+                }
+            }
+            _$o(sample, options)
+            return
+        }
+        var request = _fromJSSLON(_res, true)
+        if (!isMap(request) || isUnDef(request.state) || !isMap(request.questions) ||
+            !(isString(request.state) || isMap(request.state) || isArray(request.state)) ||
+            (isDef(request.options) && !isMap(request.options)) ||
+            Object.keys(request).some(key => ["state", "questions", "options"].indexOf(key) < 0)) {
+            _exit(-1, "in=llmdecide requires {state, questions, options?} with text/map/array state, a questions map and optional options map")
+        }
+        if (isDef(params.llmimage)) {
+            if (!isString(params.llmimage) || !io.fileExists(params.llmimage) || !io.fileInfo(params.llmimage).isFile)
+                _exit(-1, "in=llmdecide llmimage requires a local image file")
+            if (isDef(request.options) && Object.prototype.hasOwnProperty.call(request.options, "images"))
+                _exit(-1, "in=llmdecide cannot combine llmimage with options.images")
+            if (isUnDef(request.options)) request.options = {}
+            request.options.images = [af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))]
+        }
+        params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_DECIDE_MODEL")))
+            params.llmenv = "OAF_DECIDE_MODEL"
+        params.llmenv     = _resolveLLMEnvName(params.llmenv)
+        params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
+        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv)))
+            _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
+
+        _showTmpMsg()
+        var client = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )
+        var method = toBoolean(params.llmdecidestats) ? "decideWithStats" : "decide"
+        if (typeof client[method] !== "function")
+            _exit(-1, "in=llmdecide requires an updated OpenAF runtime with $llm()." + method + "() support")
+        _$o(client[method](request.state, request.questions, request.options), options)
+    }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
         params.llmenv     = _resolveLLMEnvName(params.llmenv)
@@ -4125,6 +4178,9 @@ if (typeof params.outfile !== "undefined") {
         global.__oafp_streams[params.outfile] = { s: io.writeFileStream(params.outfile, toBoolean(params.outfileappend)) }
 }
 
+// Decision samples do not consume input or require provider configuration.
+if (params.type == "llmdecide" && isDef(params.llmdecidesample)) params.data = ""
+
 // Check chs
 if (isString(params.chs) || isMap(params.chs)) {
     var _chs = af.fromJSSLON(params.chs)
@@ -4143,6 +4199,10 @@ if (isString(params.chs) || isMap(params.chs)) {
 }
 
 var _run = () => {
+    if (params.type == "llmdecide" && isDef(params.llmdecidesample)) {
+        _inputFns.get("llmdecide")("", options)
+        return
+    }
     if (_version) {
         _res = showVersion()
     } else {

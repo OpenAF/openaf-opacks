@@ -89,6 +89,7 @@ List of data input types that can be auto-detected (through the file extension o
 | jwt | Decodes and/or verifies a JSON Web Token (JWT) |
 | lines | A given string/text to be processed line by line |
 | llm | A large language model input (uses 'llmenv' or 'llmoptions') |
+| llmdecide | Stateless decisions over a whole state and named questions using OpenAF $llm().decide() |
 | llmmodels | Lists the large language models available (using 'llmenv' or 'llmoptions') |
 | ls | Returns a list of files and folders for a given directory path or zip or tar or tgz file |
 | md | A Markdown format |
@@ -333,6 +334,8 @@ List of options to use when _in=hsperf_:
 |--------|------|-------------|
 | hsperfmetadata | Boolean | With in=hsperf, returns {values, header, entries}, including header and per-counter metadata. Defaults to false; requires an updated OpenAF runtime. |
 
+Use _file=_ or _cmd=_ with _hsperfmetadata=true_. Select _path=header_ or _path=entries_ for metadata and _path=values.java_ for Java counters; without metadata, use _path=java_. Counter longs are exact decimal strings. Missing counter groups are omitted, timers require the reported frequency, and nonzero header overflow indicates counters the JVM could not store.
+
 ---
 
 ### 🧾 JFR input options
@@ -407,6 +410,62 @@ List of options to use when _in=lines_:
 | linesvisualheadsep | Boolean | If true will try to process the second line as header separator aiding on column position determination (if linesvisualsepre is not defined it will default to '\\s+') |
 
 > Supports parallel=true if linesjoin=false or not defined
+
+---
+
+### 🧾 LLM input options
+
+List of options to use when _in=llm_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| llmenv | String | Environment variable containing the model configuration (defaults to OAFP_MODEL, falling back to OAF_MODEL when absent). |
+| llmoptions | String/Map | Model configuration as a JSON/SLON string or map; overrides llmenv. See the shared LLM input/transform options below. |
+| llmconversation | String | JSON file to load an existing conversation from and save the updated conversation to. |
+| llmimage | String | Image file path or HTTP(S) URL to use with a visual model. |
+
+The input text is the prompt. Use _out=md_, _out=mdtable_ or _out=raw_ for a text response; other formats request JSON. Normal filters and output formats apply.
+
+```sh
+echo "Summarize this text" | oafp in=llm llmoptions="(type:ollama,model:llama3)" out=raw
+```
+
+---
+
+### 🧾 LLM Decide input options
+
+List of options to use when _in=llmdecide_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| llmenv | String | Environment variable containing the model configuration (defaults to OAFP_MODEL, falling back to OAF_DECIDE_MODEL and then OAF_MODEL when absent). |
+| llmoptions | String/Map | Model configuration as a JSON/SLON string or map; overrides llmenv. Supports the shared sBucket options below. |
+| llmdecidesample | String | Emit a gemini or ollama request sample without input, credentials or inference. Use out=yaml or out=json. |
+| llmimage | String | Local PNG/JPEG/WebP image file to encode as options.images for Ollama native decisions. Cannot be combined with options.images. |
+| llmdecidestats | Boolean | Return {response, stats} from one decideWithStats() execution (defaults to false). |
+
+Requires an updated OpenAF runtime with `$llm().decide()` support (`decideWithStats()` when _llmdecidestats=true_). Supply JSON, SLON or YAML via _file=_, stdin or _data=_ containing `{state, questions, options?}`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| state | String/Map/Array | Entire state to evaluate once, including arrays. |
+| questions | Map | Nonempty map of named question definitions, each with type and instructions: choice with named criteria, boolean, or score with ordered criteria. |
+| options | Map | Optional OpenAF decision settings: strategy (auto by default, native or structured), model override, requireProbabilities, providerOptions and images (ordered raw base64 image array for Ollama native decisions). |
+
+OpenAF validates questions and options; unknown request fields are rejected. _llmconversation_, _llmcontext_ and _llmprompt_ are unsupported. No conversation is saved; failures propagate without retry or fallback.
+
+Images require an updated OpenAF runtime, Ollama v0.35.1+ and CLEF/CLEF Flash vision weights. All questions share the images in order; state remains required. Supply a nonempty `options.images` array of raw base64 strings (no URLs, data URLs or paths), or use _llmimage=screenshot.png_ for one local file. OpenAF validates image options; Ollama validates image contents and model vision support. The serialized UTF-8 request limit is 32 MiB with images (including base64 and JSON), or 64 KiB without images.
+
+Output is `{contractVersion, provider, model, strategy, answers}`, or `{response, stats}` with _llmdecidestats=true_. Normal filters and output formats apply: use _path=answers.route.value out=raw_ (or _path=response.answers.route.value_ with stats). Score levels are zero-based; selectedProbability is the selected alternative's probability, providerConfidence is separate provider confidence, and expectedScore is the ordinal expectation. Structured probability fields are null.
+
+Generate a request, edit its state and questions, then run it with _file=_ and your model configuration:
+
+```sh
+oafp in=llmdecide llmdecidesample=gemini out=yaml > gemini-request.yaml
+oafp in=llmdecide llmdecidesample=ollama out=json > ollama-request.json
+```
+
+> See _help=examples_ for complete request files and provider requirements. Samples use common OpenAF question definitions with provider-specific strategy options.
 
 ---
 
@@ -682,14 +741,14 @@ List of options to use when _diff=..._:
 
 ### 🧾 LLM input/transform options
 
-List of options to use when _in=llm_ or _llmprompt=..._:
+List of options to use when _in=llm_, _in=llmdecide_ or _llmprompt=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
 | llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
-| llmoptions | String | A JSON or SLON string with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type | 
+| llmoptions | String/Map | A JSON/SLON string or map with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type; maps are supported by in=llm and in=llmdecide, while llmprompt requires a string |
 | llmconversation | String | File to keep the LLM conversation |
-| llmimage | String | For visual models you can provide a base64 image or an image file path or an URL of an image |
+| llmimage | String | With in=llm, image file path or HTTP(S) URL to use with a visual model. |
 
 > OpenAF sBuckets are supported in llmoptions. You can set any of the environment variables OAFP_SECREPO, OAFP_SECBUCKET, OAFP_SECPASS, OAFP_SECMAINPASS and OAFP_SECFILE OR set the corresponding map values secRepo, secBucket, secPass, secMainPass and secFile.
 
@@ -1130,7 +1189,3 @@ pipe:
 | help=readme | Returns this document |
 
 > You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands
-
-### HotSpot perfdata metadata
-
-Use `oafp file=/tmp/hsperfdata_user/123 in=hsperf hsperfmetadata=true out=json` to include metadata. This also works with `cmd=` input. Use `path=header` or `path=entries` to inspect metadata; use `path=values.java` for Java counters and enrichment in metadata mode. Without the option, existing paths such as `path=java` remain unchanged. Counter longs are exact decimal strings. Missing counter groups are omitted; timer calculations require the reported frequency. Nonzero header overflow means some counters were not stored by the JVM.
