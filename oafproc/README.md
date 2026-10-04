@@ -51,6 +51,7 @@ Check the main [usage documentation](docs/USAGE.md).
 
 Additional documentation:
 
+* [Agent skills](https://github.com/OpenAF/oafp/tree/main/skills)
 * [JSON Schema](docs/JSON-SCHEMA.md)
 * [Filters](docs/FILTERS.md)
 * [Template](docs/TEMPLATE.md)

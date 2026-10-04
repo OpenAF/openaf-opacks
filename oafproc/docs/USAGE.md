@@ -179,6 +179,9 @@ List of available formats to use with the _output_ option:
 | Output format | Description |
 |---------------|-------------|
 | base64 | A base64 text format |
+| bstable | A borderless Unicode table with separators between records and wrapping to the terminal width (for lists or maps) |
+| btable | A borderless Unicode table without separators between records and with wrapping to the terminal width (for lists or maps) |
+| btree | A tree-like format without ANSI colors, using plain-text branch characters |
 | ch | An OpenAF channel format |
 | chart | A line-chart style chart (useful together with 'loop') |
 | cjson | A JSON forcely colored format |
@@ -191,12 +194,14 @@ List of available formats to use with the _output_ option:
 | ckyaml | A Kubernetes YAML colored format |
 | cyaml | An YAML colored format |
 | db | Output to a JDBC database |
+| dsv | A delimiter-separated values format with configurable separator, quoting and headers (for lists or maps; see DSV output options) |
 | envs | Tries to output the input data as OS environment variables setting commands |
 | gb64json | Equivalent to out=base64 and base64gzip=true |
 | grid | A multiple output ascii grid (useful together with 'loop') |
 | html | An HTML format |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
+| jsmap | OpenAF's HTML representation of structured data, printed directly without opening a browser |
 | jwt | Signs map data into a JSON Web Token (JWT) |
 | key | Stores data into an OpenAF global (used inside OpenAF) |
 | kyaml | A Kubernetes YAML format |
@@ -207,6 +212,7 @@ List of available formats to use with the _output_ option:
 | md | A Markdown format |
 | mdtable | A Markdown table format (only for list outputs) |
 | mdyaml | A multi document YAML format (only for list outputs) |
+| mtree | A tree-like format without ANSI colors, using Unicode branch characters (falls back to ctree on older OpenAF versions without TREE.mono support) |
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | ndcslon | A NDSLON (new-line delimited SLON) format forcely colored |
@@ -231,6 +237,8 @@ List of available formats to use with the _output_ option:
 | xls | A XLSx output format |
 | xml | An XML format |
 | yaml | A YAML format |
+
+> `bstable`, `btable` and `jsmap` are passed through to OpenAF and are not listed by `out="?"`. They require an OpenAF version that supports the corresponding format. The OpenAF `btable` options `__width` and `__rowsep` are not forwarded by oafp; use `bstable` to enable separators between records.
 
 > For 'template' check https://docs.openaf.io/docs/guides/oafp/oafp-template.html
 
