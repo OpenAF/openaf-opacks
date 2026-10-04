@@ -1,0 +1,53 @@
+name: Maven dependency report
+
+on:
+  pull_request:
+    paths:
+    - pom.xml
+    - '**/.maven.yaml'
+    - updateMaven.yaml
+    - mavenMaintenance.json
+    - .github/scripts/mavenMaintenance.js
+    - .github/scripts/tests/mavenMaintenance.test.cjs
+    - .github/workflows/mavenMaintenance.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Test maintenance helpers
+      run: node --test .github/scripts/tests/mavenMaintenance.test.cjs
+    - uses: openaf/ojob-action@v7
+      env:
+        MAINTENANCE_BASE: ${{ github.event.pull_request.base.sha }}
+      with:
+        dist: t8
+        script: |
+          load(".github/scripts/mavenMaintenance.js")
+          var args = { action: "list" }
+          var base = getEnv("MAINTENANCE_BASE")
+          if (base) args.base = base
+          var result = mavenMaintenance.run(args)
+          io.writeFileJSON("/tmp/maven-maintenance.json", result)
+          mavenMaintenance.printReport(result, "markdown")
+          var summary = getEnv("GITHUB_STEP_SUMMARY")
+          if (summary) {
+            var lines = [ "## Maven dependency maintenance", "", mavenMaintenance.markdownReport(result, !!base) ]
+            if (result.error) lines.push("", "Error: " + result.error)
+            lines.push("", "Report only. Prepare locally with `ojob updateMaven.yaml action=plan folder=<oPack>`. Major or unknown changes require review; tests run during local update.")
+            io.writeFileString(summary, lines.join("\n"))
+          }
+          exit(result.exitCode)
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: maven-dependency-report
+        path: /tmp/maven-maintenance.json
+        if-no-files-found: warn

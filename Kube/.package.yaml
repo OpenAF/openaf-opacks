@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260918'
+version: '20261004'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -27,110 +27,116 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- jackson-dataformat-yaml-2.21.4.jar
-- jackson-datatype-jsr310-2.21.4.jar
+- jackson-core-2.21.6.jar
+- jackson-dataformat-yaml-3.2.3.jar
 - kube.js
 - kube.yaml
-- kubernetes-client-7.9.0.jar
-- kubernetes-client-api-7.9.0.jar
-- kubernetes-httpclient-vertx-7.9.0.jar
-- kubernetes-model-admissionregistration-7.9.0.jar
-- kubernetes-model-apiextensions-7.9.0.jar
-- kubernetes-model-apps-7.9.0.jar
-- kubernetes-model-autoscaling-7.9.0.jar
-- kubernetes-model-batch-7.9.0.jar
-- kubernetes-model-certificates-7.9.0.jar
-- kubernetes-model-common-7.9.0.jar
-- kubernetes-model-coordination-7.9.0.jar
-- kubernetes-model-core-7.9.0.jar
-- kubernetes-model-discovery-7.9.0.jar
-- kubernetes-model-events-7.9.0.jar
-- kubernetes-model-extensions-7.9.0.jar
-- kubernetes-model-flowcontrol-7.9.0.jar
-- kubernetes-model-gatewayapi-7.9.0.jar
-- kubernetes-model-metrics-7.9.0.jar
-- kubernetes-model-networking-7.9.0.jar
-- kubernetes-model-node-7.9.0.jar
-- kubernetes-model-policy-7.9.0.jar
-- kubernetes-model-rbac-7.9.0.jar
-- kubernetes-model-resource-7.9.0.jar
-- kubernetes-model-scheduling-7.9.0.jar
-- kubernetes-model-storageclass-7.9.0.jar
+- kubernetes-client-8.0.0.jar
+- kubernetes-client-api-8.0.0.jar
+- kubernetes-httpclient-vertx-5-8.0.0.jar
+- kubernetes-model-admissionregistration-8.0.0.jar
+- kubernetes-model-apiextensions-8.0.0.jar
+- kubernetes-model-apps-8.0.0.jar
+- kubernetes-model-autoscaling-8.0.0.jar
+- kubernetes-model-batch-8.0.0.jar
+- kubernetes-model-certificates-8.0.0.jar
+- kubernetes-model-common-8.0.0.jar
+- kubernetes-model-coordination-8.0.0.jar
+- kubernetes-model-core-8.0.0.jar
+- kubernetes-model-discovery-8.0.0.jar
+- kubernetes-model-events-8.0.0.jar
+- kubernetes-model-extensions-8.0.0.jar
+- kubernetes-model-flowcontrol-8.0.0.jar
+- kubernetes-model-gatewayapi-8.0.0.jar
+- kubernetes-model-metrics-8.0.0.jar
+- kubernetes-model-networking-8.0.0.jar
+- kubernetes-model-node-8.0.0.jar
+- kubernetes-model-policy-8.0.0.jar
+- kubernetes-model-rbac-8.0.0.jar
+- kubernetes-model-resource-8.0.0.jar
+- kubernetes-model-scheduling-8.0.0.jar
+- kubernetes-model-storageclass-8.0.0.jar
 - netty-buffer-4.2.18.Final.jar
 - netty-codec-base-4.2.18.Final.jar
+- netty-codec-classes-quic-4.2.18.Final.jar
 - netty-codec-compression-4.2.18.Final.jar
 - netty-codec-dns-4.2.18.Final.jar
 - netty-codec-http-4.2.18.Final.jar
 - netty-codec-http2-4.2.18.Final.jar
+- netty-codec-http3-4.2.18.Final.jar
 - netty-codec-socks-4.2.18.Final.jar
 - netty-common-4.2.18.Final.jar
 - netty-handler-4.2.18.Final.jar
 - netty-handler-proxy-4.2.18.Final.jar
 - netty-resolver-4.2.18.Final.jar
 - netty-resolver-dns-4.2.18.Final.jar
-- netty-tcnative-classes-2.0.78.Final.jar
+- netty-tcnative-classes-2.0.84.Final.jar
 - netty-transport-4.2.18.Final.jar
 - netty-transport-native-unix-common-4.2.18.Final.jar
-- snakeyaml-2.5.jar
-- snakeyaml-engine-3.0.1.jar
-- vertx-auth-common-4.5.31.jar
-- vertx-core-4.5.31.jar
-- vertx-web-client-4.5.31.jar
-- vertx-web-common-4.5.31.jar
-- zjsonpatch-7.9.0.jar
+- snakeyaml-engine-3.1.1.jar
+- vertx-auth-common-5.2.0.jar
+- vertx-core-5.2.0.jar
+- vertx-core-logging-5.2.0.jar
+- vertx-uri-template-5.2.0.jar
+- vertx-web-client-5.2.0.jar
+- vertx-web-common-5.2.0.jar
+- zjsonpatch-8.0.0.jar
 filesHash:
-  .maven.yaml: b8d0772089e9ae8a537ce1cab5c03042acc51c13
+  .maven.yaml: 1198ccad011ca448ae5a171262ea6a94bbcb7834
   .odoc.db: f8ac7d0c0c30b2e4536107e2c450f0d1d34a421d
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
-  README.md: 3ba7e3b464644bb72a3dd37e5c1ee1f79199366f
-  jackson-dataformat-yaml-2.21.4.jar: d506a8a96ba24172110aca439e78fd6a38a11799
-  jackson-datatype-jsr310-2.21.4.jar: 51f9ede30826b05cdf8a70b47bc68bd6271dfaaa
+  README.md: 10514d8f8c2cf483b20c59592ed5f4ea4b6767be
+  jackson-core-2.21.6.jar: 7a71e4eeb27e88ba462f8f085afd3e4ec6ecadf0
+  jackson-dataformat-yaml-3.2.3.jar: c39c703aadd5bc7513013e7b2871ef36698aa443
   kube.js: d978eeea8f416cbd7f271e392f2bda86617d66f2
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
-  kubernetes-client-7.9.0.jar: 952b7c5e2335fdb6e727f962d710aa74f9b71a03
-  kubernetes-client-api-7.9.0.jar: 02d2e5629004cb1515f2ceed7bf4281685393729
-  kubernetes-httpclient-vertx-7.9.0.jar: 47a20cf2cf7dda122ef37988a7a6ec5a91c8821c
-  kubernetes-model-admissionregistration-7.9.0.jar: 8504074e4647ec3eedda5e690704e366156d1bdb
-  kubernetes-model-apiextensions-7.9.0.jar: c7c1e25f0569b61a136f4995e977f898a0d110d6
-  kubernetes-model-apps-7.9.0.jar: 446b217530f4a3f15deead817e19e58a4102e8aa
-  kubernetes-model-autoscaling-7.9.0.jar: 8ee1f57943c03fa4be8be18048d53da113bba24d
-  kubernetes-model-batch-7.9.0.jar: 6c863615acc856d19dadaadc2c6e078b3396ed2c
-  kubernetes-model-certificates-7.9.0.jar: 8cb2f195409170719ea980d5ef954a9678157634
-  kubernetes-model-common-7.9.0.jar: 115900cffed21e16a93386412fad60d1a0ee58e0
-  kubernetes-model-coordination-7.9.0.jar: 054155e0d82ad5388909027fa8310ba578bd5e15
-  kubernetes-model-core-7.9.0.jar: 2892a7f97ce4155790fde9cfbec824c5d3a59729
-  kubernetes-model-discovery-7.9.0.jar: 9488af4797a58110cdbb7202fcb35244aadbb659
-  kubernetes-model-events-7.9.0.jar: c2228e2d400b78cef75d40bfaf6c67d8973e56df
-  kubernetes-model-extensions-7.9.0.jar: 12c837657b95292eea63229bb8d0f61d66b96acf
-  kubernetes-model-flowcontrol-7.9.0.jar: e1b1d29179db03d17d40ffefa139661a2d681a38
-  kubernetes-model-gatewayapi-7.9.0.jar: c96083302978a9f60a0de5aafa763a4374107b0a
-  kubernetes-model-metrics-7.9.0.jar: dc4a94353dafec00d2acded56abf89135379690b
-  kubernetes-model-networking-7.9.0.jar: 5f7e272b0aa850b4ed4e4e9118af110e1d92d866
-  kubernetes-model-node-7.9.0.jar: 813e3e428e0690e4cb888c8ae9b2126dc11df810
-  kubernetes-model-policy-7.9.0.jar: b340eee85c25924af98284f871aa663a77a38bb9
-  kubernetes-model-rbac-7.9.0.jar: 0c9d71fd7f3989a470efeb882201258fe3ec5d61
-  kubernetes-model-resource-7.9.0.jar: aa4447adf020ba6b63ce95c4c42ffc50f26b9f30
-  kubernetes-model-scheduling-7.9.0.jar: 4cfb2797761f9cc126043a918dd687a4a5c51dbf
-  kubernetes-model-storageclass-7.9.0.jar: aa67f3dd853e3e3eb02f278e3dfc4ce2a2bb5371
+  kubernetes-client-8.0.0.jar: dcff0d6ec215f5ced3591951b12a7a0b3d820e1d
+  kubernetes-client-api-8.0.0.jar: a2760c401222a0358dd5b867f1afcafd9471e90f
+  kubernetes-httpclient-vertx-5-8.0.0.jar: 49a3beefa0256fe86c8688d8d3e7a214b8577529
+  kubernetes-model-admissionregistration-8.0.0.jar: 2842c1f05796011df7344abf851b0a78c6cbbfc0
+  kubernetes-model-apiextensions-8.0.0.jar: 45a93e3a164c297151e1ee16f6b4141b437ca384
+  kubernetes-model-apps-8.0.0.jar: de6294a94840a200ed4ecd1f9741aff9a2c107c2
+  kubernetes-model-autoscaling-8.0.0.jar: fea46c102825e23ff94caab0fa33ca3e1657e6ff
+  kubernetes-model-batch-8.0.0.jar: 0995104f0871579e493c8c88ce29587d713d20fa
+  kubernetes-model-certificates-8.0.0.jar: 4f9d6aa3e974faee9735ed4ea42e7db4b5ca952c
+  kubernetes-model-common-8.0.0.jar: f3b6240479e701ae88891355418e056d77894802
+  kubernetes-model-coordination-8.0.0.jar: 5fd7d14454f50fc51e3e75ae78c703cee33785bb
+  kubernetes-model-core-8.0.0.jar: 4d4d29760af46b71b80142dc683279e5c8d6db3e
+  kubernetes-model-discovery-8.0.0.jar: 0d791c971e5745daabd4f691ba781f0ffb25c123
+  kubernetes-model-events-8.0.0.jar: a530dfdf673b7c9299cafaf2157f65191faa6898
+  kubernetes-model-extensions-8.0.0.jar: 5c9830b75cfe52e3a095dd6ab814ba530d396daf
+  kubernetes-model-flowcontrol-8.0.0.jar: e1a92ee16d42572a8043f324252cd8bfdc4d82ce
+  kubernetes-model-gatewayapi-8.0.0.jar: 3d149d7fa9ebb67aecb1557a2cfa053dc2f7c77b
+  kubernetes-model-metrics-8.0.0.jar: 27cb848569a368699d9005fe6ca7c9811837b9d6
+  kubernetes-model-networking-8.0.0.jar: 0ca558fbdc15f0178e335dd5a23d772b049a05ff
+  kubernetes-model-node-8.0.0.jar: ea7dd4275252b06bda2f9a76379903589d745bed
+  kubernetes-model-policy-8.0.0.jar: fcdf98de404bdcae9d6e7a295ad716df3a9c66ee
+  kubernetes-model-rbac-8.0.0.jar: 03027022ba42d9234139e8779b09f66d24ad2d2e
+  kubernetes-model-resource-8.0.0.jar: 4ac3ab0779440a857929d4a30475c80c602a0546
+  kubernetes-model-scheduling-8.0.0.jar: a8b1c3e0e4440deec4886a477a52286668e25882
+  kubernetes-model-storageclass-8.0.0.jar: 5ab46f17dffaba9441e4e4b0d0d2959b7e231280
   netty-buffer-4.2.18.Final.jar: 62e970871a61c58ff7164e076bb8032a1ea444af
   netty-codec-base-4.2.18.Final.jar: 058739f9f05f1806e1117401e1982b04d7a02f3b
+  netty-codec-classes-quic-4.2.18.Final.jar: cc350fcbcd92876d5de11d54e68f63f0ebb6e10b
   netty-codec-compression-4.2.18.Final.jar: f6f9e4372da33ca4f96b7af528ec8c26932f9fde
   netty-codec-dns-4.2.18.Final.jar: b89710bfb47ad07d5fd936829aba9a06fcfbcd0a
   netty-codec-http-4.2.18.Final.jar: 25d8eed33ee14c6691250df4115604cf6a41340a
   netty-codec-http2-4.2.18.Final.jar: a0f08f3697a570cb1eae4abfd6637f6facb2fe57
+  netty-codec-http3-4.2.18.Final.jar: 2776049d9acabac6a2da9346c5ffb9ac1436fc29
   netty-codec-socks-4.2.18.Final.jar: 4a3bf2cc5051c3c35076d0dd8528ebcce440258e
   netty-common-4.2.18.Final.jar: aa06ef3310c8ad1e506ec14ab3794f9e26438121
   netty-handler-4.2.18.Final.jar: b946698c37ab69603a4f0df8180f9594d89cf4b7
   netty-handler-proxy-4.2.18.Final.jar: 56176147f9e2d8186a277695a49cff2dab70d747
   netty-resolver-4.2.18.Final.jar: 9d21e01c476a1f92b9dc07d968d2a02810b2fba1
   netty-resolver-dns-4.2.18.Final.jar: 139f12718e993ebb19f64ef5eb95167f69dc97bf
-  netty-tcnative-classes-2.0.78.Final.jar: e99c3d87cbfe544813fb012d5dfbf078bde76244
+  netty-tcnative-classes-2.0.84.Final.jar: 30d95c719f174c33e5146f923cda62d7bdb65650
   netty-transport-4.2.18.Final.jar: 14ad66183e0456621161e60b41ca2abdcf9bd15c
   netty-transport-native-unix-common-4.2.18.Final.jar: b9dbd51d2802e447630ef2b8bba56bb5aaad1f82
-  snakeyaml-2.5.jar: 2d53ddec134280cb384c1e35d094e5f71c1f2316
-  snakeyaml-engine-3.0.1.jar: aaa97268dd9fcf97a3e44c96e6a50961d65199dd
-  vertx-auth-common-4.5.31.jar: ce206cf586f6f880d483a14c078c09344f33938c
-  vertx-core-4.5.31.jar: 468726e6d694bd689e6b898153511628e014e6a1
-  vertx-web-client-4.5.31.jar: f675def450fc6a331e01f956dfdd827616165ae1
-  vertx-web-common-4.5.31.jar: f27e2d9fe380fd70371b64a8e7581e91a257a325
-  zjsonpatch-7.9.0.jar: d487f5e3f86dcc32f05f076b150dbf51ce03ce96
+  snakeyaml-engine-3.1.1.jar: 9f8bf41c9f06191abd4322072849603bdc919ac7
+  vertx-auth-common-5.2.0.jar: 8163b6c35d803c14cd33448a6cb925b7426f71d4
+  vertx-core-5.2.0.jar: da57447fd65163f9bbc3414a2f571d563a3c121a
+  vertx-core-logging-5.2.0.jar: bf64c54160edce659a4f5876e6119cddf75f4237
+  vertx-uri-template-5.2.0.jar: 5120c1b957c1209f41bbc198d34dac93319ddd3b
+  vertx-web-client-5.2.0.jar: 1aecefd621029cbe196c0c24533f2c4eb7164997
+  vertx-web-common-5.2.0.jar: da1b9ff518f43a66e1c21c57d141773ad6fe56ff
+  zjsonpatch-8.0.0.jar: b298ce0a4172df5c0da4a3e619997b4727124cce

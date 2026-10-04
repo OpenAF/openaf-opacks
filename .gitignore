@@ -1,3 +1,5 @@
 .github/action/
 .openaf_precompiled/
 .mini-a
+
+.maven-maintenance.lock/

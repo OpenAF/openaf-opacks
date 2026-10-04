@@ -1,25 +1,22 @@
 artifacts:
-- id     : kubernetes-client
-  group  : io.fabric8
-  #version: 6.13.3
-#- id     : bcpkix-jdk18on
-#  group  : org.bouncycastle
-#  version: "1.77"
-- group  : io.netty
-  id     : netty-codec-http2
+- id: kubernetes-client
+  group: io.fabric8
+  version: 8.0.0
+- group: io.netty
+  id: netty-codec-http2
   version: 4.2.18.Final
-- group  : io.netty
-  id     : netty-common
+- group: io.netty
+  id: netty-common
   version: 4.2.18.Final
-- group  : io.netty
-  id     : netty-codec-dns
+- group: io.netty
+  id: netty-codec-dns
   version: 4.2.18.Final
-- group  : io.netty
-  id     : netty-codec-socks
+- group: io.netty
+  id: netty-codec-socks
   version: 4.2.18.Final
-- group  : io.netty
-  id     : netty-handler-proxy
+- group: io.netty
+  id: netty-handler-proxy
   version: 4.2.18.Final
-- group  : io.netty
-  id     : netty-resolver-dns
+- group: io.netty
+  id: netty-resolver-dns
   version: 4.2.18.Final

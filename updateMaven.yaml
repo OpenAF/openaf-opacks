@@ -1,0 +1,34 @@
+help:
+  text: Discover, plan and update Maven-backed oPacks. See MAVEN-MAINTENANCE.md.
+  expects:
+  - name: action
+    desc: list (default), plan, update or recover
+  - name: folder
+    desc: Repository-relative oPack folder (required for plan/update)
+  - name: online
+    desc: Resolve current stable releases during list
+  - name: base
+    desc: Git revision to compare POM changes against
+  - name: format
+    desc: ctable (default), table, json, yaml, csv or markdown; standard oJob format flags also work
+  - name: report
+    desc: Optional JSON report output path
+  - name: external
+    desc: Enable registered tests requiring external services
+  - name: candidate
+    desc: Retained candidate path for action=recover
+
+ojob:
+  logToConsole: true
+
+todo:
+- Maintain dependencies
+
+jobs:
+- name: Maintain dependencies
+  exec: |
+    load(".github/scripts/mavenMaintenance.js")
+    var result = mavenMaintenance.run(args)
+    mavenMaintenance.printReport(result, args)
+    if (args.report) io.writeFileJSON(args.report, result)
+    exit(result.exitCode)
