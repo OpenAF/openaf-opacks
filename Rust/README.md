@@ -47,3 +47,13 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source "$HOME/.cargo/env"
 opack install Rust
 ````
+
+## Runtime options and lifecycle
+
+Requires OpenAF 20261004 or newer and an installed `rustc`. No compiler or crate is downloaded automatically.
+
+`typeArgs.langExecutable` chooses the compiler; `langExecutableArgs` is an array of compiler flags. `pwd` selects the compiler and program working directory. `langTimeout` is a positive timeout in milliseconds shared by the compiler probe, compilation-lock wait, compilation and execution; absent means unlimited execution. The compiler availability probe is limited to five seconds. Existing `noTemplate`, environment input and JSON stdout output conventions remain unchanged. JSON results are merged only after a successful exit; plain stdout remains logging.
+
+The process-local cache is synchronized and keyed by source, resolved compiler path, compiler version, flags and working directory. Failed builds are never cached. Source files are removed after compilation, and cached binaries are removed when oJob stops (or the JVM exits). Independent processes have independent caches. Local process timeouts terminate tracked descendants; OS process-enumeration restrictions and deliberately detached processes limit this guarantee.
+
+Run `java -jar /path/to/openaf.jar -f tests/regression.js` from this directory to check argument exchange, reuse, concurrency, failed builds, timeout and cleanup.

@@ -17,13 +17,15 @@ name: Rust
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20230628'
+version: '20261004'
 dependencies:
-  openaf: '>=20230325'
+  openaf: '>=20261004'
 files:
 - .package.yaml
 - README.md
 - rust.yaml
+- tests/regression.js
 filesHash:
-  README.md: 8d51d96fb15aa24d3b56cac4bdfbc31aa0399e28
-  rust.yaml: ef2750d583db68f59ba5585cd1597249ddb146a3
+  README.md: eecc4162bf7d60d4e16ed9aca76d9b597c9045a8
+  rust.yaml: 1dca583804b70e0b8d3f196274c980d94d942528
+  tests/regression.js: 1c26983c4f7b2e6ae5c0febddf933c351d90cc4d

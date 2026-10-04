@@ -1,36 +1,78 @@
 ojob:
   langs:
-  - lang  : "rust"
+  - lang: rust
+    kind: local-process
+    processOptions: true
+    executable: rustc
+    versionArgs: ["--version"]
+    prerequisites: Rust compiler (rustc)
     langFn: |
-      // Check for templates
-      if (isDef(job.typeArgs) && !job.typeArgs.noTemplate) {
-        code = templify(code, args)
-      }
-      // Fingerprint && reuse
-      var _fp = md5(job.name + "|" + code)
-      if (isUnDef(global.__rustReuse)) global.__rustReuse = {}
-      if (isUnDef(global.__rustReuse[_fp])) {
-        var _sfp = io.createTempFile(_fp, ".rs")
-        io.writeFileString(_sfp, code)
-        var _bfp = io.createTempFile(_fp, "rust")
-        
-        // Compile
-        var _res = $sh("rustc " + _sfp + " -o " + _bfp).get(0)
-        if (_res.exitcode != 0) throw _res.stdout + _res.stderr
-
-        global.__rustReuse[_fp] = _bfp
-      }
-
-      // Executing
-      var _res = $sh()
-                 .envs(ow.oJob.__toEnvs(args))
-                 .sh(global.__rustReuse[_fp])
-                 .getJson(0)
-      if (_res.exitcode != 0) throw _res.stdout + _res.stderr
-      if (isMap(_res.stdout)) {
-        args = merge(args, _res.stdout)
+      var _options = job.typeArgs || {};
+      var _limit = _options.langTimeout;
+      if (isDef(_limit) && (!isNumber(_limit) || !isFinite(_limit) || _limit <= 0)) throw new Error("Rust langTimeout must be positive milliseconds");
+      var _started = now();
+      var _remaining = function() {
+        if (isUnDef(_limit)) return __;
+        var left = _limit - (now() - _started);
+        if (left <= 0) throw new Error("Rust job '" + job.name + "' timed out");
+        return left;
+      };
+      var _compiler = _$(_options.langExecutable, "langExecutable").isString().default("rustc");
+      var _flags = _$(_options.langExecutableArgs, "langExecutableArgs").isArray().default([]);
+      if (_flags.some(v => !isString(v))) throw new Error("Rust langExecutableArgs must contain strings");
+      // Resolve the compiler so changing PATH cannot silently reuse a different toolchain's binary.
+      var _paths = String(getEnv("PATH") || "").split(String(java.io.File.pathSeparator));
+      if (_compiler.indexOf("/") >= 0 || _compiler.indexOf("\\") >= 0) {
+        _compiler = String(new java.io.File(_options.pwd || ".", _compiler).getCanonicalPath());
+        if (new java.io.File(_options.langExecutable).isAbsolute()) _compiler = String(new java.io.File(_options.langExecutable).getCanonicalPath());
       } else {
-        printnl(_res.stdout)
-        if (isString(_res.stderr) && _res.stderr.length > 0) printErrnl(_res.stderr)
+        for (var _p = 0; _p < _paths.length; _p++) {
+          var _candidate = new java.io.File(_paths[_p], _compiler + (ow.format.isWindows() ? ".exe" : ""));
+          if (_candidate.isFile()) { _compiler = String(_candidate.getCanonicalPath()); break; }
+        }
       }
-
+      if (isDef(job.typeArgs) && !job.typeArgs.noTemplate) code = templify(code, args);
+      var _probe = ow.oJob.runLanguageProcess([_compiler, "--version"], { timeout: Math.min(_remaining() || 5000, 5000) });
+      if (_probe.timedOut || _probe.exitcode != 0) throw new Error("Rust compiler probe failed: " + _probe.stderr);
+      var _fp = sha256(stringify([code, _compiler, _probe.stdout, _flags, _options.pwd || ""], __, ""));
+      var _binary;
+      var _lock = ow.oJob.__languageLock;
+      var _locked = isDef(_limit) ? _lock.tryLock(Math.ceil(_remaining()), java.util.concurrent.TimeUnit.MILLISECONDS) : (_lock.lock(), true);
+      if (!_locked) throw new Error("Rust job '" + job.name + "' timed out waiting for compilation");
+      try {
+        if (isUnDef(global.__rustReuse)) global.__rustReuse = {};
+        ow.oJob.registerLanguageCleanup("rust", function() {
+          _lock.lock();
+          try {
+            Object.keys(global.__rustReuse || {}).forEach(k => io.rm(global.__rustReuse[k].directory));
+            global.__rustReuse = {};
+          } finally { _lock.unlock(); }
+        });
+        if (isDef(global.__rustReuse[_fp]) && !io.fileExists(global.__rustReuse[_fp].binary)) delete global.__rustReuse[_fp];
+        if (isUnDef(global.__rustReuse[_fp])) {
+          var _directory = io.createTempDir("ojob-rust-");
+          var _source = _directory + "/main.rs";
+          var _target = _directory + "/main" + (ow.format.isWindows() ? ".exe" : "");
+          try {
+            io.writeFileString(_source, code, "UTF-8");
+            var _compiled = ow.oJob.runLanguageProcess([_compiler].concat(_flags, [_source, "-o", _target]), {pwd:_options.pwd, timeout:_remaining()});
+            ow.oJob.__languageLogs(_compiled);
+            if (_compiled.timedOut) throw new Error("Rust compilation timed out");
+            if (_compiled.exitcode != 0) throw new Error("Rust compilation exit status " + _compiled.exitcode);
+            global.__rustReuse[_fp] = {binary:_target, directory:_directory};
+          } catch(e) { io.rm(_directory); throw e; }
+          finally { if (io.fileExists(_source)) io.rm(_source); }
+        }
+        _binary = global.__rustReuse[_fp].binary;
+      } finally { _lock.unlock(); }
+      var _result = ow.oJob.runLanguageProcess([_binary], {pwd:_options.pwd, env:ow.oJob.__toEnvs(args), timeout:_remaining()});
+      if (_result.timedOut || _result.exitcode != 0) {
+        ow.oJob.__languageLogs(_result);
+        throw new Error("Rust job '" + job.name + "' " + (_result.timedOut ? "timed out" : "exit status " + _result.exitcode));
+      }
+      var _returned;
+      try { _returned = JSON.parse(_result.stdout); } catch(e) { _returned = __; }
+      if (isMap(_returned)) {
+        args = merge(args, _returned);
+        if (_result.stderr.length) printErrnl(_result.stderr);
+      } else ow.oJob.__languageLogs(_result, _options.shellPrefix);
