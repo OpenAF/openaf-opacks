@@ -448,6 +448,7 @@ ow.ch.__types.redis = {
         if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
         if (isMap(aV) && isDef(aV.value)) aV = aV.value
         if (isMap(aV)) aV = stringify(sortMapKeys(aV), __, "")
+        else if (isArray(aV)) aV = stringify(aV, __, "")
         return this.__channels[aName].r.set(aK, aV)
     },
     setAll       : function(aName, aKs, aVs, aTimestamp) {

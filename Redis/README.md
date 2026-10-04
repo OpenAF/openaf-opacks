@@ -152,3 +152,11 @@ oaf -f tests/regression.js
 ```
 
 These checks use local fixtures and test doubles; they do not verify a live external service.
+
+## Corrections (2026-10-04)
+
+Channel array values are stored as JSON, preserving order, nested values and empty
+arrays. Repeated channel writes replace the previous value instead of appending
+to a Redis list. Existing native Redis lists remain readable; writing an array
+through the channel replaces that key with a JSON string. Direct `Redis.set` list
+operations retain their existing behavior.

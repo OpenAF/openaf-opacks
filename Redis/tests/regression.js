@@ -34,5 +34,31 @@ try {
 } finally {
   $ch(name).destroy(); type.create = create; type.destroy = destroy;
 }
+// Exercise public channel dispatch with the real Redis.set type selection.
+var store = {}, arrayRedis = Object.create(Redis.prototype);
+arrayRedis.strings_set = function(key, value) { store[key] = value; };
+arrayRedis.lists_push = function(key, value) {
+  if (!store[key]) store[key] = [];
+  store[key].unshift(value);
+};
+arrayRedis.get = function(key) { return store[key]; };
+arrayRedis.getKeys = function() { return Object.keys(store); };
+arrayRedis.del = function(key) { delete store[key]; };
+arrayRedis.size = function() { return Object.keys(store).length; };
+type.create = function(aName) { this.__channels[aName] = { r: arrayRedis }; };
+type.destroy = function(aName) { delete this.__channels[aName]; };
+try {
+  var ch = $ch(name).create(1, "redis");
+  ch.set({ key: "array" }, { value: ["first", "second"] });
+  check(ch.get({ key: "array" }), ["first", "second"], "array order survives channel write");
+  ch.set({ key: "array" }, { value: ["replacement"] });
+  check(ch.get({ key: "array" }), ["replacement"], "array write replaces previous value");
+  ch.set({ key: "array" }, { value: [] });
+  check(ch.get({ key: "array" }), [], "empty array replaces previous value");
+  ch.set({ key: "array" }, { value: [{ id: 1 }, false, 0, null, ["nested"]] });
+  check(ch.get({ key: "array" }), [{ id: 1 }, false, 0, null, ["nested"]], "nested array values retain types");
+} finally {
+  $ch(name).destroy(); type.create = create; type.destroy = destroy;
+}
 print("PASS Redis regression");
 } catch(e) { printErr(e); exit(1); }
