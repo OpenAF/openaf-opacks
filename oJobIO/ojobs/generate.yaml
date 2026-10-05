@@ -41,8 +41,8 @@ init:
 
     ojob:
       opacks      :
-      - openaf: 20231222
-      catch       : printErrnl("[" + job.name + "] "); if (isDef(exception.javaException)) exception.javaException.printStackTrace(); else printErr(exception)
+      - openaf: 20260728
+      catch       : printErrnl("[" + job.name + "] "); $err(exception, __, __, job.exec)
       logToConsole: true   # to change when finished
       {{#if async}}async       : true
       {{/if}}{{#if config}}
