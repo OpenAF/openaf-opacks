@@ -412,3 +412,34 @@ is rejected. `llmdecidestats=true` supports both forms. URLs and data URLs are
 unsupported. OpenAF rejects image options on other providers, while Ollama
 validates image contents and vision support. Image requests may be up to 32 MiB
 including base64 and JSON; images are never truncated.
+
+## Add a decision classification column
+
+Save the following as `classify.yaml` and configure `OAFP_MODEL` (or `OAF_DECIDE_MODEL`) with an OpenAF model configuration:
+
+```yaml
+questions:
+  category:
+    type: choice
+    instructions: Classify the ticket.
+    criteria:
+      billing: Payments, charges, and refunds
+      technical: Software errors and outages
+options:
+  strategy: structured
+statePath: description
+assign:
+  classification: answers.category.value
+```
+
+```sh
+echo '[{"id":1,"description":"I was charged twice"},{"id":2,"description":"The app crashes"}]' | oafp llmdecide=classify.yaml parallel=true out=table
+```
+
+Use `out=csv` for a report or `opath="[].classification" out=json` for just the classifications. Omit `statePath` to send the entire entry, and omit `assign` to return full decision responses. Questions and options can also be supplied inline:
+
+```sh
+echo '[{"description":"I was charged twice"}]' | oafp llmdecide='(questions: (urgent: (type: boolean, instructions: "Does this require immediate attention?")), assign: (urgent: answers.urgent.value))' out=json
+```
+
+See USAGE's Decision enrichment section for field collisions, stats extraction, model configuration and parallel failure behavior.

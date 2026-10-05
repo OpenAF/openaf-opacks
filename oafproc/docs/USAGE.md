@@ -145,6 +145,7 @@ These options will change the parsed input data included any filters provided.
 | jsonschemagen | Boolean | If true will taken the provided input map as an example to generate an output json schema |
 | kmeans | Number | Given an array of 'normalized' data will cluster data into the number of centroids provided |
 | llmcontext | String | If 'llmprompt' is defined provides extra context to the model regarding the input data |
+| llmdecide | String/Map | Per-entry stateless decisions; inline JSON/SLON configuration or JSON/YAML/SLON file. See [Decision enrichment](#decision-enrichment). |
 | llmprompt | String | A large language model prompt to transform the input data to json (uses the same input options 'llmenv' and 'llmoptions') |
 | maptoarray | Boolean | If true will try to convert the input map to an array (see maptoarraykey) |
 | maptoarraykey | String | If maptoarray=true defines the name of the map property that will hold the key for each map in the new array |
@@ -757,12 +758,56 @@ List of options to use when _diff=..._:
 
 ### 🧾 LLM input/transform options
 
-List of options to use when _in=llm_, _in=llmdecide_ or _llmprompt=..._:
+### Decision enrichment
+
+Use _llmdecide=<configuration or file>_ as a transform to classify each array entry and add fields before normal output filtering and rendering. A single map or string produces one decision; arrays produce one decision per entry, including array-valued entries. Without `assign`, entries are replaced by full decision responses.
+
+Configuration accepts a map, an inline JSON/SLON expression, or a regular JSON/YAML/SLON file. For a path-like string, an existing file is read first; a missing file falls back to parsing the original string as JSON/SLON. Existing unreadable or malformed files fail without fallback.
+
+| Configuration field | Type | Description |
+|---------------------|------|-------------|
+| questions | Map | Required named OpenAF decision questions, as for in=llmdecide. |
+| options | Map | Optional OpenAF decision options. |
+| statePath | String | Optional $path expression evaluated against each entry. Defaults to the entire entry; the result must be text, a map or an array. |
+| assign | Map | Optional map of literal destination field names to $path expressions evaluated against the decision response. Requires map entries. Multiple fields use the same decision call. |
+| overwrite | Boolean | Allow assign to replace existing own fields; defaults to false. |
+
+Example `classify.yaml`:
+
+```yaml
+questions:
+  category:
+    type: choice
+    instructions: Classify the ticket.
+    criteria:
+      billing: Payments, charges, and refunds
+      technical: Software errors and outages
+options:
+  strategy: structured
+statePath: description
+assign:
+  classification: answers.category.value
+```
+
+```sh
+oafp file=tickets.json llmdecide=classify.yaml out=table
+oafp file=tickets.json llmdecide=classify.yaml parallel=true out=csv
+```
+
+Input `[{"id":1,"description":"I was charged twice"}]` becomes `[{"id":1,"description":"I was charged twice","classification":"billing"}]`. Destination names are literal: `class.name` adds one field named `class.name`. Missing result paths that return null are assigned as null; expressions returning undefined or throwing fail with the entry index.
+
+The transform reuses _llmoptions_, _llmenv_, secrets, _llmimage_ and _llmdecidestats_ from _in=llmdecide_, including decision model fallback. With stats enabled, use `response.answers.category.value` in `assign`. Conversational parameters are unsupported. State types and field collisions are checked before inference. Empty arrays produce no inference. Provider failures propagate with the entry index and original error code; no retries or conversation persistence occur.
+
+Execution is sequential by default. _parallel=true_ or _OAFP_PARALLEL=true_ enables OpenAF's adaptive parallel processing with an isolated client for each entry and preserved result order. Older runtimes without pForEach process sequentially. Parallel failures are raised after workers finish; already dispatched requests may complete.
+
+Input filters (_path_, _ifrom_, _isql_) select data before transforms; output filters (_opath_, _from_, _sql_) can select or filter the enriched results. Transform order follows the existing transform registry, rather than CLI argument order. Streaming inputs process each dispatched record/batch separately; join records when one collected array result is needed.
+
+List of options to use when _in=llm_, _in=llmdecide_, _llmdecide=..._ or _llmprompt=..._:
 
 | Option | Type | Description |
 |--------|------|-------------|
 | llmenv | String | The environment variable containing the value of 'llmoptions' (defaults to OAFP_MODEL) |
-| llmoptions | String/Map | A JSON/SLON string or map with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type; maps are supported by in=llm and in=llmdecide, while llmprompt requires a string |
+| llmoptions | String/Map | A JSON/SLON string or map with OpenAF's LLM 'type' (e.g. openai/ollama), 'model' name, 'timeout' in ms for answers, 'url' for the ollama type or 'key' for openai type; maps are supported by in=llm, in=llmdecide and the llmdecide transform, while llmprompt requires a string |
 | llmconversation | String | File to keep the LLM conversation |
 | llmimage | String | With in=llm, image file path or HTTP(S) URL to use with a visual model. |
 

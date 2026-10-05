@@ -130,11 +130,11 @@ files:
 filesHash:
   README.md: 275625c6c21ff1bf721c6e7f7c0142250a53ca64
   buildStaticOAFP.yaml: 791ff6e12542fef38b6082e044913e07dc0556b8
-  docs/EXAMPLES.md: 2be6609767fe22d7f55c70f6d49293723b62d394
+  docs/EXAMPLES.md: 97dafdac2ce1e3ab310a31095f3580d2c6ba2026
   docs/FILTERS.md: 34146533ccdb806046b10b1ff8282f8a8ee85fa6
   docs/JSON-SCHEMA.md: d1555c9526b284a23f8249757eb4f159a563b51c
   docs/TEMPLATE.md: 1870a1d6b9e90594eb62e0f33aaaab25084fe59a
-  docs/USAGE.md: 367cb075c010a1f97fe1a4e74b28066d1c057247
-  oafp.js: de04b5bb598188900921fa03fd56dc0aeddecfac
+  docs/USAGE.md: f447b3cd362ce5fec3e26645b9032579eef54e68
+  oafp.js: 5131a80f547e9ddd9a0b59d4fcf542c92834661c
   oafp.yaml: b5450fc1d53df63262afba65f9f6b70ce8e6ba1d
-  src/oafp.source.js: 62bd35296a4d9cbe89cbdb4d3b276036db71ed4d
+  src/oafp.source.js: 1449a70b6c3657287480e6c2082c5c8bbde49931

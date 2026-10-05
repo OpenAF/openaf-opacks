@@ -184,6 +184,35 @@ const _fromJSSLON = (aString, checkYAML) => {
     }
     return _r
 }
+// Shared stateless decision setup for the input and per-entry transform.
+const _llmDecisionSetup = (decisionOptions, context) => {
+    ["llmconversation", "llmcontext", "llmprompt"].forEach(key => {
+        if (isDef(params[key])) _exit(-1, context + " does not support " + key)
+    })
+    var opts = isDef(decisionOptions) ? clone(decisionOptions) : __
+    if (isDef(params.llmimage)) {
+        if (!isString(params.llmimage) || !io.fileExists(params.llmimage) || !io.fileInfo(params.llmimage).isFile)
+            _exit(-1, context + " llmimage requires a local image file")
+        if (isDef(opts) && Object.prototype.hasOwnProperty.call(opts, "images"))
+            _exit(-1, context + " cannot combine llmimage with options.images")
+        if (isUnDef(opts)) opts = {}
+        opts.images = [af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))]
+    }
+    var env = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
+    if (env == "OAFP_MODEL" && isUnDef(getEnv(env)) && isDef(getEnv("OAF_DECIDE_MODEL"))) env = "OAF_DECIDE_MODEL"
+    env = _resolveLLMEnvName(env)
+    var config = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
+    if (isUnDef(config) && !isString(getEnv(env)))
+        _exit(-1, "llmoptions not defined and " + env + " not found.")
+    config = _getSec(isDef(config) ? _fromJSSLON(config) : $sec("system", "envs").get(env))
+    var method = toBoolean(params.llmdecidestats) ? "decideWithStats" : "decide"
+    return { options: opts, client: () => {
+        var client = $llm(clone(config))
+        if (typeof client[method] !== "function")
+            _exit(-1, context + " requires an updated OpenAF runtime with $llm()." + method + "() support")
+        return client
+    }, method: method }
+}
 const _chartPathParse = (r, frmt, prefix, isStatic) => {
     prefix = _$(prefix).isString().default("_oafp_fn_")
     let parts = splitBySepWithEnc(frmt, " ", [["\"","\""],["'","'"]])
@@ -1229,6 +1258,73 @@ var _transformFns = {
             }
         }
         return _r
+    },
+    "llmdecide": _r => {
+        var value = params.llmdecide, spec
+        if (isString(value)) {
+            value = value.trim()
+            // Inline maps cannot be file paths. Missing paths fall back to JSON/SLON parsing.
+            if (!/^[{(\[]/.test(value) && io.fileExists(value)) {
+                if (!io.fileInfo(value).isFile) _exit(-1, "llmdecide configuration must be a regular file")
+                spec = _fromJSSLON(io.readFileString(value), true)
+            } else {
+                spec = _fromJSSLON(value)
+            }
+        } else spec = value
+        if (!isMap(spec) || !isMap(spec.questions) ||
+            (isDef(spec.options) && !isMap(spec.options)) ||
+            (isDef(spec.statePath) && !isString(spec.statePath)) ||
+            (isDef(spec.assign) && !isMap(spec.assign)) ||
+            (isDef(spec.overwrite) && !isBoolean(spec.overwrite)) ||
+            Object.keys(spec).some(k => ["questions", "options", "statePath", "assign", "overwrite"].indexOf(k) < 0))
+            _exit(-1, "llmdecide requires {questions, options?, statePath?, assign?, overwrite?}")
+        var fields = isDef(spec.assign) ? Object.keys(spec.assign) : []
+        if (isDef(spec.assign) && (fields.length == 0 || fields.some(k => !isString(spec.assign[k]) || spec.assign[k].trim() == "")))
+            _exit(-1, "llmdecide assign requires destination fields mapped to nonempty $path expressions")
+        var array = isArray(_r), entries = array ? _r : [_r]
+        var states = entries.map((entry, index) => {
+            if (isDef(spec.assign)) {
+                if (!isMap(entry)) _exit(-1, "llmdecide entry " + index + " must be a map for assign")
+                if (!spec.overwrite && fields.some(k => Object.prototype.hasOwnProperty.call(entry, k)))
+                    _exit(-1, "llmdecide entry " + index + " already has an assign field; use overwrite=true in the configuration")
+            }
+            var state = isDef(spec.statePath) ? $path(entry, spec.statePath) : entry
+            if (!(isString(state) || isMap(state) || isArray(state)))
+                _exit(-1, "llmdecide entry " + index + " state must be text, a map or an array")
+            return state
+        })
+        var decision = _llmDecisionSetup(spec.options, "llmdecide transform")
+        if (entries.length == 0) return []
+        _showTmpMsg()
+        var execute = index => {
+            try {
+                var client = decision.client()
+                var response = client[decision.method](clone(states[index]), clone(spec.questions), clone(decision.options))
+                if (isUnDef(spec.assign)) return response
+                var result = clone(entries[index])
+                fields.forEach(field => {
+                    var selected = $path(response, spec.assign[field])
+                    if (isUnDef(selected)) throw new Error("assign expression for " + field + " returned undefined")
+                    // Literal field names, including dots, never become nested setters.
+                    Object.defineProperty(result, field, {value:selected, enumerable:true, writable:true, configurable:true})
+                })
+                return result
+            } catch(e) {
+                var error = new Error("llmdecide entry " + index + ": " + String(e))
+                if (isDef(e.code)) error.code = e.code
+                error.cause = e
+                throw error
+            }
+        }
+        var indexes = entries.map((entry, index) => index), result
+        var parallel = toBoolean(params.parallel) || String(getEnv("OAFP_PARALLEL")).toLowerCase() == "true"
+        if (parallel && isDef(pForEach)) {
+            ow.loadObj()
+            var errors = new ow.obj.syncArray()
+            result = pForEach(indexes, execute, error => errors.add(error))
+            if (errors.length() > 0) throw errors.toArray()[0]
+        } else result = indexes.map(execute)
+        return array ? result : result[0]
     },
     "llmprompt": _r => {
         if (isString(params.llmprompt)) {
@@ -3736,28 +3832,10 @@ var _inputFns = new Map([
             Object.keys(request).some(key => ["state", "questions", "options"].indexOf(key) < 0)) {
             _exit(-1, "in=llmdecide requires {state, questions, options?} with text/map/array state, a questions map and optional options map")
         }
-        if (isDef(params.llmimage)) {
-            if (!isString(params.llmimage) || !io.fileExists(params.llmimage) || !io.fileInfo(params.llmimage).isFile)
-                _exit(-1, "in=llmdecide llmimage requires a local image file")
-            if (isDef(request.options) && Object.prototype.hasOwnProperty.call(request.options, "images"))
-                _exit(-1, "in=llmdecide cannot combine llmimage with options.images")
-            if (isUnDef(request.options)) request.options = {}
-            request.options.images = [af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))]
-        }
-        params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
-        if (params.llmenv == "OAFP_MODEL" && isUnDef(getEnv("OAFP_MODEL")) && isDef(getEnv("OAF_DECIDE_MODEL")))
-            params.llmenv = "OAF_DECIDE_MODEL"
-        params.llmenv     = _resolveLLMEnvName(params.llmenv)
-        params.llmoptions = _$(params.llmoptions, "llmoptions").or().isString().isMap().default(__)
-        if (isUnDef(params.llmoptions) && !isString(getEnv(params.llmenv)))
-            _exit(-1, "llmoptions not defined and " + params.llmenv + " not found.")
-
+        var decision = _llmDecisionSetup(request.options, "in=llmdecide")
         _showTmpMsg()
-        var client = $llm( _getSec(isDef(params.llmoptions) ? _fromJSSLON(params.llmoptions) : $sec("system", "envs").get(params.llmenv)) )
-        var method = toBoolean(params.llmdecidestats) ? "decideWithStats" : "decide"
-        if (typeof client[method] !== "function")
-            _exit(-1, "in=llmdecide requires an updated OpenAF runtime with $llm()." + method + "() support")
-        _$o(client[method](request.state, request.questions, request.options), options)
+        var client = decision.client()
+        _$o(client[decision.method](request.state, request.questions, decision.options), options)
     }],
     ["llm", (_res, options) => {
         params.llmenv     = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
