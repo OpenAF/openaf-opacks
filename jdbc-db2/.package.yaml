@@ -16,7 +16,7 @@ name: jdbc-db2
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260923'
+version: '20261006'
 dependencies:
   openaf: '>=20240318'
 files:
