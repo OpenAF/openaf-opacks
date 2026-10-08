@@ -1,8 +1,6 @@
 
   # openaf-opacks
   
-  Maven dependency discovery, local refresh and CI reporting: [maintenance guide](MAVEN-MAINTENANCE.md).
-
   List of OpenAF opacks:
   
   | Name   | Description   |
