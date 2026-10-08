@@ -234,3 +234,11 @@ docker run --rm -ti -e OAF_MODEL=$OAF_MODEL my-image
 - This opack uses the Java SDK session `sendAndWait` flow.
 - `aJsonFlag=true` appends a JSON-only instruction and attempts to parse the answer.
 - Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, `getModelInfo(aModelId)`, `exportConversation()`, and `importConversation(...)`.
+
+## Dependency refresh (2026-10-09)
+
+The 20261009 local package bundles copilot-sdk-java 1.0.18-preview.4, matching
+the SDK already shipped on master. The Maven maintenance configuration holds
+this preview version explicitly because automatic discovery selects stable
+releases only. Copilot authentication and CLI/server compatibility still need
+to be verified in the target environment.

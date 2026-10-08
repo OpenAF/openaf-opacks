@@ -21,3 +21,8 @@ workbook.saveAs("output.xlsx");
 
 Use the plugin to automate report generation, spreadsheet ingestion, or XLSX transformations without having to manage POI
 manually.
+
+## Dependency refresh (2026-10-09)
+
+The 20261009 package retains Apache POI 5.5.1, updates XMLBeans to 5.4.1,
+and rebuilds the XLS/DOC plugin against the refreshed bundle.

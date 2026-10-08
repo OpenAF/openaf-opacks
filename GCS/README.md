@@ -30,7 +30,7 @@ methods let you probe object existence, read metadata, and generate presigned UR
 The oPack bundles all transitive dependencies required by the `google-cloud-storage` Java client. No manual classpath management is
 necessary—once the oPack is installed every OpenAF runtime can immediately leverage the Storage API.
 
-The 20260924 package bundles google-cloud-storage 2.73.0 and its matching
+The 20261009 package bundles google-cloud-storage 2.75.0 and its matching
 Google API and gRPC dependencies.
 
 ## Corrections (2026-09-18)

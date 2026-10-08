@@ -1,7 +1,28 @@
 {
   "schemaVersion": 1,
   "repository": "https://repo.maven.apache.org/maven2",
-  "holds": {},
+  "holds": {
+    "Maven/org.apache.maven:maven-resolver-provider": {
+      "version": "4.0.0-rc-7",
+      "reason": "Keep the Maven 4 API line required by the wrapper; latest stable would downgrade to Maven 3."
+    },
+    "Maven/org.apache.maven:maven-model": {
+      "version": "4.0.0-rc-7",
+      "reason": "Keep the Maven 4 API line required by the wrapper; latest stable would downgrade to Maven 3."
+    },
+    "Maven/org.apache.maven:maven-model-builder": {
+      "version": "4.0.0-rc-7",
+      "reason": "Keep the Maven 4 API line required by the wrapper; latest stable would downgrade to Maven 3."
+    },
+    "Maven/org.apache.maven.resolver:maven-resolver-transport-http": {
+      "version": "2.0.0-alpha-2",
+      "reason": "Preserve the existing HTTP transporter API used by the wrapper; latest stable belongs to Resolver 1.x."
+    },
+    "ghcopilot/com.github:copilot-sdk-java": {
+      "version": "1.0.18-preview.4",
+      "reason": "Match the preview SDK already shipped on master; the stable-only selector cannot select this SDK release."
+    }
+  },
   "opacks": {
     "plugin-GIT": {
       "build": [
@@ -105,6 +126,17 @@
     },
     "GoogleCompiler": {
       "blockedReason": "GoogleCompiler ships separate Java baseline compiler.jar/compiler11.jar outputs. A reviewed adapter is required to preserve their runtime selection before automatic updates."
+    },
+    "Maven": {
+      "tests": [
+        {
+          "command": [
+            "oaf",
+            "-c",
+            "var originalGetOPackPath = getOPackPath; getOPackPath = function(n) { return n == \"Maven\" ? io.getCanonicalPath(\".\") : originalGetOPackPath(n) }; loadExternalJars(\".\"); load(\"maven.js\"); var m = new Maven(); if (!m.resolve(\"org.apache.commons:commons-email:1.5\").length) throw new Error(\"No artifacts resolved\"); var alias = new MavenResolver(); if (!alias.resolve(\"org.apache.commons:commons-email:1.5\").length) throw new Error(\"No artifacts resolved via alias\"); print(\"PASS Maven resolution and alias\")"
+          ]
+        }
+      ]
     }
   }
 }

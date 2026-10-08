@@ -93,6 +93,20 @@ var mavenMaintenance = (function() {
       Object.keys(inventory).forEach(function(p) { var f = inventory[p]; out[p] = { hash: sha1(io.readFileBytes(f.canonicalPath)), size: Number(f.size) } })
       return out
     }
+    // oPack signatures omit CR bytes in text files; transaction hashes retain them.
+    function packageHash(path) {
+      if (io.isBinaryFile(path)) return sha1(io.readFileBytes(path))
+      var stream = io.readFileStream(path)
+      var digest = Packages.org.apache.commons.codec.digest.DigestUtils.getDigest("SHA-1")
+      try {
+        ioStreamReadBytes(stream, function(bytes) {
+          var normalized = []
+          for (var i in bytes) if (bytes[i] != 13) normalized.push(bytes[i])
+          digest.update(normalized)
+        })
+      } finally { stream.close() }
+      return String(Packages.org.apache.commons.codec.binary.Hex.encodeHexString(digest.digest()))
+    }
     function copy(src, dest) {
       io.mkdir(dest)
       Object.keys(entries(src)).forEach(function(p) {
@@ -320,7 +334,7 @@ var mavenMaintenance = (function() {
           relPath(p)
           if (p.split("/").some(function(x) { return excludes.indexOf(x) >= 0 })) throw new Error("Excluded path packaged: " + p)
           if (!snapshot[p]) throw new Error("Missing packaged file: " + p)
-          if (p !== ".package.yaml" && (!pkg.filesHash || pkg.filesHash[p] !== snapshot[p].hash)) throw new Error("Package hash mismatch: " + p)
+          if (p !== ".package.yaml" && (!pkg.filesHash || pkg.filesHash[p] !== packageHash(work + "/" + p))) throw new Error("Package hash mismatch: " + p)
         })
         Object.keys(snapshot).filter(function(p) { return /\.jar$/.test(p) }).forEach(function(p) { if (pkg.files.indexOf(p) < 0) throw new Error("JAR missing from package: " + p) })
         row.packageVersion = String(pkg.version)

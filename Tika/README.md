@@ -1,6 +1,6 @@
 # Tika
 
-Extract text and metadata from existing documents using Apache Tika 4.0.0.
+Extract text and metadata from existing documents using Apache Tika 4.1.0.
 Includes parsers for PDF, Microsoft Office (including DOCX/XLSX/PPTX), HTML,
 plain text, email and image metadata. Format support depends on the bundled
 parsers; this is not the full Tika application distribution.

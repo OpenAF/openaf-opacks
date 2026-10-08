@@ -116,3 +116,14 @@ m.removeOldVersions("com.google.code.gson.gson", "gson-{{version}}.jar", "/path/
 var mr = new MavenResolver();
 var resolved = mr.resolve("org.apache.commons:commons-email:1.5");
 ```
+
+## Dependency refresh (2026-10-09)
+
+The 20261009 dependency refresh targets Maven Resolver 2.0.24 and Maven
+4.0.0-rc-7. Repository maintenance holds preserve the Maven 4 API line and the
+existing HTTP transporter 2.0.0-alpha-2; selecting latest stable for those
+artifacts would instead choose incompatible older API lines. The resolver
+validator is initialized with the map required by Resolver 2.x.
+
+The maintenance job runs a checkout-local dependency-resolution and alias smoke
+test before applying this bundle.

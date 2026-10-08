@@ -1,21 +1,31 @@
 artifacts:
-  - group: org.apache.maven.resolver
-    id: maven-resolver-api
-  - group: org.apache.maven.resolver
-    id: maven-resolver-spi
-  - group: org.apache.maven.resolver
-    id: maven-resolver-util
-  - group: org.apache.maven.resolver
-    id: maven-resolver-impl
-  - group: org.apache.maven.resolver
-    id: maven-resolver-connector-basic
-  - group: org.apache.maven.resolver
-    id: maven-resolver-transport-file
-  - group: org.apache.maven.resolver
-    id: maven-resolver-transport-http
-  - group: org.apache.maven
-    id: maven-resolver-provider
-  - group: org.apache.maven
-    id: maven-model
-  - group: org.apache.maven
-    id: maven-model-builder
+- group: org.apache.maven.resolver
+  id: maven-resolver-api
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-spi
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-util
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-impl
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-connector-basic
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-transport-file
+  version: 2.0.24
+- group: org.apache.maven.resolver
+  id: maven-resolver-transport-http
+  version: 2.0.0-alpha-2
+- group: org.apache.maven
+  id: maven-resolver-provider
+  version: 4.0.0-rc-7
+- group: org.apache.maven
+  id: maven-model
+  version: 4.0.0-rc-7
+- group: org.apache.maven
+  id: maven-model-builder
+  version: 4.0.0-rc-7

@@ -20,7 +20,7 @@ name: Kafka
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260924'
+version: '20261009'
 dependencies:
   openaf: '>=20250725'
 files:
@@ -29,16 +29,16 @@ files:
 - README.md
 - kafka-clients-4.3.1.jar
 - kafka.js
-- lz4-java-1.11.3.jar
+- lz4-java-1.12.0.jar
 - oafp_kafka.js
-- snappy-java-1.1.10.8.jar
-- zstd-jni-1.5.7-17.jar
+- snappy-java-1.1.10.11.jar
+- zstd-jni-1.5.7-22.jar
 filesHash:
-  .maven.yaml: 923859f3e704b63e3d1c5603f13619b205f25f20
-  README.md: 874393ef701791c77f5e9832ea7b64fd814752ab
+  .maven.yaml: 687b82d44a53bbb55b7193f79daf7c9d0b7f5b8e
+  README.md: bd5f442d11bddcce6ca51771b706afc532d5eb65
   kafka-clients-4.3.1.jar: 74209a28d36f819b2f7a9b599e468b5654cad514
   kafka.js: ea0484e7b11ed8a5b2df208740a17bb0f0aa0816
-  lz4-java-1.11.3.jar: 275ac7e05f6989789004c9faaa4cf64629a29cd9
+  lz4-java-1.12.0.jar: 04aeb33effcf8f9e29f4a2e206c224afebd2621d
   oafp_kafka.js: c3e25c37921ea456d20bc817cd6f785d3b6a5993
-  snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
-  zstd-jni-1.5.7-17.jar: b4fea046fcd925681fa10c61be99da059f4f745a
+  snappy-java-1.1.10.11.jar: e633edcf90b86efb17bab87da6ea517933683a88
+  zstd-jni-1.5.7-22.jar: 6b2da2ba2a916bd9d89d60bdeede164f989c4b5a

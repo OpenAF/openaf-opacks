@@ -20,7 +20,7 @@ name: Maven
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260528'
+version: '20261009'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -29,88 +29,82 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- commons-codec-1.16.0.jar
 - error_prone_annotations-2.48.0.jar
-- gson-2.14.0.jar
 - httpclient-4.5.14.jar
 - httpcore-4.4.16.jar
 - jcl-over-slf4j-1.7.36.jar
-- maven-api-annotations-4.0.0-rc-6.jar
-- maven-api-core-4.0.0-rc-6.jar
-- maven-api-di-4.0.0-rc-6.jar
-- maven-api-metadata-4.0.0-rc-6.jar
-- maven-api-model-4.0.0-rc-6.jar
-- maven-api-plugin-4.0.0-rc-6.jar
-- maven-api-settings-4.0.0-rc-6.jar
-- maven-api-spi-4.0.0-rc-6.jar
-- maven-api-toolchain-4.0.0-rc-6.jar
-- maven-api-xml-4.0.0-rc-6.jar
-- maven-artifact-4.0.0-rc-6.jar
-- maven-builder-support-4.0.0-rc-6.jar
-- maven-model-4.0.0-rc-6.jar
-- maven-model-builder-4.0.0-rc-6.jar
-- maven-repository-metadata-4.0.0-rc-6.jar
-- maven-resolver-api-2.0.23.jar
-- maven-resolver-connector-basic-2.0.23.jar
-- maven-resolver-impl-2.0.23.jar
-- maven-resolver-named-locks-2.0.23.jar
-- maven-resolver-provider-4.0.0-rc-6.jar
-- maven-resolver-spi-2.0.23.jar
-- maven-resolver-transport-apache-2.0.21.jar
-- maven-resolver-transport-file-2.0.23.jar
+- maven-api-annotations-4.0.0-rc-7.jar
+- maven-api-core-4.0.0-rc-7.jar
+- maven-api-di-4.0.0-rc-7.jar
+- maven-api-metadata-4.0.0-rc-7.jar
+- maven-api-model-4.0.0-rc-7.jar
+- maven-api-plugin-4.0.0-rc-7.jar
+- maven-api-settings-4.0.0-rc-7.jar
+- maven-api-spi-4.0.0-rc-7.jar
+- maven-api-toolchain-4.0.0-rc-7.jar
+- maven-api-xml-4.0.0-rc-7.jar
+- maven-artifact-4.0.0-rc-7.jar
+- maven-builder-support-4.0.0-rc-7.jar
+- maven-model-4.0.0-rc-7.jar
+- maven-model-builder-4.0.0-rc-7.jar
+- maven-repository-metadata-4.0.0-rc-7.jar
+- maven-resolver-api-2.0.24.jar
+- maven-resolver-connector-basic-2.0.24.jar
+- maven-resolver-impl-2.0.24.jar
+- maven-resolver-named-locks-2.0.24.jar
+- maven-resolver-provider-4.0.0-rc-7.jar
+- maven-resolver-spi-2.0.24.jar
+- maven-resolver-transport-apache-2.0.23.jar
+- maven-resolver-transport-file-2.0.24.jar
 - maven-resolver-transport-http-2.0.0-alpha-2.jar
-- maven-resolver-util-2.0.23.jar
-- maven-support-4.0.0-rc-6.jar
-- maven-xml-4.0.0-rc-6.jar
+- maven-resolver-util-2.0.24.jar
+- maven-support-4.0.0-rc-7.jar
+- maven-xml-4.0.0-rc-7.jar
 - maven.js
-- plexus-interpolation-1.29.jar
+- plexus-interpolation-1.30.0.jar
 - plexus-utils-4.0.3.jar
-- plexus-xml-4.1.1.jar
-- slf4j-api-2.0.19.jar
+- plexus-xml-4.2.0.jar
 - stax2-api-4.3.0.jar
-- woodstox-core-7.2.1.jar
+- woodstox-core-7.2.2.jar
 filesHash:
-  .maven.yaml: f10eeccfa2c3ce72218161cab815519cd3459554
+  .maven.yaml: 71ee78edabe9d8169ca6c8f5a5407dccadfb5102
   .odoc.db: 0a99ac83d31fcdb75693dd525233261288c37dc5
   .precompile: 4a18627431df72418344ca16b0e89267483a5d92
-  README.md: 013457c18f3d91e8090975076bb850ff375c76c9
-  commons-codec-1.16.0.jar: 4e3eb3d79888d76b54e28b350915b5dc3919c9de
+  README.md: 6fc393e6003552b864fa632673c9dd46c3402ddd
   error_prone_annotations-2.48.0.jar: bbe30942a31d1778c74cb272321267eca82dc708
-  gson-2.14.0.jar: efc0e34ede4e3204eaefb84a00e55e8c86634382
   httpclient-4.5.14.jar: 1194890e6f56ec29177673f2f12d0b8e627dec98
   httpcore-4.4.16.jar: 51cf043c87253c9f58b539c9f7e44c8894223850
   jcl-over-slf4j-1.7.36.jar: d877e195a05aca4a2f1ad2ff14bfec1393af4b5e
-  maven-api-annotations-4.0.0-rc-6.jar: cebafb55f649aa9b65d7ae723eed13a23411349a
-  maven-api-core-4.0.0-rc-6.jar: 9fa493de1888a567d317f9628b34a9a21ef0edcf
-  maven-api-di-4.0.0-rc-6.jar: 80f226bc700a9b9ab8337e2e133b3a624640092a
-  maven-api-metadata-4.0.0-rc-6.jar: e20dbcd7cb7a2fb33ddd9d39c643ce8bc6f900ae
-  maven-api-model-4.0.0-rc-6.jar: 782dc3d9a2df3cf18b82e474c6b2cb222ba32ff1
-  maven-api-plugin-4.0.0-rc-6.jar: 78b7ebbaccba85113e3faa418b6eec137814e42e
-  maven-api-settings-4.0.0-rc-6.jar: 35232712f1ee26560031f1b6bd977186a5041f2d
-  maven-api-spi-4.0.0-rc-6.jar: ca8ea92e008509016216c8b77b96e4990312f920
-  maven-api-toolchain-4.0.0-rc-6.jar: 26935e46f3afe9be1a1882a40deaad12551e9234
-  maven-api-xml-4.0.0-rc-6.jar: 7cb17193fa1010c6926cb833949f625cab784f0f
-  maven-artifact-4.0.0-rc-6.jar: 32f42929c161525814cde2136009b72144ee9c64
-  maven-builder-support-4.0.0-rc-6.jar: 730144d81a0aa6b4613fa8745afd39617eb989a8
-  maven-model-4.0.0-rc-6.jar: 344da448cb38028f0f0a5dc9af3b95aa2a491a52
-  maven-model-builder-4.0.0-rc-6.jar: 076665133db7774d2c3b5ea0d4f1dce33cf6ef99
-  maven-repository-metadata-4.0.0-rc-6.jar: 3b7032776020be23d0fa8fc1bb1bd2a1a4387115
-  maven-resolver-api-2.0.23.jar: 484270fd5452adf7c4f5454cb86c23bdf6cb4fce
-  maven-resolver-connector-basic-2.0.23.jar: 56479517d24543d11f9d2f3f5d27852f9225ccf1
-  maven-resolver-impl-2.0.23.jar: 5802cbbb8436726db9911155447c4e715b28ddd5
-  maven-resolver-named-locks-2.0.23.jar: 113ead4e3638850302a3d8d1c5684f2f47941c39
-  maven-resolver-provider-4.0.0-rc-6.jar: 2ad9201c3ba786f7e5e085e025434fbba543aaa7
-  maven-resolver-spi-2.0.23.jar: 1c5d0e37df21a443c5f2eb7e67bbd1187da90247
-  maven-resolver-transport-apache-2.0.21.jar: 1d6c9aeb4558f682cc7b6bd5794873721a8e58b9
-  maven-resolver-transport-file-2.0.23.jar: c81d2f23456d2be6b874d0fe1f1321dc897530c6
+  maven-api-annotations-4.0.0-rc-7.jar: e39cfdf695b89aa85d0c0fc8a48381601afce74b
+  maven-api-core-4.0.0-rc-7.jar: 87bc3b8461ddfc70db9d30ca179de485d93e7d53
+  maven-api-di-4.0.0-rc-7.jar: d0ad00b69f836bb76f06ae85e87d41ff90b8c1a7
+  maven-api-metadata-4.0.0-rc-7.jar: 91876d20e0657937faf3a67344ca9e7af1933be4
+  maven-api-model-4.0.0-rc-7.jar: 59546311af40992049229fe0bbdf6347afa0aac4
+  maven-api-plugin-4.0.0-rc-7.jar: b5a9a1fc815d5c03af3e27935ddd1e5d8c3ffb32
+  maven-api-settings-4.0.0-rc-7.jar: 6af33a23c23fdc455e1730cac28d05f5ead44ac3
+  maven-api-spi-4.0.0-rc-7.jar: 3221256907c710799ff54d54a28c24968b14fc10
+  maven-api-toolchain-4.0.0-rc-7.jar: 76757c90db97fa3c2d6c07da9e7d269344fb2501
+  maven-api-xml-4.0.0-rc-7.jar: 8269fa564bd56ec812c54abee49c3d94a805ea0a
+  maven-artifact-4.0.0-rc-7.jar: e4598ece0801cdb6eb0070c23429c47c6ffe80cf
+  maven-builder-support-4.0.0-rc-7.jar: fb542c706d603f5b0a2aa37127762c1e4e819a0c
+  maven-model-4.0.0-rc-7.jar: 4a5b328ec935dad46f79ad04a4e1e4e49b910a5e
+  maven-model-builder-4.0.0-rc-7.jar: d0904456b82e6360ca9d1115b23062d10075ca96
+  maven-repository-metadata-4.0.0-rc-7.jar: c6706d92aaf7586406ecafd0f2f70507d269264f
+  maven-resolver-api-2.0.24.jar: 67e6bb218aa152542a71fe6e71b75903df1573ff
+  maven-resolver-connector-basic-2.0.24.jar: d3c56e3d88f32a76ef8a049af344ba0a91f881ea
+  maven-resolver-impl-2.0.24.jar: ff1b82108c48eb69aabb4c2ea7b887da69df4cdf
+  maven-resolver-named-locks-2.0.24.jar: 9d17f451a78f010cb0595fa1f7dfb68b9bed7edd
+  maven-resolver-provider-4.0.0-rc-7.jar: fd2d2a3feae678326fea0a4f4368d8abf9b69e3a
+  maven-resolver-spi-2.0.24.jar: 9738561c983e307b4e0482e0e18691b31507aa81
+  maven-resolver-transport-apache-2.0.23.jar: 0fdfb7aa55458a5e26b020d8aba481500c7a85e4
+  maven-resolver-transport-file-2.0.24.jar: 55f43d4ca3744280a367ea68ffaca5ec2a97edec
   maven-resolver-transport-http-2.0.0-alpha-2.jar: 3040d5c5d709ed325aec764d5ce4a2a0d6517321
-  maven-resolver-util-2.0.23.jar: d6ffd04f02e6900cdcf1a615cc26e042c1e3659a
-  maven-support-4.0.0-rc-6.jar: c2fa84baa864e1630884f471c99b8381f5012045
-  maven-xml-4.0.0-rc-6.jar: d73795ac39bb0f15fd6a6684054894e6829d38a7
-  maven.js: 2f1db2dba3a112d95b70d6af22184a7c779c4225
-  plexus-interpolation-1.29.jar: 5dd1b1fbaca263ad5baa169fbd8e804c789c9db5
+  maven-resolver-util-2.0.24.jar: 1e8d9ff7ef457863a604fd6626637ae11bf61c90
+  maven-support-4.0.0-rc-7.jar: 0baba4c8ae8397e93ad425feddf643797b1d0f42
+  maven-xml-4.0.0-rc-7.jar: bcaabc9b140e2977e9d6e27c2a58647ab219377e
+  maven.js: 95d17bc1b23b619ecea0f3740aad494f194dbb85
+  plexus-interpolation-1.30.0.jar: e48988a88cf1624451648f1c150e88c36aa724de
   plexus-utils-4.0.3.jar: c097bf60a8a7aaf37dfb8f2c933a21e784035976
-  plexus-xml-4.1.1.jar: 0ba2882112273cc8183c292387fbf12b4e87dd5f
-  slf4j-api-2.0.19.jar: efad9817997b3a6ce9e058f92e612917a744c290
+  plexus-xml-4.2.0.jar: ff8ce8ad4731baac8162837174759840b8c5b712
   stax2-api-4.3.0.jar: 59251773c44122e8d1366f68884e29dd784e141b
-  woodstox-core-7.2.1.jar: 68867a734916adfb379bc6881df6e1d8b575edb9
+  woodstox-core-7.2.2.jar: 64e3e5e7fd3158068c7329d74bcfee3217df1741

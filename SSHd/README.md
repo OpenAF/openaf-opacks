@@ -34,3 +34,7 @@ oaf -f tests/regression.js
 ```
 
 These checks use local fixtures and test doubles; they do not verify a live external service.
+
+## Dependency refresh (2026-10-09)
+
+The 20261009 package bundles Apache MINA SSHD 2.20.0.

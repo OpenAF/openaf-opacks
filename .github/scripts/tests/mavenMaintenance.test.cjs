@@ -256,3 +256,17 @@ test('report formats delegate to OpenAF and honor standard format flags', () => 
   assert.equal(calls[3].markdown[0].oPack,'Example')
   assert.deepEqual(prints,['native markdown'])
 })
+
+test('native package validation accepts CRLF text without changing source bytes', {skip:!fs.existsSync(oaf)}, t => {
+  const f = fixture(t)
+  const source = '// Windows text\r\n// preserved\r\n'
+  fs.writeFileSync(path.join(f.dir,'Sample/wrapper.js'),source)
+  const result = f.run()
+  if (result.candidate) t.after(() => fs.rmSync(result.candidate,{recursive:true,force:true}))
+  assert.equal(result.exitCode,0,JSON.stringify(result))
+  assert.equal(fs.readFileSync(path.join(f.dir,'Sample/wrapper.js'),'utf8'),source)
+  const second = f.run()
+  if (second.candidate) t.after(() => fs.rmSync(second.candidate,{recursive:true,force:true}))
+  assert.equal(second.exitCode,0,JSON.stringify(second))
+  assert.equal(second.opacks[0].status,'unchanged')
+})

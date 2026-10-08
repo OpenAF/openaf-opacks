@@ -20,7 +20,7 @@ name: Tika
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260919'
+version: '20261009'
 dependencies:
   openaf: '>=20260918'
 files:
@@ -29,30 +29,24 @@ files:
 - .package.yaml
 - README.md
 - SparseBitSet-1.3.jar
-- angus-activation-2.0.3.jar
-- apache-mime4j-core-0.8.14.jar
-- apache-mime4j-dom-0.8.14.jar
-- bcjmail-jdk18on-1.85.jar
-- bcpkix-jdk18on-1.85.jar
-- bcprov-jdk18on-1.85.2.jar
-- bcutil-jdk18on-1.85.jar
+- apache-mime4j-core-0.8.15.jar
+- apache-mime4j-dom-0.8.15.jar
+- bcjmail-jdk18on-1.86.jar
+- bcpkix-jdk18on-1.86.jar
+- bcprov-jdk18on-1.86.jar
+- bcutil-jdk18on-1.86.jar
 - commonmark-0.30.0.jar
 - commonmark-ext-gfm-strikethrough-0.30.0.jar
 - commonmark-ext-gfm-tables-0.30.0.jar
 - commons-exec-1.6.0.jar
 - curvesapi-1.08.jar
 - fontbox-3.0.8.jar
-- istack-commons-runtime-4.1.2.jar
-- jackcess-4.0.11.jar
-- jackcess-encrypt-4.0.3.jar
+- jackcess-5.0.0.jar
+- jackcess-encrypt-5.0.0.jar
 - jai-imageio-core-1.4.0.jar
-- jakarta.activation-api-2.1.4.jar
-- jakarta.xml.bind-api-4.0.5.jar
 - java-libpst-0.9.3.jar
-- jaxb-core-4.0.9.jar
-- jaxb-runtime-4.0.9.jar
 - jbig2-imageio-3.0.5.jar
-- jsoup-1.23.1.jar
+- jsoup-1.23.2.jar
 - log4j-api-2.26.1.jar
 - log4j-to-slf4j-2.26.1.jar
 - metadata-extractor-2.21.0.jar
@@ -64,55 +58,48 @@ files:
 - poi-5.5.1.jar
 - poi-ooxml-5.5.1.jar
 - poi-scratchpad-5.5.1.jar
-- tika-core-4.0.0.jar
-- tika-encoding-detector-mojibuster-4.0.0.jar
-- tika-ml-core-4.0.0.jar
-- tika-parser-datauri-commons-4.0.0.jar
-- tika-parser-html-module-4.0.0.jar
-- tika-parser-image-module-4.0.0.jar
-- tika-parser-mail-commons-4.0.0.jar
-- tika-parser-mail-module-4.0.0.jar
-- tika-parser-microsoft-module-4.0.0.jar
-- tika-parser-ocr-module-4.0.0.jar
-- tika-parser-pdf-module-4.0.0.jar
-- tika-parser-text-module-4.0.0.jar
-- tika-parser-xml-module-4.0.0.jar
-- tika-parser-xmp-commons-4.0.0.jar
-- tika-parser-zip-commons-4.0.0.jar
-- tika-serialization-4.0.0.jar
+- tika-core-4.1.0.jar
+- tika-encoding-detector-mojibuster-4.1.0.jar
+- tika-ml-core-4.1.0.jar
+- tika-parser-datauri-commons-4.1.0.jar
+- tika-parser-html-module-4.1.0.jar
+- tika-parser-image-module-4.1.0.jar
+- tika-parser-mail-commons-4.1.0.jar
+- tika-parser-mail-module-4.1.0.jar
+- tika-parser-microsoft-module-4.1.0.jar
+- tika-parser-ocr-module-4.1.0.jar
+- tika-parser-pdf-module-4.1.0.jar
+- tika-parser-text-module-4.1.0.jar
+- tika-parser-xml-module-4.1.0.jar
+- tika-parser-xmp-commons-4.1.0.jar
+- tika-parser-zip-commons-4.1.0.jar
+- tika-serialization-4.1.0.jar
 - tika.js
-- txw2-4.0.9.jar
 - xmlbeans-5.3.0.jar
 - xmpcore-6.1.11.jar
 filesHash:
   .gitignore: 1d997f3b74c461ad7d7e0abaa3081d92f0b77079
-  .maven.yaml: 19a3f9bab2f5f04ed4ebcdc2aadd2a97931b00d3
-  README.md: d942de3fb3e9f73c8f87e2bbd3a7ac27d978fc70
+  .maven.yaml: 06c372acd1b0acd3f8bb8782983f868e9961021b
+  README.md: 4482db6a3c6c30613347685dd12c4322d6f429f4
   SparseBitSet-1.3.jar: 533eac055afe3d5f614ea95e333afd6c2bde8f26
-  angus-activation-2.0.3.jar: 7f80607ea5014fef0b1779e6c33d63a88a45a563
-  apache-mime4j-core-0.8.14.jar: 799881495e349e71c1b9a29f7658b03e263d6002
-  apache-mime4j-dom-0.8.14.jar: 3c7fd61ca38b75b470ddd2ce9521597ea29e2031
-  bcjmail-jdk18on-1.85.jar: ae26f2937ccdb7d3a499dfa176788833e3363430
-  bcpkix-jdk18on-1.85.jar: b33d047adc6801a1cfc8ffe1634b23b306a670c1
-  bcprov-jdk18on-1.85.2.jar: aeb3dac02f799ed4783d5ed5900513339880727f
-  bcutil-jdk18on-1.85.jar: c41082d6f61628919b675970563f5615e4427c9f
+  apache-mime4j-core-0.8.15.jar: e9846d6d34c941907376174f7ac691ca7ea7d7ad
+  apache-mime4j-dom-0.8.15.jar: e7af2b28a958399d853154cfac0e9725cb6d4a14
+  bcjmail-jdk18on-1.86.jar: c2adf2980471bf5ffbd5ef3afdc6cc419ae2b1f3
+  bcpkix-jdk18on-1.86.jar: fb5ea65959db10fe5d61148bb2b77f6e231455b1
+  bcprov-jdk18on-1.86.jar: 830c8467bed8e4c1148262386b09fc42aedcf262
+  bcutil-jdk18on-1.86.jar: 2c8e77f5601c2b84c8773af4caf403a34daca357
   commonmark-0.30.0.jar: fc611136b3191a08d2b84c5d5a26116e3531afee
   commonmark-ext-gfm-strikethrough-0.30.0.jar: e9addacba704ffce26d6b8bcd1c50e235ec2c991
   commonmark-ext-gfm-tables-0.30.0.jar: 84560a4af5afe4808543bd9c5587a660ce148b14
   commons-exec-1.6.0.jar: d24a2fd672c3c278e60388bef656d9d89cf9df4f
   curvesapi-1.08.jar: 3d3d36568154059825089b289dcfca481fe44e2c
   fontbox-3.0.8.jar: e9f4225dc564b212ecdc31d1574f2d0c1dc3ad30
-  istack-commons-runtime-4.1.2.jar: 18ec117c85f3ba0ac65409136afa8e42bc74e739
-  jackcess-4.0.11.jar: b66bf29a97e35033a2e17af6f8f5a0ff9fbab59a
-  jackcess-encrypt-4.0.3.jar: 23ed17cb81b0a6ef37371a483df850885d8414a4
+  jackcess-5.0.0.jar: 76243b9ecc04f67dbe8569cc9fb64323318a5d34
+  jackcess-encrypt-5.0.0.jar: b7e2ef4d238c81b885336d23e6b3299c2f51c7b7
   jai-imageio-core-1.4.0.jar: fb6d79b929556362a241b2f65a04e538062f0077
-  jakarta.activation-api-2.1.4.jar: 9e5c2a0d75dde71a0bedc4dbdbe47b78a5dc50f8
-  jakarta.xml.bind-api-4.0.5.jar: 161811f36cad3c65991502e80317f2f6703361df
   java-libpst-0.9.3.jar: 928a6698850cd89577d28201ff1ac443bb339d2b
-  jaxb-core-4.0.9.jar: 3f32ec949d109d666fa30994223d1c25a47b105f
-  jaxb-runtime-4.0.9.jar: 500c199572538675d2819c938fbafe34935d8d6b
   jbig2-imageio-3.0.5.jar: 6e857678510425518c9082fe46c677068bd4257d
-  jsoup-1.23.1.jar: 0c0350bb325da274f0508349109516a7855d01ab
+  jsoup-1.23.2.jar: 514805efcc430bfb04e82f20bb998e39e3fd5c9c
   log4j-api-2.26.1.jar: b9864ed8d0c01f65f3b0bf70f1447e5cc1b49c24
   log4j-to-slf4j-2.26.1.jar: a5100727b898c513fda177a4f388299a5fe5955f
   metadata-extractor-2.21.0.jar: e49030b5b32a0f0cf7db59a26c914575082b1c21
@@ -124,23 +111,22 @@ filesHash:
   poi-5.5.1.jar: 613d253b6f5f0849dd68fed043a7fb4b005e63a0
   poi-ooxml-5.5.1.jar: ff561a9cab46bfe95667d5085580fefb2353fdaf
   poi-scratchpad-5.5.1.jar: 3b5d92ccc2ddb9e17946b22b0ea504c5a33126b5
-  tika-core-4.0.0.jar: f370d8619de9e19329b2cc117943c83468c2ff9f
-  tika-encoding-detector-mojibuster-4.0.0.jar: 86894a44760764ff078c7e8c73253383f506a2bc
-  tika-ml-core-4.0.0.jar: a40b51f820cd958e0a785ff52282fee038c3ebab
-  tika-parser-datauri-commons-4.0.0.jar: d3d6d6d2adfe94a5433cd2232048480cf6dc421d
-  tika-parser-html-module-4.0.0.jar: 9788969d1e054263d7dd3de08b8bbbf64b4e977f
-  tika-parser-image-module-4.0.0.jar: 4cc408274b9209358121782d070b0c46c3df830e
-  tika-parser-mail-commons-4.0.0.jar: cabfe98b1ddad681d035c36fbf68e85f7466193b
-  tika-parser-mail-module-4.0.0.jar: e4d5a7b5f98a8d39a0f75222098b1c9b9bfa1e68
-  tika-parser-microsoft-module-4.0.0.jar: f9774f6a2ef2accf965a5ad88942855cd31c1644
-  tika-parser-ocr-module-4.0.0.jar: 8c355a16e202fdc0a4a40f301245953f29e7bbaa
-  tika-parser-pdf-module-4.0.0.jar: 3db4279668cf9019e6eb8f6d84fe294357194ef4
-  tika-parser-text-module-4.0.0.jar: 9f4144483e6dced27603df86bc6cfad8b4fba025
-  tika-parser-xml-module-4.0.0.jar: 0377793d03089950f728b382b0276128d5957fc1
-  tika-parser-xmp-commons-4.0.0.jar: 1d0bcc1ffab8596db241a3624c38e203e8de6053
-  tika-parser-zip-commons-4.0.0.jar: 815ab32785620f1a586621f768ef794e9a54cea5
-  tika-serialization-4.0.0.jar: 7063c7bfffb94326ef1f3be36db38b84e4233d67
+  tika-core-4.1.0.jar: 9293ce13167ba3f495397daee1e805125018ef02
+  tika-encoding-detector-mojibuster-4.1.0.jar: fa5e47c76ecf1c5d967e4cc485691e0b3b09d795
+  tika-ml-core-4.1.0.jar: 7cd7ead3d8163be0dd2adc6ec6b06474c37ee117
+  tika-parser-datauri-commons-4.1.0.jar: 0016119c2f3a9c9b10e59c930fd6259901d5c4a4
+  tika-parser-html-module-4.1.0.jar: 75b803c412e31fae358fbcc06c2a0d4cb58f9114
+  tika-parser-image-module-4.1.0.jar: 4e78ccc9a3b417782e5c6e8cf5d3894d3612f34f
+  tika-parser-mail-commons-4.1.0.jar: 2deb1547a009b202582ed9247bd92e262393d37b
+  tika-parser-mail-module-4.1.0.jar: dcd3a2cb4b5f1575bb7de37d78e8372cff885214
+  tika-parser-microsoft-module-4.1.0.jar: ec36843f1f887e63672d7945461505f71995883a
+  tika-parser-ocr-module-4.1.0.jar: 39744d6db09cc9d5d09e8fe2cd48c2f7e200309d
+  tika-parser-pdf-module-4.1.0.jar: 14d15cb31cd1acbb618ab3bbc0ed28ae429f6518
+  tika-parser-text-module-4.1.0.jar: 4ccc250f78ce3d081b7608a61a8440f68c6c5201
+  tika-parser-xml-module-4.1.0.jar: 000683f70cc6a9f89b56a68ca667090c4cbc05c6
+  tika-parser-xmp-commons-4.1.0.jar: e38f68aebe3be662bb15f334738963257ce93cb3
+  tika-parser-zip-commons-4.1.0.jar: 795ffeca7e6285a666da7625b57aab448ec84e2e
+  tika-serialization-4.1.0.jar: 162a17fe7855465e08b3b40ea655bed9f946e661
   tika.js: 6f8473fc8763795818e1b6ee16b9d2014cc944f3
-  txw2-4.0.9.jar: 70325ebdebca3e7aae1dfa395fd41fc25d8a6f4e
   xmlbeans-5.3.0.jar: f93c3ba820d7240b7fec4ec5bc35e7223cc6fc1f
   xmpcore-6.1.11.jar: 852f14101381e527e6d43339d7db1698c970436c

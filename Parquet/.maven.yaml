@@ -1,4 +1,4 @@
 artifacts:
-  - id      : parquet-floor
-    group   : blue.strategic.parquet
-    version : 2.3
+- id: parquet-floor
+  group: blue.strategic.parquet
+  version: '2.4'

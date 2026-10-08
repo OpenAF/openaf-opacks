@@ -174,3 +174,8 @@ Dependencies are pinned in `.maven.yaml`. Refresh with
 run `opack genpack .`. OpenAF supplies SLF4J; the opack bundles Kafka and its three
 compression libraries. The 20260924 package pins snappy-java 1.1.10.8,
 lz4-java 1.11.3, and zstd-jni 1.5.7-17.
+
+## Dependency refresh (2026-10-09)
+
+The 20261009 package retains Kafka clients 4.3.1 and updates LZ4 to 1.12.0,
+Snappy to 1.1.10.11, and Zstd JNI to 1.5.7-22.

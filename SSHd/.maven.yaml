@@ -1,4 +1,4 @@
 artifacts:
-  - id      : sshd-core
-    group   : org.apache.sshd
-    version : 2.19.0
+- id: sshd-core
+  group: org.apache.sshd
+  version: 2.20.0

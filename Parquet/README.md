@@ -2,7 +2,7 @@
 
 Provides a wrapper around handling Parquet files.
 
-The 20260924 package bundles parquet-floor 2.3 with Apache Parquet 1.18.1
+The 20261009 package bundles parquet-floor 2.4 with Apache Parquet 1.18.1
 and its resolved compression dependencies.
 
 ## Usage

@@ -452,7 +452,7 @@ Maven.prototype._createRepositorySystem = function() {
     offlineController
   );
 
-  var repositorySystemValidators = new java.util.ArrayList();
+  var repositorySystemValidators = emptyMap();
   var repositorySystemValidator = new Packages.org.eclipse.aether.internal.impl.DefaultRepositorySystemValidator(repositorySystemValidators);
   var artifactDecorators = emptyMap();
 
