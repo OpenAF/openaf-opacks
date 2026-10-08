@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parser-zip-commons</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
