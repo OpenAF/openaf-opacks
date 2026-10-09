@@ -1,0 +1,88 @@
+author: OpenAF
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- arangodb
+- aql
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/ArangoDB
+  url: https://openaf.io/opacks/ArangoDB.opack
+description: OpenAF wrapper for the Java ArangoDB driver.
+name: ArangoDB
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261009'
+dependencies:
+  openaf: '>=20240318'
+files:
+- .maven.yaml
+- .package.yaml
+- README.md
+- arangodb-java-driver-7.26.0.jar
+- arangodb.js
+- core-7.26.0.jar
+- http-protocol-7.26.0.jar
+- jackson-annotations-2.21.jar
+- jackson-core-2.21.1.jar
+- jackson-databind-2.21.1.jar
+- jackson-datatype-jakarta-jsonp-2.21.1.jar
+- jackson-serde-json-7.26.0.jar
+- jakarta.json-api-2.1.3.jar
+- netty-buffer-4.1.125.Final.jar
+- netty-codec-4.1.125.Final.jar
+- netty-codec-dns-4.1.125.Final.jar
+- netty-codec-http-4.1.125.Final.jar
+- netty-codec-http2-4.1.125.Final.jar
+- netty-codec-socks-4.1.125.Final.jar
+- netty-common-4.1.125.Final.jar
+- netty-handler-4.1.125.Final.jar
+- netty-handler-proxy-4.1.125.Final.jar
+- netty-resolver-4.1.125.Final.jar
+- netty-resolver-dns-4.1.125.Final.jar
+- netty-transport-4.1.125.Final.jar
+- netty-transport-native-unix-common-4.1.125.Final.jar
+- slf4j-api-2.0.17.jar
+- vertx-auth-common-4.5.21.jar
+- vertx-core-4.5.21.jar
+- vertx-uri-template-4.5.21.jar
+- vertx-web-client-4.5.21.jar
+- vertx-web-common-4.5.21.jar
+filesHash:
+  .maven.yaml: 2cdfac56c179ab93f3600aa202ab0849f7e3bb71
+  README.md: 89edeec3411a35907e1bceeb31d05c4c0d5377f0
+  arangodb-java-driver-7.26.0.jar: 7f7ae4b6695ff8682d0df2f1cd7c56fdbdbeadec
+  arangodb.js: ca56b488a41e332dc7eaf612da45ffb980462aac
+  core-7.26.0.jar: c8de50c83408511ef4d3d7fdafb52d099b921f61
+  http-protocol-7.26.0.jar: c5e4f953088a177b1db246dd79457d746243e627
+  jackson-annotations-2.21.jar: b1bc1868bf02dc0bd6c7836257a036a331005309
+  jackson-core-2.21.1.jar: 47b013fc85dbb819f3ba51e95a5560d0f1c4121c
+  jackson-databind-2.21.1.jar: 5615fb77652bfd386d87b95a1d663e1c0e38b372
+  jackson-datatype-jakarta-jsonp-2.21.1.jar: d1aae343830b19d7d7a1a733ed22f9007f22a175
+  jackson-serde-json-7.26.0.jar: 63d756158ab28d113f4a4ea8ce679051a8d65a5b
+  jakarta.json-api-2.1.3.jar: 4febd83e1d9d1561d078af460ecd19532383735c
+  netty-buffer-4.1.125.Final.jar: 814b9a0fbe6b46ea87f77b6548c26f2f6b21cc51
+  netty-codec-4.1.125.Final.jar: ce90b4cf7fffaec2711397337eeb098a1495c455
+  netty-codec-dns-4.1.125.Final.jar: c328f0afa45a0198a6c3674ca07d36204dc36179
+  netty-codec-http-4.1.125.Final.jar: e5c04e7e7885890cf03085cac4fdf837e73ef8ab
+  netty-codec-http2-4.1.125.Final.jar: 38ac88e75e5721665bd5ea8124fe71cb1d7faef3
+  netty-codec-socks-4.1.125.Final.jar: 87880becd7919fb79d76d01e7f8f2b0c616604a1
+  netty-common-4.1.125.Final.jar: e07fdeb2ad80ad1d849e45f57d3889a992b25159
+  netty-handler-4.1.125.Final.jar: 3eb6a0d1aaded69e40de0a1d812c5f7944a020cb
+  netty-handler-proxy-4.1.125.Final.jar: 19a614cccc6fe8924c2674035fb3c9fedc7ae1c9
+  netty-resolver-4.1.125.Final.jar: 6dd3e964005803e6ef477323035725480349ca76
+  netty-resolver-dns-4.1.125.Final.jar: 2f0d5f10e52739fcf9ab2b021adad4ded6064f2c
+  netty-transport-4.1.125.Final.jar: a81400cf3207415e549ad54c6c2f47473886c1b0
+  netty-transport-native-unix-common-4.1.125.Final.jar: 72f1e54685c68e921ac1dd87cbd65ec1dcbbcb92
+  slf4j-api-2.0.17.jar: d9e58ac9c7779ba3bf8142aff6c830617a7fe60f
+  vertx-auth-common-4.5.21.jar: 259e4fedf1ac15e428128134ca23a283c285ff0a
+  vertx-core-4.5.21.jar: 70c73f7af4a3a7ee19604603ea2e769a4fa3f8ce
+  vertx-uri-template-4.5.21.jar: 6f70faed88ad8a2c489375243ab0d2e13beea53b
+  vertx-web-client-4.5.21.jar: ff5f8526f3b76d90785c8acaf0692d8ddd655c42
+  vertx-web-common-4.5.21.jar: e66ad838074a02e390d607b2ac5cf74724022aee

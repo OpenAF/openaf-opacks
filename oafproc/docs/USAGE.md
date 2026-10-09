@@ -31,7 +31,9 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | outkey | If defined the map/list output will be prefixed with the provided key |
 | outfile | If defined all output will be written to the provided file |
 | outfileappend | If 'true' and outfile=true the output will be appended on the provided file |
-| parallel | If 'true' and input supports parallel processing it will try to process the input in parallel disregarding input order |
+| parallel | `auto` (default), `true`, or `false`. Auto measures eligible pure work before using bounded workers. Record output stays ordered; explicit `true` also enables supported specialized parallel operations. `false` overrides `OAFP_PARALLEL`. |
+| progress | `auto` (default) or `off`. Shows a delayed wait animation on interactive stderr only. |
+| stream | With `in=json`, processes a top-level array one element at a time using record-level filters and output. Default `false`. |
 | pause  | If 'true' (or `-p`) will try to pause contents in alternative to _less -r_ |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |
@@ -315,7 +317,7 @@ For a headerless semicolon-separated file:
 oafp in=dsv file=data.txt indsvsep=';' indsvfields=name,score indsvheader=false indsvjoin=true out=json
 ```
 
-> Supports parallel=true if indsvjoin=false or not defined. Supply indsvfields for parallel processing so workers do not need to infer a shared header.
+> DSV parsing and header inference stay sequential. Supplying indsvfields avoids inferred field names. Filters, transforms and output run on the calling thread.
 
 ---
 
@@ -426,7 +428,7 @@ List of options to use when _in=lines_:
 | linesvisualsepre | String | Regular expression representing the separator between columns when linesvisual=true (defaults to ' \\s+') | 
 | linesvisualheadsep | Boolean | If true will try to process the second line as header separator aiding on column position determination (if linesvisualsepre is not defined it will default to '\\s+') |
 
-> Supports parallel=true if linesjoin=false or not defined
+> Lines and visual-header processing stay sequential.
 
 ---
 
@@ -560,7 +562,7 @@ List of options to use when _in=ndjson_:
 | ndjsonjoin | Boolean | If true will join the ndjson records to build an output array |
 | ndjsonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter json records on a ndjson) |
 
-> Supports parallel=true if ndjsonjoin=false or not defined
+> With ndjsonjoin=false, eligible JSON parsing supports bounded workers through parallel=auto or parallel=true. Framing, filters, other transforms and output stay on the calling thread.
 
 ---
 
@@ -573,7 +575,7 @@ List of options to use when _in=ndslon_:
 | ndslonjoin | Boolean | If true will join the ndslon records to build an output array |
 | ndslonfilter | Boolean | If true each line is interpreted as an array before filters execute (this allows to filter slon records on a ndslon) |
 
-> Supports parallel=true if ndslonjoin=false or not defined
+> NDSLON framing and parsing stay sequential.
 
 ---
 
@@ -798,7 +800,7 @@ Input `[{"id":1,"description":"I was charged twice"}]` becomes `[{"id":1,"descri
 
 The transform reuses _llmoptions_, _llmenv_, secrets, _llmimage_ and _llmdecidestats_ from _in=llmdecide_, including decision model fallback. With stats enabled, use `response.answers.category.value` in `assign`. Conversational parameters are unsupported. State types and field collisions are checked before inference. Empty arrays produce no inference. Provider failures propagate with the entry index and original error code; no retries or conversation persistence occur.
 
-Execution is sequential by default. _parallel=true_ or _OAFP_PARALLEL=true_ enables OpenAF's adaptive parallel processing with an isolated client for each entry and preserved result order. Older runtimes without pForEach process sequentially. Parallel failures are raised after workers finish; already dispatched requests may complete.
+LLM decision execution is sequential by default, including _parallel=auto_. _parallel=true_ or _OAFP_PARALLEL=true_ enables OpenAF's adaptive parallel processing with an isolated client for each entry and preserved result order. Older runtimes without pForEach process sequentially. Parallel failures are raised after workers finish; already dispatched requests may complete.
 
 Input filters (_path_, _ifrom_, _isql_) select data before transforms; output filters (_opath_, _from_, _sql_) can select or filter the enriched results. Transform order follows the existing transform registry, rather than CLI argument order. Streaming inputs process each dispatched record/batch separately; join records when one collected array result is needed.
 
@@ -1256,3 +1258,22 @@ pipe:
 | help=readme | Returns this document |
 
 > You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands
+
+## Processing large inputs
+
+NDJSON, NDSLON, DSV and lines are processed incrementally when their join option is false (the default), for files, stdin and commands. CSV still produces a complete array. Joined input, sorting across records, SQL over a complete dataset, and whole-document output require memory proportional to their data.
+
+Use `in=json stream=true` to process a top-level JSON array incrementally:
+
+```sh
+oafp file=large.json in=json stream=true out=json parallel=auto
+cat large.json | oafp in=json stream=true out=json path='[].name'
+```
+
+Each element is processed independently, like an NDJSON record; `out=json` emits one JSON value per record rather than a single array. Nulls, scalars, nested arrays and empty containers are supported. Whole-document queries require the default `stream=false`. Streaming does not support `jsonprefix` or `jsondesc`. Malformed input can fail after earlier records have already been emitted.
+
+Automatic workers only parse framed JSON records or sort independent map keys. Other transforms, record framing, header inference and rendering stay sequential. Work queues are bounded by record count and input size; one oversized record still requires memory proportional to that record. `parallel=false` disables these workers, and an explicit CLI value overrides `OAFP_PARALLEL`. Stateful readers may remain sequential even with `parallel=true`.
+
+The wait animation starts after 250 ms, refreshes every 150 ms, and clears before output. Use `progress=off` to disable it. Redirected stderr, nested processing and full-screen outputs do not animate.
+
+See [PERFORMANCE.md](PERFORMANCE.md) for repeatable measurements and runtime considerations.
