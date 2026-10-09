@@ -29,6 +29,16 @@ jobs:
   to  : oJob Test
   exec: args.func = args.tests.testChannelRoundTrip
 
+- name: Redis::CacheAndScan
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testCacheAndScan
+
+- name: Redis::NativeJSON
+  from: Redis::Init
+  to  : oJob Test
+  exec: args.func = args.tests.testNativeJSON
+
 - name: Test results
   from: oJob Test Results
   deps:
@@ -36,6 +46,8 @@ jobs:
   - Redis::PackageFilesExist
   - Redis::RoundTrip
   - Redis::ChannelRoundTrip
+  - Redis::CacheAndScan
+  - Redis::NativeJSON
   args:
     quiet: true
   exec: |
@@ -51,4 +63,6 @@ todo:
 - Redis::PackageFilesExist
 - Redis::RoundTrip
 - Redis::ChannelRoundTrip
+- Redis::CacheAndScan
+- Redis::NativeJSON
 - Test results

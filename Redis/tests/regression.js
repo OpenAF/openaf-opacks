@@ -60,5 +60,27 @@ try {
 } finally {
   $ch(name).destroy(); type.create = create; type.destroy = destroy;
 }
+// Live Jedis returns java.lang.String; ensure the channel parses that boundary.
+values.javaString = new java.lang.String('{"answer":42}');
+type.__channels[name] = { r: { get: function() { return values.javaString; } } };
+try {
+  check(type.get(name, "javaString"), { answer: 42 }, "Java string channel JSON decode");
+} finally { delete type.__channels[name]; }
+check(redis._jsonEncode({ nested: [null, false, 0, "text"] }), '{"nested":[null,false,0,"text"]}', "JSON encode preserves nested types");
+var invalid = [__, function() {}, NaN, Infinity, { value: __ }];
+var cycle = {}; cycle.self = cycle; invalid.push(cycle);
+invalid.forEach(function(value) {
+  var failed = false;
+  try { redis._jsonEncode(value); } catch(e) { failed = String(e).indexOf("JSON serializable") >= 0; }
+  check(failed, true, "Reject invalid JSON value");
+});
+var scanner = Object.create(Redis.prototype), scanned = [], cursors = [];
+scanner.scan = function(cursor) {
+  cursors.push(cursor);
+  return cursor == "0" ? { cursor: "1844674407370955161", keys: [] } : { cursor: "0", keys: ["one", "one", "two"] };
+};
+scanner.scanKeys("*", function(key) { scanned.push(key); });
+check(cursors, ["0", "1844674407370955161"], "Continue after empty nonterminal SCAN page with string cursor");
+check(scanned, ["one", "one", "two"], "SCAN callback preserves duplicates");
 print("PASS Redis regression");
 } catch(e) { printErr(e); exit(1); }

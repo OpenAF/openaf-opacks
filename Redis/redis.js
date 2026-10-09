@@ -124,6 +124,8 @@ Redis.prototype.get = function(aKeyName) {
         return this.sortedSets_toArray(aKeyName);
     case "string":
         return this.strings_get(aKeyName);
+    case "ReJSON-RL":
+        return this.json_get(aKeyName);
     case "none"  : 
         break;
     default: 
@@ -247,6 +249,209 @@ Redis.prototype.move = function(aKeyName, aDBId) {
     return this.jedis.move(aKeyName, aDBId);
 };
 
+// JSON and cache helpers. Keep using the existing Jedis connection so SELECT,
+// authentication through getObj(), and connection ownership remain unchanged.
+Redis.prototype._positiveInteger = function(aValue, aName) {
+    if (typeof aValue != "number" || !isFinite(aValue) || aValue <= 0 || Math.floor(aValue) != aValue || aValue > 9007199254740991) {
+        throw new Error(aName + " must be a positive safe integer");
+    }
+    return aValue;
+};
+
+/**
+ * <odoc>
+ * <key>Redis.supports(aCommand) : Boolean</key>
+ * Checks COMMAND INFO for a command. ACL/connection errors propagate; availability does not imply permission to execute it.
+ * </odoc>
+ */
+Redis.prototype.supports = function(aCommand) {
+    _$(aCommand, "aCommand").isString().$_();
+    var info = this.jedis.commandInfo([aCommand]);
+    return info.get(aCommand.toLowerCase()) != null;
+};
+
+Redis.prototype._jsonCommand = function(aCommand, aArgs, parseJSON) {
+    if (!this.supports("JSON." + aCommand)) throw new Error("Redis JSON." + aCommand + " is not supported by this server");
+    var command = Packages.redis.clients.jedis.json.JsonProtocol.JsonCommand.valueOf(aCommand);
+    var result = this.jedis["sendCommand(redis.clients.jedis.commands.ProtocolCommand,java.lang.String[])"](command, aArgs.map(v => String(v)));
+    var decode = function(value) {
+        if (value == null) return null;
+        if (value instanceof java.util.List) return af.fromJavaArray(value.toArray()).map(decode);
+        if (value.getClass && String(value.getClass().getName()) == "[B") {
+            value = String(new java.lang.String(value, "UTF-8"));
+            return parseJSON ? jsonParse(value) : value;
+        }
+        if (typeof value == "number" || value instanceof java.lang.Number) return Number(value);
+        return parseJSON ? jsonParse(String(value)) : String(value);
+    };
+    return result == null ? __ : decode(result);
+};
+
+Redis.prototype._jsonEncode = function(aValue) {
+    var ancestors = [];
+    var validate = function(value) {
+        if (value === null || typeof value == "string" || typeof value == "boolean") return;
+        if (typeof value == "number" && isFinite(value)) return;
+        if (!isArray(value) && Object.prototype.toString.call(value) != "[object Object]") {
+            throw new Error("aValue must be JSON serializable (native maps, arrays, finite numbers, strings, booleans or null)");
+        }
+        if (ancestors.indexOf(value) >= 0) throw new Error("aValue must be JSON serializable (cyclic value)");
+        ancestors.push(value);
+        if (isArray(value)) {
+            for (var i = 0; i < value.length; i++) validate(value[i]);
+        } else {
+            Object.keys(value).forEach(k => validate(value[k]));
+        }
+        ancestors.pop();
+    };
+    validate(aValue);
+    return stringify(aValue, __, "");
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_get(aKey, aPath) : Object</key>
+ * Returns the document when path is omitted. Explicit JSONPath ($...) returns an array of matches. Missing keys return undefined.
+ * </odoc>
+ */
+Redis.prototype.json_get = function(aKey, aPath) {
+    return this._jsonCommand("GET", isUnDef(aPath) ? [aKey] : [aKey, aPath], true);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_set(aKey, aValue, aPath) : String</key>
+ * Stores a JSON value at aPath (default $). Does not convert existing non-JSON keys.
+ * </odoc>
+ */
+Redis.prototype.json_set = function(aKey, aValue, aPath) {
+    return this._jsonCommand("SET", [aKey, _$(aPath).isString().default("$"), this._jsonEncode(aValue)], false);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_setWithTTL(aKey, aValue, aTTLms) : String</key>
+ * Atomically writes a whole JSON document and sets its positive millisecond lifetime. Requires Redis 7+ with JSON, and EVAL, JSON.SET and PEXPIRE permissions.
+ * </odoc>
+ */
+Redis.prototype.json_setWithTTL = function(aKey, aValue, aTTLms) {
+    this._positiveInteger(aTTLms, "aTTLms");
+    var encoded = this._jsonEncode(aValue);
+    if (!this.supports("JSON.SET")) throw new Error("Redis JSON.SET is not supported by this server");
+    return String(this.jedis.eval("if not redis.acl_check_cmd('JSON.SET', KEYS[1], '$', ARGV[1]) or not redis.acl_check_cmd('PEXPIRE', KEYS[1], ARGV[2]) then return redis.error_reply('NOPERM JSON.SET and PEXPIRE permissions required') end; local r = redis.call('JSON.SET', KEYS[1], '$', ARGV[1]); redis.call('PEXPIRE', KEYS[1], ARGV[2]); return r", 1, [String(aKey), encoded, String(aTTLms)]));
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_del(aKey, aPath) : Number</key>
+ * Deletes matching values (default $ deletes the document).
+ * </odoc>
+ */
+Redis.prototype.json_del = function(aKey, aPath) {
+    return this._jsonCommand("DEL", [aKey, _$(aPath).isString().default("$")], false);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_increment(aKey, aPath, anAmount) : Array</key>
+ * Atomically increments matching JSON numbers. Uses JSONPath; amount defaults to 1.
+ * </odoc>
+ */
+Redis.prototype.json_increment = function(aKey, aPath, anAmount) {
+    _$(aPath, "aPath").isString().$_();
+    if (isUnDef(anAmount)) anAmount = 1;
+    if (typeof anAmount != "number" || !isFinite(anAmount)) throw new Error("anAmount must be a finite number");
+    return this._jsonCommand("NUMINCRBY", [aKey, aPath, anAmount], true);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_arrayAppend(aKey, aPath, anArray) : Array</key>
+ * Atomically appends each value from anArray to matching JSON arrays. Returns their lengths.
+ * </odoc>
+ */
+Redis.prototype.json_arrayAppend = function(aKey, aPath, anArray) {
+    _$(aPath, "aPath").isString().$_();
+    _$(anArray, "anArray").isArray().$_();
+    if (anArray.length == 0) throw new Error("anArray must contain at least one value");
+    return this._jsonCommand("ARRAPPEND", [aKey, aPath].concat(anArray.map(v => this._jsonEncode(v))), true);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.json_arrayPop(aKey, aPath, anIndex) : Array</key>
+ * Atomically removes and returns values from matching JSON arrays. Index defaults to -1.
+ * </odoc>
+ */
+Redis.prototype.json_arrayPop = function(aKey, aPath, anIndex) {
+    _$(aPath, "aPath").isString().$_();
+    anIndex = _$(anIndex, "anIndex").isNumber().default(-1);
+    if (!isFinite(anIndex) || Math.floor(anIndex) != anIndex) throw new Error("anIndex must be an integer");
+    return this._jsonCommand("ARRPOP", [aKey, aPath, anIndex], true);
+};
+
+/**
+ * <odoc>
+ * <key>Redis.expire(aKey, aTTLms) : Boolean</key>
+ * Sets a positive millisecond lifetime on an existing key.
+ * </odoc>
+ */
+Redis.prototype.expire = function(aKey, aTTLms) {
+    this._positiveInteger(aTTLms, "aTTLms");
+    return Number(this.jedis.pexpire(aKey, aTTLms)) == 1;
+};
+
+/**
+ * <odoc>
+ * <key>Redis.ttl(aKey) : Number</key>
+ * Returns remaining lifetime in milliseconds, -1 for persistent keys, or -2 for missing keys.
+ * </odoc>
+ */
+Redis.prototype.ttl = function(aKey) { return Number(this.jedis.pttl(aKey)); };
+
+/**
+ * <odoc>
+ * <key>Redis.persist(aKey) : Boolean</key>
+ * Removes expiration from an existing key.
+ * </odoc>
+ */
+Redis.prototype.persist = function(aKey) { return Number(this.jedis.persist(aKey)) == 1; };
+
+/**
+ * <odoc>
+ * <key>Redis.scan(aCursor, aPattern, aCount) : Map</key>
+ * Returns {cursor, keys} for one SCAN page. Cursor defaults to "0", pattern to "*", count to 100. Keep cursors as strings.
+ * </odoc>
+ */
+Redis.prototype.scan = function(aCursor, aPattern, aCount) {
+    aCursor = _$(aCursor, "aCursor").isString().default("0");
+    if (!/^\d+$/.test(aCursor)) throw new Error("aCursor must be a decimal cursor string");
+    aPattern = _$(aPattern, "aPattern").isString().default("*");
+    aCount = _$(aCount, "aCount").isNumber().default(100);
+    this._positiveInteger(aCount, "aCount");
+    var params = new Packages.redis.clients.jedis.params.ScanParams().match(aPattern).count(aCount);
+    var result = this.jedis.scan(aCursor, params);
+    return { cursor: String(result.getCursor()), keys: af.fromJavaArray(result.getResult().toArray()).map(v => String(v)) };
+};
+
+/**
+ * <odoc>
+ * <key>Redis.scanKeys(aPattern, aFunction, aCount)</key>
+ * Calls aFunction(key) incrementally until cursor 0. Returning false stops early. SCAN may yield duplicates and is not a snapshot.
+ * </odoc>
+ */
+Redis.prototype.scanKeys = function(aPattern, aFunction, aCount) {
+    _$(aFunction, "aFunction").isFunction().$_();
+    var cursor = "0";
+    do {
+        var page = this.scan(cursor, aPattern, aCount);
+        cursor = page.cursor;
+        for (var i = 0; i < page.keys.length; i++) {
+            if (aFunction(page.keys[i]) === false) return;
+        }
+    } while (cursor != "0");
+};
+
 // Strings
 // -------
 
@@ -254,8 +459,24 @@ Redis.prototype.strings_get = function(aKeyName) {
     return this.jedis.get(aKeyName);
 };
 
-Redis.prototype.strings_set = function(aKeyName, aValue) {
-    return this.jedis.set(aKeyName, aValue);
+/**
+ * <odoc>
+ * <key>Redis.strings_set(aKey, aValue, options) : String</key>
+ * SET with optional {ttlms, nx, xx}. Positive ttlms is in milliseconds. NX and XX are mutually exclusive; unmet conditions return undefined.
+ * </odoc>
+ */
+Redis.prototype.strings_set = function(aKeyName, aValue, options) {
+    if (isUnDef(options)) return this.jedis.set(aKeyName, aValue);
+    _$(options, "options").isMap().$_();
+    var params = new Packages.redis.clients.jedis.params.SetParams();
+    if (isDef(options.ttlms)) params.px(this._positiveInteger(options.ttlms, "ttlms"));
+    if (isDef(options.nx)) _$(options.nx, "nx").isBoolean().$_();
+    if (isDef(options.xx)) _$(options.xx, "xx").isBoolean().$_();
+    if (options.nx && options.xx) throw new Error("nx and xx are mutually exclusive");
+    if (options.nx) params.nx();
+    if (options.xx) params.xx();
+    var result = this.jedis.set(aKeyName, aValue, params);
+    return result == null ? __ : String(result);
 };
 
 // Hashes
@@ -368,9 +589,16 @@ Redis.prototype.sortedSets_toArray = function(aKeyName) {
     return ar;
 };
 
-Redis.prototype.getCh = function(aCh) {
+/**
+ * <odoc>
+ * <key>Redis.getCh(aName, options) : Channel</key>
+ * Creates a channel using this connection's host, port and current database. Optional {json:true, ttlms:60000} enables JSON documents and cache lifetime.
+ * </odoc>
+ */
+Redis.prototype.getCh = function(aCh, options) {
     _$(aCh, "aCh").isString().$_()
-    return $ch(aCh).create(1, "redis", { host: this.host, port: this.port, dbid: this.dbid })
+    options = _$(options, "options").isMap().default({})
+    return $ch(aCh).create(1, "redis", merge(options, { host: this.host, port: this.port, dbid: this.dbid }))
 }
 
 ow.loadObj();
@@ -395,7 +623,9 @@ ow.loadObj()
 * \
 *    - host  (String)  The Redis server host.\
 *    - port  (Number)  The Redis server port (e.g. 6379).\
-     - dbid  (String)  Optionally provided the Redis db id.\
+*    - dbid  (Number)  Optionally provided the Redis db id.\
+*    - json  (Boolean) Opt-in native JSON storage (default false).\
+*    - ttlms (Number)  Optional positive cache lifetime in milliseconds, refreshed on each write.\
 * \
 * </odoc>
 */
@@ -407,6 +637,16 @@ ow.ch.__types.redis = {
       options.port = _$(options.port, "redis port").isNumber().default(6379)
 
       var redis = new Redis(options.host, options.port, options.dbid)
+      try {
+        if (isDef(options.json)) _$(options.json, "json").isBoolean().$_();
+        if (isDef(options.ttlms)) redis._positiveInteger(options.ttlms, "ttlms");
+        if (options.json && (!redis.supports("JSON.SET") || !redis.supports("JSON.GET"))) {
+          throw new Error("Redis JSON channel requires JSON.SET and JSON.GET support");
+        }
+      } catch(e) {
+        redis.close();
+        throw e;
+      }
       this.__channels[aName] = {
         r: redis,
         o: options
@@ -421,11 +661,11 @@ ow.ch.__types.redis = {
     },
     forEach      : function(aName, aFunction) {
       this.getKeys(aName).forEach(k => {
-        aFunction(k, this.get(aName, k))
+        aFunction(k, this._getValue(aName, k))
       })
     },
     getAll       : function(aName, full) {
-      return this.getKeys(aName, full).map(k => this.get(aName, k))
+      return this.getKeys(aName, full).map(k => this._getValue(aName, k))
     },
     getKeys      : function(aName, full) {
       var _ks = this.__channels[aName].r.getKeys(full)
@@ -447,8 +687,16 @@ ow.ch.__types.redis = {
         if (isMap(aK) && isDef(aK.key)) aK = aK.key
         if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
         if (isMap(aV) && isDef(aV.value)) aV = aV.value
+        var channel = this.__channels[aName];
+        if (channel.o && channel.o.json) {
+            if (aV === null) throw new Error("JSON channel root null is not supported by OpenAF get; wrap null in a map or array, or use json_set/json_get");
+            return isDef(channel.o.ttlms) ? channel.r.json_setWithTTL(aK, aV, channel.o.ttlms) : channel.r.json_set(aK, aV);
+        }
         if (isMap(aV)) aV = stringify(sortMapKeys(aV), __, "")
         else if (isArray(aV)) aV = stringify(aV, __, "")
+        if (channel.o && isDef(channel.o.ttlms)) {
+            return channel.r.strings_set(aK, aV, { ttlms: channel.o.ttlms });
+        }
         return this.__channels[aName].r.set(aK, aV)
     },
     setAll       : function(aName, aKs, aVs, aTimestamp) {
@@ -474,10 +722,20 @@ ow.ch.__types.redis = {
         return c
     },
     get          : function(aName, aK) {
+        var value = this._getValue(aName, aK);
+        var channel = this.__channels[aName];
+        // OpenAF's public get calls Object.keys on defined results, including null.
+        if (channel.o && channel.o.json && value === null) throw new Error("JSON channel root null is not supported by OpenAF get; use json_get");
+        return value;
+    },
+    _getValue    : function(aName, aK) {
         if (isMap(aK) && isDef(aK.key)) aK = aK.key
         if (isMap(aK)) aK = stringify(sortMapKeys(aK), __, "")
-        var _v = this.__channels[aName].r.get(aK)
-        if (isString(_v))
+        var channel = this.__channels[aName];
+        // Native JSON strings may themselves look like serialized objects. Never parse twice.
+        if (channel.o && channel.o.json && String(channel.r.type(aK)) == "ReJSON-RL") return channel.r.json_get(aK);
+        var _v = channel.r.get(aK)
+        if (isString(_v) || _v instanceof java.lang.String)
             if ((String(_v.trim()).startsWith("{") && String(_v.trim()).endsWith("}")) || (String(_v.trim()).startsWith("[") && String(_v.trim()).endsWith("]"))) 
                 _v = jsonParse(String(_v), true)
         return _v

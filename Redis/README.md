@@ -4,7 +4,7 @@ Wrapper around the [Jedis](https://github.com/redis/jedis) client to provide a c
 exposing the underlying Jedis object, the oPack includes helpers to manage keys, hashes, lists, sets, and sorted sets with native
 JavaScript data structures.
 
-The 20260924 package bundles Jedis 8.0.1.
+This package bundles Jedis 8.0.1.
 
 ## Installation
 
@@ -123,6 +123,127 @@ try {
 }
 ```
 
+## JSON documents
+
+Native Redis JSON is available in Redis 8 or older installations with RedisJSON enabled.
+The existing `set()` inference remains unchanged. Use the explicit JSON helpers to
+preserve nested maps, arrays, booleans, numbers and nulls:
+
+```javascript
+var redis = new Redis("localhost", 6379, 0);
+try {
+  if (redis.supports("JSON.SET")) {
+    redis.json_set("app:document", { stats: { hits: 0 }, events: [] });
+    redis.json_increment("app:document", "$.stats.hits");
+    redis.json_arrayAppend("app:document", "$.events", [{ kind: "visit" }]);
+    print(redis.json_get("app:document"));
+    print(redis.json_get("app:document", "$.stats.hits")); // [1]
+  }
+} finally {
+  redis.close();
+}
+```
+
+| Helper | Behavior |
+| --- | --- |
+| `supports(command)` | Checks `COMMAND INFO`; returns false for an unavailable command. Connection and ACL errors propagate. Availability does not guarantee execution permission. |
+| `json_set(key, value, path)` | Sets a JSON value; path defaults to `$` (whole document). Returns `"OK"`, or undefined when Redis reports no update. |
+| `json_get(key, path)` | With no path, returns the document as native JavaScript values. Explicit JSONPath expressions such as `$.stats.hits` return arrays of matches, including an empty array for no matches. Missing keys return undefined; stored JSON null returns null. |
+| `json_del(key, path)` | Deletes matching values; defaults to deleting the whole document. Returns the deletion count. |
+| `json_increment(key, path, amount)` | Atomically increments matching numbers; amount defaults to 1. |
+| `json_arrayAppend(key, path, values)` | Atomically appends every item in the nonempty `values` array. Wrap a nested array in another array to append it as one value. |
+| `json_arrayPop(key, path, index)` | Atomically removes and returns elements; index defaults to -1. |
+| `json_setWithTTL(key, value, ttlms)` | Atomically writes a whole JSON document and sets a positive lifetime in milliseconds. Requires Redis 7+ with JSON support and `EVAL`, `JSON.SET`, and `PEXPIRE` permissions. |
+
+Path-based operations follow Redis response semantics: `$` JSONPath expressions
+return arrays of matches/results; legacy paths can return scalar results. Use `$`
+paths for consistent new code. JSON values must be JSON serializable; JavaScript
+functions, undefined, cycles and custom Java objects are not supported document values.
+
+`get(key)` also recognizes native JSON keys. JSON helpers use the same connection
+as `getObj()`, which continues to return a Jedis instance. Unsupported JSON commands
+fail explicitly. Existing string, hash or list keys are never automatically migrated
+to JSON; JSON writes to those keys fail with a Redis type error. Use separate keys or
+perform an explicit migration. Ordinary `json_set()` follows Redis JSON TTL behavior;
+use `json_setWithTTL()` to assign or refresh a lifetime.
+
+## Cache lifetime and conditional string writes
+
+```javascript
+redis.strings_set("app:cache", "cached text", { ttlms: 60000 });
+redis.strings_set("app:claim", "worker-1", { ttlms: 10000, nx: true });
+redis.strings_set("app:cache", "replacement", { ttlms: 60000, xx: true });
+redis.expire("app:cache", 30000);
+print(redis.ttl("app:cache"));
+redis.persist("app:cache");
+```
+
+`strings_set(key, value, options)` accepts `ttlms`, `nx` (only create) and `xx`
+(only replace). NX and XX are mutually exclusive. It returns `"OK"` on success or
+undefined when the condition is unmet. Expiration is applied in the same `SET`
+command. A successful plain SET without `ttlms` removes the old expiration.
+
+All wrapper lifetime arguments are **milliseconds**, and must be positive safe
+integers. `expire()` returns whether an existing key received expiration;
+`persist()` returns whether expiration was removed. `ttl()` returns remaining
+milliseconds, -1 for a persistent key, or -2 for a missing key.
+
+## JSON and cache channels
+
+Channel creation accepts two additional options:
+
+```javascript
+var channel = redis.getCh("documents", { json: true, ttlms: 60000 });
+// Equivalent: $ch("documents").create(1, "redis", {
+//   host: "localhost", port: 6379, dbid: 0, json: true, ttlms: 60000
+// });
+try {
+  channel.set({ key: "app:channel-document" }, { value: { nested: [1, false, null] } });
+  print(channel.get({ key: "app:channel-document" }));
+} finally {
+  channel.destroy();
+}
+```
+
+- `json: true` opts into native JSON documents. Creation checks JSON command
+  availability; it fails and closes the new connection when unavailable.
+- `ttlms` sets a cache lifetime refreshed on every successful write. It works
+  with the default string-backed channels as well as JSON channels. JSON writes
+  with TTL use a Lua script that checks write/expiration permissions before changing data.
+- Defaults retain the existing channel storage behavior. JSON channels can read
+  legacy keys, but writing native JSON over a legacy key requires explicit migration.
+- Nested nulls are supported. Root null is supported by the direct JSON API, but
+  JSON channel writes reject it because OpenAF's public channel `get()` cannot
+  return root null safely. Wrap it in a map or array. Reading an externally written
+  root null through channel `get()` raises an explanatory error; use `json_get()`.
+- Keys and the existing `{key: ...}` / `{value: ...}` envelopes retain their usual
+  meaning. Wrap literal documents containing a `value` field inside the value envelope.
+- `getCh(name, options)` takes host, port and database from the Redis object.
+  Destroying the channel closes its own connection, independently of that object.
+
+## Incremental key scanning
+
+```javascript
+var cursor = "0";
+do {
+  var page = redis.scan(cursor, "app:*", 100);
+  page.keys.forEach(key => print(key));
+  cursor = page.cursor;
+} while (cursor != "0");
+
+redis.scanKeys("app:*", function(key) {
+  print(key);
+  // Return false to stop early.
+}, 100);
+```
+
+`scan(cursor, pattern, count)` returns `{cursor, keys}`. Defaults are `"0"`, `"*"`
+and 100. Keep cursors as strings. COUNT is a work hint, not a page-size limit;
+empty pages can have a nonzero cursor. SCAN can return duplicates and does not
+provide a snapshot when keys change. `scanKeys(pattern, callback, count)` iterates
+incrementally without collecting all keys in memory. Existing `keys()` and
+`getKeys()` retain their `KEYS` behavior.
+
 ## Tests
 
 Run the local smoke tests from this folder:
@@ -136,6 +257,19 @@ By default, tests that need a live Redis server are skipped. To run the full int
 ```bash
 REDIS_TEST_HOST=localhost REDIS_TEST_PORT=6379 REDIS_TEST_DB=15 ojob tests/tests.yaml
 ```
+
+Run a disposable Docker matrix (Redis 8.10.2 with JSON and Redis 7 without JSON):
+
+```bash
+bash tests/docker.sh
+```
+
+The runner requires Docker, `oaf` and `ojob`, binds random ports on localhost,
+and removes its containers on exit. It runs the service-independent regressions
+and both integration suites. For manual integration runs, optional
+`REDIS_TEST_JSON=true` or `false` asserts the expected JSON availability.
+JSON integration includes ACL failure tests and requires permission to create
+and delete a temporary `openaf-test-json-*` user. Use an isolated test server/database.
 
 The integration tests clean up keys matching `openaf-test:*` in the selected database before and after each Redis-backed test.
 
