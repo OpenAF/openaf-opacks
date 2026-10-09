@@ -1,3 +1,0 @@
-artifacts:
-- group: com.arangodb
-  id   : arangodb-java-driver
