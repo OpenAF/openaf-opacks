@@ -46,8 +46,6 @@ files:
 - s3.yaml
 - simple-xml-safe-2.7.1.jar
 - snappy-java-1.1.10.8.jar
-- tests/legacy.js
-- tests/regression.js
 filesHash:
   .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
   .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
@@ -72,5 +70,3 @@ filesHash:
   s3.yaml: 258dcf5460fbf67d0fd98662a06ed55f984dff68
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
-  tests/legacy.js: 759b4192cbdf9aff1b6be3adea420dd70c0993d7
-  tests/regression.js: 07a1d53e610c53f3cd08a437e06b5d4188621713
