@@ -15,9 +15,12 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | -h     | Show this document |
 | help   | Alternative way to show this document or others (e.g. filters, template) |
 | file   | The file to parse (if not provided stdin is used) |
+| ingzip | Decompress file input with OpenAF gzip streams. Auto-detected from `.gz` (case-insensitive); `true` forces decompression and `false` disables it. The preceding extension selects the input format. |
 | cmd    | Alternative to file and stdin to execute a command (e.g. kubectl, docker) to get the file contents |
 | data   | Alternative to file, stdin and cmd to provide data input |
 | out    | The output format (default: ctree) |
+| idescsource | `loaded` (default) or `stream`. `stream` enables file-backed JSON browsing with `out=idesc`. |
+| idescrecipe | Replay a saved idesc selection/query recipe with the supplied source; use `out=idesc` to reopen interactively. |
 | in     | The input type (if not provided it will try to be auto-detected) |
 | ifrom | An OpenAF nLinq expression to filter input data |
 | isql | A SQL expression to filter input data |
@@ -66,6 +69,17 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 > Use 'OAFP_CODESET=UTF-16' to force reading files in a different codeset (e.g. UTF-16) different from the default UTF-8.
 
 ---
+
+Gzip file input works with both positional filenames and `file=`:
+
+```sh
+oafp file=records.json.gz out=json
+oafp records.ndjson.gz out=json
+oafp file=records.json.gz stream=true out=json
+oafp file=compressed.dat ingzip=true in=csv out=json
+```
+
+Decompression streams directly into text and record readers; whole-document formats still buffer the decompressed text. Path-only readers (`jsonprefix`, `jsondesc`, JFR and hsperf) use a temporary decompressed file that is removed after reading. `ingzip` applies to file input, not stdin, commands or URLs. Use `ingzip=false` for an uncompressed file whose name ends in `.gz`.
 
 ## ⬇️  Input types
 
@@ -202,6 +216,7 @@ List of available formats to use with the _output_ option:
 | gb64json | Equivalent to out=base64 and base64gzip=true |
 | grid | A multiple output ascii grid (useful together with 'loop') |
 | html | An HTML format |
+| idesc | Interactive full-screen tree browser for maps, arrays and scalar values; expand/collapse, zoom, filter, queries, previews, bookmarks, comparison and export |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
 | jsmap | OpenAF's HTML representation of structured data, printed directly without opening a browser |
@@ -398,7 +413,7 @@ List of options to use when _in=json_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| jsondesc | Boolean | If true the output will be a list of JSON paths of the original json.  |
+| jsondesc | Boolean | If true the output will be a list of JSON paths of the original json. Uses metadata-only scanning when OpenAF provides `io.scanJSON`, avoiding scalar-value loading; older runtimes and lenient JSON use the compatible reader. |
 | jsonprefix | String | Given the 'jsondesc=true' output list you can use each to filter big json files by prefix. |
 
 ---
@@ -853,6 +868,101 @@ List of options to use when _set=..._:
 
 ---
 
+### 🧭 IDesc output options
+
+`out=idesc` opens a full-screen tree browser (in the style of `out=ctree`) over maps, arrays and scalar values. Containers start collapsed and show their length (`{3}` for a map, `[40]` for an array); scalars are shown inline. The current location is always visible and quoted path segments preserve literal keys such as `a.b`, `a[0]`, numeric strings and empty names.
+
+| Option | Type | Description |
+|--------|------|-------------|
+| idescsource | String | `loaded` (default) browses the normal processed result. `stream` scans UTF-8 JSON on demand without loading the whole document. |
+| idescrecipe | String | File containing a saved version-1 selection/query recipe and named bookmarks. The source is supplied separately. |
+| idescpage | Number | Entries loaded per expand/"more" step in the tree browser (and per page in the numbered fallback and previews). Default `20`. |
+| idescdepth | Number | Maximum preview depth. Default `3`. |
+| idescstring | Number | Maximum displayed characters per preview string. Default `200`. Oversized file-backed scalars may be omitted with a byte-size label. |
+| idescbytes | Number | Maximum selected JSON bytes admitted for file-backed queries/slices. Default `16777216` (16 MiB). |
+| idescnodes | Number | Maximum value nodes admitted for file-backed queries/slices and preview traversal. Default `100000`. |
+
+All numeric options must be positive integers. These loading limits do not bound intermediate allocations inside existing query engines.
+
+```sh
+# Explore the normal input after standard filters/transforms.
+oafp file=response.json path=response out=idesc
+
+# Explore JSON too large to load in memory.
+oafp file=large.json out=idesc idescsource=stream
+cat large.json | oafp in=json out=idesc idescsource=stream
+oafp cmd='some-command --json' in=json out=idesc idescsource=stream
+oafp url=https://example.org/data.json in=json out=idesc idescsource=stream
+
+# Replay a saved selection/query without an interactive terminal.
+oafp file=large.json idescrecipe=selection.json out=json outfile=selected.json
+```
+
+```text
+ oafp ⌂ › inventory                                      │ 💾 file · 1 ops
+──────────────────────────────────────────────────────────────────────────
+ ▾ inventory {3}                                                       map
+ ╭ ▾ items [3]                                                       table
+ │ id│name │ok
+ │ ──┼─────┼────
+▌│ 1 │alpha│true
+ │ 22│beta │null
+ │ 3 │gamma│
+ ├ ▸ tags [12]                                                       array
+ ╰ ▸ owner {2} 1.2 KB                                                  map
+──────────────────────────────────────────────────────────────────────────
+items[0]  5/9    🔍 name
+←↑↓→ hjkl move · ⏎ zoom · ⌫ up · ~ top · / filter · t table/tree · : cmd · q quit
+```
+
+The current root is the left-aligned top line; its children hang from it with the same `╭ ├ ╰ ─` lines as `out=ctree`. Like `out=ctree`, an expanded array whose entries are all flat maps is shown as a table (one line per entry, with `Enter` zooming into the entry); `t` switches the focused array back to a tree (and back again) and `T` turns tables off or on everywhere. Arrays of scalars, mixed arrays and arrays with nested values always stay trees. The screen has a header (breadcrumbs, source badge and operation count), the tree, a status line (the focused path in a reusable `path=` form, the row position and the active filter, or messages and prompts) and a key hint line. Colors follow OpenAF's `__colorFormat` theme, so the browser matches `out=ctree`/`out=ctable` and your customizations: `key` (property names), `number`/`string`/`boolean`/`date`/`default` (values by type), `tree.lines` (tree lines, dividers and secondary text), `table.title`/`table.lines`/`table.bandRow` (tables: header, lines and every second row, unless `__flags.TABLE.bandRows` is false; cells take their value-type color), `askChoose` (the cursor row), `askPre`/`askQuestion`/`askChooseFilter`/`askPos` (prompts, header, filter and confirmations) and `md.heads.h3` (help headings); entries that are missing or empty fall back to built-in colors. Quoted names and `[index]` rows keep data distinct from commands. Containers whose size is not yet known in file-backed mode show `?` plus their size in bytes until expanded or counted. The browser uses the alternate screen: your scrollback is untouched and restored on exit, and nothing is written to stdout unless you export.
+
+| Key | Action |
+|-----|--------|
+| `↑`/`k`, `↓`/`j` | Move the cursor. `PgUp`/`PgDn` (or `Ctrl-U`/`Ctrl-D`) page, `g`/`G` or `Home`/`End` jump to the first/last row |
+| `→`/`l` | Expand the focused container (already expanded: move to its first child; on a "more" row: load more) |
+| `←`/`h` | Collapse; if already collapsed or a scalar, jump to the parent row; on the root row, zoom out |
+| `Space` | Toggle expand. `*` expands all children of the focused container one level |
+| `t` / `T` | Switch the focused array between table and tree / turn tables off or on for every array |
+| `Enter` | Zoom: make the focused container the root (recorded). On a scalar opens it in the preview; on a "more" row loads the next `idescpage` entries |
+| `Backspace`/`u` | Zoom out one level. `~` or `0` goes back to the original root. `U` undoes the last zoom or query |
+| `/` | Filter the child names of the current root as you type (`Enter` keeps, `Esc` clears) |
+| `p` | Scrollable bounded preview of the focused node (`f` cycles `ctree`/`ctable`/`cyaml`) |
+| `y` | Show the reusable `path=` expression for the focused node |
+| `:` | Command line (`Tab` completes, `↑`/`↓` recall history) |
+| `?` | Help overlay. `q` or `Ctrl-C` quits |
+
+Expanding, collapsing, moving and filtering only change the view: they are never part of a recipe. Zooming, queries and slices are recorded as ordered operations, so a session can be saved and replayed. Queries and slices act on the focused node (zooming to it first); preview, count, field summary, comparison, bookmarks and exports act on the focused node without moving the view.
+
+| Command | Description |
+|---------|-------------|
+| `path <expr>`, `from <expr>`, `sql <expr>` | Query the focused node with the existing engines (also `query path\|from\|sql <expr>`). Examples: `path [?status == 'active']`, `from equals(status, active)`, `sql select id where status = 'active'` |
+| `slice a:b` | Keep array entries `a` to `b` (end exclusive) |
+| `jump <path>` | Zoom to an exact property/index path from the current root (e.g. `items[2].nested`) |
+| `count` / `fields` | Entry count / field summary (samples up to the first 100 records) in an overlay |
+| `bm [name]`, `bm go <name>`, `bm rm <name>` | List, save (the focused node) and replay/remove bookmarks |
+| `compare <bookmark> [values]` | Diff the focused node with a bookmark (structure by default, bounded values with `values`) |
+| `recipe [print]`, `recipe save <file>`, `recipe load <file>` | Show, save or load the recipe |
+| `export json\|yaml <file>` | Write the focused node to a file (asks before replacing). `export json -` leaves the screen, writes only the selected data to stdout and exits |
+| `format ctree\|ctable\|cyaml\|auto` | Preview format (remembered) |
+| `quit` | Leave without emitting data |
+
+Errors (bad queries, missing paths, unknown commands) appear in the status line and leave the view unchanged. A changed source file clears cached locations and bookmarks and restarts at the root. Scans report progress in the status line and `Ctrl-C` cancels them. The terminal is resized live. Narrow terminals clip rows instead of wrapping.
+
+Terminals without ANSI support (for example `TERM=dumb`) automatically get a numbered, line-oriented menu with the same capabilities: Preview, Query, Export, Navigate (Parent, Original root, Undo, Next/Previous page, Filter names, Jump to path) and Tools (Slice array, Count entries, Field summary, Bookmarks, Compare with bookmark, Recipe).
+
+Preview uses the existing `ctable`, `ctree` and `cyaml` renderers on bounded data. Automatic format starts with `ctable` for arrays of maps and `ctree` otherwise; an explicit choice is remembered. Preview truncation markers are display-only and are never exported as selected data. A simple selection prints a reusable `path=` expression; compound selections use `idescrecipe=` replay. Replay uses the same source mode and operation order, including slices. Supply equivalent startup processing again when replaying a loaded-result recipe. Imported query expressions execute through the normal query engines; review recipes from others before replaying them. Saved recipes contain operations/bookmarks rather than source data, credentials or temporary-file paths.
+
+Export writes JSON or YAML to a file, or emits only selected data to stdout and exits. Interactive screens use a separate controlling terminal, including when stdin/stdout are redirected. JSON export of an untransformed file-backed selection streams the original byte range; YAML and derived queries use bounded loading. `outfile=` with noninteractive recipe replay explicitly replaces the destination after successful export. Quit without exporting emits no data.
+
+File-backed mode accepts local JSON, `.json.gz`/`ingzip`, stdin, command output and URL input. Non-file sources are streamed to a temporary file before browsing; source commands/requests run once. Temporary files are removed on session exit. Startup filters, transforms, record-streaming options and loops are rejected in this mode: use its Query action after narrowing or the normal loaded mode. Loaded NDJSON exploration should use `ndjsonjoin=true` to browse one combined result.
+
+Navigation rescans on demand and caches up to 64 page summaries. Exact counts may require reading the selected container; use Count explicitly. Scans/large JSON copies report progress and Ctrl-C cancels them. Early-stopped scans do not validate the unread suffix. File changes clear cached navigation/bookmarks and restart at root. A persistent index and full disk-backed sorting/aggregation are outside this mode.
+
+Requires OpenAF with `askConsole` (including `read`, `size`, `raw` and `altScreen`), `askKey`, `ow.format.string.ansiClip`/`ansiPad`, injectable `askChoose`/`ask`, `io.scanJSON` and `io.copyJSONRange`; missing capabilities report an update/rebuild requirement. The controlling-terminal implementation uses JLine's `/dev/tty` provider on macOS/Linux (requires `stty`) and independent `CONIN$`/`CONOUT$` handles on Windows. No interactive terminal is required for recipe replay to an ordinary output format.
+
+---
+
 ### 🧾 CH output options
 
 List of options to use when _out=ch_:
@@ -1255,7 +1365,11 @@ pipe:
 | help=template | Provides more details regarding the use of "output=template" |
 | help=examples | Provide several examples |
 | help=jsonschema | JSON Schema validation, options, drafts and sample generation |
+| `help=in:<format>` | Input format options, for example `oafp help=in:csv` |
+| `help=out:<format>` | Output format options, for example `oafp help=out:sql` |
 | help=readme | Returns this document |
+
+Format help includes shared input/output options. Format names ignore case, spacing and punctuation (for example `help=in:llmdecide` and `help=in:mini-a`). Use `out=raw` for Markdown or `pause=true` to page the selected help.
 
 > You can use [OpenAI's ChatGPT oAFp GPT](https://chatgpt.com/g/g-uBUaPluLw-oafp) to generate commands
 
@@ -1276,4 +1390,3 @@ Automatic workers only parse framed JSON records or sort independent map keys. O
 
 The wait animation starts after 250 ms, refreshes every 150 ms, and clears before output. Use `progress=off` to disable it. Redirected stderr, nested processing and full-screen outputs do not animate.
 
-See [PERFORMANCE.md](PERFORMANCE.md) for repeatable measurements and runtime considerations.
