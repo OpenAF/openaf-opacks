@@ -32,7 +32,7 @@
   |**GCP**|<img src=".github/badges/GCP.svg"><br>Simplified and light GCP API calls to avoid including the GCP Java SDK (work in progress)|
   |**GCS**|<img src=".github/badges/GCS.svg"><br>Google Cloud Storage (GCS) wrapper|
   |**GIST**|<img src=".github/badges/GIST.svg"><br>Provides an OpenAF channel implementation to use GitHub&#x27;s GIST.|
-  |**GPU**|<img src=".github/badges/GPU.svg"><br>Optional guarded numerical JavaScript acceleration through OpenCL and Rhino CPU fallback.|
+  |**GPU**|<img src=".github/badges/GPU.svg"><br>Optional guarded numerical JavaScript acceleration through OpenCL, optional Metal and Rhino CPU fallback.|
   |**GenData**|<img src=".github/badges/GenData.svg"><br>Helps in the quick generation of dummy data with already provided lists, custom lists, already provided functions (including telecom functions) and lists.|
   |**GitHub**|<img src=".github/badges/GitHub.svg"><br>GitHub partially API wrapper|
   |**GoogleCompiler**|<img src=".github/badges/GoogleCompiler.svg"><br>Google Closure Compiler, reducing size of Javascript files and makes them more efficient helping your application to load faster and reducing your bandwidth needs and provides warning for illegal JavaScript and warnings for potentially dangerous operations, helping you to produce JavaScript that is less buggy and easier to maintain.|
