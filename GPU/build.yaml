@@ -20,3 +20,9 @@ jobs:
     }
     run([javac, "--release", "21", "-encoding", "UTF-8", "-classpath", getOpenAFJar(), "-d", "build/classes"].concat(sources))
     run([jar, "--create", "--file", "lib/gpu-runtime.jar", "-C", "build/classes", "."])
+
+    if (String(java.lang.System.getProperty("os.name")).indexOf("Mac") == 0) {
+      var arch = String(java.lang.System.getProperty("os.arch"))
+      run(["/usr/bin/clang", "-dynamiclib", "-fobjc-arc", "-O2", "-mmacosx-version-min=11.0", "-framework", "Foundation", "-framework", "Metal",
+        "src/native/metal.m", "-o", "lib/libgpu-metal-" + arch + ".dylib"])
+    }

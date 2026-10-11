@@ -1,15 +1,18 @@
 // Bootstrap: loadLib("gpu.js"); ow.loadGPU()
-var _gpuRoot = getOPackPath("GPU") || String(new java.io.File(__loadedfrom).getAbsoluteFile().getParent())
+var _gpuSourceRoot = String(new java.io.File(__loadedfrom).getAbsoluteFile().getParent())
+if (!io.fileExists(_gpuSourceRoot + "/gpu-service.js") && io.fileExists("gpu-service.js"))
+  _gpuSourceRoot = String(new java.io.File(".").getCanonicalPath())
+var _gpuRoot = io.fileExists(_gpuSourceRoot + "/gpu-service.js") ? _gpuSourceRoot : getOPackPath("GPU")
 loadExternalJars(_gpuRoot + "/lib")
 
 var _gpuAnalyzer = require(_gpuRoot + "/gpu-analyzer.js")
 var _gpuEmitter = require(_gpuRoot + "/gpu-ir.js")
 var _gpuPolicy = require(_gpuRoot + "/gpu-policy.js")
-var _gpuRuntime = require(_gpuRoot + "/gpu-opencl.js")
+var _gpuRuntime = require(_gpuRoot + "/gpu-runtime.js")
 var _gpuService = require(_gpuRoot + "/gpu-service.js")
 
 OpenWrap.GPU = function() {
-  return _gpuService.create(_gpuRuntime.runtime(), _gpuAnalyzer, _gpuEmitter, _gpuPolicy)
+  return _gpuService.create(_gpuRuntime.runtime(_gpuRoot), _gpuAnalyzer, _gpuEmitter, _gpuPolicy)
 }
 
 /**

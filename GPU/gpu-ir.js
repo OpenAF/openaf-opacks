@@ -1,5 +1,5 @@
 // Small typed expression emitter. No general JavaScript rewriting takes place.
-exports.emit = function(plan, type) {
+exports.emit = function(plan, type, backend) {
   var floating = type == "float32"
   function expression(node) {
     if (node.kind == "load") return "p" + node.parameter + "[i]"
@@ -14,11 +14,17 @@ exports.emit = function(plan, type) {
     return "(" + expression(node.left) + node.operator + expression(node.right) + ")"
   }
   var scalar = floating ? "float" : "uint"
+  var metal = backend == "metal"
   var parameters = plan.parameters.map(function(p, i) {
+    if (metal) return (plan.arrayIndices.indexOf(i) >= 0
+      ? "device " + (i == plan.output ? "" : "const ") + scalar + "* p" + i
+      : "constant " + scalar + "& p" + i) + " [[buffer(" + i + ")]]"
     return plan.arrayIndices.indexOf(i) >= 0
       ? "__global " + (i == plan.output ? "" : "const ") + scalar + "* p" + i
       : scalar + " p" + i
   })
+  if (metal) return "#include <metal_stdlib>\nusing namespace metal;\n#pragma clang fp contract(off)\nkernel void calculate(" +
+    parameters.join(",") + ",uint i [[thread_position_in_grid]]){p" + plan.output + "[i]=" + expression(plan.expression) + ";}"
   return "#pragma OPENCL FP_CONTRACT OFF\n__kernel void calculate(" + parameters.join(",") +
     "){size_t i=get_global_id(0);p" + plan.output + "[i]=" + expression(plan.expression) + ";}"
 }

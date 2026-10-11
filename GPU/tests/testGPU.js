@@ -109,7 +109,7 @@
     check(plainReceiver() === (function(){return this})(),"ordinary original preserves global receiver")
     var originalError = new Error("original-error"), thrown = m.service.auto(function(){throw originalError})
     try { thrown() } catch(e) { check(e === originalError,"exception identity preserved") }
-    [null,false,3,[],{mode:"unsafe"},{backend:"metal"},{minElements:-1},{minElements:0.5},{device:1},{unexpected:true}].forEach(function(o){throws(function(){m.service.auto(xor,o)},"invalid options")})
+    [null,false,3,[],{mode:"unsafe"},{backend:"cuda"},{minElements:-1},{minElements:0.5},{device:1},{unexpected:true}].forEach(function(o){throws(function(){m.service.auto(xor,o)},"invalid options")})
 
     var trial = mock(), runCalls = 0, cpuCalls = 0
     trial.rt.source = function() { return String(J.FunctionAccess.source(xor)) }

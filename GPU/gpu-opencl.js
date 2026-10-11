@@ -1,9 +1,10 @@
 // Java ownership is lazy: explicit CPU wrappers never instantiate a native backend.
-exports.runtime = function() {
+exports.runtime = function(kind, root) {
+  kind = kind || "opencl"
   var backend, arrays
   var J = Packages.openaf.opacks.gpu
   function nativeBackend() {
-    if (!backend) backend = new J.OpenCLBackend()
+    if (!backend) backend = kind == "metal" ? new J.MetalBackend(root + "/lib/libgpu-metal-" + String(java.lang.System.getProperty("os.arch")) + ".dylib") : new J.OpenCLBackend()
     return backend
   }
   return {
@@ -17,7 +18,7 @@ exports.runtime = function() {
       for (var i = 0; i < p.devices.size(); i++) {
         var d = p.devices.get(i)
         devices.push({ id: String(d.id), name: String(d.name), vendor: String(d.vendor),
-          type: "GPU", backend: "opencl", version: String(d.version), driver: String(d.driver),
+          type: "GPU", backend: kind, version: String(d.version), driver: String(d.driver),
           littleEndian: Boolean(d.littleEndian), fp64: Boolean(d.fp64), maxAllocation: Number(d.maxAllocation) })
       }
       return { available: Boolean(p.available), reason: String(p.reason), devices: devices }

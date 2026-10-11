@@ -2,6 +2,12 @@ ojob:
   catch: false
 todo:
 - GPU regression
+- Metal regression
+- Adaptive regression
 jobs:
 - name: GPU regression
   exec: load("tests/testGPU.js")
+- name: Metal regression
+  exec: load("tests/testMetal.js")
+- name: Adaptive regression
+  exec: load("tests/testAdaptive.js")
