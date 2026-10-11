@@ -7,6 +7,7 @@ scripts:
 keywords:
 - gpu
 - opencl
+- metal
 - numerical
 bugs:
   url: https://github.com/OpenAF/openaf-opacks/issues
@@ -14,7 +15,7 @@ repository:
   type: http
   url: https://openaf.io/opacks/GPU.opack
   backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GPU
-description: Optional guarded numerical JavaScript acceleration through OpenCL and Rhino CPU fallback.
+description: Optional guarded numerical JavaScript acceleration through OpenCL, optional Metal and Rhino CPU fallback.
 name: GPU
 main: ''
 mainJob: ''
@@ -27,37 +28,49 @@ files:
 - .package.yaml
 - README.md
 - build.yaml
+- examples/adaptive.js
 - examples/automatic.js
 - examples/benchmark.js
 - examples/diagnostics.js
+- examples/metal.js
 - gpu-analyzer.js
 - gpu-ir.js
 - gpu-opencl.js
 - gpu-policy.js
+- gpu-runtime.js
 - gpu-service.js
 - gpu.js
 - lib/gpu-runtime.jar
+- lib/libgpu-metal-aarch64.dylib
 - src/java/openaf/opacks/gpu/FunctionAccess.java
 - src/java/openaf/opacks/gpu/GPUException.java
+- src/java/openaf/opacks/gpu/MetalBackend.java
 - src/java/openaf/opacks/gpu/OpenCLApi.java
 - src/java/openaf/opacks/gpu/OpenCLBackend.java
 - src/java/openaf/opacks/gpu/TypedArrayAccess.java
+- src/native/metal.m
 filesHash:
   .gitignore: 7467e30ab741d3fed93ca6f43c0e40b466c670d9
-  README.md: 3a925d13a4c5d4d10b40d5fb0932471ccae769f7
-  build.yaml: 25a4e0e9e027b851709229f5e1bdf3738de455af
+  README.md: dbfc8acf27c6068f63da74e805b7ede6607f9b83
+  build.yaml: 1f0dac4b4bc7d3f0922e3721a340568cef858d0b
+  examples/adaptive.js: 8086e6422d925ca46f891c19835a74f6948fb2e9
   examples/automatic.js: d6c59492638f5732d3c4eef59e3c4148a969f766
   examples/benchmark.js: e723efc6a7e75cf92a65db9c461c49b3bb762e42
   examples/diagnostics.js: a2180810470f0c7baf3a4d79a61f2c1dfd00188d
+  examples/metal.js: 3f326bd2779c091329552e7fe3213ac31f244b4a
   gpu-analyzer.js: e1b1e4c87b40426582472adc65f3634417c75430
-  gpu-ir.js: 48cf568b97aead02b825c85bf82e86415dc3440d
-  gpu-opencl.js: 9ac2c24b17594d8acd5959c98b1d0de0b8135720
-  gpu-policy.js: 496469250728e364e08c76808b33a4dcc84616b5
-  gpu-service.js: d6c0ab5321a9560399d0e099b918c3a4251616ec
-  gpu.js: a3751e990bf8be5ea9e56d698f5768586dc22a93
-  lib/gpu-runtime.jar: 57150747113779fa6cc737a82eae9936c0e7e0c7
+  gpu-ir.js: 8ff54c2a8e2f1b90001a3ec523325a2eb12860da
+  gpu-opencl.js: 51d44027fa661a011ffb458f9394c632b8f5053f
+  gpu-policy.js: b1d14ae3d8a0461b80343a2dd4b6fe796e20697b
+  gpu-runtime.js: 256dfba5d39188f2083342a45b6b90615ad04e9f
+  gpu-service.js: eb7130606f88061d92d665aa7b3a88ffb79d3bf1
+  gpu.js: 6ea8d3d4f5a14ee3f02c1d04d462d3dfb4b9b51b
+  lib/gpu-runtime.jar: 1578628d180a199850d7a7e1c86101ab3e5e0e01
+  lib/libgpu-metal-aarch64.dylib: 1b65be88f72b151bc50eeb4408fc376721419412
   src/java/openaf/opacks/gpu/FunctionAccess.java: 40adc2913770ff57aafe905902071027f69664c4
   src/java/openaf/opacks/gpu/GPUException.java: b9578986abb8d14f899e3135ac2cab3e73273955
+  src/java/openaf/opacks/gpu/MetalBackend.java: 14455a371aeb42714029640efbca0df3309b573c
   src/java/openaf/opacks/gpu/OpenCLApi.java: 3a9dc67946047d85af7588dd3d367f991462df16
   src/java/openaf/opacks/gpu/OpenCLBackend.java: 37fb2adf3c3013a8b6804cdf0cc9ec3a03db7008
   src/java/openaf/opacks/gpu/TypedArrayAccess.java: 1a663274f20d3e9e1a640ff70ccc28b9a08629d7
+  src/native/metal.m: 43dbc3f4addf50da5c89a13ea4ec1f379c6dbee6
