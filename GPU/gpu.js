@@ -12,7 +12,9 @@ var _gpuRuntime = require(_gpuRoot + "/gpu-runtime.js")
 var _gpuService = require(_gpuRoot + "/gpu-service.js")
 
 OpenWrap.GPU = function() {
-  return _gpuService.create(_gpuRuntime.runtime(_gpuRoot), _gpuAnalyzer, _gpuEmitter, _gpuPolicy)
+  var service = _gpuService.create(_gpuRuntime.runtime(_gpuRoot), _gpuAnalyzer, _gpuEmitter, _gpuPolicy)
+  require(_gpuRoot + "/gpu-collections.js").attach(service, _gpuRuntime.runtime(_gpuRoot), _gpuEmitter)
+  return require(_gpuRoot + "/gpu-aggregate.js").attach(service)
 }
 
 /**

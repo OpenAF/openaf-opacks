@@ -4,6 +4,7 @@ todo:
 - GPU regression
 - Metal regression
 - Adaptive regression
+- Collection policy regression
 jobs:
 - name: GPU regression
   exec: load("tests/testGPU.js")
@@ -11,3 +12,6 @@ jobs:
   exec: load("tests/testMetal.js")
 - name: Adaptive regression
   exec: load("tests/testAdaptive.js")
+
+- name: Collection policy regression
+  exec: load("tests/testCollectionPolicy.js")

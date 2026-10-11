@@ -1,6 +1,6 @@
 # GPU
 
-Optional GPU acceleration for a deliberately restricted subset of ordinary Rhino JavaScript functions. Uses OpenAF's existing JNA and Rhino dependencies, an approximately 23 KiB Java helper, and an installed OpenCL runtime. An optional Metal backend uses a bundled macOS native bridge. OpenAF core and its normal installation remain unchanged.
+Optional GPU acceleration for a deliberately restricted subset of ordinary Rhino JavaScript functions. Uses OpenAF's existing JNA and Rhino dependencies, an approximately 23 KiB Java helper, and an installed OpenCL runtime. An optional Metal backend uses a bundled macOS native bridge. Core delegation is available in a compatible OpenAF build; older builds can use the explicit `ow.gpu` adapters.
 
 Requires OpenAF **20261009+** and Java **21+**. Java 27 on macOS arm64 was tested; Java 21 is the compilation target but has not been executed locally. GPU execution was verified on Apple M2 Pro through OpenCL 1.2 and Metal. Linux, Windows, other GPU vendors, and other Apple systems need hardware validation. Apple deprecated OpenCL in macOS 10.14; availability on future macOS versions is not assured.
 
@@ -155,3 +155,39 @@ The tests also recognize `OPENAF_GPU_TEST_HARDWARE=1`. On the local machine, som
 Hardware tests require a driver exposing an available GPU with an OpenCL C 1.2 compiler. Linux requires an installed vendor ICD/runtime; Windows requires the vendor OpenCL DLL/runtime. An OpenCL CPU device is never reported as GPU execution. Without hardware enabled, deterministic tests explicitly report skipped hardware cases. Benchmarking reports complete call cost and actual GPU execution, with 30 warmups and 30 alternating CPU/GPU samples.
 
 See `examples/` and the repository-root GPU architecture, implementation-plan, POC-results and API-examples documents. Reductions, matrices, strict floating-point acceleration, CUDA and other extra backends, and transparent optimization are deferred.
+
+## Collection adapters and optional core delegation
+
+With the corresponding OpenAF core changes, installing this opack enables delegation for `pForEach` and `parallel4Array` by default. Loading `gpu.js` manually also makes the adapters available in that process. The core has no mandatory GPU dependency: missing/broken packages retain CPU behavior. A compatible **rebuilt** OpenAF JAR is required for automatic delegation; the date alone does not establish compatibility.
+
+```javascript
+var metrics = {};
+var result = pForEach(values, function(value) { return value ^ 255 }, undefined,
+                      false, undefined, {metrics: metrics});
+// Environment: OAF_PFOREACH_GPU=false
+// Process: __flags.PFOREACH.useGPU = false
+// Call: pForEach(values, fn, err, false, undefined, {useGPU:false})
+// Call: parallel4Array(values, fn, undefined, undefined, {useGPU:false})
+```
+
+The sixth `pForEach` argument and fifth `parallel4Array` argument accept `useGPU`, `execution`, `mode`, `minElements`, `maxWorkers` and `metrics`. `execution` requests `auto` (default), `sequential`, `parallel`, `opencl` or `metal`; unavailable GPU requests fall back to CPU. Core CPU parallel requests still respect pool pressure and global forced-sequential settings. `maxWorkers` caps CPU partitions. `metrics.execution` reports the actual route, `totalMs` includes adapter validation/conversion/materialization, `fallback` identifies failed native attempts, and `calls` counts useful calls for that specialization. Legacy CPU fallback paths provide core route/timeout metrics where supported.
+
+Only dense ordinary arrays of primitive signed-int32 numbers and statically pure callbacks consisting of one returned value/constant/bitwise expression qualify by default. Callbacks may declare a second index parameter, but using it, closures, calls, property accesses, mutations and other statements keep the original CPU implementation. No callback is replayed for timing. Native attempts write private result arrays; a failure runs the original callback on CPU once. `mode:"fast"` additionally allows finite numeric inputs and `+`, `-`, `*` expressions with explicit FP32 differences. Results are ordinary arrays. Typed-array inputs and arbitrary callback compilation are not supported by these collection adapters.
+
+Eligible workloads trial sequential and parallel CPU calls twice, then three useful calls on each available default OpenCL/Metal device when length is at least `minElements` (default 131072). CPU candidates receive eight useful samples each; the latest three warm observations form a median. GPU estimates discard the first compilation call. The selector requires a 10% improvement before switching from its current comparison baseline, and periodically refreshes one candidate every 32 calls. Histories are bounded to 64 exact-size specializations per callback/mode configuration. Failed candidates are suppressed until `clearCache()`; closing the service restores CPU execution. This learns warm repeated execution, not guaranteed minimum latency for the first call or every changing workload.
+
+Forced sequential calls and positive explicit/default timeouts retain core CPU semantics and cancellation. The native drivers do not provide the same bounded timeout contract. Unsupported callbacks retain the existing core heuristics.
+
+`parallel4Array` preserves its legacy reversed results **within each partition**; order between completed partitions remains unspecified. Callbacks that use partition-relative indexes retain the original implementation. Explicit thread counts or thread-control maps also bypass delegation, preserving `__threads` synchronization and UUID metadata. `parallelArray` itself is unchanged.
+
+Explicit adapters are `ow.gpu.pForEach(values, fn, err, useSeq, timeout, options)` and `ow.gpu.parallel4Array(values, fn, options)`. The parallel CPU collection route requires the compatible core options; older cores keep their original CPU heuristics.
+
+## OpenAF nLinq numeric aggregates
+
+The maintained `../nLinq` OpenAF extension adds `$from(values).gpu(options).sum()` and corresponding `average()`, `min()` and `max()` methods. This is **explicit per-query opt-in**; browser nLinq is unchanged. Filters execute once before the numeric reducer. Keyed reductions, sparse/noninteger/nonfinite inputs and empty arrays retain their original implementation. Signed-int32 sum/average require `length * max(abs(value)) <= 2147483647` to preserve exact partial sums. Floating-point reductions remain on CPU.
+
+The shared `ow.gpu.aggregate(values, operation, fallback, options)` engine compares CPU and GPU execution using useful calls. Native kernels calculate 256-element partial reductions, then JavaScript combines the partials. It currently transfers full-size private output buffers, so conversion and transfers can outweigh any kernel speedup. No aggregate speedup is claimed without workload-specific measurements. `metrics` costs exclude nLinq's preceding query/filter work, which is common to both routes.
+
+`$path` assessment: its existing custom-function API can expose the same reducer for numeric `sum`, `avg`, `min` and `max` after CPU projections. General traversal, filters, strings, custom functions and keyed `min_by`/`max_by` should remain on their existing engine. An adapter can preserve JMESPath type/empty-result rules without rewriting expressions or adding a GPU dependency to the query parser.
+
+Validation: `tests/testCollectionPolicy.js` provides injected-runtime selection/failure tests; `tests/testCollections.js` checks integration against the rebuilt core and sibling nLinq; `tests/benchmarkCollections.js` records actual useful-call routes. Run collection integration from the repository root, and policy/benchmark scripts from `GPU/`. `tests/testCollectionHardware.js` verifies both native backends and treats fallback as a failure. See [collection validation](tests/COLLECTION-RESULTS.md).
