@@ -1,0 +1,22 @@
+ojob:
+  catch: false
+todo:
+- Build GPU runtime
+jobs:
+- name: Build GPU runtime
+  exec: |
+    var home = String(java.lang.System.getProperty("java.home"))
+    var javac = home + "/bin/javac"
+    var jar = home + "/bin/jar"
+    var sources = listFilesRecursive("src/java").filter(function(f) { return /\.java$/.test(f.filepath) }).map(function(f) { return f.filepath })
+    io.mkdir("build/classes")
+    io.mkdir("lib")
+    var ProcessBuilder = java.lang.ProcessBuilder
+    function run(command) {
+      var args = new java.util.ArrayList()
+      command.forEach(function(arg) { args.add(String(arg)) })
+      var p = new ProcessBuilder(args).inheritIO().start()
+      if (p.waitFor() != 0) throw new Error("GPU build failed")
+    }
+    run([javac, "--release", "21", "-encoding", "UTF-8", "-classpath", getOpenAFJar(), "-d", "build/classes"].concat(sources))
+    run([jar, "--create", "--file", "lib/gpu-runtime.jar", "-C", "build/classes", "."])

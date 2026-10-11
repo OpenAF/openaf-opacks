@@ -1,0 +1,7 @@
+ojob:
+  catch: false
+todo:
+- GPU regression
+jobs:
+- name: GPU regression
+  exec: load("tests/testGPU.js")
