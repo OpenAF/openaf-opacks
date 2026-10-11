@@ -1,0 +1,63 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- gpu
+- opencl
+- numerical
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/GPU.opack
+  backurl: https://raw.githubusercontent.com/OpenAF/openaf-opacks/master/GPU
+description: Optional guarded numerical JavaScript acceleration through OpenCL and Rhino CPU fallback.
+name: GPU
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261011'
+dependencies:
+  openaf: '>=20261009'
+files:
+- .gitignore
+- .package.yaml
+- README.md
+- build.yaml
+- examples/automatic.js
+- examples/benchmark.js
+- examples/diagnostics.js
+- gpu-analyzer.js
+- gpu-ir.js
+- gpu-opencl.js
+- gpu-policy.js
+- gpu-service.js
+- gpu.js
+- lib/gpu-runtime.jar
+- src/java/openaf/opacks/gpu/FunctionAccess.java
+- src/java/openaf/opacks/gpu/GPUException.java
+- src/java/openaf/opacks/gpu/OpenCLApi.java
+- src/java/openaf/opacks/gpu/OpenCLBackend.java
+- src/java/openaf/opacks/gpu/TypedArrayAccess.java
+filesHash:
+  .gitignore: 7467e30ab741d3fed93ca6f43c0e40b466c670d9
+  README.md: 3a925d13a4c5d4d10b40d5fb0932471ccae769f7
+  build.yaml: 25a4e0e9e027b851709229f5e1bdf3738de455af
+  examples/automatic.js: d6c59492638f5732d3c4eef59e3c4148a969f766
+  examples/benchmark.js: e723efc6a7e75cf92a65db9c461c49b3bb762e42
+  examples/diagnostics.js: a2180810470f0c7baf3a4d79a61f2c1dfd00188d
+  gpu-analyzer.js: e1b1e4c87b40426582472adc65f3634417c75430
+  gpu-ir.js: 48cf568b97aead02b825c85bf82e86415dc3440d
+  gpu-opencl.js: 9ac2c24b17594d8acd5959c98b1d0de0b8135720
+  gpu-policy.js: 496469250728e364e08c76808b33a4dcc84616b5
+  gpu-service.js: d6c0ab5321a9560399d0e099b918c3a4251616ec
+  gpu.js: a3751e990bf8be5ea9e56d698f5768586dc22a93
+  lib/gpu-runtime.jar: 57150747113779fa6cc737a82eae9936c0e7e0c7
+  src/java/openaf/opacks/gpu/FunctionAccess.java: 40adc2913770ff57aafe905902071027f69664c4
+  src/java/openaf/opacks/gpu/GPUException.java: b9578986abb8d14f899e3135ac2cab3e73273955
+  src/java/openaf/opacks/gpu/OpenCLApi.java: 3a9dc67946047d85af7588dd3d367f991462df16
+  src/java/openaf/opacks/gpu/OpenCLBackend.java: 37fb2adf3c3013a8b6804cdf0cc9ec3a03db7008
+  src/java/openaf/opacks/gpu/TypedArrayAccess.java: 1a663274f20d3e9e1a640ff70ccc28b9a08629d7
