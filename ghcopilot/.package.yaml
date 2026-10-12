@@ -30,6 +30,9 @@ files:
 - README.md
 - copilot-sdk-java-1.0.18-preview.4.jar
 - ghcopilot.js
+- jackson-annotations-2.22.jar
+- jackson-core-2.22.2.jar
+- jackson-databind-2.22.2.jar
 - jackson-datatype-jsr310-2.22.2.jar
 filesHash:
   .maven.yaml: 73d2f67deaf92ca05429e194fce7e99984ae7e6d
@@ -37,4 +40,7 @@ filesHash:
   README.md: e9e09842af6692b8f9d92611e4bc615826bb3d8b
   copilot-sdk-java-1.0.18-preview.4.jar: bc24110403652598c3cac8575a165733ef066782
   ghcopilot.js: cdfcf79c90512b20a6dc6ffa15e3d53f824e46ba
+  jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
+  jackson-core-2.22.2.jar: 13a748ea3e329fa220076e021b45c8391b32420c
+  jackson-databind-2.22.2.jar: 921bd2092b0c539b2876de7063d55c72edcd05d3
   jackson-datatype-jsr310-2.22.2.jar: 99a4fe6c2e23fac2973fea2b2ec6f47e8302bbf4
