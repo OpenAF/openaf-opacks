@@ -877,6 +877,7 @@ List of options to use when _set=..._:
 | idescsource | String | `loaded` (default) browses the normal processed result. `stream` scans UTF-8 JSON on demand without loading the whole document. |
 | idescrecipe | String | File containing a saved version-1 selection/query recipe and named bookmarks. The source is supplied separately. |
 | idescpage | Number | Entries loaded per expand/"more" step in the tree browser (and per page in the numbered fallback and previews). Default `20`. |
+| idescrecords | Number | Batch size for line-oriented input (NDJSON, NDSLON, lines, DSV) or `in=json stream=true`. Each batch of processed records opens one explorer session; press `n` (or `:next`) to drop it and read the next batch, `q` to stop reading. Only one batch is held in memory. A selection/query is carried over to the next batch when it still applies. Positive integer, default `100`. CSV and explicit join options still browse the whole result. |
 | idescdepth | Number | Maximum preview depth. Default `3`. |
 | idescstring | Number | Maximum displayed characters per preview string. Default `200`. Oversized file-backed scalars may be omitted with a byte-size label. |
 | idescbytes | Number | Maximum selected JSON bytes admitted for file-backed queries/slices. Default `16777216` (16 MiB). |
@@ -887,6 +888,7 @@ All numeric options must be positive integers. These loading limits do not bound
 ```sh
 # Explore the normal input after standard filters/transforms.
 oafp file=response.json path=response out=idesc
+oafp file=events.ndjson in=ndjson out=idesc idescrecords=50
 
 # Explore JSON too large to load in memory.
 oafp file=large.json out=idesc idescsource=stream
@@ -1389,4 +1391,3 @@ Each element is processed independently, like an NDJSON record; `out=json` emits
 Automatic workers only parse framed JSON records or sort independent map keys. Other transforms, record framing, header inference and rendering stay sequential. Work queues are bounded by record count and input size; one oversized record still requires memory proportional to that record. `parallel=false` disables these workers, and an explicit CLI value overrides `OAFP_PARALLEL`. Stateful readers may remain sequential even with `parallel=true`.
 
 The wait animation starts after 250 ms, refreshes every 150 ms, and clears before output. Use `progress=off` to disable it. Redirected stderr, nested processing and full-screen outputs do not animate.
-

@@ -161,6 +161,7 @@ const _$o = (r, options, lineByLine) => {
 
     _clearTmpMsg()
     if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "ctree")
+    if (lineByLine && nOptions.__format == "idesc" && isDef(_idescSample)) return _idescSample.add(r)
     if (_outputFns.has(nOptions.__format)) {
         _outputFns.get(nOptions.__format)(r, nOptions)
     } else {
@@ -409,7 +410,9 @@ const _withCommandStream = (cmd, fn) => {
             failure = e
         } finally {
             // Also drain any remaining stdout if a reader terminates early.
-            try { ioStreamReadBytes(out, () => false) } catch(ignore) {}
+            if (typeof _idescSample == "undefined" || failure !== _idescSample.stop) {
+                try { ioStreamReadBytes(out, () => false) } catch(ignore) {}
+            }
             out.close()
             $doWait(drain)
             err.close()
@@ -469,8 +472,15 @@ const _describeJSONPaths = (file, prefix) => {
     return Array.from(paths)
 }
 
+// Set once stdin/cmd output has already been read into memory (e.g. to auto-detect the input type)
+var _inputBuffered = false
 // Keep streams owned by this call separate from the process-wide stdin stream.
 const _withInputStream = (res, fn) => {
+    // stdin/cmd can only be consumed once: stream from what was already buffered instead
+    if (_inputBuffered && isString(res)) {
+        var bstream = af.fromString2InputStream(res)
+        try { return fn(bstream) } finally { bstream.close() }
+    }
     if (isDef(params.file) && isUnDef(params.cmd)) {
         return _withFileStream(fn)
     }
@@ -633,7 +643,35 @@ const _jsonLineFramer = () => {
 }
 
 // Interactive description: OpenAF owns parsing, prompts, queries and rendering.
-const _idesc = (value, file, ui) => {
+// Line-oriented readers share one bounded explorer session per input run.
+var _idescSample
+const _withIDescSample = fn => {
+    if (params.format != "idesc") return fn()
+    var limit = isDef(params.idescrecords) ? Number(params.idescrecords) : 100
+    if (!isFinite(limit) || limit < 1 || Math.floor(limit) != limit) throw "idescrecords must be a positive integer"
+    var sample = { rows: [], stop: {}, used: false, seen: 0, recipe: __ }
+    // Only one batch is ever held: a finished batch (and its browser) is dropped before the next one fills.
+    var open = last => {
+        var rows = sample.rows, from = sample.seen - rows.length + 1
+        sample.rows = []
+        var res = _idescOutput(rows, { from: from, to: sample.seen, last: last }, sample.recipe)
+        sample.recipe = res.recipe
+        return res.outcome
+    }
+    sample.add = value => {
+        sample.used = true
+        sample.rows.push(value)
+        sample.seen++
+        if (sample.rows.length >= limit && open(false) != "next") throw sample.stop
+    }
+    _idescSample = sample
+    try {
+        try { fn() } catch(e) { if (e !== sample.stop) throw e; return }
+    } finally { _idescSample = __ }
+    if (sample.rows.length) open(true)
+    else if (sample.used) _progressGuard(() => { _eraseProgress(); printErr("No more records") })
+}
+const _idesc = (value, file, ui, batch) => {
     var cfg = {page:20, depth:3, string:200, bytes:16777216, nodes:100000}
     Object.keys(cfg).forEach(k => {
         var v = Number(params["idesc" + k])
@@ -643,7 +681,7 @@ const _idesc = (value, file, ui) => {
         }
     })
     var initial = {base:value, file:file, path:[], ops:[]}, state = initial, history = [], bookmarks = Object.create(null), cache = new Map(), stamp
-    var format, page = 0, search = "", closed = false, scanCancelled = false, generation = 0
+    var format, page = 0, search = "", closed = false, outcome = "quit", scanCancelled = false, generation = 0
     var equal = (a, b) => stringify(a, __, "") == stringify(b, __, "")
     var prefix = (a, b) => a.length <= b.length && a.every((k, i) => k === b[i])
     var pathText = path => "@" + path.map(k => typeof k == "number" ? "[" + k + "]" : "." + stringify(k, __, "")).join("")
@@ -1180,7 +1218,7 @@ const _idesc = (value, file, ui) => {
             return tone(cf("askChoose", "BOLD,CYAN"), padded)
         }
         var hints = mode => ({
-            tree:"←↑↓→ hjkl move · ⏎ zoom · ⌫ up · ~ top · / filter · t table/tree · : cmd · p preview · ? help · q quit",
+            tree:"←↑↓→ hjkl move · ⏎ zoom · ⌫ up · ~ top · / filter · t table/tree · : cmd · p preview · ? help · q quit" + (batch && !batch.last ? " · n next records" : ""),
             overlay:"↑↓ PgUp/PgDn scroll · g/G ends · f format (preview) · q/Esc close",
             filter:"type to filter child names · ⏎ keep · Esc clear",
             cmd:"⏎ run · Tab complete · ↑↓ history · Esc cancel · try: path [?x>`1`] | slice 0:10 | export json -",
@@ -1212,6 +1250,7 @@ const _idesc = (value, file, ui) => {
                 key("p", "bounded preview of the focused node (f cycles ctree/ctable/cyaml)"),
                 key("y", "show the reusable path= of the focused node"),
                 key("?", "this help"),
+                key("n", "next batch of records (line-oriented input; drops this batch)"),
                 key("q Ctrl-C", "quit; nothing is emitted unless you export"),
                 "",
                 head("Commands  (press : then type; Tab completes, ↑↓ recall)"),
@@ -1230,9 +1269,13 @@ const _idesc = (value, file, ui) => {
         }
         var frame = () => {
             var d = dims(), w = d.w, body = d.h - 5, out = [], ov = view.overlay
+            if (ov && ov.width != w) {
+                ov.lines = String(ov.make()).split("\n"); ov.width = w
+                ov.top = Math.min(ov.top, Math.max(0, ov.lines.length - body))
+            }
             var lc = cf("tree.lines", "FAINT")
             var src = state.file ? paint(cf("string", "CYAN"), "💾 file") : state.ops.length ? paint(cf("default", "YELLOW"), "⚡ derived") : paint(cf("number", "GREEN"), "📥 loaded")
-            var head = paint(cf("askPre", "YELLOW,BOLD"), "oafp") + " " + (ov ? paint(cf("askQuestion", "BOLD"), ov.title) : crumbs(state.path)) + paint(lc, "  │ ") + src + paint(lc, " · " + steps(state).length + " ops")
+            var head = paint(cf("askPre", "YELLOW,BOLD"), "oafp") + " " + (ov ? paint(cf("askQuestion", "BOLD"), ov.title) : crumbs(state.path)) + paint(lc, "  │ ") + src + paint(lc, " · " + steps(state).length + " ops") + (batch ? paint(lc, " · ") + paint(cf("number", "GREEN"), "records " + batch.from + "–" + batch.to + (batch.last ? " (last)" : "")) : "")
             out.push(head); out.push(divider(w))
             if (ov) for (var i = 0; i < body; i++) out.push(ov.lines[ov.top + i] != null ? " " + ov.lines[ov.top + i] : "")
             else for (var i = 0; i < body; i++) {
@@ -1260,13 +1303,19 @@ const _idesc = (value, file, ui) => {
         // ---- actions
         var openOverlay = (title, make, formats) => {
             var lines = String(make()).split("\n")
-            view.overlay = {title:title, make:make, formats:!!formats, lines:lines, top:0}; view.mode = "overlay"
+            view.overlay = {title:title, make:make, formats:!!formats, lines:lines, top:0, width:dims().w}; view.mode = "overlay"
         }
         var scroll = n => { var ov = view.overlay, body = dims().h - 5; ov.top = Math.max(0, Math.min(ov.top + n, Math.max(0, ov.lines.length - body))) }
-        var ctree = v => $o(v, {__format:"ctree"}, __, true)
+        var render = (v, fmt) => {
+            var width = dims().w - 1, ansi = ui.ansi !== false
+            if (fmt == "ctable" && (isArray(v) || isMap(v))) return printTable(isMap(v) ? [v] : v, width, true, ansi, ansi ? "utf" : __, __, true, false, true)
+            if (fmt == "ctree") return printTreeOrS(v, width, {noansi:!ansi, mono:false, color:true})
+            return $o(v, {__format:fmt}, __, true)
+        }
+        var ctree = v => render(v, "ctree")
         var previewOverlay = path => openOverlay("Preview " + pathText(path) + " (bounded)", () => {
             var p = withPath(path, preview)
-            return $o(p.value, {__format:p.format}, __, true)
+            return render(p.value, p.format)
         }, true)
         var zoom = path => {
             if (equal(path, state.path)) return
@@ -1290,7 +1339,7 @@ const _idesc = (value, file, ui) => {
             var go = () => { writeFile(file, fn); info("✔ Saved: " + file) }
             if (io.fileExists(file)) confirmThen("Replace " + file + "? (y/N)", go); else go()
         }
-        var cmdNames = ["path", "from", "sql", "query", "slice", "jump", "count", "fields", "bm", "compare", "recipe", "export", "format", "help", "quit"]
+        var cmdNames = ["path", "from", "sql", "query", "slice", "jump", "count", "fields", "bm", "compare", "recipe", "export", "format", "help", "next", "quit"]
         var runCmd = text => {
             var m = String(text).trim().match(/^(\S+)\s*(.*)$/)
             if (!m) return
@@ -1341,6 +1390,7 @@ const _idesc = (value, file, ui) => {
                 if (["ctree", "ctable", "cyaml", "auto"].indexOf(arg) < 0) throw "Use: format ctree|ctable|cyaml|auto"
                 format = arg == "auto" ? __ : arg; info("Preview format: " + arg); break
             case "help": openOverlay("Help", () => helpLines().join("\n")); break
+            case "next": case "n": if (!api.next()) info("No further batch of records"); break
             case "quit": case "q": closed = true; break
             default: throw "Unknown command: " + name + " (try ? for help)"
             }
@@ -1413,6 +1463,7 @@ const _idesc = (value, file, ui) => {
                 info(view.tables ? "Arrays of flat maps shown as tables" : "Tables off: arrays shown as trees")
                 break
             case "esc": if (view.filter) { view.filter = ""; view.cursor = rid("n", state.path) }; break
+            case "n": if (!api.next()) info("No further batch of records"); break
             case "q": case "ctrl-c": case "eof": closed = true; break
             }
         }
@@ -1502,6 +1553,7 @@ const _idesc = (value, file, ui) => {
         root:() => saveState(initial), parent:() => { if (state.path.length) select(state.path.slice(0, -1)) },
         bookmark:name => { if (!name.length) throw "Bookmark name is empty"; bookmarks[name] = steps(state) },
         close:() => { closed = true },
+        next:() => { if (!batch || batch.last) return false; outcome = "next"; closed = true; return true },
         runMenu:() => {
             var choose = (title, choices) => ui.choose ? ui.choose(title, choices) : askChoose(title, choices, 12, __, ui)
             var input = title => {
@@ -1615,6 +1667,7 @@ const _idesc = (value, file, ui) => {
                                     if (confirm(name)) { writeFile(name, out => exportData(out, ["json", "yaml"][t])); ui.write(tone("BOLD,GREEN", "✔ Saved: ") + tone("WHITE", name)) }
                                 } else if (dest === 1) { exportData(java.lang.System.out, ["json", "yaml"][t]); closed = true }
                                 break
+                            case "next": api.next(); break
                             case "quit": closed = true
                         }
                     }
@@ -1631,6 +1684,7 @@ const _idesc = (value, file, ui) => {
                             entry("fields", "Field summary", () => listing.meta.type == "array"), entry("bookmarks", "Bookmarks..."),
                             entry("compare", "Compare with bookmark...", () => Object.keys(bookmarks).length > 0), entry("recipe", "Recipe...")])),
                         entry("quit", "🚪 Quit")]
+                    if (batch && !batch.last) main.splice(main.length - 1, 0, entry("next", "⏭ Next records"))
                     var up = state.path.length ? [entry("parent", "⬆ .. parent" + (state.path.length > 1 ? " (" + clip(pathText(state.path.slice(0, -1)), 40) + ")" : " (root)"))] : []
                     if (state.path.length > 1) up.push(entry("root", "⌂ original root"))
                     main = up.concat(main)
@@ -1645,7 +1699,10 @@ const _idesc = (value, file, ui) => {
             }
         }
     }
-    api.run = () => ui && ui.readKey && ui.size && ui.ansi !== false ? runTUI() : api.runMenu()
+    api.run = () => {
+        if (ui && ui.readKey && ui.size && ui.ansi !== false) runTUI(); else api.runMenu()
+        return outcome
+    }
     return api
 }
 
@@ -1664,16 +1721,21 @@ const _idescUI = () => {
     ui.progress = n => { if (now() - last > 1000) { ui.write((ui && ui.console ? ansiColor("CYAN", "⏳ ") : "") + "Scanning: " + n + " bytes (Ctrl-C cancels)"); last = now() } }
     return ui
 }
-const _idescOutput = value => {
-    var ui
+const _idescOutput = (value, batch, recipe) => {
+    var ui, outcome = "quit", saved
     try {
         ui = _idescUI()
-        var browser = _idesc(value, __, ui)
+        var browser = _idesc(value, __, ui, batch)
         if (params.idescrecipe) browser.load(io.readFileJSON(params.idescrecipe))
-        browser.run()
+        // Carry the previous batch's view over; fall back to the root if it doesn't apply here.
+        else if (recipe) { try { browser.load(recipe) } catch(e) { browser.root() } }
+        outcome = browser.run()
+        // Keep only the small recipe, never the browser or its cached records.
+        saved = browser.recipe()
     }
     catch(e) { _exit(-1, String(e)) }
     finally { if (ui) ui.close() }
+    return { outcome: outcome, recipe: saved }
 }
 const _idescSource = () => {
     if (!isFunction(io.scanJSON) || !isFunction(io.copyJSONRange)) throw "idescsource=stream requires OpenAF io.scanJSON/copyJSONRange; rebuild/update OpenAF"
@@ -5503,7 +5565,6 @@ var _run = () => {
         try { _idescSource() } catch(e) { _exit(-1, String(e)) }
         return
     }
-    if (params.format == "idesc" && toBoolean(params.stream)) _exit(-1, "out=idesc needs a whole result; remove stream=true or use idescsource=stream")
     if (params.type == "llmdecide" && isDef(params.llmdecidesample)) {
         _inputFns.get("llmdecide")("", options)
         return
@@ -5559,6 +5620,7 @@ var _run = () => {
 
             if (typeof params.cmd !== "undefined") {
                 _res = _runCmd2Bytes(params.cmd, true)
+                _inputBuffered = true
             } else {
                 if (isString(params.data)) {
                     _res = params.data
@@ -5600,6 +5662,7 @@ var _run = () => {
                                 return false
                             })
                             _res = String(text.toString())
+                            _inputBuffered = true
                         }
                     }
                 }
@@ -5652,6 +5715,9 @@ var _run = () => {
 }
 
 // Verify debug
+var _runInput = _run
+_run = () => _withIDescSample(_runInput)
+
 if (params.debug) {
     //__initializeCon()
     printErr("DEBUG: " + colorify(params))
