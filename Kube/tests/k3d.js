@@ -84,6 +84,7 @@ try {
     eventually("ConfigMap deleted", function() {
       return !(kube.list(cm, ns, true).items || []).some(function(o) { return o.metadata.name == "settings"; });
     });
+    check(kube.deleteObject(cm, "settings") === false, "Deleting an absent ConfigMap should return false");
   });
   test("manifest delete", function() {
     check(kube.delete({ apiVersion: "apps/v1", kind: "Deployment", metadata: { name: "worker", namespace: ns } }), "Deployment delete failed");

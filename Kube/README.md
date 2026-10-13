@@ -88,6 +88,13 @@ $kube().deleteObject({
 }, "guestbook", "argocd")
 ```
 
+## Corrections (2026-10-13)
+
+`deleteObject` explicitly selects Fabric8's no-argument delete method so the named
+resource is deleted. It returns `true` when the API reports a deleted resource,
+and `false` when the resource is already absent. Deletion completion can be
+asynchronous; poll the API when you need to confirm that the resource is gone.
+
 ## Corrections (2026-09-18)
 
 `scaleWithDeps` accepts resource maps or deployment-name strings and defaults `scaleDown` to `false`. Pod exec calls keep their completion waiters local to each call.

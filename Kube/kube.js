@@ -1258,11 +1258,13 @@ Kube.prototype.getObject = function(aNamespace, aKind, aName, aVersion) {
  * <odoc>
  * <key>Kube.deleteObject(aNamespace, aResource, aName) : Boolean</key>
  * Given aResource (e.g. { apiVersion, kind, plural, namespaced }) and aName will try to delete the current object definition.
+ * Returns true when the API reports a deleted resource, or false when it is already absent. Deletion completion can be asynchronous.
  * </odoc>
  */
 Kube.prototype.deleteObject = function(aNamespace, aResource, aName) {
 	_$(aName, "name").isString().$_()
-	return Boolean(this.__getGenericResourceClient(aNamespace, aResource).withName(aName).delete())
+	// Select the no-argument overload; Rhino otherwise selects delete(HasMetadata...) with zero items.
+	return !this.__getGenericResourceClient(aNamespace, aResource).withName(aName)["delete()"]().isEmpty()
 }
 
 /**
