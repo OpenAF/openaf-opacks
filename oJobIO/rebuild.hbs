@@ -18,6 +18,7 @@ jobs:
     if (io.fileExists(hd + "/ojobs")) {
       var lst = $from(listFilesRecursive(hd + "/ojobs"))
                .ends("filename", "yaml")
+               .orEnds("filename", "yml")
                .orEnds("filename", "json")
                .notStarts("filename", "_")
                .select(r => r.filepath.replace(hd + "/ojobs", "_local"))
@@ -27,6 +28,7 @@ jobs:
     if (isDef(__flags) && isDef(__flags.OJOB_LOCALPATH)) {
       var lst = $from(listFilesRecursive(__flags.OJOB_LOCALPATH))
                 .ends("filename", "yaml")
+                .orEnds("filename", "yml")
                 .orEnds("filename", "json")
                 .notStarts("filename", "_")
                 .select(r => r.filepath.replace(__flags.OJOB_LOCALPATH, "_global"))
@@ -47,6 +49,12 @@ jobs:
 
       ow.oJob.output(lst, args);
     } else {
+      var modernLauncher =
+{{{launcher}}}
+      ;
+      if (modernLauncher({ name: "{{name}}", home: hd, ids: args.init.l,
+        catalog: args.init.catalog, globalPath: (typeof __flags != "undefined" ? __flags.OJOB_LOCALPATH : ""), args: args })) return;
+      delete args.ui;
       plugin("Console");
       var o = args.init.l.map(r => r.replace(/^{{proto}}:\/\/{{url}}\//g, "").replace(/\.ya?ml$/, "").replace(/\.json$/, ""));
 
@@ -59,7 +67,11 @@ jobs:
 
       print(ansiColor("BOLD", "── {{name}} " + repeat(con.getConsoleReader().getTerminal().getWidth() - (4 + {{lname}}), "─")) + "\n" + ansiColor("ITALIC", "Start completing the URI and/or hit TAB to auto-complete to select the ojob to execute (you can hit Ctrl-C at any time to abort):") + "\n");
       var cmd, ct = 0;
-      while (o.indexOf(cmd) < 0 && ct < 2) { cmd = con.readLinePrompt(">> {{url}}/").trim(); ct++ }
+      while (o.indexOf(cmd) < 0 && ct < 2) {
+        var line = con.readLinePrompt(">> {{url}}/");
+        if (line == null) return;
+        cmd = line.trim(); ct++;
+      }
       hist.flush();
 
       if (cmd != "") {
@@ -106,9 +118,8 @@ jobs:
 
           var _r = ow.oJob.askOnHelp(oj.help)
 
-          if (isDef(_r)) {
-            args = merge(args, _r)
-          }
+          if (isUnDef(_r)) return;
+          args = merge(args, _r)
         } else {
           var h = $from(oj.jobs).equals("name", "Help").at(0)
           if (isUnDef(h) && isDef(oj.help)) h = oj

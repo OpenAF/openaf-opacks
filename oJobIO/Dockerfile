@@ -4,6 +4,7 @@ EXPOSE 8088
 
 COPY rebuild.yaml /openaf/rebuild.yaml
 COPY rebuild.hbs /openaf/rebuild.hbs
+COPY launcher.js /openaf/launcher.js
 COPY server.yaml /openaf/main.yaml
 #COPY setupOJobIO.yaml /openaf/setupOJobIO.yaml
 

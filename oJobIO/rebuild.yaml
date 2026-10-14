@@ -56,14 +56,14 @@ jobs:
     args.init.name  = _$(args.NAME, "NAME").default(args.init.name)
     args.init.url   = _$(args.URL, "URL").default(args.init.url)
     args.init.lname = args.init.name.length
-    var l = [], lp = []
+    var l = [], lp = [], catalog = []
      
     $from(listFilesRecursive("_output"))
     .notStarts("filename", ".")
     .attach("dir", r => (r.isFile ? r.filepath.substr(0, r.filepath.lastIndexOf("/")) : r.filepath))
     .sort("dir", "-isDirectory", "filename")
     .select(r => {
-       if (r.filename.endsWith(".yaml") || r.filename.endsWith(".json")) {
+       if (r.filename.endsWith(".yaml") || r.filename.endsWith(".yml") || r.filename.endsWith(".json")) {
           var orig = r.filepath
           if (r.filename == "index.yaml") r.filepath = r.filepath.replace(/index\.yaml$/, "")
           if (r.filename != ".package.yaml") {
@@ -99,6 +99,19 @@ jobs:
          }
        } catch(e) {
          logErr("Problem reading file '" + f + "': " + String(e))
+       }
+
+       if (isDef(j)) {
+         var help = j.help;
+         if (isUnDef(help) && isArray(j.jobs)) {
+           var helpJob = $from(j.jobs).equals("name", "Help").at(0);
+           if (isDef(helpJob)) help = helpJob.help;
+         }
+         var path = f.replace(/^_output\//, "");
+         var id = args.init.proto + "://" + args.init.url + "/" + path.replace(/index\.yaml$/, "");
+         catalog.push({ id: id, path: path.replace(/\.(ya?ml|json)$/, ""),
+           category: path.indexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "(root)",
+           description: isDef(help) && isString(help.text) ? help.text : "" });
        }
 
        if (isDef(j) && isDef(j.jobs) && ($from(j.jobs).equals("name", "Help").any() || isDef(j.help))) {
@@ -155,8 +168,10 @@ jobs:
     io.writeFileString("_output/index.md", mdindex)
     io.writeFileString("_output/index.html", ow.template.parseMD2HTML(htmlmdindex, true))
     
-    var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), args.init))
+    var launcher = io.readFileString("launcher.js").split("\n").map(line => "      " + line).join("\n")
+    var _tmpl = af.fromYAML(templify(io.readFileString("rebuild.hbs"), merge(args.init, { launcher: launcher })))
     _tmpl.init.l = l
+    _tmpl.init.catalog = catalog
     io.writeFileJSON("_output/index.json", _tmpl)
     io.cp("imgs/openaf.png", "_output/logo.png")
     io.cp("imgs/favicon.ico", "_output/favicon.ico")
