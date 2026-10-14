@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261013'
+version: '20261014'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -28,7 +28,6 @@ files:
 - .precompile
 - README.md
 - jackson-annotations-2.22.jar
-- jackson-core-2.21.6.jar
 - jackson-core-3.2.3.jar
 - jackson-databind-3.2.3.jar
 - jackson-dataformat-yaml-3.2.3.jar
@@ -78,9 +77,6 @@ files:
 - netty-transport-native-unix-common-4.2.18.Final.jar
 - slf4j-api-2.0.20.jar
 - snakeyaml-engine-3.1.1.jar
-- tests/k3d.js
-- tests/k3d.sh
-- tests/regression.js
 - vertx-auth-common-5.2.0.jar
 - vertx-core-5.2.0.jar
 - vertx-core-logging-5.2.0.jar
@@ -94,7 +90,6 @@ filesHash:
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: 04472d99b869f5cf0b2ebe4eb75d75a32d4fca9e
   jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
-  jackson-core-2.21.6.jar: 7a71e4eeb27e88ba462f8f085afd3e4ec6ecadf0
   jackson-core-3.2.3.jar: 94d7dab7ac8e336a4c7a5ce36b8ca206bfde18c5
   jackson-databind-3.2.3.jar: edb121f17d1a441732b15919f531e529c5cc76ec
   jackson-dataformat-yaml-3.2.3.jar: c39c703aadd5bc7513013e7b2871ef36698aa443
@@ -144,9 +139,6 @@ filesHash:
   netty-transport-native-unix-common-4.2.18.Final.jar: b9dbd51d2802e447630ef2b8bba56bb5aaad1f82
   slf4j-api-2.0.20.jar: 7fea9d92ba67e9b3c8f03515fb202b86a1fe44f6
   snakeyaml-engine-3.1.1.jar: 9f8bf41c9f06191abd4322072849603bdc919ac7
-  tests/k3d.js: 12bb922cd490453a21a51fef2394380354ba24df
-  tests/k3d.sh: 27b1a6b7be5f559f84b7e8fae1e4b8bf0e918612
-  tests/regression.js: ebfa0f7d964d9a512f554f259a5cc5bb148c9dcb
   vertx-auth-common-5.2.0.jar: 8163b6c35d803c14cd33448a6cb925b7426f71d4
   vertx-core-5.2.0.jar: da57447fd65163f9bbc3414a2f571d563a3c121a
   vertx-core-logging-5.2.0.jar: bf64c54160edce659a4f5876e6119cddf75f4237
