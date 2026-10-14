@@ -287,6 +287,38 @@ separate `bucket` argument. Optional `meta` and `copyOptions` are forwarded to
 * MinIO
 * ScaleWay Object Storage
 
+## Running tests locally
+
+With OpenAF (`oaf`, `ojob`), the `oJob-common` opack, Docker and `curl`
+installed, run from this directory:
+
+```sh
+bash tests/minio.sh
+```
+
+The runner executes the fixture regression checks, starts a disposable MinIO
+container on a dynamically allocated localhost port, waits for readiness, and
+runs both `s3-test.yaml` (client API, including S3 Select) and
+`s3-ojob-test.yaml` (oJob integration). It removes the container and its anonymous
+volumes on exit. Downloads and reports use a temporary workspace; failures retain
+that workspace and print its path along with container logs. Failed assertions
+or job errors produce a nonzero exit status. Sync uses `tests/fixtures`, so it
+does not upload the library's JARs or other working files.
+
+The default image is pinned by digest in `tests/minio.sh` to MinIO release
+`RELEASE.2025-09-07T16-13-09Z`. Set `S3_TEST_IMAGE` to use another compatible
+MinIO image, including one already cached locally. An uncached image requires
+registry access; if the pinned image is unavailable, supply your own image.
+
+For a server you manage yourself, both YAML suites default to
+`http://127.0.0.1:9000`, access key `openaf-test`, secret
+`openaf-test-secret`, and region `us-east-1`. Override these with
+`S3_TEST_URL`, `S3_TEST_ACCESS_KEY`, `S3_TEST_SECRET_KEY` and
+`S3_TEST_REGION`, then run `ojob s3-test.yaml` or `ojob s3-ojob-test.yaml`.
+Use a disposable server: these tests create and delete buckets and objects.
+Direct runs write reports and temporary downloads in the current directory.
+The container runner always supplies its own endpoint and test credentials.
+
 ## Corrections (2026-09-18)
 
 `deleteFolderActions(bucket, prefix, beRecursive)` forwards the optional recursion flag to `listObjects`. The default remains nonrecursive; inspect the returned action list before executing it. Sync conflict reporting handles equal timestamps with different sizes.

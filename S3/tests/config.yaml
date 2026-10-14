@@ -1,0 +1,8 @@
+jobs:
+- name: S3 Test config
+  exec: |
+    args.init.url = getEnv("S3_TEST_URL") || args.init.url;
+    args.init.accessKey = getEnv("S3_TEST_ACCESS_KEY") || args.init.accessKey;
+    args.init.secretKey = getEnv("S3_TEST_SECRET_KEY") || args.init.secretKey;
+    args.init.region = getEnv("S3_TEST_REGION") || args.init.region;
+    global.s3TestConfig = args.init;

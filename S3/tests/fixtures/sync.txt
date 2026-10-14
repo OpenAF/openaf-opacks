@@ -1,0 +1,1 @@
+Local S3 sync fixture.

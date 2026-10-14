@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261004'
+version: '20261014'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -28,10 +28,10 @@ files:
 - .precompile
 - README.md
 - annotations-26.1.0.jar
-- bcprov-jdk18on-1.85.2.jar
+- bcprov-jdk18on-1.86.jar
 - error_prone_annotations-2.50.0.jar
 - failureaccess-1.0.3.jar
-- guava-33.7.1-jre.jar
+- guava-33.7.2-jre.jar
 - j2objc-annotations-3.1.jar
 - jackson-annotations-3.0-rc5.jar
 - jspecify-1.0.1.jar
@@ -45,19 +45,17 @@ files:
 - s3.js
 - s3.yaml
 - simple-xml-safe-2.7.1.jar
-- snappy-java-1.1.10.8.jar
-- tests/legacy.js
-- tests/regression.js
+- snappy-java-1.1.10.12.jar
 filesHash:
   .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
   .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
-  README.md: 5f1ecf8f0f30060782f849d193d01f388263ba33
+  README.md: 23293dc88647ee9f444e397a5ee59edefb02bd42
   annotations-26.1.0.jar: c1e9226d7ca6661020c58c94397da0cc3673d5e4
-  bcprov-jdk18on-1.85.2.jar: aeb3dac02f799ed4783d5ed5900513339880727f
+  bcprov-jdk18on-1.86.jar: 830c8467bed8e4c1148262386b09fc42aedcf262
   error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  guava-33.7.1-jre.jar: 77e37866fb969b4ff6710faaefd3a86067730ada
+  guava-33.7.2-jre.jar: e70def5b06cfb109ea050de99870e79c8ce80dbc
   j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
   jackson-annotations-3.0-rc5.jar: dc49f719f3e5b7acbe0cfcab6cafcd4203ccf48e
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
@@ -66,11 +64,9 @@ filesHash:
   minio-9.0.3.jar: f44ec333c12a1a3773c92d8d48e9f5d52942d4e6
   oJobS3.yaml: ec79e9f1a77531c289c24874cce955007f47c0f8
   oafp_S3.js: fb0d0321c744f3bbe210dd0478175fe2a2dc8f2d
-  s3-ojob-test.yaml: 41175a1afbf0ad793545ac07044b30332d38bf02
-  s3-test.yaml: ebbdd027e37034c8d63be4f3045eabf9af5e8c41
+  s3-ojob-test.yaml: e91b6b8cbaf922fca16d11727cd24e4701fd9e9c
+  s3-test.yaml: 5add0613ccc22073cd61d852a2e4946d8186af7c
   s3.js: fc42b5af38d1b3196e58d4fe02f580a1984d1231
   s3.yaml: 258dcf5460fbf67d0fd98662a06ed55f984dff68
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
-  snappy-java-1.1.10.8.jar: ccbaa2b5ea6a023a27c44daf2d6cdec0e138592d
-  tests/legacy.js: 759b4192cbdf9aff1b6be3adea420dd70c0993d7
-  tests/regression.js: 07a1d53e610c53f3cd08a437e06b5d4188621713
+  snappy-java-1.1.10.12.jar: c97fdfd953df72ae08be22384a1581ce665c2694

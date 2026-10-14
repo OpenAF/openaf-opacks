@@ -1,11 +1,12 @@
 init:
-  url       : https://play.min.io:9000
-  accessKey : Q3AM3UQ867SPQQA43P2F
-  secretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
-  #region    : 
+  url       : http://127.0.0.1:9000
+  accessKey : openaf-test
+  secretKey : openaf-test-secret
+  region    : us-east-1
   testBucket: openaf-test
 
 include:
+- tests/config.yaml
 - oJobTest.yaml
 
 ojob:
@@ -13,12 +14,11 @@ ojob:
   opacks:
   - oJob-common
   - openaf: 20200523
-  catch       : logErr(exception);
+  catch       : global.s3TestJobFailed = true; logErr(exception);
   logToConsole: true 
 
 todo:
 - S3 Init
-- Results
 
 - S3::Create, list and remove bucket
 - S3::Upload, list, download and delete an object
@@ -31,26 +31,27 @@ todo:
 - S3::Object URL
 - S3::Ignore cert check
 - S3::Close
+- Results
 
 jobs:
 # -------------
 - name: Results
   from: oJob Test Results
-  type: shutdown
   args:
     quiet: true
   exec: |
     tprint("Tests PASSED: {{pass}}/{{count}}", args.results);
     tprint("Tests FAILED: {{fail}}/{{count}}", args.results);
-    if (args.results.fail > 0) printErr("There are failed tests");
     io.writeFileString("s3-test.md", ow.test.toMarkdown());
     io.writeFileJSON("s3-test.json", args.results);
+    if (args.results.count != 10 || args.results.fail > 0 || global.s3TestJobFailed) exit(1);
 
 # -------------
 - name: S3 Init
+  from: S3 Test config
   exec: |
     loadLib("s3.js");
-    global.s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region);
+    global.s3 = new S3(global.s3TestConfig.url, global.s3TestConfig.accessKey, global.s3TestConfig.secretKey, global.s3TestConfig.region);
 
 # ---------------
 - name: S3::Close
@@ -63,7 +64,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket);
 
       ow.test.assert(global.s3.bucketExists(bucket), true, "Problem with creating bucket.");
@@ -81,7 +82,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket); 
 
       try {
@@ -116,7 +117,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket);
 
       try {
@@ -149,7 +150,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket); 
 
       try {
@@ -167,7 +168,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       var localFile = "select-test.csv";
       global.s3.makeBucket(bucket);
 
@@ -199,7 +200,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket); 
 
       try {
@@ -219,7 +220,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket);
 
       try {
@@ -247,7 +248,7 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      var bucket = args.init.testBucket + "-" + now();
+      var bucket = global.s3TestConfig.testBucket + "-" + now();
       global.s3.makeBucket(bucket);
 
       try {
@@ -276,14 +277,14 @@ jobs:
   to  : oJob Test
   args:
     func: |
-      ow.test.assert(global.s3.getObjectURL(args.init.testBucket, "folder name/anExample.md"), args.init.url + "/" + args.init.testBucket + "/folder%20name/anExample.md", "Problem with getObjectURL.");
+      ow.test.assert(global.s3.getObjectURL(global.s3TestConfig.testBucket, "folder name/anExample.md"), global.s3TestConfig.url + "/" + global.s3TestConfig.testBucket + "/folder%20name/anExample.md", "Problem with getObjectURL.");
 
 # --------------------------
 - name: S3::Ignore cert check
   to  : oJob Test
   args:
     func: |
-      var s3 = new S3(args.init.url, args.init.accessKey, args.init.secretKey, args.init.region, __, true);
+      var s3 = new S3(global.s3TestConfig.url, global.s3TestConfig.accessKey, global.s3TestConfig.secretKey, global.s3TestConfig.region, __, true);
       try {
         ow.test.assert(isDef(s3.s3), true, "Problem creating client with ignoreCertCheck.");
       } finally {
