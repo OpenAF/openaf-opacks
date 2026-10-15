@@ -96,6 +96,7 @@ with tempfile.TemporaryDirectory(prefix='ojobio-check-') as tmp:
       finish = finish.substring(0, finish.indexOf('io.rm(args.output)'));
       new Function('args', finish)({init: build.init, compile: false, URL: 'test.io', NAME: 'test.io'});
       var index = io.readFileJSON('_output/index.json');
+      if (io.readFileString('_output/index') != io.readFileString('_output/index.json')) throw 'Static index files differ';
       index.jobs.forEach(function(job) { new Function('args', job.exec); });
       if (index.init.l.indexOf('https://test.io/hello/') < 0) throw 'Directory URL changed';
       if (!$from(index.init.catalog).equals('id', 'https://test.io/hello/').equals('description', 'Legacy fixture').any()) throw 'Legacy metadata missing';
@@ -129,9 +130,12 @@ jobs:
     target.write_text(json.dumps(index))
     session(current, target, work, [('Search:', b'\x03')], ['Search:'])
     session(current, target, work, [('Search:', b'RESIZE'), ('Search:', b'\x03')], ['Search:'])
-    session(current, target, work,
+    executed = session(current, target, work,
             [('Search:', b'\n'), ('Configure and run', b'\n'), ('value (*):', b'chosen\n'),
              ('Execution', b'\n')], ['JOB_VALUE=chosen', 'PIPE=PIPE_UNTOUCHED'], piped=True)
+    assert ("ojob '" + str(fixture / 'fixture.yaml') + "' 'value=chosen'").encode() in executed, executed.decode(errors='replace')[-3000:]
+    for unexpected in [b"'__id=", b"'execid=", b"'objId=", (str(target) + '=').encode()]:
+        assert unexpected not in executed, executed.decode(errors='replace')[-3000:]
     declined = session(current, target, work,
                        [('>> test.io/', b'_local/noargs\n'), ('no arguments to fill out', b'\x1b[B\n')],
                        ['no arguments to fill out'], extra='ui=legacy')

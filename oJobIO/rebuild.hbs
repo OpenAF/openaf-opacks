@@ -49,11 +49,13 @@ jobs:
 
       ow.oJob.output(lst, args);
     } else {
+      __initializeCon();
       var modernLauncher =
 {{{launcher}}}
       ;
       if (modernLauncher({ name: "{{name}}", home: hd, ids: args.init.l,
-        catalog: args.init.catalog, globalPath: (typeof __flags != "undefined" ? __flags.OJOB_LOCALPATH : ""), args: args })) return;
+        catalog: args.init.catalog, entrypoint: ow.oJob.__file,
+        globalPath: (typeof __flags != "undefined" ? __flags.OJOB_LOCALPATH : ""), args: args })) return;
       delete args.ui;
       plugin("Console");
       var o = args.init.l.map(r => r.replace(/^{{proto}}:\/\/{{url}}\//g, "").replace(/\.ya?ml$/, "").replace(/\.json$/, ""));

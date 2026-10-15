@@ -23,6 +23,27 @@
   // Help and filenames can contain control characters; never interpret them as terminal commands.
   var clean = function(s) { return String(s == null ? "" : s).replace(/\x1b\[[0-?]*[ -\/]*[@-~]/g, "").replace(/[\x00-\x1f\x7f-\x9f]/g, " "); };
   var color = function(style, s) { return ansiColor(style, clean(s)); };
+  var themed = function(path, fallback) {
+    var value = typeof __colorFormat == "undefined" ? {} : __colorFormat;
+    path.split(".").forEach(function(k) { value = value && value[k]; });
+    return typeof value == "string" ? value : fallback;
+  };
+  var accent = themed("askChoose", "BOLD,CYAN"), heading = themed("md.heads.h3", "BOLD"), muted = themed("md.line", "FAINT");
+  var panel = function(text) {
+    var width = Math.max(1, ui.size().width - 1);
+    if (width >= 8 && typeof ow.format.withSideLine == "function" && typeof ow.format.withSideLineThemes == "function") {
+      var themes = ow.format.withSideLineThemes();
+      return ow.format.withSideLine(text, width, themed("md.note.line", "FAINT"), "RESET",
+        themes[themed("md.note.theme", "simpleLine")] || themes.simpleLine);
+    }
+    return text;
+  };
+  var description = function(text) {
+    // Preserve Markdown paragraphs, but strip terminal control sequences from remote help.
+    var safe = String(text || "No description available.").replace(/\x1b\[[0-?]*[ -\/]*[@-~]/g, "")
+      .replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, " ");
+    return typeof ow.format.withMD == "function" ? ow.format.withMD(safe, "ITALIC", Math.max(1, ui.size().width - 4)) : color("ITALIC", safe);
+  };
   var helpOf = function(j) {
     if (j && j.help) return j.help;
     var jobs = j && j.jobs || [];
@@ -30,7 +51,11 @@
     return {};
   };
   var readJob = function(e) {
-    return e.source == "remote" ? $rest().get(e.id) : (/\.ya?ml$/.test(e.file) ? io.readFileYAML(e.file) : io.readFileJSON(e.file));
+    if (e.source != "remote") return /\.ya?ml$/.test(e.file) ? io.readFileYAML(e.file) : io.readFileJSON(e.file);
+    var job = $rest().get(e.id);
+    // Explicit YAML URLs are served as text; JSON may already be decoded by $rest.
+    if (typeof job == "string") job = /^\s*[\[{]/.test(job) ? jsonParse(job) : af.fromYAML(job);
+    return job;
   };
   var save = function() {
     try { io.writeFileJSON(stateFile, state); }
@@ -81,15 +106,17 @@
           position = Math.max(0, Math.min(position, rows.length - 1));
           var start = Math.max(0, position - height + 1);
           erase();
-          var lines = [color("BOLD", cfg.name) + "  " + clean(scope == "category" ? category : scope),
-            "Search: " + clean(query) + "  (" + rows.length + " results)"];
+          var lines = [color(heading, cfg.name) + "  " + color(muted, scope == "category" ? category : scope),
+            color(muted, "Search: ") + color("BOLD", query) + color(muted, "  (" + rows.length + " results)")];
           rows.slice(start, start + height).forEach(function(e, i) {
-            var label = (start + i == position ? "> " : "  ") + (state.favorites.indexOf(e.id) >= 0 ? "* " : "  ") + e.path + " [" + e.source + "]";
-            if (width >= 65) label = fmt.ansiPad(fmt.ansiClip(label, Math.floor(width * 0.5)), Math.floor(width * 0.5)) + " " + e.description;
-            lines.push(start + i == position ? color("BOLD,CYAN", label) : clean(label));
+            var selected = start + i == position;
+            var path = (selected ? "> " : "  ") + (state.favorites.indexOf(e.id) >= 0 ? "* " : "  ") + e.path;
+            var label = (selected ? color(accent, path) : clean(path)) + color(muted, " [" + e.source + "]");
+            if (width >= 65) label = fmt.ansiPad(fmt.ansiClip(label, Math.floor(width * 0.5)), Math.floor(width * 0.5)) + " " + color("FAINT,ITALIC", e.description);
+            lines.push(label);
           });
-          if (!rows.length) lines.push("No matching jobs. Change the search or press Tab.");
-          lines.push("Type to search | arrows/PgUp/PgDn | Enter review | Tab views | Esc back | Ctrl-C exit");
+          if (!rows.length) lines.push(color("FAINT,ITALIC", "No matching jobs. Change the search or press Tab."));
+          lines.push(color(muted, "Type to search | arrows/PgUp/PgDn | Enter review | Tab views | Esc back | Ctrl-C exit"));
           lines.forEach(function(l) { write(fmt.ansiClip(l, width)); });
           drawn = lines.length;
           lastSize = size.width + ":" + size.height;
@@ -124,7 +151,7 @@
   var collect = function(help, values) {
     (help.expects || []).forEach(function(p) {
       if (!p.name) return;
-      write(clean(p.desc || p.name));
+      write(color("ITALIC", p.desc || p.name));
       while (true) {
         var value, prompt = clean(p.name) + (p.mandatory ? " (*)" : "") + ": ";
         if (p.options && !p.secret) {
@@ -144,32 +171,62 @@
           if (!picked) throw cancelled;
           value = picked.map(function(id) { return p.moptions[Number(id) - 1]; }).join(",");
         } else {
-          if (Object.prototype.hasOwnProperty.call(values, p.name)) write("Current: " + (p.secret ? "***" : clean(values[p.name])) + " (blank keeps it)");
+          if (Object.prototype.hasOwnProperty.call(values, p.name)) write(color("FAINT", "Current: ") + (p.secret ? "***" : clean(values[p.name])) + color("FAINT,ITALIC", " (blank keeps it)"));
           value = ask(prompt, p.secret ? String.fromCharCode(0) : undefined, ui.console, false, ui.write);
           if (value == null) throw cancelled;
           if (String(value).length == 0 && Object.prototype.hasOwnProperty.call(values, p.name)) value = values[p.name];
         }
-        if (p.mandatory && (value == null || String(value).length == 0)) { write("A value is required."); continue; }
+        if (p.mandatory && (value == null || String(value).length == 0)) { write(color("YELLOW", "A value is required.")); continue; }
         if (value != null && String(value).length) values[p.name] = value; else delete values[p.name];
         break;
       }
     });
     return values;
   };
+  var additionalArguments = function(values) {
+    write("Enter one name=value at a time; values are literal (no shell quotes). Blank finishes.");
+    while (true) {
+      var input = ask("Additional argument: ", undefined, ui.console, false, ui.write);
+      if (input == null) throw cancelled;
+      input = String(input);
+      if (!input.trim().length) return;
+      var equals = input.indexOf("="), name = input.substring(0, equals).trim();
+      if (equals < 1 || !name.length || /[\s\x00-\x1f\x7f]/.test(name)) {
+        write("Use name=value, for example __format=json.");
+        continue;
+      }
+      Object.defineProperty(values, name, { value: input.substring(equals + 1),
+        writable: true, enumerable: true, configurable: true });
+    }
+  };
   var preview = function(e, help, values) {
     var secret = {};
     (help.expects || []).forEach(function(p) { if (p.secret) secret[p.name] = true; });
-    var windows = String(java.lang.System.getProperty("os.name")).toLowerCase().indexOf("windows") >= 0;
+    var windows = ow.format.isWindows();
     // PowerShell on Windows; POSIX shell elsewhere. Never execute this display string.
-    var quote = function(s) { return "'" + String(s).replace(/'/g, windows ? "''" : "'\\''") + "'"; };
+    var quote = function(s) {
+      s = clean(s);
+      if (/^[a-zA-Z0-9_@%+=:,./-]+$/.test(s)) return s;
+      return '"' + s.replace(windows ? /[`$"\\]/g : /[\\"$`]/g, function(c) {
+        // Backslashes are literal in PowerShell, including before a closing quote.
+        return windows && c == "\\" ? c : (windows ? "`" : "\\") + c;
+      }) + '"';
+    };
     var parts = ["ojob", quote(e.source == "remote" ? e.id : e.file)], masked = false;
     Object.keys(values).forEach(function(k) {
       var value = secret[k] ? "***" : values[k];
       if (secret[k]) masked = true;
-      parts.push(quote(k + "=" + clean(value)));
+      parts.push(quote(k) + "=" + quote(value));
     });
-    write("Command (" + (windows ? "PowerShell" : "POSIX shell") + (masked ? "; secrets masked" : "") + "):");
-    write(parts.join(" "));
+    var title = color(heading, "Run command") + color(muted, " (" + (windows ? "PowerShell" : "POSIX shell") + (masked ? "; secrets masked" : "") + ")");
+    var command = parts.join(" ");
+    // Do not insert panel prefixes into a long command: leave terminal soft wrapping copyable.
+    if (typeof visibleLength == "function" && visibleLength(command) <= ui.size().width - 4) {
+      write(panel(title + "\n" + color(accent, command)));
+    } else {
+      write(panel(title));
+      write(color(accent, command));
+    }
   };
   try {
     if (io.fileExists(stateFile)) {
@@ -231,28 +288,40 @@
       }
       var job, help;
       try {
-        write("Loading " + clean(entry.path) + "...");
+        write(color("FAINT,ITALIC", "Loading " + entry.path + "..."));
         job = readJob(entry);
         if (!job || typeof job != "object" || (!job.jobs && !job.todo)) throw "Not an oJob document";
         help = helpOf(job);
         if (help.expects != null && !Array.isArray(help.expects)) throw "Invalid argument definitions";
       } catch(e) { write("Could not load job: " + clean(e)); continue; }
       var reviewing = true, values = {};
-      Object.keys(cfg.args).forEach(function(k) { if (k != "ui" && k != "init" && k != "objId") values[k] = cfg.args[k]; });
+      // oJob adds execution metadata and processExpr exposes the launcher URL as a key.
+      // Preserve user options (including __format), rather than dropping all __ names.
+      Object.keys(cfg.args).forEach(function(k) {
+        if (["ui", "init", "objId", "__id", "execid", ""].indexOf(k) < 0 &&
+            !/^https?:\/\//i.test(k) && k != cfg.entrypoint) values[k] = cfg.args[k];
+      });
       while (reviewing && !selectedJob) {
-        write(color("BOLD", entry.path) + " [" + clean(entry.source) + "]");
-        write(clean(help.text || "No description available."));
-        (help.expects || []).forEach(function(p) { write("  " + clean(p.name) + (p.mandatory ? " (*)" : "") + "  " + clean(p.desc)); });
+        write(panel(color(heading, entry.path) + color(muted, " [" + entry.source + "]") + "\n" + description(help.text)));
+        var parameters = (help.expects || []).map(function(p) {
+          return { Parameter: clean(p.name) + (p.mandatory ? " (*)" : ""), Description: clean(p.desc) };
+        });
+        if (parameters.length) write(ow.oJob.output(parameters, {
+          __format: "btable", __width: Math.max(1, ui.size().width - 1)
+        }, undefined, true));
         var action = choose("Job", ["Configure and run", state.favorites.indexOf(entry.id) < 0 ? "Favorite" : "Unfavorite", "Back"]);
         if (action == 2) { reviewing = false; continue; }
         if (action == 1) { favorite(entry.id); continue; }
         try {
-          var configuring = true;
+          var configuring = true, editArguments = true;
           while (configuring) {
-            collect(help, values);
+            if (editArguments) collect(help, values);
+            editArguments = false;
             preview(entry, help, values);
-            var confirm = choose("Execution", ["Run", "Edit arguments", "Back", "Cancel"]);
+            var confirm = choose("Execution", ["Run", "Edit arguments", "Back", "Cancel", "Additional arguments"]);
             if (confirm == 0) { selectedJob = job; runArgs = values; state.recent = [entry.id].concat(state.recent.filter(function(id) { return id != entry.id; })).slice(0, 20); save(); configuring = false; }
+            else if (confirm == 1) editArguments = true;
+            else if (confirm == 4) additionalArguments(values);
             else if (confirm == 2) configuring = false;
             else if (confirm == 3) throw cancelled;
           }

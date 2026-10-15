@@ -173,6 +173,7 @@ jobs:
     _tmpl.init.l = l
     _tmpl.init.catalog = catalog
     io.writeFileJSON("_output/index.json", _tmpl)
+    io.cp("_output/index.json", "_output/index")
     io.cp("imgs/openaf.png", "_output/logo.png")
     io.cp("imgs/favicon.ico", "_output/favicon.ico")
 

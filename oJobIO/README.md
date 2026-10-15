@@ -75,14 +75,29 @@ Type words to match the full job path and description. Use arrows, Page Up/Down,
 Home/End, and Enter to review a job. Tab opens All jobs, Categories, Favorites,
 and Recent jobs. Escape clears the search, returns to All jobs, then exits;
 Ctrl-C exits. The list adapts to terminal size and leaves other scrollback intact.
+Styling follows OpenAF's `__colorFormat` heading, selection, and Markdown note
+settings, with bold paths and argument names, italic descriptions, and faint
+source labels and keyboard hints. Job help renders Markdown, and job review and
+the run command use restrained side-line panels. Long commands stay on an
+unbroken line for copying. Selection and required fields also have text markers,
+so color is not needed to understand the flow.
 
-Review shows the current job help and expected arguments. Choose **Configure and
+Review shows the current job help and expected arguments using `btable` output
+sized to the terminal width. Choose **Configure and
 run**, fill arguments (mandatory values are marked `(*)`), then review the command
-and choose **Run**, **Edit arguments**, **Back**, or **Cancel**. Blank text input
+and choose **Run**, **Edit arguments**, **Additional arguments**, **Back**, or
+**Cancel**. **Additional arguments** accepts one `name=value` per prompt, including
+options such as `__format=json` that are absent from the job's help. Enter a blank
+line to finish and review the updated command. Values are literal: enter
+`author=Nuno Aguiar` without shell quotes. Reusing a name replaces its value;
+`name=` sets an empty value. Blank text input
 keeps a supplied/current value; otherwise it omits an optional argument. Choice
 and multiple-choice arguments use OpenAF prompts; secret arguments are masked.
 The command preview is quoted for a POSIX shell, or PowerShell on Windows, and is
-labelled when secrets are masked. Execution runs one job and exits.
+labelled when secrets are masked. Simple URLs and values stay unquoted; values
+with spaces or shell-sensitive characters use escaped double quotes, for example
+`ojob http://localhost:8088/generate.yaml args=abc,xyz author="Nuno Aguiar"`.
+Windows detection uses `ow.format.isWindows()`. Execution runs one job and exits.
 
 The launcher uses an independent controlling terminal and closes it before job
 execution, preserving piped stdin and normal job output. Older runtimes or
@@ -96,6 +111,9 @@ ojob https://ojob.mydomain ui=legacy
 Use `ui=auto` (the default) to select automatically. `ui` is a launcher option and
 is not passed to the selected job. Existing `list=true` and `search=...` commands
 retain their URL-array output.
+The launcher also removes inherited `__id`, `execid`, `objId`, and the positional
+launcher URL/file from command previews and forwarded arguments. Explicit job
+options, including `__format` and named URL options, are preserved.
 
 Favorites and the latest 20 distinct launched jobs are stored in
 `~/.<service-domain>/launcher-state.json` (colons in the domain become underscores).
@@ -103,10 +121,16 @@ Only job identifiers are saved, never argument values. Unavailable saved jobs ca
 be removed from Favorites or Recent jobs. State read/write failures are nonfatal.
 
 Builds embed `launcher.js` into `index.json`; clients need no additional script.
+Rebuild writes identical static launcher documents as `output/index.json` and
+`output/index`, including both in the output archive. These can be served as
+static files; the extensionless file needs a JSON content type. Docker generates
+them during its build. `setupOJobIO.yaml` only populates the source `ojobs/` tree.
 The optional `init.catalog` array adds job identifiers, paths, categories, and help
 descriptions alongside the existing `init.l` URL array. Rebuild the service/image
 to publish launcher changes. Descriptions reflect build-time help; review and
 argument entry use the selected job's current help, including legacy `Help` jobs.
+Remote responses are parsed as YAML or JSON when returned as text; already
+decoded JSON objects are used directly.
 
 ### Validation
 
@@ -118,3 +142,8 @@ also requires a controlling terminal and an OpenAF runtime containing
 the APIs above; test both automatic and `ui=legacy` modes. No infrastructure or
 credentials are needed when using local fixture jobs. Remote jobs still need
 network access and any prerequisites documented by the job.
+
+With an oJobIO service running, use
+`OJOBIO_TEST_BASE=http://localhost:8088 oaf -f tests/remote.js` to check remote
+YAML, JSON, and extensionless job loading. This requires `hello/world` on the
+service; the check inspects the loaded jobs without executing them.
