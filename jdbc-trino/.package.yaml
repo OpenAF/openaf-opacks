@@ -16,7 +16,7 @@ name: jdbc-trino
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260726'
+version: '20261015'
 dependencies:
   openaf: '>=20240318'
 files:
