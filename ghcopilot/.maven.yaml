@@ -1,4 +1,4 @@
 artifacts:
 - id: copilot-sdk-java
   group: com.github
-  version: 1.0.18-preview.4
+#  version: 1.0.18-preview.4
