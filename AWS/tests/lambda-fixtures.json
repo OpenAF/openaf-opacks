@@ -1,0 +1,752 @@
+[
+  {
+    "name": "LAMBDA_WEB_CreateWebFunction",
+    "method": "PUT",
+    "path": "/2025-03-07/web-functions",
+    "query": {},
+    "body": {
+      "endpointConfig": {},
+      "functionName": "value",
+      "revisionConfig": {},
+      "tags": {}
+    },
+    "params": {
+      "endpointConfig": {},
+      "functionName": "value",
+      "revisionConfig": {},
+      "tags": {}
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_CreateWebFunctionEndpoint",
+    "method": "PUT",
+    "path": "/2025-03-07/web-functions/{functionName}/endpoints",
+    "query": {},
+    "body": {
+      "authType": "value",
+      "autoDeploymentMode": "value",
+      "description": "value",
+      "endpointName": "value",
+      "endpointType": "value",
+      "regions": "value",
+      "revisionWeights": "value",
+      "scalingConfig": "value",
+      "throttleConfig": "value"
+    },
+    "params": {
+      "functionName": "id:/ +?é!",
+      "authType": "value",
+      "autoDeploymentMode": "value",
+      "description": "value",
+      "endpointName": "value",
+      "endpointType": "value",
+      "regions": "value",
+      "revisionWeights": "value",
+      "scalingConfig": "value",
+      "throttleConfig": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_CreateWebFunctionRevision",
+    "method": "POST",
+    "path": "/2025-03-07/web-functions/{functionName}/revisions",
+    "query": {},
+    "body": {
+      "buildConfig": {},
+      "description": "value",
+      "kmsKeyArn": "value",
+      "serviceConfig": {}
+    },
+    "params": {
+      "functionName": "id:/ +?é!",
+      "buildConfig": {},
+      "description": "value",
+      "kmsKeyArn": "value",
+      "serviceConfig": {}
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_DeleteResourcePolicy",
+    "method": "DELETE",
+    "path": "/2025-03-07/resource-policy/{resourceArn}",
+    "query": {
+      "RevisionId": "value"
+    },
+    "body": {},
+    "params": {
+      "resourceArn": "id:/ +?é!",
+      "revisionId": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_DeleteWebFunction",
+    "method": "DELETE",
+    "path": "/2025-03-07/web-functions/{functionName}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_DeleteWebFunctionEndpoint",
+    "method": "DELETE",
+    "path": "/2025-03-07/web-functions/{functionName}/endpoints/{endpointName}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!",
+      "endpointName": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_DeleteWebFunctionRevision",
+    "method": "DELETE",
+    "path": "/2025-03-07/web-functions/{functionName}/revisions/{revisionId}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!",
+      "revisionId": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_GetResourcePolicy",
+    "method": "GET",
+    "path": "/2025-03-07/resource-policy/{resourceArn}",
+    "query": {},
+    "body": {},
+    "params": {
+      "resourceArn": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_GetWebAccountSettings",
+    "method": "GET",
+    "path": "/2025-03-07/web-account-settings",
+    "query": {},
+    "body": {},
+    "params": {}
+  },
+  {
+    "name": "LAMBDA_WEB_GetWebFunction",
+    "method": "GET",
+    "path": "/2025-03-07/web-functions/{functionName}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_GetWebFunctionEndpoint",
+    "method": "GET",
+    "path": "/2025-03-07/web-functions/{functionName}/endpoints/{endpointName}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!",
+      "endpointName": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_GetWebFunctionRevision",
+    "method": "GET",
+    "path": "/2025-03-07/web-functions/{functionName}/revisions/{revisionId}",
+    "query": {},
+    "body": {},
+    "params": {
+      "functionName": "id:/ +?é!",
+      "revisionId": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_ListTags",
+    "method": "GET",
+    "path": "/2025-03-07/tags/{resource}",
+    "query": {},
+    "body": {},
+    "params": {
+      "resource": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_ListWebFunctionEndpoints",
+    "method": "POST",
+    "path": "/2025-03-07/web-functions/{functionName}/list-endpoints",
+    "query": {},
+    "body": {
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    },
+    "params": {
+      "functionName": "id:/ +?é!",
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_ListWebFunctionRevisions",
+    "method": "POST",
+    "path": "/2025-03-07/web-functions/{functionName}/list-revisions",
+    "query": {},
+    "body": {
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    },
+    "params": {
+      "functionName": "id:/ +?é!",
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_ListWebFunctions",
+    "method": "POST",
+    "path": "/2025-03-07/web-functions",
+    "query": {},
+    "body": {
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    },
+    "params": {
+      "filters": "value",
+      "maxResults": "value",
+      "nextToken": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_PutResourcePolicy",
+    "method": "PUT",
+    "path": "/2025-03-07/resource-policy/{resourceArn}",
+    "query": {},
+    "body": {
+      "Policy": "value",
+      "RevisionId": "value"
+    },
+    "params": {
+      "resourceArn": "id:/ +?é!",
+      "policy": "value",
+      "revisionId": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_TagResource",
+    "method": "POST",
+    "path": "/2025-03-07/tags/{resource}",
+    "query": {},
+    "body": {
+      "Tags": {}
+    },
+    "params": {
+      "resource": "id:/ +?é!",
+      "tags": {}
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_UntagResource",
+    "method": "DELETE",
+    "path": "/2025-03-07/tags/{resource}",
+    "query": {
+      "tagKeys": [
+        "z /",
+        "a+"
+      ]
+    },
+    "body": {},
+    "params": {
+      "resource": "id:/ +?é!",
+      "tagKeys": [
+        "z /",
+        "a+"
+      ]
+    }
+  },
+  {
+    "name": "LAMBDA_WEB_UpdateWebFunctionEndpoint",
+    "method": "PATCH",
+    "path": "/2025-03-07/web-functions/{functionName}/endpoints/{endpointName}",
+    "query": {},
+    "body": {
+      "authType": "value",
+      "autoDeploymentMode": "value",
+      "description": "value",
+      "revisionWeights": "value",
+      "scalingConfig": "value",
+      "throttleConfig": "value"
+    },
+    "params": {
+      "functionName": "id:/ +?é!",
+      "endpointName": "id:/ +?é!",
+      "authType": "value",
+      "autoDeploymentMode": "value",
+      "description": "value",
+      "revisionWeights": "value",
+      "scalingConfig": "value",
+      "throttleConfig": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_CreateMicrovmAuthToken",
+    "method": "POST",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}/auth-token",
+    "query": {},
+    "body": {
+      "allowedPorts": "value",
+      "expirationInMinutes": "value"
+    },
+    "params": {
+      "microvmIdentifier": "id:/ +?é!",
+      "allowedPorts": "value",
+      "expirationInMinutes": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_CreateMicrovmImage",
+    "method": "POST",
+    "path": "/2025-09-09/microvm-images",
+    "query": {},
+    "body": {
+      "additionalOsCapabilities": "value",
+      "baseImageArn": "value",
+      "baseImageVersion": "value",
+      "buildRoleArn": "value",
+      "clientToken": "value",
+      "codeArtifact": "value",
+      "cpuConfigurations": "value",
+      "description": "value",
+      "egressNetworkConnectors": "value",
+      "environmentVariables": "value",
+      "hooks": "value",
+      "logging": "value",
+      "name": "value",
+      "resources": "value",
+      "tags": {}
+    },
+    "params": {
+      "additionalOsCapabilities": "value",
+      "baseImageArn": "value",
+      "baseImageVersion": "value",
+      "buildRoleArn": "value",
+      "clientToken": "value",
+      "codeArtifact": "value",
+      "cpuConfigurations": "value",
+      "description": "value",
+      "egressNetworkConnectors": "value",
+      "environmentVariables": "value",
+      "hooks": "value",
+      "logging": "value",
+      "name": "value",
+      "resources": "value",
+      "tags": {}
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_CreateMicrovmShellAuthToken",
+    "method": "POST",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}/shell-auth-token",
+    "query": {},
+    "body": {
+      "expirationInMinutes": "value"
+    },
+    "params": {
+      "microvmIdentifier": "id:/ +?é!",
+      "expirationInMinutes": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_DeleteMicrovmImage",
+    "method": "DELETE",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_DeleteMicrovmImageVersion",
+    "method": "DELETE",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions/{imageVersion}",
+    "query": {},
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "imageVersion": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_GetMicrovm",
+    "method": "GET",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "microvmIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_GetMicrovmImage",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_GetMicrovmImageBuild",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions/{imageVersion}/builds/{buildId}",
+    "query": {},
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "imageVersion": "id:/ +?é!",
+      "buildId": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_GetMicrovmImageVersion",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions/{imageVersion}",
+    "query": {},
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "imageVersion": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListManagedMicrovmImageVersions",
+    "method": "GET",
+    "path": "/2025-09-09/managed-microvm-images/{imageIdentifier}/versions",
+    "query": {
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListManagedMicrovmImages",
+    "method": "GET",
+    "path": "/2025-09-09/managed-microvm-images",
+    "query": {
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListMicrovmImageBuilds",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions/{imageVersion}/builds",
+    "query": {
+      "architecture": "value",
+      "chipset": "value",
+      "chipsetGeneration": "value",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "imageVersion": "id:/ +?é!",
+      "architecture": "value",
+      "chipset": "value",
+      "chipsetGeneration": "value",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListMicrovmImageVersions",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions",
+    "query": {
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListMicrovmImages",
+    "method": "GET",
+    "path": "/2025-09-09/microvm-images",
+    "query": {
+      "maxResults": 0,
+      "nameFilter": "value",
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "maxResults": 0,
+      "nameFilter": "value",
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListMicrovms",
+    "method": "GET",
+    "path": "/2025-09-09/microvms",
+    "query": {
+      "imageIdentifier": "value",
+      "imageVersion": "value",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    },
+    "body": {},
+    "params": {
+      "imageIdentifier": "value",
+      "imageVersion": "value",
+      "maxResults": 0,
+      "nextToken": "token+/= "
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ListTags",
+    "method": "GET",
+    "path": "/2017-03-31/tags/{Resource}",
+    "query": {},
+    "body": {},
+    "params": {
+      "Resource": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_ResumeMicrovm",
+    "method": "POST",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}/resume",
+    "query": {},
+    "body": {},
+    "params": {
+      "microvmIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_RunMicrovm",
+    "method": "POST",
+    "path": "/2025-09-09/microvms",
+    "query": {},
+    "body": {
+      "clientToken": "value",
+      "egressNetworkConnectors": "value",
+      "executionRoleArn": "value",
+      "idlePolicy": "value",
+      "imageIdentifier": "value",
+      "imageVersion": "value",
+      "ingressNetworkConnectors": "value",
+      "logging": "value",
+      "maximumDurationInSeconds": "value",
+      "runHookPayload": "value"
+    },
+    "params": {
+      "clientToken": "value",
+      "egressNetworkConnectors": "value",
+      "executionRoleArn": "value",
+      "idlePolicy": "value",
+      "imageIdentifier": "value",
+      "imageVersion": "value",
+      "ingressNetworkConnectors": "value",
+      "logging": "value",
+      "maximumDurationInSeconds": "value",
+      "runHookPayload": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_SuspendMicrovm",
+    "method": "POST",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}/suspend",
+    "query": {},
+    "body": {},
+    "params": {
+      "microvmIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_TagResource",
+    "method": "POST",
+    "path": "/2017-03-31/tags/{Resource}",
+    "query": {},
+    "body": {
+      "Tags": {}
+    },
+    "params": {
+      "Resource": "id:/ +?é!",
+      "Tags": {}
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_TerminateMicrovm",
+    "method": "DELETE",
+    "path": "/2025-09-09/microvms/{microvmIdentifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "microvmIdentifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_UntagResource",
+    "method": "DELETE",
+    "path": "/2017-03-31/tags/{Resource}",
+    "query": {
+      "tagKeys": [
+        "z /",
+        "a+"
+      ]
+    },
+    "body": {},
+    "params": {
+      "Resource": "id:/ +?é!",
+      "TagKeys": [
+        "z /",
+        "a+"
+      ]
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_UpdateMicrovmImage",
+    "method": "PUT",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}",
+    "query": {},
+    "body": {
+      "additionalOsCapabilities": "value",
+      "baseImageArn": "value",
+      "baseImageVersion": "value",
+      "buildRoleArn": "value",
+      "clientToken": "value",
+      "codeArtifact": "value",
+      "cpuConfigurations": "value",
+      "description": "value",
+      "egressNetworkConnectors": "value",
+      "environmentVariables": "value",
+      "hooks": "value",
+      "logging": "value",
+      "resources": "value"
+    },
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "additionalOsCapabilities": "value",
+      "baseImageArn": "value",
+      "baseImageVersion": "value",
+      "buildRoleArn": "value",
+      "clientToken": "value",
+      "codeArtifact": "value",
+      "cpuConfigurations": "value",
+      "description": "value",
+      "egressNetworkConnectors": "value",
+      "environmentVariables": "value",
+      "hooks": "value",
+      "logging": "value",
+      "resources": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_MICROVM_UpdateMicrovmImageVersion",
+    "method": "PATCH",
+    "path": "/2025-09-09/microvm-images/{imageIdentifier}/versions/{imageVersion}",
+    "query": {},
+    "body": {
+      "status": "value"
+    },
+    "params": {
+      "imageIdentifier": "id:/ +?é!",
+      "imageVersion": "id:/ +?é!",
+      "status": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_CORE_CreateNetworkConnector",
+    "method": "POST",
+    "path": "/2026-04-04/network-connectors",
+    "query": {},
+    "body": {
+      "ClientToken": "value",
+      "Configuration": {},
+      "Name": "value",
+      "OperatorRole": "value",
+      "Tags": {}
+    },
+    "params": {
+      "ClientToken": "value",
+      "Configuration": {},
+      "Name": "value",
+      "OperatorRole": "value",
+      "Tags": {}
+    }
+  },
+  {
+    "name": "LAMBDA_CORE_DeleteNetworkConnector",
+    "method": "DELETE",
+    "path": "/2026-04-04/network-connectors/{Identifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "Identifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_CORE_GetNetworkConnector",
+    "method": "GET",
+    "path": "/2026-04-04/network-connectors/{Identifier}",
+    "query": {},
+    "body": {},
+    "params": {
+      "Identifier": "id:/ +?é!"
+    }
+  },
+  {
+    "name": "LAMBDA_CORE_ListNetworkConnectors",
+    "method": "GET",
+    "path": "/2026-04-04/network-connectors",
+    "query": {
+      "Marker": "token+/= ",
+      "MaxItems": 0,
+      "State": "value"
+    },
+    "body": {},
+    "params": {
+      "Marker": "token+/= ",
+      "MaxItems": 0,
+      "State": "value"
+    }
+  },
+  {
+    "name": "LAMBDA_CORE_UpdateNetworkConnector",
+    "method": "PUT",
+    "path": "/2026-04-04/network-connectors/{Identifier}",
+    "query": {},
+    "body": {
+      "ClientToken": "value",
+      "Configuration": {},
+      "OperatorRole": "value"
+    },
+    "params": {
+      "Identifier": "id:/ +?é!",
+      "ClientToken": "value",
+      "Configuration": {},
+      "OperatorRole": "value"
+    }
+  }
+]

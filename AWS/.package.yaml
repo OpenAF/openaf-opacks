@@ -34,7 +34,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260923'
+version: '20261020'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -76,9 +76,9 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 69629605b4cd27d89dec81eff20b6bdeddf77977
+  .odoc.db: 236b0bfb259cd8fc128135f13b3cb56b5f3add06
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  README.md: 4c9e642ccb51985a3ed50b3b136f2f1b58fe0fa7
+  README.md: 33d9c0553bf869e4fe5a24876be9ebc5224ec836
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
   aws_bedrock.js: e182d7d04ea4c7f59b56071d804a7e7b8ba83d57
@@ -95,7 +95,7 @@ filesHash:
   aws_events.js: 3d80ad66519fd15ba6c4462480ed6b5c9bfffb08
   aws_iam.js: eea5a913e9ca137e6e3d459a7c8c7bad05dd01a4
   aws_kms.js: 41a4ecdc5c681ea2678a06fd12a210c7cbac3ca3
-  aws_lambda.js: 6c34420c45ebc2529547f22066a7c9b4e0c4ce5b
+  aws_lambda.js: 9e971269b61a4ea1f732665b199dad404b1a41e0
   aws_organizations.js: 9e62d2bbfab8cd29c4bb76a51ad1d16e42dee34a
   aws_pi.js: b94cd1b86f4cbb88e706a1c629100f2310511ba1
   aws_rds.js: 1d40ebfde872c8389351276f1276ab56bfe05397
