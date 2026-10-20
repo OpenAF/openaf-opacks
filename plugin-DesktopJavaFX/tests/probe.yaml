@@ -1,0 +1,11 @@
+ojob:
+  async: false
+jobs:
+- name: Probe JavaFX availability
+  exec: |
+    var p = require("./desktop-javafx.js").create(String(new java.io.File(".").getCanonicalPath()));
+    var cfg = {};
+    if (java.lang.System.getenv("OPENAF_DESKTOP_JAVA") != null) cfg.providerOptions = { javafx: { java: String(java.lang.System.getenv("OPENAF_DESKTOP_JAVA")) } };
+    print(stringify({ provider: p.describe(), probe: p.probe(cfg), java: String(java.lang.System.getProperty("java.version")) }));
+todo:
+- Probe JavaFX availability

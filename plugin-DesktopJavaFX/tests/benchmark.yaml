@@ -1,0 +1,49 @@
+ojob:
+  async: false
+jobs:
+- name: Measure desktop runtime
+  exec: |
+    if (String(java.lang.System.getenv("OPENAF_DESKTOP_TEST_GUI")) != "1") throw "Set OPENAF_DESKTOP_TEST_GUI=1 to open automatically closed benchmark windows";
+    var cfg = { provider: "javafx", timeout: 20000 };
+    if (java.lang.System.getenv("OPENAF_DESKTOP_JAVA") != null) cfg.providerOptions = { javafx: { java: String(java.lang.System.getenv("OPENAF_DESKTOP_JAVA")) } };
+    var d = ow.loadDesktop(cfg);
+    var provider = require("./desktop-javafx.js").create(String(new java.io.File(".").getCanonicalPath()));
+    d.registerProvider(provider);
+    var baseline = null;
+    if (String(java.lang.System.getProperty("os.name")).toLowerCase().indexOf("windows") < 0) {
+      var r = $sh(["ps", "-o", "rss=", "-p", String(java.lang.ProcessHandle.current().pid())]).get(0);
+      if (r.exitcode == 0) baseline = Number(String(r.stdout).trim());
+    }
+    var started = now(), first, roundTrip, done = new java.util.concurrent.CountDownLatch(1), sent, samples = [], second;
+    var w = d.window({ html: '<h1>OpenAF benchmark</h1><script>openafDesktop.onMessage(function(m){openafDesktop.send("echo",m.payload);});openafDesktop.ready.then(function(){openafDesktop.send("ready",{});});</script>', messaging: { types: ["ready","echo"] } });
+    w.on("ready", function() { if (!first) first = now() - started; });
+    w.on("message", function(e) {
+      if (e.message.type == "ready") { sent = now(); w.send("echo", { index: 0 }); }
+      if (e.message.type == "echo") {
+        samples.push(now() - sent);
+        if (samples.length < 50) { sent = now(); w.send("echo", { index: samples.length }); }
+        else done.countDown();
+      }
+    });
+    w.show();
+    try {
+      if (!done.await(25, java.util.concurrent.TimeUnit.SECONDS)) throw "Messaging benchmark deadline";
+      function rss() {
+        if (String(java.lang.System.getProperty("os.name")).toLowerCase().indexOf("windows") >= 0) return null;
+        var r = $sh(["ps", "-o", "rss=", "-p", String(java.lang.ProcessHandle.current().pid()) + "," + provider.diagnostics().pid]).get(0);
+        return r.exitcode == 0 ? String(r.stdout).trim().split(/\s+/).map(Number).reduce((a,b) => a+b, 0) : null;
+      }
+      var oneWindowRss = rss();
+      var next = now(); second = d.window({ html: "<h1>Second benchmark window</h1>" });
+      $doWait(second.show(), 20000);
+      var secondMs = now() - next;
+      var rss = null;
+      if (String(java.lang.System.getProperty("os.name")).toLowerCase().indexOf("windows") < 0) {
+        var r = $sh(["ps", "-o", "rss=", "-p", String(java.lang.ProcessHandle.current().pid()) + "," + provider.diagnostics().pid]).get(0);
+        if (r.exitcode == 0) rss = String(r.stdout).trim().split(/\s+/).map(Number).reduce((a,b) => a+b, 0);
+      }
+      var shutdown = now(); $doWait(d.shutdown(), 20000);
+      print(stringify({ java: String(java.lang.System.getProperty("java.version")), os: String(java.lang.System.getProperty("os.name")), arch: String(java.lang.System.getProperty("os.arch")), provider: provider.describe(), providerStartupMs: provider.diagnostics().startupMs, firstDocumentMs: first, secondWindowMs: secondMs, oneWindowRssKiB: oneWindowRss, messageSamplesMs: samples, parentBaselineRssKiB: baseline, parentAndHelperRssKiB: rss, incrementalRssKiB: rss != null && baseline != null ? rss - baseline : null, shutdownMs: now() - shutdown }));
+    } finally { d.__cleanup(); }
+todo:
+- Measure desktop runtime

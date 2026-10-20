@@ -1,0 +1,6 @@
+lib/
+.cache/
+classes/
+*.opack
+*.download
+*.results.json

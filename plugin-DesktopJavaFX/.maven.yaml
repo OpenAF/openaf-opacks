@@ -1,0 +1,5 @@
+# Installation uses javafx-lock.json to select and SHA-256 verify platform-specific artifacts.
+artifacts:
+- group: org.openjfx
+  id: javafx-web
+  version: 21.0.12

@@ -1,0 +1,20 @@
+ojob:
+  async: false
+jobs:
+- name: Compile JavaFX provider
+  exec: |
+    var root = String(new java.io.File(".").getCanonicalPath());
+    var dirs = io.listFiles(root + "/lib").files.filter(r => r.isDirectory);
+    if (dirs.length == 0) throw "Run install.js before compiling";
+    var javaHome = String(java.lang.System.getProperty("java.home"));
+    var modulePath = dirs[0].canonicalPath;
+    io.mkdir(root + "/classes");
+    var sources = listFilesRecursive(root + "/src").filter(r => /\.java$/.test(r.filename)).map(r => r.canonicalPath);
+    var result = $sh([javaHome + "/bin/javac", "--release", "21", "--module-path", modulePath,
+      "--add-modules", "javafx.web", "-cp", getOpenAFJar(), "-d", root + "/classes"].concat(sources)).get(0);
+    if (result.exitcode != 0) throw result.stderr + result.stdout;
+    result = $sh([javaHome + "/bin/jar", "--create", "--file", root + "/desktop-javafx.jar", "-C", root + "/classes", "."]).get(0);
+    if (result.exitcode != 0) throw result.stderr + result.stdout;
+    io.rm(root + "/classes");
+todo:
+- Compile JavaFX provider

@@ -1,0 +1,10 @@
+Provider source: OpenAF/openaf-opacks repository license.
+
+OpenJFX 21.0.12: GNU General Public License version 2 with the Classpath Exception.
+Upstream: https://github.com/openjdk/jfx
+License: https://github.com/openjdk/jfx/blob/jfx21/LICENSE
+Additional legal notices are distributed in the JavaFX JAR META-INF/legal resources;
+preserve them when redistributing dependency artifacts or standalone applications.
+
+The provider reuses Gson from the executing OpenAF distribution (Apache License 2.0).
+No extra Gson copy is included in this oPack.

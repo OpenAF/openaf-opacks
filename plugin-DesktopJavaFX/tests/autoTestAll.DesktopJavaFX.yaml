@@ -1,0 +1,14 @@
+ojob:
+  async: false
+jobs:
+- name: Test JavaFX provider
+  exec: |
+    ow.loadTest();
+    var tests = require("tests/autoTestAll.DesktopJavaFX.js");
+    Object.keys(tests).forEach(name => ow.test.test(name, tests[name]));
+    var result = { pass: ow.test.getCountPass(), fail: ow.test.getCountFail(), count: ow.test.getCountTest() };
+    io.writeFileJSON("DesktopJavaFX.results.json", result);
+    print(stringify(result));
+    exit(result.fail > 0 ? 1 : 0);
+todo:
+- Test JavaFX provider

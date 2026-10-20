@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>OpenAF Desktop</title>
+<style>body{font:18px system-ui;margin:3rem;background:#f5f7fa;color:#17212b}button{padding:.7rem 1.1rem;margin-right:.5rem}#status{padding:1rem 0}</style>
+</head><body><h1>OpenAF Desktop</h1><p>This page has a restricted messaging API.</p>
+<button id="hello" disabled>Send to OpenAF</button><button id="close" disabled>Close</button>
+<div id="status">Connecting…</div>
+<script>
+openafDesktop.onMessage(function(message) {
+  if (message.type === "status") document.getElementById("status").textContent = message.payload.text;
+});
+openafDesktop.ready.then(function() {
+  document.getElementById("status").textContent = "Ready";
+  document.getElementById("hello").disabled = false;
+  document.getElementById("close").disabled = false;
+});
+document.getElementById("hello").onclick = function() { openafDesktop.send("clicked", { id: "hello" }); };
+document.getElementById("close").onclick = function() { openafDesktop.send("close", {}); };
+</script></body></html>
