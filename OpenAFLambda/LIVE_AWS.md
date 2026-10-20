@@ -63,4 +63,4 @@ Evidence is in ignored `output/live-aws/<run-id>/`:
 - `journal.json`: resource identities, uploaded object versions and cleanup actions.
 - `cleanup-verification-initial.json` and `cleanup-verification.json`: the initial late-log finding and final successful absence checks.
 
-Presigned URLs and credentials are excluded from recorded configuration/logs. Reproduce using `tests/live_aws.py`; see the opt-in live-verification commands in [README.md](README.md). Generated evidence and deployment fixtures are excluded from opack metadata.
+Presigned URLs and credentials are excluded from recorded configuration/logs. Reproduce using `tests/live_aws.js`; see the opt-in live-verification commands in [README.md](README.md). Generated evidence and deployment fixtures are excluded from opack metadata.

@@ -38,37 +38,49 @@ files:
 - microvm/Dockerfile
 - runtime/bootstrap
 - runtime/lambda.js
-- scripts/assemble.py
-- scripts/build.py
-- scripts/microvm.py
-- tests/benchmark.py
-- tests/live_aws.py
-- tests/live_microvm.py
-- tests/test_live_metrics.py
-- tests/test_microvm.py
-- tests/test_microvm_container.py
-- tests/test_runtime.py
+- scripts/assemble.js
+- scripts/bootstrap-builder.sh
+- scripts/build.js
+- scripts/lib.js
+- scripts/microvm.js
+- tests/benchmark.js
+- tests/live-lib.js
+- tests/live_aws.js
+- tests/live_microvm.js
+- tests/runtime-lib.js
+- tests/test_build.js
+- tests/test_live_harness.js
+- tests/test_live_metrics.js
+- tests/test_microvm.js
+- tests/test_microvm_container.js
+- tests/test_runtime.js
 filesHash:
   .gitignore: da6dae34545db4ae02bd22ef70a8267bb9907c64
-  AGENTS.md: 8ab7089a84d840b2a4ac028791ca9db7bcc3ddeb
-  BENCHMARKS.md: c74aa45297f53de329a14ab18c2e0fbe4ff1bc3c
-  Dockerfile: 3d841fda9ed39130183b821ddb358dc5400b0e76
-  LIVE_AWS.md: 9d609d9a5e750dfcaaac438b7d4f92934784c65d
+  AGENTS.md: 7353ae132368bd52d208b8e70d806a0eeb6ec04e
+  BENCHMARKS.md: b14144da6b8cc0a583543d99bd1564b00c116ed8
+  Dockerfile: e94a05e1741ec048f8256e4f7289674ba0364ea2
+  LIVE_AWS.md: 656d1cf1aae62e348a2810308c9573c06d967635
   LIVE_MICROVM.md: 4d9260f1ad16e86b6f06aae5becdcae36476dd10
-  README.md: d93d47201805936a6526f498305889bf2a414f63
-  build.yaml: 89453c39fc3971b23620d90c233227dfd9aa2c1e
+  README.md: 6d5e4c4769f78322e6f98fd25cc4f11448d29202
+  build.yaml: b4eaa73318480aadc52ad36cb27cfe436160eb38
   examples/ojob/main.yaml: 89a2c167ae10f74ff70c8852749248e864bfd041
   examples/script/main.js: a2c655e4823b6da88b7a53ccb37d1abb94549515
   microvm/Dockerfile: dee90bb4c67dd5fa3eb35f4237d2293951e10109
   runtime/bootstrap: 28dcfab3f69480cadc13d8ea92d8dfe93b111dd7
   runtime/lambda.js: 74fb18cb7dc19af51498cee1321b72d39940d0c4
-  scripts/assemble.py: ff59a5113e6762c4f08defb6517b394a48e20a66
-  scripts/build.py: 3c46c619c7a59587bdb5ceb19287668a0a755aeb
-  scripts/microvm.py: e2cced9da0f11def5c4d333812c326c698220727
-  tests/benchmark.py: 2d938fe96faddf94a00dec00b5e465d50357f637
-  tests/live_aws.py: 5b5e6e271e6141917f3e977e0fc3f9356fcef5df
-  tests/live_microvm.py: 9d77cc51ea57f3637715a5a4fe8f1a8c2a8424a9
-  tests/test_live_metrics.py: d693fd7b62d859d6865cf19e8fd2feb8fbe41f29
-  tests/test_microvm.py: f7ea0809d8ebe92bf8e0e9f66574f1577e8e2290
-  tests/test_microvm_container.py: 54a544674edf384d2760c1d4b2740df61a2ad66c
-  tests/test_runtime.py: 8d5570d605ee37ec2b36263e65c5ce58e06f5599
+  scripts/assemble.js: 1826e452e3350aefccd88a3fdd3b2c2586c148eb
+  scripts/bootstrap-builder.sh: ea48779f7d0836c3f86c10b88bdbc266ad963477
+  scripts/build.js: f1fa19747a262ff1b515ba63a40fc318c10163da
+  scripts/lib.js: f9b8134a94beb562c90d92a4a9f753430750a569
+  scripts/microvm.js: abfa7689e73ed7b690eb2cbe459637d41dabcf7f
+  tests/benchmark.js: 8f31a8e7a5cf947681cfc7868a52c32542564928
+  tests/live-lib.js: 00af4e3f6e67d99835e41dffd288cbf8e776b4b5
+  tests/live_aws.js: c7d2e28c8c8dfcbadfd1c0db80af2924b482d8ff
+  tests/live_microvm.js: 89a9f0a82f3ce7ea4e4dc74a9282b0d912549a5e
+  tests/runtime-lib.js: 32e11ae966e8e719d8af10110d1c90dc8a60dffb
+  tests/test_build.js: b4edbae3e9eeb4d5ad19559f9a181b816309cec4
+  tests/test_live_harness.js: a958b6dee6aa08d0b8c24f4d60d5980af990e7cd
+  tests/test_live_metrics.js: 07539d823c1554c2f748b16e99f74613f407de05
+  tests/test_microvm.js: b6616bd1f837cd88e9e86b89f9b3da972b2673d8
+  tests/test_microvm_container.js: 3cb24a74cc31113b6372fb204393371493c8f47f
+  tests/test_runtime.js: f05b29659bf413b90b5535256844c71b75a3c990

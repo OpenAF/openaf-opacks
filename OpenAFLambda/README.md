@@ -6,47 +6,48 @@ The workload is prepared once per cold start. Each event then runs in the same J
 
 ## Build
 
-Requirements: Python 3.9+, Docker with Buildx, and internet access to the selected Java distribution, OpenAF and opack repositories. OpenAF is additionally required for the optional oJob wrapper.
+Requirements: OpenAF, Java 25+, Docker with Buildx, and internet access to the selected Java distribution, OpenAF and opack repositories. Build commands run natively through OpenAF or the oJob entrypoint.
 
 ```sh
 # Separate x86_64 and arm64 ZIPs, with an embedded example oJob.
-python3 scripts/build.py
+ojob build.yaml
 
 # One architecture and your own embedded workload directory.
-python3 scripts/build.py --arch arm64 --workload examples/script
+oaf -f scripts/build.js -e 'arch=arm64 workload=examples/script'
 
 # Use unpublished sibling artifacts without changing those checkouts.
-python3 scripts/build.py --arch arm64 \
-  --openaf-jar ../../openaf/openaf.jar --opack ../AWS
+oaf -f scripts/build.js -e 'arch=arm64 jar=../../openaf/openaf.jar localOpacks=["../AWS"]'
 
 # AWS remains installed when adding/replacing the default published opack list.
-python3 scripts/build.py --opacks AWS,oJob-common,Kube
+oaf -f scripts/build.js -e 'opacks=AWS,oJob-common,Kube'
 
 # Select a newer JRE or build a Corretto runtime using its matching jlink.
-python3 scripts/build.py --arch arm64 --java 25 --jre-provider corretto
+oaf -f scripts/build.js -e 'arch=arm64 java=25 jreProvider=corretto'
 
 # Generate and validate OpenAF's .shared.oaf for this exact JVM and architecture.
-python3 scripts/build.py --arch arm64 --cds auto
+oaf -f scripts/build.js -e 'arch=arm64 cds=auto'
 
 # Equivalent wrapper; localOpacks is a JSON array.
 ojob build.yaml arch=arm64 dist=stable java=25 output=output \
   jar=../../openaf/openaf.jar 'localOpacks=["../AWS"]'
 ```
 
+OpenAF scripts accept `key=value` arguments in the single `-e` expression. The oJob entrypoint accepts the same keys directly. Paths containing spaces can be JSON strings inside the expression. Live AWS scripts still require the AWS CLI and an explicitly selected bucket.
+
 Options:
 
 | Option | Default | Purpose |
 |---|---|---|
-| `--arch` | `both` | `both`, `x86_64` or `arm64`; builds Linux binaries using Docker's selected platform. |
-| `--java` | `25` | Java major version, at least 25. |
-| `--jre-provider` | `temurin` | `temurin` JRE, or a runtime linked from the `corretto` JDK. |
-| `--dist` | `stable` | OpenAF distribution, such as `stable`, `nightly` or `edge`. |
-| `--cds` | `auto` | `auto` generates and validates OpenAF's archive; `off` omits it. |
-| `--opacks` | `AWS,oJob-common` | Published opacks to install. AWS is always included. |
-| `--openaf-jar` | published JAR | Local repacked OpenAF JAR. |
-| `--opack` | none | Local opack directory or `.opack` file; repeatable. Overrides its published counterpart. |
-| `--workload` | `examples/ojob` | Workload directory copied into `function/`. |
-| `--output` | `output` | Artifact destination. |
+| `arch` | `both` | `both`, `x86_64` or `arm64`; builds Linux binaries using Docker's selected platform. |
+| `java` | `25` | Java major version, at least 25. |
+| `jreProvider` | `temurin` | `temurin` JRE, or a runtime linked from the `corretto` JDK. |
+| `dist` | `stable` | OpenAF distribution, such as `stable`, `nightly` or `edge`. |
+| `cds` | `auto` | `auto` generates and validates OpenAF's archive; `off` omits it. |
+| `opacks` | `AWS,oJob-common` | Published opacks to install. AWS is always included. |
+| `jar` | published JAR | Local repacked OpenAF JAR. |
+| `localOpacks` | none | JSON array of local opack directories or `.opack` files. Overrides its published counterpart. |
+| `workload` | `examples/ojob` | Workload directory copied into `function/`. |
+| `output` | `output` | Artifact destination. |
 
 Each build produces `openaf-lambda-ARCH.zip` and `openaf-lambda-ARCH.manifest.json`. The manifest records resolved versions, input hashes, runtime/workload hashes, architecture, sizes and ZIP SHA-256. The ZIP includes `build-manifest.json` with its build inputs. Downloads follow the selected distribution's latest release; retain the generated artifacts/manifests when pinning a deployment.
 
@@ -66,7 +67,7 @@ The builder rejects deployment packages larger than 250 MiB uncompressed and pre
 | `OJOB_JSONLOG` | `false` | JSON runtime logs; workload logging is independent. |
 | `login`, `pass` | none | Optional HTTP basic authentication. |
 | `OJOB_MAX_BYTES` | `268435456` | Maximum downloaded, copied or expanded workload bytes (256 MiB). |
-| `OAF_JAVA_XSHARE` | build's `--cds` value | Override class sharing with `auto` or `off`. |
+| `OAF_JAVA_XSHARE` | build's `cds` value | Override class sharing with `auto` or `off`. |
 
 Examples of environment settings:
 
@@ -173,11 +174,11 @@ Pass it as `--environment file://environment.json`. For JavaScript embedded buil
 
 ```sh
 # Local OpenAF/JRE, with a fixture Runtime API and HTTP download service:
-python3 tests/test_runtime.py --openaf /path/to/openaf --java /path/to/java
+oaf -f tests/test_runtime.js -e 'openaf=/path/to/openaf java=/path/to/java'
 
 # Actual deployment ZIP on read-only AL2023, as an unprivileged user:
-python3 tests/test_runtime.py --zip output/openaf-lambda-arm64.zip --arch arm64
-python3 tests/test_runtime.py --zip output/openaf-lambda-x86_64.zip --arch x86_64
+oaf -f tests/test_runtime.js -e 'zip=output/openaf-lambda-arm64.zip arch=arm64'
+oaf -f tests/test_runtime.js -e 'zip=output/openaf-lambda-x86_64.zip arch=x86_64'
 ```
 
 The S3 integration test uses the real AWS signer with dummy temporary credentials and redirects its generated download URL to the local fixture. It verifies binary transport and signing parameters; it does not prove live AWS access. For live verification, upload a workload ZIP, configure the S3 environment above, invoke twice, and check that CloudWatch shows one preparation followed by two successful invocations. No AWS deployment is performed by these tests.
@@ -185,27 +186,24 @@ The S3 integration test uses the real AWS signer with dummy temporary credential
 An opt-in live AWS harness creates temporary `nma-temp-test-*` roles/functions and uploads fixtures beneath a unique run directory in the selected S3 prefix:
 
 ```sh
-python3 tests/live_aws.py --profile default --region eu-west-1 \
-  --bucket YOUR_TEST_BUCKET --prefix mvms --memory 1024 --runs 3
+oaf -f tests/live_aws.js -e 'profile=default region=eu-west-1  bucket=YOUR_TEST_BUCKET prefix=mvms memory=1024 runs=3'
 ```
 
 The profile needs Lambda create/configure/invoke/read/delete permissions, IAM create/read/delete role and inline-policy permissions plus `iam:PassRole`, S3 upload/read/delete and object/version listing permissions, and CloudWatch Logs read/delete permissions. The generated execution role can read only that run's `workloads/` objects and write its test-function logs. The bucket must already exist in the selected region.
 
-The harness exercises embedded scripts/oJobs, S3 files/ZIPs, nested resources, warm-state recovery, denied/missing objects, integrity failures and HTTP retrieval through a temporary presigned S3 URL. It compares fresh-environment `auto`/`off` invocations on both architectures using an embedded oJob, with configurable memory (1024 MiB by default) and a 60-second function timeout, and checks CloudWatch CDS mapping separately. Select `--benchmark-workload s3` to include retrieval in the measurements. Initialization retries are recorded separately from successful initialization metrics.
+The harness exercises embedded scripts/oJobs, S3 files/ZIPs, nested resources, warm-state recovery, denied/missing objects, integrity failures and HTTP retrieval through a temporary presigned S3 URL. It compares fresh-environment `auto`/`off` invocations on both architectures using an embedded oJob, with configurable memory (1024 MiB by default) and a 60-second function timeout, and checks CloudWatch CDS mapping separately. Select `benchmarkWorkload=s3` to include retrieval in the measurements. Initialization retries are recorded separately from successful initialization metrics.
 
 Live testing observed S3 preparation exceeding Lambda's initial 10-second initialization window at both 512 and 1024 MiB. Lambda retried initialization during the first invocation and returned successfully, but cold-start latency increased. Increasing memory to 1024 MiB alone did not eliminate this behavior. Embedded workloads initialized within the window in the initial checks. See [AWS's execution lifecycle](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html) for the initialization/retry behavior.
 
-The harness deletes its functions, log groups, uploaded object versions and role on completion or failure, then verifies absence and retries any late-created test log groups; `--keep` explicitly retains resources. Evidence and a resource/cleanup journal are saved under `output/live-aws/`. Resume a retained or interrupted run with `--resume output/live-aws/RUN_ID/journal.json`; `--benchmark-only` skips functional checks already captured in that run. Presigned URLs are excluded from recorded configuration and logs. See [the live AWS results](LIVE_AWS.md) for the completed run and its startup findings.
+The harness deletes its functions, log groups, uploaded object versions and role on completion or failure, then verifies absence and retries any late-created test log groups; `keep=true` explicitly retains resources. Evidence and a resource/cleanup journal are saved under `output/live-aws/`. Resume a retained or interrupted run with `resume=output/live-aws/RUN_ID/journal.json`; `benchmarkOnly=true` skips functional checks already captured in that run. Presigned URLs are excluded from recorded configuration and logs. See [the live AWS results](LIVE_AWS.md) for the completed run and its startup findings.
 
 The shell bootstrap uses a short preparation JVM, then starts the reusable invocation JVM in the workload directory. Cold-start measurements must include both processes. CDS archives are architecture/JRE/flag-specific and are generated inside the target Linux builder using the same `repackCDS` helper used by OpenAF install/repack. The builder calls that helper directly to preserve the selected JAR, including unpublished local builds. `auto` may fall back; build-time validation uses `-Xshare:on` to reject unusable OpenAF archives.
 
 Compare sharing modes on the same archive-enabled ZIP:
 
 ```sh
-python3 tests/benchmark.py --zip output/openaf-lambda-arm64.zip \
-  --arch arm64 --runs 7 --kind ojob --output output/benchmark-ojob.json
-python3 tests/benchmark.py --zip output/openaf-lambda-arm64.zip \
-  --arch arm64 --runs 7 --kind js --output output/benchmark-js.json
+oaf -f tests/benchmark.js -e 'zip=output/openaf-lambda-arm64.zip  arch=arm64 runs=7 kind=ojob output=output/benchmark-ojob.json'
+oaf -f tests/benchmark.js -e 'zip=output/openaf-lambda-arm64.zip  arch=arm64 runs=7 kind=js output=output/benchmark-js.json'
 ```
 
 The benchmark alternates `auto`/`off`, measures both cold-start JVMs and warm events, and separately checks CDS logs to confirm that both JVMs map `.shared.oaf`. It uses AL2023 with 512 MiB and one CPU. Container wall time includes Docker startup; JVM time excludes that overhead. These are local process-start measurements with a warm host filesystem, not AWS Lambda cold-start measurements. Raw samples and CDS diagnostics accompany each summary. See [the validation and startup comparison](BENCHMARKS.md) for the measured Java 25/27 and Corretto results.
@@ -216,17 +214,17 @@ The optional MicroVM target produces an **image source ZIP** containing a Docker
 
 ```sh
 # Build Java/OpenAF and package the MicroVM image source (arm64).
-python3 scripts/build.py --target microvm --workload examples/ojob
+oaf -f scripts/build.js -e 'target=microvm workload=examples/ojob'
 
 # Or reuse an already built arm64 runtime without downloading Java/opacks again.
-python3 scripts/microvm.py --runtime-zip output/openaf-lambda-arm64.zip
+oaf -f scripts/microvm.js -e 'runtimeZip=output/openaf-lambda-arm64.zip'
 ```
 
 Outputs: `output/openaf-microvm-arm64.zip` and its `.manifest.json`, including source/runtime hashes. Existing Java 25+, provider, opack, workload and CDS build options still apply. Packaging reuses the function ZIP builder, including its 250 MiB uncompressed size guard. `ojob build.yaml target=microvm` exposes the same target. An x86_64 MicroVM build fails explicitly.
 
 For an embedded JavaScript workload, set `OJOB_ENTRYPOINT=main.js` in the image's `--environment-variables` map. The default entrypoint is `main.yaml`; local ZIPs can select a nested entrypoint through the same setting.
 
-The Dockerfile uses AWS's snapshot-compatible `public.ecr.aws/lambda/microvms:al2023-minimal` container base and copies the prebuilt Java/OpenAF payload. It installs no additional language runtime; Python is used only by host build/test tools. OpenAF's `ow.server.httpd` serves HTTP directly, and its `Threads` plugin runs workloads with a deadline. The existing bootstrap prepares the workload and starts the reusable JVM in MicroVM mode; there is no local proxy or interprocess invocation connection. When reusing an older function ZIP, the packager overlays this package's current runtime JavaScript/bootstrap and updates its runtime hash. No function resource is created by the MicroVM path.
+The Dockerfile uses AWS's snapshot-compatible `public.ecr.aws/lambda/microvms:al2023-minimal` container base and copies the prebuilt Java/OpenAF payload. It installs no additional language runtime; Host build/test tools also use OpenAF; the builder bootstraps Java/OpenAF with a shell script. OpenAF's `ow.server.httpd` serves HTTP directly, and its `Threads` plugin runs workloads with a deadline. The existing bootstrap prepares the workload and starts the reusable JVM in MicroVM mode; there is no local proxy or interprocess invocation connection. When reusing an older function ZIP, the packager overlays this package's current runtime JavaScript/bootstrap and updates its runtime hash. No function resource is created by the MicroVM path.
 
 - Application port **8080**: `POST /invoke` with a JSON event returns the workload's JSON result. `GET /health` reports JVM health. A workload error returns HTTP 500; malformed input returns 400; an overlapping invocation returns 409.
 - Hook port **8081**: implements `/aws/lambda-microvms/runtime/v1/ready`, `/validate`, `/run` and `/resume`. Readiness requires the JVM's HTTP services to be configured. Hooks check runtime availability without executing user code. Restrict caller authentication tokens to port 8080.
@@ -280,19 +278,21 @@ Image environment variables are fixed at build time. To compare sharing, create 
 ### MicroVM validation
 
 ```sh
-python3 -B -m unittest discover -s tests -p test_microvm.py -v
+oaf -f tests/test_build.js
+oaf -f tests/test_microvm.js
+oaf -f tests/test_live_metrics.js
+oaf -f tests/test_live_harness.js
 
 # Extract the image source ZIP into a build directory, then:
 docker build --platform linux/arm64 -t openaf-microvm-test:local BUILD_DIRECTORY
-python3 tests/test_microvm_container.py --image openaf-microvm-test:local
+oaf -f tests/test_microvm_container.js -e 'image=openaf-microvm-test:local'
 
 # Opt-in AWS test: creates temporary images, MicroVMs, role, logs and S3 source.
 # Use the default example oJob bundle; responses are checked against that fixture.
-python3 tests/live_microvm.py --profile default --region eu-west-1 \
-  --bucket YOUR_TEST_BUCKET --prefix mvms --runs 3
+oaf -f tests/live_microvm.js -e 'profile=default region=eu-west-1  bucket=YOUR_TEST_BUCKET prefix=mvms runs=3'
 
 # Retry interrupted/failed cleanup using the private resource journal:
-python3 tests/live_microvm.py --cleanup output/live-microvm/RUN_ID/journal.json
+oaf -f tests/live_microvm.js -e 'cleanup=output/live-microvm/RUN_ID/journal.json'
 ```
 
 The live test builds separate `auto`/`off` images, checks active version build success, launches fresh MicroVMs, verifies first/warm requests with unique request IDs, suspends/resumes each instance and invokes again, then requests resource cleanup. It uses 1024 MiB and a 600-second maximum instance lifespan. The profile needs MicroVM image/lifecycle/auth APIs, `iam:PassRole`, temporary IAM role/policy management, S3 object/version management, and CloudWatch Logs management. Private journals contain resource identifiers; the measurement report omits account/resource identifiers and never records authentication tokens. Evidence belongs in ignored `output/live-microvm/`. Container tests establish application behavior, not AWS snapshot correctness; only completed live image/lifecycle checks establish that.
@@ -300,3 +300,9 @@ The live test builds separate `auto`/`off` images, checks active version build s
 AWS references: [image creation and hooks](https://docs.aws.amazon.com/lambda/latest/dg/microvms-images.html), [running and authenticating MicroVMs](https://docs.aws.amazon.com/lambda/latest/dg/microvms-launching.html), [snapshot compatibility](https://docs.aws.amazon.com/lambda/latest/dg/microvms-images-snapshots.html).
 
 See [the native MicroVM verification report](LIVE_MICROVM.md) for image-build, lifecycle and `auto`/`off` measurements.
+
+## Package maintenance
+
+The build, fixture, benchmark and live verification tools run through OpenAF; Python is no longer required. The shell builder bootstrap downloads the selected Java/OpenAF before native assembly begins. Live verification still uses the AWS CLI.
+
+Regenerate opack metadata with `opack genpack . --exclude output,__pycache__` and retain the date-based package version. The exclusions keep deployment ZIPs, measurements and private AWS journals out of the distributed package.

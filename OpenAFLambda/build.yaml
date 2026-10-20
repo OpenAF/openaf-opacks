@@ -32,18 +32,6 @@ todo:
 jobs:
 - name: Build Lambda ZIPs
   exec: |
-    var command = ["python3", getOPackPath("OpenAFLambda") + "/scripts/build.py"];
-    if (isUnDef(getOPackPath("OpenAFLambda"))) command[1] = "scripts/build.py";
-    ["target", "arch", "output", "java", "dist", "cds", "opacks", "workload"].forEach(function(key) {
-      if (isDef(args[key])) command.push("--" + key, String(args[key]));
-    });
-    if (isDef(args.jar)) command.push("--openaf-jar", String(args.jar));
-    if (isDef(args.jreProvider)) command.push("--jre-provider", String(args.jreProvider));
-    if (isDef(args.localOpacks)) {
-      var local = isArray(args.localOpacks) ? args.localOpacks : jsonParse(args.localOpacks);
-      local.forEach(function(file) { command.push("--opack", String(file)); });
-    }
-    var list = new java.util.ArrayList();
-    command.forEach(function(value) { list.add(String(value)); });
-    var process = new java.lang.ProcessBuilder(list).inheritIO().start();
-    if (process.waitFor() != 0) throw "Lambda build failed.";
+    global.lambdaSource = getOPackPath("OpenAFLambda") || io.fileInfo("build.yaml").canonicalPath.replace(/[/\\]build.yaml$/, "");
+    global.lambdaImport = true;
+    require(global.lambdaSource + "/scripts/build.js").build(args);

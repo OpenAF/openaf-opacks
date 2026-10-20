@@ -45,17 +45,16 @@ Arm64 comparison ZIPs use stable OpenAF `20261015`, AWS `20260923`, and oJob-com
 
 Corretto's linked/compressed modules save expanded space but compress less inside the deployment ZIP. Both providers passed the AL2023 checks. Temurin 25 remains the default because its ZIP is smaller and the measured provider latency difference is modest.
 
-For Temurin 25, `.shared.oaf` adds 18 MiB expanded and approximately 4.49 MiB compressed. Use `--cds off` to omit it, or set `OAF_JAVA_XSHARE=off` to compare modes on an archive-enabled build. Retaining `auto` by default favors the observed cold-start improvement.
+For Temurin 25, `.shared.oaf` adds 18 MiB expanded and approximately 4.49 MiB compressed. Use `cds=off` to omit it, or set `OAF_JAVA_XSHARE=off` to compare modes on an archive-enabled build. Retaining `auto` by default favors the observed cold-start improvement.
 
 ## Reproduce
 
 ```sh
-python3 scripts/build.py --arch arm64 --java 25 --cds auto --output output/temurin25
-python3 scripts/build.py --arch arm64 --java 25 --jre-provider corretto --cds auto --output output/corretto25
-python3 scripts/build.py --arch arm64 --java 27 --cds auto --output output/temurin27
+oaf -f scripts/build.js -e 'arch=arm64 java=25 cds=auto output=output/temurin25'
+oaf -f scripts/build.js -e 'arch=arm64 java=25 jreProvider=corretto cds=auto output=output/corretto25'
+oaf -f scripts/build.js -e 'arch=arm64 java=27 cds=auto output=output/temurin27'
 
-python3 tests/benchmark.py --zip output/temurin25/openaf-lambda-arm64.zip \
-  --kind ojob --runs 7 --output output/benchmarks/temurin25-ojob.json
+oaf -f tests/benchmark.js -e 'zip=output/temurin25/openaf-lambda-arm64.zip  kind=ojob runs=7 output=output/benchmarks/temurin25-ojob.json'
 ```
 
-Repeat the benchmark with each candidate and `--kind js` for the JavaScript case. Raw JSON reports and `.cds.log` diagnostics from this run are in `output/benchmarks/`; they are generated artifacts excluded from the opack package. Each report embeds build versions and content hashes. Final deployable ZIPs and manifests are in `output/`.
+Repeat the benchmark with each candidate and `kind=js` for the JavaScript case. Raw JSON reports and `.cds.log` diagnostics from this run are in `output/benchmarks/`; they are generated artifacts excluded from the opack package. Each report embeds build versions and content hashes. Final deployable ZIPs and manifests are in `output/`.
