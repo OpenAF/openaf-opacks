@@ -28,7 +28,7 @@ files:
 - .package.yaml
 - Dockerfile
 - README.md
-- copilot-sdk-java-1.0.24-preview.0.jar
+- copilot-sdk-java-1.0.24-preview.1.jar
 - ghcopilot.js
 - jackson-annotations-2.22.jar
 - jackson-core-2.22.3.jar
@@ -38,7 +38,7 @@ filesHash:
   .maven.yaml: a03abfeafae85d542addd89eeb459515b5dbaad6
   Dockerfile: 6bb1c386f43d37ea2b7f6f1a5dc55f410eb67025
   README.md: e9e09842af6692b8f9d92611e4bc615826bb3d8b
-  copilot-sdk-java-1.0.24-preview.0.jar: 09131bae907a74c95b1e3e93a30535ea7c52a151
+  copilot-sdk-java-1.0.24-preview.1.jar: f477061d393f134336c6e51aaf2c193aa0a36c63
   ghcopilot.js: cdfcf79c90512b20a6dc6ffa15e3d53f824e46ba
   jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
   jackson-core-2.22.3.jar: 8695aab38355c65b60e242ec62edf13c52916d88
