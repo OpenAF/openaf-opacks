@@ -1,0 +1,54 @@
+author: Nuno Aguiar
+scripts:
+  preinstall: ''
+  postinstall: require(args.OPACK_PATH + '/install.js').install(args.OPACK_PATH);
+  preerase: ''
+  posterase: ''
+keywords:
+- openaf
+- desktop
+- javafx
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/plugin-DesktopJavaFX.opack
+description: Optional JavaFX WebView provider for the OpenAF desktop API.
+name: plugin-DesktopJavaFX
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261018'
+dependencies:
+  openaf: '>=20261018'
+files:
+- .gitignore
+- .maven.yaml
+- .package.yaml
+- LICENSES.txt
+- README.md
+- compile.yaml
+- desktop-javafx.jar
+- desktop-javafx.js
+- desktop-provider.json
+- examples/assets/index.html
+- examples/hello.js
+- install.js
+- javafx-lock.json
+- src/openaf/desktop/javafx/DesktopBootstrap.java
+- src/openaf/desktop/javafx/DesktopRuntime.java
+filesHash:
+  .gitignore: 972bc7782ae396f3a4d9e0b815de984c58665cde
+  .maven.yaml: 1c1f71a82ce220dcbc0c3d3dd840f2246e036ff6
+  LICENSES.txt: 5162494214e895e89a1026f952e40133983b7901
+  README.md: cdc50ae3eea8adde84d02693946bfccd52a32ceb
+  compile.yaml: 0571ae7d27279594d425c34cf6b0a621606d1469
+  desktop-javafx.jar: 534c8c5c37a532516761c43badcdb3de3b16977b
+  desktop-javafx.js: 63074689a6cc0e29323c6f521db6682357b02e58
+  desktop-provider.json: 03af692753c656678720ecf8653a26c81edefd77
+  examples/assets/index.html: 6d11105d0b130bb98f940f9e999ee31dd7b0351a
+  examples/hello.js: 8936c84696a686e6d81c56b11afadbca5737d03a
+  install.js: c44caff35eea71ecb4818b875ddc85960c32cd75
+  javafx-lock.json: f2a194da57ab6d2acde62811679d605d3a63942f
+  src/openaf/desktop/javafx/DesktopBootstrap.java: 88a7082272f9ae86dab9634fdd46ad72aaa94e86
+  src/openaf/desktop/javafx/DesktopRuntime.java: a73a84f6a513f42e3416102baa6b7744da9f46f6
