@@ -55,6 +55,7 @@
   |**Mongo**|<img src=".github/badges/Mongo.svg"><br>An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
   |**Morse**|<img src=".github/badges/Morse.svg"><br>Simple morse code translator|
   |**Notifications**|<img src=".github/badges/Notifications.svg"><br>Provides libraries to use notifications services. Currently pushover.js.|
+  |**OpenAFLambda**|<img src=".github/badges/OpenAFLambda.svg"><br>Build AWS Lambda function ZIPs and MicroVM image sources for OpenAF scripts and local, HTTP or S3 oJob bundles|
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build AWS Lambda layers or a compatible OpenAF container build context|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.|
