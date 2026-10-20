@@ -1,0 +1,74 @@
+author: Nuno Aguiar
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- aws
+- lambda
+- microvm
+- runtime
+- ojob
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://openaf.io/opacks/OpenAFLambda.opack
+description: Build AWS Lambda function ZIPs and MicroVM image sources for OpenAF scripts and local, HTTP or S3 oJob bundles
+name: OpenAFLambda
+main: ''
+mainJob: build.yaml
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261020'
+dependencies:
+  OpenAF: '>=20250315'
+files:
+- .gitignore
+- .package.yaml
+- AGENTS.md
+- BENCHMARKS.md
+- Dockerfile
+- LIVE_AWS.md
+- LIVE_MICROVM.md
+- README.md
+- build.yaml
+- examples/ojob/main.yaml
+- examples/script/main.js
+- microvm/Dockerfile
+- runtime/bootstrap
+- runtime/lambda.js
+- scripts/assemble.py
+- scripts/build.py
+- scripts/microvm.py
+- tests/benchmark.py
+- tests/live_aws.py
+- tests/live_microvm.py
+- tests/test_live_metrics.py
+- tests/test_microvm.py
+- tests/test_microvm_container.py
+- tests/test_runtime.py
+filesHash:
+  .gitignore: da6dae34545db4ae02bd22ef70a8267bb9907c64
+  AGENTS.md: 8ab7089a84d840b2a4ac028791ca9db7bcc3ddeb
+  BENCHMARKS.md: c74aa45297f53de329a14ab18c2e0fbe4ff1bc3c
+  Dockerfile: 3d841fda9ed39130183b821ddb358dc5400b0e76
+  LIVE_AWS.md: 9d609d9a5e750dfcaaac438b7d4f92934784c65d
+  LIVE_MICROVM.md: 4d9260f1ad16e86b6f06aae5becdcae36476dd10
+  README.md: d93d47201805936a6526f498305889bf2a414f63
+  build.yaml: 89453c39fc3971b23620d90c233227dfd9aa2c1e
+  examples/ojob/main.yaml: 89a2c167ae10f74ff70c8852749248e864bfd041
+  examples/script/main.js: a2c655e4823b6da88b7a53ccb37d1abb94549515
+  microvm/Dockerfile: dee90bb4c67dd5fa3eb35f4237d2293951e10109
+  runtime/bootstrap: 28dcfab3f69480cadc13d8ea92d8dfe93b111dd7
+  runtime/lambda.js: 74fb18cb7dc19af51498cee1321b72d39940d0c4
+  scripts/assemble.py: ff59a5113e6762c4f08defb6517b394a48e20a66
+  scripts/build.py: 3c46c619c7a59587bdb5ceb19287668a0a755aeb
+  scripts/microvm.py: e2cced9da0f11def5c4d333812c326c698220727
+  tests/benchmark.py: 2d938fe96faddf94a00dec00b5e465d50357f637
+  tests/live_aws.py: 5b5e6e271e6141917f3e977e0fc3f9356fcef5df
+  tests/live_microvm.py: 9d77cc51ea57f3637715a5a4fe8f1a8c2a8424a9
+  tests/test_live_metrics.py: d693fd7b62d859d6865cf19e8fd2feb8fbe41f29
+  tests/test_microvm.py: f7ea0809d8ebe92bf8e0e9f66574f1577e8e2290
+  tests/test_microvm_container.py: 54a544674edf384d2760c1d4b2740df61a2ad66c
+  tests/test_runtime.py: 8d5570d605ee37ec2b36263e65c5ce58e06f5599

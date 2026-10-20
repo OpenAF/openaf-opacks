@@ -1,0 +1,7 @@
+ojob: {}
+todo:
+- Hello
+jobs:
+- name: Hello
+  exec: |
+    __pmOut = { message: "Hello " + _$(args.name).default("Lambda"), requestId: __lambdaContext.awsRequestId };

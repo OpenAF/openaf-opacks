@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+root="${OAF_LAMBDA_ROOT:-${LAMBDA_TASK_ROOT:-/var/task}}"
+export OAF_LAMBDA_ROOT="$root"
+export OAF_HOME="${OAF_HOME:-/tmp/openaf}"
+export TMPDIR="${TMPDIR:-/tmp}"
+export OAF_LAMBDA_STATE
+OAF_LAMBDA_STATE=$(mktemp -d "$TMPDIR/openaf-lambda.XXXXXXXX")
+mkdir -p "$OAF_HOME"
+xshare="${OAF_JAVA_XSHARE:-$(cat "$root/runtime/xshare" 2>/dev/null || printf off)}"
+case "$xshare" in auto|off) ;; *) echo 'OAF_JAVA_XSHARE must be auto or off' >&2; exit 1 ;; esac
+OAF_LAMBDA_PHASE=prepare "$root/jre/bin/java" "-Xshare:$xshare" -XX:MaxRAMPercentage=75.0 \
+  --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED -XX:+UseCompactObjectHeaders \
+  "-XX:SharedArchiveFile=$root/openaf/.shared.oaf" \
+  -Djava.io.tmpdir="$TMPDIR" -Duser.home="$OAF_HOME" \
+  -jar "$root/openaf/openaf.jar" -f "$root/runtime/lambda.js"
+cd "$(cat "$OAF_LAMBDA_STATE/workdir")"
+export OAF_LAMBDA_PHASE="${OAF_LAMBDA_TRANSPORT:-invoke}"
+exec "$root/jre/bin/java" "-Xshare:$xshare" -XX:MaxRAMPercentage=75.0 \
+  --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED -XX:+UseCompactObjectHeaders \
+  "-XX:SharedArchiveFile=$root/openaf/.shared.oaf" \
+  -Djava.io.tmpdir="$TMPDIR" -Duser.home="$OAF_HOME" \
+  -jar "$root/openaf/openaf.jar" -f "$root/runtime/lambda.js"
