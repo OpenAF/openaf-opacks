@@ -26,6 +26,8 @@ const _transform = r => {
 const _$f = (r, options) => {
     params.__origr = r
 
+    var jq = isDef(options.__ijq) || isDef(options.__ojq)
+
     // Input filters
     if (options.__ifrom) {
         r = $from(isArray(r) ? r : [ r ]).query(af.fromNLinq(options.__ifrom.trim()))
@@ -69,8 +71,14 @@ const _$f = (r, options) => {
 
     //if (!Array.isArray(params.__origr) && Array.isArray(r) && r.length <= 1) r = r[0]
 
+    if (isDef(options.__ijq)) {
+        r = $jq(r, options.__ijq)
+        delete options.__ijq
+        if (typeof r === "undefined") return r
+    }
+
     // Transforms
-    if (isString(r)) return _transform(r)
+    if (isString(r) && !jq) return _transform(r)
     r = _transform(r)
 
     // Output filters
@@ -113,11 +121,17 @@ const _$f = (r, options) => {
         delete options.__opath
     }
     
+    if (isDef(options.__ojq)) {
+        r = $jq(r, options.__ojq)
+        delete options.__ojq
+    }
+
     //if (!Array.isArray(__origr2) && Array.isArray(r) && r.length <= 1) r = r[0]
     return r
 }
 const _$o = (r, options, lineByLine) => {
-    if ((r == null && !options.__keepNull && options.__format != "idesc" && isUnDef(params.idescrecipe)) || ("undefined" == typeof r)) {
+    var jq = isDef(options.__ijq) || isDef(options.__ojq)
+    if ((r == null && !jq && !options.__keepNull && options.__format != "idesc" && isUnDef(params.idescrecipe)) || ("undefined" == typeof r)) {
         _clearTmpMsg()
         return
     }
@@ -131,7 +145,10 @@ const _$o = (r, options, lineByLine) => {
             __conAnsi = false
         }
     }
-    if (!isString(r)) {
+    if (jq) {
+        r = _$f(r, nOptions)
+        if (typeof r === "undefined") { _clearTmpMsg(); return }
+    } else if (!isString(r)) {
         if (lineByLine)
             r = _$f([r], nOptions)[0]
         else
@@ -1740,7 +1757,7 @@ const _idescOutput = (value, batch, recipe) => {
 const _idescSource = () => {
     if (!isFunction(io.scanJSON) || !isFunction(io.copyJSONRange)) throw "idescsource=stream requires OpenAF io.scanJSON/copyJSONRange; rebuild/update OpenAF"
     if (isDef(params.type) && params.type != "json") throw "idescsource=stream supports JSON input only"
-    var incompatible = ["path", "opath", "from", "ifrom", "sql", "isql", "jsonprefix", "jsondesc", "stream", "outputkey", "outkey", "loop", "pipe", "outfileappend"]
+    var incompatible = ["path", "opath", "from", "ifrom", "sql", "isql", "jq", "ijq", "ojq", "jsonprefix", "jsondesc", "stream", "outputkey", "outkey", "loop", "pipe", "outfileappend"]
         .concat(Object.keys(_transformFns))
     incompatible.forEach(k => { if (isDef(params[k])) throw "idescsource=stream cannot use " + k + "; narrow/query inside idesc or use loaded mode" })
     if (isDef(params.chs) || isDef(params.paramsfile) && params.paramsfile == "-") throw "idescsource=stream requires an independent JSON source"
@@ -1856,6 +1873,18 @@ const _exit = (code, msg) => {
 
 // Select complete Markdown option sections, ignoring headings inside code fences.
 const _formatHelp = (markdown, selector) => {
+    var filter = selector.trim().match(/^filter=(.*)$/i)
+    if (filter) {
+        var name = filter[1].trim(), lines = markdown.split(/\r?\n/)
+        var header, separator, row
+        lines.forEach(line => {
+            if (/^\|\s*Function\s*\|\s*OpenAF\s*\|/.test(line)) header = line
+            else if (header && !separator && /^\|[- :|]+\|\s*$/.test(line)) separator = line
+            var entry = line.match(/^\|\s*([A-Za-z_][A-Za-z0-9_]*)\(/)
+            if (entry && entry[1] == name) row = line
+        })
+        return header && separator && row ? [header, separator, row].join("\n") : "No documented function found for `help=filter=" + name.replace(/`/g, "") + "`. See `help=filters`."
+    }
     var request = selector.match(/^(in|out):(.*)$/i)
     if (!request) return markdown
     var normalize = value => value.toLowerCase().replace(/[^a-z0-9]/g, "")
@@ -1890,6 +1919,8 @@ const showHelp = () => {
     var _ff
     params.help = _$(params.help, "help").isString().default("")
 
+    params.help = params.help.trim()
+    var _filterSelector = /^filter=/i.test(params.help)
     var _formatSelector = /^(in|out):/i.test(params.help)
     var _f
     switch(params.help.toLowerCase()) {
@@ -1901,7 +1932,9 @@ const showHelp = () => {
     case "usage"   : _ff = "docs/USAGE.md"; break
     default        : 
         var _r = params.help.toLowerCase()
-        if (!_formatSelector && isDef(_oafhelp_libs[_r]))
+        if (_filterSelector)
+            _ff = "docs/FILTERS.md"
+        else if (!_formatSelector && isDef(_oafhelp_libs[_r]))
             _ff = "docs/" + _r + ".md"
         else
             _ff = "docs/USAGE.md"
@@ -3546,6 +3579,7 @@ var _outputFns = new Map([
 
         if (isUnDef(params.envscmd)) params.envscmd = (ow.format.isWindows() ? "set" : "export")
         params.envscmd = String(params.envscmd)
+        if (toBoolean(params.envsnocmd)) params.envscmd = ""
 
         if (isUnDef(params.envsprefix)) params.envsprefix = "_OAFP_"
         params.envsprefix = String(params.envsprefix)
@@ -5084,8 +5118,8 @@ var _inputFns = new Map([
             if (isDef(params[key])) _exit(-1, "in=llmdecide does not support " + key)
         })
         if (isDef(params.llmdecidesample)) {
-            if (["gemini", "ollama"].indexOf(params.llmdecidesample) < 0)
-                _exit(-1, "llmdecidesample must be gemini or ollama")
+            if (["gemini", "ollama", "openai"].indexOf(params.llmdecidesample) < 0)
+                _exit(-1, "llmdecidesample must be gemini, ollama or openai")
             var sample = {
                 state: { ticket: "The customer was charged twice." },
                 questions: {
@@ -5095,7 +5129,9 @@ var _inputFns = new Map([
                     urgent: { type: "boolean", instructions: "Does this require immediate attention?" },
                     priority: { type: "score", instructions: "Assess the urgency.", criteria: ["Routine", "Soon", "Urgent"] }
                 },
-                options: params.llmdecidesample == "gemini" ? { strategy: "structured" } : {
+                options: params.llmdecidesample == "gemini" ? { strategy: "structured" } : params.llmdecidesample == "openai" ? {
+                    strategy: "native", requireProbabilities: true
+                } : {
                     strategy: "native", requireProbabilities: true, providerOptions: { keepAlive: 0 }
                 }
             }
@@ -5414,8 +5450,9 @@ if (params["-h"] == "" || (isString(params.help) && params.help.length > 0)) sho
 // Default format
 params.format = _$(params.format, "format").isString().default(__)
 
-// Interactive consumers initialize the console only when needed.
-if (toBoolean(params.pause) || toBoolean(params.color)) __initializeCon()
+// All interactive outputs need terminal dimensions, independently of color.
+// Keep redirected/streaming invocations lazy unless explicitly requested.
+if (java.lang.System.console() != null || toBoolean(params.pause) || toBoolean(params.color)) __initializeCon()
 var _dr = !String(java.lang.System.getProperty("os.name")).match(/Windows/)
 var _drev = getEnv("OAFP_RESET")
 var _cs = getEnv("OAFP_CODESET")
@@ -5447,6 +5484,16 @@ if (isDef(params.secKey)) {
     }
 }
 
+// jq is an input-stage alias. Validate only explicitly requested jq filters.
+if (isDef(params.jq) && isDef(params.ijq)) _exit(-1, "Use either jq or ijq, not both")
+;["jq", "ijq", "ojq"].forEach(name => {
+    if (isDef(params[name])) {
+        if (!isString(params[name]) || params[name].trim().length == 0) _exit(-1, name + " requires a nonempty jq expression")
+        if (typeof $jq !== "function") _exit(-1, name + " requires an OpenAF runtime providing $jq")
+        params[name] = params[name].trim()
+    }
+})
+
 // Set options
 var options = { 
     __format: params.format, 
@@ -5456,6 +5503,8 @@ var options = {
     __sql: params.sql, 
     __path: params.path, 
     __opath: params.opath,
+    __ijq: isDef(params.ijq) ? params.ijq : params.jq,
+    __ojq: params.ojq,
     __csv: params.csv, 
     __pause: params.pause, 
     __key: params.__key,

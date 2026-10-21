@@ -26,10 +26,13 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | isql | A SQL expression to filter input data |
 | from   | An OpenAF nLinq path expression to filter output |
 | sql    | A SQL expression to filter output |
+| ijq | A jq expression to filter input after path and before transforms; requires OpenAF $jq |
+| jq | Alias for ijq; do not combine with ijq |
+| ojq | A jq expression to filter output after opath |
 | opath | A JMESPath expression to filter output data |
 | sqlfilter | Enables the forcing of the sql filter parser (values: auto, simple, advanced) |
 | sqlfiltertables | A JSON/SLON array composed of 'table' name and 'path' to each table's data to be used with the sqlfilter |
-| path   | A JMESPath expression to filter output |
+| path   | A JMESPath expression to filter input before transforms |
 | csv    | If type=csv, the CSV options to use | 
 | outkey | If defined the map/list output will be prefixed with the provided key |
 | outfile | If defined all output will be written to the provided file |
@@ -37,7 +40,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | parallel | `auto` (default), `true`, or `false`. Auto measures eligible pure work before using bounded workers. Record output stays ordered; explicit `true` also enables supported specialized parallel operations. `false` overrides `OAFP_PARALLEL`. |
 | progress | `auto` (default) or `off`. Shows a delayed wait animation on interactive stderr only. |
 | stream | With `in=json`, processes a top-level array one element at a time using record-level filters and output. Default `false`. |
-| pause  | If 'true' (or `-p`) will try to pause contents in alternative to _less -r_ |
+| pause  | If 'true' (or `-p`) will try to pause contents in alternative to _less -r_. PgUp/Left and PgDown/Right move by a page; Up/Down move by a line. Shift+Left/Home goes to the top; Shift+Right/End goes to the bottom. Shift+PgUp/PgDown are also supported as top/bottom aliases. At the bottom, navigation remains available; forward paging or an ordinary key exits. Use `q` to quit. These controls require an updated OpenAF runtime. |
 | color  | If 'true' will force colored output if available |
 | url    | Retrieves data from the provided URL |
 | urlmethod | If 'url' is provided defines the http method to use if different from GET | 
@@ -56,7 +59,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | -v | Changes the input to a map with the tool's version info |
 | debug | If true prints debugging messages |
 
-> Filter options apply in the following order: _path_, _from_ and _sql_.
+> Filter order: _ifrom_, _isql_, _path_, _ijq_ (alias _jq_), transforms, _from_, _sql_, _opath_, _ojq_. See _help=filters_ for syntax, examples, and jq result/record handling.
 
 > For _path_ syntax check https://jmespath.org/tutorial.html
 
@@ -474,7 +477,7 @@ List of options to use when _in=llmdecide_:
 |--------|------|-------------|
 | llmenv | String | Environment variable containing the model configuration (defaults to OAFP_MODEL, falling back to OAF_DECIDE_MODEL and then OAF_MODEL when absent). |
 | llmoptions | String/Map | Model configuration as a JSON/SLON string or map; overrides llmenv. Supports the shared sBucket options below. |
-| llmdecidesample | String | Emit a gemini or ollama request sample without input, credentials or inference. Use out=yaml or out=json. |
+| llmdecidesample | String | Emit a gemini, ollama or openai request sample without input, credentials or inference. Use out=yaml or out=json. |
 | llmimage | String | Local PNG/JPEG/WebP image file to encode as options.images for Ollama native decisions. Cannot be combined with options.images. |
 | llmdecidestats | Boolean | Return {response, stats} from one decideWithStats() execution (defaults to false). |
 
@@ -497,6 +500,7 @@ Generate a request, edit its state and questions, then run it with _file=_ and y
 ```sh
 oafp in=llmdecide llmdecidesample=gemini out=yaml > gemini-request.yaml
 oafp in=llmdecide llmdecidesample=ollama out=json > ollama-request.json
+oafp in=llmdecide llmdecidesample=openai out=yaml > openai-request.yaml
 ```
 
 > See _help=examples_ for complete request files and provider requirements. Samples use common OpenAF question definitions with provider-specific strategy options.
@@ -984,21 +988,94 @@ List of options to use when _out=ch_:
 
 ### 🧾 Chart output options
 
-List of options to use when _out=chart_:
+Use `out=chart` to plot numeric samples as a terminal line chart. Each output update adds one sample per series to a rolling history. With `loop=<seconds>`, oafp reads the input again at that interval; without repeated updates, the chart only has one sample. The horizontal axis represents sample order, not timestamps.
+
+To plot a fixed array of existing values instead, use `out=schart` (see **SChart output options**).
+
+#### Quick start
+
+This self-contained example generates a changing value between 10 and 90, samples it every second, and redraws the chart in place:
+
+```sh
+oafp in=oaf 'data=data=50+40*Math.sin(Date.now()/1000)' \
+  out=chart 'chart=int @:green:value -min:0 -max:100 -hsize:40 -vsize:10' \
+  loop=1 chartcls=true
+```
+
+Let it run for several updates to see the line develop. Press **Ctrl+C** to stop. Here `in=oaf` evaluates JavaScript on each update, and the inner `data=` assigns its result. `@` selects that numeric result. `int` formats the Y-axis labels as integers; it does not round the input samples.
+
+#### Options and chart syntax
 
 | Option | Type | Description |
 |--------|------|-------------|
-| chart  | String | Chart definition in the format `"<unit> <path:color:legend>... [-min:<n>] [-max:<n>] [-hsize:<n>] [-vsize:<n>]"`. The 'unit' must be one of: `int`, `dec1`, `dec2`, `dec3`, `dec4`, `dec`, `bytes` or `si`. The 'path' is a JMESPath expression equivalent to the `path=` filter (use quotes for non-basic expressions; use `@` for the current root value). The 'color' should be one of the basic ANSI color names. The 'legend' is the series label (quote it if it contains spaces). The `-min` and `-max` flags set the Y-axis range; `-hsize` and `-vsize` override the default chart width and height in terminal columns/rows. |
-| chartcls | Boolean | If true the screen will be cleared before rendering each update (alternative to `loopcls=true`) |
+| chart | String | Required. Unit, one or more series, and optional axis/size flags, as described below. |
+| chartcls | Boolean | Clear the screen before printing each chart update. Use this or the general `loopcls=true` option to redraw in place. Otherwise updates are printed one after another. |
+| loop | Number | General oafp option: repeat the input and output, waiting this many seconds between runs. Use a changing source such as `cmd=`, `url=`, or `in=oaf` for live data. |
 
-Examples:
-```oafp cmd="curl -s http://api.open-notify.org/iss-now.json" out=chart loopcls=true chart="dec3 iss_position.latitude:blue:lat iss_position.longitude:red:long" loop=5```
+```text
+chart="<unit> <path[:color][:legend]> ... [-min:<n>] [-max:<n>] [-hsize:<n>] [-vsize:<n>]"
+```
 
-```oafp cmd="uptime" in=raw path="replace(trim(@), '.+ ([\d\.]+),? ([\d\.]+),? ([\d\.]+)$', '', '$1|$2|$3').split(@,'|')" out=chart chart="dec2 [0]:green:load1m [1]:yellow:load5m [2]:red:load15m -min:0" loop=1 loopcls=true```
+- **Unit:** `int` uses integer labels; `dec1`, `dec2`, `dec3`, and `dec4` use the specified decimal places; `dec` uses the number's string representation; `bytes` and `si` use abbreviated byte and SI-style labels. These format the Y-axis; they do not convert the input values.
+- **Path:** a JMESPath expression selecting one numeric value per series. Paths apply to the processed input, after filters such as `path=`. Use `@` for a numeric root, `metrics.cpu` for a nested field, or `[0]` for an array element. Convert numeric strings with `to_number(...)` when necessary.
+- **Color:** optional ANSI color specification, such as `green`, `yellow`, `red`, or `blue`. If you specify a color for one series, supply one for every series.
+- **Legend:** optional label after the color, for example `cpu:green:CPU`. Use a single token without spaces or colons, such as `load_1m`. Quoting does not make multiword legends work in the renderer. To show a complete legend, label every series.
+- **Range:** `-min:<n>` and `-max:<n>` set the Y-axis bounds. Omit them for automatic scaling; set both when comparing updates on a fixed scale.
+- **Size:** `-hsize:<n>` sets the horizontal history limit in samples and the chart width budget; `-vsize:<n>` sets the height budget in terminal rows, including space reserved for legends. Defaults are based on terminal dimensions when available. Explicit sizes make examples more predictable.
 
-```oafp cmd="ps -p 12345 -o %cpu,%mem" in=lines linesvisual=true linesvisualsepre="\\s+" out=chart chart="int '\"%CPU\"':red:cpu '\"%MEM\"':blue:mem -min:0 -max:100" loop=1 loopcls=true```
+The examples below use POSIX shell quoting (sh/bash/zsh). Quote the whole `chart=...` argument so the shell passes it as one value. Inside the chart definition, quote complex paths that contain spaces or colons. Property names containing punctuation need JMESPath double quotes; the quoted-property example below shows how to preserve them through the shell.
 
-```HOST=1.1.1.1 && PORT=53 && oafp in=oaf data="data=ow.loadNet().testPortLatency('$HOST',$PORT)" out=chart chart="int @:red:latencyMS -min:0" loop=1 loopcls=true```
+#### Examples
+
+**Two series from nested fields.** Both paths select numbers from the same input on each update:
+
+```sh
+oafp in=oaf 'data=data={metrics:{cpu:50+40*Math.sin(Date.now()/1000),memory:60+20*Math.cos(Date.now()/1000)}}' \
+  out=chart 'chart=dec1 metrics.cpu:green:CPU metrics.memory:blue:Memory -min:0 -max:100 -hsize:40 -vsize:10' \
+  loop=1 chartcls=true
+```
+
+**Select a numeric root first.** After `path=metrics.cpu`, the chart receives the number rather than the original object:
+
+```sh
+oafp in=oaf 'data=data={metrics:{cpu:50+40*Math.sin(Date.now()/1000)}}' \
+  path=metrics.cpu out=chart 'chart=dec1 @:green:CPU -min:0 -max:100 -hsize:40 -vsize:10' \
+  loop=1 chartcls=true
+```
+
+**A property name containing punctuation.** This fixed input demonstrates quoting and renders one sample. The shell passes `chart=int '"%CPU"':red:CPU ...`; the inner double quotes identify the literal JMESPath property name:
+
+```sh
+oafp in=json 'data={"%CPU":42}' out=chart \
+  chart="int '\"%CPU\"':red:CPU -min:0 -max:100 -hsize:40 -vsize:10"
+```
+
+**Monitor a process on macOS/Linux.** Replace `12345` with a running PID. This uses `ps` without headers and converts its CPU percentage to a number, avoiding column-name and table-parsing differences:
+
+```sh
+oafp cmd="ps -p 12345 -o pcpu=" in=raw 'path=to_number(trim(@))' \
+  out=chart 'chart=dec1 @:red:CPU -min:0 -hsize:40 -vsize:10' \
+  loop=1 chartcls=true
+```
+
+CPU usage can exceed 100% on some systems, so this example leaves the upper bound automatic. Stop the chart if the process exits and `ps` no longer returns a value.
+
+**Measure TCP connection latency.** This requires network access to the target host and port; it measures a TCP connection, not ICMP ping:
+
+```sh
+oafp in=oaf 'data=data=ow.loadNet().testPortLatency("1.1.1.1",53,1000)' \
+  out=chart 'chart=dec2 @:red:latency_ms -hsize:40 -vsize:10' \
+  loop=1 chartcls=true
+```
+
+The timeout is 1000 ms. A value of `-1` means the connection failed or timed out; it is not a latency measurement. The example leaves the Y-axis range automatic so failures remain visible.
+
+#### Common pitfalls
+
+- A single input produces a single sample; adding `loop` to unchanged `data=` simply repeats the same value. For an existing array, use `out=schart`.
+- Each series must resolve to a number. Check the same input with `out=json` and your intended `path=` first if a chart is empty or fails. Missing fields and nonnumeric values are not substitutes for zero.
+- Use an interactive terminal for live redraws. Explicit dimensions help in small terminals; omit screen clearing when capturing output to a file.
+- If oafp reports that chart output is unsupported by your OpenAF version, update the OpenAF runtime.
 
 ---
 
@@ -1071,6 +1148,7 @@ List of options to use when _out=envs_:
 | Option | Type | Description |
 |--------|------|-------------|
 | envscmd | String | If defined will output the provided command to set each environment variable (defaults to 'export' or 'set' in Windows) |
+| envsnocmd | Boolean | If true omits the command before each environment variable assignment, including a custom envscmd (defaults to false) |
 | envsprefix | String | If defined uses the provided prefix for each environment variable key (defaults to '_OAFP_') |
 | envsnoprefix | Boolean | Boolean flag to indicate that no envsprefix should be used (defaults to false) |
 
@@ -1363,7 +1441,8 @@ pipe:
 
 | Help | Description |
 |------|-------------|
-| help=filters | Provides more details regarding the use of "path=", "from=" and "sql=" |
+| help=filters | Filter order, JMESPath functions, jq, nLinq and SQL |
+| `help="filter=keys"` | Return the exact JMESPath function row, including signature, availability, description and example |
 | help=template | Provides more details regarding the use of "output=template" |
 | help=examples | Provide several examples |
 | help=jsonschema | JSON Schema validation, options, drafts and sample generation |

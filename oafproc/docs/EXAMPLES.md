@@ -248,18 +248,19 @@ find /some/data -name "*.json" | xargs -I '{}' /bin/sh -c 'oafp file={} output=x
 
 See [JSON Schema](JSON-SCHEMA.md) for validation examples, Ajv options, draft selection, v8 error fields and sample generation.
 
-## Stateless LLM decisions: Gemini and Ollama
+## Stateless LLM decisions: Gemini, Ollama and OpenAI
 
 Generate the request files below automatically, then edit state and questions:
 
 ```sh
 oafp in=llmdecide llmdecidesample=gemini out=yaml > gemini-request.yaml
 oafp in=llmdecide llmdecidesample=ollama out=yaml > ollama-request.yaml
+oafp in=llmdecide llmdecidesample=openai out=yaml > openai-request.yaml
 ```
 
 Sample output also supports `out=json` and requires no inference,
 input stream or credentials. Replace the explicit model/key placeholders below with your configuration.
-Both providers use the same named question syntax; each command evaluates the
+All providers use the same named question syntax; each command evaluates the
 whole state once. Alternatively set `OAFP_MODEL` (or `OAF_DECIDE_MODEL`, then `OAF_MODEL` as fallback),
 use `llmenv=YOUR_CONFIG_ENV`, or use the existing sBucket fields in `llmoptions`
 (`secRepo`, `secBucket`, `secPass`, `secMainPass`, `secFile`) and their
@@ -371,6 +372,26 @@ Score levels are zero-based (`Routine` = 0, `Soon` = 1, `Urgent` = 2).
 `expectedScore` is the expectation and may differ from the selected level.
 Provider errors and invalid answers remain visible without strategy/model
 fallback. These examples describe the API contract, not verified live inference.
+
+### OpenAI native decisions API
+
+Generate a request using the same state and named questions as above:
+
+```sh
+oafp in=llmdecide llmdecidesample=openai out=yaml > openai-request.yaml
+export OAFP_MODEL="(type: openai, model: gpt-6-luna, key: YOUR_OPENAI_API_KEY)"
+oafp in=llmdecide file=openai-request.yaml out=json
+oafp in=llmdecide file=openai-request.yaml llmdecidestats=true out=json
+oafp in=llmdecide file=openai-request.yaml path=answers.route.value out=raw
+# Alternatively supply the configuration directly:
+oafp in=llmdecide file=openai-request.yaml out=json llmoptions="(type: openai, model: gpt-6-luna, key: YOUR_OPENAI_API_KEY)"
+```
+
+The generated request selects `strategy: native` and `requireProbabilities: true`.
+OpenAF sends it to the official OpenAI `/v1/decisions` endpoint. The current
+adapter enables native decisions for `gpt-6-luna`; account and model access are
+checked by the provider. This requires an updated OpenAF runtime with OpenAI
+native decision support. The sample omits Ollama's `keepAlive` option.
 
 ### Ollama image decisions
 
