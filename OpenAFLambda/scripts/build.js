@@ -84,8 +84,15 @@ function build(a, utilities) {
   } finally {
     C.remove(temp);
   }
-  if (a.target === 'microvm')
-    require(source + '/scripts/microvm.js').package(out + '/openaf-lambda-arm64.zip', out);
+  if (a.target === 'microvm') {
+    var previousImport = global.lambdaImport;
+    try {
+      global.lambdaImport = true;
+      require(source + '/scripts/microvm.js').package(out + '/openaf-lambda-arm64.zip', out);
+    } finally {
+      global.lambdaImport = previousImport;
+    }
+  }
   print('Lambda artifacts: ' + out);
 }
 if (typeof exports !== 'undefined') Object.assign(exports, { build: build });

@@ -77,6 +77,23 @@ function run() {
       build({ arch: 'arm64', output: tmp + '/out', workload: tmp + '/workload' });
     }, /symlink/);
     C.remove(tmp + '/workload/link');
+    C.run = function () {
+      C.zipWriter(tmp + '/microvm/openaf-lambda-arm64.zip', function (add) {
+        add('build-manifest.json', JSON.stringify({ architecture: 'arm64' }));
+        ['bootstrap', 'runtime/lambda.js', 'jre/bin/java', 'openaf/openaf.jar'].forEach(function (n) {
+          add(n, 'fixture', 33261);
+        });
+      });
+    };
+    // Match direct CLI execution: no import guard is set by the caller.
+    global.lambdaImport = false;
+    try {
+      build({ target: 'microvm', arch: 'arm64', workload: tmp + '/workload', output: tmp + '/microvm' });
+      C.assert(C.exists(tmp + '/microvm/openaf-microvm-arm64.zip'));
+      C.equal(global.lambdaImport, false);
+    } finally {
+      global.lambdaImport = true;
+    }
     C.run = function (argv) {
       contexts.push(argv[argv.length - 1]);
       throw new Error('deliberate build failure');

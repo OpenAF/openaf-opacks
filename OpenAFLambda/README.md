@@ -222,7 +222,30 @@ oaf -f scripts/microvm.js -e 'runtimeZip=output/openaf-lambda-arm64.zip'
 
 Outputs: `output/openaf-microvm-arm64.zip` and its `.manifest.json`, including source/runtime hashes. Existing Java 25+, provider, opack, workload and CDS build options still apply. Packaging reuses the function ZIP builder, including its 250 MiB uncompressed size guard. `ojob build.yaml target=microvm` exposes the same target. An x86_64 MicroVM build fails explicitly.
 
-For an embedded JavaScript workload, set `OJOB_ENTRYPOINT=main.js` in the image's `--environment-variables` map. The default entrypoint is `main.yaml`; local ZIPs can select a nested entrypoint through the same setting.
+The `workload` build option controls files embedded in the image source ZIP. For an S3-hosted workload, it is fine to leave the default example in that ZIP: set `OJOB_METHOD=s3`, `OJOB_CONFIG`, and `OJOB_ENTRYPOINT` when creating the MicroVM image, and the image builder retrieves the configured ZIP and prepares that workload instead. For example, first build and upload the generic runtime source:
+
+```sh
+oaf -f scripts/build.js -e 'target=microvm arch=arm64'
+aws s3 cp output/openaf-microvm-arm64.zip \
+  s3://DEPLOYMENT_BUCKET/microvm/openaf-microvm-arm64.zip
+```
+
+Then configure the S3 workload as image environment variables:
+
+```sh
+aws lambda-microvms create-microvm-image --region eu-west-1 \
+  --name openaf-my-ojob \
+  --code-artifact uri=s3://DEPLOYMENT_BUCKET/microvm/openaf-microvm-arm64.zip \
+  --base-image-arn arn:aws:lambda:eu-west-1:aws:microvm-image:al2023-1 \
+  --build-role-arn arn:aws:iam::ACCOUNT:role/MicrovmBuildRole \
+  --cpu-configurations '[{"architecture":"ARM_64"}]' \
+  --resources '[{"minimumMemoryInMiB":1024}]' \
+  --environment-variables '{"OJOB_METHOD":"s3","OJOB_CONFIG":"s3://WORKLOAD_BUCKET/path/workload.zip","OJOB_ENTRYPOINT":"jobs/main.yaml","OJOB_S3_REGION":"eu-west-1"}' \
+  --egress-network-connectors arn:aws:lambda:eu-west-1:aws:network-connector:aws-network-connector:INTERNET_EGRESS \
+  --hooks '{"port":8081,"microvmImageHooks":{"ready":"ENABLED","readyTimeoutInSeconds":300,"validate":"ENABLED","validateTimeoutInSeconds":60},"microvmHooks":{"run":"ENABLED","runTimeoutInSeconds":60,"resume":"ENABLED","resumeTimeoutInSeconds":60}}'
+```
+
+The workload ZIP must contain `jobs/main.yaml` at the selected path. The build role needs `s3:GetObject` for both the image source ZIP and workload ZIP, plus the documented CloudWatch Logs permissions; image-build egress must reach S3. Image environment variables are fixed at build time, and the workload is downloaded before the image snapshot. Rebuild the image to pick up a changed workload. For an embedded JavaScript workload, set `OJOB_ENTRYPOINT=main.js`; the default entrypoint is `main.yaml`.
 
 The Dockerfile uses AWS's snapshot-compatible `public.ecr.aws/lambda/microvms:al2023-minimal` container base and copies the prebuilt Java/OpenAF payload. It installs no additional language runtime; Host build/test tools also use OpenAF; the builder bootstraps Java/OpenAF with a shell script. OpenAF's `ow.server.httpd` serves HTTP directly, and its `Threads` plugin runs workloads with a deadline. The existing bootstrap prepares the workload and starts the reusable JVM in MicroVM mode; there is no local proxy or interprocess invocation connection. When reusing an older function ZIP, the packager overlays this package's current runtime JavaScript/bootstrap and updates its runtime hash. No function resource is created by the MicroVM path.
 
