@@ -210,6 +210,8 @@ The benchmark alternates `auto`/`off`, measures both cold-start JVMs and warm ev
 
 ## Lambda MicroVM images
 
+For a complete walkthrough with **JSON request data, S3 input, S3 output, IAM policies and cleanup**, see [MicroVM data integration examples](MICROVM_EXAMPLES.md). The runnable [S3 workload](examples/microvm-s3/main.js) supports all three data paths with the same image.
+
 The optional MicroVM target produces an **image source ZIP** containing a Dockerfile and the complete Java/OpenAF payload. AWS builds this source into a MicroVM image and snapshots the initialized runtime. This is separate from the standard Lambda function ZIP and Runtime API deployment above. The current MicroVM API supports `ARM_64` only.
 
 ```sh

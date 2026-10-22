@@ -20,7 +20,7 @@ name: OpenAFLambda
 main: ''
 mainJob: build.yaml
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261021'
+version: '20261022'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -31,8 +31,10 @@ files:
 - Dockerfile
 - LIVE_AWS.md
 - LIVE_MICROVM.md
+- MICROVM_EXAMPLES.md
 - README.md
 - build.yaml
+- examples/microvm-s3/main.js
 - examples/ojob/main.yaml
 - examples/script/main.js
 - microvm/Dockerfile
@@ -50,8 +52,10 @@ filesHash:
   Dockerfile: e94a05e1741ec048f8256e4f7289674ba0364ea2
   LIVE_AWS.md: 656d1cf1aae62e348a2810308c9573c06d967635
   LIVE_MICROVM.md: 4d9260f1ad16e86b6f06aae5becdcae36476dd10
-  README.md: d0f895ee89c726ca892a1be719ec2da6c2f02942
+  MICROVM_EXAMPLES.md: 6c6811ace6759fbb90e4f5a1a1b645dd0817b554
+  README.md: 30b826ae522b848ae9564125dbf9f432db7031ff
   build.yaml: b4eaa73318480aadc52ad36cb27cfe436160eb38
+  examples/microvm-s3/main.js: 7bcc720d818f12d778a6348b92742cb83d407cf2
   examples/ojob/main.yaml: 89a2c167ae10f74ff70c8852749248e864bfd041
   examples/script/main.js: a2c655e4823b6da88b7a53ccb37d1abb94549515
   microvm/Dockerfile: dee90bb4c67dd5fa3eb35f4237d2293951e10109
