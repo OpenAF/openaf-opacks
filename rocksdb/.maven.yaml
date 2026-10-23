@@ -2,24 +2,24 @@ artifacts:
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-linux64.jar
-  version: 11.1.2
+  version: 11.8.1
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-linux64-musl.jar
-  version: 11.1.2
+  version: 11.8.1
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-win64.jar
-  version: 11.1.2
+  version: 11.8.1
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-osx.jar
-  version: 11.1.2
+  version: 11.8.1
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-linux32-musl.jar
-  version: 11.1.2
+  version: 11.8.1
 - id: rocksdbjni
   group: org.rocksdb
   template: rocksdbjni-{{version}}-linux32.jar
-  version: 11.1.2
+  version: 11.8.1
