@@ -55,6 +55,7 @@
   |**Mongo**|<img src=".github/badges/Mongo.svg"><br>An OpenAF channels implementation (&#x27;mongo&#x27;) to access collections on MongoDBs. It also includes an utility object (e.g. MongoUtil).|
   |**Morse**|<img src=".github/badges/Morse.svg"><br>Simple morse code translator|
   |**Notifications**|<img src=".github/badges/Notifications.svg"><br>Provides libraries to use notifications services. Currently pushover.js.|
+  |**OpenAFLambda**|<img src=".github/badges/OpenAFLambda.svg"><br>Build AWS Lambda function ZIPs and MicroVM image sources for OpenAF scripts and local, HTTP or S3 oJob bundles|
   |**OpenAFLambdaLayers**|<img src=".github/badges/OpenAFLambdaLayers.svg"><br>Build AWS Lambda layers or a compatible OpenAF container build context|
   |**OpenAI**|<img src=".github/badges/OpenAI.svg"><br>Wrapper around the OpenAI API functionality.|
   |**OpenAPI**|<img src=".github/badges/OpenAPI.svg"><br>OpenAPI 3.0/3.1 operation discovery and REST client with explicit tool and oJob generation.|
@@ -121,6 +122,7 @@
   |**oPackServer**|<img src=".github/badges/oPackServer.svg"><br>Provides an ojob or docker container to launch a private oPack server and easily add it to any OpenAF client.|
   |**oafproc**|<img src=".github/badges/oafproc.svg"><br>A command-line data processor for various input and output formats with query capabilities.|
   |**playwright**|<img src=".github/badges/playwright.svg"><br>Wrapper around Microsoft Playwright Java for browser automation from OpenAF.|
+  |**plugin-DesktopJavaFX**|<img src=".github/badges/plugin-DesktopJavaFX.svg"><br>Optional JavaFX WebView provider for the OpenAF desktop API.|
   |**plugin-GIT**|<img src=".github/badges/plugin-GIT.svg"><br>OpenAF plugin to access GIT repositories.|
   |**plugin-Ignite**|<img src=".github/badges/plugin-Ignite.svg"><br>OpenAF plugin to wrap Ignite functionality.|
   |**plugin-SMB**|<img src=".github/badges/plugin-SMB.svg"><br>OpenAF plugin to access samba/window shares.|
