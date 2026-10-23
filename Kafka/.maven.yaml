@@ -1,13 +1,13 @@
 artifacts:
 - group: org.apache.kafka
   id: kafka-clients
-  version: 4.3.1
+  version: 4.4.0
 - group: org.xerial.snappy
   id: snappy-java
-  version: 1.1.10.11
+  version: 1.1.10.12
 - group: at.yawk.lz4
   id: lz4-java
-  version: 1.12.0
+  version: 1.12.1
 - group: com.github.luben
   id: zstd-jni
-  version: 1.5.7-22
+  version: 1.5.7-24
