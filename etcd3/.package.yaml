@@ -17,7 +17,7 @@ name: etcd3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260626'
+version: '20261023'
 dependencies:
   openaf: '>=20220822'
 files:
@@ -37,10 +37,6 @@ files:
 - grpc-stub-1.82.0.jar
 - grpc-util-1.82.0.jar
 - guava-33.6.0-jre.jar
-- jackson-annotations-2.21.jar
-- jackson-core-2.21.4.jar
-- jackson-core-3.1.4.jar
-- jackson-databind-3.1.4.jar
 - javax.annotation-api-1.3.2.jar
 - jetcd-api-0.8.7.jar
 - jetcd-common-0.8.7.jar
@@ -69,7 +65,6 @@ files:
 - perfmark-api-0.27.0.jar
 - proto-google-common-protos-2.64.1.jar
 - protobuf-java-3.25.8.jar
-- slf4j-api-2.0.18.jar
 - vertx-core-5.1.2.jar
 - vertx-core-logging-5.1.2.jar
 - vertx-grpc-5.1.2.jar
@@ -89,10 +84,6 @@ filesHash:
   grpc-stub-1.82.0.jar: 737819b3e1040282a3c5cc10908d6385b2027b33
   grpc-util-1.82.0.jar: e7fb2823fa103b69413d6527aa56166a40caf9ce
   guava-33.6.0-jre.jar: c376b13067cc99a5774403530953f7b05a91e218
-  jackson-annotations-2.21.jar: b1bc1868bf02dc0bd6c7836257a036a331005309
-  jackson-core-2.21.4.jar: 56a503ba45016714394807ea89f95f5093760089
-  jackson-core-3.1.4.jar: f9fd39204bd3d4922b42f6a54b81f46bd8ed575a
-  jackson-databind-3.1.4.jar: c7be3c757289893a791b2a4967ec09d1a8b6c576
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
   jetcd-api-0.8.7.jar: 2ad14aed781c4a73ed4dbb421966d408a0a06686
   jetcd-common-0.8.7.jar: 02ca8fc827c1c28b52aa9ff40e6e96113f456c72
@@ -121,7 +112,6 @@ filesHash:
   perfmark-api-0.27.0.jar: f86f575a41b091786a4b027cd9c0c1d2e3fc1c01
   proto-google-common-protos-2.64.1.jar: a71d9a9867ed792e54e893b8c7864a0ba1b022cf
   protobuf-java-3.25.8.jar: 2ba593767658038775b2ea9724c3686609874470
-  slf4j-api-2.0.18.jar: 78a9e7a37cd6360e0b818e86341b24123d28d4df
   vertx-core-5.1.2.jar: b2217ef7872ff5320bb4f5b815756823aa7a9bd4
   vertx-core-logging-5.1.2.jar: daadc7cf3adb843f0edd163aba2d910396cc1763
   vertx-grpc-5.1.2.jar: 1ea3228cd2eeb77eb554b88f5d6dc070fe4a27fb
