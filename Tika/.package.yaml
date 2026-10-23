@@ -20,7 +20,7 @@ name: Tika
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261009'
+version: '20261022'
 dependencies:
   openaf: '>=20260918'
 files:
@@ -47,8 +47,8 @@ files:
 - java-libpst-0.9.3.jar
 - jbig2-imageio-3.0.5.jar
 - jsoup-1.23.2.jar
-- log4j-api-2.26.1.jar
-- log4j-to-slf4j-2.26.1.jar
+- log4j-api-3.0.0-beta2.jar
+- log4j-to-slf4j-3.0.0-beta2.jar
 - metadata-extractor-2.21.0.jar
 - oafp_Tika.js
 - pdfbox-3.0.8.jar
@@ -79,7 +79,7 @@ files:
 - xmpcore-6.1.11.jar
 filesHash:
   .gitignore: 1d997f3b74c461ad7d7e0abaa3081d92f0b77079
-  .maven.yaml: 06c372acd1b0acd3f8bb8782983f868e9961021b
+  .maven.yaml: 289d18ba5b8ff6f3b8cfa39567c26c082e403023
   README.md: 4482db6a3c6c30613347685dd12c4322d6f429f4
   SparseBitSet-1.3.jar: 533eac055afe3d5f614ea95e333afd6c2bde8f26
   apache-mime4j-core-0.8.15.jar: e9846d6d34c941907376174f7ac691ca7ea7d7ad
@@ -100,8 +100,8 @@ filesHash:
   java-libpst-0.9.3.jar: 928a6698850cd89577d28201ff1ac443bb339d2b
   jbig2-imageio-3.0.5.jar: 6e857678510425518c9082fe46c677068bd4257d
   jsoup-1.23.2.jar: 514805efcc430bfb04e82f20bb998e39e3fd5c9c
-  log4j-api-2.26.1.jar: b9864ed8d0c01f65f3b0bf70f1447e5cc1b49c24
-  log4j-to-slf4j-2.26.1.jar: a5100727b898c513fda177a4f388299a5fe5955f
+  log4j-api-3.0.0-beta2.jar: 3df0cf119d50a1840f39e3dd75dbceebb46079f2
+  log4j-to-slf4j-3.0.0-beta2.jar: 7d315b93350907ba6552e5e64fefb51d33b2d1db
   metadata-extractor-2.21.0.jar: e49030b5b32a0f0cf7db59a26c914575082b1c21
   oafp_Tika.js: b8c3f3a1bbfa9e70f9e995958509f3e7f5b3e6d2
   pdfbox-3.0.8.jar: c5d8c0b56aa156d64283f07729215a9938be2e69
