@@ -19,7 +19,7 @@ name: FalkorDB
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20260924
+version: 20261022
 dependencies:
   openaf: '>=20240318'
 files:
