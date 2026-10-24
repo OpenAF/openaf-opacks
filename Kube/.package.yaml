@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261023'
+version: '20261024'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -27,7 +27,7 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- jackson-core-2.21.6.jar
+- jackson-core-2.22.4.jar
 - jackson-dataformat-yaml-3.2.3.jar
 - kube.js
 - kube.yaml
@@ -86,7 +86,7 @@ filesHash:
   .odoc.db: f8ac7d0c0c30b2e4536107e2c450f0d1d34a421d
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: 04472d99b869f5cf0b2ebe4eb75d75a32d4fca9e
-  jackson-core-2.21.6.jar: 7a71e4eeb27e88ba462f8f085afd3e4ec6ecadf0
+  jackson-core-2.22.4.jar: d753ae59bae7dcb183f856da541c5b27272088ce
   jackson-dataformat-yaml-3.2.3.jar: c39c703aadd5bc7513013e7b2871ef36698aa443
   kube.js: a599a56d41e3b60ec7adc5a3101d4f4d6806f175
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b

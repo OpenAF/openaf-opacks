@@ -150,6 +150,7 @@ These options will change the parsed input data included any filters provided.
 | correcttypes | Boolean | If true will try to convert alpha-numeric field values with just numbers to number fields, string date fields to dates and boolean fields |
 | denormalize | String | Reverses 'normalize' given a JSON/SLON map with a normalize schema (see OpenAF's ow.ai.normalize.withSchema) |
 | diff | String | A JSON/SLON map with a 'a' path and a 'b' path to compare and provide diff data |
+| mapdiff | String/Map | A JSON/SLON map with 'a' and 'b' paths selecting maps to compare structurally. Returns onlyA, onlyB and changed maps. See [Map diff](#map-diff). |
 | field2byte | String | A comma delimited list of fields whose value should be converted to a byte abbreviation |
 | field2date | String | A comma delimited list of fields whose value should be converted to date values |
 | field2si | String | A comma delimited list of fields whose value should be converted to a SI abbreviation |
@@ -774,6 +775,34 @@ List of options to use when _diff=..._:
 > If both inputs are array based and color=false (or not provided) the comparison will be performed at the array elements level
 
 > The contents of 'difftheme' can also be provided through the 'OAFP_DIFFTHEME' environment variable
+
+---
+
+### Map diff
+
+Use `mapdiff="(a: old, b: new)"` to compare two maps selected by `$path` expressions from the input:
+
+```sh
+oafp 'data={"old":{"name":"old","config":{"port":80},"legacy":true},"new":{"name":"new","config":{"port":443},"enabled":true}}' \
+  'mapdiff=(a: old, b: new)' out=json
+```
+
+```json
+{
+  "onlyA": {"legacy": true},
+  "onlyB": {"enabled": true},
+  "changed": {
+    "/config/port": {"a": 80, "b": 443},
+    "/name": {"a": "old", "b": "new"}
+  }
+}
+```
+
+`onlyA` and `onlyB` preserve the nested structure of keys missing from the other map. A missing key includes its complete value, including empty maps and arrays. `changed` uses JSON Pointer paths (`~` becomes `~0`, `/` becomes `~1`) and includes both values. Type changes are reported at the changed key's path. Equal values are omitted; equal maps return `{"onlyA":{},"onlyB":{},"changed":{}}`.
+
+Map key order is ignored during comparison and result keys are sorted consistently, subject to JavaScript's usual integer-key ordering. Arrays are compared as complete values: order and duplicates matter, while map key order within them does not. Nested arrays retain their shape. Missing keys differ from explicit `null`, and values have strict types (`1` differs from `"1"`). Inputs are preserved.
+
+Both paths must select maps; missing paths, non-map selections and invalid configurations produce errors. This transform targets JSON-compatible data and produces structured output independently of `color` and the existing `diff` display options.
 
 ---
 

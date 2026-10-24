@@ -2459,6 +2459,59 @@ var _sortTransformKeys = value => {
     return result
 }
 
+// Sort key-only maps with OpenAF; prefix keys to keep __proto__ ordinary data.
+var _mapDiffKeys = value => {
+    var keys = {}
+    Object.keys(value).forEach(key => { keys["$" + key] = true })
+    return Object.keys(sortMapKeys(keys)).map(key => key.substring(1))
+}
+var _mapDiffSet = (map, key, value) => {
+    Object.defineProperty(map, key, {value:value, enumerable:true, writable:true, configurable:true})
+}
+var _mapDiffIsMap = value => isMap(value) && !isDate(value)
+var _mapDiffCopy = value => {
+    if (isArray(value)) return value.map(_mapDiffCopy)
+    if (!_mapDiffIsMap(value)) return value
+    var result = {}
+    _mapDiffKeys(value).forEach(key => { _mapDiffSet(result, key, _mapDiffCopy(value[key])) })
+    return result
+}
+var _mapDiffEqual = (a, b) => {
+    if (a === b) return true
+    if (isArray(a) || isArray(b)) {
+        return isArray(a) && isArray(b) && a.length === b.length && a.every((value, i) => _mapDiffEqual(value, b[i]))
+    }
+    if (!_mapDiffIsMap(a) || !_mapDiffIsMap(b)) return false
+    var keys = Object.keys(a)
+    return keys.length === Object.keys(b).length && keys.every(key =>
+        Object.prototype.hasOwnProperty.call(b, key) && _mapDiffEqual(a[key], b[key]))
+}
+var _mapDiff = (a, b) => {
+    var changed = {}
+    var walk = (left, right, path) => {
+        var onlyA = {}, onlyB = {}
+        _mapDiffKeys(left).forEach(key => {
+            var next = path + "/" + key.replace(/~/g, "~0").replace(/\//g, "~1")
+            if (!Object.prototype.hasOwnProperty.call(right, key)) {
+                _mapDiffSet(onlyA, key, _mapDiffCopy(left[key]))
+            } else if (_mapDiffIsMap(left[key]) && _mapDiffIsMap(right[key])) {
+                var nested = walk(left[key], right[key], next)
+                if (Object.keys(nested.onlyA).length) _mapDiffSet(onlyA, key, nested.onlyA)
+                if (Object.keys(nested.onlyB).length) _mapDiffSet(onlyB, key, nested.onlyB)
+            } else if (!_mapDiffEqual(left[key], right[key])) {
+                _mapDiffSet(changed, next, {a:_mapDiffCopy(left[key]), b:_mapDiffCopy(right[key])})
+            }
+        })
+        _mapDiffKeys(right).forEach(key => {
+            if (!Object.prototype.hasOwnProperty.call(left, key)) _mapDiffSet(onlyB, key, _mapDiffCopy(right[key]))
+        })
+        return {onlyA:onlyA, onlyB:onlyB}
+    }
+    var result = walk(a, b, "")
+    result.changed = _mapDiffCopy(changed)
+    return result
+}
+
 var _transformFns = {
     "transforms"    : _r => {
         if (toBoolean(params.transforms)) {
@@ -2490,6 +2543,21 @@ var _transformFns = {
                 _exit(-1, "Invalid cmltch parameter")
             }
         }
+    },
+    "mapdiff": _r => {
+        var config
+        try { config = _fromJSSLON(params.mapdiff) } catch(e) { _exit(-1, "Invalid mapdiff configuration: expected a JSON/SLON map.") }
+        if (!_mapDiffIsMap(config)) _exit(-1, "Invalid mapdiff configuration: expected a JSON/SLON map.")
+        if (!isString(config.a) || !isString(config.b) || !config.a.trim().length || !config.b.trim().length) {
+            _exit(-1, "mapdiff.a path and mapdiff.b path are required and must be non-empty strings.")
+        }
+        var select = name => {
+            var value
+            try { value = $path(_r, config[name]) } catch(e) { _exit(-1, "Invalid mapdiff." + name + " path: " + config[name]) }
+            if (!_mapDiffIsMap(value)) _exit(-1, "mapdiff." + name + " path must resolve to a map: " + config[name])
+            return value
+        }
+        return _mapDiff(select("a"), select("b"))
     },
     "diff": _r => {
         var _d = _fromJSSLON(params.diff)
