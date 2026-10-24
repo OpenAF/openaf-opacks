@@ -45,8 +45,15 @@ are excluded. Version ordering uses OpenAF `ow.format.compareVersion`, including
 versions and its fallback for Maven qualifiers; unusual versions are reported as requiring review. Version numbers are
 risk hints, not evidence of API compatibility.
 
-Normal Maven transitive resolution is retained. Transitive artifacts appear in
-before/after JAR inventories but are not independently promoted to latest.
+The downloader runs with `updateLevel=2` and `updateTransitive=true`: declared
+numeric releases may advance within their major version, and discovered transitive
+dependencies are promoted to their own latest versions. The transitive promotion
+is not constrained by `updateLevel` and can cross major versions. Transitive
+artifacts appear in before/after JAR inventories.
+The final summary warns when a major version is selected for a direct dependency
+or when embedded Maven metadata shows a major upgrade from a previously bundled
+JAR, including transitive dependencies. Newly introduced transitive artifacts have
+no previous bundled version to compare against.
 Resolved direct versions are persisted, including previously unpinned entries.
 Unchanged pinned manifests retain their original text. Changed manifests use
 OpenAF YAML serialization, which can remove comments.
@@ -107,8 +114,12 @@ can set `outputDir` relative to the manifest directory and `swapCoordinates`;
 the shipped qr adapter corrects its reversed coordinates and targets `lib/`.
 `additionalArtifacts` restores required direct dependencies missing from a manifest;
 Docker registers `com.amihaiemil.web:docker-java-api` this way. The resolved entry is
-persisted in its manifest. `blockedReason` stops preparation for known unsupported
-layouts; GoogleCompiler needs a reviewed dual Java-baseline compiler adapter.
+persisted in its manifest. `blockedReason` stops preparation for known unsupported layouts. GoogleCompiler
+uses a template adapter to download `compiler11.jar`, preserves `compiler.jar`
+byte-for-byte, and uses its JSON package metadata. Its wrapper checks the newer
+compiler class Java baseline before selecting it. `trackedPom` records explained
+transitive, lockfile-managed and legacy POM entries with their consumers; these
+remain visible in JSON reports without being listed as unmapped dependencies.
 Plugin adapters use `cleanClasses` to discard newly generated loose class files
 after packing their JAR. Existing build JARs are retained when their entry contents
 are identical, avoiding package churn from ZIP timestamps alone. Registered
@@ -124,7 +135,7 @@ only in the registered dependency directories, with compiled plugins rebuilt
 by their adapters. Each directory runs:
 
 ```sh
-ojob ojob.io/oaf/mavenGetJars folder=.
+ojob ojob.io/oaf/mavenGetJars folder=. updateLevel=2 updateTransitive=true
 ojob ojob.io/oaf/checkOAFJars path=. remove=true versioninsensitive=true
 ```
 

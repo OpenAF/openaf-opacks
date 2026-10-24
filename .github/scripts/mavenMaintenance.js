@@ -14,6 +14,25 @@ var mavenMaintenance = (function() {
     return "patch"
   }
   function tag(s, name) { var m = s.match(new RegExp("<" + name + ">\\s*([^<]+)\\s*</" + name + ">")); return m ? m[1].trim() : undefined }
+  function majorWarnings(before, after) {
+    var previous = {}, warnings = []
+    Object.keys(before).forEach(function(p) {
+      ;(before[p].metadata || []).forEach(function(m) {
+        if (!previous[m.coordinate]) previous[m.coordinate] = []
+        if (previous[m.coordinate].indexOf(m.version) < 0) previous[m.coordinate].push(m.version)
+      })
+    })
+    Object.keys(after).forEach(function(p) {
+      ;(after[p].metadata || []).forEach(function(m) {
+        ;(previous[m.coordinate] || []).forEach(function(v) {
+          if (!/^\d+\./.test(v) || !/^\d+\./.test(m.version) || Number(m.version.split(".")[0]) <= Number(v.split(".")[0])) return
+          var warning = "WARNING: Major version selected for " + m.coordinate + ": " + v + " -> " + m.version + "; compatibility review required"
+          if (warnings.indexOf(warning) < 0) warnings.push(warning)
+        })
+      })
+    })
+    return warnings
+  }
   function pomEntries(s) {
     var out = {}, blocks = s.match(/<dependency>[^]*?<\/dependency>/g) || []
     blocks.forEach(function(b) {
@@ -180,7 +199,7 @@ var mavenMaintenance = (function() {
       if (folder && folder.indexOf("/") >= 0) blocked("Select the top-level oPack folder")
       var manifests = git([ "ls-files", "-z" ]).split("\0").filter(function(p) { return /\/.maven.yaml$/.test(p) })
       if (folder) {
-        if (!io.fileExists(root + "/" + folder + "/.package.yaml")) blocked("Missing .package.yaml")
+        if (!io.fileExists(root + "/" + folder + "/" + ((config.opacks[folder] || {}).packageFile || ".package.yaml"))) blocked("Missing package metadata")
         manifests = Object.keys(files(root + "/" + folder)).filter(function(p) { return /(^|\/)\.maven.yaml$/.test(p) }).map(function(p) { return folder + "/" + p })
       }
       var basePom = args.base ? pomEntries(git([ "show", String(args.base) + ":pom.xml" ])) : null, latestCache = {}
@@ -217,6 +236,7 @@ var mavenMaintenance = (function() {
         if (!rows[name]) rows[name] = { folder: name, dependencies: [], warnings: [], tests: [], status: "listed" }
         artifacts.forEach(function(a) {
           if (!/^[\w.\-]+$/.test(a.group || "") || !/^[\w.\-]+$/.test(a.id || "")) blocked("Invalid Maven coordinate in " + p)
+          if (manifestOptions.templates && manifestOptions.templates[a.group + ":" + a.id]) a.template = manifestOptions.templates[a.group + ":" + a.id]
           if (a.template && (/[\\/]/.test(a.template) || !/\.jar$/.test(a.template))) blocked("Template must be a JAR basename: " + a.template)
           var key = a.group + ":" + a.id, hold = config.holds[name + "/" + key] || config.holds[key]
           mapped[key] = true
@@ -234,8 +254,20 @@ var mavenMaintenance = (function() {
         })
       })
       report.opacks = Object.keys(rows).sort().map(function(k) { return rows[k] })
+      report.trackedPom = config.trackedPom || {}
+      Object.keys(report.trackedPom).forEach(function(k) {
+        var entry = report.trackedPom[k]
+        if (!entry.reason || !Array.isArray(entry.consumers)) blocked("Tracked POM entry requires consumers and reason: " + k)
+        entry.consumers.forEach(function(name) { if (!folder && !rows[name]) blocked("Unknown tracked POM consumer: " + name) })
+        mapped[k] = true
+      })
       report.unmappedPom = folder ? [] : Object.keys(pom).filter(function(k) { return !mapped[k] })
       if (basePom) report.affected = report.opacks.filter(function(r) { return r.dependencies.some(function(d) { return d.pomChanged }) }).map(function(r) { return r.folder })
+      if (basePom) Object.keys(report.trackedPom).forEach(function(k) {
+        if (basePom[k] !== pom[k]) report.trackedPom[k].consumers.forEach(function(name) {
+          if (report.affected.indexOf(name) < 0) report.affected.push(name)
+        })
+      })
       if (folder && !manifestData.length) blocked("No Maven manifests found")
       report.opacks.forEach(function(o) {
         if ((config.opacks[o.folder] || {}).blockedReason) o.warnings.push(config.opacks[o.folder].blockedReason)
@@ -260,7 +292,10 @@ var mavenMaintenance = (function() {
       if (report.action === "list") return report
       var row = rows[folder], adapter = config.opacks[folder] || {}
       if (io.fileExists(root + "/" + folder + "/compile.yaml") && !adapter.build) blocked("Unregistered compile adapter: " + folder)
-      row.dependencies.forEach(function(d) { if ([ "major", "unknown", "pre-1.0-minor", "downgrade" ].indexOf(d.change) >= 0) row.warnings.push(d.coordinate + ": " + d.change + " requires review") })
+      row.dependencies.forEach(function(d) {
+        if (d.change === "major") row.warnings.push("WARNING: Major version selected for " + d.coordinate + ": " + (d.declared || "bundled version") + " -> " + d.target + "; compatibility review required")
+        else if ([ "unknown", "pre-1.0-minor", "downgrade" ].indexOf(d.change) >= 0) row.warnings.push(d.coordinate + ": " + d.change + " requires review")
+      })
       row.testCommands = adapter.tests || []
       if (!row.testCommands.length) row.warnings.push("No registered compatibility tests; manual testing required")
       if (report.action === "plan") { row.status = "planned"; return report }
@@ -286,8 +321,8 @@ var mavenMaintenance = (function() {
           io.mkdir(dependencyDir)
           var temporaryManifest = dependencyDir + "/.maven.yaml", saved = io.fileExists(temporaryManifest) ? read(temporaryManifest) : null
           io.writeFileYAML(temporaryManifest, { artifacts: byLocation[loc] })
-          io.listFiles(dependencyDir).files.filter(function(f) { return !f.isDirectory && /\.jar$/.test(f.filename) }).forEach(function(f) { io.rm(f.canonicalPath) })
-          exec([ "ojob", "ojob.io/oaf/mavenGetJars", "folder=." ], dependencyDir)
+          io.listFiles(dependencyDir).files.filter(function(f) { return !f.isDirectory && /\.jar$/.test(f.filename) }).forEach(function(f) { if ((adapter.preserveJars || []).indexOf((dependencyDir === work ? "" : dependencyDir.substring(work.length + 1) + "/") + f.filename) < 0) io.rm(f.canonicalPath) })
+          exec([ "ojob", "ojob.io/oaf/mavenGetJars", "folder=.", "updateLevel=2", "updateTransitive=true" ], dependencyDir)
           var downloaded = jars(dependencyDir)
           byLocation[loc].forEach(function(a) {
             var key = a.group + ":" + a.id, ok = Object.keys(downloaded).some(function(p) {
@@ -304,6 +339,11 @@ var mavenMaintenance = (function() {
           if (saved !== null) io.writeFileString(temporaryManifest, saved); else io.rm(temporaryManifest)
         })
       })
+      ;(adapter.preserveJars || []).forEach(function(p) {
+        relPath(p)
+        if (!original[p]) blocked("Missing preserved JAR: " + p)
+        io.cp(source + "/" + p, work + "/" + p)
+      })
       if (adapter.build) exec(adapter.build, work)
       ;(adapter.expected || []).forEach(function(p) {
         if (!io.fileExists(work + "/" + relPath(p)) || Number(io.fileInfo(work + "/" + p).size) === 0) throw new Error("Missing build output " + p)
@@ -318,23 +358,25 @@ var mavenMaintenance = (function() {
       // Build jobs may download again. Normalize their output using the chosen runtime.
       if (adapter.build) exec([ "ojob", "ojob.io/oaf/checkOAFJars", "path=.", "remove=true", "versioninsensitive=true" ], work)
       row.afterJars = jars(work)
+      row.warnings = row.warnings.concat(majorWarnings(row.beforeJars, row.afterJars))
       row.jarChanges = changed(row.beforeJars, row.afterJars)
       function total(js) { return Object.keys(js).reduce(function(n, p) { return n + js[p].size }, 0) }
       row.sizeChange = total(row.afterJars) - total(row.beforeJars)
       // Package metadata must reflect candidate contents before package-aware tests.
       var payloadChanges = changed(original, files(work)).filter(function(p) { return p !== ".package.yaml" })
       if (payloadChanges.length) {
-        var pkg = io.readFileYAML(work + "/.package.yaml")
+        var packageFile = adapter.packageFile || ".package.yaml"
+        var pkg = packageFile === ".package.json" ? io.readFileJSON(work + "/" + packageFile) : io.readFileYAML(work + "/" + packageFile)
         pkg.version = ow.loadFormat().fromDate(new Date(), "yyyyMMdd")
-        io.writeFileYAML(work + "/.package.yaml", pkg)
+        if (packageFile === ".package.json") io.writeFileJSON(work + "/" + packageFile, pkg); else io.writeFileYAML(work + "/" + packageFile, pkg)
         exec([ "opack", "genpack", ".", "--exclude", excludes.join(",") ], work)
-        pkg = io.readFileYAML(work + "/.package.yaml")
+        pkg = packageFile === ".package.json" ? io.readFileJSON(work + "/" + packageFile) : io.readFileYAML(work + "/" + packageFile)
         var snapshot = files(work)
         ;(pkg.files || []).forEach(function(p) {
           relPath(p)
           if (p.split("/").some(function(x) { return excludes.indexOf(x) >= 0 })) throw new Error("Excluded path packaged: " + p)
           if (!snapshot[p]) throw new Error("Missing packaged file: " + p)
-          if (p !== ".package.yaml" && (!pkg.filesHash || pkg.filesHash[p] !== packageHash(work + "/" + p))) throw new Error("Package hash mismatch: " + p)
+          if (p !== packageFile && (!pkg.filesHash || pkg.filesHash[p] !== packageHash(work + "/" + p))) throw new Error("Package hash mismatch: " + p)
         })
         Object.keys(snapshot).filter(function(p) { return /\.jar$/.test(p) }).forEach(function(p) { if (pkg.files.indexOf(p) < 0) throw new Error("JAR missing from package: " + p) })
         row.packageVersion = String(pkg.version)
@@ -420,6 +462,6 @@ var mavenMaintenance = (function() {
     if (r.unmappedPom && r.unmappedPom.length) print("Unmapped POM dependencies: " + r.unmappedPom.join(", "))
     if (r.affected) print("Affected oPacks: " + r.affected.join(", "))
   }
-  return { run: run, printReport: printReport, reportRows: reportRows, markdownReport: markdownReport, stable: stable, compare: compare, classify: classify, pomEntries: pomEntries, syncPom: syncPom, normalize: normalize, relPath: relPath }
+  return { run: run, printReport: printReport, reportRows: reportRows, markdownReport: markdownReport, stable: stable, compare: compare, classify: classify, majorWarnings: majorWarnings, pomEntries: pomEntries, syncPom: syncPom, normalize: normalize, relPath: relPath }
 })()
 if (typeof module !== "undefined") module.exports = mavenMaintenance

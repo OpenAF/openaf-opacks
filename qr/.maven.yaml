@@ -1,15 +1,16 @@
 artifacts:
-    - id      : com.google.zxing
-      group   : core
-      version : 3.5.4
-      template: core-{{version}}.jar
-
-    - id      : com.google.zxing
-      group   : javase
-      version : 3.5.4
-      template: javase-{{version}}.jar
-
-    - id      : com.github.jai-imageio
-      group   : jai-imageio-core
-      version : 1.4.0
-      template: jai-imageio-core-{{version}}.jar
+- id: core
+  group: com.google.zxing
+  version: 3.5.4
+  template: core-{{version}}.jar
+  location: lib
+- id: javase
+  group: com.google.zxing
+  version: 3.5.4
+  template: javase-{{version}}.jar
+  location: lib
+- id: jai-imageio-core
+  group: com.github.jai-imageio
+  version: 1.4.0
+  template: jai-imageio-core-{{version}}.jar
+  location: lib

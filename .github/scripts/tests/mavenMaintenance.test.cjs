@@ -45,7 +45,8 @@ const path = require('node:path')
 const repo = path.resolve(__dirname, '../../..')
 function fixture(t, options = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maven-maintenance-test-'))
-  const pkg = fs.readFileSync(path.join(repo, 'Kafka/.package.yaml'), 'utf8')
+  const fixtureDir = path.join(__dirname, 'fixtures/mavenMaintenance')
+  const pkg = fs.readFileSync(path.join(fixtureDir, 'package.yaml'), 'utf8')
   fs.mkdirSync(path.join(dir, 'Sample/lib'), {recursive:true})
   fs.writeFileSync(path.join(dir, 'Sample/.package.yaml'), pkg)
   fs.writeFileSync(path.join(dir, 'Sample/wrapper.js'), '// untouched\n')
@@ -64,8 +65,9 @@ var fixtureShell = function(command) {
     var cwd
     return { pwd: function(p) { cwd = p; return this }, get: function() {
       if (command[1] === "ojob.io/oaf/mavenGetJars") {
+        if (command.indexOf("updateLevel=2") < 0 || command.indexOf("updateTransitive=true") < 0) throw new Error("Missing Maven update options")
         ${options.mutateSource ? 'io.writeFileString("Sample/wrapper.js","manual edit")' : ''}
-        ${options.failDownload ? 'return {exitcode:0,stdout:"",stderr:""}' : `io.cp(${JSON.stringify(path.join(repo,'Kafka/kafka-clients-4.3.1.jar'))}, cwd + "/kafka-clients-4.3.1.jar"); io.cp(${JSON.stringify(path.join(repo,'FalkorDB/commons-text-1.15.0.jar'))}, cwd + "/commons-text-1.15.0.jar")`}
+        ${options.failDownload ? 'return {exitcode:0,stdout:"",stderr:""}' : `io.cp(${JSON.stringify(path.join(fixtureDir,'kafka-clients-4.3.1.jar'))}, cwd + "/kafka-clients-4.3.1.jar"); io.cp(${JSON.stringify(path.join(fixtureDir,'commons-text-1.15.0.jar'))}, cwd + "/commons-text-1.15.0.jar")`}
       }
       return {exitcode:0,stdout:"fixture",stderr:""}
     } }
@@ -269,4 +271,35 @@ test('native package validation accepts CRLF text without changing source bytes'
   if (second.candidate) t.after(() => fs.rmSync(second.candidate,{recursive:true,force:true}))
   assert.equal(second.exitCode,0,JSON.stringify(second))
   assert.equal(second.opacks[0].status,'unchanged')
+})
+
+test('final warnings identify major upgrades including transitive artifacts', () => {
+  const jar = (coordinate, version) => ({metadata:[{coordinate,version}]})
+  const before = {'old.jar':jar('example:transitive','2.9.0')}
+  const after = {'new.jar':jar('example:transitive','3.0.0'), 'duplicate.jar':jar('example:transitive','3.0.0')}
+  assert.deepEqual(m.majorWarnings(before,after), ['WARNING: Major version selected for example:transitive: 2.9.0 -> 3.0.0; compatibility review required'])
+  for (const version of ['2.10.0','2.9.1','1.0.0']) assert.deepEqual(m.majorWarnings(before,{'new.jar':jar('example:transitive',version)}),[])
+  assert.deepEqual(m.majorWarnings({},after),[])
+})
+
+test('native adapter preserves legacy JARs and supports JSON packages', {skip:!fs.existsSync(oaf)}, t => {
+  const f = fixture(t,{adapter:{packageFile:'.package.json',preserveJars:['lib/legacy.jar']}})
+  fs.writeFileSync(path.join(f.dir,'Sample/.package.json'),JSON.stringify({name:'Sample',version:'20200101',files:[],filesHash:{}}))
+  fs.unlinkSync(path.join(f.dir,'Sample/.package.yaml'))
+  const legacy = fs.readFileSync(path.join(__dirname,'fixtures/mavenMaintenance/kafka-clients-4.3.1.jar'))
+  fs.writeFileSync(path.join(f.dir,'Sample/lib/legacy.jar'),legacy)
+  const result = f.run()
+  if (result.candidate) t.after(() => fs.rmSync(result.candidate,{recursive:true,force:true}))
+  assert.equal(result.exitCode,0,JSON.stringify(result))
+  assert.deepEqual(fs.readFileSync(path.join(f.dir,'Sample/lib/legacy.jar')),legacy)
+  const pkg = JSON.parse(fs.readFileSync(path.join(f.dir,'Sample/.package.json'),'utf8'))
+  assert.ok(pkg.files.includes('lib/legacy.jar'))
+  assert.ok(pkg.filesHash['lib/legacy.jar'])
+})
+
+test('native adapter plans stable compiler output names', {skip:!fs.existsSync(oaf)}, t => {
+  const f = fixture(t,{adapter:{manifests:{'lib/.maven.yaml':{templates:{'org.apache.kafka:kafka-clients':'compiler11.jar'}}}}})
+  const result = f.run('plan')
+  assert.equal(result.exitCode,0,JSON.stringify(result))
+  assert.equal(result.opacks[0].dependencies[0].template,'compiler11.jar')
 })
