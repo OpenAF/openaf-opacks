@@ -125,7 +125,21 @@
       }
     },
     "GoogleCompiler": {
-      "blockedReason": "GoogleCompiler ships separate Java baseline compiler.jar/compiler11.jar outputs. A reviewed adapter is required to preserve their runtime selection before automatic updates."
+      "packageFile": ".package.json",
+      "preserveJars": [
+        "compiler.jar"
+      ],
+      "manifests": {
+        ".maven.yaml": {
+          "templates": {
+            "com.google.javascript:closure-compiler": "compiler11.jar"
+          }
+        }
+      },
+      "expected": [
+        "compiler.jar",
+        "compiler11.jar"
+      ]
     },
     "Maven": {
       "tests": [
@@ -137,6 +151,56 @@
           ]
         }
       ]
+    }
+  },
+  "trackedPom": {
+    "org.openjfx:javafx-base": {
+      "consumers": [
+        "plugin-DesktopJavaFX"
+      ],
+      "reason": "Platform artifacts maintained together in javafx-lock.json."
+    },
+    "org.openjfx:javafx-graphics": {
+      "consumers": [
+        "plugin-DesktopJavaFX"
+      ],
+      "reason": "Platform artifacts maintained together in javafx-lock.json."
+    },
+    "org.openjfx:javafx-controls": {
+      "consumers": [
+        "plugin-DesktopJavaFX"
+      ],
+      "reason": "Platform artifacts maintained together in javafx-lock.json."
+    },
+    "org.openjfx:javafx-media": {
+      "consumers": [
+        "plugin-DesktopJavaFX"
+      ],
+      "reason": "Platform artifacts maintained together in javafx-lock.json."
+    },
+    "org.bouncycastle:bcprov-jdk18on": {
+      "consumers": [
+        "BouncyCastle"
+      ],
+      "reason": "Transitive dependency of bcpkix-jdk18on; refreshed with its bundle."
+    },
+    "org.bouncycastle:bcutil-jdk18on": {
+      "consumers": [
+        "BouncyCastle"
+      ],
+      "reason": "Transitive dependency of bcpkix-jdk18on; refreshed with its bundle."
+    },
+    "com.ibm.etcd:etcd-java": {
+      "consumers": [],
+      "reason": "Legacy tracking entry; etcd3 now consumes io.etcd:jetcd-core."
+    },
+    "org.jetbrains:annotations": {
+      "consumers": [
+        "plugin-Ignite",
+        "mdconvert",
+        "cq"
+      ],
+      "reason": "Bundled transitive dependency; refreshed with consumer bundles."
     }
   }
 }

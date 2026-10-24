@@ -20,11 +20,17 @@ if (__expr.match(/--update/)) {
 }
 
 if (isUnDef(classPath)) {
-	var majorVersion = ow.format.getJavaVersion().match(/^\d+/)[0]
-	var jarFile
-
-	if (majorVersion < 11) jarFile = "compiler.jar"; else jarFile = "compiler11.jar"
-	classPath = getOPackPath("GoogleCompiler") + "/" + jarFile;
+  var majorVersion = Number(String(java.lang.System.getProperty("java.specification.version")).replace(/^1\./, ""))
+  var compilerPath = getOPackPath("GoogleCompiler")
+  plugin("ZIP")
+  var zip = new ZIP()
+  var requiredJava
+  try {
+    var header = zip.streamGetFile(compilerPath + "/compiler11.jar", "com/google/javascript/jscomp/CommandLineRunner.class")
+    requiredJava = ((header[6] & 255) * 256 + (header[7] & 255)) - 44
+  } finally { zip.close() }
+  var jarFile = majorVersion >= requiredJava ? "compiler11.jar" : "compiler.jar"
+  classPath = compilerPath + "/" + jarFile;
 	classPath = classPath.replace(/\\/g, "/");
 }
 

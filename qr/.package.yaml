@@ -18,7 +18,7 @@ name: QR
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260822'
+version: '20261024'
 dependencies:
   openaf: '>=20241117'
 files:
@@ -34,7 +34,7 @@ files:
 - oafp_qr.js
 - qr.js
 filesHash:
-  .maven.yaml: ecf6b270b9c8c89a4ab3e48a10dabdabdf54cf50
+  .maven.yaml: 96380e5b41f95efff7d2ea65bf0ac6a69fafc927
   .odoc.db: 4618798f416142ae9a7dac8ca6f79f0a05e813f7
   .precompile: 87d0b8c5672656702f3a8a3230f916cbbede5086
   FORMATS.md: f592f5886280737bd45255652789c62a1ad46094
