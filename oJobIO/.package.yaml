@@ -50,9 +50,6 @@ files:
 - rebuild.yaml
 - server.yaml
 - setupOJobIO.yaml
-- tests/launcher.test.js
-- tests/remote.js
-- tests/terminal.py
 filesHash:
   Dockerfile: e7a50ba6f42ef79d70b0c309a7eadd9aa7dd7df0
   README.md: caae8a8a5eb8a0671232c8881d01b276e45bb595
@@ -81,6 +78,3 @@ filesHash:
   rebuild.yaml: 061e417a19aa862c7140e3550a753a91e0bd230a
   server.yaml: d830d18791ab3c5606f8c5997a24504b64734051
   setupOJobIO.yaml: e6f404c4607607e34a0a122655359bf57aa06039
-  tests/launcher.test.js: b6b27428ac049f3022154f2a27380d2a10615dde
-  tests/remote.js: cfb199671b43299fb9b8d107250dc6f927a447b8
-  tests/terminal.py: d3f21023dfc6baf4e973bbd69713c1c167ea0a78

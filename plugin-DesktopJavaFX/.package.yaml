@@ -37,10 +37,6 @@ files:
 - javafx-lock.json
 - src/openaf/desktop/javafx/DesktopBootstrap.java
 - src/openaf/desktop/javafx/DesktopRuntime.java
-- tests/autoTestAll.DesktopJavaFX.js
-- tests/autoTestAll.DesktopJavaFX.yaml
-- tests/benchmark.yaml
-- tests/probe.yaml
 filesHash:
   .gitignore: 972bc7782ae396f3a4d9e0b815de984c58665cde
   .maven.yaml: 1c1f71a82ce220dcbc0c3d3dd840f2246e036ff6
@@ -56,7 +52,3 @@ filesHash:
   javafx-lock.json: f2a194da57ab6d2acde62811679d605d3a63942f
   src/openaf/desktop/javafx/DesktopBootstrap.java: 88a7082272f9ae86dab9634fdd46ad72aaa94e86
   src/openaf/desktop/javafx/DesktopRuntime.java: a73a84f6a513f42e3416102baa6b7744da9f46f6
-  tests/autoTestAll.DesktopJavaFX.js: 2daffbcd05bd3b79f355b9b5f88c7fcf7dac30a2
-  tests/autoTestAll.DesktopJavaFX.yaml: ea1605871fe55b2b00cca8814b8db3ffdcc121c5
-  tests/benchmark.yaml: b62c72ae61921912295f3d7d65b3a8813a92a71f
-  tests/probe.yaml: 93e1ae15e793830c8d15198c74a0a2a8d77ec4d3
