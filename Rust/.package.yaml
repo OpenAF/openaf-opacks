@@ -24,8 +24,6 @@ files:
 - .package.yaml
 - README.md
 - rust.yaml
-- tests/regression.js
 filesHash:
   README.md: eecc4162bf7d60d4e16ed9aca76d9b597c9045a8
   rust.yaml: 1dca583804b70e0b8d3f196274c980d94d942528
-  tests/regression.js: 1c26983c4f7b2e6ae5c0febddf933c351d90cc4d

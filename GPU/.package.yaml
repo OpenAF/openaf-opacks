@@ -26,22 +26,8 @@ dependencies:
 files:
 - .gitignore
 - .package.yaml
-- GPU-20261011.opack
 - README.md
 - build.yaml
-- build/classes/openaf/opacks/gpu/FunctionAccess.class
-- build/classes/openaf/opacks/gpu/GPUException.class
-- build/classes/openaf/opacks/gpu/MetalBackend.class
-- build/classes/openaf/opacks/gpu/OpenCLApi$SizeT.class
-- build/classes/openaf/opacks/gpu/OpenCLApi.class
-- build/classes/openaf/opacks/gpu/OpenCLBackend$Device.class
-- build/classes/openaf/opacks/gpu/OpenCLBackend$Execution.class
-- build/classes/openaf/opacks/gpu/OpenCLBackend$Kernel.class
-- build/classes/openaf/opacks/gpu/OpenCLBackend$Probe.class
-- build/classes/openaf/opacks/gpu/OpenCLBackend.class
-- build/classes/openaf/opacks/gpu/TypedArrayAccess$Guard.class
-- build/classes/openaf/opacks/gpu/TypedArrayAccess$StorageOrder.class
-- build/classes/openaf/opacks/gpu/TypedArrayAccess.class
 - examples/adaptive.js
 - examples/automatic.js
 - examples/benchmark.js
@@ -67,22 +53,8 @@ files:
 - src/native/metal.m
 filesHash:
   .gitignore: 7467e30ab741d3fed93ca6f43c0e40b466c670d9
-  GPU-20261011.opack: ec51b9097be116ab87f8d4afdb62ab4d14fd464c
   README.md: 15d1d11a3aac11497121ff714539ff9ff59507d4
   build.yaml: 1f0dac4b4bc7d3f0922e3721a340568cef858d0b
-  build/classes/openaf/opacks/gpu/FunctionAccess.class: a6d6afc275d7f526e492f4e19791aec28f387fbd
-  build/classes/openaf/opacks/gpu/GPUException.class: 88c4c5430e2a5a12e56b377ff30545890fffdbdd
-  build/classes/openaf/opacks/gpu/MetalBackend.class: a0bdd575c29c646626c324f0f03e06f6430c8b0f
-  build/classes/openaf/opacks/gpu/OpenCLApi$SizeT.class: de2e7bb6485fedff6a203e87a004745b2d19389d
-  build/classes/openaf/opacks/gpu/OpenCLApi.class: 709b38c5afee8f676aeba30c45617148b9106dd2
-  build/classes/openaf/opacks/gpu/OpenCLBackend$Device.class: 5fecf00619bc4ef020168a2b169295b18d3f5fd8
-  build/classes/openaf/opacks/gpu/OpenCLBackend$Execution.class: 2c706a69d09e7e4cf6d81d4018b4a9249cb12c9b
-  build/classes/openaf/opacks/gpu/OpenCLBackend$Kernel.class: 094bcc53c666e7f7fd174ca9b0eafff9e721e611
-  build/classes/openaf/opacks/gpu/OpenCLBackend$Probe.class: 09b5d6bb178be948626041d05813e2691fe095b7
-  build/classes/openaf/opacks/gpu/OpenCLBackend.class: 72edb75fdeac7ac3b311e77f5759a96197a08bd1
-  build/classes/openaf/opacks/gpu/TypedArrayAccess$Guard.class: 835fac2c987efc2abdcf7b1e893543e2ab164602
-  build/classes/openaf/opacks/gpu/TypedArrayAccess$StorageOrder.class: 67c6b8b0c9f15ffd67033a8e000a2d310944bb67
-  build/classes/openaf/opacks/gpu/TypedArrayAccess.class: 518beaef86343aa55ec38cbae1acdafc9e759a5d
   examples/adaptive.js: 8086e6422d925ca46f891c19835a74f6948fb2e9
   examples/automatic.js: d6c59492638f5732d3c4eef59e3c4148a969f766
   examples/benchmark.js: e723efc6a7e75cf92a65db9c461c49b3bb762e42
