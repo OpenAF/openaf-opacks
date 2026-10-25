@@ -95,6 +95,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ch | An OpenAF channel format |
 | csv | A CSV format (auto-detected) |
 | db | A JDBC query to a database |
+| dsv | A DSV (Delimiter Separated Values) format |
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
 | ini | INI/Properties format |
@@ -376,6 +377,12 @@ Use _file=_ or _cmd=_ with _hsperfmetadata=true_. Select _path=header_ or _path=
 
 ---
 
+### 🧾 Javas input options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| javasinception | Boolean | If true includes oafp itself in the local Java process list |
+
 ### 🧾 JFR input options
 
 List of options to use when _in=jfr_:
@@ -599,6 +606,12 @@ List of options to use when _in=ndslon_:
 
 ---
 
+### 🧾 OAFP input options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inoafpseq | Boolean | If true processes an input array of oafp parameter maps sequentially |
+
 ### 🧾 RAWHEX input options
 
 List of options to use when _in=rawhex_:
@@ -714,9 +727,19 @@ List of options to use when _in=base64_ or _out=base64_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| base64gzip | Boolean | If true the contents will thet gzip/gunzip respectively to reduce the size of the base64 output |
+| base64gzip | Boolean | If true, gzip before Base64 encoding or gunzip after Base64 decoding |
 
 ---
+
+Base64 conversions use bounded conversion buffers for files, stdin, commands, URLs, and `data`.
+Direct `in=raw out=base64` output streams automatically when no filtering, transformation,
+paging, or `pipe` requires a complete value. Text encodings and stdin line normalization
+are preserved. JSON parsing, object serialization, paging, and `pipe` can still require
+complete strings or objects; streaming removes intermediate byte arrays rather than
+making those operations constant-memory. GZIP and Base64 are composed without an
+intermediate compressed array. Direct raw conversions stage file output before
+replacement or append, preserving data when the source reads the same destination.
+Archive-entry paths retain the existing buffered reader.
 
 ### 🧾 CSV input/output options
 
@@ -724,6 +747,14 @@ List of options to use with the _inputcsv_ input option (when input type=csv) an
 
 | Option | Type | Description |
 |--------|------|-------------|
+| inputcsv | String/Map | CSV input configuration as JSON/SLON |
+| incsv | String/Map | Alias for inputcsv |
+| csv | String/Map | CSV output configuration as JSON/SLON |
+
+The configuration map supports these fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
 | format | String | You can choose between DEFAULT, EXCEL, INFORMIX_UNLOAD, INFORMIX_UNLOAD_CSV, MYSQL, RFC4180, ORACLE, POSTGRESQL_CSV, POSTGRESQL_TEXT and TDF |
 | withHeader | Boolean | If true tries to automatically use the available header |
 | withHeaders | Array | A list of headers to use with the corresponding order |
@@ -1290,6 +1321,12 @@ List of options to use when _out=md_:
 | mdformat | String | For map or array values: `structured` (default) renders headings, scalar tables, and lists; `json` or `yaml` emits the value in a fenced code block. |
 
 ---
+
+### 🧾 OAF output options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| outoaf | String | OpenAF code or a script file to execute with the transformed input as data |
 
 ### 🧾 PXML output options
 

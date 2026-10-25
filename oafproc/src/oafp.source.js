@@ -227,7 +227,7 @@ const _llmDecisionSetup = (decisionOptions, context) => {
         if (isDef(opts) && Object.prototype.hasOwnProperty.call(opts, "images"))
             _exit(-1, context + " cannot combine llmimage with options.images")
         if (isUnDef(opts)) opts = {}
-        opts.images = [af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))]
+        opts.images = [_codecs.encodeFile(params.llmimage)]
     }
     var env = _$(params.llmenv, "llmenv").isString().default("OAFP_MODEL")
     if (env == "OAFP_MODEL" && isUnDef(getEnv(env)) && isDef(getEnv("OAF_DECIDE_MODEL"))) env = "OAF_DECIDE_MODEL"
@@ -439,8 +439,8 @@ const _withCommandStream = (cmd, fn) => {
     // A very short-lived child may finish before OpenAF invokes its stream callback.
     if (!called) {
         if (commandResult.stderr) _progressGuard(() => { _eraseProgress(); printErr(commandResult.stderr) })
-        var stream = af.fromString2InputStream(commandResult.stdout || "")
-        try { return fn(stream) } finally { stream.close() }
+        var stream = _codecs.textInput(commandResult.stdout || "")
+        try { return fn(stream, String(java.nio.charset.Charset.defaultCharset().name())) } finally { stream.close() }
     }
     return result
 }
@@ -495,7 +495,7 @@ var _inputBuffered = false
 const _withInputStream = (res, fn) => {
     // stdin/cmd can only be consumed once: stream from what was already buffered instead
     if (_inputBuffered && isString(res)) {
-        var bstream = af.fromString2InputStream(res)
+        var bstream = _codecs.textInput(res)
         try { return fn(bstream) } finally { bstream.close() }
     }
     if (isDef(params.file) && isUnDef(params.cmd)) {
@@ -503,7 +503,7 @@ const _withInputStream = (res, fn) => {
     }
     if (isDef(params.cmd)) return _withCommandStream(params.cmd, fn)
     if (isDef(params.data) || isDef(params.url) || _version) {
-        var stream = af.fromString2InputStream(res)
+        var stream = _codecs.textInput(res)
         try { return fn(stream) } finally { stream.close() }
     }
     return fn(java.lang.System.in)
@@ -657,6 +657,283 @@ const _jsonLineFramer = () => {
     }
     frame.end = () => { if (buffer.trim().length > 0) throw "Incomplete NDJSON record" }
     return frame
+}
+
+// All codecs leave caller-owned streams open. The fallback keeps older runtimes usable.
+const _codecs = typeof __streamCodec != "undefined" ? __streamCodec : (() => {
+  var IO = Packages.org.apache.commons.io, Codec = Packages.org.apache.commons.codec.binary
+  var charset = value => java.nio.charset.Charset.forName(String(value || java.nio.charset.Charset.defaultCharset().name()))
+  var use = (resources, fn) => {
+    var result, failure, failed = false
+    try { result = fn() } catch(e) { failure = e; failed = true }
+    resources.forEach(resource => {
+      try { resource.close() } catch(e) {
+        if (!failed) { failure = e; failed = true }
+        else {
+          try { (failure.javaException || failure).addSuppressed(e.javaException || e) } catch(ignore) {}
+        }
+      }
+    })
+    if (failed) throw failure
+    return result
+  }
+  var textInput = (text, encoding) => new IO.input.ReaderInputStream(new java.io.StringReader(String(text)), charset(encoding))
+  var textOutput = (writer, encoding) => new IO.output.WriterOutputStream(writer, charset(encoding))
+  var copy = (input, output) => { IO.IOUtils.copyLarge(input, output); output.flush() }
+  var encode = (input, output, gzip) => {
+    if (!gzip && isFunction(af.toBase64Stream)) return af.toBase64Stream(input, output, true)
+    var base64 = new Codec.Base64OutputStream(IO.output.CloseShieldOutputStream.wrap(output), true, 0, null)
+    use([base64], () => {
+      if (gzip) {
+        if (isFunction(io.gzipStream)) io.gzipStream(input, base64, true)
+        else {
+          var zipped = new java.util.zip.GZIPOutputStream(IO.output.CloseShieldOutputStream.wrap(base64))
+          use([zipped], () => copy(input, zipped))
+        }
+      } else copy(input, base64)
+    })
+    output.flush()
+  }
+  var decode = (input, output, gzip) => {
+    if (!gzip && isFunction(af.fromBase64Stream)) return af.fromBase64Stream(input, output, true)
+    var base64 = new Codec.Base64InputStream(IO.input.CloseShieldInputStream.wrap(input), false)
+    use([base64], () => {
+      if (gzip) {
+        if (isFunction(io.gunzipStream)) io.gunzipStream(base64, output, true)
+        else {
+          var zipped = new java.util.zip.GZIPInputStream(IO.input.CloseShieldInputStream.wrap(base64))
+          use([zipped], () => copy(zipped, output))
+        }
+      } else copy(base64, output)
+    })
+    output.flush()
+  }
+  var toText = (input, convert, encoding) => {
+    var writer = new java.io.StringWriter(), output = textOutput(writer, encoding)
+    use([output], () => convert(input, output))
+    return String(writer.toString())
+  }
+  var fileInput = file => {
+    if (String(file).indexOf("::") < 0) return io.readFileStream(file)
+    plugin("ZIP")
+    var split = String(file).indexOf("::"), zip = new ZIP()
+    return zip.streamGetFileStream(String(file).substring(0, split), String(file).substring(split + 2))
+  }
+  return {
+    use: use, textInput: textInput, textOutput: textOutput, copy: copy,
+    encode: encode, decode: decode, fileInput: fileInput,
+    encodeText: (text, output, gzip) => {
+      var input = textInput(text)
+      return use([input], () => encode(input, output, gzip))
+    },
+    encodeToString: (input, gzip) => toText(input, (i, o) => encode(i, o, gzip), "US-ASCII"),
+    decodeToString: (input, gzip) => toText(input, (i, o) => decode(i, o, gzip)),
+    encodeFile: file => {
+      var input = fileInput(file)
+      return use([input], () => toText(input, (i, o) => encode(i, o, false), "US-ASCII"))
+    },
+    gzipText: (text, output) => {
+      var input = textInput(text)
+      return use([input], () => {
+        if (isFunction(io.gzipStream)) return io.gzipStream(input, output, true)
+        var zipped = new java.util.zip.GZIPOutputStream(IO.output.CloseShieldOutputStream.wrap(output))
+        return use([zipped], () => copy(input, zipped))
+      })
+    },
+    gunzipText: input => toText(input, (i, o) => {
+      if (isFunction(io.gunzipStream)) return io.gunzipStream(i, o, true)
+      var zipped = new java.util.zip.GZIPInputStream(IO.input.CloseShieldInputStream.wrap(i))
+      return use([zipped], () => copy(zipped, o))
+    })
+  }
+})()
+
+const _codecDestination = (fn, stage) => {
+    // Finish reading before replacing/appending a file: input and output may be aliases,
+    // or an opaque command/HTTP handler may still be reading the destination.
+    if (stage && isDef(params.outfile)) {
+        var temporary = io.createTempFile("oafp-base64-output-", ".tmp")
+        try {
+            var sink = io.writeFileStream(temporary)
+            _codecs.use([sink], () => fn(sink))
+            var source = io.readFileStream(temporary)
+            return _codecs.use([source], () => _codecDestination(output => _codecs.copy(source, output), false))
+        } finally { io.rm(temporary) }
+    }
+    // Never hold the progress lock while consuming input: command stderr drains
+    // need that lock too, and a full stderr pipe would otherwise deadlock stdout.
+    _clearTmpMsg()
+    if (isUnDef(params.outfile)) {
+        if (toBoolean(params.loopcls)) _progressGuard(() => cls())
+        fn(java.lang.System.out)
+        _progressGuard(() => print(""))
+    } else if (isDef(global.__oafp_streams) && isDef(global.__oafp_streams[params.outfile])) {
+        var stream = global.__oafp_streams[params.outfile].s
+        fn(stream)
+        if (toBoolean(params.outfileappend)) _progressGuard(() => ioStreamWrite(stream, "\n"))
+    } else {
+        var stream = io.writeFileStream(params.outfile)
+        _codecs.use([stream], () => fn(stream))
+    }
+}
+const _codecOutput = (value, gzip) => {
+    var text = isString(value) ? value : stringify(value)
+    if (isDef(params.pipe) || toBoolean(params.pause)) {
+        var input = _codecs.textInput(text)
+        return _codecs.use([input], () => _print(_codecs.encodeToString(input, gzip)))
+    }
+    return _codecDestination(output => _codecs.encodeText(text, output, gzip))
+}
+// Match io.pipeLn: normalize CR/LF/CRLF and omit the final line terminator.
+// Work in UTF-8 so newline bytes cannot occur inside another encoded character.
+const _codecStdin = source => {
+    var utf8 = new Packages.org.apache.commons.io.input.ReaderInputStream(
+        new java.io.InputStreamReader(Packages.org.apache.commons.io.input.CloseShieldInputStream.wrap(source)),
+        java.nio.charset.StandardCharsets.UTF_8)
+    var raw = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 8192)
+    var chunk, position = 0, pending = false, skipLF = false, ended = false
+    var fill = () => {
+        while (!ended && (isUnDef(chunk) || position >= chunk.length)) {
+            var count = utf8.read(raw)
+            if (count < 0) { ended = true; break }
+            var text = new java.lang.String(raw, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1)
+            if (skipLF && text.startsWith("\n")) text = text.substring(1)
+            skipLF = text.endsWith("\r")
+            text = String(text.replaceAll("\r\n?", "\n"))
+            if (pending) text = "\n" + text
+            pending = text.endsWith("\n")
+            if (pending) text = text.substring(0, text.length - 1)
+            chunk = new java.lang.String(text).getBytes(java.nio.charset.StandardCharsets.ISO_8859_1)
+            position = 0
+        }
+        return isDef(chunk) && position < chunk.length
+    }
+    var normalized = new JavaAdapter(java.io.InputStream, {
+        read: function(buffer, offset, length) {
+            if (arguments.length == 0) return fill() ? chunk[position++] & 255 : -1
+            if (arguments.length == 1) { offset = 0; length = buffer.length }
+            if (length == 0) return 0
+            if (!fill()) return -1
+            var count = Math.min(length, chunk.length - position)
+            java.lang.System.arraycopy(chunk, position, buffer, offset, count)
+            position += count
+            return count
+        },
+        close: function() { utf8.close() }
+    })
+    return new Packages.org.apache.commons.io.input.ReaderInputStream(
+        new java.io.InputStreamReader(normalized, java.nio.charset.StandardCharsets.UTF_8),
+        java.nio.charset.Charset.defaultCharset())
+}
+const _withCodecSource = (res, fn) => {
+    if ((_inputBuffered && isString(res)) || isDef(params.data)) {
+        var input = _codecs.textInput(res)
+        return _codecs.use([input], () => fn(input))
+    }
+    if (isDef(params.url) && !_inputBuffered) {
+        // Keep HEAD metadata and JSON-valued REST responses on their existing path.
+        var hp = Object.assign({}, _fromJSSLON(_$(params.urlparams).or().isString().isMap().default("{}")))
+        var method = String(params.urlmethod || "GET").toLowerCase()
+        if (method == "head") return false
+        ow.loadObj()
+        var owned = isUnDef(hp.httpClient)
+        var client = hp.httpClient || ow.obj.rest.connectionFactory()
+        hp.httpClient = client
+        var rest = $rest(hp), body = isDef(params.urldata) ? _fromJSSLON(params.urldata) : __
+        return _codecs.use(owned ? [client] : [], () => {
+            var stream
+            if (method == "post") stream = rest.post2Stream(params.url, body)
+            else if (method == "put") stream = rest.put2Stream(params.url, body)
+            else if (method == "delete") stream = rest.delete2Stream(params.url)
+            else stream = rest.get2Stream(params.url)
+            if (!isJavaObject(stream) || !isFunction(stream.read)) {
+                // The REST default/error response is already materialized.
+                var input = _codecs.textInput(isObject(stream) ? stringify(stream, __, "") : String(stream))
+                return _codecs.use([input], () => fn(input, String(java.nio.charset.Charset.defaultCharset().name())))
+            }
+            return _codecs.use([stream], () => {
+                var buffered = new java.io.BufferedInputStream(stream)
+                buffered.mark(8192)
+                var head = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 4)
+                var size = Packages.org.apache.commons.io.IOUtils.read(buffered, head)
+                buffered.reset()
+                var b = index => Number(head[index]) & 255
+                var type = isFunction(client.responseType) ? String(client.responseType() || "") : ""
+                var match = type.match(/charset\s*=\s*["']?([^;"'\s]+)/i), encoding = match ? match[1] : "UTF-8"
+                try { encoding = String(java.nio.charset.Charset.forName(encoding).name()) } catch(ignore) { encoding = "UTF-8" }
+                var skip = 0
+                if (size >= 4 && b(0) == 0 && b(1) == 0 && b(2) == 254 && b(3) == 255) { encoding = "UTF-32BE"; skip = 4 }
+                else if (size >= 4 && b(0) == 255 && b(1) == 254 && b(2) == 0 && b(3) == 0) { encoding = "UTF-32LE"; skip = 4 }
+                else if (size >= 3 && b(0) == 239 && b(1) == 187 && b(2) == 191) { encoding = "UTF-8"; skip = 3 }
+                else if (size >= 2 && b(0) == 254 && b(1) == 255) { encoding = "UTF-16BE"; skip = 2 }
+                else if (size >= 2 && b(0) == 255 && b(1) == 254) { encoding = "UTF-16LE"; skip = 2 }
+                var decodedText
+                if (skip || encoding != "UTF-8") {
+                    if (skip) buffered.skip(skip)
+                    var writer = new java.io.StringWriter()
+                    Packages.org.apache.commons.io.IOUtils.copy(new java.io.InputStreamReader(buffered, encoding), writer)
+                    decodedText = String(writer.toString())
+                }
+                var first = -1, scanned = 0
+                do { first = buffered.read(); scanned++ } while (first >= 0 && first <= 32 && scanned < 8192)
+                if (isUnDef(decodedText)) buffered.reset()
+                if (isDef(decodedText) || scanned >= 8192 || (first >= 0 && '{["-0123456789tfn'.indexOf(String.fromCharCode(first)) >= 0)) {
+                    var text = isDef(decodedText) ? decodedText : af.fromInputStream2String(buffered, "UTF-8")
+                    var parsed = jsonParse(text)
+                    if (isObject(parsed)) text = stringify(parsed, __, "")
+                    else if (isString(parsed)) text = parsed
+                    else if (params.type == "raw") {
+                        if (parsed == null) return
+                        text = stringify(parsed, __, "")
+                    } else {
+                        // Preserve legacy REST scalar/error behavior; these are not text payloads.
+                        var bytes = af.fromBase64(parsed)
+                        if (params.type == "gb64json" || toBoolean(params.base64gzip)) bytes = io.gunzip(bytes)
+                        return _$o(af.fromBytes2String(bytes), options)
+                    }
+                    var input = _codecs.textInput(text)
+                    return _codecs.use([input], () => fn(input, String(java.nio.charset.Charset.defaultCharset().name())))
+                }
+                return fn(buffered, "UTF-8")
+            })
+        })
+    }
+    if (isUnDef(params.file) && isUnDef(params.cmd) && isUnDef(params.data) && !_inputBuffered) {
+        var input = _codecStdin(java.lang.System.in)
+        return _codecs.use([input], () => fn(input))
+    }
+    return _withInputStream(res, fn)
+}
+const _tryRawCodec = () => {
+    if ((isString(params.file) && params.file.indexOf("::") >= 0) || params.type != "raw" || ["base64", "gb64json"].indexOf(params.format) < 0 ||
+        _activeTransforms.length || Object.keys(options).some(key =>
+            ["__ijq", "__ojq", "__ifrom", "__isql", "__path", "__from", "__sql", "__opath"].indexOf(key) >= 0 && isDef(options[key])) ||
+        isDef(params.pipe) || toBoolean(params.pause) ||
+        toBoolean(params._shebang) || isDef(params.outkey) || isDef(params.outputkey) ||
+        isDef(params.idescrecipe) || isDef(params.jsonprefix) || toBoolean(params.jsondesc)) return false
+    var gzip = params.format == "gb64json" || toBoolean(params.base64gzip)
+    if (isDef(params.url) && String(params.urlmethod || "GET").toLowerCase() == "head") return false
+    if (isDef(params.insecure) && toBoolean(params.insecure)) ow.loadJava().setIgnoreSSLDomains()
+    _withCodecSource(isString(params.data) ? params.data : "", (input, encoding) => {
+        // File/raw text is decoded as before, then re-encoded in the runtime charset.
+        var source = input
+        if (isDef(params.file) || isDef(params.cmd) || isDef(params.url)) source = new Packages.org.apache.commons.io.input.ReaderInputStream(
+            new java.io.InputStreamReader(Packages.org.apache.commons.io.input.CloseShieldInputStream.wrap(input), encoding || _cs || "UTF-8"),
+            java.nio.charset.Charset.defaultCharset())
+        _codecs.use(source === input ? [] : [source], () => _codecDestination(output => _codecs.encode(source, output, gzip), true))
+    })
+    return true
+}
+const _codecInput = (res, options, gzip) => {
+    _showTmpMsg()
+    _withCodecSource(res, (input, encoding) => {
+        var charset = encoding || ((isDef(params.file) || isDef(params.cmd)) && !_inputBuffered
+            ? _cs || "UTF-8" : String(java.nio.charset.Charset.defaultCharset().name()))
+        var source = new Packages.org.apache.commons.io.input.ReaderInputStream(
+            new java.io.InputStreamReader(Packages.org.apache.commons.io.input.CloseShieldInputStream.wrap(input), charset),
+            java.nio.charset.StandardCharsets.UTF_8)
+        return _codecs.use([source], () => _$o(_codecs.decodeToString(source, gzip), options))
+    })
 }
 
 // Interactive description: OpenAF owns parsing, prompts, queries and rendering.
@@ -3553,28 +3830,8 @@ var _outputFns = new Map([
             _o$o(r, options)
         }
     }],
-    ["base64", (r, options) => {
-        var _o = ""
-        if (isString(r))
-            _o = r
-        else
-            _o = stringify(r)
-
-        if (toBoolean(params.base64gzip)) {
-            _print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
-        } else {
-            _print(af.fromBytes2String(af.toBase64Bytes(_o)))
-        }
-    }],
-    ["gb64json", (r, options) => {
-        var _o = ""
-        if (isString(r))
-            _o = r
-        else
-            _o = stringify(r)
-
-        _print(af.fromBytes2String(af.toBase64Bytes(io.gzip(af.fromString2Bytes(_o)))))
-    }],
+    ["base64", (r, options) => _codecOutput(r, toBoolean(params.base64gzip))],
+    ["gb64json", (r, options) => _codecOutput(r, true)],
     ["jwt", (r, options) => {
         if (isMap(r)) {
             if (isUnDef(params.jwtsecret) && isUnDef(params.jwtprivkey)) _exit(-1, "For out=jwt you need to provide a jwtsecret or a jwtprivkey")
@@ -5061,22 +5318,8 @@ var _inputFns = new Map([
         })
         _$o(__r, options)
     }],
-    ["base64", (_res, options) => {
-        var _r
-        _showTmpMsg()
-        if (toBoolean(params.base64gzip)) {
-            _r = af.fromBytes2String(io.gunzip(af.fromBase64(_res, true)))
-        } else {
-            _r = af.fromBytes2String(af.fromBase64(_res))
-        }
-        _$o(_r, options)
-    }],
-    ["gb64json", (_res, options) => {
-        var _r
-        _showTmpMsg()
-        _r = af.fromBytes2String(io.gunzip(af.fromBase64(_res, true)))
-        _$o(_r, options)
-    }],
+    ["base64", (r, options) => _codecInput(r, options, toBoolean(params.base64gzip))],
+    ["gb64json", (r, options) => _codecInput(r, options, true)],
     ["oaf", (_res, options) => {
         if (!isString(_res)) _exit(-1, "oaf is only supported with a string.")
         _showTmpMsg()
@@ -5233,9 +5476,9 @@ var _inputFns = new Map([
         let img
         if (isString(params.llmimage)) {
             if (params.llmimage.toLowerCase().match(/^https?:\/\//))
-                img = af.fromBytes2String(af.toBase64Bytes(af.fromInputStream2Bytes($rest().get2Stream(params.llmimage))))
+                img = (function() { var input = $rest().get2Stream(params.llmimage); return _codecs.use([input], () => _codecs.encodeToString(input)); })()
             else if (io.fileExists(params.llmimage))
-                img = af.fromBytes2String(af.toBase64Bytes(io.readFileBytes(params.llmimage)))
+                img = _codecs.encodeFile(params.llmimage)
         } 
         if (params.out == "md" || params.out == "mdtable" || params.out == "raw") {
             __res = isDef(img) ? res.promptImage(_res, img) : res.prompt(_res)
@@ -5689,6 +5932,16 @@ var _run = () => {
     if (!_version && isDef(params.file) && params.file.indexOf("::") < 0 && !io.fileExists(params.file)) {
         _exit(-1, "ERROR: File not found: '" + params.file + "'")
     }
+    if (!_version && _tryRawCodec()) return
+    if (!_version && ["base64", "gb64json"].indexOf(params.type) >= 0 &&
+        (!isDef(params.url) || String(params.urlmethod || "GET").toLowerCase() != "head") &&
+        (!isString(params.file) || params.file.indexOf("::") < 0) &&
+        !toBoolean(params._shebang) && !params.jsondesc && !params.jsonprefix) {
+        if (isDef(params.insecure) && toBoolean(params.insecure)) ow.loadJava().setIgnoreSSLDomains()
+        _inputFns.get(params.type)(isString(params.data) ? params.data : "", options)
+        delete params.__origr
+        return
+    }
     // Stream-capable handlers own their input; do not first buffer it in _res.
     if (!_version && isUnDef(params.url) &&
         (["lines", "ndjson", "ndslon", "dsv", "csv"].indexOf(params.type) >= 0 ||
@@ -5822,6 +6075,7 @@ var _run = () => {
 
         // Determine input type and execute
         if (isDef(params.type) && _inputFns.has(params.type)) {
+            if (["base64", "gb64json"].indexOf(params.type) >= 0) _inputBuffered = true
             _inputFns.get(params.type)(_takeInput(), options)
         } else {
             if (isString(params.type)) printErr("WARN: " + params.type + " input type not supported. Using json.")
