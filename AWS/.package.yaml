@@ -81,7 +81,7 @@ filesHash:
   README.md: 33d9c0553bf869e4fe5a24876be9ebc5224ec836
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
-  aws_bedrock.js: e182d7d04ea4c7f59b56071d804a7e7b8ba83d57
+  aws_bedrock.js: 8cddf341eda598895439f2797361e648a72f1c80
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
