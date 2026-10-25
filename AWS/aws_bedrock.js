@@ -959,7 +959,26 @@ ow.ai.__gpttypes.bedrock = {
         return __r
       },
       promptImage: (aPrompt, aImage, aDetailLevel, aRole, aModel, aTemperature, aJsonFlag) => {
-        throw "Not implemented yet"
+        aRole = _$(aRole, "aRole").isString().default("user")
+        aModel = _$(aModel, "aModel").isString().default(_model)
+        if (!(aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0)) {
+          throw "Images are only supported for Anthropic Claude models on Bedrock (model: " + aModel + ")"
+        }
+
+        // aDetailLevel has no Claude equivalent and is ignored; InvokeModel does not accept url sources
+        var _att = ow.ai.__image.anthropicBlocks(aImage, ow.ai.__image.options(aOptions, "anthropic"), false)
+        var _content = _att.blocks.concat([ { type: "text", text: isArray(aPrompt) ? aPrompt.join("\n") : String(aPrompt) } ])
+
+        var __r = _r.rawPrompt([ { role: aRole, content: _content } ], aModel, aTemperature, aJsonFlag)
+
+        _lastStats = _lastStats || {}
+        _lastStats.images = _att.images
+
+        if (isMap(__r) && isArray(__r.content)) {
+          var _txt = __r.content.filter(c => isMap(c) && c.type == "text" && isString(c.text))
+          if (_txt.length > 0) return _txt.map(c => c.text).join("\n")
+        }
+        return __r
       },
       rawPrompt: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
         aPrompt = _$(aPrompt, "aPrompt").default("")
