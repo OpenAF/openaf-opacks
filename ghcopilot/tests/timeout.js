@@ -4,6 +4,9 @@ var start = source.indexOf('    var _sendAndWait = ')
 var end = source.indexOf('    var _extractUsage = ', start)
 var aOptions = { timeout: 1000 }
 var _setDebug = () => {}
+var _call = (obj, fn) => {
+  try { var value = fn(obj); return value === null ? __ : value } catch(e) { return __ }
+}
 var closed, aborted, unsubscribed, future, _session
 var event = (type, data, agent) => ({ getType: () => type, getData: () => data, getAgentId: () => agent || null })
 var user = id => event('user.message', { messageId: () => id })
@@ -33,6 +36,17 @@ var expected = answer('request-1')
 setup([idle(), user('other'), answer('other'), idle(), user('request-1'), answer('request-1', 'child'), idle('child'), expected, idle()])
 check(_sendAndWait({}) === expected, 'wrong response or premature idle completion')
 check(unsubscribed && !closed && !aborted, 'success cleanup incorrect')
+// Reproduce the reported CLI schema: user has no messageId and assistant
+// has its own messageId, but no originatingMessageId.
+var legacyUser = event('user.message', { content: () => 'user: 2+2', messageId: () => null })
+var legacyAnswer = event('assistant.message', { messageId: () => 'assistant-own-id', originatingMessageId: () => null })
+setup([event('session.start', null), idle(),
+  event('user.message', { content: () => 'other prompt' }), answer(null), idle(),
+  legacyUser, legacyAnswer, idle()])
+check(_sendAndWait({ getPrompt: () => 'user: 2+2' }) === legacyAnswer, 'ID-less CLI response not completed')
+// Missing accessor methods are supported as well as null accessor results.
+setup([event('user.message', { content: () => 'user: 2+2' }), event('assistant.message', {}), idle()])
+check(_sendAndWait({ getPrompt: () => 'user: 2+2' }) !== null, 'missing ID accessors not supported')
 setup([user('request-1'), event('session.error', { message: () => 'denied' })])
 try { _sendAndWait({}); throw 'expected error' } catch(e) { check(String(e).indexOf('denied') >= 0, 'session error lost') }
 check(unsubscribed, 'session error listener leaked')

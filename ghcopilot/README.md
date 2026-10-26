@@ -221,7 +221,10 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 ### Troubleshooting account-dependent timeouts
 
 Text, streaming, and image requests use `session.send()` and correlate response
-events with its returned message ID. They complete on the matching root session
+events with its returned message ID. For CLI event schemas that omit correlation
+IDs, the submitted prompt is matched against the root user-message content,
+then its assistant response is collected. Explicit mismatched IDs remain excluded.
+Use one prompt at a time per provider instance. Requests complete on the root session
 idle event, avoiding a stalled SDK `session.sendAndWait` completion RPC. The
 configured `timeout` covers both send acknowledgement and event completion. A timed-out request triggers a
 best-effort abort (up to one additional second waiting for acknowledgement) and

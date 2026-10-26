@@ -532,13 +532,19 @@ ow.ai.__gpttypes.ghcopilot = {
           _setDebug("session-event", { type: lastEvent })
           // Subagent messages and idle events must not complete the root request.
           var agentId = evt.getAgentId()
-          if (agentId !== null && String(agentId).length > 0) continue
+          if (isDef(agentId) && agentId !== null && String(agentId).length > 0) continue
           var data = isDef(evt.getData) ? evt.getData() : null
           if (lastEvent === "user.message" && data !== null) {
-            requestStarted = String(data.messageId()) === messageId
+            var userId = _call(data, d => d.messageId())
+            // Older CLI event schemas omit messageId/originatingMessageId.
+            // Match the submitted content only when the user ID is absent;
+            // an explicit ID belonging to another request must never match.
+            requestStarted = isDef(userId) && String(userId).length > 0
+              ? String(userId) === messageId
+              : String(_call(data, d => d.content())) === String(mo.getPrompt())
           } else if (lastEvent === "assistant.message" && data !== null) {
-            var origin = data.originatingMessageId()
-            if (origin !== null ? String(origin) === messageId : requestStarted) {
+            var origin = _call(data, d => d.originatingMessageId())
+            if (isDef(origin) && String(origin).length > 0 ? String(origin) === messageId : requestStarted) {
               requestStarted = true
               response = evt
             }
