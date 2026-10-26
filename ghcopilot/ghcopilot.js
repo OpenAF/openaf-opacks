@@ -503,24 +503,54 @@ ow.ai.__gpttypes.ghcopilot = {
       _sessionToolsKey = _currentToolsKey
     }
 
-    // Pass the deadline to the SDK too: its one-argument overload defaults to 60s.
+    // Use session.send plus correlated events: some CLI/account combinations emit
+    // session.idle but never resolve the newer session.sendAndWait RPC.
     var _sendAndWait = (mo) => {
       var session = _session
       var future = __
       var lastEvent = __
       var started = now()
+      var deadline = java.lang.System.nanoTime() + aOptions.timeout * 1000000
+      var events = new java.util.concurrent.LinkedBlockingQueue()
+      var remaining = () => {
+        var ns = deadline - java.lang.System.nanoTime()
+        if (ns <= 0) throw new java.util.concurrent.TimeoutException("Copilot request timed out after " + aOptions.timeout + "ms")
+        return ns
+      }
       var eventsClose = session.on(new JavaAdapter(java.util.function.Consumer, {
-        accept: function(evt) {
-          // Diagnostics must never interrupt SDK event dispatch.
-          try {
-            lastEvent = String(evt.getType())
-            _setDebug("session-event", { type: lastEvent })
-          } catch(ignore) {}
-        }
+        accept: function(evt) { events.offer(evt) }
       }))
       try {
-        future = session.sendAndWait(mo, aOptions.timeout)
-        return future.get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+        future = session.send(mo)
+        var messageId = String(future.get(remaining(), java.util.concurrent.TimeUnit.NANOSECONDS))
+        var requestStarted = false
+        var response = null
+        while (true) {
+          var evt = events.poll(remaining(), java.util.concurrent.TimeUnit.NANOSECONDS)
+          if (evt === null) throw new java.util.concurrent.TimeoutException("Copilot request timed out after " + aOptions.timeout + "ms")
+          lastEvent = String(evt.getType())
+          _setDebug("session-event", { type: lastEvent })
+          // Subagent messages and idle events must not complete the root request.
+          var agentId = evt.getAgentId()
+          if (agentId !== null && String(agentId).length > 0) continue
+          var data = isDef(evt.getData) ? evt.getData() : null
+          if (lastEvent === "user.message" && data !== null) {
+            requestStarted = String(data.messageId()) === messageId
+          } else if (lastEvent === "assistant.message" && data !== null) {
+            var origin = data.originatingMessageId()
+            if (origin !== null ? String(origin) === messageId : requestStarted) {
+              requestStarted = true
+              response = evt
+            }
+          } else if (lastEvent === "session.error" && data !== null) {
+            throw new java.lang.RuntimeException("Copilot session error: " + String(data.message()))
+          } else if (requestStarted && (lastEvent === "session.idle" || lastEvent === "session.autopilot_stopped")) {
+            if (data !== null && isDef(data.aborted) && java.lang.Boolean.TRUE.equals(data.aborted()))
+              throw new java.lang.RuntimeException("Copilot request was aborted")
+            if (lastEvent === "session.idle" && data !== null && isDef(data.mode) && String(data.mode()).toLowerCase() === "autopilot") continue
+            return response
+          }
+        }
       } catch(e) {
         var cause = e
         var timedOut = false

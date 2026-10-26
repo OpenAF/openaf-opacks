@@ -135,7 +135,7 @@ export OAF_MODEL="(type: ghcopilot, options: (model: gpt-4.1, timeout: 900000, t
 
 ## Tool use
 
-Register tools with `setTool` before prompting. The SDK's native `ToolDefinition` / `ToolHandler` mechanism is used, so the Copilot agent calls tools automatically during `sendAndWait`:
+Register tools with `setTool` before prompting. The SDK's native `ToolDefinition` / `ToolHandler` mechanism is used, so the Copilot agent calls tools automatically while processing the request:
 
 ```javascript
 llm.setTool(
@@ -220,8 +220,10 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 
 ### Troubleshooting account-dependent timeouts
 
-The configured `timeout` is passed to both the SDK request and the Java wait,
-including text, streaming, and image requests. A timed-out request triggers a
+Text, streaming, and image requests use `session.send()` and correlate response
+events with its returned message ID. They complete on the matching root session
+idle event, avoiding a stalled SDK `session.sendAndWait` completion RPC. The
+configured `timeout` covers both send acknowledgement and event completion. A timed-out request triggers a
 best-effort abort (up to one additional second waiting for acknowledgement) and
 retires its session; the next prompt creates a new session.
 
@@ -251,7 +253,7 @@ docker run --rm -ti -e OAF_MODEL=$OAF_MODEL my-image
 
 ## Notes
 
-- This opack uses the Java SDK session `sendAndWait` flow.
+- This opack uses the Java SDK `send` flow with correlated response and idle events.
 - `aJsonFlag=true` appends a JSON-only instruction and attempts to parse the answer.
 - Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, `getModelInfo(aModelId)`, `exportConversation()`, and `importConversation(...)`.
 
