@@ -388,6 +388,7 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isString(_token)) {
         co.setGithubToken(_token)
         var _env = new java.util.HashMap()
+        _env.put("COPILOT_GITHUB_TOKEN", _token)
         _env.put("GH_TOKEN",     _token)
         _env.put("GITHUB_TOKEN", _token)
         co.setEnvironment(_env)
@@ -398,6 +399,9 @@ ow.ai.__gpttypes.ghcopilot = {
       try {
         _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
       } catch(e) {
+        try { _client.close() } catch(ignore) {}
+        _client = __
+        _setDebug("client-start-error", { error: String(e) })
         if (_isCliMissingStartupError(e)) throw _buildCliNotFoundError(e, _cliDetected)
         if (_isProtocolMismatchError(e)) throw _buildProtocolMismatchError(e)
         throw e
@@ -486,8 +490,10 @@ ow.ai.__gpttypes.ghcopilot = {
         sc.setExcludedTools(_toJavaList(aOptions.excludedTools))
 
       try {
+        _setDebug("session-create", { model: aOptions.model })
         _session = _client.createSession(sc).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
       } catch(e) {
+        _setDebug("session-create-error", { model: aOptions.model, error: String(e) })
         if (_isProtocolMismatchError(e)) throw _buildProtocolMismatchError(e)
         throw e
       }
@@ -495,6 +501,47 @@ ow.ai.__gpttypes.ghcopilot = {
       _sessionModel    = aOptions.model
       _sessionSysMsg   = _currentSysMsg
       _sessionToolsKey = _currentToolsKey
+    }
+
+    // Pass the deadline to the SDK too: its one-argument overload defaults to 60s.
+    var _sendAndWait = (mo) => {
+      var session = _session
+      var future = __
+      var lastEvent = __
+      var started = now()
+      var eventsClose = session.on(new JavaAdapter(java.util.function.Consumer, {
+        accept: function(evt) {
+          // Diagnostics must never interrupt SDK event dispatch.
+          try {
+            lastEvent = String(evt.getType())
+            _setDebug("session-event", { type: lastEvent })
+          } catch(ignore) {}
+        }
+      }))
+      try {
+        future = session.sendAndWait(mo, aOptions.timeout)
+        return future.get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+      } catch(e) {
+        var cause = e
+        var timedOut = false
+        // Rhino may wrap ExecutionException and TimeoutException in JavaException.
+        try { if (isDef(e.javaException)) cause = e.javaException } catch(ignore) {}
+        for (var i = 0; i < 10 && isDef(cause) && cause !== null; i++) {
+          if (cause instanceof java.util.concurrent.TimeoutException) { timedOut = true; break }
+          try { cause = cause.getCause() } catch(ignore) { break }
+        }
+        _setDebug("request-error", { error: String(e), elapsedMs: now() - started, lastEvent: lastEvent, timeout: timedOut })
+        if (timedOut) {
+          // Retire the session so a retry cannot enqueue behind the abandoned turn.
+          _session = __
+          try { if (isDef(future)) future.cancel(true) } catch(ignore) {}
+          try { session.abort().get(1000, java.util.concurrent.TimeUnit.MILLISECONDS) } catch(ignore) {}
+          try { session.close() } catch(ignore) {}
+        }
+        throw e
+      } finally {
+        try { eventsClose.close() } catch(ignore) {}
+      }
     }
 
     var _extractUsage = (aUsageEvent) => {
@@ -668,7 +715,7 @@ ow.ai.__gpttypes.ghcopilot = {
             prompt      : p
           })
 
-          var ev      = _session.sendAndWait(mo).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+          var ev      = _sendAndWait(mo)
           var content = isDef(ev) && isDef(ev.getData) && isDef(ev.getData()) ? String(ev.getData().content()) : ""
 
           _conversation.push({ role: "assistant", content: content })
@@ -741,7 +788,7 @@ ow.ai.__gpttypes.ghcopilot = {
             prompt      : p
           })
 
-          var ev      = _session.sendAndWait(mo).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+          var ev      = _sendAndWait(mo)
           var content = fullContent
           if (content.length === 0) {
             content = isDef(ev) && isDef(ev.getData) && isDef(ev.getData()) ? String(ev.getData().content()) : ""
@@ -862,7 +909,7 @@ ow.ai.__gpttypes.ghcopilot = {
             hasImage    : true
           })
 
-          var ev      = _session.sendAndWait(mo).get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+          var ev      = _sendAndWait(mo)
           var content = isDef(ev) && isDef(ev.getData) && isDef(ev.getData()) ? String(ev.getData().content()) : ""
 
           _conversation.push({ role: "assistant", content: content })
@@ -907,6 +954,18 @@ ow.ai.__gpttypes.ghcopilot = {
         _sessionModel    = __
         _sessionSysMsg   = __
         _sessionToolsKey = __
+      },
+      getAuthStatus: () => {
+        _ensureClient()
+        var auth = _client.getAuthStatus().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
+        // Explicit fields avoid accidentally exposing credentials from SDK objects.
+        return {
+          authenticated: Boolean(auth.isAuthenticated()),
+          authType: _str(auth.getAuthType()),
+          host: _str(auth.getHost()),
+          login: _str(auth.getLogin()),
+          statusMessage: _str(auth.getStatusMessage())
+        }
       },
       getModels: () => {
         _ensureClient()

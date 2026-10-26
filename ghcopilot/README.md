@@ -38,7 +38,7 @@ Model "gpt-5.6-luna" is not available.
 
 even though the same model works when you run `copilot` interactively, this is usually an **authentication identity mismatch**, not a stale/unsupported model. `getModels()` lists the general Copilot model catalog, but `session.create` validates the requested model against whichever identity the spawned `copilot` process actually authenticates as — and new/preview models are often gated per-account (plan tier, org policy, preview enrollment).
 
-When `token`/`githubToken` is set, the SDK exports it to the Copilot subprocess as `GH_TOKEN`/`GITHUB_TOKEN`, so the process authenticates as *that token's* identity instead of reusing your interactively logged-in `copilot` session — and that token's identity may not have the same model entitlements.
+When `token`/`githubToken` is set, the SDK exports it to the Copilot subprocess as `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN`, so the process authenticates as *that token's* identity instead of reusing your interactively logged-in `copilot` session — and that token's identity may not have the same model entitlements.
 
 Fixes:
 
@@ -125,7 +125,7 @@ options:
   useStdio: true
 ```
 
-`token` is forwarded to the SDK and also exported to the Copilot process as `GH_TOKEN` and `GITHUB_TOKEN`.
+`token` is forwarded to the SDK and also exported to the Copilot process as `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, and `GITHUB_TOKEN`.
 
 You can also set the model in OpenAF directly with:
 
@@ -208,6 +208,7 @@ The following options are supported:
 Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 
 - `getModels()`
+- `getAuthStatus()` (authenticated state, login, host, authentication type, and status message; no token)
 - `getLastStats()`
 - `promptWithStats(...)`
 - `rawPromptWithStats(...)`
@@ -216,6 +217,25 @@ Along with the standard `ow.ai.gpt` surface, this provider also exposes:
 - `close()`
 
 `getModels()` returns the Copilot SDK model list with `id` and `name` plus available SDK metadata, including `policy`, `capabilities`, `billing`, `supportedReasoningEfforts`, and `defaultReasoningEffort`. Use `policy.state` to inspect model availability/entitlement hints when a model appears in the list but `session.create` rejects it — and check the authentication identity in use, since `getModels()` reflects the general catalog regardless of which account will actually authenticate the session (see [Model "X" is not available](#model-x-is-not-available-but-works-in-the-interactive-cli)).
+
+### Troubleshooting account-dependent timeouts
+
+The configured `timeout` is passed to both the SDK request and the Java wait,
+including text, streaming, and image requests. A timed-out request triggers a
+best-effort abort (up to one additional second waiting for acknowledgement) and
+retires its session; the next prompt creates a new session.
+
+Use `getAuthStatus()` on the provider to compare the authenticated login and host
+between environments. Explicit `token`/`githubToken` options take precedence over
+inherited token environment variables for the spawned CLI. Without an explicit
+token, the CLI's normal authentication precedence applies. When using `cliUrl`,
+authentication also depends on the externally managed CLI server.
+
+`setDebugCh("copilot-debug")` additionally records session creation errors,
+session event types, and request errors with elapsed time and the last observed
+event. Debug channels also contain prompts and responses, so treat them as
+sensitive. These diagnostics do not change account entitlements or organization
+policy; a supported token and Copilot access are still required.
 
 ## Docker
 

@@ -31,10 +31,12 @@ files:
 - copilot-sdk-java-1.0.27-preview.3.jar
 - ghcopilot.js
 - jackson-datatype-jsr310-2.22.3.jar
+- tests/timeout.js
 filesHash:
   .maven.yaml: a03abfeafae85d542addd89eeb459515b5dbaad6
   Dockerfile: 6bb1c386f43d37ea2b7f6f1a5dc55f410eb67025
-  README.md: e9e09842af6692b8f9d92611e4bc615826bb3d8b
+  README.md: 669a94ce58130ae1c075e8c6b90718003c9fb215
   copilot-sdk-java-1.0.27-preview.3.jar: ad645b111237225e09c209a802beebc1fa9f28e4
-  ghcopilot.js: cdfcf79c90512b20a6dc6ffa15e3d53f824e46ba
+  ghcopilot.js: 7cba7989794485250745d64fc1996f9045c88e55
   jackson-datatype-jsr310-2.22.3.jar: 8d54f48cfe4865bdfa245b8a90fb15b56c8a4a3c
+  tests/timeout.js: 90c073a741b61b98974dd03362a90e9c85c323ef
