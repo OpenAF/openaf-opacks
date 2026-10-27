@@ -314,7 +314,7 @@ ow.ai.__gpttypes.bedrock = {
     if (isDef(_p) && isNumber(_p.timeout)) __flags.HTTP_CON_TIMEOUT = _p.timeout
 
     ow.loadObj()
-    var aOptions = _$(_p.options, "aOptions").isMap().$_()
+    var aOptions = clone(_$(_p.options, "aOptions").isMap().$_())
     aOptions.params = _$(aOptions.params, "aOptions.params").isMap().default({})
     //aOptions.timeout = _$(aOptions.timeout, "aOptions.timeout").isNumber().default(5 * 60000)
     aOptions.model = _$(aOptions.model, "aOptions.model").isString().default("amazon.titan-text-express-v1")
@@ -828,7 +828,188 @@ ow.ai.__gpttypes.bedrock = {
       }
       return __
     }
+    // Explicit native support: keep this allowlist tied to AWS model cards, not name guesses.
+    // https://docs.aws.amazon.com/bedrock/latest/userguide/structured-output.html
+    var _structuredCapability = model => {
+      if (isDef(aOptions.nativeStructuredOutput) && typeof aOptions.nativeStructuredOutput != "boolean") {
+        _structuredInvalid("nativeStructuredOutput must be a boolean")
+      }
+      var match = /^(?:(global|us|eu|apac|au|jp|in)\.)?(anthropic\.claude-[a-z0-9:.-]+)$/.exec(String(model))
+      if (!match) return "unknown"
+      if (match[1] == "in" && match[2] == "anthropic.claude-haiku-4-5-20251001-v1:0") return "unsupported"
+      if (aOptions.nativeStructuredOutput === false) return "unsupported"
+      if (aOptions.nativeStructuredOutput === true) return "supported"
+      var profiles = {
+        "anthropic.claude-sonnet-4-5-20250929-v1:0": ["", "global", "us", "eu", "au", "jp"],
+        "anthropic.claude-haiku-4-5-20251001-v1:0": ["", "global", "us", "eu", "au", "jp"],
+        "anthropic.claude-opus-4-5-20251101-v1:0": ["", "global", "us", "eu"],
+        "anthropic.claude-sonnet-5-5": ["", "global"]
+      }
+      return profiles[match[2]] && profiles[match[2]].indexOf(match[1] || "") >= 0 ? "supported" : "unknown"
+    }
+    var _structuredInvalid = detail => {
+      throw ow.ai.__decision.error("LLM_DECISION_INVALID_REQUEST", "bedrock", __, detail)
+    }
+    var _structuredSchema = request => {
+      var d = ow.ai.__decision, schema = d.copy(request.schema)
+      try { d.checkSchema(schema) } catch(e) {
+        _structuredInvalid("Use OpenAF's supported schema subset: type, properties, required, additionalProperties, enum, items, minItems, description and title; see AWS README")
+      }
+      // The core decision compiler uses integer bounds for ordinal scores. An enum is equivalent.
+      if (request.questions) Object.keys(request.questions).forEach(k => {
+        if (request.questions[k].type != "score") return
+        var prop = schema.properties[k], count = request.questions[k].criteria.length
+        if (prop.type != "integer" || prop.minimum !== 0 || prop.maximum !== count - 1 || d.has(prop, "enum")) d.invalid()
+        prop.enum = request.questions[k].criteria.map((v, i) => i)
+        delete prop.minimum
+        delete prop.maximum
+      })
+      var optional = 0
+      var visit = (node, path) => {
+        ["minimum", "maximum", "maxItems"].forEach(k => {
+          if (d.has(node, k)) _structuredInvalid(path + ": Bedrock does not support " + k)
+        })
+        if (d.has(node, "minItems") && node.minItems > 1) _structuredInvalid(path + ": minItems must be 0 or 1")
+        if (node.type == "object") {
+          if (node.additionalProperties !== false) _structuredInvalid(path + ": additionalProperties must explicitly be false")
+          Object.keys(node.properties || {}).forEach(k => {
+            if ((node.required || []).indexOf(k) < 0) optional++
+            visit(node.properties[k], path + ".properties." + k)
+          })
+        }
+        if (node.items) visit(node.items, path + ".items")
+      }
+      visit(schema, "schema")
+      if (optional > 12) _structuredInvalid("Bedrock supports at most 12 optional properties")
+      return schema
+    }
     var _r = {
+      resetDecisionStats: () => _resetStats(),
+      getCapabilities: model => {
+        var d = ow.ai.__decision, capability = _structuredCapability(model || _model)
+        var caps = d.capabilities(false, capability == "supported", "unsupported")
+        caps.structured.availability = capability == "unsupported" ? "incompatible" : "unknown"
+        return caps
+      },
+      rawStructuredPrompt: request => {
+        var d = ow.ai.__decision
+        _resetStats()
+        if (!d.map(request)) d.invalid()
+        var isolated = {}
+        Object.keys(request).forEach(k => { if (isDef(request[k])) d.put(isolated, k, d.copy(request[k])) })
+        request = isolated
+        if (_structuredCapability(request.model) != "supported") throw d.error("LLM_DECISION_UNSUPPORTED", "bedrock")
+        var schema = _structuredSchema(request), po = request.providerOptions || {}
+        d.only(po, ["temperature", "maxOutputTokens"])
+        var params = d.copy(aOptions.params)
+        // Explicit schema requests own their messages, schema and tools. Never merge conflicting bodies.
+        Object.keys(params).forEach(k => {
+          if (["max_tokens", "temperature", "top_p", "top_k", "stop_sequences", "thinking", "service_tier", "system", "anthropic_version", "promptCaching", "strictToolMsg"].indexOf(k) < 0) {
+            _structuredInvalid("Native structured output does not accept params." + k)
+          }
+        })
+        var body = params
+        if (d.has(body, "anthropic_version") && body.anthropic_version != "bedrock-2023-05-31") d.invalid()
+        body.anthropic_version = "bedrock-2023-05-31"
+        delete body.promptCaching
+        delete body.strictToolMsg
+        body.max_tokens = isDef(po.maxOutputTokens) ? po.maxOutputTokens : (isDef(body.max_tokens) ? body.max_tokens : 1024)
+        var temperature = isDef(po.temperature) ? po.temperature : (isDef(body.temperature) ? body.temperature : _temperature)
+        if (isDef(temperature)) {
+          if (typeof temperature != "number" || !isFinite(temperature) || temperature < 0 || temperature > 1) d.invalid()
+          body.temperature = temperature
+        }
+        if (!Number.isInteger(body.max_tokens) || body.max_tokens <= 0) d.invalid()
+        if (isDef(body.top_p) && (typeof body.top_p != "number" || body.top_p < 0 || body.top_p > 1)) d.invalid()
+        if (isDef(body.top_k) && (!Number.isInteger(body.top_k) || body.top_k < 0)) d.invalid()
+        if (isDef(body.stop_sequences) && (!isArray(body.stop_sequences) || body.stop_sequences.some(v => typeof v != "string"))) d.invalid()
+        if (d.has(body, "thinking") && (!d.map(body.thinking) || ["enabled", "disabled", "adaptive"].indexOf(body.thinking.type) < 0)) d.invalid()
+        if (body.thinking && body.thinking.type == "enabled" && (!Number.isInteger(body.thinking.budget_tokens) || body.thinking.budget_tokens < 1024 || body.thinking.budget_tokens >= body.max_tokens)) d.invalid()
+        if (d.has(body, "service_tier") && !d.text(body.service_tier)) d.invalid()
+        var messages = request.messages || [{ role: "user", content: typeof request.state == "string" ? request.state : JSON.stringify(request.state) }]
+        if (!isArray(messages) || messages.length == 0) d.invalid()
+        body.messages = []
+        var system = []
+        if (d.has(body, "system")) {
+          if (typeof body.system == "string") system = [{ type: "text", text: body.system }]
+          else if (isArray(body.system)) system = body.system
+          else d.invalid()
+        }
+        var instructions = request.instructions
+        if (request.questions && typeof instructions == "string") instructions = instructions.replace(" Return only the requested JSON object.", "")
+        if (d.text(instructions)) system.push({ type: "text", text: instructions })
+        messages.forEach(msg => {
+          if (!d.map(msg) || ["system", "user", "assistant"].indexOf(msg.role) < 0) d.invalid()
+          var content = typeof msg.content == "string" ? [{ type: "text", text: msg.content }] : msg.content
+          if (!isArray(content) || content.length == 0) d.invalid()
+          content.forEach(block => {
+            if (!d.map(block) || block.type != "text" || !d.text(block.text)) d.invalid()
+            d.only(block, ["type", "text", "cache_control"])
+          })
+          if (msg.role == "system") system = system.concat(content)
+          else body.messages.push({ role: msg.role, content: content })
+        })
+        if (body.messages.length == 0 || body.messages[body.messages.length - 1].role != "user") d.invalid()
+        system.forEach(block => {
+          if (!d.map(block) || block.type != "text" || !d.text(block.text)) d.invalid()
+          d.only(block, ["type", "text", "cache_control"])
+        })
+        if (system.length) {
+          body.system = system
+          if (aOptions.promptCaching) body.system[body.system.length - 1].cache_control = { type: "ephemeral" }
+        }
+        if (aOptions.promptCaching) {
+          var last = body.messages[body.messages.length - 1].content
+          last[last.length - 1].cache_control = { type: "ephemeral" }
+        }
+        body.output_config = { format: { type: "json_schema", schema: schema } }
+        var raw = d.execution(() => {
+          if (aws.lastConnect() > 5 * 60000) aws.reconnect()
+          var result = aws.BEDROCK_InvokeModel(aOptions.region, request.model, body)
+          // $rest exposes HTTP failures as {error:{responseCode,response}}; retain status and safe API detail.
+          if (_hasError(result) && d.map(result.error)) {
+            var failure = result.error, detail = failure.response
+            if (typeof detail == "string") { try { detail = JSON.parse(detail) } catch(ignore) { detail = {} } }
+            throw d.error("LLM_DECISION_PROVIDER_ERROR", "bedrock", failure.responseCode,
+              d.providerMessage({ error: d.map(detail) ? detail.message : __ }))
+          }
+          return result
+        }, "bedrock")
+        return { raw: raw, stats: _captureStats(raw, request.model) }
+      },
+      normalizeStructuredResponse: (raw, request) => {
+        var d = ow.ai.__decision
+        if (!d.map(raw) || raw.refusal || raw.stop_reason !== "end_turn" || !isArray(raw.content)) d.badResponse()
+        var text = ""
+        raw.content.forEach(block => {
+          if (!d.map(block)) d.badResponse()
+          if (block.type == "thinking" || block.type == "redacted_thinking") return
+          if (block.type != "text" || typeof block.text != "string") d.badResponse()
+          text += block.text
+        })
+        var value = d.parse(text)
+        return request.questions ? d.structuredAnswers(value, request) : d.validateSchema(request.schema, value)
+      },
+      structuredSchemaPrompt: (prompt, descriptor, model, temperature, tools) => {
+        var d = ow.ai.__decision
+        _resetStats()
+        if (isDef(tools) && (!isArray(tools) || tools.length > 0)) d.invalid()
+        descriptor = d.copy(descriptor)
+        // Accept raw schemas at the adapter hook as well as the standard public descriptor.
+        if (!d.has(descriptor, "schema")) descriptor = { schema: descriptor }
+        d.only(descriptor, ["name", "description", "schema", "strict"])
+        ;["name", "description"].forEach(k => { if (d.has(descriptor, k) && typeof descriptor[k] != "string") d.invalid() })
+        if (d.has(descriptor, "strict") && typeof descriptor.strict != "boolean") d.invalid()
+        if (!d.text(prompt)) d.invalid()
+        var conversation = d.copy(_r.conversation)
+        var request = { model: isDef(model) ? model : _model, schema: descriptor.schema,
+                        messages: conversation.concat([{ role: "user", content: prompt }]), providerOptions: {} }
+        if (isDef(temperature)) request.providerOptions.temperature = temperature
+        var execution = _r.rawStructuredPrompt(request)
+        var response = _r.normalizeStructuredResponse(execution.raw, request)
+        _r.conversation = conversation.concat([{ role: "user", content: prompt }, { role: "assistant", content: JSON.stringify(response) }])
+        return { response: response, stats: execution.stats }
+      },
       conversation: [],
       tools: {},
       getConversation: () => {

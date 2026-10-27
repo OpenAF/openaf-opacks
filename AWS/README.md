@@ -104,3 +104,142 @@ var connectors = aws.LAMBDA_CORE_ListNetworkConnectors(undefined, { MaxItems: 10
 These are individual management calls. Callers manage pagination, readiness polling, deployment order, application HTTP requests, and shell connections. No SDK dependency or runtime model download is required. The regional endpoint and signing service are both Lambda; access remains subject to AWS service availability and IAM permissions.
 
 Run `oaf -f tests/lambda.js` for offline request/signing and compatibility checks with dummy credentials and intercepted HTTP. Its static fixtures come from AWS's published operation request syntax, cross-checked against the botocore [Web](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-web/2025-03-07/service-2.json), [MicroVM](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-microvms/2025-09-09/service-2.json), and [Core](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-core/2026-04-30/service-2.json) models on 2026-10-20. These checks do not deploy resources or validate live AWS access.
+
+## Bedrock Claude native structured output
+
+With an OpenAF build providing `ow.ai.__decision` and the structured-output hooks
+(the sibling OpenAF source includes them), load `aws_bedrock.js` before creating
+an LLM. No OpenAF core changes or extra validation dependency are required.
+The adapter uses the existing signed, non-streaming `BEDROCK_InvokeModel`
+transport with `output_config.format: { type: "json_schema", schema: <object> }`.
+It never retries as prompt-only JSON. Ordinary prompts, JSON flags, streaming,
+tools, and other Bedrock model providers retain their existing paths.
+
+Configure credentials through the existing AWS environment/profile setup:
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and optional `AWS_SESSION_TOKEN`.
+Region and model remain explicit adapter options:
+
+```javascript
+loadLib("aws_bedrock.js")
+var llm = $llm({
+  type: "bedrock", timeout: 180000,
+  options: {
+    region: "us-east-1",
+    model: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    params: { max_tokens: 1024 }
+  }
+})
+var person = llm.getGPT().jsonSchemaPrompt("Extract the person: Alice, 30.", {
+  name: "person", strict: true,
+  schema: {
+    type: "object",
+    properties: { name: { type: "string" }, age: { type: "integer" } },
+    required: ["name", "age"], additionalProperties: false
+  }
+})
+var result = llm.decide({ ticket: "Charged twice" }, {
+  billing: { type: "boolean", instructions: "Is this a billing issue?" },
+  priority: { type: "score", instructions: "Assess urgency", criteria: ["Routine", "Urgent"] }
+}, { strategy: "structured" })
+// result.answers.billing.value; probability fields and score expectedScore are null.
+var withStats = llm.decideWithStats("Duplicate charge", {
+  billing: { type: "boolean", instructions: "Is this a billing issue?" }
+}, { strategy: "structured" })
+```
+
+`jsonSchemaPromptWithStats` returns `{response, stats}` too. The inspected OpenAF
+core has no AI `extract()` method; use `jsonSchemaPrompt` for schema-based extraction.
+The public schema descriptor is `{name, description, schema, strict}`; raw JSON
+Schemas are also accepted by this adapter's helper. Metadata stays local, and
+both `strict` settings retain native enforcement and local validation.
+
+Capability policy is deliberately conservative. The default known model IDs are:
+
+- `anthropic.claude-sonnet-4-5-20250929-v1:0`
+- `anthropic.claude-haiku-4-5-20251001-v1:0`
+- `anthropic.claude-opus-4-5-20251101-v1:0`
+- `anthropic.claude-sonnet-5-5`
+
+Base IDs and profile forms are classified locally. The default profile allowlist
+is `global`, `us`, `eu`, `au`, and `jp` for Sonnet/Haiku 4.5; `global`, `us`, and
+`eu` for Opus 4.5; and `global` for Sonnet 5.5. Other recognized `apac.`/`in.`
+or future combinations require explicit opt-in. This does **not** guarantee that a model or
+profile exists in your region or that your account has access. The documented
+`in.anthropic.claude-haiku-4-5-20251001-v1:0` exclusion always rejects native output.
+Other Claude IDs and opaque/custom profile ARNs are unknown and disabled by
+default. For a newer recognized Claude ID verified against its AWS model card,
+set `options.nativeStructuredOutput: true`. This opt-in does not bypass the known
+India/Haiku exclusion or enable non-Claude/opaque identifiers. Set it to `false`
+to disable native schemas. No capability probes are sent.
+
+`getCapabilities()` advertises structured choice, boolean, and score decisions
+only for enabled models, with no probabilities and no structured streaming.
+Known exclusions report incompatible availability; enabled and unknown model
+availability remains unknown until execution (unknown models are ineligible).
+Native *decision scoring* is unsupported; `strategy: "structured"` uses native
+JSON Schema generation. `auto` can select this structured strategy.
+
+Schemas use the intersection of OpenAF's existing validator and Bedrock's subset:
+single `type` (object, array, string, integer, number, boolean, null), `properties`,
+`required`, primitive `enum`, `items`, `minItems` of 0 or 1, `description`, and
+`title`. Every object must explicitly set `additionalProperties: false`.
+At most 12 optional properties are allowed across nested objects. Unsupported
+keywords fail before HTTP, including numeric bounds, `maxItems`, patterns,
+references, unions, formats, defaults, and compositions, even where Bedrock
+supports some of them. Constraints are never silently removed. Core-compiled
+score bounds become equivalent finite integer enums on the wire; the original
+core schema still validates the response. Validation does not use global Ajv
+coercion/default settings.
+
+The helper keeps text system messages/history and appends only a successful
+exchange. Decisions and raw structured hooks isolate their requests from history
+and registered tools. Explicit nonempty tools and history containing non-text
+blocks are rejected on the schema helper; ordinary tool calls still work.
+Prompt caching follows `options.promptCaching`, including supported explicit
+text-block cache markers. `aJsonFlag` remains the legacy instruction to answer in
+JSON; it does not enable native schema enforcement.
+
+Native calls accept inference `params.max_tokens` (default 1024), `temperature`
+(0–1), `top_p`, `top_k`, `stop_sequences`, `thinking`, `service_tier`, `system`, and
+`anthropic_version: "bedrock-2023-05-31"`. Conflicting schema/message/tool fields
+and unrecognized parameters fail locally. Model-specific inference combinations
+remain subject to AWS validation. The existing core currently accepts no Bedrock
+`decide` provider options: configure inference through `options.params` instead.
+The schema helper also accepts its standard positional temperature/model override.
+
+Errors follow OpenAF codes: `LLM_DECISION_UNSUPPORTED` for ineligible capabilities,
+`LLM_DECISION_INVALID_REQUEST` for invalid schemas/options,
+`LLM_DECISION_PROVIDER_ERROR` for HTTP/API/connection/timeout failures, and
+`LLM_DECISION_INVALID_RESPONSE` for empty, malformed, refused, truncated,
+tool-use, or schema-invalid output. Only finalized `end_turn` text blocks are
+parsed; thinking blocks are excluded. No fallback or second inference is used for
+normalization. Execution-scoped statistics are returned directly; `getLastStats`
+remains last-call mutable state. Usage from a received response remains available
+when output validation fails, while preflight failures clear previous usage.
+
+AWS can take approximately 90 seconds to compile a new schema; compiled grammars
+are cached for 24 hours. Configure the existing timeout to at least 120 seconds
+for first use and enough output tokens to avoid `max_tokens` truncation. See the
+[AWS structured-output guide](https://docs.aws.amazon.com/bedrock/latest/userguide/structured-output.html),
+[Claude announcement and InvokeModel example](https://aws.amazon.com/blogs/machine-learning/structured-outputs-for-anthropic-claude-models-on-amazon-bedrock/),
+and [model cards](https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html)
+for regional/profile availability and service limitations.
+
+Run deterministic tests from `AWS/` using the sibling OpenAF build:
+
+```sh
+java -jar ../../openaf/openaf.jar -f tests/bedrock.js
+```
+
+HTTP responses and credentials are mocked; these tests make no AWS requests.
+The separate live smoke test skips by default and incurs inference charges only
+with explicit opt-in. Supply `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, optional
+`AWS_SESSION_TOKEN`, `AWS_REGION`, and `BEDROCK_MODEL_ID`, then run:
+
+```sh
+OPENAF_BEDROCK_LIVE=1 java -jar ../../openaf/openaf.jar -f tests/bedrock-live.js
+```
+
+For a verified newer model, additionally set `BEDROCK_NATIVE_STRUCTURED_OUTPUT=true`.
+The smoke test performs one schema extraction and reports statistics. Offline test
+success does not establish live AWS model availability or access.
