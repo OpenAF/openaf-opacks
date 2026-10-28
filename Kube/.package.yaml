@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261024'
+version: '20261028'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -27,7 +27,10 @@ files:
 - .package.yaml
 - .precompile
 - README.md
+- jackson-annotations-2.22.jar
 - jackson-core-2.22.4.jar
+- jackson-core-3.2.3.jar
+- jackson-databind-3.2.3.jar
 - jackson-dataformat-yaml-3.2.3.jar
 - kube.js
 - kube.yaml
@@ -73,6 +76,7 @@ files:
 - netty-tcnative-classes-2.0.84.Final.jar
 - netty-transport-4.2.19.Final.jar
 - netty-transport-native-unix-common-4.2.19.Final.jar
+- slf4j-api-2.0.20.jar
 - snakeyaml-engine-3.1.1.jar
 - vertx-auth-common-5.2.0.jar
 - vertx-core-5.2.0.jar
@@ -82,11 +86,14 @@ files:
 - vertx-web-common-5.2.0.jar
 - zjsonpatch-8.0.0.jar
 filesHash:
-  .maven.yaml: beabd9219b88a537972d225e978e7db4b722aeda
+  .maven.yaml: 147a5e60e184db2e9a60139595a41e8a1bc9591c
   .odoc.db: f8ac7d0c0c30b2e4536107e2c450f0d1d34a421d
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: 04472d99b869f5cf0b2ebe4eb75d75a32d4fca9e
+  jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
   jackson-core-2.22.4.jar: d753ae59bae7dcb183f856da541c5b27272088ce
+  jackson-core-3.2.3.jar: 94d7dab7ac8e336a4c7a5ce36b8ca206bfde18c5
+  jackson-databind-3.2.3.jar: edb121f17d1a441732b15919f531e529c5cc76ec
   jackson-dataformat-yaml-3.2.3.jar: c39c703aadd5bc7513013e7b2871ef36698aa443
   kube.js: a599a56d41e3b60ec7adc5a3101d4f4d6806f175
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
@@ -132,6 +139,7 @@ filesHash:
   netty-tcnative-classes-2.0.84.Final.jar: 30d95c719f174c33e5146f923cda62d7bdb65650
   netty-transport-4.2.19.Final.jar: 52c2306d4b71cfbfc8a6ab9de1d083d2978c3b83
   netty-transport-native-unix-common-4.2.19.Final.jar: 8ca98433d3ff179b2aab7f526a16435cb4242b7e
+  slf4j-api-2.0.20.jar: 7fea9d92ba67e9b3c8f03515fb202b86a1fe44f6
   snakeyaml-engine-3.1.1.jar: 9f8bf41c9f06191abd4322072849603bdc919ac7
   vertx-auth-common-5.2.0.jar: 8163b6c35d803c14cd33448a6cb925b7426f71d4
   vertx-core-5.2.0.jar: da57447fd65163f9bbc3414a2f571d563a3c121a

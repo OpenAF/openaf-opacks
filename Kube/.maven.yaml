@@ -1,7 +1,7 @@
 artifacts:
 - id: kubernetes-client
   group: io.fabric8
-  version: 8.0.0
+  #version: 8.0.0
 - group: io.netty
   id: netty-codec-http2
   version: 4.2.19.Final
