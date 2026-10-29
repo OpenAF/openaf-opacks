@@ -8,6 +8,9 @@ on:
 jobs:
   update-packages:
     runs-on    : ubuntu-latest
+    concurrency:
+      group: update-packages-${{ github.ref_name }}
+      cancel-in-progress: false
     permissions:
       contents: write
       pull-requests: write
@@ -54,11 +57,8 @@ jobs:
         ojob: 'updatePacks.yaml'
         dist: t8
 
-    - name: Commit changes
-      env :
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: openaf/ojob-action@v7
-      with:
-        ojob: 'ojob.io/git/hub/contentIn'
-        args: "message=\"Update packs {{date}}/{{time}}\" title=\"Update packs\" branch=\"${{ github.ref_name }}\""
-        dist: t8
+    - name: Create or update packages pull request
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BASE_BRANCH: ${{ github.ref_name }}
+      run: bash .github/scripts/publishPackageUpdates.sh
