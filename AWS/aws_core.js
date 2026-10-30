@@ -96,7 +96,8 @@ AWS.prototype._imds = function() {
            return {
                    accessKey: _cred.AccessKeyId,
                    secretKey: _cred.SecretAccessKey,
-                   token    : _cred.Token
+                   token    : _cred.Token,
+                   expiration: _cred.Expiration
            }
    } else {
       return __
@@ -159,6 +160,7 @@ AWS.prototype._credentialProcess = function() {
  * </odoc>
  */
 AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion) {
+   this._credentialExpiration = undefined;
    this.accessKey = _$(aAccessKey).default(this._aAccessKey);
    this.secretKey = _$(aSecretKey).default(this._aSecretKey);
    this.stoken    = _$(aSessionToken).default(this.aSessionToken);
@@ -184,7 +186,8 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
             o = {
                   AccessKeyId: _cred.AccessKeyId,
                SecretAccessKey: _cred.SecretAccessKey,
-               Token: isDef(_cred.SessionToken) ? _cred.SessionToken : __
+               Token: isDef(_cred.SessionToken) ? _cred.SessionToken : __,
+               Expiration: _cred.Expiration
             }
          } else if (isDef(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))) {
             var _token = io.readFileString(getEnv("AWS_WEB_IDENTITY_TOKEN_FILE"))
@@ -204,6 +207,7 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
                o = {
                   AccessKeyId: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.AccessKeyId,
                   SecretAccessKey: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SecretAccessKey,
+                  Expiration: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.Expiration,
                   Token: _res.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials.SessionToken
                }
             } else {
@@ -236,6 +240,7 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
                            o.AccessKeyId     = _cred.accessKey
                            o.SecretAccessKey = _cred.secretKey
                            o.Token           = _cred.token
+                           o.Expiration      = _cred.expiration
                         }
                      }
                   }
@@ -246,10 +251,12 @@ AWS.prototype.connect = function(aAccessKey, aSecretKey, aSessionToken, aRegion)
 
       this.accessKey = o.AccessKeyId;
       this.secretKey = o.SecretAccessKey;
-      this.stoken    = o.Token;
+      this.stoken    = isDef(o.SessionToken) ? o.SessionToken : o.Token;
+      this._credentialExpiration = o.Expiration;
    }
 
    this.region = aRegion || getEnv("AWS_DEFAULT_REGION");
+   this._credentialCheckedAt = Date.now();
 };
 
 /*AWS.prototype.getS3 = function() {
@@ -727,3 +734,123 @@ AWS.prototype.head = function(aService, aRegion, aPartURI, aParams, aAmzFields, 
       requestHeaders: extra
    }).head(aURL);
 };
+
+
+/**
+ * <odoc>
+ * <key>AWS.forSigning(aRegion) : AWS</key>
+ * Creates a lazy signing-only client. Credential discovery is bounded by signRequest timeoutMs.
+ * </odoc>
+ */
+AWS.forSigning = function(aRegion) {
+   ow.loadFormat(); ow.loadObj(); ow.loadNet()
+   var client = Object.create(AWS.prototype)
+   client._original = { region: aRegion }
+   client._signLock = new java.util.concurrent.locks.ReentrantLock()
+   return client
+}
+
+/**
+ * <odoc>
+ * <key>AWS.signRequest(options) : Map</key>
+ * Signs without sending. options: method, HTTPS url, region, service, exact string body,
+ * optional headers and timeoutMs (default 5000). URLs support simple unescaped paths only,
+ * without credentials, query or fragment. Discovered credentials refresh automatically;
+ * explicit constructor credentials remain caller-managed. Errors never include provider data.
+ * </odoc>
+ */
+AWS.prototype.signRequest = function(options) {
+   var invalid = () => { throw new Error("AWS.signRequest: invalid signing options") }
+   if (!isMap(options) || !isString(options.url) || !isString(options.method) ||
+       !/^[A-Za-z]+$/.test(options.method) || !isString(options.body) ||
+       !isString(options.region) || !/^[a-z0-9-]+$/.test(options.region) ||
+       !isString(options.service) || !/^[a-z0-9-]+$/.test(options.service)) invalid()
+   var uri
+   try { uri = new java.net.URI(options.url) } catch(e) { invalid() }
+   if (String(uri.getScheme()) != "https" || isNull(uri.getHost()) ||
+       !isNull(uri.getUserInfo()) || !isNull(uri.getQuery()) || !isNull(uri.getFragment()) ||
+       !/^[A-Za-z0-9/_.~-]*$/.test(String(uri.getRawPath())) ||
+       String(uri.normalize()) != String(uri)) invalid()
+   var timeout = isUnDef(options.timeoutMs) ? 5000 : options.timeoutMs
+   if (!isNumber(timeout) || !isFinite(timeout) || timeout < 1 || Math.floor(timeout) != timeout) invalid()
+   var headers = {}, wireHeaders = {}, seen = Object.create(null), input = isUnDef(options.headers) ? {} : options.headers
+   if (!isMap(input)) invalid()
+   Object.keys(input).forEach(k => {
+      var name = k.toLowerCase(), value = input[k]
+      if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(k) || seen[name] ||
+          ["authorization", "proxy-authorization", "host", "x-amz-date", "x-amz-security-token", "x-amz-content-sha256",
+           "x-amz-credential", "x-amz-signature", "x-amz-algorithm", "x-amz-signedheaders", "x-amz-expires",
+           "connection", "transfer-encoding", "content-length"].indexOf(name) >= 0 ||
+          !isString(value) || /[\r\n]/.test(value)) invalid()
+      seen[name] = true
+      wireHeaders[name] = value.trim()
+      headers[name] = value.trim().replace(/\s+/g, " ")
+   })
+   var started = Date.now(), deadline = started + timeout
+   // Older instances get a lock under the JVM monitor to avoid first-call races.
+   sync(() => {
+      if (isUnDef(this._signLock)) this._signLock = new java.util.concurrent.locks.ReentrantLock()
+   }, this)
+   if (!this._signLock.tryLock(timeout, java.util.concurrent.TimeUnit.MILLISECONDS))
+      throw new Error("AWS.signRequest: credential acquisition timed out")
+   try {
+      var original = this._original || {}, explicit = isDef(original.accessKey) || isDef(original.secretKey)
+      var nowMs = Date.now(), expiry = isDef(this._credentialExpiration) ? Date.parse(String(this._credentialExpiration)) : undefined
+      if (isDef(expiry) && !isFinite(expiry)) throw new Error("AWS.signRequest: invalid credential expiration")
+      var due = isUnDef(this.accessKey) || (isDef(expiry) ? nowMs >= expiry - 60000 :
+         isUnDef(this._credentialCheckedAt) || nowMs >= this._credentialCheckedAt + 300000)
+      if (!explicit && due && (isUnDef(this._signAcquiring) || !this._signAcquiring.get()) &&
+          (isUnDef(this._signRetryAt) || nowMs >= this._signRetryAt)) {
+         this._signRetryAt = nowMs + 30000
+         // Acquire into an isolated object: timeout/failure cannot partially publish a session.
+         var candidate = Object.create(AWS.prototype), completed = false, failed = false, acquisitionResult
+         candidate.region = original.region
+         var budget = deadline - Date.now()
+         if (budget > 0) {
+            // A provider that ignores interruption may finish later. Keep it marked
+            // in flight until it actually exits, but never publish a late result.
+            var acquisition = this._signAcquiring = new java.util.concurrent.atomic.AtomicBoolean(true)
+            try { acquisitionResult = $tb().timeout(budget).exec(() => {
+               try { candidate.connect(undefined, undefined, undefined, original.region); completed = true }
+               catch(e) { failed = true }
+               finally { acquisition.set(false) }
+            }) } catch(e) { failed = true }
+         }
+         var nextExpiry = isDef(candidate._credentialExpiration) ? Date.parse(String(candidate._credentialExpiration)) : undefined
+         if (acquisitionResult === true && completed && !failed && Date.now() < deadline && isString(candidate.accessKey) && candidate.accessKey.length > 0 &&
+             isString(candidate.secretKey) && candidate.secretKey.length > 0 &&
+             (isUnDef(nextExpiry) || isFinite(nextExpiry) && nextExpiry > Date.now())) {
+            this.accessKey = candidate.accessKey
+            this.secretKey = candidate.secretKey
+            this.stoken = candidate.stoken
+            this._credentialExpiration = candidate._credentialExpiration
+            this._credentialCheckedAt = Date.now()
+            expiry = nextExpiry
+            delete this._signRetryAt
+         }
+      }
+      if (Date.now() >= deadline) throw new Error("AWS.signRequest: credential acquisition timed out")
+      if (!isString(this.accessKey) || !this.accessKey.length || !isString(this.secretKey) || !this.secretKey.length ||
+          isDef(expiry) && Date.now() >= expiry) throw new Error("AWS.signRequest: credentials unavailable or expired")
+      // Sign a private snapshot and include the token in canonical headers. Legacy signing
+      // excludes its mixed-case token header, so suppress that insertion on this snapshot.
+      var snapshot = Object.create(AWS.prototype)
+      snapshot.accessKey = this.accessKey; snapshot.secretKey = this.secretKey; snapshot.__debug = false
+      if (isDef(this.stoken)) headers["x-amz-security-token"] = String(this.stoken)
+      var contentType = headers["content-type"]
+      delete headers["content-type"]
+      var host = String(uri.getHost()) + (uri.getPort() == -1 ? "" : ":" + uri.getPort())
+      var signed
+      try {
+         signed = snapshot.__getRequest(options.method, String(uri.getRawPath()) || "/", options.service,
+            host, options.region, "", options.body, headers, new Date(), contentType)
+      } catch(e) { throw new Error("AWS.signRequest: signing failed") }
+      var result = { host: host }
+      Object.keys(signed).forEach(k => { if (isDef(signed[k])) result[k.toLowerCase()] = signed[k] })
+      // Canonical whitespace is folded for signing; preserve header semantics on wire
+      // (for example a log stream name containing consecutive spaces).
+      Object.keys(wireHeaders).forEach(k => { result[k] = wireHeaders[k] })
+      if (Date.now() >= deadline) throw new Error("AWS.signRequest: signing timed out")
+      return result
+   } finally { this._signLock.unlock() }
+}

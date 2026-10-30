@@ -243,3 +243,58 @@ OPENAF_BEDROCK_LIVE=1 java -jar ../../openaf/openaf.jar -f tests/bedrock-live.js
 For a verified newer model, additionally set `BEDROCK_NATIVE_STRUCTURED_OUTPUT=true`.
 The smoke test performs one schema extraction and reports statistics. Offline test
 success does not establish live AWS model availability or access.
+
+## Signing without sending
+
+`AWS.signRequest(options)` returns headers for a request, without transmitting it.
+Load only `aws_core.js` if no service helpers are needed. Example for direct OTLP
+metrics and logs (these calls only sign; send the exact same body string yourself):
+
+```javascript
+loadLib("aws_core.js")
+var aws = AWS.forSigning("eu-west-1") // Lazy, bounded discovery; no network yet.
+var metricBody = JSON.stringify({ resourceMetrics: [{ scopeMetrics: [{ metrics: [{
+   name: "example_gauge", gauge: { dataPoints: [{ asDouble: 1,
+      timeUnixNano: String(Date.now()) + "000000" }] }
+}] }] }] })
+var metricHeaders = aws.signRequest({ method: "POST",
+   url: "https://monitoring.eu-west-1.amazonaws.com/v1/metrics",
+   region: "eu-west-1", service: "monitoring", body: metricBody,
+   headers: { "Content-Type": "application/json" }, timeoutMs: 5000 })
+var logBody = JSON.stringify({ resourceLogs: [{ scopeLogs: [{ logRecords: [{
+   timeUnixNano: String(Date.now()) + "000000", body: { stringValue: "Example warning" },
+   severityNumber: 13, severityText: "WARN"
+}] }] }] })
+var logHeaders = aws.signRequest({ method: "POST",
+   url: "https://logs.eu-west-1.amazonaws.com/v1/logs",
+   region: "eu-west-1", service: "logs", body: logBody,
+   headers: { "Content-Type": "application/json", "x-aws-log-group": "/nattrmon/warnings",
+      "x-aws-log-stream": "monitoring-01" }, timeoutMs: 5000 })
+```
+
+URLs must use HTTPS, a simple unescaped path, and no credentials, query or
+fragment. Headers are cloned and normalized; duplicate names and caller-supplied
+signature, host and transport framing headers are rejected. Temporary session
+tokens are signed. The body must already be a string; serialize it exactly once.
+
+`AWS.forSigning(region)` creates a lazy signing-only instance. `new AWS(...)`
+continues to perform its existing eager connection; it also supports the new
+instance method. Explicit constructor credentials remain caller-managed. Existing
+request helpers and private signing APIs keep their previous refresh behavior.
+
+For discovered credentials, `signRequest` preserves expiration from the existing
+credential process, web identity, container and IMDS providers. It refreshes 60
+seconds before expiration, or rechecks credentials without expiration after five
+minutes. Refresh and signing are serialized per instance; credentials are published
+only as a complete valid session. On failure a still-valid session remains usable;
+refresh failures are throttled to one attempt every 30 seconds. Expired sessions
+fail signing. `timeoutMs` includes lock wait, acquisition and signing. Acquisition
+runs in an isolated time-bounded task; a timed-out result is never published.
+Provider error text and credentials are excluded from signing errors. No new
+credential providers or output-specific credential fields are introduced.
+
+Run `openaf -f tests/signing.js` from `AWS/` for offline independent-JCA signature,
+Unicode, header immutability, expiration, timeout and concurrency checks. Also run
+`tests/credentials.js`, `tests/lambda.js` and `tests/bedrock.js`. The nAttrMon
+repository supplies `tests/opentelemetry-aws-live.js` as an opt-in end-to-end test
+against an existing log group/stream; offline checks do not establish live delivery.
