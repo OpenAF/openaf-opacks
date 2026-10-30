@@ -6,6 +6,25 @@ if (isUnDef(params) || isDef(params.____ojob)) return
 // Process secBuckets
 if (isDef(params.secKey)) params = $sec().procMap(params)
 
+// Certificate bypass belongs to this invocation's HTTP clients, never JVM defaults.
+var _rest = global.$rest
+var $rest = opts => {
+    if (!toBoolean(params.insecure)) return _rest(opts)
+    ow.loadObj()
+    opts = Object.assign({}, opts)
+    var client = opts.httpClient ? Object.assign(Object.create(Object.getPrototypeOf(opts.httpClient)), opts.httpClient) : new ow.obj.http(__, __, __, __, __, __, __, {delayBuild:true})
+    var trust = new JavaAdapter(javax.net.ssl.X509TrustManager, {
+        checkClientTrusted: function() {}, checkServerTrusted: function() {},
+        getAcceptedIssuers: function() { return java.lang.reflect.Array.newInstance(java.security.cert.X509Certificate, 0) }
+    })
+    var ctx = javax.net.ssl.SSLContext.getInstance("TLS")
+    ctx.init(null, [trust], new java.security.SecureRandom())
+    var builder = isFunction(client.client.newBuilder) ? client.client.newBuilder() : client.client
+    client.client = builder.sslSocketFactory(ctx.getSocketFactory(), trust).build()
+    opts.httpClient = client
+    return _rest(opts)
+}
+
 // --- Util functions
 // Util functions
 var _activeTransforms
@@ -1046,7 +1065,6 @@ const _tryRawCodec = () => {
         isDef(params.idescrecipe) || isDef(params.jsonprefix) || toBoolean(params.jsondesc)) return false
     var gzip = params.format == "gb64json" || toBoolean(params.base64gzip)
     if (isDef(params.url) && String(params.urlmethod || "GET").toLowerCase() == "head") return false
-    if (isDef(params.insecure) && toBoolean(params.insecure)) ow.loadJava().setIgnoreSSLDomains()
     _withCodecSource(isString(params.data) ? params.data : "", (input, encoding) => {
         // File/raw text is decoded as before, then re-encoded in the runtime charset.
         var source = input
@@ -4861,7 +4879,8 @@ var _inputFns = new Map([
             return "lines"
         }
 
-        var _queue = new java.util.concurrent.LinkedBlockingQueue()
+        // Bound retained request bodies independently of the consumer's processing speed.
+        var _queue = new java.util.concurrent.LinkedBlockingQueue(1)
         var _srv = _httpdServer("inhttpd", (req, hs, hdrs) => {
             var _hdr = req.header || {}
             if (Number(_hdr["content-length"] || 0) > _max) return hs.reply("Payload too large", "text/plain", 413, hdrs)
@@ -4882,7 +4901,7 @@ var _inputFns = new Map([
             // Without a body the query/form parameters are the payload
             if (_body.length == 0 && Object.keys(_p).length > 0) _body = stringify(_p, __, "")
             if (_body.length > _max) return hs.reply("Payload too large", "text/plain", 413, hdrs)
-            _queue.offer(stringify({ method: req.method, uri: req.uri, headers: _hdr, params: _p, body: _body }, __, ""))
+            if (!_queue.offer(stringify({ method: req.method, uri: req.uri, headers: _hdr, params: _p, body: _body }, __, ""))) return hs.reply("Busy", "text/plain", 503, hdrs)
             return hs.reply(_answer, "text/plain", _status, hdrs)
         })
 
@@ -5955,7 +5974,6 @@ var _run = () => {
         (!isDef(params.url) || String(params.urlmethod || "GET").toLowerCase() != "head") &&
         (!isString(params.file) || params.file.indexOf("::") < 0) &&
         !toBoolean(params._shebang) && !params.jsondesc && !params.jsonprefix) {
-        if (isDef(params.insecure) && toBoolean(params.insecure)) ow.loadJava().setIgnoreSSLDomains()
         _inputFns.get(params.type)(isString(params.data) ? params.data : "", options)
         delete params.__origr
         return
@@ -5975,9 +5993,6 @@ var _run = () => {
         params.jsonprefix = _$(params.jsonprefix, "jsonprefix").isString().default(__)
         params.jsondesc   = _$(toBoolean(params.jsondesc), "jsondesc").isBoolean().default(false)
 
-        if (typeof params.insecure !== "undefined" && toBoolean(params.insecure)) {
-            ow.loadJava().setIgnoreSSLDomains()
-        }
 
         if (isDef(params.file)) {
             if (params.file.indexOf("::") < 0 && !(io.fileExists(params.file))) {
