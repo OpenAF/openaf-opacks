@@ -98,6 +98,7 @@ List of data input types that can be auto-detected (through the file extension o
 | dsv | A DSV (Delimiter Separated Values) format |
 | gb64json | Equivalent to in=base64 and base64gzip=true |
 | hsperf | A Java hsperfdata* file (requires file=hsperfdata_user/123) |
+| httpd | Receives the input from an HTTP request sent to a temporary local HTTP server (e.g. a webhook) |
 | ini | INI/Properties format |
 | javas | Tries to list java processes running locally (javasinception=true to include itself). Adds the hsperf file path when the process id matches ow.java.getLocalJavaPIDs() |
 | javagc | The Java GC log lines text format |
@@ -221,6 +222,8 @@ List of available formats to use with the _output_ option:
 | gb64json | Equivalent to out=base64 and base64gzip=true |
 | grid | A multiple output ascii grid (useful together with 'loop') |
 | html | An HTML format |
+| http | Sends the output as the body of an HTTP request (POST, PUT, PATCH or DELETE) |
+| httpd | Serves the output over a local HTTP server (e.g. a live JSON endpoint or an OpenMetrics exporter with loop) |
 | idesc | Interactive full-screen tree browser for maps, arrays and scalar values; expand/collapse, zoom, filter, queries, previews, bookmarks, comparison and export |
 | ini | A INI/Properties format (arrays are not supported) |
 | json | A JSON format without spacing |
@@ -376,6 +379,33 @@ List of options to use when _in=hsperf_:
 | hsperfmetadata | Boolean | With in=hsperf, returns {values, header, entries}, including header and per-counter metadata. Defaults to false; requires an updated OpenAF runtime. |
 
 Use _file=_ or _cmd=_ with _hsperfmetadata=true_. Select _path=header_ or _path=entries_ for metadata and _path=values.java_ for Java counters; without metadata, use _path=java_. Counter longs are exact decimal strings. Missing counter groups are omitted, timers require the reported frequency, and nonzero header overflow indicates counters the JVM could not store.
+
+---
+
+### 🧾 HTTPd input options
+
+List of options to use when _in=httpd_ (no other input should be provided):
+
+| Option | Type | Description |
+|--------|------|-------------|
+| inhttpdport | Number | The port to listen on (if not provided a free port is chosen and reported on stderr) |
+| inhttpdhost | String | The address to bind to (defaults to 127.0.0.1; use 0.0.0.0 to accept remote connections) |
+| inhttpdpath | String | If provided only requests to this path (or below) are accepted; others get a 404 |
+| inhttpdtimeout | Number | Milliseconds to wait for a request (defaults to 60000; 0 waits forever) |
+| inhttpdcount | Number | Number of requests to process before stopping (defaults to 1; 0 for no limit until a timeout occurs) |
+| inhttpdtype | String | The input type to parse the request body with (otherwise detected from the Content-Type and the body) |
+| inhttpdmax | Number | Maximum request body size in bytes (defaults to 10485760); larger requests get a 413 |
+| inhttpdstatus | Number | The HTTP status code returned to the sender (defaults to 200) |
+| inhttpdreply | String | The text returned to the sender (defaults to empty) |
+| inhttpdenvelope | Boolean | If true the input is a map with method, uri, headers, params and body instead of just the parsed body |
+| inhttpduser | String | If provided requests need HTTP basic authentication with this user |
+| inhttpdpass | String | The password for _inhttpduser_ |
+| inhttpdcors | Boolean | If true adds CORS headers and answers OPTIONS preflight requests |
+| inhttpdkeystore | String | A Java keystore path to serve HTTPS |
+| inhttpdkeypass | String | The password of _inhttpdkeystore_ |
+
+> Any HTTP method is accepted. Without a body, the query string/form parameters are used as the input.
+> The server only listens on the loopback address by default and stops after the requests are processed. Example: _oafp in=httpd inhttpdport=8080 out=yaml_
 
 ---
 
@@ -1288,6 +1318,52 @@ Examples:
 ```HSPERF=/tmp/hsperfdata_user/12345 && oafp $HSPERF in=hsperf path=java out=grid grid="[[(title:Threads,type:chart,obj:'int threads.live:green:live threads.livePeak:red:peak threads.daemon:blue:daemon -min:0')|(title:ClassLoaders,type:chart,obj:'int cls.loadedClasses:blue:loaded cls.unloadedClasses:red:unloaded')]|[(title:Heap,type:chart,obj:'bytes __mem.total:red:total __mem.used:blue:used -min:0')|(title:Metaspace,type:chart,obj:'bytes __mem.metaTotal:blue:total __mem.metaUsed:green:used -min:0')]]" loop=1 loopcls=true```
 
 ```NS=my-namespace && POD=my-pod-123 && oafp cmd="kubectl top -n $NS pod $POD" in=lines linesvisual=true path="[].{name:NAME,cpu:from_siAbbr(\"CPU(cores)\"),mem:from_bytesAbbr(\"MEMORY(bytes)\")}" out=grid grid="[[(title:cpu,type:chart,obj:'dec3 cpu:blue:cpu -min:0')|(title:mem,type:chart,obj:'bytes mem:green:mem -min:0')]]" loop=2 loopcls=true```
+
+---
+
+### 🌐 HTTPd output options
+
+List of options to use when _out=httpd_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| httpdport | Number | The port to listen on (if not provided a free port is chosen and reported on stderr) |
+| httpdhost | String | The address to bind to (defaults to 127.0.0.1; use 0.0.0.0 to accept remote connections) |
+| httpdpath | String | If provided only requests to this path (or below) are accepted; others get a 404 |
+| httpdformat | String | The output format served (defaults to json). A request can override it with _?format=_ |
+| httpdmime | String | Forces the Content-Type of the replies |
+| httpdstatus | Number | The HTTP status code of the replies (defaults to 200) |
+| httpdcount | Number | Stop after this many requests were answered (defaults to 0: serve until interrupted) |
+| httpdtimeout | Number | Stop after this many milliseconds without requests (defaults to 0: no limit) |
+| httpduser | String | If provided requests need HTTP basic authentication with this user |
+| httpdpass | String | The password for _httpduser_ |
+| httpdcors | Boolean | If true adds CORS headers and answers OPTIONS preflight requests |
+| httpdkeystore | String | A Java keystore path to serve HTTPS |
+| httpdkeypass | String | The password of _httpdkeystore_ |
+
+Formats that can be served: json, pjson, ndjson, ndslon, yaml, toon, slon, csv, dsv, md, mdtable, mdyaml, xml, pxml, html, openmetrics, toml, ini, lines, text, raw, template and tree. Only GET and HEAD are accepted.
+
+> The result is served as a snapshot. With _loop_ the same server keeps running and each pass replaces the snapshot. For inputs that emit records one by one (e.g. ndjson) the snapshot is published when the pass ends.
+> Example: _oafp cmd="kubectl top pod" in=lines linesvisual=true out=httpd httpdformat=openmetrics httpdport=9100 loop=15_
+> Basic authentication only supports passwords without a ':' character.
+
+---
+
+### 🧾 HTTP output options
+
+List of options to use when _out=http_:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| httpurl | String | The URL to send the output to (required) |
+| httpmethod | String | The HTTP method: post (default), put, patch or delete |
+| httpformat | String | The body format: json (default), yaml, ndjson or text. Strings are sent as-is |
+| httpparams | String/Map | A JSON/SLON map of OpenAF $rest options (e.g. requestHeaders, login, pass, timeout, retry) |
+| httpeach | Boolean | If true and the input is an array, one request is made per entry |
+| httpquiet | Boolean | If true the server response is not printed |
+
+> Example: oafp in=yaml file=data.yaml out=http httpurl=https://host/api httpparams="(requestHeaders: (Authorization: 'Bearer x'))"
+> The server response is printed (so it can be piped into another oafp) and a failed request exits with an error. You can use sBuckets variables (e.g. secKey, secRepo, secBucket, secPass, secMainPass, secFile) on 'httpparams' to fill it.
 
 ---
 
