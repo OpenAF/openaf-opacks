@@ -1,0 +1,136 @@
+author: OpenAF contributors
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- openaf
+- grpc
+- protobuf
+bugs:
+  url: https://github.com/OpenAF/openaf-opacks/issues
+repository:
+  type: http
+  url: https://github.com/OpenAF/openaf-opacks/tree/master/grpc
+description: Dynamic gRPC client and server
+name: grpc
+main: grpc.js
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261030'
+dependencies:
+  openaf: '>=20261030'
+files:
+- .gitignore
+- .maven.yaml
+- .package.yaml
+- GRPC-OJOB.md
+- README.md
+- build.sh
+- build.yaml
+- grpc-20261030.jar
+- grpc.js
+- lib/animal-sniffer-annotations-1.27.jar
+- lib/annotations-4.1.1.4.jar
+- lib/error_prone_annotations-2.50.0.jar
+- lib/failureaccess-1.0.3.jar
+- lib/grpc-api-1.85.0.jar
+- lib/grpc-core-1.85.0.jar
+- lib/grpc-netty-shaded-1.85.0.jar
+- lib/grpc-protobuf-1.85.0.jar
+- lib/grpc-protobuf-lite-1.85.0.jar
+- lib/grpc-services-1.85.0.jar
+- lib/grpc-stub-1.85.0.jar
+- lib/grpc-util-1.85.0.jar
+- lib/guava-33.6.0-jre.jar
+- lib/j2objc-annotations-2.8.jar
+- lib/jspecify-1.0.0.jar
+- lib/jsr305-3.0.2.jar
+- lib/perfmark-api-0.27.0.jar
+- lib/proto-google-common-protos-2.64.1.jar
+- lib/protobuf-java-3.25.9.jar
+- lib/protobuf-java-util-3.25.9.jar
+- oJobGRPC.js
+- oJobGRPC.yaml
+- oafp_grpc.js
+- src/openaf/plugins/grpc/Bridge.java
+- src/openaf/plugins/grpc/Conversion.java
+- src/openaf/plugins/grpc/Schema.java
+- tests/conversion.js
+- tests/hello.proto
+- tests/hello.protoset
+- tests/interop.js
+- tests/interop.sh
+- tests/oafp-cli.py
+- tests/oafp-command.js
+- tests/oafp.js
+- tests/ojob.js
+- tests/peer.py
+- tests/protoc-slow.sh
+- tests/run.sh
+- tests/schema.js
+- tests/schema/invalid.proto
+- tests/schema/root.proto
+- tests/schema/roundtrip2.proto
+- tests/schema/roundtrip3.proto
+- tests/schema/types.proto
+- tests/stream.js
+- tests/test.js
+- tests/tls.js
+filesHash:
+  .gitignore: 4bcdd0ef500e36de0e5037ff7d3d7413a58c111e
+  .maven.yaml: 6ec027efedd334f0ad49a64b74a815439c039d57
+  GRPC-OJOB.md: d2de6bb20e1a0abfc0e37a9f4bc62ed5550f9cc0
+  README.md: e7f13a7338e1dfc861422732a08f3548bcf4542e
+  build.sh: 40db574006196258490028d7d7621adb85c8e37e
+  build.yaml: 4b83d21b2c1991b34b97f064293933253b38a0c1
+  grpc-20261030.jar: ba1ea1d0c6952bd9234ca73f43f3ce1bce5204e1
+  grpc.js: 524585f09210e49db2b20af36a6b023c769edcde
+  lib/animal-sniffer-annotations-1.27.jar: c8dc3113676f4d40d4cec38366d4e02ebb8c70cb
+  lib/annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
+  lib/error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
+  lib/failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
+  lib/grpc-api-1.85.0.jar: 2a9fce330f22e02b279c996bb53cef7e13d9be92
+  lib/grpc-core-1.85.0.jar: 7cb2f47b33a87f822d6b5f6e7ab18175fe35a25d
+  lib/grpc-netty-shaded-1.85.0.jar: 1255bb8a7fcbf6cce3c3a014a052ab4d53bf98de
+  lib/grpc-protobuf-1.85.0.jar: fcac483133cf53b320f0e3f7827d4ad194ec1b68
+  lib/grpc-protobuf-lite-1.85.0.jar: d6ce6c5f7cf7fefd9f40cbede26c66f484785f24
+  lib/grpc-services-1.85.0.jar: d97ab990a6851356be5fdda250706e4e9c0b1f14
+  lib/grpc-stub-1.85.0.jar: 75dd7c455458616be9c72c9c51139b76e979245c
+  lib/grpc-util-1.85.0.jar: a89ddea1eeaca791da7bda9b63de0a08bed78e9f
+  lib/guava-33.6.0-jre.jar: c376b13067cc99a5774403530953f7b05a91e218
+  lib/j2objc-annotations-2.8.jar: c85270e307e7b822f1086b93689124b89768e273
+  lib/jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
+  lib/jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
+  lib/perfmark-api-0.27.0.jar: f86f575a41b091786a4b027cd9c0c1d2e3fc1c01
+  lib/proto-google-common-protos-2.64.1.jar: a71d9a9867ed792e54e893b8c7864a0ba1b022cf
+  lib/protobuf-java-3.25.9.jar: 64cdd0aac23f3c05740b6e6a15b041353cf6ffaa
+  lib/protobuf-java-util-3.25.9.jar: 62aaa6521bbc050dc44431a4456f3bf99a1231c4
+  oJobGRPC.js: d07919ecb37259674e60ab56e6e7e2fc672e0f59
+  oJobGRPC.yaml: b7e2f91ad45d7014022b94addc4c7aa11bddfaf9
+  oafp_grpc.js: ac9ee7b7121b43ad6701844784a3e2623ab2015a
+  src/openaf/plugins/grpc/Bridge.java: 1ae341c58b26a8c8677c9d4848164ae2cc46f5b9
+  src/openaf/plugins/grpc/Conversion.java: ebb20458728f8c8d2010f605c4ed9a27e28c7aad
+  src/openaf/plugins/grpc/Schema.java: d4bf3e75f6098b772aa96139b93d927428eb60ad
+  tests/conversion.js: 8669fcc0835901450b4c251ad49ee4d08837fca3
+  tests/hello.proto: 4488d869b49f563e7a7d01da630ce37ece13e62f
+  tests/hello.protoset: 6b1df6284560d0d648688499c8e308cbfe547895
+  tests/interop.js: 7db7bc6ab4b2a2710c9567d4e3ffb8ddc431f769
+  tests/interop.sh: 8559fc962f427e8a39e6f363d3875ded1e85ac62
+  tests/oafp-cli.py: 734b8cfa3bb3e6162f67a68cbf7fa5b6ac78a0cb
+  tests/oafp-command.js: 15694e447575af27077eee4f98912380a0e66177
+  tests/oafp.js: 2472eeea471d737a9d093e0d67a0e871bfa5e38c
+  tests/ojob.js: d13d6eb32df493ad0a5965ea83af709c3c888b70
+  tests/peer.py: d06d5618b9d3b34001333744e12b9c61bc4500af
+  tests/protoc-slow.sh: a05aea4ab532ef8518140d52bd4e71f1eba9a258
+  tests/run.sh: 07916bbafde92921b2d8ea6829eeee25497880c1
+  tests/schema.js: f15f393dc26178250398717eb1a7b697e2b9b1f3
+  tests/schema/invalid.proto: 842493e002f71b7f64d1f0c2de11be82ace2ecf4
+  tests/schema/root.proto: 17178680adda319dae6cebca2a5b7bb32d2973e6
+  tests/schema/roundtrip2.proto: 0afd9b1408f8185a3bf5247cb469e7ff78f8f017
+  tests/schema/roundtrip3.proto: 6ab5c5caac4f7aa22c5dc359299488cb546a728e
+  tests/schema/types.proto: fbb0206c77cff123aded4971dce198886a22cc20
+  tests/stream.js: 4d4ba776cf798757bc2f6b25e18298473881f135
+  tests/test.js: 68dd9451f88e2a30706de2f9dfa65281cfb72573
+  tests/tls.js: 452adefa8695472e7e3e07ee6bfa4c439c2f95fa

@@ -1,0 +1,4 @@
+syntax = "proto3";
+package fixture;
+import "types.proto";
+service Registry { rpc Read(Payload) returns (Payload); }

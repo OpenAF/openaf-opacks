@@ -1,0 +1,16 @@
+artifacts:
+  - group: io.grpc
+    id: grpc-services
+    version: 1.85.0
+  - group: io.grpc
+    id: grpc-netty-shaded
+    version: 1.85.0
+  - group: io.grpc
+    id: grpc-protobuf
+    version: 1.85.0
+  - group: io.grpc
+    id: grpc-stub
+    version: 1.85.0
+  - group: com.google.protobuf
+    id: protobuf-java-util
+    version: 3.25.9

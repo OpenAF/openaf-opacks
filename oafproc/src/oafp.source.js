@@ -936,6 +936,92 @@ const _codecInput = (res, options, gzip) => {
     })
 }
 
+// Each GC pattern owns its capture mapping; parser state belongs to one input.
+const _javaGCParser = () => {
+    var bytes = value => ow.format.fromBytesAbbreviation(value + "B")
+    var fields = (result, match, start, names) => {
+        names.forEach((name, i) => { result[name] = bytes(match[start + i]) })
+    }
+    var timestamp = text => ow.format.toDate(text.replace(/:$/, ""), "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    var legacy = (m, start, full, times) => {
+        var r = {timestamp:timestamp(m[1]), sinceStart:parseFloat(m[2]), gcType:m[3] + " " + m[4]}
+        fields(r,m,start,["PSYoungGenBeforeGC","PSYoungGenAfterGC","PSYoungGenTotal"])
+        start += 3
+        if (full) { fields(r,m,start,["ParOldGenBeforeGC","ParOldGenAfterGC","ParOldGenTotal"]); start += 3 }
+        fields(r,m,start,["heapBeforeGC","heapAfterGC","heapTotal"]); start += 3
+        if (full) { fields(r,m,start,["metaBeforeGC","metaAfterGC","metaTotal"]); start += 3 }
+        r.durationSecs = parseFloat(m[start++])
+        if (times) ["userTime","sysTime","realTime"].forEach(name => { r[name] = parseFloat(m[start++]) })
+        return r
+    }
+    var youngMultiline = m => legacy(m,6,false,true)
+    var young = m => legacy(m,5,false,false)
+    var youngTimes = m => legacy(m,5,false,true)
+    var full = m => legacy(m,5,true,false)
+    var fullTimes = m => legacy(m,5,true,true)
+    var generic = m => {
+        var r = {sinceStart:parseFloat(m[1]),gcType:m[2] + " " + m[3],durationSecs:parseFloat(m[7])}
+        fields(r,m,4,["heapBeforeGC","heapAfterGC","heapTotal"])
+        return r
+    }
+    var modern = m => {
+        var r = {gcId:parseInt(m[2]),gcType:m[3].trim() || "none"}
+        m[1].split("][").forEach(head => {
+            if (/^\d+\.\d+s$/.test(head)) r.sinceStart = parseFloat(head)
+            else if (/\d{4}-\d{2}-\d{2}T/.test(head)) r.timestamp = timestamp(head)
+        })
+        return r
+    }
+    var heap = m => {
+        var r = modern(m)
+        fields(r,m,4,["heapBeforeGC","heapAfterGC","heapTotal"])
+        r.durationSecs = parseFloat(m[7]) / 1000
+        return r
+    }
+    var allocation = m => {
+        var r = modern(m)
+        fields(r,m,5,["heapBeforeGC","heapAfterGC","heapTotal"])
+        r.durationSecs = parseFloat(m[8]) / 1000
+        return r
+    }
+    var meta = m => {
+        var r = modern(m)
+        fields(r,m,4,["metaUsedBeforeGC","metaTotalBeforeGC","metaUsedAfterGC","metaTotalAfterGC",
+            "nonClassUsedBeforeGC","nonClassTotalBeforeGC","nonClassUsedAfterGC","nonClassTotalAfterGC",
+            "classUsedBeforeGC","classTotalBeforeGC","classUsedAfterGC","classTotalAfterGC"])
+        return r
+    }
+    // Specific timed and allocation forms precede shorter alternatives.
+    var patterns = [
+        {pattern: /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s, read: youngMultiline},
+        {pattern: /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/, read: youngTimes},
+        {pattern: /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\]/, read: young},
+        {pattern: /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/, read: fullTimes},
+        {pattern: /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\]/, read: full},
+        {pattern: /(\d+\.\d+): \[(GC|Full GC) \((.*?)\)\s+(\d+K)->(\d+K)\((\d+K)\), (\d+\.\d+) secs\]/, read: generic},
+        {pattern: /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/, read: allocation},
+        {pattern: /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/, read: heap},
+        {pattern: /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/, read: meta},
+    ]
+    return event => {
+        for (var i = 0; i < patterns.length; i++) {
+            var match = event.match(patterns[i].pattern)
+            if (match) return patterns[i].read(match)
+        }
+    }
+}
+const _javaGCFramer = () => {
+    var lines = []
+    var start = /^(\[?\d+|\d{4}-\d{2}-\d{2}T)/
+    var flush = emit => { if (lines.length) emit(lines.join("\n")); lines = [] }
+    var frame = (line, emit) => {
+        if (start.test(line)) { flush(emit); lines.push(line) }
+        else if (lines.length) lines.push(line)
+    }
+    frame.end = emit => flush(emit)
+    return frame
+}
+
 // Interactive description: OpenAF owns parsing, prompts, queries and rendering.
 // Line-oriented readers share one bounded explorer session per input run.
 var _idescSample
@@ -2430,147 +2516,6 @@ var _inputLineFns = {
             return true
         }
     },
-    "javagc": (r, options) => {
-        params.javagcjoin = _$(toBoolean(params.javagcjoin), "javagcjoin").isBoolean().default(false)
-
-        if (params.javagcjoin) return true
-
-        if (isUnDef(global.__javagc_buffer) || global.__javagc_buffer.length > 1048576) global.__javagc_buffer = ""
-        
-        let _procLine = _event => {
-            try {
-                let regexes = [
-                    // JDK 8 Allocation Failure (adjusted to handle multiline events)
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
-                    // JDK 8 style regexes
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\]/,
-                    /([^ ]+) (\d+\.\d+): \[Full GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] \[ParOldGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), \[Metaspace: (\d+K)->(\d+K)\(.*?\)\], (\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintTenuringDistribution
-                    /([^ ]+) (\d+\.\d+): \[GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-                    // JDK 8 with +PrintHeapAtGC
-                    /([^ ]+) (\d+\.\d+): \[Full GC \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\(.*?\)\] \[ParOldGen: (\d+K)->(\d+K)\(.*?\)\] (\d+K)->(\d+K)\(.*?\), \[Metaspace: (\d+K)->(\d+K)\(.*?\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-                    // JDK 9+ style regexes
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc(?:,\w+)?\]\s*GC\((\d+)\)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc(?:,\w+)?\]\s*GC\((\d+)\)\s*(.*?)\s*Heap:\s*(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s*Metaspace:\s*(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s*(\d+\.\d+)ms/,
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
-                    ///\[(\d+\.\d+)s\]\[\w+\]\[gc,\w+\]\s*GC\((\d+)\)\s*(.*?)\s*Heap:\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*Metaspace:\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/,
-                    // JDK 9+ Allocation Failure
-                    /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
-                ]
-
-                for (let index = 0; index < regexes.length; index++) {
-                    let regex = regexes[index]
-                    let match = _event.match(regex)
-                    if (match) {
-                        let result = {}
-
-                        if (_event.startsWith('[')) {
-                            // JDK 9+ style parsing
-                            var heads = match[1].split("][")
-                            heads.forEach(head => {
-                                if (head.match(/^\d+\.\d+s$/)) {
-                                    result.sinceStart = parseFloat(head.replace(/s$/, ""))
-                                } else if (head.match(/\d{4}-\d{2}-\d{2}T/)) {
-                                    result.timestamp = ow.format.toDate(head, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                                }
-                            })
-                            //result.index = index
-                            result.gcId = parseInt(match[2])
-                            result.gcType = match[3].trim()
-                            if (result.gcType == "") result.gcType = "none"
-                            result.durationSecs = parseFloat(match[match.length - 1]) / 1000 // convert ms to secs
-
-                            if (index === 5) {
-                                // Match for GC pause with heap info
-                                result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.heapAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.heapTotal = ow.format.fromBytesAbbreviation(match[6] + "B")
-                            } else if (index > 5) {
-                                if (index == 6) {
-                                    result.metaUsedBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                    result.metaTotalBeforeGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                    result.metaUsedAfterGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                    result.metaTotalAfterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                    result.nonClassUsedBeforeGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                    result.nonClassTotalBeforeGC = ow.format.fromBytesAbbreviation(match[9] + "B")
-                                    result.nonClassUsedAfterGC = ow.format.fromBytesAbbreviation(match[10] + "B")
-                                    result.nonClassTotalAfterGC = ow.format.fromBytesAbbreviation(match[11] + "B")
-                                    result.classUsedBeforeGC = ow.format.fromBytesAbbreviation(match[12] + "B")
-                                    result.classTotalBeforeGC = ow.format.fromBytesAbbreviation(match[13] + "B")
-                                    result.classUsedAfterGC = ow.format.fromBytesAbbreviation(match[14] + "B")
-                                    result.classTotalAfterGC = ow.format.fromBytesAbbreviation(match[15] + "B")
-                                } else {
-                                    result.heapBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                    result.heapAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                    result.heapTotal = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                }
-                            }
-                        } else {
-                            // JDK 8 style parsing
-                            //result.index = index
-                            result.timestamp = ow.format.toDate(match[1], "yyyy-MMdd'T'HH:mm:ss.SSSZ")
-                            result.sinceStart = parseFloat(match[2])
-                            result.gcType = match[3]
-                            result.durationSecs = parseFloat(match[match.length - 1])
-
-                            if (index === 0 || index === 6) {
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                if (index === 6 && _event.includes("Allocation Failure")) {
-                                    result.gcCause = "Allocation Failure"
-                                }
-                            } else if (index === 1 || index === 3) {
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.ParOldGenBeforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.ParOldGenAfterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[9] + "B")
-                                result.metaspaceBeforeGC = ow.format.fromBytesAbbreviation(match[10] + "B")
-                                result.metaspaceAfterGC = ow.format.fromBytesAbbreviation(match[11] + "B")
-                            } else if (index === 2) {
-                                // Match for GC with +PrintTenuringDistribution
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[4] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.userTime = parseFloat(match[8])
-                                result.sysTime = parseFloat(match[9])
-                                result.realTime = parseFloat(match[10])
-                            } else if (index === 6) {
-                                // Adjusted Allocation Failure parsing
-                                result.PSYoungGenBeforeGC = ow.format.fromBytesAbbreviation(match[5] + "B")
-                                result.PSYoungGenAfterGC = ow.format.fromBytesAbbreviation(match[6] + "B")
-                                result.beforeGC = ow.format.fromBytesAbbreviation(match[7] + "B")
-                                result.afterGC = ow.format.fromBytesAbbreviation(match[8] + "B")
-                                result.durationSecs = parseFloat(match[9])
-                                if (match[10]) {
-                                    result.userTime = parseFloat(match[10])
-                                    result.sysTime = parseFloat(match[11])
-                                    result.realTime = parseFloat(match[12])
-                                }
-                                result.gcCause = "Allocation Failure"
-                            }
-                        }
-                        return result
-                    }
-                }
-            } catch (e) {
-                printErr(e)
-                _exit(-2, "Error parsing Java GC log: " + e)
-            }
-        }
-
-        global.__javagc_buffer += r
-        var _res = _procLine(r)
-        if (isMap(_res)) {
-            _$o(_res, options, true)
-            global.__javagc_buffer = ""
-        }
-    },
     "ndjson": (r, options) => {
         params.ndjsonjoin = _$(toBoolean(params.ndjsonjoin), "ndjsonjoin").isBoolean().default(false)
         
@@ -3264,7 +3209,7 @@ var _transformFns = {
     "set": _r => {
         var _d = _fromJSSLON(params.set)
 
-        if (!isMap(_d) && isUnDef(_d.a) && isUnDef(_d.b)) _exit(-1, "set.a path and set.b path are required.")
+        if (!isMap(_d)) _exit(-1, "set.a path and set.b path are required.")
         if (isUnDef(pForEach)) _exit(-1, "This version of OpenAF does not support the set transform")
         if (!isString(_d.a)) _exit(-1, "set.a path is not a string.")
         if (!isString(_d.b)) _exit(-1, "set.b path is not a string.")
@@ -3278,36 +3223,25 @@ var _transformFns = {
             ow.loadObj()
             var _ks = params.setkeys.split(",").map(r => r.trim())
             toOrdStr  = r => stringify(isObject(r) ? _sortTransformKeys(ow.obj.filterKeys(_ks, r)) : r, __, "")
-            toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
+            toOrdStrs = r => pForEach(r, toOrdStr)
         } else {
             toOrdStr  = r => stringify(isObject(r) ? _sortTransformKeys(r) : r, __, "")
-            toOrdStrs = r => pForEach(r, toOrdStr).reduce((pV, cV) => pV.concat(cV), [])
+            toOrdStrs = r => pForEach(r, toOrdStr)
         }
 
+        var keysA = toOrdStrs(_d1), keysB = toOrdStrs(_d2)
+        var ca = new Set(keysA), cb = new Set(keysB)
         switch(params.setop) {
-        case "union"    :
-            let ca = new Set(toOrdStrs(_d1))
-            return _d1.concat(_d2.filter(r => !ca.has(toOrdStr(r))))
-        case "diffa"    :
-            let cb2 = new Set(toOrdStrs(_d2))
-            return _d1.filter(r => !cb2.has(toOrdStr(r)))
-        case "diffb"    :
-            let cb3 = new Set(toOrdStrs(_d1))
-            return _d2.filter(r => !cb3.has(toOrdStr(r)))
-        case "diffab"   :
-            let cb4 = new Set(toOrdStrs(_d1))
-            let cb5 = new Set(toOrdStrs(_d2))
-            return _d1.filter(r => !cb5.has(toOrdStr(r))).concat(_d2.filter(r => !cb4.has(toOrdStr(r))))
-        case "diff"     :
-            let cb6 = new Set(toOrdStrs(_d1))
-            let cb7 = new Set(toOrdStrs(_d2))
-            return            _d1.map(r => Object.assign({ '*': cb7.has(toOrdStr(r)) ? __ : "a" }, r))
-                      .concat(_d2.map(r => Object.assign({ '*': cb6.has(toOrdStr(r)) ? __ : "b" }, r)))
-                      .filter(r => isDef(r['*']))
+        case "union": return _d1.concat(_d2.filter((r, i) => !ca.has(keysB[i])))
+        case "diffa": return _d1.filter((r, i) => !cb.has(keysA[i]))
+        case "diffb": return _d2.filter((r, i) => !ca.has(keysB[i]))
+        case "diffab":
+            return _d1.filter((r, i) => !cb.has(keysA[i])).concat(_d2.filter((r, i) => !ca.has(keysB[i])))
+        case "diff":
+            return _d1.filter((r, i) => !cb.has(keysA[i])).map(r => Object.assign({}, r, { '*': "a" }))
+                .concat(_d2.filter((r, i) => !ca.has(keysB[i])).map(r => Object.assign({}, r, { '*': "b" })))
         case "intersect":
-        default         :
-            let cb1 = new Set(toOrdStrs(_d2))
-            return _d1.filter(r => cb1.has(toOrdStr(r)))
+        default: return _d1.filter((r, i) => cb.has(keysA[i]))
         }
     },
     "forcearray": _r => {
@@ -5031,189 +4965,18 @@ var _inputFns = new Map([
         _$o(_r, options)
     }],
     ["javagc", (_res, options) => {
-        params.javagcjoin = _$(toBoolean(params.javagcjoin), "javagcjoin").isBoolean().default(false)
-
-        // Pre-compile regex patterns for performance (moved outside hot path)
-        const regexes = [
-            // JDK 8 Allocation Failure (adjusted to handle multiline events)
-            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\)(.+?)\[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/s,
-            // JDK 8 style regexes
-            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\]/,
-            // JDK 8 with +PrintHeapAtGC
-            /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-            // JDK 8 with +PrintHeapAtGC and +PrintTenuringDistribution
-            /([^ ]+) (\d+\.\d+): \[(Full GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] \[ParOldGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), \[Metaspace: (\d+K)->(\d+K)\((.*?)\)\], (\d+\.\d+) secs\]/,
-            // JDK 8 with +PrintTenuringDistribution
-            /([^ ]+) (\d+\.\d+): \[(GC) \((.*?)\) \[PSYoungGen: (\d+K)->(\d+K)\((.*?)\)\] (\d+K)->(\d+K)\((.*?)\), (\d+\.\d+) secs\] \[Times: user=(\d+\.\d+) sys=(\d+\.\d+), real=(\d+\.\d+) secs\]/,
-            // JDK 8 Generic GC logs (simple format)
-            /(\d+\.\d+): \[(GC|Full GC) \((.*?)\)\s+(\d+K)->(\d+K)\((\d+K)\), (\d+\.\d+) secs\]/,
-            // JDK 9+ style regexes
-            /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*(\d+[GMK])->(\d+[GMK])\((\d+[GMK])\)\s*(\d+\.\d+)ms/,
-            /^\[(.+)\]\s+GC\((\d+)\)\s*(.*?)\s*Metaspace:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*NonClass:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)\s*Class:\s*(\d+[GMK])\((\d+[GMK])\)->(\d+[GMK])\((\d+[GMK])\)/,
-            // JDK 9+ Allocation Failure
-            /^\[(.+)\]\s+GC\((\d+)\)\s*(Allocation Failure)\s*(.*?)\s+(\d+[KMGT])->(\d+[KMGT])\((\d+[KMGT])\)\s+(\d+\.\d+)ms/,
-        ]
-
-        // Pre-compile patterns for head parsing
-        const timePattern = /^\d+\.\d+s$/
-        const timestampPattern = /\d{4}-\d{2}-\d{2}T/
-
-        // Helper function to avoid repeated string concatenation
-        const fromBytesAbbr = val => isDef(val) ? ow.format.fromBytesAbbreviation(val + "B") : __
-
-        let _procLine = _event => {
-            try {
-
-                for (let index = 0; index < regexes.length; index++) {
-                    let match = _event.match(regexes[index])
-                    if (match) {
-                        let result = {}
-
-                        if (_event.charCodeAt(0) === 91) { // '[' char - faster than startsWith
-                            // JDK 9+ style parsing
-                            var heads = match[1].split("][")
-                            for (let i = 0; i < heads.length; i++) {
-                                let head = heads[i]
-                                if (timePattern.test(head)) {
-                                    result.sinceStart = parseFloat(head.slice(0, -1)) // faster than replace
-                                } else if (timestampPattern.test(head)) {
-                                    result.timestamp = ow.format.toDate(head, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                                }
-                            }
-                            result.gcId = parseInt(match[2])
-                            result.gcType = match[3].trim() || "none"
-                            result.durationSecs = parseFloat(match[match.length - 1]) / 1000 // convert ms to secs
-
-                            if (index === 5) {
-                                // Match for GC pause with heap info
-                                result.heapBeforeGC = fromBytesAbbr(match[4])
-                                result.heapAfterGC = fromBytesAbbr(match[5])
-                                result.heapTotal = fromBytesAbbr(match[6])
-                            } else if (index > 5) {
-                                if (index == 6) {
-                                    result.metaUsedBeforeGC = fromBytesAbbr(match[4])
-                                    result.metaTotalBeforeGC = fromBytesAbbr(match[5])
-                                    result.metaUsedAfterGC = fromBytesAbbr(match[6])
-                                    result.metaTotalAfterGC = fromBytesAbbr(match[7])
-                                    result.nonClassUsedBeforeGC = fromBytesAbbr(match[8])
-                                    result.nonClassTotalBeforeGC = fromBytesAbbr(match[9])
-                                    result.nonClassUsedAfterGC = fromBytesAbbr(match[10])
-                                    result.nonClassTotalAfterGC = fromBytesAbbr(match[11])
-                                    result.classUsedBeforeGC = fromBytesAbbr(match[12])
-                                    result.classTotalBeforeGC = fromBytesAbbr(match[13])
-                                    result.classUsedAfterGC = fromBytesAbbr(match[14])
-                                    result.classTotalAfterGC = fromBytesAbbr(match[15])
-                                } else {
-                                    result.heapBeforeGC = fromBytesAbbr(match[4])
-                                    result.heapAfterGC = fromBytesAbbr(match[5])
-                                    result.heapTotal = fromBytesAbbr(match[6])
-                                }
-                            }
-                        } else {
-                            // JDK 8 style parsing
-                            if (index == 5) {
-                                // JDK 8 Generic GC logs (simple format)
-                                result.sinceStart = parseFloat(match[1])
-                                result.gcType = match[2] + " " + match[3]
-                                result.heapBeforeGC = fromBytesAbbr(match[4])
-                                result.heapAfterGC = fromBytesAbbr(match[5])
-                                result.heapTotal = fromBytesAbbr(match[6])
-                                result.durationSecs = parseFloat(match[7])
-                            } else {
-                                result.timestamp = ow.format.toDate(match[1], "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                                result.sinceStart = parseFloat(match[2])
-                                result.gcType = match[3] + " " + match[4]
-
-                                if (index <= 4) {
-                                    let idx = 5
-                                    result.PSYoungGenBeforeGC = fromBytesAbbr(match[idx++])
-                                    result.PSYoungGenAfterGC = fromBytesAbbr(match[idx++])
-                                    result.PSYoungGenTotal = fromBytesAbbr(match[idx++])
-
-                                    if (index == 2 || index == 3) {
-                                        result.ParOldGenBeforeGC = fromBytesAbbr(match[idx++])
-                                        result.ParOldGenAfterGC = fromBytesAbbr(match[idx++])
-                                        result.ParOldGenTotal = fromBytesAbbr(match[idx++])
-                                    }
-
-                                    result.heapBeforeGC = fromBytesAbbr(match[idx++])
-                                    result.heapAfterGC = fromBytesAbbr(match[idx++])
-                                    result.heapTotal = fromBytesAbbr(match[idx++])
-
-                                    if (index == 2 || index == 3) {
-                                        result.metaBeforeGC = fromBytesAbbr(match[idx++])
-                                        result.metaAfterGC = fromBytesAbbr(match[idx++])
-                                        result.metaTotal = fromBytesAbbr(match[idx++])
-                                    }
-
-                                    result.durationSecs = parseFloat(match[idx++])
-
-                                    if (index == 0 || index == 2 || index == 4) {
-                                        result.userTime = parseFloat(match[idx++])
-                                        result.sysTime = parseFloat(match[idx++])
-                                        result.realTime = parseFloat(match[idx++])
-                                    }
-                                }
-                            }
-                        }
-                        return result
-                    }
-                }
-            } catch (e) {
-                printErr(e)
-                _exit(-2, "Error parsing Java GC log: " + e)
+        var parse = _javaGCParser(), frame = _javaGCFramer(), results = []
+        var joined = toBoolean(params.javagcjoin)
+        var emit = text => {
+            var result = parse(text)
+            if (isDef(result)) {
+                if (joined) results.push(result)
+                else _$o(result, options, true)
             }
         }
-
-        _showTmpMsg()
-        if (isString(_res)) {
-            let lines = _res.split("\n")
-            let gcStartPattern = /^(\[?\d+|\d{4}-\d{2}-\d{2}T)/ // Matches lines starting with '[\d+' or a timestamp
-
-            let gcEvents = []
-            let currentEvent = ""
-            let hasCurrentEvent = false
-
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i]
-                if (gcStartPattern.test(line)) {
-                    // New GC event detected
-                    if (hasCurrentEvent) {
-                        gcEvents.push(currentEvent)
-                    }
-                    currentEvent = line
-                    hasCurrentEvent = true
-                } else {
-                    // Continuation of the current GC event
-                    if (hasCurrentEvent) {
-                        currentEvent += "\n" + line
-                    }
-                }
-            }
-            // Add the last GC event
-            if (hasCurrentEvent) {
-                gcEvents.push(currentEvent)
-            }
-
-            // Process events and filter valid results in one pass
-            let results = []
-            for (let i = 0; i < gcEvents.length; i++) {
-                let result = _procLine(gcEvents[i])
-                if (isMap(result)) {
-                    results.push(result)
-                }
-            }
-
-            if (params.javagcjoin) {
-                _$o(results, options, true)
-            } else {
-                for (let i = 0; i < results.length; i++) {
-                    _$o(results[i], options, true)
-                }
-            }
-        } else {
-            _exit(-1, "javagc is only supported with a string input.")
-        }
+        _readInputLines(_res, line => { frame(line, emit); return false })
+        frame.end(emit)
+        if (joined) _$o(results, options)
     }],
     ["hsperf", (_res, options) => {
         if (isDef(params.file) || isDef(params.cmd)) {
@@ -5342,40 +5105,33 @@ var _inputFns = new Map([
         // Detects if input is YAML of JSON/SLON
         var _r = _fromJSSLON(_res, true)
         var id = "_oafp_key_" + genUUID()
+        var invoke = (request, key, capture) => {
+            var child = clone(request)
+            child.noexit = true
+            child.__inception = true
+            if (capture) { child.out = "key"; child.__key = key }
+            try {
+                oafp(child)
+                if (capture) return $get(key)
+            } finally { if (capture) $unset(key) }
+        }
         if (isMap(_r)) {
-            _r.out         = "key"
-            _r.__key       = id
-            _r.__inception = true
-            oafp(_r)
-            var _d = $get(id)
-            $unset(id)
-            _$o(_d, options)
+            var value
+            try { value = invoke(_r, id, true) } catch(e) { _exit(-1, e) }
+            _$o(value, options)
         } else if (isArray(_r)) {
-            $set(id, true)
-            var _out = pForEach(_r, (__r, i) => {
-                var sid = id + "_" + String(i)
-                var _ok = false
-                if (isUnDef(__r.out)) {
-                    __r.out         = "key"
-                    __r.__key       = sid
-                    __r.__inception = true
-                    _ok = true
-                }
-                //return $do(() => {
-                var _rr
-                try {
-                    oafp(__r)
-                    if (_ok) {
-                        _rr = $get(sid)
-                        $unset(sid)
-                    }
-                } catch(e) {
-                    sprintErr(e)
-                } finally {
-                    return _rr
-                }
-            }, __, isDef(params.inoafpseq) ? toBoolean(params.inoafpseq) : __)
-            //$doWait($doAll(_p))
+            ow.loadObj()
+            var errors = new ow.obj.syncArray()
+            var _out = pForEach(_r, (request, i) => {
+                try { return invoke(request, id + "_" + i, isUnDef(request.out)) }
+                catch(e) { errors.add({index:i, error:e}) }
+            }, e => errors.add({index:-1, error:e}), isDef(params.inoafpseq) ? toBoolean(params.inoafpseq) : __)
+            if (errors.length() > 0) {
+                var first = errors.toArray().sort((a,b) => a.index - b.index)[0]
+                var failure = new Error("oafp entry " + first.index + ": " + String(first.error))
+                failure.cause = first.error
+                _exit(-1, failure)
+            }
             _$o(_out, options)
         } else {
             _exit(-1, "oafp input data needs to be a map or an array.")
@@ -5944,7 +5700,7 @@ var _run = () => {
     }
     // Stream-capable handlers own their input; do not first buffer it in _res.
     if (!_version && isUnDef(params.url) &&
-        (["lines", "ndjson", "ndslon", "dsv", "csv"].indexOf(params.type) >= 0 ||
+        (["lines", "ndjson", "ndslon", "dsv", "csv", "javagc"].indexOf(params.type) >= 0 ||
          (params.type == "json" && toBoolean(params.stream)))) {
         _inputFns.get(params.type)(isString(params.data) ? params.data : "", options)
         delete params.__origr

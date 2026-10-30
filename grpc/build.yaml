@@ -1,0 +1,104 @@
+help:
+  text: Clean, fetch, normalize, compile and package grpc.
+  expects:
+    - name: test
+      desc: Run local regression tests after compiling (requires protoc).
+      example: true
+      mandatory: false
+
+ojob:
+  async: false
+  catch: printErr(exception); exit(1);
+
+jobs:
+  - name: Initialize build
+    exec: |
+      global.__grpcBuild = {};
+      global.__grpcBuild.root = String(new java.io.File('.').getCanonicalPath());
+      if (Number(getVersion()) < 20261030) throw 'OpenAF >=20261030 is required';
+      if (!io.fileExists(getOpenAFJar() + '.orig')) throw 'checkOAFJars requires the OpenAF .jar.orig archive';
+      ow.loadFormat();
+      global.__grpcBuild.javaHome = ow.format.getJavaHome();
+      if (!io.fileExists(global.__grpcBuild.javaHome + '/bin/javac')) throw 'A JDK with javac is required';
+      var required = ['src/openaf/plugins/grpc/Bridge.java', '.maven.yaml', '.package.yaml'];
+      required.forEach(function(file) {
+        if (!io.fileExists(global.__grpcBuild.root + '/' + file)) throw 'Run this job from the grpc directory: missing ' + file;
+      });
+      global.__grpcBuild.run = function(command) {
+        var result = $sh(command).pwd(global.__grpcBuild.root).get(0);
+        if (result.stdout) print(result.stdout);
+        if (result.stderr) printErr(result.stderr);
+        if (result.exitcode !== 0) throw 'Build command failed (' + result.exitcode + '): ' + command.join(' ');
+      };
+      global.__grpcBuild.oaf = [global.__grpcBuild.javaHome + '/bin/java', '-jar', getOpenAFJar()];
+      global.__grpcBuild.package = io.readFileYAML(global.__grpcBuild.root + '/.package.yaml');
+      global.__grpcBuild.jar = 'grpc-' + global.__grpcBuild.package.version + '.jar';
+
+  - name: Clean build artifacts
+    exec: |
+      io.mkdir(global.__grpcBuild.root + '/lib');
+      io.listFiles(global.__grpcBuild.root + '/lib').files.filter(function(file) {
+        return file.isFile && /\.jar$/.test(file.filename);
+      }).forEach(function(file) { io.rm(file.canonicalPath); });
+      // target contains generated classes and Maven build outputs only.
+      io.rm(global.__grpcBuild.root + '/target');
+      io.mkdir(global.__grpcBuild.root + '/target/classes');
+      io.listFiles(global.__grpcBuild.root).files.filter(function(file) {
+        return file.isFile && /^grpc-.*\.jar$/.test(file.filename);
+      }).forEach(function(file) { io.rm(file.canonicalPath); });
+
+  - name: Fetch dependencies
+    exec: |
+      io.cp(global.__grpcBuild.root + '/.maven.yaml', global.__grpcBuild.root + '/lib/.maven.yaml');
+      try {
+        global.__grpcBuild.run(global.__grpcBuild.oaf.concat(['--ojob', '-e', 'ojob.io/oaf/mavenGetJars folder=lib updateLevel=0 updateTransitive=false']));
+      } finally {
+        io.rm(global.__grpcBuild.root + '/lib/.maven.yaml');
+      }
+      var config = io.readFileYAML(global.__grpcBuild.root + '/.maven.yaml');
+      config.artifacts.forEach(function(artifact) {
+        var jar = global.__grpcBuild.root + '/lib/' + artifact.id + '-' + artifact.version + '.jar';
+        if (!io.fileExists(jar) || io.fileInfo(jar).size === 0) throw 'Dependency download missing or empty: ' + jar;
+      });
+
+  - name: Remove OpenAF dependencies
+    exec: |
+      global.__grpcBuild.run(global.__grpcBuild.oaf.concat(['--ojob', '-e', 'ojob.io/oaf/checkOAFJars path=lib remove=true versioninsensitive=true']));
+      if (io.listFiles(global.__grpcBuild.root + '/lib').files.some(function(file) { return /^gson-.*\.jar$/.test(file.filename); })) {
+        throw 'Gson should be supplied by OpenAF; checkOAFJars did not remove it';
+      }
+      // These compatibility artifacts have no runtime implementation.
+      io.listFiles(global.__grpcBuild.root + '/lib').files.filter(function(file) {
+        return /^(grpc-context-|listenablefuture-9999\.0-empty-to-avoid-conflict-with-guava).*\.jar$/.test(file.filename);
+      }).forEach(function(file) { io.rm(file.canonicalPath); });
+
+  - name: Compile transport
+    exec: |
+      var jars = io.listFiles(global.__grpcBuild.root + '/lib').files.filter(function(file) {
+        return file.isFile && /\.jar$/.test(file.filename);
+      }).map(function(file) { return file.canonicalPath; });
+      jars.push(getOpenAFJar());
+      var sources = listFilesRecursive(global.__grpcBuild.root + '/src').filter(function(file) {
+        return /\.java$/.test(file.filename);
+      }).map(function(file) { return file.canonicalPath; });
+      global.__grpcBuild.run([global.__grpcBuild.javaHome + '/bin/javac', '--release', '21', '-encoding', 'UTF-8',
+        '-cp', jars.join(String(java.io.File.pathSeparator)), '-d', global.__grpcBuild.root + '/target/classes'].concat(sources));
+      global.__grpcBuild.run([global.__grpcBuild.javaHome + '/bin/jar', '--create', '--file', global.__grpcBuild.root + '/' + global.__grpcBuild.jar,
+        '-C', global.__grpcBuild.root + '/target/classes', '.']);
+
+  - name: Test transport
+    exec: |
+      if (toBoolean(args.test)) global.__grpcBuild.run(['env', 'GRPC_OPENAF_JAR=' + getOpenAFJar(), 'sh', 'tests/run.sh']);
+
+  - name: Regenerate package
+    exec: |
+      global.__grpcBuild.run(global.__grpcBuild.oaf.concat(['--opack', '-e', 'genpack . --exclude target']));
+
+todo:
+  - Initialize build
+  - Clean build artifacts
+  - Fetch dependencies
+  - Remove OpenAF dependencies
+  - Compile transport
+  - Test transport
+  - Regenerate package

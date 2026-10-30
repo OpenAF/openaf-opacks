@@ -1,0 +1,71 @@
+# Include this file; it declares jobs without starting transport.
+jobs:
+  - name: GRPC Start Server
+    typeArgs:
+      shortcut:
+        name: grpcServer
+        keyArg: id
+        args:
+          options: options
+          bindings: bindings
+    help: |
+      Start a named server. options is the ow.server.grpc.start configuration
+      without services. bindings maps service/method to a job name or
+      {job: jobName, args: extraArgs}. Jobs receive request, metadata and method,
+      and must set response. Sets args.port to the actual listening port.
+      Streaming uploads supply an array; server-streaming replies use an array;
+      bidirectional methods invoke the bound job once per incoming message.
+    check:
+      in:
+        id: isString.default("grpc")
+        options: isMap
+        bindings: isMap
+    exec: |
+      var grpcJobs = require("oJobGRPC.js")
+      args.port = grpcJobs.start(args.id, args.options, args.bindings)
+
+  - name: GRPC Stop Server
+    typeArgs:
+      shortcut:
+        name: grpcStop
+        keyArg: id
+        args:
+          timeout: timeout
+    help: |
+      Stop a named server started by GRPC Start Server. timeout is a shutdown
+      grace period in milliseconds (default 5000; zero forces shutdown).
+      Already stopped servers are ignored. Does not affect other named servers.
+    check:
+      in:
+        id: isString.default("grpc")
+        timeout: toNumber.isNumber.default(5000)
+    exec: |
+      require("oJobGRPC.js").stop(args.id, args.timeout)
+
+  - name: GRPC Call
+    typeArgs:
+      shortcut:
+        name: grpcCall
+        keyArg: method
+        args:
+          options: options
+          request: request
+          callOptions: callOptions
+    help: |
+      Call a remote method using ow.obj.grpc.client options (schema, target,
+      reflection and TLS). method is service/method. request is one map for
+      unary/server-streaming or an array for client/bidirectional streaming.
+      callOptions accepts timeout and metadata. Sets args.response (map for
+      unary/client-streaming, array for server/bidirectional streaming),
+      args.headers and args.trailers. Always closes transport; no retries.
+    check:
+      in:
+        options: isMap
+        method: isString
+        request: default({})
+        callOptions: isMap.default({})
+    exec: |
+      var result = require("oJobGRPC.js").call(args.options, args.method, args.request, args.callOptions)
+      args.response = result.response
+      args.headers = result.headers
+      args.trailers = result.trailers

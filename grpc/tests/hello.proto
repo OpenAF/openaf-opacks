@@ -1,0 +1,4 @@
+syntax = "proto3";
+package demo;
+message Message { string name = 1; int64 count = 2; bytes data = 3; map<string,string> labels = 4; oneof choice { string text = 5; int32 number = 6; } }
+service Greeter { rpc Echo(Message) returns (Message); rpc Fail(Message) returns (Message); rpc Slow(Message) returns (Message); rpc Watch(Message) returns (stream Message); rpc Collect(stream Message) returns (Message); rpc Chat(stream Message) returns (stream Message); }

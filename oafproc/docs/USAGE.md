@@ -347,7 +347,9 @@ List of options to use when _in=javagc_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| javagcjoin | Boolean | If true it will return an array with each processed line. |
+| javagcjoin | Boolean | If true returns one array of parsed GC events; otherwise emits events incrementally. |
+
+File, data, command and stdin input share the same parser. Multiline events are completed at the next event or EOF. Heap and metaspace metrics are reported in bytes; duration and timing fields are in seconds and omitted when absent.
 
 ---
 
@@ -611,6 +613,8 @@ List of options to use when _in=ndslon_:
 | Option | Type | Description |
 |--------|------|-------------|
 | inoafpseq | Boolean | If true processes an input array of oafp parameter maps sequentially |
+
+A child failure fails the parent after all started workers settle, without emitting a successful aggregate. Errors identify the child array index. Completed child side effects are not rolled back.
 
 ### 🧾 RAWHEX input options
 
@@ -924,7 +928,7 @@ List of options to use when _set=..._:
 | setop | String | Allows to choose a different set operation between 'union', 'diffa', 'diffb', 'diffab' (symmetric difference), 'diff' and 'intersect' (default) |
 
 > Example: ```set="(a: old, b: new)" setop=diffb```
-> 'setop=diff' will add an extra column '*' to identify if a line only exists in 'a' or in 'b'
+> 'setop=diff' adds the reserved column '*' to identify if a line only exists in 'a' or 'b'. Membership is computed from the original values (or `setkeys`); on returned differing rows, the marker replaces any existing '*' value. Input rows are unchanged.
 
 ---
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package fixture;
+message Modern {
+  optional string name = 1;
+  map<string, int64> values = 2;
+  oneof choice { string text = 3; bytes data = 4; }
+  message Nested { string value = 1; }
+  repeated Nested nested = 5;
+  reserved 8 to 10;
+  reserved "old";
+}
+enum Mode { MODE_UNSPECIFIED = 0; ACTIVE = 1 [deprecated = true]; }
+service Streaming { rpc Chat(stream Modern) returns (stream Modern); }

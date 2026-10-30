@@ -1,0 +1,16 @@
+syntax = "proto2";
+package fixture;
+option java_package = "org.example.fixture";
+message Legacy {
+  reserved 5 to 8, 12;
+  reserved "old_name";
+  required string name = 1 [default = "hello", deprecated = true];
+  optional bytes data = 2 [default = "\000\377abc"];
+  repeated sint64 values = 3 [packed = true];
+  optional Nested nested = 4;
+  message Nested { optional bool enabled = 1 [default = true]; }
+  enum State { option allow_alias = true; UNKNOWN = 0; FIRST = 1; ALSO_FIRST = 1; reserved 2 to 4; reserved "OLD"; }
+  optional State state = 9 [default = FIRST];
+  oneof choice { string text = 10; int32 number = 11; }
+}
+service LegacyService { option deprecated = true; rpc Call(Legacy) returns (Legacy) { option deprecated = true; } }
