@@ -2552,6 +2552,8 @@ if ("undefined" == typeof params.file && "undefined" == typeof params.cmd && "un
 
 if (typeof params.debug !== "undefined") params.debug = toBoolean(params.debug)
 if (isDef(params["-debug"])) params.debug = true
+// Only show error stacks when debug is enabled
+__flags.OAF_ERRSTACK = (params.debug === true)
 if (isDef(params["-p"])) params.pause = true
 
 // Verify the data param

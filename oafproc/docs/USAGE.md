@@ -57,7 +57,7 @@ Takes an input, usually a data structure such as json, and transforms it to an e
 | examples | Will search the provided keyword or 'category::subcategory' in the internet based list of oafp examples |
 | version | Alternative way to change the input to a map with the tool's version |
 | -v | Changes the input to a map with the tool's version info |
-| debug | If true prints debugging messages |
+| debug | If true prints debugging messages and enables error stack traces (OAF_ERRSTACK) |
 
 > Filter order: _ifrom_, _isql_, _path_, _ijq_ (alias _jq_), transforms, _from_, _sql_, _opath_, _ojq_. See _help=filters_ for syntax, examples, and jq result/record handling.
 
