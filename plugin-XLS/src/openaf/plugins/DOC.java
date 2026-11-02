@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.lang.String;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.util.HexFormat;
 
 import org.apache.poi.xwpf.usermodel.XWPFAbstractNum;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -148,9 +148,7 @@ public class DOC extends ScriptableObject {
 
     // doc.getDocument().getProperties().getCoreProperties().getCreator()
     protected byte[] hexToBytes(String hexString) {
-        HexBinaryAdapter adapter = new HexBinaryAdapter();
-        byte[] bytes = adapter.unmarshal(hexString);
-        return bytes;
+        return hexString == null ? null : HexFormat.of().parseHex(hexString);
     }
 
     /* @JSFunction
