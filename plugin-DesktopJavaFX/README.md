@@ -5,13 +5,14 @@ JVM: one owned helper uses the module path and exits on parent-pipe EOF. Ordinar
 OpenAF/headless installations have no JavaFX dependency or new startup flags.
 
 Requires an OpenAF build containing `ow.loadDesktop`, Java 21+ for OpenAF, and a
-helper JVM containing `jdk.jsobject` (Java 21 through 25). JavaFX is pinned to
-21.0.12. The adapter reports a clear error when the current JVM is incompatible;
+JDK 25+ helper JVM. JavaFX is pinned to 27.0.1 (upgraded from 21.0.12).
+JavaFX 27 requires JDK 25+ and supplies its own `jdk.jsobject` module.
+The adapter reports a clear error when the current JVM is incompatible;
 configure another helper without changing the application's API:
 
 ```javascript
 ow.loadDesktop({ provider: "javafx",
-  providerOptions: { javafx: { java: "/path/to/java21/bin/java" } } });
+  providerOptions: { javafx: { java: "/path/to/java25/bin/java" } } });
 ```
 
 ## Installation and source build
@@ -20,23 +21,25 @@ ow.loadDesktop({ provider: "javafx",
 opack install plugin-DesktopJavaFX
 ```
 
-The install hook downloads only the current platform's five JavaFX modules and
-verifies `javafx-lock.json` SHA-256 hashes. It never runs at window creation time.
+The install hook downloads the current platform's six modules (five `javafx-*`
+JARs plus `jdk-jsobject`) and verifies `javafx-lock.json` SHA-256 hashes. After verifying the complete set, it
+removes older versions of those modules from the platform directory. It never
+runs at window creation time.
 For offline installation set `OPENAF_DESKTOP_ARTIFACTS` to a directory containing
-all five pinned classifier JARs. JavaFX files live in ignored `lib/<classifier>`;
+all six pinned classifier JARs. JavaFX files live in ignored `lib/<classifier>`;
 only the small provider JAR is distributed in the oPack.
 
-To build this package from source, use an OpenAF runtime with a JDK (21+):
+To build this package from source, use an OpenAF runtime with a JDK (25+):
 
 ```sh
 cd plugin-DesktopJavaFX
 openaf -c 'require("./install.js").install(".");'
 ojob compile.yaml
-opack genpack . --exclude lib,.cache,classes
+opack genpack . --exclude lib,.cache,classes,tests,DesktopJavaFX.results.json
 ```
 
-Compilation uses `--release 21`. OpenAF itself is built with its existing JDK 24+
-requirements. No new core Maven dependency, JavaFX Maven plugin, FXML, Swing,
+Compilation uses `--release 25` for the JavaFX 27 helper. OpenAF itself is built
+with its existing JDK 24+ requirements. No new core Maven dependency, JavaFX Maven plugin, FXML, Swing,
 Node.js or frontend framework is required. Gson comes from the OpenAF JAR.
 
 Locked classifiers: `win` (x64), `mac` (x64), `mac-aarch64`, `linux` (x64), and

@@ -2,4 +2,4 @@
 artifacts:
 - group: org.openjfx
   id: javafx-web
-  version: 21.0.12
+  version: 27.0.1

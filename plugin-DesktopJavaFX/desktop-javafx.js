@@ -34,16 +34,16 @@ exports.create = function(root) {
     } finally { pending.remove(id); }
   }
   return {
-    describe: function() { return { id: "javafx", version: "20261018", spi: 1, engineVersion: "21.0.12", execution: "helper" }; },
+    describe: function() { return { id: "javafx", version: "20261102", spi: 1, engineVersion: "27.0.1", execution: "helper" }; },
     probe: function(options) {
       try {
         var c = config(options);
         if (!c.classifier) return { available: false, reason: "Unsupported OS/architecture" };
         if (String(java.lang.System.getProperty("java.awt.headless")) == "true") return { available: false, reason: "Headless JVM" };
         if (c.classifier.indexOf("linux") == 0 && java.lang.System.getenv("DISPLAY") == null && java.lang.System.getenv("WAYLAND_DISPLAY") == null) return { available: false, reason: "No display environment" };
-        if (!io.fileExists(root + "/desktop-javafx.jar") || !io.fileExists(root + "/lib/" + c.classifier + "/javafx-web-21.0.12-" + c.classifier + ".jar")) return { available: false, reason: "Run the provider install.js and compile.yaml first" };
-        var r = $sh([c.java, "--list-modules"]).timeout(10000).get(0);
-        if (r.exitcode != 0 || !/java.base@(2[1-9]|[3-9][0-9])/.test(String(r.stdout)) || String(r.stdout).indexOf("jdk.jsobject@") < 0) return { available: false, reason: "JavaFX 21 needs a JVM containing jdk.jsobject (Java 21-25); set providerOptions.javafx.java" };
+        if (!io.fileExists(root + "/desktop-javafx.jar") || !io.fileExists(root + "/lib/" + c.classifier + "/javafx-web-27.0.1-" + c.classifier + ".jar")) return { available: false, reason: "Run the provider install.js and compile.yaml first" };
+        var r = $sh([c.java, "--module-path", root + "/lib/" + c.classifier, "--add-modules", "javafx.web", "--list-modules"]).timeout(10000).get(0);
+        if (r.exitcode != 0 || !/^java\.base@(2[5-9]|[3-9][0-9]|[1-9][0-9]{2,})(?:[.\s+-]|$)/m.test(String(r.stdout)) || String(r.stdout).indexOf("javafx.web@27.0.1") < 0) return { available: false, reason: "JavaFX 27.0.1 needs JDK 25+ and its installed modules; set providerOptions.javafx.java or rerun install.js" };
         return { available: true };
       } catch(e) { return { available: false, reason: String(e.message || e) }; }
     },

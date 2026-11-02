@@ -10,7 +10,7 @@ jobs:
     var modulePath = dirs[0].canonicalPath;
     io.mkdir(root + "/classes");
     var sources = listFilesRecursive(root + "/src").filter(r => /\.java$/.test(r.filename)).map(r => r.canonicalPath);
-    var result = $sh([javaHome + "/bin/javac", "--release", "21", "--module-path", modulePath,
+    var result = $sh([javaHome + "/bin/javac", "--release", "25", "--module-path", modulePath,
       "--add-modules", "javafx.web", "-cp", getOpenAFJar(), "-d", root + "/classes"].concat(sources)).get(0);
     if (result.exitcode != 0) throw result.stderr + result.stdout;
     result = $sh([javaHome + "/bin/jar", "--create", "--file", root + "/desktop-javafx.jar", "-C", root + "/classes", "."]).get(0);

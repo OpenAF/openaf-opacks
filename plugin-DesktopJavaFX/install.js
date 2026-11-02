@@ -36,5 +36,12 @@ exports.install = function(path) {
       java.nio.file.Files.move(java.nio.file.Path.of(tmp), java.nio.file.Path.of(dest), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
     } finally { if (io.fileExists(tmp)) io.rm(tmp); }
   });
+  // Remove older locked modules only after the complete replacement set is verified.
+  var installed = lock.platforms[platform].map(function(artifact) { return artifact.file; });
+  io.listFiles(target).files.forEach(function(file) {
+    var match = file.filename.match(/^(javafx-[a-z]+|jdk-jsobject)-[0-9][0-9.]*-(.+)\.jar$/);
+    var module = match && (match[1] == "jdk-jsobject" ? "jdk.jsobject" : match[1].substring(7));
+    if (file.isFile && match && lock.modules.indexOf(module) >= 0 && match[2] == platform && installed.indexOf(file.filename) < 0) io.rm(target + "/" + file.filename);
+  });
   log("JavaFX " + lock.version + " installed for " + platform);
 };

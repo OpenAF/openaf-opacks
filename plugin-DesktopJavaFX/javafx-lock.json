@@ -1,146 +1,172 @@
 {
-  "version": "21.0.12",
+  "version": "27.0.1",
   "modules": [
     "base",
     "graphics",
     "controls",
     "media",
-    "web"
+    "web",
+    "jdk.jsobject"
   ],
   "platforms": {
     "mac-aarch64": [
       {
-        "file": "javafx-base-21.0.12-mac-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.12/javafx-base-21.0.12-mac-aarch64.jar",
-        "sha256": "b0abf6e038cbe181697a9567ee06efd3b7552d5e55fa12c8594e564420014766"
+        "file": "javafx-base-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/27.0.1/javafx-base-27.0.1-mac-aarch64.jar",
+        "sha256": "625bb1c31b4f30413064b66b15b2b311d57461d71eb9edab651bd5bf68f91ea0"
       },
       {
-        "file": "javafx-graphics-21.0.12-mac-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.12/javafx-graphics-21.0.12-mac-aarch64.jar",
-        "sha256": "7abb75cfb7409250e87745e998d1de7d694e8919ab5e5990ba5619501c7a021d"
+        "file": "javafx-graphics-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/27.0.1/javafx-graphics-27.0.1-mac-aarch64.jar",
+        "sha256": "8faed7492269c5d0326b0bcb480fda2f1a008885da3deca7dea14ef094e3cf15"
       },
       {
-        "file": "javafx-controls-21.0.12-mac-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.12/javafx-controls-21.0.12-mac-aarch64.jar",
-        "sha256": "4d6481bfd64a6dabaad3f247a7e03c925c407a86f21e973767d36e15540971c4"
+        "file": "javafx-controls-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/27.0.1/javafx-controls-27.0.1-mac-aarch64.jar",
+        "sha256": "d82d23ea6cdc0d498ac3cc2e45f5609d6b469a60e8435b52594480534e55efcd"
       },
       {
-        "file": "javafx-media-21.0.12-mac-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/21.0.12/javafx-media-21.0.12-mac-aarch64.jar",
-        "sha256": "d92b6ba17bac8e6e9383f1e85e411fd009c0a4731ac7b283f451ac9b46dba3b3"
+        "file": "javafx-media-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/27.0.1/javafx-media-27.0.1-mac-aarch64.jar",
+        "sha256": "61f687dce4db011acb39c1ed3f86011c0a0d80936896ca7a8cabadd015138836"
       },
       {
-        "file": "javafx-web-21.0.12-mac-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/21.0.12/javafx-web-21.0.12-mac-aarch64.jar",
-        "sha256": "04e22cbcac6d615b1f8d13083942b7f922ef880a4537e33be4f88bc558d490fe"
+        "file": "javafx-web-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/27.0.1/javafx-web-27.0.1-mac-aarch64.jar",
+        "sha256": "408f09b3a45bc7ad252d1ab8fded16c9a945f71b156966d367b86eead5560559"
+      },
+      {
+        "file": "jdk-jsobject-27.0.1-mac-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/jdk-jsobject/27.0.1/jdk-jsobject-27.0.1-mac-aarch64.jar",
+        "sha256": "e207ad66db199354dcdf5d00d31183e44bf1f8fff3e5a25ab6f9fa34427e8d57"
       }
     ],
     "mac": [
       {
-        "file": "javafx-base-21.0.12-mac.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.12/javafx-base-21.0.12-mac.jar",
-        "sha256": "38703ff65208d24324dd22d24de89019d076fb861ca841b2f73d35d2151778e2"
+        "file": "javafx-base-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/27.0.1/javafx-base-27.0.1-mac.jar",
+        "sha256": "ed7eb516d9751bbcf401c36285719dcf4490885d5b67ec5bbf786ed785302d47"
       },
       {
-        "file": "javafx-graphics-21.0.12-mac.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.12/javafx-graphics-21.0.12-mac.jar",
-        "sha256": "6b730264fe322ee8abd8a701de39ef71c3014e4af45743ec39b67ae699c302f7"
+        "file": "javafx-graphics-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/27.0.1/javafx-graphics-27.0.1-mac.jar",
+        "sha256": "2bfa6dd8b0a1e94c2e1ae6549b13265c7bc86bf5b39c3732010c976c70b37a4a"
       },
       {
-        "file": "javafx-controls-21.0.12-mac.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.12/javafx-controls-21.0.12-mac.jar",
-        "sha256": "cd3ace8c4dab0bde22f8849805009733d6112802b1ccbedf8d32d8b62fd998f3"
+        "file": "javafx-controls-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/27.0.1/javafx-controls-27.0.1-mac.jar",
+        "sha256": "c337acc3aa8a65ea58a72e43ffdffb75e4b27c84cada03c09a3f7554f201c168"
       },
       {
-        "file": "javafx-media-21.0.12-mac.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/21.0.12/javafx-media-21.0.12-mac.jar",
-        "sha256": "78e6fccdf4a2a662292e70b54192aa33395c2d57682d84dccd41760da25e336e"
+        "file": "javafx-media-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/27.0.1/javafx-media-27.0.1-mac.jar",
+        "sha256": "cc31aef09ac188df7473d5b37e3a23325a3b6ca2d5752ef7ede79790de91e5a3"
       },
       {
-        "file": "javafx-web-21.0.12-mac.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/21.0.12/javafx-web-21.0.12-mac.jar",
-        "sha256": "ca702ebac045fc7a6cfcfcc48f8112dca24541ac62ef3a3c2f1d9094a69a4ddf"
+        "file": "javafx-web-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/27.0.1/javafx-web-27.0.1-mac.jar",
+        "sha256": "8ee9f6aa09fdc59d26eb0822e68d5c92a7be4dae64eacd97ed2b5cda51f41530"
+      },
+      {
+        "file": "jdk-jsobject-27.0.1-mac.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/jdk-jsobject/27.0.1/jdk-jsobject-27.0.1-mac.jar",
+        "sha256": "b14d8cbcf632ede68525de725ff8c02d18230492092c60e579e333507dd45500"
       }
     ],
     "linux": [
       {
-        "file": "javafx-base-21.0.12-linux.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.12/javafx-base-21.0.12-linux.jar",
-        "sha256": "ac83213e343d734d7d315b4a850b309d8de4a4950c6e46497d8bc68e744b245d"
+        "file": "javafx-base-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/27.0.1/javafx-base-27.0.1-linux.jar",
+        "sha256": "75661785ddcb30b2e2b0a49b85fc404426563f7c3d2bbf8326b7e9744efb7c10"
       },
       {
-        "file": "javafx-graphics-21.0.12-linux.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.12/javafx-graphics-21.0.12-linux.jar",
-        "sha256": "200ee46c819d03811c736900cdfacb2047921313b261d93e52cdeef1eaf1ebb7"
+        "file": "javafx-graphics-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/27.0.1/javafx-graphics-27.0.1-linux.jar",
+        "sha256": "6823427dd66154e383879cdca968c9b9982c5d5048ec686b1d9e9ffe8852e339"
       },
       {
-        "file": "javafx-controls-21.0.12-linux.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.12/javafx-controls-21.0.12-linux.jar",
-        "sha256": "de5417dbb39920d19376073dbbe896b97cbd5a4e88d56cc6627ff0a32666dc04"
+        "file": "javafx-controls-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/27.0.1/javafx-controls-27.0.1-linux.jar",
+        "sha256": "2c90a41c1a68f568c7211d2bd0779e57ba3e8c4447bf2f88391d8c55a9dbca93"
       },
       {
-        "file": "javafx-media-21.0.12-linux.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/21.0.12/javafx-media-21.0.12-linux.jar",
-        "sha256": "927574bc433cbf9836058efcb216d93c5bdab6307cf4a9e0a28b1f8b4b311032"
+        "file": "javafx-media-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/27.0.1/javafx-media-27.0.1-linux.jar",
+        "sha256": "f4cdc8a867d2e411bcbb2a496f9f128a9f9670a4bc12e81d8cb19b9fdac34fd2"
       },
       {
-        "file": "javafx-web-21.0.12-linux.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/21.0.12/javafx-web-21.0.12-linux.jar",
-        "sha256": "2a7168d21e8f07094be2c6817fa2e770d4cc00016d64ba21f7e7e406dee50e4a"
+        "file": "javafx-web-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/27.0.1/javafx-web-27.0.1-linux.jar",
+        "sha256": "4b5cf927e071bb157b3939fd65c7046040c3aebf90466b1cf198e78ef0ae0dd8"
+      },
+      {
+        "file": "jdk-jsobject-27.0.1-linux.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/jdk-jsobject/27.0.1/jdk-jsobject-27.0.1-linux.jar",
+        "sha256": "ac098f65c6f7d2f275a5697b6e42132b7039c8ebea180d2473b088754cf32f80"
       }
     ],
     "linux-aarch64": [
       {
-        "file": "javafx-base-21.0.12-linux-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.12/javafx-base-21.0.12-linux-aarch64.jar",
-        "sha256": "e5fa1fc5d46f0e3222a67a3cea237566fe5617e7816529318bb7b3483a03f8ee"
+        "file": "javafx-base-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/27.0.1/javafx-base-27.0.1-linux-aarch64.jar",
+        "sha256": "89c325ad86007216c4f07e7879105559fac5facb20e48853a8f97f65b3d02c0f"
       },
       {
-        "file": "javafx-graphics-21.0.12-linux-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.12/javafx-graphics-21.0.12-linux-aarch64.jar",
-        "sha256": "130ad00f2b38fdee4b4e2ba35ad7341d75ac1e7a956385652c2fb63bd557f1c4"
+        "file": "javafx-graphics-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/27.0.1/javafx-graphics-27.0.1-linux-aarch64.jar",
+        "sha256": "21b06697e7f9370b960f15a8b117e8acff7e439584dbc1e6ab463c60d1b8dcf4"
       },
       {
-        "file": "javafx-controls-21.0.12-linux-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.12/javafx-controls-21.0.12-linux-aarch64.jar",
-        "sha256": "55bce633784b51e097775283fab7b3ccaa320aea611fb676115d594b1a1a46c5"
+        "file": "javafx-controls-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/27.0.1/javafx-controls-27.0.1-linux-aarch64.jar",
+        "sha256": "91d69781fa3d5c50e1c628a0e155b6f0409e3416fcdda887caa23f17cf8d8f80"
       },
       {
-        "file": "javafx-media-21.0.12-linux-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/21.0.12/javafx-media-21.0.12-linux-aarch64.jar",
-        "sha256": "f84816f3cf906fe0be1b371eba52b9669201694fddd387fe62261271d07363aa"
+        "file": "javafx-media-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/27.0.1/javafx-media-27.0.1-linux-aarch64.jar",
+        "sha256": "bdba8f95e08678c4e7241c6830641cc8781c06dd0678fc58a19048351f793b7a"
       },
       {
-        "file": "javafx-web-21.0.12-linux-aarch64.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/21.0.12/javafx-web-21.0.12-linux-aarch64.jar",
-        "sha256": "648142b290b89d4d45a5f1bf4dc743c2e1c7f089f3ced3abec7195cbfeb89edd"
+        "file": "javafx-web-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/27.0.1/javafx-web-27.0.1-linux-aarch64.jar",
+        "sha256": "196fe73883b1b4fc724d130c18add6ab958166e57c8c570399021b37ad0b3121"
+      },
+      {
+        "file": "jdk-jsobject-27.0.1-linux-aarch64.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/jdk-jsobject/27.0.1/jdk-jsobject-27.0.1-linux-aarch64.jar",
+        "sha256": "8c021d19470930daae05e16c15e14734f1f11076fc1605fba14b479ee2370bbe"
       }
     ],
     "win": [
       {
-        "file": "javafx-base-21.0.12-win.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.12/javafx-base-21.0.12-win.jar",
-        "sha256": "110c32b2034d1ca4c644b919f9f28370d312cd192a26e2df1a83ec1df4cd6a6b"
+        "file": "javafx-base-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/27.0.1/javafx-base-27.0.1-win.jar",
+        "sha256": "034310867e268fe6bcad663474a2cb5487cecc22814633bc4f4548f975695723"
       },
       {
-        "file": "javafx-graphics-21.0.12-win.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.12/javafx-graphics-21.0.12-win.jar",
-        "sha256": "af380b5afede1f13fbe0a8ebdb5b2855a97b1e22c60dcefb5a90a498fd679722"
+        "file": "javafx-graphics-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/27.0.1/javafx-graphics-27.0.1-win.jar",
+        "sha256": "b4fb15eb086bbf01a9c4edf56ce11926d43e35d13a4cbca6e1c80b3a64ddbdb7"
       },
       {
-        "file": "javafx-controls-21.0.12-win.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.12/javafx-controls-21.0.12-win.jar",
-        "sha256": "fe32329525908377b3a34580f37fa4dafc0574943521ac2244a56380ac6f7770"
+        "file": "javafx-controls-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/27.0.1/javafx-controls-27.0.1-win.jar",
+        "sha256": "a558813291466912f9f8c710ff25c9244dd8b86d91f352f2489de279a14974f8"
       },
       {
-        "file": "javafx-media-21.0.12-win.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/21.0.12/javafx-media-21.0.12-win.jar",
-        "sha256": "4a50be716a4afa246787d114679ddba1ecc17e35f275ff3b99ccb49610ec1a06"
+        "file": "javafx-media-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-media/27.0.1/javafx-media-27.0.1-win.jar",
+        "sha256": "eb6a18b9833cbe845aedea00b07f087798111e294c5690da1fdc43919dc5f9b5"
       },
       {
-        "file": "javafx-web-21.0.12-win.jar",
-        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/21.0.12/javafx-web-21.0.12-win.jar",
-        "sha256": "5101cdfbb86d66fdc7407ab7ab9afefd4b53915f646b0c22470fb657b3478e65"
+        "file": "javafx-web-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-web/27.0.1/javafx-web-27.0.1-win.jar",
+        "sha256": "42935cce5285ffee7f31893c5a36f57f9adad20269d8fa0e766210ae60ea0ba7"
+      },
+      {
+        "file": "jdk-jsobject-27.0.1-win.jar",
+        "url": "https://repo.maven.apache.org/maven2/org/openjfx/jdk-jsobject/27.0.1/jdk-jsobject-27.0.1-win.jar",
+        "sha256": "062161fb51cc8392a035bd46256f6cd018701960f6f7724d412d52cf80f4e764"
       }
     ]
   }

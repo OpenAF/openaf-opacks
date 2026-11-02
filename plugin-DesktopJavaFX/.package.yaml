@@ -18,7 +18,7 @@ name: plugin-DesktopJavaFX
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261018'
+version: '20261102'
 dependencies:
   openaf: '>=20261018'
 files:
@@ -39,16 +39,16 @@ files:
 - src/openaf/desktop/javafx/DesktopRuntime.java
 filesHash:
   .gitignore: 972bc7782ae396f3a4d9e0b815de984c58665cde
-  .maven.yaml: 1c1f71a82ce220dcbc0c3d3dd840f2246e036ff6
-  LICENSES.txt: 5162494214e895e89a1026f952e40133983b7901
-  README.md: cdc50ae3eea8adde84d02693946bfccd52a32ceb
-  compile.yaml: 0571ae7d27279594d425c34cf6b0a621606d1469
-  desktop-javafx.jar: 534c8c5c37a532516761c43badcdb3de3b16977b
-  desktop-javafx.js: 63074689a6cc0e29323c6f521db6682357b02e58
-  desktop-provider.json: 03af692753c656678720ecf8653a26c81edefd77
+  .maven.yaml: 3770cd98e630bea66631fc34bfc2b4c6ce108191
+  LICENSES.txt: f0afe097362125df70cad48894af7cce52634df4
+  README.md: c2e7753b5af9b2d77b60c9edb991508a36560d1d
+  compile.yaml: 71f3b85048a340f697eeff907e86643dd9547325
+  desktop-javafx.jar: 756cf9766169cd838f4b9301588218e027e1f320
+  desktop-javafx.js: 4171dcc595dea65736c4f2526c622d799de2ebfb
+  desktop-provider.json: db22d91c5fef94cf8df7b889dc08df23767ee896
   examples/assets/index.html: 6d11105d0b130bb98f940f9e999ee31dd7b0351a
   examples/hello.js: 8936c84696a686e6d81c56b11afadbca5737d03a
-  install.js: c44caff35eea71ecb4818b875ddc85960c32cd75
-  javafx-lock.json: f2a194da57ab6d2acde62811679d605d3a63942f
+  install.js: 4f1c9aac00cf1312361b421203069584c5577b4d
+  javafx-lock.json: 2ec01e553331198c86fa3a0cefba98d790b0f8bc
   src/openaf/desktop/javafx/DesktopBootstrap.java: 88a7082272f9ae86dab9634fdd46ad72aaa94e86
   src/openaf/desktop/javafx/DesktopRuntime.java: a73a84f6a513f42e3416102baa6b7744da9f46f6

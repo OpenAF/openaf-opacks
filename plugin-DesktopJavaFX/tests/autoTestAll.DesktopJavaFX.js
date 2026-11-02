@@ -3,9 +3,9 @@
   var assert = function(a, b, text) { ow.test.assert(a, b, text); };
   exports.testLockAndAvailability = function() {
     var lock = io.readFileJSON(root + "/javafx-lock.json");
-    assert(lock.version, "21.0.12", "Pinned maintenance release");
+    assert(lock.version, "27.0.1", "Pinned stable release");
     ["win", "mac", "mac-aarch64", "linux", "linux-aarch64"].forEach(function(platform) {
-      assert(lock.platforms[platform].length, 5, "Complete JavaFX web module closure");
+      assert(lock.platforms[platform].length, 6, "Complete JavaFX web module closure");
       lock.platforms[platform].forEach(function(a) { assert(/^[a-f0-9]{64}$/.test(a.sha256), true, "SHA-256 artifact lock"); });
     });
     var p = require(root + "/desktop-javafx.js").create(root);
