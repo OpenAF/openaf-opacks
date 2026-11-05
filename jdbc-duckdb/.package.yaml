@@ -16,15 +16,15 @@ name: jdbc-duckdb
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20261022'
+version: '20261105'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - LICENSES.txt
-- duckdb_jdbc-2.0.0.0.jar
+- duckdb_jdbc-2.0.0.1.jar
 - jdbc-duckdb.js
 filesHash:
-  LICENSES.txt: 0ed33b2c5a80b7188907a6bce9efcdc78dbf65a2
-  duckdb_jdbc-2.0.0.0.jar: 1dabd455151efc65981a25f4551e20a0eafe85da
+  LICENSES.txt: 156f75e080e948744bf06bd434dd3e55fafb6edc
+  duckdb_jdbc-2.0.0.1.jar: 20200e3a9721cfa1266151a3f7a96e8955578b3a
   jdbc-duckdb.js: 45ca00f4dfdd4b10c4e89657773d1cb5c68d0e43
