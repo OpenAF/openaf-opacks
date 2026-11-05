@@ -16,13 +16,13 @@ name: jdbc-presto
 main: ''
 mainJob: ''
 license: Check the LICENSES.txt file
-version: '20260902'
+version: '20261105'
 dependencies:
   openaf: '>=20240318'
 files:
 - .package.yaml
 - jdbc-presto.js
-- presto-jdbc-0.299.jar
+- presto-jdbc-0.300.jar
 filesHash:
   jdbc-presto.js: e544435371509525d8c8df53ea1a56dc3d827edb
-  presto-jdbc-0.299.jar: 0ada484547905ef0ece8bb260c3a88efad81630c
+  presto-jdbc-0.300.jar: 46229e1236b991b6cecb4168b389c2f11ff3e01a
