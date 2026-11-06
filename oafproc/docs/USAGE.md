@@ -176,6 +176,7 @@ These options will change the parsed input data included any filters provided.
 | numformat | String | For all number values applies a java.util.Formatter format (e.g. %,d) |
 | oaf | String | An OpenAF scripting code or OpenAF scripting file to execute taking input as 'data' and returning the transformed data |
 | regression | String | Performs a regression (linear, log, exp, poly or power) over a provided list/array of numeric values |
+| removedupsmem | Number | Streaming dedup memory budget as a percentage of JVM max heap (default 5, range 0–100). Zero uses a temporary disk index immediately. |
 | removedups | Boolean | Removes duplicate array entries, retaining the first occurrence. Map key order is ignored recursively; array order and the distinction between arrays and maps are preserved. |
 | removeempty | Boolean | If true will remove array/list entries that are either null or undefined |
 | removenulls | Boolean | If true will try to remove nulls and undefined values from a map or array |
@@ -220,7 +221,7 @@ List of available formats to use with the _output_ option:
 | dsv | A delimiter-separated values format with configurable separator, quoting and headers (for lists or maps; see DSV output options) |
 | envs | Tries to output the input data as OS environment variables setting commands |
 | gb64json | Equivalent to out=base64 and base64gzip=true |
-| grid | A multiple output ascii grid (useful together with 'loop') |
+| grid | A multi-widget terminal dashboard (charts, bars, sparklines, heatmaps, bullets, status matrices, timelines, tables, ...) laid out as a grid (useful together with 'loop') |
 | html | An HTML format |
 | http | Sends the output as the body of an HTTP request (POST, PUT, PATCH or DELETE) |
 | httpd | Serves the output over a local HTTP server (e.g. a live JSON endpoint or an OpenMetrics exporter with loop) |
@@ -1112,7 +1113,7 @@ chart="<unit> <path[:color][:legend]> ... [-min:<n>] [-max:<n>] [-hsize:<n>] [-v
 
 - **Unit:** `int` uses integer labels; `dec1`, `dec2`, `dec3`, and `dec4` use the specified decimal places; `dec` uses the number's string representation; `bytes` and `si` use abbreviated byte and SI-style labels. These format the Y-axis; they do not convert the input values.
 - **Path:** a JMESPath expression selecting one numeric value per series. Paths apply to the processed input, after filters such as `path=`. Use `@` for a numeric root, `metrics.cpu` for a nested field, or `[0]` for an array element. Convert numeric strings with `to_number(...)` when necessary.
-- **Color:** optional ANSI color specification, such as `green`, `yellow`, `red`, or `blue`. If you specify a color for one series, supply one for every series.
+- **Color:** optional ANSI color specification, using the same values as OpenAF's `ansiColor`: named colors such as `green`, `yellow`, `red` or `blue`, comma-separated combinations with attributes such as `BOLD,CYAN`, 256-color forms such as `FG(208)` and true-color forms such as `RGB(80,160,255)`. If you specify a color for one series, supply one for every series.
 - **Legend:** optional label after the color, for example `cpu:green:CPU`. Use a single token without spaces or colons, such as `load_1m`. Quoting does not make multiword legends work in the renderer. To show a complete legend, label every series.
 - **Range:** `-min:<n>` and `-max:<n>` set the Y-axis bounds. Omit them for automatic scaling; set both when comparing updates on a fixed scale.
 - **Size:** `-hsize:<n>` sets the horizontal history limit in samples and the chart width budget; `-vsize:<n>` sets the height budget in terminal rows, including space reserved for legends. Defaults are based on terminal dimensions when available. Explicit sizes make examples more predictable.
@@ -1170,6 +1171,7 @@ The timeout is 1000 ms. A value of `-1` means the connection failed or timed out
 - Each series must resolve to a number. Check the same input with `out=json` and your intended `path=` first if a chart is empty or fails. Missing fields and nonnumeric values are not substitutes for zero.
 - Use an interactive terminal for live redraws. Explicit dimensions help in small terminals; omit screen clearing when capturing output to a file.
 - If oafp reports that chart output is unsupported by your OpenAF version, update the OpenAF runtime.
+- To show several charts (or charts next to other widgets such as tables, sparklines or heatmaps) use `out=grid` with `type:chart` cells (see **Grid output options**).
 
 ---
 
@@ -1285,34 +1287,91 @@ The data map to sign can have the following entries:
 
 ### 🧾 Grid output options
 
+Use `out=grid` to build a terminal dashboard: a grid of cells (widgets), each rendering the input data (or a part of it, or the output of its own command) as a chart, bars, sparkline, heatmap, table, tree, markdown, etc. Combine it with `loop=<seconds>` and `loopcls=true` to refresh the dashboard in place.
+
 List of options to use when _out=grid_:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| grid   | String | A JSON/SLON configuration structured as an array of row arrays. Each row array contains one map per column cell (see column cell options below). |
+| grid   | String | A JSON/SLON configuration structured as an array of row arrays. Each row array contains one map per column cell (see cell fields below). |
 
-Each column cell map supports:
+```text
+grid="[[ <cell> | <cell> ... ] | [ <cell> ... ] ...]"     (SLON: arrays use '|' as separator, maps use '(key:value,...)')
+```
+
+The dashboard uses the full terminal width; each row gets an equal share of the terminal height. Cells in a row share the width equally (adjusted by `xspan`).
+
+> The widget types `sparkline`, `histogram`, `heatmap`, `bullet`, `scatter`, `boxplot`, `timeline`, `statusMatrix` and `progress` are rendered by OpenAF's terminal visualization layer and require a recent OpenAF version (20260728 or newer). On older versions only `tree`, `map`, `table`, `chart`, `bar`, `area`, `text`, `md` and `func` are available.
+
+#### Cell fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| title | String | Label displayed as a bold header above the cell content. Auto-set from `path` if not provided. |
-| type  | String | Rendering type: `tree` (default for maps/arrays), `map`, `table`, `chart`, `bar`, `area`, `text`, `md`, `func`, or `empty` |
-| path  | String | JMESPath expression to select data from the pipeline input (use `@` for root). Auto-sets `title` if not provided. |
-| obj   | String | Data or format string to render. For `chart`: same format as `chart=`; for `bar`: same format as `bar=`; for `func`: JS function body with `mx` (height) and `my` (width) args returning a string. |
-| cmd   | String | Shell command whose JSON stdout is used as cell data instead of the pipeline input. |
+| title | String | Label displayed as a bold header (`> title ───`) above the cell content. Defaults to `path` when provided (or `Chart _chrt<row>.<col>` for `chart`/`bar` cells without `path`). |
+| type  | String | Widget type (see **Widget types** below). Defaults to `tree` for maps/arrays and `text` otherwise. `empty` leaves the cell blank. |
+| path  | String | JMESPath expression selecting the cell data from the input (use `@` for the root). For `chart`/`bar` cells it narrows the data the series paths in `obj` are evaluated against. |
+| obj   | String | Literal cell content: the format string for `chart`/`bar`, a JS function body for `func`, or a literal text/markdown string. For other types `path` takes precedence over `obj`. When neither `path` nor `obj` is provided, the whole input is used. |
+| cmd   | String | Shell command whose stdout (JSON is parsed; otherwise text) is used as the cell data instead of the pipeline input. |
 | xspan | Number | Number of columns this cell spans (default: 1). |
 | yspan | Number | Number of rows this cell spans (default: 1). |
+| options | Map | Extra options passed directly to the widget renderer (see per-type options below), e.g. `options:(valueFormat:bytes)`. |
 
-Extra fields for `bar` type cells:
+For convenience the following fields can also be set directly on the cell (they are copied into `options`): `min`, `max`, `indicator`, `space`, `target`, `ranges`, `xLabels`, `yLabels`, `legend`, `xLabel`, `yLabel`, `from`, `to` and `labels`. Any other renderer option must be provided inside `options:(...)`.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| max   | Number | Maximum value for the bar scale |
-| min   | Number | Minimum value for the bar scale |
-| indicator | String | Bar fill character (default: `━`) |
-| space | String | Background character (default: ` `) |
+#### Widget types
 
-Examples:
+| Type | Cell data (from `path`/input, or `obj`) | Renderer options |
+|------|------------------------------------------|------------------|
+| tree | Map or array (default for maps/arrays) | |
+| map | Map rendered as a rectangle map | |
+| table | Array of maps | |
+| text | String (default for non-map/array data) | |
+| md | Markdown string | |
+| chart | `obj` with a line-chart definition: `"<unit> <path[:color][:legend]> ... [-min:<n>] [-max:<n>] [-hsize:<n>] [-vsize:<n>]"` (same syntax as `chart=`, see **Chart output options**). Accumulates one sample per refresh. | `-min`, `-max`, `-hsize`, `-vsize` inside `obj` |
+| bar | `obj` with a horizontal bars definition: `"<unit> <path[:color][:legend]> ... [-min:<n>] [-max:<n>]"`. Units: `int`, `dec1`, `dec2`, `dec3`, `dec`, `bytes`, `si` (no `dec4`). | `min`, `max`, `indicator` (fill char, default `━`), `space` (background char, default ` `) |
+| area | A single number; accumulates one sample per refresh and plots it as a filled area chart. The history is keyed by the cell `title` (use distinct titles for distinct area cells). | |
+| func | `obj` with a JS function body receiving `mx` (cell height) and `my` (cell width) and returning a string | |
+| sparkline | Number array, or array of series maps `{ data: [...], name, color }` (one line per series) | `label`, `showMinMax` (default false), `color` |
+| histogram | Number array (bucketed automatically using Sturges' formula) | `buckets`, `vertical` (default false), `color`, `labels` (default true), `showCount` (default true) |
+| heatmap | Number matrix (array of arrays); or map `{ values: [[...]], xLabels: [...], yLabels: [...] }`; or a map keyed by date (`YYYY-MM-DD`), time (`HH:mm`) or date-time (`YYYY-MM-DDTHH:mm`) strings with numeric values for a time-bucketed view (see below) | `legend` (default false), `xLabels`, `yLabels`; time-bucketed: `xAxis`, `yAxis`, `aggregate`, `weekStart`, `from`, `to`, `empty`, `dayLabels` |
+| bullet | Map or array of maps `{ value, target, min, max, ranges: [...], label, unit }` (a plain number is treated as `value`) | `min`, `max` (default max(100, value)), `target`, `ranges`, `label`, `unit`, `showValue` (default true), `valueFormat` (`raw`, `si` or `bytes`), `color`, `targetColor`, `rangeColor`, `goodColor` |
+| scatter | Array of `[x, y]` pairs or `{ x, y, symbol, color }` maps | `xMin`, `xMax`, `yMin`, `yMax`, `xLabel`, `yLabel` |
+| boxplot | Number array, or array of series maps `{ values: [...], label }` (one boxplot per series) | `min`, `max`, `showOutliers` (default true), `label` |
+| timeline | Array of events `{ label, start, end, status, color }` (`start`/`end` as dates, ISO strings or epoch ms; `status`: `ok`/`up`/`success`, `warn`/`warning`, `error`/`fail`/`down`) | `from`, `to`, `labels` (default true) |
+| statusMatrix | Matrix of status strings, or map `{ values: [[...]], xLabels: [...], yLabels: [...] }` (statuses: `ok`/`up`/`success`, `warn`/`warning`, `error`/`fail`/`down`, `unknown`) | `xLabels`, `yLabels`, `symbols` (map of status to symbol, e.g. `symbols:(ok:'+',error:'x')`) |
+| progress | A number (0 to 100) or a map `{ value, max, min }` | |
+| empty | Nothing (blank cell) | |
+
+Notes on the **time-bucketed heatmap** (map keyed by date/time strings):
+
+- `xAxis`/`yAxis` can be `year`, `month`, `week`, `weekday`, `day` or `hour` (`yAxis` can also be `none` for a single row). Defaults: `xAxis:week,yAxis:weekday` (a GitHub-style contribution calendar) for date or date-time keys; `xAxis:hour,yAxis:none` for time-only keys. Use `xAxis:hour,yAxis:weekday` on date-time keys for a punch-card view.
+- `aggregate` combines values landing on the same bucket: `sum` (default), `avg`, `max` or `count`.
+- `weekStart` (0 = Sunday, default), `from`/`to` (bound the visible range), `empty` (glyph for buckets without data, default `·`), `dayLabels` (weekday rows/columns to label, default `['Mon'|'Wed'|'Fri']`).
+
+#### Examples
+
+A static dashboard combining a bullet graph (with byte formatting), a sparkline, a status matrix and a progress bar:
+
+```oafp in=json data='{"disk":{"value":5368709120,"max":10737418240,"target":8589934592},"latency":[12,14,10,18,11,9,15,40],"services":{"values":[["ok","warn"],["ok","error"]],"xLabels":["eu","us"],"yLabels":["api","db"]},"cpu":42}' out=grid grid="[[(title:Disk,type:bullet,path:disk,options:(valueFormat:bytes,label:disk))|(title:Latency,type:sparkline,path:latency,options:(showMinMax:true))]|[(title:Services,type:statusMatrix,path:services)|(title:CPU,type:progress,path:cpu)]]"```
+
+A labelled heatmap from a matrix with a legend:
+
+```oafp in=json data='{"values":[[1,5,3],[4,2,8]],"xLabels":["00h","08h","16h"],"yLabels":["mon","tue"]}' out=grid grid="[[(title:Load,type:heatmap,legend:true)]]"```
+
+A punch-card heatmap (hour of the day per weekday) from date-time keyed values:
+
+```oafp in=json data='{"2026-10-05T09:15":3,"2026-10-06T14:40":5,"2026-10-07T09:05":2,"2026-10-12T17:30":8}' out=grid grid="[[(title:Activity,type:heatmap,legend:true,options:(xAxis:hour,yAxis:weekday,dayLabels:['Mon'|'Tue'|'Wed'|'Thu'|'Fri']))]]"```
+
+Distributions and events: a histogram, a boxplot, a scatter plot and a timeline:
+
+```oafp in=json data='{"lat":[12,14,10,18,11,9,15,40],"pts":[[0,0],[1,2],[2,1],[3,3]],"jobs":[{"label":"build","start":"2026-04-23T10:00:00Z","end":"2026-04-23T10:02:00Z","status":"ok"},{"label":"test","start":"2026-04-23T10:02:00Z","end":"2026-04-23T10:05:00Z","status":"warn"}]}' out=grid grid="[[(title:Latency distribution,type:histogram,path:lat)|(title:Latency spread,type:boxplot,path:lat)]|[(title:Points,type:scatter,path:pts,xLabel:x)|(title:Jobs,type:timeline,path:jobs)]]"```
+
+Literal cells (bars, markdown and a function) together with a line chart narrowed by `path`:
+
+```oafp in=json data='{"a":3,"b":5,"n":{"a":7}}' out=grid grid="[[(title:Bars,type:bar,obj:'int a:red:A b:blue:B -max:10')|(title:Notes,type:md,obj:'**literal** markdown')]|[(type:chart,path:n,obj:'int a:green:A -min:0')|(title:Area,type:func,obj:'return mx * my')]]"```
+
+Live dashboards (refreshed every second with `loop`):
+
 ```oafp cmd="cat /sys/fs/cgroup/cpu.stat | sed 's/ /: /g'" in=yaml out=grid grid="[[(title:cpu.stat,type:tree)|(title:chart,type:chart,obj:'int nr_throttled:red:throttled nr_bursts:blue:bursts -min:0 -vsize:10')]]" loop=1 loopcls=true```
 
 ```HSPERF=/tmp/hsperfdata_user/12345 && oafp $HSPERF in=hsperf path=java out=grid grid="[[(title:Threads,type:chart,obj:'int threads.live:green:live threads.livePeak:red:peak threads.daemon:blue:daemon -min:0')|(title:ClassLoaders,type:chart,obj:'int cls.loadedClasses:blue:loaded cls.unloadedClasses:red:unloaded')]|[(title:Heap,type:chart,obj:'bytes __mem.total:red:total __mem.used:blue:used -min:0')|(title:Metaspace,type:chart,obj:'bytes __mem.metaTotal:blue:total __mem.metaUsed:green:used -min:0')]]" loop=1 loopcls=true```
@@ -1616,3 +1675,13 @@ Each element is processed independently, like an NDJSON record; `out=json` emits
 Automatic workers only parse framed JSON records or sort independent map keys. Other transforms, record framing, header inference and rendering stay sequential. Work queues are bounded by record count and input size; one oversized record still requires memory proportional to that record. `parallel=false` disables these workers, and an explicit CLI value overrides `OAFP_PARALLEL`. Stateful readers may remain sequential even with `parallel=true`.
 
 The wait animation starts after 250 ms, refreshes every 150 ms, and clears before output. Use `progress=off` to disable it. Redirected stderr, nested processing and full-screen outputs do not animate.
+
+### Streaming duplicate removal
+
+`removedups=true` retains the first occurrence of each transformed record across NDJSON, NDSLON, lines, DSV, streamed JSON arrays and database record streams. Comparison follows filters and transforms and ignores map key order while preserving array order and types. Arrays within a streamed record are compared as complete values. Joined inputs retain array deduplication behavior.
+
+```sh
+cat records.ndjson | oafp in=ndjson removedups=true out=ndjson
+```
+
+Streaming deduplication stores SHA-256 fingerprints with a negligible hash collision risk. It spills to a temporary H2 index when estimated fingerprint memory reaches `removedupsmem` percent of JVM max heap (default 5), or observed overall heap usage reaches 80%. The estimate allows 256 bytes per fingerprint and is not a strict heap limit. Use `removedupsmem=0` for immediate disk storage. The disk index uses a 1 MiB database cache; disk usage grows with unique records. Processing also temporarily holds the current record and its canonical representation. Temporary files are removed on normal completion or failure, and state resets each loop pass. Storage errors fail processing; abrupt process termination may leave temporary files.

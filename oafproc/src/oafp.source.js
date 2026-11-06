@@ -27,10 +27,72 @@ var $rest = opts => {
 
 // --- Util functions
 // Util functions
+var _streamDedupSeen, _streamDedupTransform = false
+// Fingerprint storage is local to an input pass. Budget estimates include Set/string overhead.
+const _streamDedupClose = () => {
+    var store = _streamDedupSeen
+    _streamDedupSeen = __
+    if (isUnDef(store)) return
+    try {
+        if (store.query) store.query.close()
+    } finally {
+        try { if (store.insert) store.insert.close() }
+        finally {
+            try { if (store.db) store.db.close() }
+            finally {
+                if (store.file) {
+                    [store.file, store.file + ".mv.db", store.file + ".trace.db"].forEach(file => {
+                        if (io.fileExists(file)) io.rm(file)
+                    })
+                }
+            }
+        }
+    }
+}
+const _streamDedupAdd = fingerprint => {
+    if (isUnDef(_streamDedupSeen)) {
+        var percent = isDef(params.removedupsmem) ? Number(params.removedupsmem) : 5
+        if (!isFinite(percent) || percent < 0 || percent > 100) throw "removedupsmem must be a percentage from 0 to 100"
+        _streamDedupSeen = { seen: new Set(), budget: java.lang.Runtime.getRuntime().maxMemory() * percent / 100 }
+    }
+    var store = _streamDedupSeen, runtime = java.lang.Runtime.getRuntime()
+    if (!store.db && (store.seen.size * 256 >= store.budget ||
+        runtime.totalMemory() - runtime.freeMemory() >= runtime.maxMemory() * 0.8)) {
+        store.file = String(io.createTempFile("oafp-dedup-", ""))
+        // Fixed-size database cache; the primary key supplies indexed membership checks.
+        var credentials = new java.util.Properties()
+        credentials.setProperty("user", "sa")
+        credentials.setProperty("password", "")
+        store.db = new Packages.org.h2.Driver().connect("jdbc:h2:" + store.file + ";CACHE_SIZE=1024;DB_CLOSE_ON_EXIT=FALSE", credentials)
+        var statement = store.db.createStatement()
+        try { statement.execute("CREATE TABLE fingerprints (hash VARCHAR(64) PRIMARY KEY)") }
+        finally { statement.close() }
+        store.insert = store.db.prepareStatement("INSERT INTO fingerprints VALUES (?)")
+        store.query = store.db.prepareStatement("SELECT 1 FROM fingerprints WHERE hash = ?")
+        store.seen.forEach(hash => {
+            store.insert.setString(1, hash)
+            store.insert.executeUpdate()
+        })
+        store.seen = __
+    }
+    if (!store.db) {
+        if (store.seen.has(fingerprint)) return false
+        store.seen.add(fingerprint)
+        return true
+    }
+    store.query.setString(1, fingerprint)
+    var result = store.query.executeQuery(), exists
+    try { exists = result.next() } finally { result.close() }
+    if (exists) return false
+    store.insert.setString(1, fingerprint)
+    store.insert.executeUpdate()
+    return true
+}
 var _activeTransforms
 const _transform = r => {
     var keys = _activeTransforms || Object.keys(_transformFns).filter(key => isDef(params[key]))
     for (var i = 0; i < keys.length; i++) {
+        if (_streamDedupTransform && keys[i] == "removedups") continue
         if (keys[i] == "sortmapkeys" && toBoolean(params.sortmapkeys) && isArray(r) && r.length > 128) {
             var sorted = [], processor = _recordProcessor(_sortTransformKeys, value => sorted.push(value), true)
             try { r.forEach(processor.add); processor.done() } catch(e) {
@@ -164,6 +226,9 @@ const _$o = (r, options, lineByLine) => {
             __conAnsi = false
         }
     }
+    var previousDedupTransform = _streamDedupTransform
+    _streamDedupTransform = lineByLine === true
+    try {
     if (jq) {
         r = _$f(r, nOptions)
         if (typeof r === "undefined") { _clearTmpMsg(); return }
@@ -184,6 +249,13 @@ const _$o = (r, options, lineByLine) => {
         } else {
             r = _transform(r)
         }
+    }
+
+    } finally { _streamDedupTransform = previousDedupTransform }
+    if (lineByLine === true && toBoolean(params.removedups)) {
+        if (typeof r === "undefined") return
+        var fingerprint = String(sha256(stringify(_sortTransformKeys(r), __, true)))
+        if (!_streamDedupAdd(fingerprint)) return
     }
 
     if (isDef(params.outputkey)) r = $$({}).set(params.outputkey, r)
@@ -3938,7 +4010,8 @@ var _outputFns = new Map([
     }],   
     ["grid" , (r, options) => {
         if (isUnDef(params.grid)) _exit(-1, "For out=grid you need to provide a grid=...")
-        let _f = _fromJSSLON(_$(params.grid, "grid").or().isString().isMap().isArray().$_())
+        // Clone so that a map/array grid definition isn't mutated between loop iterations
+        let _f = clone(_fromJSSLON(_$(params.grid, "grid").or().isString().isMap().isArray().$_()))
 
         if (isArray(_f) && _f.length > 0 && isArray(_f[0])) {
             _f.forEach((y, yi) => {
@@ -3955,17 +4028,19 @@ var _outputFns = new Map([
                             _rd = r
                         }
                         if (x.type == "chart" || x.type == "bar") {
+                            // path narrows the data the chart/bar series paths are evaluated against
+                            if (isDef(x.path)) _rd = $path(_rd, x.path)
                             var _n = "_chrt" + (yi+1) + "." + (xi+1)
                             x.obj = (x.type == "chart" ? _n + " " : "") + _chartPathParse(_rd, x.obj, _n)
-                            if (isUnDef(x.title)) x.title = "Chart " + _n
-                        }
-                        if (isDef(x.path)) {
+                            if (isUnDef(x.title)) x.title = (isDef(x.path) ? x.path : "Chart " + _n)
+                        } else if (isDef(x.path)) {
                             x.obj = $path(_rd, x.path)
                             if (isUnDef(x.title)) x.title = x.path
-                        } else {
-                            if (isString(_rd)) 
+                        } else if (isUnDef(x.obj)) {
+                            // only fall back to the input data when no literal obj was provided
+                            if (isString(_rd))
                                 x.obj = _rd
-                            else if (isObject(_rd) && x.type != "chart")
+                            else if (isObject(_rd))
                                 x.obj = $path(_rd, "@")
                         }
                     } else {
@@ -4981,7 +5056,7 @@ var _inputFns = new Map([
                                     }
                                     _r[_rs.getMetaData().getColumnName(i)] = _v
                                 }
-                                _$o(_r, options)
+                                _$o(_r, options, true)
                             }
                         } catch(e) {
                             _exit(-1, "Error streaming SQL: " + e.message)
@@ -6059,7 +6134,7 @@ var _run = () => {
                             var text = new java.lang.StringBuilder(), firstLine = true
                             io.pipeLn(r => {
                                 if (isDef(_inputLineFns[params.type])) {
-                                    if (!_inputLineFns[params.type](_transform(r), clone(options))) return false
+                                    if (!_inputLineFns[params.type](toBoolean(params.removedups) ? r : _transform(r), clone(options))) return false
                                 }
                                 if (!firstLine) text.append("\n")
                                 text.append(r)
@@ -6122,7 +6197,11 @@ var _run = () => {
 
 // Verify debug
 var _runInput = _run
-_run = () => _withIDescSample(_runInput)
+_run = () => {
+    _streamDedupSeen = __
+    try { return _withIDescSample(_runInput) }
+    finally { _streamDedupClose() }
+}
 
 if (params.debug) {
     //__initializeCon()
