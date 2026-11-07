@@ -1,4 +1,4 @@
 artifacts:
 - id: jedis
   group: redis.clients
-  #version: jedis-3.6.2
+  version: jedis-3.6.2
