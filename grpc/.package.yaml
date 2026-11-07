@@ -18,7 +18,7 @@ name: grpc
 main: grpc.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261030'
+version: '20261107'
 dependencies:
   openaf: '>=20261030'
 files:
@@ -29,20 +29,20 @@ files:
 - README.md
 - build.sh
 - build.yaml
-- grpc-20261030.jar
+- grpc-20261107.jar
 - grpc.js
 - lib/animal-sniffer-annotations-1.27.jar
 - lib/annotations-4.1.1.4.jar
 - lib/error_prone_annotations-2.50.0.jar
 - lib/failureaccess-1.0.3.jar
-- lib/grpc-api-1.85.0.jar
-- lib/grpc-core-1.85.0.jar
-- lib/grpc-netty-shaded-1.85.0.jar
-- lib/grpc-protobuf-1.85.0.jar
-- lib/grpc-protobuf-lite-1.85.0.jar
-- lib/grpc-services-1.85.0.jar
-- lib/grpc-stub-1.85.0.jar
-- lib/grpc-util-1.85.0.jar
+- lib/grpc-api-1.85.1.jar
+- lib/grpc-core-1.85.1.jar
+- lib/grpc-netty-shaded-1.85.1.jar
+- lib/grpc-protobuf-1.85.1.jar
+- lib/grpc-protobuf-lite-1.85.1.jar
+- lib/grpc-services-1.85.1.jar
+- lib/grpc-stub-1.85.1.jar
+- lib/grpc-util-1.85.1.jar
 - lib/guava-33.6.0-jre.jar
 - lib/j2objc-annotations-2.8.jar
 - lib/jspecify-1.0.0.jar
@@ -80,25 +80,25 @@ files:
 - tests/tls.js
 filesHash:
   .gitignore: 4bcdd0ef500e36de0e5037ff7d3d7413a58c111e
-  .maven.yaml: 6ec027efedd334f0ad49a64b74a815439c039d57
+  .maven.yaml: 275d07e8e99240270841e36fee8d7f35b90df588
   GRPC-OJOB.md: d2de6bb20e1a0abfc0e37a9f4bc62ed5550f9cc0
   README.md: e7f13a7338e1dfc861422732a08f3548bcf4542e
   build.sh: 40db574006196258490028d7d7621adb85c8e37e
   build.yaml: 4b83d21b2c1991b34b97f064293933253b38a0c1
-  grpc-20261030.jar: ba1ea1d0c6952bd9234ca73f43f3ce1bce5204e1
+  grpc-20261107.jar: 5206660c1e5598e0243cf9b660ce7baab41647a7
   grpc.js: 524585f09210e49db2b20af36a6b023c769edcde
   lib/animal-sniffer-annotations-1.27.jar: c8dc3113676f4d40d4cec38366d4e02ebb8c70cb
   lib/annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   lib/error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
   lib/failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  lib/grpc-api-1.85.0.jar: 2a9fce330f22e02b279c996bb53cef7e13d9be92
-  lib/grpc-core-1.85.0.jar: 7cb2f47b33a87f822d6b5f6e7ab18175fe35a25d
-  lib/grpc-netty-shaded-1.85.0.jar: 1255bb8a7fcbf6cce3c3a014a052ab4d53bf98de
-  lib/grpc-protobuf-1.85.0.jar: fcac483133cf53b320f0e3f7827d4ad194ec1b68
-  lib/grpc-protobuf-lite-1.85.0.jar: d6ce6c5f7cf7fefd9f40cbede26c66f484785f24
-  lib/grpc-services-1.85.0.jar: d97ab990a6851356be5fdda250706e4e9c0b1f14
-  lib/grpc-stub-1.85.0.jar: 75dd7c455458616be9c72c9c51139b76e979245c
-  lib/grpc-util-1.85.0.jar: a89ddea1eeaca791da7bda9b63de0a08bed78e9f
+  lib/grpc-api-1.85.1.jar: b3c14915233d8062b2b30680fe91acdc5628f5e3
+  lib/grpc-core-1.85.1.jar: f0920cb1aa4083e71c0c597ec09bffa57a2f927e
+  lib/grpc-netty-shaded-1.85.1.jar: d7c60cf377496490518d37321cb0f6f2c866e64a
+  lib/grpc-protobuf-1.85.1.jar: 023ab6f44d8f34266d12e39032fcb88dac54412f
+  lib/grpc-protobuf-lite-1.85.1.jar: d3e35c16dd312575d37b3510a8e5fb88906882d5
+  lib/grpc-services-1.85.1.jar: a667caa1b13f35800662f47aba44d0b9e6cc99a2
+  lib/grpc-stub-1.85.1.jar: 88d9eda111aa813a3e4563c90eab4f77fed0edeb
+  lib/grpc-util-1.85.1.jar: 2ee0224641f3e563aefe2495c980c9940f42ab8f
   lib/guava-33.6.0-jre.jar: c376b13067cc99a5774403530953f7b05a91e218
   lib/j2objc-annotations-2.8.jar: c85270e307e7b822f1086b93689124b89768e273
   lib/jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
