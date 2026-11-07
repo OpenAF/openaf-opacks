@@ -132,7 +132,7 @@
         <dependency>
             <groupId>at.yawk.lz4</groupId>
             <artifactId>lz4-java</artifactId>
-            <version>1.12.1</version>
+            <version>1.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.xerial.snappy</groupId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <version>1.5.7-24</version>
+            <version>1.5.7-25</version>
         </dependency>
         <dependency>
             <artifactId>sshd-core</artifactId>
