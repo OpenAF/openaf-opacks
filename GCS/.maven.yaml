@@ -1,4 +1,4 @@
 artifacts:
 - group: com.google.cloud
   id: google-cloud-storage
-  version: 2.75.0
+  version: 2.78.0
