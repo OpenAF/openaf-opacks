@@ -141,8 +141,9 @@ ow.template.parseMD2HTML = function(aMarkdownString, isFull, removeMaxWidth, ext
   if (String(cleanedOut).indexOf('katex.min.js') >= 0 || String(cleanedOut).indexOf('katex.min.css') >= 0) return cleanedOut
 
   var extras = __katexAssetsHTML.map(r => __katexApplyPrefix(r, aURIPrefix)).join('')
-  if (String(cleanedOut).indexOf('</head>') >= 0) return String(cleanedOut).replace('</head>', extras + '</head>')
-  if (String(cleanedOut).indexOf('<body') >= 0) return String(cleanedOut).replace(/<body([^>]*)>/, extras + '<body$1>')
+  // Return inserted script text literally so replacement tokens do not collapse math delimiters.
+  if (String(cleanedOut).indexOf('</head>') >= 0) return String(cleanedOut).replace('</head>', function() { return extras + '</head>' })
+  if (String(cleanedOut).indexOf('<body') >= 0) return String(cleanedOut).replace(/<body([^>]*)>/, function(match, attributes) { return extras + '<body' + attributes + '>' })
   return extras + cleanedOut
 }
 
