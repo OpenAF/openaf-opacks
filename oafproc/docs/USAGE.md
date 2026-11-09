@@ -101,6 +101,11 @@ List of data input types that can be auto-detected (through the file extension o
 | httpd | Receives the input from an HTTP request sent to a temporary local HTTP server (e.g. a webhook) |
 | ini | INI/Properties format |
 | javas | Tries to list java processes running locally (javasinception=true to include itself). Adds the hsperf file path when the process id matches ow.java.getLocalJavaPIDs() |
+| hprof | Streaming HotSpot heap records; hprofmode=summary returns histogram metadata |
+| jcmd | Explicit JVM diagnostic command with javapid and jcmdcommand |
+| javadiag | Java capabilities, snapshots and explicit capture operations |
+| javastacks | Full text or JSON thread dumps |
+| javaoom | OOM messages and bounded surrounding log excerpts |
 | javagc | The Java GC log lines text format |
 | javathread | The Java Thread stack dump lines text format |
 | jfr | The Java Flight Recorder format |
@@ -1685,3 +1690,26 @@ cat records.ndjson | oafp in=ndjson removedups=true out=ndjson
 ```
 
 Streaming deduplication stores SHA-256 fingerprints with a negligible hash collision risk. It spills to a temporary H2 index when estimated fingerprint memory reaches `removedupsmem` percent of JVM max heap (default 5), or observed overall heap usage reaches 80%. The estimate allows 256 bytes per fingerprint and is not a strict heap limit. Use `removedupsmem=0` for immediate disk storage. The disk index uses a 1 MiB database cache; disk usage grows with unique records. Processing also temporarily holds the current record and its canonical representation. Temporary files are removed on normal completion or failure, and state resets each loop pass. Storage errors fail processing; abrupt process termination may leave temporary files.
+
+## Java diagnostics
+
+See [Java diagnostics](JAVA-DIAGNOSTICS.md) for collection, report and container recipes.
+
+| Option | Type | Description |
+|--------|------|-------------|
+| javapid | String | Explicit positive PID or self (collector JVM). |
+| javadiagop | String | capabilities, snapshot (default), histogram, threads, nmt, heapdump, jfr, bundle. |
+| javaoptions | Map | OpenAF diagnostic/parser options; also accepts a JSON/SLON string. |
+| javafile | String | Explicit target-filesystem destination for heapdump. |
+| jcmdcommand | String | One explicit diagnostic command; out=jcmd accepts the input string. |
+| hprofmode | String | records (default) or summary. Requires file. |
+| javareport | Boolean | Transform supplied evidence into a structured report. |
+| javareportkind | String | Report label: gc, oom, profile, all (default). |
+| javareportformat | String | out=javareport renders Markdown by default; json selects JSON. |
+| javatop | Number | Maximum classes, stack groups and event examples; default 50. |
+| javabundledir | String | out=javabundle creates a new local directory; in=javadiag javadiagop=bundle reopens it. |
+| loopcount | Number | Positive integer maximum loop passes. |
+| loopduration | Number | Positive maximum elapsed seconds; does not interrupt an active pass. |
+| counterdelta | Map | Transform options: identity, timestamp and counters (array of dotted paths). |
+
+Additional output formats: **jcmd**, **javareport**, **javabundle**. Capture requires explicit target/operation; report outputs never collect implicitly.

@@ -2378,6 +2378,182 @@ const _idescSource = () => {
     } finally { try { if (temp) io.rm(temp) } finally { if (ui) ui.close() } }
 }
 
+// Java evidence helpers share invocation-local state with loop and pipe handlers.
+var _javaPrevious = Object.create(null)
+var _javaOptions = () => {
+    var o = isMap(params.javaoptions) ? params.javaoptions : (isString(params.javaoptions) ? _fromJSSLON(params.javaoptions) : {})
+    return Object.assign({isolated:true}, o)
+}
+var _javaAPI = name => {
+    ow.loadJava()
+    if (!isFunction(ow.java[name])) throw new Error(name + " requires an updated OpenAF runtime")
+    return ow.java[name].bind(ow.java)
+}
+var _javaTarget = () => {
+    var target = params.javapid
+    if (target !== "self" && !/^[1-9][0-9]*$/.test(String(target))) throw new Error("javapid must be self or a positive PID")
+    return target
+}
+var _javaCommand = command => {
+    if (!isString(command) || !command.trim() || /[\r\n\x00]/.test(command)) throw new Error("Expected one diagnostic command string")
+    return _javaAPI("jcmd")(_javaTarget(), command, _javaOptions())
+}
+var _javaCollect = () => {
+    var op = params.javadiagop || "snapshot", o = _javaOptions()
+    if (op === "bundle") {
+        var root = String(params.javabundledir || ""), manifest = io.readFileJSON(root + "/manifest.json")
+        if (manifest.schemaVersion !== 1) throw new Error("Unsupported Java bundle version")
+        if (!isArray(manifest.files) || manifest.files.length !== 3 || manifest.files.map(f => f.name).sort().join(",") !== "evidence.json,report.json,report.md") throw new Error("Invalid bundle manifest")
+        manifest.files.forEach(f => {
+            if (["evidence.json", "report.json", "report.md"].indexOf(f.name) < 0) throw new Error("Unexpected bundle path")
+            if (sha256(io.readFileBytes(root + "/" + f.name)) !== f.sha256) throw new Error("Bundle checksum mismatch: " + f.name)
+        })
+        return io.readFileJSON(root + "/evidence.json")
+    }
+    var target = _javaTarget(), start = now(), data
+    switch(op) {
+    case "capabilities": data = _javaAPI("diagnosticCapabilities")(target, o); break
+    case "snapshot": data = _javaAPI("collectOOM")(target, o); break
+    case "histogram": data = _javaAPI("classHistogram")(target, o); break
+    case "threads": data = _javaAPI("threadDump")(target, o); break
+    case "nmt": data = _javaAPI("nativeMemory")(target, o); break
+    case "heapdump": data = _javaAPI("heapDump")(target, params.javafile, o); break
+    case "jfr":
+        if (!/^JFR\.(start|stop|dump|check)( |$)/.test(String(params.jcmdcommand))) throw new Error("jfr requires an explicit JFR command")
+        data = _javaCommand(params.jcmdcommand); break
+    default: throw new Error("Unsupported javadiagop: " + op)
+    }
+    return { schemaVersion: 1, kind: op, target: String(target), timestamp: new Date().toISOString(), durationMs: now() - start,
+        helperJava: String(java.lang.System.getProperty("java.version")), source: "ow.java", data: data }
+}
+var _javaStacks = text => {
+    if (isString(text) && /^\s*\{/.test(text)) {
+        try { text = jsonParse(text) } catch(e) { throw new Error("Invalid JSON thread dump: " + e) }
+    }
+    if (isMap(text)) return { format: "json", dump: text, coverage: "Source JSON preserved; JSON stack grouping unavailable" }
+    var threads = [], current
+    String(text).split(/\r?\n/).forEach(line => {
+        var m = line.match(/^"([^"\n]+)"(.*)$/)
+        if (m) { current = { name: m[1], header: m[2], frames: [], locks: [] }; threads.push(current) }
+        else if (current) {
+            var state = line.match(/java.lang.Thread.State:\s*(\S+)/)
+            if (state) current.state = state[1]
+            else if (/^\s+at /.test(line)) current.frames.push(line.trim())
+            else if (/^\s+- /.test(line)) current.locks.push(line.trim())
+        }
+    })
+    return { threads: threads, coverage: "Text platform-thread dump; virtual-thread coverage depends on source" }
+}
+var _javaOOM = text => {
+    var lines = String(text).split(/\r?\n/), matches = []
+    lines.forEach((line, i) => {
+        if (/OutOfMemoryError|oom-kill|OOMKilled|Cannot allocate memory|unable to create native thread|fatal error.*Java Runtime/i.test(line))
+            matches.push({ line: i + 1, message: line.substring(0, 2048), context: lines.slice(Math.max(0, i - 2), i + 3).map(s => s.substring(0, 2048)) })
+    })
+    return { kind: "oom", matches: matches.slice(0, 100), totalMatches: matches.length, truncated: matches.length > 100,
+        limitations: ["Messages classify symptoms; correlate timestamps with process and container evidence"] }
+}
+var _javaReport = evidence => {
+    var rows = isArray(evidence) ? evidence : [evidence], limit = Number(params.javatop || 50)
+    if (!isFinite(limit) || limit < 1 || limit > 10000) throw new Error("javatop must be between 1 and 10000")
+    var r = { schemaVersion: 1, kind: params.javareportkind || "all", generatedAt: new Date().toISOString(), observations: [], gaps: [], evidence: [] }
+    var pauses = [], jfrCounts = Object.create(null), profiles = Object.create(null)
+    rows.forEach((row, i) => {
+        var d = row && isDef(row.data) ? row.data : row, ref = "evidence/" + i
+        r.evidence.push({ ref: ref, timestamp: row && row.timestamp, source: row && row.source, target: row && row.target })
+        if (!d) { r.gaps.push({ ref: ref, reason: "Empty evidence" }); return }
+        if (d.errors) d.errors.forEach(e => r.gaps.push({ ref: ref, reason: e }))
+        if (d.histogram) r.observations.push({ ref: ref, type: "histogram", classes: d.histogram.slice(0, limit), sizeMeaning: d.payloadBytes ? "serialized payload" : "source-defined bytes; never retained size" })
+        if (d.matches) r.observations.push({ ref: ref, type: "oomMessages", matches: d.matches.slice(0, limit) })
+        if (d.sections) r.observations.push({ ref: ref, type: "snapshot", sections: d.sections })
+        if (d.format === "json") r.gaps.push({ref:ref, reason:d.coverage})
+        if (d.threads) {
+            var groups = Object.create(null)
+            d.threads.forEach(t => { var key = (t.frames || []).join("\n"); if (!groups[key]) groups[key] = { frames: t.frames, count: 0 }; groups[key].count++ })
+            r.observations.push({ ref: ref, type: "stacks", groups: Object.keys(groups).map(k => groups[k]).sort((a,b) => b.count-a.count).slice(0,limit) })
+        }
+        if (isDef(d.durationSecs)) pauses.push({ref:ref, seconds:Number(d.durationSecs), gcType:d.gcType, before:d.heapBeforeGC, after:d.heapAfterGC})
+        if (d.name && d.fields) {
+            jfrCounts[d.name] = (jfrCounts[d.name] || 0) + 1
+            var category = /ExecutionSample|NativeMethodSample/.test(d.name) ? "executionSamples" : /ObjectAllocation/.test(d.name) ? "allocationEvents" : /Monitor|Park/.test(d.name) ? "blockingEvents" : /FileRead|FileWrite|SocketRead|SocketWrite/.test(d.name) ? "ioEvents" : __
+            if (isDef(category)) {
+                var frames = ((d.fields.stackTrace || {}).frames || []).slice(0, 32)
+                var signature = category + ":" + stringify(frames)
+                if (!profiles[signature] && Object.keys(profiles).length < 10000) profiles[signature] = {category:category, frames:frames, count:0, observedBytes:"0", durationSeconds:0, evidenceRef:ref}
+                if (profiles[signature]) {
+                    var group = profiles[signature]
+                    group.count++
+                    var bytes = d.fields.allocationSize || d.fields.objectSize
+                    if (/^[0-9]+$/.test(String(bytes))) group.observedBytes = String(new java.math.BigInteger(group.observedBytes).add(new java.math.BigInteger(String(bytes))))
+                    try { group.durationSeconds += Number(java.time.Duration.parse(String(d.duration)).toNanos()) / 1e9 } catch(ignore) {}
+                }
+            }
+        }
+        if (!d.sections && !d.histogram && !d.matches && !d.threads && !(d.name && d.fields) && !isDef(d.durationSecs))
+            r.gaps.push({ ref: ref, reason: "No supported summary for this evidence shape; preserve source for analysis" })
+    })
+    if (pauses.length) {
+        var durations = pauses.map(p => p.seconds).filter(isFinite).sort((a,b) => a-b)
+        r.observations.push({type:"gcEvents", count:pauses.length, totalEventSeconds:durations.reduce((a,b) => a+b,0),
+            p50Seconds:durations[Math.floor((durations.length-1)*0.5)], p95Seconds:durations[Math.floor((durations.length-1)*0.95)],
+            maxSeconds:durations[durations.length-1], events:pauses.slice(0,limit), note:"Event durations may include concurrent phases; not application pause percentage"})
+    }
+    if (Object.keys(profiles).length) r.observations.push({type:"profileGroups", groups:Object.keys(profiles).map(k => profiles[k]).sort((a,b) => b.count-a.count).slice(0,limit), note:"Observed event weights only; allocation samples are not total allocation and stack samples are not CPU time. Group inventory capped at 10000."})
+    if (Object.keys(jfrCounts).length) r.observations.push({type:"jfrEventCounts", counts:jfrCounts, note:"Counts are event counts, not CPU time or allocated bytes"})
+    r.limitations = ["A snapshot cannot establish a historical OOM cause", "Histogram payload sizes are not retained heap", "Thread samples are not measured CPU time", "Missing evidence is not zero activity"]
+    return r
+}
+var _javaMarkdown = r => "# Java diagnostics: " + r.kind + "\n\n" +
+    "Generated: " + r.generatedAt + "\n\n## Observations\n\n```json\n" + stringify(r.observations, __, "  ") +
+    "\n```\n\n## Coverage gaps\n\n```json\n" + stringify(r.gaps, __, "  ") + "\n```\n\n" + r.limitations.map(s => "- " + s).join("\n")
+var _javaSelected = value => {
+    if (isArray(value)) return value.slice(0, 1000).map(_javaSelected)
+    if (isMap(value)) {
+        var out = Object.create(null)
+        Object.keys(value).forEach(k => {
+            if (/password|secret|token|credential|environment|properties|raw|context|values/i.test(k)) return
+            out[k] = _javaSelected(value[k])
+        })
+        return out
+    }
+    if (isString(value)) return value.substring(0, 8192).replace(/(password|token|secret|authorization)\s*[:=]\s*\S+/gi, "$1=[REDACTED]")
+    return value
+}
+var _javaBundle = evidence => {
+    var dir = params.javabundledir
+    if (!isString(dir) || !dir.length) throw new Error("javabundledir is required")
+    if (io.fileExists(dir)) throw new Error("Bundle destination already exists")
+    var selected = _javaSelected(evidence), report = _javaReport(selected)
+    io.mkdir(dir)
+    io.writeFileJSON(dir + "/evidence.json", selected)
+    io.writeFileJSON(dir + "/report.json", report)
+    io.writeFileString(dir + "/report.md", _javaMarkdown(report))
+    var files = ["evidence.json", "report.json", "report.md"].map(name => ({ name: name, sha256: sha256(io.readFileBytes(dir + "/" + name)) }))
+    var manifest = { schemaVersion: 1, createdAt: new Date().toISOString(), files: files,
+        exclusions: ["Sensitive-key fields, raw text, heap values and binary artifacts excluded", "Lists limited to 1000 entries; text limited to 8192 characters", "Review before transfer; filtering cannot guarantee removal of secrets"] }
+    io.writeFileJSON(dir + "/manifest.json", manifest)
+    return manifest
+}
+var _counterDelta = row => {
+    var o = isMap(params.counterdelta) ? params.counterdelta : _fromJSSLON(params.counterdelta)
+    if (!isMap(o) || !isArray(o.counters)) throw new Error("counterdelta requires identity, timestamp and counters paths")
+    var read = p => String(p).split(".").reduce((v,k) => isDef(v) ? v[k] : __, row)
+    var identity = String(read(o.identity)), timestamp = new Date(read(o.timestamp)).getTime(), prior = _javaPrevious[identity]
+    var result = { data: row, baseline: true, delta: {}, rate: {} }, counters = {}
+    o.counters.forEach(p => { var v = read(p); if (/^[0-9]+$/.test(String(v))) counters[p] = String(v) })
+    if (prior && timestamp > prior.timestamp) {
+        result.elapsedSeconds = (timestamp - prior.timestamp) / 1000
+        Object.keys(counters).forEach(p => {
+            if (isDef(prior.counters[p])) {
+                var delta = new java.math.BigInteger(counters[p]).subtract(new java.math.BigInteger(prior.counters[p]))
+                if (delta.signum() >= 0) { result.delta[p] = String(delta); result.rate[p] = Number(String(delta)) / result.elapsedSeconds; result.baseline = false }
+            }
+        })
+    }
+    _javaPrevious[identity] = { timestamp: timestamp, counters: counters }
+    return result
+}
+
 // ---
 
 // Process params
@@ -2694,6 +2870,10 @@ const _fileExtensions = new Map([
   [
     ".jfr",
     "jfr"
+  ],
+  [
+    ".hprof",
+    "hprof"
   ]
 ])
 // --- add extra _fileExtensions here ---
@@ -2711,7 +2891,8 @@ var _inputNoMem = new Set([
   "ndjson",
   "ndslon",
   "lines",
-  "dsv"
+  "dsv",
+  "hprof"
 ])
 // --- add extra _inputNoMem here ---
 const _addSrcFileExtensionsNoMem = ext => {
@@ -2960,6 +3141,8 @@ var _mapDiff = (a, b) => {
 }
 
 var _transformFns = {
+    "counterdelta": r => { if (isDef(params.counterdelta)) return _counterDelta(r) },
+    "javareport": r => { if (toBoolean(params.javareport)) return _javaReport(r) },
     "transforms"    : _r => {
         if (toBoolean(params.transforms)) {
             var _t = Object.keys(_transformFns).filter(r => r != 'transforms').sort()
@@ -3666,6 +3849,9 @@ const _addSrcTransformFns = (type, fn) => {
 
 // --- Output functions
 var _outputFns = new Map([
+    ["jcmd", (r, options) => _print(_javaCommand(r))],
+    ["javareport", (r, options) => { var report = _javaReport(r); _print(params.javareportformat === "json" ? stringify(report) : _javaMarkdown(report)) }],
+    ["javabundle", (r, options) => _print(stringify(_javaBundle(r)))],
     ["idesc", (r, options) => _idescOutput(r)],
     ["?" , (r, options) => {
         r = Array.from(_outputFns.keys()).filter(r => r != '?').sort()
@@ -4476,6 +4662,16 @@ if (typeof _resolveLLMEnvName === "undefined") {
 }
 
 var _inputFns = new Map([
+    ["jcmd", (r, options) => _$o(_javaCommand(isDef(params.jcmdcommand) ? params.jcmdcommand : r), options)],
+    ["javadiag", (r, options) => _$o(_javaCollect(), options)],
+    ["javastacks", (r, options) => _$o(_javaStacks(_readInputString(r)), options)],
+    ["javaoom", (r, options) => _$o(_javaOOM(_readInputString(r)), options)],
+    ["hprof", (r, options) => {
+        if (!isDef(params.file)) throw new Error("hprof requires file (plain or gzip)")
+        if (params.hprofmode === "summary") _$o(_javaAPI("hprofSummary")(params.file, _javaOptions()), options)
+        else _javaAPI("parseHPROF")(params.file, record => { _$o(record, options, true) }, _javaOptions())
+    }],
+
     ["?"    , (_res, options) => {
         _res = Array.from(_inputFns.keys()).filter(r => r != '?').sort()
         _$o(_res, options)
@@ -5415,9 +5611,9 @@ var _inputFns = new Map([
 
         var parse = source => {
             if (params.jfrjoin) {
-                _$o(ow.java.parseJFR(source, __, params.jfrdesc), options)
+                _$o(ow.java.parseJFR(source, __, params.jfrdesc, _javaOptions()), options)
             } else {
-                ow.java.parseJFR(source, event => _$o(event, options), params.jfrdesc)
+                ow.java.parseJFR(source, event => _$o(event, options), params.jfrdesc, _javaOptions())
             }
         }
         if (isDef(params.file) && isUnDef(params.cmd)) _withInputFilePath(parse)
@@ -6057,7 +6253,7 @@ var _run = () => {
     }
     // Stream-capable handlers own their input; do not first buffer it in _res.
     if (!_version && isUnDef(params.url) &&
-        (["lines", "ndjson", "ndslon", "dsv", "csv", "javagc", "httpd"].indexOf(params.type) >= 0 ||
+        (["lines", "ndjson", "ndslon", "dsv", "csv", "javagc", "httpd", "javadiag", "jcmd", "hprof"].indexOf(params.type) >= 0 ||
          (params.type == "json" && toBoolean(params.stream)))) {
         _inputFns.get(params.type)(isString(params.data) ? params.data : "", options)
         delete params.__origr
@@ -6210,6 +6406,8 @@ if (params.debug) {
 
 try {
 if (isNumber(params.loop)) {
+    var _loopStarted = now(), _loopPasses = 0
+    ;["loopcount", "loopduration"].forEach(k => { if (isDef(params[k]) && (!isFinite(Number(params[k])) || Number(params[k]) <= 0 || (k === "loopcount" && Number(params[k]) % 1 !== 0))) throw new Error(k + " must be positive") })
     while(1) {
         if (toBoolean(params.loopcls)) {
             if (isDef(params.outfile) && isDef(global.__oafp_streams[params.outfile])) {
@@ -6219,7 +6417,10 @@ if (isNumber(params.loop)) {
         }
         _httpdPass(() => _withProgress(_run))
         _httpdFlush()
-        sleep(params.loop * 1000, true)
+        _loopPasses++
+        if ((isDef(params.loopcount) && _loopPasses >= Number(params.loopcount)) || (isDef(params.loopduration) && now() - _loopStarted >= Number(params.loopduration) * 1000)) break
+        sleep(isDef(params.loopduration) ? Math.min(params.loop * 1000, Math.max(0, Number(params.loopduration) * 1000 - (now() - _loopStarted))) : params.loop * 1000, true)
+        if (isDef(params.loopduration) && now() - _loopStarted >= Number(params.loopduration) * 1000) break
         // Ensure params have a fresh copy
         if (isDef(bkprms)) params = clone(bkprms)
     }
