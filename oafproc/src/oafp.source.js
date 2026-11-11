@@ -3,6 +3,70 @@ var _params = processExpr(" ")
 const oafp = params => {
 if (isUnDef(params) || isDef(params.____ojob)) return 
 
+// Resolve opt-in request parameters before defaults and source dispatch.
+if (toBoolean(params.inparams)) {
+    var requestType = params.input || params.type || params.in
+    var requestKeys = {
+        javadiag: "javapid javadiagop javaoptions javafile jcmdcommand javabundledir",
+        hprof: "file hprofmode hprofindex hprofid javaoptions",
+        jcmd: "javapid jcmdcommand javaoptions",
+        httpd: "inhttpdport inhttpdhost inhttpdpath inhttpdtimeout inhttpdcount inhttpdmax inhttpdstatus inhttpdreply inhttpdtype inhttpdenvelope",
+        llmmodels: "llmenv llmoptions",
+        javas: "javasinception",
+        jmx: "jmxop jmxurl jmxpid jmxuser jmxpass jmxprovider",
+        javathread: "javathreadpid",
+        hsperf: "file cmd hsperfmetadata",
+        jfr: "file cmd jfrjoin jfrdesc javaoptions",
+        xls: "file cmd inxlssheet inxlsdesc inxlsevalformulas inxlscol inxlsrow xlssheet xlsevalformulas xlscol xlsrow",
+        ls: "file lsposix lsrecursive lsext"
+    }
+    if (!Object.prototype.hasOwnProperty.call(requestKeys, requestType)) throw new Error("inparams is unsupported for input " + requestType)
+    var request = params.data
+    if (isUnDef(request) && isDef(params.file)) request = io.readFileString(params.file)
+    if (isUnDef(request) && isDef(params.cmd)) request = $sh(params.cmd).get(0).stdout
+    if (isUnDef(request)) {
+        var requestLines = []
+        io.pipeLn(function(line) { requestLines.push(line); return false })
+        request = requestLines.join("\n")
+    }
+    if (isString(request)) {
+        var requestText = request
+        try { request = af.fromJSSLON(requestText) } catch(ignore) { request = requestText }
+        if (isString(request) || isUnDef(request)) request = af.fromYAML(requestText)
+    }
+    if (!isMap(request)) throw new Error("inparams requires one parameter map")
+    var allowed = requestKeys[requestType].split(" ").concat(["data"])
+    Object.keys(request).forEach(function(key) {
+        if (allowed.indexOf(key) < 0) throw new Error("Unsupported inparams key for " + requestType + ": " + key)
+    })
+    // Merge option maps without modifying either caller-owned object.
+    var mergeRequest = function(base, explicit) {
+        var result = clone(base)
+        Object.keys(explicit).forEach(function(key) {
+            if (["__proto__", "constructor", "prototype"].indexOf(key) >= 0) throw new Error("Invalid parameter key")
+            result[key] = isMap(result[key]) && isMap(explicit[key]) ? mergeRequest(result[key], explicit[key]) : clone(explicit[key])
+        })
+        return result
+    }
+    var explicitRequest = clone(params)
+    delete explicitRequest.file
+    delete explicitRequest.cmd
+    delete explicitRequest.data
+    // CLI option maps arrive as strings; normalize them before recursive merging.
+    request = clone(request)
+    ;["javaoptions", "llmoptions"].forEach(function(key) {
+        ;[request, explicitRequest].forEach(function(value) {
+            if (isString(value[key])) {
+                var parsed = af.fromJSSLON(value[key])
+                if (isMap(parsed)) value[key] = parsed
+            }
+        })
+    })
+    params = mergeRequest(request, explicitRequest)
+    delete params.inparams
+    if (isUnDef(params.data)) params.data = ""
+}
+
 // Process secBuckets
 if (isDef(params.secKey)) params = $sec().procMap(params)
 
@@ -2463,6 +2527,10 @@ var _javaReport = evidence => {
         r.evidence.push({ ref: ref, timestamp: row && row.timestamp, source: row && row.source, target: row && row.target })
         if (!d) { r.gaps.push({ ref: ref, reason: "Empty evidence" }); return }
         if (d.errors) d.errors.forEach(e => r.gaps.push({ ref: ref, reason: e }))
+        var graph = (typeof d.found === "boolean" && isArray(d.path)) || isArray(d.references) ||
+            (isArray(d.objects) && isDef(d.scanned)) || (d.id && d.type) ||
+            (d.complete === true && isDef(d.references) && isDef(d.roots))
+        if (graph) r.observations.push({ ref: ref, type: "heapGraph", data: d, meaning: "Object/reference evidence; no retained-size or dominator calculation" })
         if (d.histogram) r.observations.push({ ref: ref, type: "histogram", classes: d.histogram.slice(0, limit), sizeMeaning: d.payloadBytes ? "serialized payload" : "source-defined bytes; never retained size" })
         if (d.matches) r.observations.push({ ref: ref, type: "oomMessages", matches: d.matches.slice(0, limit) })
         if (d.sections) r.observations.push({ ref: ref, type: "snapshot", sections: d.sections })
@@ -2489,7 +2557,7 @@ var _javaReport = evidence => {
                 }
             }
         }
-        if (!d.sections && !d.histogram && !d.matches && !d.threads && !(d.name && d.fields) && !isDef(d.durationSecs))
+        if (!graph && !d.sections && !d.histogram && !d.matches && !d.threads && !(d.name && d.fields) && !isDef(d.durationSecs))
             r.gaps.push({ ref: ref, reason: "No supported summary for this evidence shape; preserve source for analysis" })
     })
     if (pauses.length) {
@@ -2552,6 +2620,23 @@ var _counterDelta = row => {
     }
     _javaPrevious[identity] = { timestamp: timestamp, counters: counters }
     return result
+}
+
+// HPROF graph queries use an existing index without reading stdin or buffering the heap.
+var _javaHPROF = () => {
+    var mode = params.hprofmode || "records", o = _javaOptions()
+    if (["records", "summary", "index", "object", "find", "refs", "path"].indexOf(mode) < 0) throw new Error("Unsupported hprofmode: " + mode)
+    if (["records", "summary", "index"].indexOf(mode) >= 0 && !isString(params.file)) throw new Error("hprof " + mode + " requires file (plain or gzip)")
+    if (["records", "summary"].indexOf(mode) < 0 && (!isString(params.hprofindex) || !params.hprofindex.length)) throw new Error("hprof " + mode + " requires hprofindex directory")
+    if (["object", "refs", "path"].indexOf(mode) >= 0 && !isString(params.hprofid)) throw new Error("hprof " + mode + " requires hprofid hexadecimal object ID")
+    switch (mode) {
+    case "summary": return _javaAPI("hprofSummary")(params.file, o)
+    case "index": return _javaAPI("hprofIndex")(params.file, params.hprofindex, o)
+    case "object": return _javaAPI("hprofObject")(params.hprofindex, params.hprofid, o)
+    case "find": return _javaAPI("hprofFind")(params.hprofindex, o)
+    case "refs": return _javaAPI("hprofReferences")(params.hprofindex, params.hprofid, o)
+    case "path": return _javaAPI("hprofPath")(params.hprofindex, params.hprofid, o)
+    }
 }
 
 // ---
@@ -4667,9 +4752,10 @@ var _inputFns = new Map([
     ["javastacks", (r, options) => _$o(_javaStacks(_readInputString(r)), options)],
     ["javaoom", (r, options) => _$o(_javaOOM(_readInputString(r)), options)],
     ["hprof", (r, options) => {
-        if (!isDef(params.file)) throw new Error("hprof requires file (plain or gzip)")
-        if (params.hprofmode === "summary") _$o(_javaAPI("hprofSummary")(params.file, _javaOptions()), options)
-        else _javaAPI("parseHPROF")(params.file, record => { _$o(record, options, true) }, _javaOptions())
+        if (!isDef(params.hprofmode) || params.hprofmode === "records") {
+            if (!isString(params.file)) throw new Error("hprof records requires file (plain or gzip)")
+            _javaAPI("parseHPROF")(params.file, record => { _$o(record, options, true) }, _javaOptions())
+        } else _$o(_javaHPROF(), options)
     }],
 
     ["?"    , (_res, options) => {

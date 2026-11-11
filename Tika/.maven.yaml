@@ -30,5 +30,8 @@ artifacts:
   id: tika-parser-zip-commons
   version: 4.2.0
 - group: org.apache.logging.log4j
+  id: log4j-api
+  version: 2.26.1
+- group: org.apache.logging.log4j
   id: log4j-to-slf4j
   version: 2.26.1

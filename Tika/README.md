@@ -115,6 +115,12 @@ When upgrading, remove the old JAR set first, fetch the pinned artifacts from
 repository's JAR downloader works. The Log4j-to-SLF4J bridge routes parser logs
 through OpenAF's logging setup.
 
+Keep `log4j-api` pinned to **2.26.1**, matching `log4j-to-slf4j`.
+The previously bundled `log4j-api-3.0.0-beta2.jar` lacks
+`org.apache.logging.log4j.message.ParameterizedMessageFactory` and causes parser
+initialization failures. Replace it rather than keeping both API versions, and
+restart the OpenAF process after upgrading.
+
 Use the same `--exclude .openaf_precompiled` when running `opack pack .`.
 
 Tests use small synthetic fixtures (no external services): HTML with Unicode,

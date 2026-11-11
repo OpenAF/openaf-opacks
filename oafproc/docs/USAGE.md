@@ -1702,7 +1702,9 @@ See [Java diagnostics](JAVA-DIAGNOSTICS.md) for collection, report and container
 | javaoptions | Map | OpenAF diagnostic/parser options; also accepts a JSON/SLON string. |
 | javafile | String | Explicit target-filesystem destination for heapdump. |
 | jcmdcommand | String | One explicit diagnostic command; out=jcmd accepts the input string. |
-| hprofmode | String | records (default) or summary. Requires file. |
+| hprofmode | String | records (default), summary, index, object, find, refs or path. records/summary/index require file. |
+| hprofindex | String | New directory for index mode; existing disk-backed HPROF index directory for queries. |
+| hprofid | String | Hexadecimal object ID for object, refs and path modes. |
 | javareport | Boolean | Transform supplied evidence into a structured report. |
 | javareportkind | String | Report label: gc, oom, profile, all (default). |
 | javareportformat | String | out=javareport renders Markdown by default; json selects JSON. |
@@ -1713,3 +1715,29 @@ See [Java diagnostics](JAVA-DIAGNOSTICS.md) for collection, report and container
 | counterdelta | Map | Transform options: identity, timestamp and counters (array of dotted paths). |
 
 Additional output formats: **jcmd**, **javareport**, **javabundle**. Capture requires explicit target/operation; report outputs never collect implicitly.
+
+## Parameter-map inputs
+
+Set `inparams=true` to supply one JSON/SLON/YAML map through `data`, stdin,
+`file` or `cmd`. Map keys use existing input parameter names; `data` holds
+a query or command payload. Explicit invocation parameters override map values,
+with nested option maps merged recursively and arrays replaced. Outer source
+parameters are consumed before map-level artifact paths are used.
+
+Supported inputs: javadiag, hprof, jcmd, httpd, llmmodels, javas, jmx,
+javathread, hsperf, jfr, xls and ls. Unsupported keys and inputs are rejected.
+Pipeline/output controls belong on the command line. Existing input behavior
+is unchanged without this option.
+
+```sh
+echo '{"javapid":123,"javadiagop":"snapshot"}' | oafp in=javadiag inparams=true out=json
+echo '{"file":"heap.hprof.gz","hprofmode":"summary"}' | oafp in=hprof inparams=true out=json
+```
+
+| Option | Type | Description |
+| --- | --- | --- |
+| inparams | Boolean | Resolve supported input parameters from one request map; explicit invocation values win. Defaults to false. |
+
+Request-source regression checks: `python3 src/tests/inputParams.py` from the
+repository root (`OAF` may name an alternative OpenAF launcher). These cover
+source and compiled artifacts from an unrelated working directory.
