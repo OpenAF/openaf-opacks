@@ -26,7 +26,7 @@
   "main": "main.js",
   "mainJob": "",
   "license": "https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE",
-  "version": "20261109",
+  "version": "20261111",
   "dependencies": {},
   "files": [
     ".maven.yaml",
@@ -42,7 +42,7 @@
     "LICENSE": "2b8b815229aa8a61e483fb4ba0588b8b6c491890",
     "README.md": "013d62a2b657a49db6430af846c887508e42504d",
     "compiler.jar": "8e7597243416b3d890c19d9cc57a35e5b96d0f2a",
-    "compiler11.jar": "85acac8cd99c6c350e2a5111cb6b394f08697e04",
+    "compiler11.jar": "2cc0266cc79d3dd69b42640b06e9e4c7cd7a8183",
     "main.js": "9b6659cb5a2deb06d341612acf67c1e4479ec148"
   }
 }
