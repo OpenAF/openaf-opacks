@@ -10,8 +10,8 @@ remote_tip=$(git ls-remote --heads origin "refs/heads/${update_branch}")
 remote_sha=${remote_tip%%$'\t'*}
 
 # Stage the complete generated snapshot, including removed dependency JARs.
-# These paths are implementation artifacts of the OpenAF action/runtime.
-git add -A -- . ':!.github/action' ':!.openaf_precompiled'
+# .gitignore excludes the OpenAF action/runtime artifacts.
+git add -A -- .
 if git diff --cached --quiet; then
   echo "No package changes to publish."
   exit 0
