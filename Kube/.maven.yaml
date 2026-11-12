@@ -2,6 +2,12 @@ artifacts:
 - id: kubernetes-client
   group: io.fabric8
   #version: 8.0.0
+- group: io.vertx
+  id: vertx-core
+  version: 5.2.3
+- group: io.vertx
+  id: vertx-web-client
+  version: 5.2.3
 - group: io.netty
   id: netty-codec-http2
   version: 4.2.19.Final

@@ -18,7 +18,7 @@ name: Kube
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261029'
+version: '20261112'
 dependencies:
   OpenAF: '>=20241117'
 files:
@@ -27,10 +27,15 @@ files:
 - .package.yaml
 - .precompile
 - README.md
+- jackson-annotations-2.21.jar
 - jackson-annotations-2.22.jar
+- jackson-core-2.21.8.jar
 - jackson-core-2.22.4.jar
+- jackson-core-3.1.8.jar
 - jackson-core-3.2.4.jar
+- jackson-databind-3.1.8.jar
 - jackson-databind-3.2.4.jar
+- jackson-dataformat-yaml-3.2.3.jar
 - jackson-dataformat-yaml-3.2.4.jar
 - kube.js
 - kube.yaml
@@ -60,13 +65,18 @@ files:
 - kubernetes-model-scheduling-8.0.0.jar
 - kubernetes-model-storageclass-8.0.0.jar
 - netty-buffer-4.2.19.Final.jar
+- netty-buffer-4.2.20.Final.jar
 - netty-codec-base-4.2.19.Final.jar
 - netty-codec-classes-quic-4.2.18.Final.jar
+- netty-codec-classes-quic-4.2.20.Final.jar
 - netty-codec-compression-4.2.19.Final.jar
+- netty-codec-compression-4.2.20.Final.jar
 - netty-codec-dns-4.2.19.Final.jar
 - netty-codec-http-4.2.19.Final.jar
+- netty-codec-http-4.2.20.Final.jar
 - netty-codec-http2-4.2.19.Final.jar
 - netty-codec-http3-4.2.18.Final.jar
+- netty-codec-http3-4.2.20.Final.jar
 - netty-codec-native-quic-4.2.18.Final-linux-aarch_64.jar
 - netty-codec-native-quic-4.2.18.Final-linux-x86_64.jar
 - netty-codec-native-quic-4.2.18.Final-osx-aarch_64.jar
@@ -75,30 +85,41 @@ files:
 - netty-codec-socks-4.2.19.Final.jar
 - netty-common-4.2.19.Final.jar
 - netty-handler-4.2.19.Final.jar
+- netty-handler-4.2.20.Final.jar
 - netty-handler-proxy-4.2.19.Final.jar
 - netty-resolver-4.2.19.Final.jar
+- netty-resolver-4.2.20.Final.jar
 - netty-resolver-dns-4.2.19.Final.jar
 - netty-tcnative-classes-2.0.84.Final.jar
+- netty-tcnative-classes-2.0.85.Final.jar
 - netty-transport-4.2.19.Final.jar
+- netty-transport-4.2.20.Final.jar
 - netty-transport-native-unix-common-4.2.19.Final.jar
+- netty-transport-native-unix-common-4.2.20.Final.jar
 - slf4j-api-2.0.20.jar
+- snakeyaml-engine-3.1.1.jar
 - snakeyaml-engine-3.2.jar
-- vertx-auth-common-5.2.2.jar
-- vertx-core-5.2.2.jar
-- vertx-core-logging-5.2.2.jar
-- vertx-uri-template-5.2.2.jar
-- vertx-web-client-5.2.2.jar
-- vertx-web-common-5.2.2.jar
+- vertx-auth-common-5.2.3.jar
+- vertx-core-5.2.3.jar
+- vertx-core-logging-5.2.3.jar
+- vertx-uri-template-5.2.3.jar
+- vertx-web-client-5.2.3.jar
+- vertx-web-common-5.2.3.jar
 - zjsonpatch-8.0.0.jar
 filesHash:
-  .maven.yaml: 147a5e60e184db2e9a60139595a41e8a1bc9591c
+  .maven.yaml: 222e574de57699bb3e6729d013a6b1b2ff81f7c8
   .odoc.db: f8ac7d0c0c30b2e4536107e2c450f0d1d34a421d
   .precompile: 8c98d16175a11dcbe315a8e3acf6a40ac70eb365
   README.md: 04472d99b869f5cf0b2ebe4eb75d75a32d4fca9e
+  jackson-annotations-2.21.jar: b1bc1868bf02dc0bd6c7836257a036a331005309
   jackson-annotations-2.22.jar: 15c67f9498d6934cff9510fc70c5a12e52290457
+  jackson-core-2.21.8.jar: 6343fa08a059a4f5afa7411c8c04652f2880d69b
   jackson-core-2.22.4.jar: d753ae59bae7dcb183f856da541c5b27272088ce
+  jackson-core-3.1.8.jar: 7d15ed4f722805d4d1413b9537b2f86ab76178a9
   jackson-core-3.2.4.jar: 025beaee139ae32025c5f189e4fb39c5b1f78653
+  jackson-databind-3.1.8.jar: 57f38eece00f227b26916130502ec4082c1b87a5
   jackson-databind-3.2.4.jar: 73cd5c393378036c5b556355e5257128796b9a9a
+  jackson-dataformat-yaml-3.2.3.jar: c39c703aadd5bc7513013e7b2871ef36698aa443
   jackson-dataformat-yaml-3.2.4.jar: edaa1b55acc9f9f6ee9487689e1fbcf1ca874345
   kube.js: a599a56d41e3b60ec7adc5a3101d4f4d6806f175
   kube.yaml: 460ff6cdd56f7eaec351799d1bf299e363ed1c6b
@@ -128,13 +149,18 @@ filesHash:
   kubernetes-model-scheduling-8.0.0.jar: a8b1c3e0e4440deec4886a477a52286668e25882
   kubernetes-model-storageclass-8.0.0.jar: 5ab46f17dffaba9441e4e4b0d0d2959b7e231280
   netty-buffer-4.2.19.Final.jar: c00e1256ce4f9c4ed44947bd8596be01d58141db
+  netty-buffer-4.2.20.Final.jar: 12d223b605fe08ec593750fd25115297c4f3418a
   netty-codec-base-4.2.19.Final.jar: abc65e2d8ff180f8f68bdefadb861f0e07b0a457
   netty-codec-classes-quic-4.2.18.Final.jar: cc350fcbcd92876d5de11d54e68f63f0ebb6e10b
+  netty-codec-classes-quic-4.2.20.Final.jar: a9b3eb06737a2f7a1f0ea931c3f358cd7000bfc3
   netty-codec-compression-4.2.19.Final.jar: 34392c72a81269eb2ef1b5f171ff9d93014188de
+  netty-codec-compression-4.2.20.Final.jar: 921bf1c5e238dbfd54d19d344a3ef253080d2a66
   netty-codec-dns-4.2.19.Final.jar: 0f3e2a455d50afff74c5a2c0d0737e0563ae7960
   netty-codec-http-4.2.19.Final.jar: 14bc8cdb50ced3a4d51d09e2f1f869fb4046ac7f
+  netty-codec-http-4.2.20.Final.jar: 2d7b07f88c991d0bd30755afe367fe1bd8610b7d
   netty-codec-http2-4.2.19.Final.jar: c0e800f6265dbb5854d956b9ecdb2ca1f8a9d683
   netty-codec-http3-4.2.18.Final.jar: 2776049d9acabac6a2da9346c5ffb9ac1436fc29
+  netty-codec-http3-4.2.20.Final.jar: 55c951c513e725d0e8906dce474001230fe3d49f
   netty-codec-native-quic-4.2.18.Final-linux-aarch_64.jar: 10293f8920dd974eb05da4991407a16694649f64
   netty-codec-native-quic-4.2.18.Final-linux-x86_64.jar: 4841f339d9e4729712da0988d767d38ee1829ed2
   netty-codec-native-quic-4.2.18.Final-osx-aarch_64.jar: c6755e7c1797f813858a18b43eb3a61ff97e4994
@@ -143,18 +169,24 @@ filesHash:
   netty-codec-socks-4.2.19.Final.jar: ac0652893932696257322ce3581e52b22da74982
   netty-common-4.2.19.Final.jar: aae16e793dd13a63fc9a9935ff11fa19d0de7885
   netty-handler-4.2.19.Final.jar: 6cfc1334a230b3c4c8325417fada299067648672
+  netty-handler-4.2.20.Final.jar: 937cf68d314ea0edbf077643a3db42988e872f87
   netty-handler-proxy-4.2.19.Final.jar: 06da1b66407b417323afc0abb61c16839e6ab66f
   netty-resolver-4.2.19.Final.jar: 58689765eb4fc7176aaa7e48b5350c34526d9887
+  netty-resolver-4.2.20.Final.jar: c4305893023f9705eb85db85be3c65149666c004
   netty-resolver-dns-4.2.19.Final.jar: fc3043ad2fa4caacb01c527aa7c8cb5627e3504b
   netty-tcnative-classes-2.0.84.Final.jar: 30d95c719f174c33e5146f923cda62d7bdb65650
+  netty-tcnative-classes-2.0.85.Final.jar: 08019d502460ace96b2734854964860718e92016
   netty-transport-4.2.19.Final.jar: 52c2306d4b71cfbfc8a6ab9de1d083d2978c3b83
+  netty-transport-4.2.20.Final.jar: f4e01e4208b3799ef7f83c826c15fb9b3648c589
   netty-transport-native-unix-common-4.2.19.Final.jar: 8ca98433d3ff179b2aab7f526a16435cb4242b7e
+  netty-transport-native-unix-common-4.2.20.Final.jar: 34e59d72bab77ba8fc1ff899a267d52ccb4e3312
   slf4j-api-2.0.20.jar: 7fea9d92ba67e9b3c8f03515fb202b86a1fe44f6
+  snakeyaml-engine-3.1.1.jar: 9f8bf41c9f06191abd4322072849603bdc919ac7
   snakeyaml-engine-3.2.jar: d633f92a2bd4df3572f371ed6ae645570f9ac519
-  vertx-auth-common-5.2.2.jar: c0bcf69022856c8b125c762ce3843310fa173b11
-  vertx-core-5.2.2.jar: 066525a47aadfdf95ff0d565ced558b784fb1d27
-  vertx-core-logging-5.2.2.jar: f4074f901b237d4117870ea6a88dd2bc835a779e
-  vertx-uri-template-5.2.2.jar: a25b83c89be2f61858b025c86d4837cfb0e19e44
-  vertx-web-client-5.2.2.jar: b15c40d3e1d6200e329951e4a275747b54c45956
-  vertx-web-common-5.2.2.jar: a83e7f913333763a39b293331d4194c81259bf88
+  vertx-auth-common-5.2.3.jar: 5a225407254ab13e3242109dc28be197a646d2ce
+  vertx-core-5.2.3.jar: 91d29e416c3be791a3fdca5ace2fa9ba935ccddc
+  vertx-core-logging-5.2.3.jar: b4328dbffcc5ce4611e178ea3faed40f04db0104
+  vertx-uri-template-5.2.3.jar: ca46aff65cb09588d7e3c71161e5669026878ac0
+  vertx-web-client-5.2.3.jar: 7e668cedc34fbc759c41ac2ef4ec5be7e32c7760
+  vertx-web-common-5.2.3.jar: 1ca254101a886b61d74177c40300074509102b6a
   zjsonpatch-8.0.0.jar: b298ce0a4172df5c0da4a3e619997b4727124cce
