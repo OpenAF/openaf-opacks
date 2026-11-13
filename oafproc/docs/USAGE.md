@@ -126,6 +126,7 @@ List of data input types that can be auto-detected (through the file extension o
 | ndjson | A NDJSON (new-line delimited JSON) format |
 | ndslon | A NDSLON (new-line delimited SLON) format |
 | oaf | Takes an OpenAF scripting code or OpenAF scripting file to execute and use the result as input |
+| files | Processes a newline-separated list of local filepaths concurrently; see Parallel file lists |
 | oafp | Takes a JSON/SLON/YAML map input as parameters for calling a sub oafp process (arrays will call multiple oafp processes; inoafpseq=true will process sequentially) |
 | ojob | Takes a JSON/SLON/YAML map input with a 'ojob' string and a 'args' map parameter |
 | openmetrics | An OpenMetrics/Prometheus compatible format |
@@ -1741,3 +1742,42 @@ echo '{"file":"heap.hprof.gz","hprofmode":"summary"}' | oafp in=hprof inparams=t
 Request-source regression checks: `python3 src/tests/inputParams.py` from the
 repository root (`OAF` may name an alternative OpenAF launcher). These cover
 source and compiled artifacts from an unrelated working directory.
+
+### Parallel file lists
+
+| Option | Type | Description |
+|--------|------|-------------|
+| filesin | String | Input format for each listed file; defaults to extension detection |
+| filesworkers | Number | Positive worker count; defaults to at most four cores |
+| filessource | String | Optional literal field containing the listed filepath |
+
+`in=files` reads one local filepath per line from stdin, `file`, `data` or `cmd`.
+Blank lines are skipped; relative paths use the working directory. Duplicate paths
+are processed independently. Paths containing newlines cannot be represented.
+
+```sh
+cat files.txt | oafp in=files filesin=json path=records out=ndjson
+oafp file=files.txt in=files out=csv csv='(withHeaders: [id, name])'
+```
+
+`filesin` overrides extension detection. `filesworkers` defaults to at most four
+cores; `parallel=false` uses one worker. Filters and transforms apply per file
+with their usual streaming semantics. Arrays are flattened one level. Records
+arrive as ready and files may interleave. `filessource=field` adds the listed
+filepath to object records; collisions and non-objects fail that file.
+
+Supported outputs are `ndjson` (default), `ndslon`, `ndcslon`, `raw`, `lines`,
+`csv`, `dsv`, `json`, and `yaml`, written by one writer. JSON is one streamed
+array, including `[]` for empty input, and is closed after individual file failures.
+YAML is a document stream with a `---` separator before each record. Raw output
+writes strings verbatim and serializes other records as JSON; lines uses text
+conversion. Embedded newlines in text can span multiple output lines.
+DSV honors `dsvsep`, `dsvfields`, `dsvquote`, `dsvuseslon`, `dsvnl`, and
+`dsvheader`, with one header and the same fixed-column rules as CSV.
+CSV uses explicit
+`csv.withHeaders` or the first arriving record's fields; missing fields are empty
+and unexpected fields fail the file. Explicit headers give deterministic columns.
+Failures are reported on stderr and cause a nonzero exit after remaining files
+finish. Already emitted records remain. Queue buffering is bounded, but a parser
+or aggregate transform may still load an entire file. Pipe into another oafp for
+combined analysis or other output formats.

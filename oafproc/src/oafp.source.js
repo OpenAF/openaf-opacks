@@ -331,6 +331,7 @@ const _$o = (r, options, lineByLine) => {
         r = browser.current()
     }
 
+    if (isFunction(params.__recordSink)) return params.__recordSink(r)
     _clearTmpMsg()
     if (isUnDef(nOptions.__format)) nOptions.__format = getEnvsDef("OAFP_OUTPUT", nOptions.__format, "ctree")
     if (lineByLine && nOptions.__format == "idesc" && isDef(_idescSample)) return _idescSample.add(r)
@@ -698,6 +699,57 @@ const _withProgress = fn => {
             _progressVisible = true
         }), 150)
     } finally { _clearTmpMsg() }
+}
+
+// Shared DSV rendering for ordinary output and the file-list writer.
+const _renderDSV = (r, params) => {
+        if (isUnDef(params.dsvsep))     params.dsvsep = ","
+        if (isUnDef(params.dsvquote))   params.dsvquote = '\\"'
+        if (isUnDef(params.dsvfields))  params.dsvfields = __
+        if (isUnDef(params.dsvuseslon)) params.dsvuseslon = false
+        if (isUnDef(params.dsvnl))      params.dsvnl = "\n"
+        if (isUnDef(params.dsvheader))  params.dsvheader = true
+
+        if (isString(params.dsvfields)) params.dsvfields = params.dsvfields.split(",").map(f => f.trim())
+        params.dsvuseslon = toBoolean(params.dsvuseslon)
+
+        if (isMap(r)) {
+            r = [ r ]
+        }
+        if (isArray(r)) {
+            var _out = []
+            // Use one schema for the entire table, regardless of each row's key order.
+            var _fields = isArray(params.dsvfields) ? params.dsvfields : (r.length > 0 ? Object.keys(r[0]) : [])
+            if (toBoolean(params.dsvheader) && r.length > 0) {
+                _out.push(_fields.map(f => '"' + String(f).replace(/"/g, '""') + '"').join(params.dsvsep))
+                if (params.dsvnl.length > 0) _out.push(params.dsvnl)
+            }
+
+            r.forEach((row, i) => {
+                if (i > 0) _out.push(params.dsvnl)
+                var _row = pForEach(_fields, k => {
+                    var v = row[k]
+                    if (isString(v)) {
+                        v = v.replace(/"/g, '""')
+                        v = `"${v}"`
+                    } else if (isNull(v)) {
+                        v = ""
+                    } else if (isArray(v) || isMap(v)) {
+                        v = params.dsvuseslon ? af.toSLON(v) : stringify(v, __, "")
+                        v = v.replace(/"/g, params.dsvquote)
+                        v = `"${v}"`
+                    }
+                    return v
+                })
+                _out.push(_row.join(params.dsvsep))
+            })
+            if (params.dsvnl.length > 0 && _out.length > 0 && _out[_out.length - 1] != params.dsvnl && r.length > 1) {
+                _out.push(params.dsvnl)
+            }
+        } else {
+            _exit(-1, "For out=dsv, input needs to be an array or map.")
+        }
+        return _out.join("")
 }
 
 const _withCommandStream = (cmd, fn) => {
@@ -4676,53 +4728,7 @@ var _outputFns = new Map([
         }
     }],
     ["dsv", (r, options) => {
-        if (isUnDef(params.dsvsep))     params.dsvsep = ","
-        if (isUnDef(params.dsvquote))   params.dsvquote = '\\"'
-        if (isUnDef(params.dsvfields))  params.dsvfields = __
-        if (isUnDef(params.dsvuseslon)) params.dsvuseslon = false
-        if (isUnDef(params.dsvnl))      params.dsvnl = "\n"
-        if (isUnDef(params.dsvheader))  params.dsvheader = true
-
-        if (isString(params.dsvfields)) params.dsvfields = params.dsvfields.split(",").map(f => f.trim())
-        params.dsvuseslon = toBoolean(params.dsvuseslon)
-
-        if (isMap(r)) {
-            r = [ r ]
-        }
-        if (isArray(r)) {
-            var _out = []
-            // Use one schema for the entire table, regardless of each row's key order.
-            var _fields = isArray(params.dsvfields) ? params.dsvfields : (r.length > 0 ? Object.keys(r[0]) : [])
-            if (toBoolean(params.dsvheader) && r.length > 0) {
-                _out.push(_fields.map(f => '"' + String(f).replace(/"/g, '""') + '"').join(params.dsvsep))
-                if (params.dsvnl.length > 0) _out.push(params.dsvnl)
-            }
-
-            r.forEach((row, i) => {
-                if (i > 0) _out.push(params.dsvnl)
-                var _row = pForEach(_fields, k => {
-                    var v = row[k]
-                    if (isString(v)) {
-                        v = v.replace(/"/g, '""')
-                        v = `"${v}"`
-                    } else if (isNull(v)) {
-                        v = ""
-                    } else if (isArray(v) || isMap(v)) {
-                        v = params.dsvuseslon ? af.toSLON(v) : stringify(v, __, "")
-                        v = v.replace(/"/g, params.dsvquote)
-                        v = `"${v}"`
-                    }
-                    return v
-                })
-                _out.push(_row.join(params.dsvsep))
-            })
-            if (params.dsvnl.length > 0 && _out.length > 0 && _out[_out.length - 1] != params.dsvnl && r.length > 1) {
-                _out.push(params.dsvnl)
-            }
-        } else {
-            _exit(-1, "For out=dsv, input needs to be an array or map.")
-        }
-        _print(_out.join(""))
+        _print(_renderDSV(r, params))
     }]
 ])
 
@@ -5741,6 +5747,143 @@ var _inputFns = new Map([
         }
         _$o(_r, options)
     }],
+    ["files", (_res, options) => {
+        ;["loop", "watch", "pause", "pipe", "idescrecipe", "loopcls"].forEach(key => {
+            if (isDef(params[key])) throw new Error("in=files does not support " + key)
+        })
+        var format = params.out || params.output || "ndjson"
+        var formats = ["ndjson", "csv", "ndslon", "ndcslon", "raw", "lines", "dsv", "json", "yaml"]
+        if (formats.indexOf(format) < 0) throw new Error("in=files supports out=" + formats.join(", "))
+        var workers = isDef(params.filesworkers) ? Number(params.filesworkers) : Math.min(4, getNumberOfCores())
+        if (!isFinite(workers) || workers < 1 || Math.floor(workers) != workers) throw new Error("filesworkers must be a positive integer")
+        if (_parallelMode() == "false") workers = 1
+        var tasks = new java.util.concurrent.ArrayBlockingQueue(workers)
+        var results = new java.util.concurrent.ArrayBlockingQueue(128)
+        var bytes = new java.util.concurrent.Semaphore(1048576)
+        var stopped = new java.util.concurrent.atomic.AtomicBoolean(false)
+        var ended = new java.util.concurrent.atomic.AtomicBoolean(false)
+        var active = new java.util.concurrent.atomic.AtomicInteger(workers)
+        var failed = new java.util.concurrent.atomic.AtomicBoolean(false)
+        var headers, csv = params.csv || {}, line = 0
+        if (isString(csv)) csv = _fromJSSLON(csv)
+        if (format == "csv" && isArray(csv.withHeaders)) headers = csv.withHeaders.slice()
+        if (format == "dsv" && isDef(params.dsvfields)) headers = isArray(params.dsvfields) ? params.dsvfields.slice() : String(params.dsvfields).split(",").map(f => f.trim())
+        if (isDef(params.outfile) && isDef(params.file) && String(new java.io.File(params.outfile).getCanonicalPath()) == String(new java.io.File(params.file).getCanonicalPath())) throw new Error("Output must differ from the file list")
+        var target
+        var write = (text, newline) => {
+            if (isUnDef(newline)) newline = "\n"
+            if (isDef(params.outfile)) {
+                if (isUnDef(target)) target = io.writeFileStream(params.outfile, toBoolean(params.outfileappend))
+                ioStreamWrite(target, text + newline)
+            }
+            else if (newline == "\n") _print(text)
+            else printnl(text + newline)
+        }
+        var headerWritten = false, jsonWritten = false
+        var diagnostic = (task, e) => { failed.set(true); if (isDef(task.failed)) task.failed.set(true); printErr("files line " + task.line + " (" + task.file + "): " + String(e)) }
+        var publish = value => {
+            var text = stringify(value.row, __, ""), size = Math.min(1048576, Math.max(1, text.length * 2))
+            while (!stopped.get()) {
+                if (!bytes.tryAcquire(size, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) continue
+                var entry = {text:text, size:size, task:value.task}
+                while (!stopped.get()) {
+                    if (results.offer(entry, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) return
+                }
+                bytes.release(size)
+            }
+            throw new Error("files output stopped")
+        }
+        var producer = $do(() => {
+            try {
+                _readInputLines(_res, path => {
+                    line++
+                    if (!path.trim().length) return false
+                    var task = {file:path, line:line, failed:new java.util.concurrent.atomic.AtomicBoolean(false)}
+                    while (!stopped.get()) if (tasks.offer(task, 50, java.util.concurrent.TimeUnit.MILLISECONDS)) return false
+                    throw new Error("files output stopped")
+                })
+            } catch(e) { if (!stopped.get()) diagnostic({file:"list", line:line}, e) }
+            finally { ended.set(true) }
+        })
+        var jobs = []
+        for (var n = 0; n < workers; n++) jobs.push($do(() => {
+            try {
+                while (!stopped.get()) {
+                    var task = tasks.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    if (task == null) { if (ended.get()) break; else continue }
+                    try {
+                        if (isDef(params.outfile) && String(new java.io.File(params.outfile).getCanonicalPath()) == String(new java.io.File(task.file).getCanonicalPath())) throw new Error("Output must differ from input files")
+                        if (!io.fileExists(task.file) || io.fileInfo(task.file).isDirectory) throw new Error("Not a regular file")
+                        var child = clone(params)
+                        ;["file", "data", "cmd", "url", "in", "input", "type", "out", "output", "format", "outfile", "outfileappend", "filesworkers", "filesin", "filessource", "loop", "watch"].forEach(k => delete child[k])
+                        child.file = task.file
+                        if (isDef(params.filesin)) child.in = params.filesin
+                        child.parallel = false
+                        child.noexit = true
+                        child.__inception = true
+                        child.__recordSink = value => {
+                            if (task.failed.get()) throw new Error("File processing failed")
+                            var rows = isArray(value) ? value : [value]
+                            rows.forEach(row => {
+                                if (task.failed.get()) throw new Error("File processing failed")
+                                if (isDef(params.filessource)) {
+                                    if (!isMap(row) || Object.prototype.hasOwnProperty.call(row, params.filessource)) throw new Error("filessource requires an object without the source field")
+                                    row = clone(row); row[params.filessource] = task.file
+                                }
+                                if (["csv", "dsv"].indexOf(format) >= 0 && !isMap(row)) throw new Error(format.toUpperCase() + " requires object records")
+                                publish({task:task, row:row})
+                            })
+                        }
+                        oafp(child)
+                    } catch(e) { diagnostic(task, e) }
+                }
+            } finally { active.decrementAndGet() }
+        }))
+        try {
+            if (format == "json") write("[")
+            while (active.get() > 0 || !results.isEmpty()) {
+                var entry = results.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS)
+                if (entry == null) continue
+                bytes.release(entry.size)
+                var value = {task:entry.task}, row = jsonParse(entry.text)
+                if (entry.task.failed.get()) continue
+                if (format == "ndjson") { write(stringify(row, __, "")); continue }
+                if (format == "ndslon") { write(af.toSLON(row)); continue }
+                if (format == "ndcslon") { write(af.toCSLON(row)); continue }
+                if (format == "raw") { write(isString(row) ? row : stringify(row, __, "")); continue }
+                if (format == "lines") { write(String(row)); continue }
+                if (format == "json") { write((jsonWritten ? "," : "") + stringify(row, __, "")); jsonWritten = true; continue }
+                if (format == "yaml") { write("---\n" + String(af.toYAML(row)).replace(/\r?\n$/, "")); continue }
+                if (isUnDef(headers)) headers = Object.keys(row)
+                if (Object.keys(row).some(k => headers.indexOf(k) < 0)) { diagnostic(value.task, "Unexpected " + format.toUpperCase() + " column"); continue }
+                if (format == "dsv") {
+                    write(_renderDSV([row], Object.assign({}, params, {dsvfields:headers, dsvheader:!headerWritten && (isUnDef(params.dsvheader) || toBoolean(params.dsvheader))})), isDef(params.dsvnl) ? params.dsvnl : "\n")
+                    headerWritten = true
+                    continue
+                }
+                var settings = clone(csv)
+                settings.withHeaders = headers
+                settings.withHeader = !headerWritten && csv.withHeader !== false
+                write(String($o([row], {__format:"csv", __csv:stringify(settings, __, "")}, __, true)).replace(/\r?\n$/, ""))
+                headerWritten = true
+            }
+            if (format == "json") write("]")
+            if (format == "dsv" && !headerWritten && isDef(headers) && (isUnDef(params.dsvheader) || toBoolean(params.dsvheader))) {
+                write(headers.map(h => '"' + String(h).replace(/"/g, '""') + '"').join(isDef(params.dsvsep) ? params.dsvsep : ","), isDef(params.dsvnl) ? params.dsvnl : "\n")
+            }
+            if (format == "csv" && !headerWritten && isDef(headers) && csv.withHeader !== false) {
+                var empty = {}; headers.forEach(key => empty[key] = "")
+                var rendered = String($o([empty], {__format:"csv", __csv:stringify(merge(csv, {withHeaders:headers, withHeader:true}), __, "")}, __, true))
+                write(rendered.split(/\r?\n/)[0])
+            }
+        } finally {
+            stopped.set(true)
+            $doWait(producer)
+            jobs.forEach(job => $doWait(job))
+            if (isDef(target)) target.close()
+        }
+        if (failed.get()) _exit(-1, "One or more files failed")
+    }],
     ["oafp", (_res, options) => {
         // Detects if input is YAML of JSON/SLON
         var _r = _fromJSSLON(_res, true)
@@ -6339,7 +6482,7 @@ var _run = () => {
     }
     // Stream-capable handlers own their input; do not first buffer it in _res.
     if (!_version && isUnDef(params.url) &&
-        (["lines", "ndjson", "ndslon", "dsv", "csv", "javagc", "httpd", "javadiag", "jcmd", "hprof"].indexOf(params.type) >= 0 ||
+        (["files", "lines", "ndjson", "ndslon", "dsv", "csv", "javagc", "httpd", "javadiag", "jcmd", "hprof"].indexOf(params.type) >= 0 ||
          (params.type == "json" && toBoolean(params.stream)))) {
         _inputFns.get(params.type)(isString(params.data) ? params.data : "", options)
         delete params.__origr

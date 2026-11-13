@@ -225,9 +225,9 @@ AWS.prototype.BEDROCK_InvokeModelStream = function(aRegion, aModelId, aInput, aO
 /**
  * <odoc>
  * <key>AWS.BEDROCK_OpenAIResponses(aRegion, aInput) : Map</key>
- * Calls the OpenAI-compatible Responses API. OpenAI GPT-5.6 models use Mantle
- * for in-region requests in supported US regions and Bedrock Runtime for
- * cross-region inference profile requests.
+ * Calls the OpenAI-compatible Responses API. Base model IDs use Mantle in
+ * the caller's region; cross-region profile IDs use Bedrock Runtime. Model
+ * availability and access remain subject to AWS region/account support.
  * </odoc>
  */
 AWS.prototype.BEDROCK_OpenAIResponses = function(aRegion, aInput) {
@@ -235,8 +235,7 @@ AWS.prototype.BEDROCK_OpenAIResponses = function(aRegion, aInput) {
   _$(aInput, "aInput").$_()
 
   var uri = "/openai/v1/responses"
-  var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aRegion) >= 0 &&
-                  !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
+  var useMantle = !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
   var service = useMantle ? "bedrock-mantle" : "bedrock"
   var aURL = useMantle ?
     "https://bedrock-mantle." + aRegion + ".api.aws" + uri :
@@ -260,8 +259,7 @@ AWS.prototype.BEDROCK_OpenAIResponsesStream = function(aRegion, aInput, aOnChunk
   _$(aOnChunk, "aOnChunk").isFunction().$_()
 
   var uri = "/openai/v1/responses"
-  var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aRegion) >= 0 &&
-                  !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
+  var useMantle = !/^(global|us|eu|apac)\./i.test(String(aInput.model || ""))
   var service = useMantle ? "bedrock-mantle" : "bedrock"
   var aURL = useMantle ?
     "https://bedrock-mantle." + aRegion + ".api.aws" + uri :
@@ -338,14 +336,46 @@ ow.ai.__gpttypes.bedrock = {
     // 'error' key set to null on success, so only treat non-null values as errors.
     var _hasError = aValue => isMap(aValue) && isDef(aValue.error) && aValue.error !== null
     var _isOpenAIResponsesModel = aModelName => {
-      return isString(aModelName) && String(aModelName).toLowerCase().indexOf("openai.gpt-5.6-") >= 0
+      return isString(aModelName) && /^(?:(?:global|us|eu|apac)\.)?openai\.gpt-(?:5\.[45]|5\.6-(?:sol|terra|luna)|6-(?:astra|sol|luna)|6\.1-(?:sol|terra))$/.test(String(aModelName).toLowerCase())
     }
-    var _openAIResponsesModelId = aModelName => {
-      var modelName = String(aModelName)
-      var useMantle = ["us-east-1", "us-east-2", "us-west-2"].indexOf(aOptions.region) >= 0 &&
-                      !/^(global|us|eu|apac)\./i.test(modelName)
-      return useMantle ? modelName.replace(/^(global|us|eu|apac)\./i, "") : modelName
+    var _normalizeClaudeParams = (model, body) => {
+      var id = String(model).replace(/^(global|us|eu|apac|au|jp|in|ca|us-gov)\./, "")
+      if (id.indexOf("anthropic.claude-") != 0) return body
+      if (/^anthropic\.claude-(?:opus-4-[78]|(?:opus|sonnet|haiku)-5(?:-5)?)$/.test(id)) {
+        delete body.temperature
+        delete body.top_p
+        delete body.top_k
+      }
+      if (/^anthropic\.claude-(?:fable|mythos)-5(?:-[12])?$/.test(id)) {
+        if (body.temperature !== 1) delete body.temperature
+        if (/-5$/.test(id) ? !(body.top_p >= 0.99 && body.top_p < 1) : body.top_p !== 0.99) delete body.top_p
+        delete body.top_k
+        if (isDef(body.top_p)) delete body.temperature
+      }
+      if (/^anthropic\.claude-(?:sonnet|haiku)-4-5-/.test(id) && isDef(body.top_p)) delete body.temperature
+      if (isMap(body.thinking)) {
+        var type = body.thinking.type
+        if (type == "between_tools" && Object.keys(body.thinking).some(key => key != "type")) {
+          throw new Error("between_tools accepts only the type field")
+        }
+        if (type == "disabled" && /^anthropic\.claude-(?:opus-5|sonnet-5|haiku-5-5)$/.test(id) &&
+            isMap(body.output_config) && ["xhigh", "max"].indexOf(body.output_config.effort) >= 0) {
+          throw new Error("Disabled thinking supports effort up to high on this Claude model")
+        }
+        if (type == "between_tools" && (id != "anthropic.claude-sonnet-5-5" ||
+            (isMap(body.output_config) && ["xhigh", "max"].indexOf(body.output_config.effort) >= 0))) {
+          throw new Error("between_tools requires Claude Sonnet 5.5 at low, medium or high effort")
+        }
+        if (type == "disabled" && /^anthropic\.claude-(?:opus-5-5|sonnet-5-5|(?:fable|mythos)-5(?:-[12])?)$/.test(id)) {
+          throw new Error("This Claude model does not support disabled thinking; configure output_config.effort")
+        }
+        if ((type == "enabled" || isDef(body.thinking.budget_tokens)) && /^anthropic\.claude-(?:opus-4-[78]|(?:opus|sonnet|haiku|fable|mythos)-5(?:-[125])?)$/.test(id)) {
+          throw new Error("This Claude model uses adaptive thinking without budget_tokens")
+        }
+      }
+      return body
     }
+    var _openAIResponsesModelId = aModelName => String(aModelName)
     var _openAIResponsesText = response => {
       if (!isMap(response)) return ""
       if (isString(response.output_text)) return response.output_text
@@ -361,7 +391,7 @@ ow.ai.__gpttypes.bedrock = {
       collect(response.output)
       return texts.join("")
     }
-    var _buildOpenAIResponsesInput = (aPrompt, aModelName, aTemperature, toolsToUse) => {
+    var _buildOpenAIResponsesInput = (aPrompt, aModelName, aTemperature, toolsToUse, aJsonFlag) => {
       if (isArray(aPrompt)) _r.conversation = aPrompt
       else if (isString(aPrompt) && aPrompt.length > 0) _r.conversation.push({ role: "user", content: aPrompt })
 
@@ -369,6 +399,10 @@ ow.ai.__gpttypes.bedrock = {
       _r.conversation.forEach(msg => {
         if (!isMap(msg)) {
           input.push({ role: "user", content: String(msg) })
+          return
+        }
+        if (isArray(msg._responsesOutput)) {
+          msg._responsesOutput.forEach(item => input.push(clone(item)))
           return
         }
         if (String(msg.role || "").toLowerCase() == "tool") {
@@ -385,7 +419,7 @@ ow.ai.__gpttypes.bedrock = {
         if (role == "system") role = "developer"
         if (role != "developer" && role != "user" && role != "assistant") role = "user"
         if (isDef(msg.content) && (!isArray(msg.tool_calls) || msg.content !== "")) {
-          input.push({ role: role, content: isString(msg.content) ? msg.content : JSON.stringify(msg.content) })
+          input.push({ role: role, content: isArray(msg.content) ? clone(msg.content) : (isString(msg.content) ? msg.content : JSON.stringify(msg.content)) })
         }
       })
 
@@ -394,7 +428,18 @@ ow.ai.__gpttypes.bedrock = {
         input: input,
         store: _$(toBoolean(aOptions.responsesStore), "aOptions.responsesStore").isBoolean().default(false)
       }
-      if (isDef(aTemperature)) request.temperature = aTemperature
+      // Omit legacy sampling defaults on the reasoning Responses path.
+      if (isDef(aOptions.params.reasoning)) request.reasoning = clone(aOptions.params.reasoning)
+      if (isDef(aOptions.params.reasoning_effort)) {
+        request.reasoning = merge(request.reasoning || {}, { effort: aOptions.params.reasoning_effort })
+      }
+      ;["tool_choice", "parallel_tool_calls", "text", "service_tier", "include", "prompt_cache_key", "prompt_cache_retention"].forEach(key => {
+        if (isDef(aOptions.params[key])) request[key] = clone(aOptions.params[key])
+      })
+      // Stateless continuations need the encrypted reasoning item, even when hidden in UI.
+      request.include = isArray(request.include) ? request.include : []
+      if (request.include.indexOf("reasoning.encrypted_content") < 0) request.include.push("reasoning.encrypted_content")
+      if (aJsonFlag && isUnDef(request.text)) request.text = { format: { type: "json_object" } }
       var maxOutputTokens = aOptions.params.max_output_tokens
       if (isUnDef(maxOutputTokens)) maxOutputTokens = aOptions.params.max_completion_tokens
       if (isUnDef(maxOutputTokens)) maxOutputTokens = aOptions.params.max_tokens
@@ -834,7 +879,7 @@ ow.ai.__gpttypes.bedrock = {
       if (isDef(aOptions.nativeStructuredOutput) && typeof aOptions.nativeStructuredOutput != "boolean") {
         _structuredInvalid("nativeStructuredOutput must be a boolean")
       }
-      var match = /^(?:(global|us|eu|apac|au|jp|in)\.)?(anthropic\.claude-[a-z0-9:.-]+)$/.exec(String(model))
+      var match = /^(?:(global|us|eu|apac|au|jp|in|ca|us-gov)\.)?(anthropic\.claude-[a-z0-9:.-]+)$/.exec(String(model))
       if (!match) return "unknown"
       if (match[1] == "in" && match[2] == "anthropic.claude-haiku-4-5-20251001-v1:0") return "unsupported"
       if (aOptions.nativeStructuredOutput === false) return "unsupported"
@@ -843,7 +888,20 @@ ow.ai.__gpttypes.bedrock = {
         "anthropic.claude-sonnet-4-5-20250929-v1:0": ["", "global", "us", "eu", "au", "jp"],
         "anthropic.claude-haiku-4-5-20251001-v1:0": ["", "global", "us", "eu", "au", "jp"],
         "anthropic.claude-opus-4-5-20251101-v1:0": ["", "global", "us", "eu"],
-        "anthropic.claude-sonnet-5-5": ["", "global"]
+        "anthropic.claude-sonnet-5-5": ["", "global", "us", "eu", "au"],
+        "anthropic.claude-opus-5-5": ["", "global", "us", "eu", "au", "jp"],
+        "anthropic.claude-haiku-5-5": ["", "global", "us", "ca", "eu", "au", "jp"],
+        "anthropic.claude-opus-5": ["", "global", "us", "eu", "au", "in"],
+        "anthropic.claude-sonnet-5": ["", "global", "us", "eu", "au", "in"],
+        "anthropic.claude-fable-5": ["", "global", "us"],
+        "anthropic.claude-fable-5-1": ["", "global", "us"],
+        "anthropic.claude-fable-5-2": ["", "global", "us"],
+        "anthropic.claude-mythos-5": ["", "global", "us"],
+        "anthropic.claude-mythos-5-1": ["", "global", "us"],
+        "anthropic.claude-opus-4-8": ["", "global", "us", "eu", "au", "jp", "us-gov"],
+        "anthropic.claude-opus-4-7": ["", "global", "us", "eu", "au", "jp"],
+        "anthropic.claude-opus-4-6-v1": ["", "global", "us", "eu", "au"],
+        "anthropic.claude-sonnet-4-6": ["", "global", "us", "eu", "au", "jp"]
       }
       return profiles[match[2]] && profiles[match[2]].indexOf(match[1] || "") >= 0 ? "supported" : "unknown"
     }
@@ -904,7 +962,7 @@ ow.ai.__gpttypes.bedrock = {
         var params = d.copy(aOptions.params)
         // Explicit schema requests own their messages, schema and tools. Never merge conflicting bodies.
         Object.keys(params).forEach(k => {
-          if (["max_tokens", "temperature", "top_p", "top_k", "stop_sequences", "thinking", "service_tier", "system", "anthropic_version", "promptCaching", "strictToolMsg"].indexOf(k) < 0) {
+          if (["max_tokens", "temperature", "top_p", "top_k", "stop_sequences", "thinking", "service_tier", "system", "anthropic_version", "output_config", "anthropic_beta", "promptCaching", "strictToolMsg"].indexOf(k) < 0) {
             _structuredInvalid("Native structured output does not accept params." + k)
           }
         })
@@ -923,9 +981,10 @@ ow.ai.__gpttypes.bedrock = {
         if (isDef(body.top_p) && (typeof body.top_p != "number" || body.top_p < 0 || body.top_p > 1)) d.invalid()
         if (isDef(body.top_k) && (!Number.isInteger(body.top_k) || body.top_k < 0)) d.invalid()
         if (isDef(body.stop_sequences) && (!isArray(body.stop_sequences) || body.stop_sequences.some(v => typeof v != "string"))) d.invalid()
-        if (d.has(body, "thinking") && (!d.map(body.thinking) || ["enabled", "disabled", "adaptive"].indexOf(body.thinking.type) < 0)) d.invalid()
+        if (d.has(body, "thinking") && (!d.map(body.thinking) || ["enabled", "disabled", "adaptive", "between_tools"].indexOf(body.thinking.type) < 0)) d.invalid()
         if (body.thinking && body.thinking.type == "enabled" && (!Number.isInteger(body.thinking.budget_tokens) || body.thinking.budget_tokens < 1024 || body.thinking.budget_tokens >= body.max_tokens)) d.invalid()
         if (d.has(body, "service_tier") && !d.text(body.service_tier)) d.invalid()
+        if (d.has(body, "anthropic_beta") && (!isArray(body.anthropic_beta) || body.anthropic_beta.some(value => !d.text(value)))) d.invalid()
         var messages = request.messages || [{ role: "user", content: typeof request.state == "string" ? request.state : JSON.stringify(request.state) }]
         if (!isArray(messages) || messages.length == 0) d.invalid()
         body.messages = []
@@ -962,7 +1021,12 @@ ow.ai.__gpttypes.bedrock = {
           var last = body.messages[body.messages.length - 1].content
           last[last.length - 1].cache_control = { type: "ephemeral" }
         }
-        body.output_config = { format: { type: "json_schema", schema: schema } }
+        if (d.has(body, "output_config")) {
+          d.only(body.output_config, ["effort"])
+          if (["low", "medium", "high", "xhigh", "max"].indexOf(body.output_config.effort) < 0) d.invalid()
+        }
+        body.output_config = merge(body.output_config || {}, { format: { type: "json_schema", schema: schema } })
+        try { _normalizeClaudeParams(request.model, body) } catch(e) { _structuredInvalid(String(e.message || e)) }
         var raw = d.execution(() => {
           if (aws.lastConnect() > 5 * 60000) aws.reconnect()
           var result = aws.BEDROCK_InvokeModel(aOptions.region, request.model, body)
@@ -1290,7 +1354,7 @@ ow.ai.__gpttypes.bedrock = {
         // JSON instructions are now handled per-model to avoid persisting in conversation history
 
         if (_isOpenAIResponsesModel(aModel)) {
-          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse)
+          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse, aJsonFlag)
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client'}, merge({_t:nowNano(),_f:'client'}, responsesInput))
           var responsesResult = aws.BEDROCK_OpenAIResponses(aOptions.region, responsesInput)
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm'}, merge({_t:nowNano(),_f:'llm'}, responsesResult))
@@ -1299,7 +1363,28 @@ ow.ai.__gpttypes.bedrock = {
 
           var responsesText = _openAIResponsesText(responsesResult)
           if (!aOptions.showReasoning) responsesText = _stripReasoningTags(responsesText)
-          if (responsesText.length > 0) _r.conversation.push({ role: "assistant", content: responsesText })
+          var output = isArray(responsesResult.output) ? responsesResult.output : []
+          if (output.length > 0 || responsesText.length > 0) {
+            var message = { role: "assistant", content: responsesText }
+            if (output.length > 0) message._responsesOutput = clone(output)
+            _r.conversation.push(message)
+          }
+          var calls = output.filter(item => isMap(item) && item.type == "function_call")
+          if (calls.length > 0) {
+            message.tool_calls = calls.map(call => ({ id: call.call_id || call.id, type: "function", function: { name: call.name, arguments: call.arguments } }))
+            calls.forEach(call => {
+              var tool = toolRegistry[call.name] || _r.tools[call.name]
+              var fn = tool && (tool.fn || (tool.function && tool.function.func))
+              var value
+              try {
+                var args = isString(call.arguments) ? JSON.parse(call.arguments) : call.arguments
+                value = isFunction(fn) ? fn(args) : "Tool " + call.name + " is not available."
+              } catch(e) { value = "Error executing tool: " + e.message }
+              _r.conversation.push({ role: "tool", tool_call_id: call.call_id || call.id,
+                content: isString(value) ? value : (isUnDef(value) ? "" : JSON.stringify(value)) })
+            })
+            return _r.rawPrompt(_r.conversation, aModel, aTemperature, aJsonFlag, aTools)
+          }
           if (aJsonFlag) {
             responsesResult.response = responsesText
             responsesResult.message = { content: responsesText }
@@ -1702,7 +1787,7 @@ ow.ai.__gpttypes.bedrock = {
                       content: toolResultContent
                     }
                   }
-                  if (isDef(c.type) && c.type != "text") return c
+                  if (isDef(c.type)) return clone(c)
                   return { type: c.type || "text", text: c.text || String(c) }
                 }
                 return { type: "text", text: String(c) }
@@ -1714,7 +1799,7 @@ ow.ai.__gpttypes.bedrock = {
 
           var messagesForAPI = normalized
           if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
-            messagesForAPI = JSON.parse(JSON.stringify(normalized))
+            messagesForAPI = normalized
             for (var aci = messagesForAPI.length - 1; aci >= 0; aci--) {
               if (messagesForAPI[aci].role == "user" && isArray(messagesForAPI[aci].content)) {
                 for (var acci = messagesForAPI[aci].content.length - 1; acci >= 0; acci--) {
@@ -1744,7 +1829,9 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
           if (aOptions.promptCaching) {
-            var foundCachePoint = false
+            // Keep the existing breakpoint stable across signed thinking replays.
+            var foundCachePoint = messagesForAPI.some(message => isArray(message.content) &&
+              message.content.some(block => isMap(block) && isDef(block.cache_control)))
             for (var apmi = messagesForAPI.length - 1; apmi >= 0 && !foundCachePoint; apmi--) {
               if (messagesForAPI[apmi].role == "user" && isArray(messagesForAPI[apmi].content)) {
                 for (var apci = messagesForAPI[apmi].content.length - 1; apci >= 0; apci--) {
@@ -1929,7 +2016,7 @@ ow.ai.__gpttypes.bedrock = {
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.ministral-large-2407-v1:0', temperature: 0.7, params: (max_tokens: 2048)))"
         // export OAFP_MODEL="(type: bedrock, timeout: 900000, options: (model: 'mistral.devstral-2-123b', temperature: 0, params: (max_tokens: 4096)))"
 
-        var aInput = merge(_m, aOptions.params)
+        var aInput = _normalizeClaudeParams(aModel, merge(_m, aOptions.params))
         if (aws.lastConnect() > 5 * 60000) aws.reconnect() // reconnect if more than 5 minutes since last connect
         //sprint(aInput)
         if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client'}, merge({_t:nowNano(),_f:'client'}, aInput))
@@ -2167,9 +2254,6 @@ ow.ai.__gpttypes.bedrock = {
           for (var mi = 0; mi < messages.length; mi++) {
             var msg = messages[mi]
             // keep conversation updated
-            if (isDef(msg.role) && String(msg.role).toLowerCase() === "assistant") {
-              msg = merge(msg, { content: _sanitizeAssistantContent(msg.content) })
-            }
             _r.conversation.push(msg)
 
             // If message contains an array of content parts, iterate
@@ -2695,21 +2779,25 @@ ow.ai.__gpttypes.bedrock = {
         })
 
         if (_isOpenAIResponsesModel(aModel)) {
-          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse)
+          var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse, aJsonFlag)
           responsesInput.stream = true
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client-stream'}, merge({_t:nowNano(),_f:'client-stream'}, responsesInput))
 
           var fullContent = ""
           var events = []
           var completedResponse = __
+          var responseOutputItems = [], responseStreamError
           var responsesStreamResult = aws.BEDROCK_OpenAIResponsesStream(aOptions.region, responsesInput, function(event) {
             events.push(event)
             if (event.type == "response.output_text.delta" && isString(event.delta)) {
               fullContent += event.delta
               if (isDef(aOnDelta)) aOnDelta(event.delta, event)
             }
+            if (event.type == "response.output_item.done" && isMap(event.item)) responseOutputItems.push(clone(event.item))
             if (event.type == "response.completed" && isMap(event.response)) completedResponse = event.response
+            if (event.type == "error" || event.type == "response.failed") responseStreamError = event.error || (event.response && event.response.error) || event
           })
+          if (isDef(responseStreamError)) return { error: responseStreamError, content: fullContent, events: events }
           if (_hasError(responsesStreamResult)) {
             if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'llm-stream-error'}, {_t:nowNano(),_f:'llm-stream-error', error: String(responsesStreamResult.error)})
             return { error: responsesStreamResult.error, content: fullContent, events: events }
@@ -2755,9 +2843,12 @@ ow.ai.__gpttypes.bedrock = {
             if (isDef(value.response)) collectResponseToolCalls(value.response)
           }
           collectResponseToolCalls(completedResponse)
+          if (isUnDef(completedResponse)) collectResponseToolCalls(responseOutputItems)
 
           if (fullContent.length > 0 || responseToolCalls.length > 0) {
             var responseMessage = { role: "assistant", content: fullContent }
+            if (isDef(completedResponse) && isArray(completedResponse.output)) responseMessage._responsesOutput = clone(completedResponse.output)
+            else if (responseOutputItems.length > 0) responseMessage._responsesOutput = clone(responseOutputItems)
             if (responseToolCalls.length > 0) responseMessage.tool_calls = responseToolCalls
             _r.conversation.push(responseMessage)
           }
@@ -2941,6 +3032,8 @@ ow.ai.__gpttypes.bedrock = {
               if (isString(content)) {
                 content = [{ type: "text", text: content }]
               }
+              // Persist the exact native content sent on this turn for thinking replay.
+              msg.content = content
               messages.push({
                 role: msg.role,
                 content: content
@@ -2950,7 +3043,7 @@ ow.ai.__gpttypes.bedrock = {
 
           var messagesForAPI = messages
           if (!Array.isArray(aPrompt) && isString(aPrompt) && aPrompt.length > 0 && aJsonFlag) {
-            messagesForAPI = JSON.parse(JSON.stringify(messages))
+            messagesForAPI = messages
             for (var aci = messagesForAPI.length - 1; aci >= 0; aci--) {
               if (messagesForAPI[aci].role == "user" && isArray(messagesForAPI[aci].content)) {
                 for (var acci = messagesForAPI[aci].content.length - 1; acci >= 0; acci--) {
@@ -2980,7 +3073,9 @@ ow.ai.__gpttypes.bedrock = {
             }
           }
           if (aOptions.promptCaching) {
-            var foundCachePoint = false
+            // Keep the existing breakpoint stable across signed thinking replays.
+            var foundCachePoint = messagesForAPI.some(message => isArray(message.content) &&
+              message.content.some(block => isMap(block) && isDef(block.cache_control)))
             for (var apmi = messagesForAPI.length - 1; apmi >= 0 && !foundCachePoint; apmi--) {
               if (messagesForAPI[apmi].role == "user" && isArray(messagesForAPI[apmi].content)) {
                 for (var apci = messagesForAPI[apmi].content.length - 1; apci >= 0; apci--) {
@@ -3111,7 +3206,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         // Merge with any additional params
-        var aInput = merge(_m, aOptions.params)
+        var aInput = _normalizeClaudeParams(aModel, merge(_m, aOptions.params))
 
         // Reconnect if needed
         if (aws.lastConnect() > 5 * 60000) aws.reconnect()
@@ -3126,9 +3221,20 @@ ow.ai.__gpttypes.bedrock = {
         var finishReason = __
         // Track pending tool calls by index for accumulating input JSON (Anthropic/Nova streaming)
         var pendingToolCalls = {}
+        var claudeBlocks = {}
 
         try {
           var result = aws.BEDROCK_InvokeModelStream(aOptions.region, aModel, aInput, (chunk, event) => {
+            if (aModel.indexOf("anthropic.") >= 0) {
+              if (chunk.type == "content_block_start" && isMap(chunk.content_block)) claudeBlocks[chunk.index] = clone(chunk.content_block)
+              if (chunk.type == "content_block_delta" && isMap(chunk.delta) && isMap(claudeBlocks[chunk.index])) {
+                var block = claudeBlocks[chunk.index], change = chunk.delta
+                ;["text", "thinking", "signature"].forEach(key => {
+                  if (isString(change[key])) block[key] = (block[key] || "") + change[key]
+                })
+                if (isString(change.partial_json)) block._partialJson = (block._partialJson || "") + change.partial_json
+              }
+            }
             // Extract content delta
             var delta = _r._extractStreamingDelta(chunk, aModel)
             if (isDef(delta) && delta.length > 0) {
@@ -3269,7 +3375,7 @@ ow.ai.__gpttypes.bedrock = {
         }
 
         // Update conversation history
-        if (fullContent.length > 0 || normalizedToolCalls.length > 0) {
+        if (fullContent.length > 0 || normalizedToolCalls.length > 0 || Object.keys(claudeBlocks).length > 0) {
           var storedMessage = {
             role: "assistant",
             content: fullContent
@@ -3285,6 +3391,16 @@ ow.ai.__gpttypes.bedrock = {
             } else if (fullContent.length == 0) {
               storedMessage.content = normalizedToolCalls
             }
+          }
+          if (aModel.indexOf("anthropic.") >= 0 && Object.keys(claudeBlocks).length > 0) {
+            storedMessage.content = Object.keys(claudeBlocks).sort((a, b) => Number(a) - Number(b)).map(key => {
+              var block = claudeBlocks[key]
+              if (isDef(block._partialJson)) {
+                block.input = JSON.parse(block._partialJson)
+                delete block._partialJson
+              }
+              return block
+            })
           }
           _r.conversation.push(storedMessage)
         }

@@ -105,6 +105,51 @@ These are individual management calls. Callers manage pagination, readiness poll
 
 Run `oaf -f tests/lambda.js` for offline request/signing and compatibility checks with dummy credentials and intercepted HTTP. Its static fixtures come from AWS's published operation request syntax, cross-checked against the botocore [Web](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-web/2025-03-07/service-2.json), [MicroVM](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-microvms/2025-09-09/service-2.json), and [Core](https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/lambda-core/2026-04-30/service-2.json) models on 2026-10-20. These checks do not deploy resources or validate live AWS access.
 
+## Recent Bedrock GPT and Claude models
+
+GPT-5.4, GPT-5.5, GPT-5.6 Sol/Terra/Luna, GPT-6 Astra/Sol/Luna, and GPT-6.1
+Sol/Terra use the signed OpenAI Responses API for normal and streaming calls.
+Base IDs such as `openai.gpt-6-luna` use Mantle in the configured region;
+profile IDs such as `global.openai.gpt-6-luna` use Bedrock Runtime. The adapter
+never changes your region or inference profile. Check the
+[AWS model cards](https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html)
+for endpoint availability and account permissions. GPT OSS retains its existing path.
+
+Use `options.params.reasoning: { effort: "medium" }` or the
+`reasoning_effort: "medium"` alias (the alias takes precedence). Responses supports
+reasoning alongside function tools, so Luna no longer needs reasoning disabled.
+`max_output_tokens` takes precedence over `max_completion_tokens`, then `max_tokens`;
+only `max_output_tokens` is sent. Legacy sampling temperature is omitted.
+`tool_choice`, `parallel_tool_calls`, `text`, `service_tier`, `include`,
+`prompt_cache_key`, and `prompt_cache_retention` are forwarded when configured.
+AWS validates model-specific values. Normal and streaming calls execute registered
+function tools and continue with their results. Native output items, including
+opaque reasoning, are retained for replay; stateless calls request encrypted
+reasoning content. Legacy JSON flags select `text.format.type: "json_object"`
+unless an explicit `params.text` is supplied.
+
+Claude keeps full native assistant blocks (including thinking, signatures, and
+redacted thinking) in protocol history. `showReasoning: false` hides reasoning
+from returned text, without deleting the history needed for subsequent tool turns.
+Keep the model, system prompt, tools, and prior turns stable when replaying bound
+thinking. Automatic message cache breakpoints stay stable across later turns.
+`getConversation()` is raw protocol history; portable conversation
+exports are for transfer and do not preserve signed reasoning.
+
+Opus 4.7/4.8 and the supported Opus/Sonnet/Haiku 5.x models omit sampling
+parameters from requests. Fable/Mythos 5.x omit unsupported sampling values and
+`top_k`; valid fixed sampling values remain supported. Sonnet/Haiku 4.5 prefer
+`top_p` over temperature when both are configured. Older models otherwise retain
+their existing behavior.
+
+Configure adaptive thinking with `params.thinking: { type: "adaptive" }` and
+`params.output_config: { effort: "medium" }`. Manual `enabled`/`budget_tokens`
+settings are rejected locally on models that require adaptive thinking. Sonnet 5.5
+accepts `{ type: "between_tools" }` at low, medium, or high effort, and rejects
+`disabled`. Opus 5.5 and Fable/Mythos 5.x reject `disabled`; Opus 5, Sonnet 5,
+and Haiku 5.5 allow it through high effort. See
+[AWS adaptive thinking](https://docs.aws.amazon.com/bedrock/latest/userguide/claude-messages-adaptive-thinking.html).
+
 ## Bedrock Claude native structured output
 
 With an OpenAF build providing `ow.ai.__decision` and the structured-output hooks
@@ -153,18 +198,13 @@ The public schema descriptor is `{name, description, schema, strict}`; raw JSON
 Schemas are also accepted by this adapter's helper. Metadata stays local, and
 both `strict` settings retain native enforcement and local validation.
 
-Capability policy is deliberately conservative. The default known model IDs are:
-
-- `anthropic.claude-sonnet-4-5-20250929-v1:0`
-- `anthropic.claude-haiku-4-5-20251001-v1:0`
-- `anthropic.claude-opus-4-5-20251101-v1:0`
-- `anthropic.claude-sonnet-5-5`
-
-Base IDs and profile forms are classified locally. The default profile allowlist
-is `global`, `us`, `eu`, `au`, and `jp` for Sonnet/Haiku 4.5; `global`, `us`, and
-`eu` for Opus 4.5; and `global` for Sonnet 5.5. Other recognized `apac.`/`in.`
-or future combinations require explicit opt-in. This does **not** guarantee that a model or
-profile exists in your region or that your account has access. The documented
+Capability policy is deliberately conservative. The known models include
+Sonnet/Haiku/Opus 4.5, Sonnet/Opus 4.6, Opus 4.7/4.8, Sonnet/Opus 5,
+Sonnet/Opus/Haiku 5.5, Fable 5/5.1/5.2, and Mythos 5/5.1. Model IDs and profile
+prefixes are explicitly listed in `_structuredCapability`; unknown combinations
+require opt-in. Recognized profiles include the documented US, EU, AU, JP, India,
+Canada, and GovCloud combinations where listed for that model. This does **not**
+guarantee availability in your region or access from your account. The documented
 `in.anthropic.claude-haiku-4-5-20251001-v1:0` exclusion always rejects native output.
 Other Claude IDs and opaque/custom profile ARNs are unknown and disabled by
 default. For a newer recognized Claude ID verified against its AWS model card,
@@ -201,7 +241,11 @@ JSON; it does not enable native schema enforcement.
 
 Native calls accept inference `params.max_tokens` (default 1024), `temperature`
 (0–1), `top_p`, `top_k`, `stop_sequences`, `thinking`, `service_tier`, `system`, and
-`anthropic_version: "bedrock-2023-05-31"`. Conflicting schema/message/tool fields
+`anthropic_version: "bedrock-2023-05-31"`, `anthropic_beta` (an array of strings),
+and `output_config: { effort: "low" | "medium" | "high" | "xhigh" | "max" }`.
+The adapter adds its schema format alongside effort; caller-supplied format fields
+are rejected. `thinking.type: "between_tools"` is accepted for Sonnet 5.5.
+Conflicting schema/message/tool fields
 and unrecognized parameters fail locally. Model-specific inference combinations
 remain subject to AWS validation. The existing core currently accepts no Bedrock
 `decide` provider options: configure inference through `options.params` instead.

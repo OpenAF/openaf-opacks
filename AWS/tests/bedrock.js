@@ -29,7 +29,182 @@ ow.obj.rest.connectionFactory = function() { return {
   }, getErrorResponse: function() { return JSON.stringify(response) }, close: function() {}
 } }
 try {
+  var invoke = AWS.prototype.BEDROCK_InvokeModel, invokeStream = AWS.prototype.BEDROCK_InvokeModelStream
+  var responsesInvoke = AWS.prototype.BEDROCK_OpenAIResponses, responsesStream = AWS.prototype.BEDROCK_OpenAIResponsesStream
+  var bodies = [], executeCount = 0, toolBody
+  var reasoningItem = { type: "reasoning", id: "r1", encrypted_content: "opaque", summary: [] }
+  AWS.prototype.BEDROCK_OpenAIResponses = function(region, input) {
+    bodies.push(clone(input))
+    if (input.tools && !input.input.some(item => item.type == "function_call_output")) return {
+      output: [reasoningItem, { type: "function_call", id: "fc1", call_id: "c1", name: "lookup", arguments: '{"key":"x"}' }]
+    }
+    return { output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "done" }] }] }
+  }
+  AWS.prototype.BEDROCK_OpenAIResponsesStream = function(region, input, callback) {
+    var result = AWS.prototype.BEDROCK_OpenAIResponses(region, input)
+    callback({ type: "response.completed", response: merge(result, { status: "completed" }) })
+    return {}
+  }
+  AWS.prototype.BEDROCK_InvokeModel = function(region, id, input) {
+    toolBody = clone(input)
+    if (id.indexOf("anthropic.") >= 0) return { role: "assistant", content: [
+      { type: "thinking", thinking: "private", signature: "signed" }, { type: "text", text: "visible" }
+    ] }
+    return { choices: [{ message: { role: "assistant", content: "done" }, finish_reason: "stop" }] }
+  }
+  AWS.prototype.BEDROCK_InvokeModelStream = function(region, id, input, callback) {
+    toolBody = clone(input)
+    callback({ type: "content_block_start", index: 0, content_block: { type: "thinking", thinking: "" } })
+    callback({ type: "content_block_delta", index: 0, delta: { type: "thinking_delta", thinking: "private" } })
+    callback({ type: "content_block_delta", index: 0, delta: { type: "signature_delta", signature: "signed" } })
+    callback({ type: "content_block_start", index: 1, content_block: { type: "text", text: "" } })
+    callback({ type: "content_block_delta", index: 1, delta: { type: "text_delta", text: "visible" } })
+    callback({ type: "content_block_start", index: 2, content_block: { type: "redacted_thinking", data: "opaque" } })
+    return {}
+  }
+  try {
+    ;["openai.gpt-5.4", "openai.gpt-5.5", "openai.gpt-5.6-sol", "openai.gpt-5.6-terra", "openai.gpt-5.6-luna", "global.openai.gpt-6-luna", "us.openai.gpt-6-sol", "global.openai.gpt-6-astra", "global.openai.gpt-6.1-sol", "us.openai.gpt-6.1-terra"].forEach(function(id) {
+      var params = { max_tokens: 321, max_completion_tokens: 456, reasoning_effort: "medium", tool_choice: "auto", parallel_tool_calls: false }, before = JSON.stringify(params)
+      var modern = make(id, { params: params }).getGPT().model
+      modern.setTool("lookup", "Lookup", { type: "object", properties: { key: { type: "string" } } }, function(args) {
+        executeCount++; eq(args.key, "x", "tool arguments parsed"); return { value: "found" }
+      })
+      bodies = []
+      eq(modern.rawPrompt("hello"), "done", "Responses tool continuation")
+      eq(bodies.length, 2, "one tool continuation")
+      eq(bodies[0].model, id, "model preserved")
+      eq(bodies[0].max_output_tokens, 456, "completion limit precedence")
+      eq(bodies[0].reasoning, { effort: "medium" }, "reasoning forwarded with tools")
+      eq(bodies[0].tool_choice, "auto", "tool choice forwarded")
+      eq(bodies[0].parallel_tool_calls, false, "parallel setting forwarded")
+      ok(isUnDef(bodies[0].max_tokens) && isUnDef(bodies[0].temperature), "legacy/sampling params excluded")
+      eq(bodies[1].input.filter(item => item.type == "reasoning")[0], reasoningItem, "opaque reasoning replayed")
+      eq(bodies[1].input.filter(item => item.type == "function_call_output")[0].output, '{"value":"found"}', "tool output serialized")
+      modern.setConversation([]); bodies = []
+      eq(modern.rawPromptStream("hello").content, "done", "streaming Responses tool continuation")
+      eq(bodies.length, 2, "streaming tool continuation count")
+      eq(bodies[1].input.filter(item => item.type == "reasoning")[0], reasoningItem, "streaming reasoning replayed")
+      eq(JSON.stringify(params), before, "caller params immutable")
+    })
+    eq(executeCount, 20, "all registered tools executed")
+    var jsonModel = make("global.openai.gpt-6-luna", { params: { max_tokens: 123, max_output_tokens: 789, reasoning: { effort: "low", summary: "auto" } } }).getGPT().model
+    bodies = []; jsonModel.rawPrompt("hello", __, __, true)
+    eq(bodies[0].max_output_tokens, 789, "native output limit wins")
+    eq(bodies[0].text.format.type, "json_object", "legacy JSON flag becomes native JSON format")
+    eq(bodies[0].reasoning, { effort: "low", summary: "auto" }, "native reasoning map retained")
+    ok(bodies[0].include.indexOf("reasoning.encrypted_content") >= 0, "stateless reasoning requested")
+    AWS.prototype.BEDROCK_OpenAIResponsesStream = function(region, input, callback) { callback({ type: "response.failed", response: { error: { message: "fixture failure" } } }); return {} }
+    var failed = jsonModel.rawPromptStream("hello")
+    eq(failed.error.message, "fixture failure", "Responses streaming API error surfaced")
+    var other = make("openai.gpt-oss-120b-1:0", { params: { reasoning_effort: "high" } }).getGPT().model
+    other.rawPrompt("hello")
+    eq(toolBody.reasoning_effort, "high", "legacy OpenAI reasoning unchanged")
+    eq(toolBody.max_tokens, 512, "legacy OpenAI token limit unchanged")
+    ;["global.anthropic.claude-opus-4-7", "global.anthropic.claude-sonnet-5-5"].forEach(function(id) {
+      var claude = make(id, { params: { max_tokens: 1024, temperature: 0, top_p: 0.5, top_k: 5 } }).getGPT().model
+      eq(claude.rawPrompt("hello"), "visible", "thinking hidden from text")
+      var firstUser = clone(toolBody.messages[0])
+      eq(claude.conversation[claude.conversation.length - 1].content[0].signature, "signed", "thinking retained in history")
+      claude.rawPrompt("again")
+      eq(toolBody.messages[1].content[0].signature, "signed", "thinking replayed")
+      eq(toolBody.messages[0], firstUser, "normal signed prefix unchanged")
+      ok(isUnDef(toolBody.temperature) && isUnDef(toolBody.top_p) && isUnDef(toolBody.top_k), "unsupported sampling omitted")
+      claude.setConversation([])
+      eq(claude.rawPromptStream("hello").content, "visible", "streaming text hides thinking")
+      var streamingFirstUser = clone(toolBody.messages[0])
+      eq(claude.conversation[1].content[0], { type: "thinking", thinking: "private", signature: "signed" }, "streaming signed thinking retained")
+      eq(claude.conversation[1].content[2], { type: "redacted_thinking", data: "opaque" }, "streaming redacted thinking retained")
+      claude.rawPromptStream("again")
+      eq(toolBody.messages[0], streamingFirstUser, "streaming signed prefix unchanged")
+      eq(toolBody.messages[1].content[0].signature, "signed", "streaming thinking replayed")
+      for (var turn = 0; turn < 5; turn++) claude.rawPromptStream("next")
+      var cacheCount = 0
+      toolBody.messages.forEach(function(message) { message.content.forEach(function(block) { if (block.cache_control) cacheCount++ }) })
+      eq(cacheCount, 1, "automatic cache markers do not accumulate across turns")
+    })
+    var streamTurns = 0, streamExecuted = false
+    AWS.prototype.BEDROCK_InvokeModelStream = function(region, id, input, callback) {
+      streamTurns++
+      if (streamTurns == 1) {
+        callback({ type: "content_block_start", index: 0, content_block: { type: "thinking", thinking: "private", signature: "signed" } })
+        callback({ type: "content_block_start", index: 1, content_block: { type: "tool_use", id: "t1", name: "lookup", input: {} } })
+        callback({ type: "content_block_delta", index: 1, delta: { type: "input_json_delta", partial_json: '{"key":"x"}' } })
+      } else {
+        eq(input.messages[1].content[0].signature, "signed", "tool continuation replays signed thinking")
+        eq(input.messages[1].content[1].input, { key: "x" }, "tool history retains streamed input")
+        eq(input.messages[2].content[0].tool_use_id, "t1", "tool result linked")
+        callback({ type: "content_block_start", index: 0, content_block: { type: "text", text: "" } })
+        callback({ type: "content_block_delta", index: 0, delta: { type: "text_delta", text: "done" } })
+      }
+      return {}
+    }
+    var agent = make("global.anthropic.claude-sonnet-5-5").getGPT().model
+    agent.setTool("lookup", "Lookup", { type: "object", properties: {} }, function(args) { streamExecuted = args.key == "x"; return "found" })
+    eq(agent.rawPromptStream("hello").content, "done", "Claude streamed tool continuation")
+    ok(streamExecuted, "Claude streamed tool executed")
+  } finally {
+    AWS.prototype.BEDROCK_InvokeModel = invoke
+    AWS.prototype.BEDROCK_InvokeModelStream = invokeStream
+    AWS.prototype.BEDROCK_OpenAIResponses = responsesInvoke
+    AWS.prototype.BEDROCK_OpenAIResponsesStream = responsesStream
+  }
   response = fixture({ name: "Alice", age: 30 })
+  // Exercise the actual signed Responses helper, with HTTP intercepted by the fixture.
+  var signedClient = new AWS()
+  signedClient.BEDROCK_OpenAIResponses("us-east-1", { model: "openai.gpt-6-luna", input: "hello" })
+  ok(calls[calls.length - 1].url.indexOf("bedrock-mantle.us-east-1.api.aws/openai/v1/responses") >= 0, "base GPT uses Mantle")
+  ok(calls[calls.length - 1].headers.Authorization.indexOf("/bedrock-mantle/aws4_request") >= 0, "Mantle signing service")
+  signedClient.BEDROCK_OpenAIResponses("eu-west-1", { model: "global.openai.gpt-6-luna", input: "hello" })
+  ok(calls[calls.length - 1].url.indexOf("bedrock-runtime.eu-west-1.amazonaws.com/openai/v1/responses") >= 0, "profile GPT uses Runtime")
+  ok(calls[calls.length - 1].headers.Authorization.indexOf("/bedrock/aws4_request") >= 0, "Runtime signing service")
+  var originalHttp = ow.obj.http, streamUrl, streamHeaders, decodedEvents = []
+  ow.obj.http = function(url, method, payload, headers) {
+    streamUrl = String(url); streamHeaders = headers
+    this.client = {}
+    this.setThrowExceptions = function() {}
+    this.exec = function() {}
+    this.responseCode = function() { return 200 }
+    this.responseStream = function() { return new java.io.ByteArrayInputStream(new java.lang.String('data: {"type":"response.output_text.delta","delta":"ok"}\n\ndata: [DONE]\n\n').getBytes("UTF-8")) }
+  }
+  try {
+    signedClient.BEDROCK_OpenAIResponsesStream("us-east-1", { model: "openai.gpt-6-luna", input: "hello" }, function(event) { decodedEvents.push(event) })
+    ok(streamUrl.indexOf("bedrock-mantle.us-east-1.api.aws/openai/v1/responses") >= 0, "streaming Mantle endpoint")
+    ok(streamHeaders.Authorization.indexOf("/bedrock-mantle/aws4_request") >= 0, "streaming Mantle signature")
+    eq(decodedEvents[0].delta, "ok", "SSE decoded")
+    signedClient.BEDROCK_OpenAIResponsesStream("eu-west-1", { model: "global.openai.gpt-6.1-sol", input: "hello" }, function() {})
+    ok(streamUrl.indexOf("bedrock-runtime.eu-west-1.amazonaws.com/openai/v1/responses") >= 0, "streaming Runtime endpoint")
+    ok(streamHeaders.Authorization.indexOf("/bedrock/aws4_request") >= 0, "streaming Runtime signature")
+  } finally { ow.obj.http = originalHttp }
+  ;["opus-4-6-v1", "sonnet-4-6", "opus-4-7", "opus-4-8", "opus-5", "sonnet-5", "opus-5-5", "sonnet-5-5", "haiku-5-5", "fable-5", "fable-5-1", "fable-5-2", "mythos-5", "mythos-5-1"].forEach(function(id) {
+    var native = make("global.anthropic.claude-" + id, { params: { max_tokens: 2048, thinking: { type: "adaptive" }, output_config: { effort: "medium" } } }).getGPT()
+    native.jsonSchemaPrompt("Alice", descriptor)
+    eq(calls[calls.length - 1].body.output_config.effort, "medium", "native effort retained: " + id)
+    eq(calls[calls.length - 1].body.output_config.format.schema, schema, "schema alongside effort: " + id)
+  })
+  var between = make("global.anthropic.claude-sonnet-5-5", { params: { max_tokens: 2048, thinking: { type: "between_tools" }, output_config: { effort: "high" } } }).getGPT()
+  between.jsonSchemaPrompt("Alice", descriptor)
+  eq(calls[calls.length - 1].body.thinking.type, "between_tools", "native Sonnet between_tools")
+  rejects(function() { make("global.anthropic.claude-sonnet-5-5", { params: { thinking: { type: "between_tools", display: "omitted" } } }).getGPT().jsonSchemaPrompt("Alice", descriptor) }, "LLM_DECISION_INVALID_REQUEST")
+  rejects(function() { make("global.anthropic.claude-sonnet-5-5", { params: { output_config: { format: { type: "text" } } } }).getGPT().jsonSchemaPrompt("Alice", descriptor) }, "LLM_DECISION_INVALID_REQUEST")
+  ;[
+    ["sonnet-5-5", { type: "disabled" }, "high"],
+    ["opus-5-5", { type: "disabled" }, "medium"],
+    ["sonnet-5-5", { type: "between_tools" }, "max"],
+    ["opus-4-7", { type: "between_tools" }, "high"],
+    ["opus-4-7", { type: "enabled", budget_tokens: 1024 }, "high"],
+    ["haiku-5-5", { type: "disabled" }, "xhigh"]
+  ].forEach(function(test) {
+    var n = calls.length, error
+    try { make("global.anthropic.claude-" + test[0], { params: { max_tokens: 2048, thinking: test[1], output_config: { effort: test[2] } } }).getGPT().model.rawPrompt("hello") } catch(e) { error = e }
+    ok(isDef(error), "invalid thinking rejected: " + test[0])
+    eq(calls.length, n, "invalid thinking before HTTP")
+  })
+  ;["opus-5", "sonnet-5", "haiku-5-5"].forEach(function(id) {
+    make("global.anthropic.claude-" + id, { params: { max_tokens: 2048, thinking: { type: "disabled" }, output_config: { effort: "high" } } }).getGPT().jsonSchemaPrompt("Alice", descriptor)
+    eq(calls[calls.length - 1].body.thinking.type, "disabled", "supported disabled thinking retained")
+  })
+  eq(make("ca.anthropic.claude-haiku-5-5").getCapabilities().structured.implemented, true, "Canada Haiku profile")
+  eq(make("apac.anthropic.claude-sonnet-5-5").getCapabilities().structured.implemented, false, "unlisted modern profile remains unknown")
   var llm = make(), g = llm.getGPT(), api = g.model
   var options = { model: model, params: { max_tokens: 123 } }, beforeOptions = JSON.stringify(options)
   ow.ai.__gpttypes.bedrock.create({ options: options })
