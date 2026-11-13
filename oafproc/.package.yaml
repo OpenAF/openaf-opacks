@@ -123,6 +123,7 @@ files:
 - docs/FILTERS.md
 - docs/JAVA-DIAGNOSTICS.md
 - docs/JSON-SCHEMA.md
+- docs/PERFORMANCE.md
 - docs/TEMPLATE.md
 - docs/USAGE.md
 - oafp.js
@@ -135,6 +136,7 @@ filesHash:
   docs/FILTERS.md: 4645621cc153655c1da8be6de233e8dbcadac0da
   docs/JAVA-DIAGNOSTICS.md: 0fde9c3c419dbb5dface7943cefeb2577e722750
   docs/JSON-SCHEMA.md: d1555c9526b284a23f8249757eb4f159a563b51c
+  docs/PERFORMANCE.md: 062c661ddcd6cf7729dc86291948846dce8af95a
   docs/TEMPLATE.md: 1870a1d6b9e90594eb62e0f33aaaab25084fe59a
   docs/USAGE.md: f81e9244564f4530d88188ec96160d1fef35dcb4
   oafp.js: 8c743266a7ab631307c49c39dc78bb76f6bdce1d
