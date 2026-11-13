@@ -1,0 +1,29 @@
+author: OpenAF
+scripts:
+  preerase: ''
+  posterase: ''
+  preinstall: ''
+  postinstall: ''
+keywords:
+- Keyword1
+- keyword2
+bugs:
+  url: URL to track bugs
+repository:
+  type: http
+  url: URL to main repository
+description: Microsoft 365 Copilot Graph Chat provider for ow.ai.
+name: m365copilot
+main: ''
+mainJob: ''
+license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
+version: '20261113'
+dependencies:
+  OpenAF: '>=20260312'
+files:
+- .package.yaml
+- README.md
+- m365copilot.js
+filesHash:
+  README.md: 79f3b6080a771ddf90544346705e6cb6246e2780
+  m365copilot.js: e322733c119491fbcc058fd4828e035251c6f814
