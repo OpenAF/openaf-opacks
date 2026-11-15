@@ -353,3 +353,5 @@ try {
   rejects(function() { g.jsonSchemaPrompt("input", optional) }, "LLM_DECISION_INVALID_REQUEST")
 } catch(e) { printErr(String(e)); exit(1) } finally { AWS.prototype.connect = connect; ow.obj.rest.connectionFactory = factory }
 print("PASS " + checks + " Bedrock checks")
+
+load("tests/bedrock-converse.js")

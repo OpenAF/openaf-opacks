@@ -2,6 +2,7 @@
 // BedRock
 
 loadLib("aws_core.js")
+loadLib("aws_bedrock_converse.js")
 
 /**
  * <odoc>
@@ -941,15 +942,61 @@ ow.ai.__gpttypes.bedrock = {
       if (optional > 12) _structuredInvalid("Bedrock supports at most 12 optional properties")
       return schema
     }
+    var _converse = AWS.__bedrockConverse.create(aOptions, {
+      aws: aws,
+      promptCachingRequested: _p.options.promptCaching === true || (_p.options.params && _p.options.params.promptCaching === true),
+      provider: () => _r,
+      responses: _isOpenAIResponsesModel,
+      structured: _structuredCapability,
+      schema: _structuredSchema,
+      reset: _resetStats,
+      refresh: () => { if (aws.lastConnect() > 5 * 60000) aws.reconnect() },
+      stats: (raw, model) => {
+        var stats = _captureStats(raw, model)
+        stats.api = "converse"
+        if (isMap(raw.usage)) {
+          if (!isMap(stats.tokens)) stats.tokens = {}
+          if (isNumber(raw.usage.cacheReadInputTokens)) stats.tokens.cacheRead = raw.usage.cacheReadInputTokens
+          if (isNumber(raw.usage.cacheWriteInputTokens)) stats.tokens.cacheCreation = raw.usage.cacheWriteInputTokens
+        }
+        if (isMap(raw.metrics) && isNumber(raw.metrics.latencyMs)) stats.latencyMs = raw.metrics.latencyMs
+        return stats
+      },
+      debug: (event, detail) => {
+        if (isDef(_debugCh)) {
+          var metadata = { _t: nowNano(), _f: event }
+          $ch(_debugCh).set(metadata, merge(metadata, detail))
+        }
+      }
+    })
+    if (isNumber(_p.timeout)) aws.bedrockTimeout = _p.timeout
     var _r = {
       resetDecisionStats: () => _resetStats(),
       getCapabilities: model => {
-        var d = ow.ai.__decision, capability = _structuredCapability(model || _model)
+        model = model || _model
+        if (isDef(aOptions.api)) {
+          var backend
+          try { backend = _converse.resolve(model, ["structuredOutput"]) } catch(ignore) {}
+          if (backend == "converse") {
+            var cc = ow.ai.__decision.capabilities(false, true, "unsupported")
+            cc.structured.availability = "unknown"
+            cc.api = "converse"
+            return cc
+          }
+          if (aOptions.api == "converse" || aOptions.api == "responses") return ow.ai.__decision.capabilities(false, false, "unsupported")
+        }
+        var d = ow.ai.__decision, capability = _structuredCapability(model)
         var caps = d.capabilities(false, capability == "supported", "unsupported")
         caps.structured.availability = capability == "unsupported" ? "incompatible" : "unknown"
         return caps
       },
       rawStructuredPrompt: request => {
+        if (isDef(aOptions.api)) {
+          var backend
+          try { backend = _converse.resolve(request && (request.model || _model), ["structuredOutput"]) }
+          catch(e) { throw ow.ai.__decision.error("LLM_DECISION_UNSUPPORTED", "bedrock", __, String(e.message || e)) }
+          if (backend == "converse") return _converse.structured(request)
+        }
         var d = ow.ai.__decision
         _resetStats()
         if (!d.map(request)) d.invalid()
@@ -1042,6 +1089,7 @@ ow.ai.__gpttypes.bedrock = {
         return { raw: raw, stats: _captureStats(raw, request.model) }
       },
       normalizeStructuredResponse: (raw, request) => {
+        if (isDef(aOptions.api) && _converse.resolve(request.model || _model, ["structuredOutput"]) == "converse") return _converse.normalizeStructured(raw, request)
         var d = ow.ai.__decision
         if (!d.map(raw) || raw.refusal || raw.stop_reason !== "end_turn" || !isArray(raw.content)) d.badResponse()
         var text = ""
@@ -1069,9 +1117,14 @@ ow.ai.__gpttypes.bedrock = {
         var request = { model: isDef(model) ? model : _model, schema: descriptor.schema,
                         messages: conversation.concat([{ role: "user", content: prompt }]), providerOptions: {} }
         if (isDef(temperature)) request.providerOptions.temperature = temperature
+        if (isDef(aOptions.api)) {
+          if (isDef(descriptor.name)) request.schemaName = descriptor.name
+          if (isDef(descriptor.description)) request.schemaDescription = descriptor.description
+        }
         var execution = _r.rawStructuredPrompt(request)
         var response = _r.normalizeStructuredResponse(execution.raw, request)
-        _r.conversation = conversation.concat([{ role: "user", content: prompt }, { role: "assistant", content: JSON.stringify(response) }])
+        var assistant = isDef(aOptions.api) && execution.raw && execution.raw.output && execution.raw.output.message ? clone(execution.raw.output.message) : { role: "assistant", content: JSON.stringify(response) }
+        _r.conversation = conversation.concat([{ role: "user", content: prompt }, assistant])
         return { response: response, stats: execution.stats }
       },
       conversation: [],
@@ -1160,6 +1213,7 @@ ow.ai.__gpttypes.bedrock = {
         _r.conversation = _conv
         return _r
       },
+      getBedrockCapabilities: (model, api) => _converse.caps(model || _model, api || "converse"),
       getModelName: () => _model,
       getLastStats: () => _lastStats,
       setDebugCh: (aChName) => {
@@ -1206,6 +1260,15 @@ ow.ai.__gpttypes.bedrock = {
       promptImage: (aPrompt, aImage, aDetailLevel, aRole, aModel, aTemperature, aJsonFlag) => {
         aRole = _$(aRole, "aRole").isString().default("user")
         aModel = _$(aModel, "aModel").isString().default(_model)
+        if (isDef(aOptions.api) && _converse.resolve(aModel, ["images"]) == "converse") {
+          var imageOptions = ow.ai.__image.options(aOptions, "anthropic")
+          imageOptions.maxBytes = Math.min(imageOptions.maxBytes || 3932160, 3932160)
+          var att = ow.ai.__image.anthropicBlocks(aImage, imageOptions, false)
+          var result = _r.rawPrompt([{ role: aRole, content: att.blocks.concat([{ type: "text", text: isArray(aPrompt) ? aPrompt.join("\n") : String(aPrompt) }]) }], aModel, aTemperature, aJsonFlag)
+          _lastStats = _lastStats || {}
+          _lastStats.images = att.images
+          return result
+        }
         if (!(aModel.indexOf("anthropic.") >= 0 || aModel.indexOf("claude") >= 0)) {
           throw "Images are only supported for Anthropic Claude models on Bedrock (model: " + aModel + ")"
         }
@@ -1226,6 +1289,9 @@ ow.ai.__gpttypes.bedrock = {
         return __r
       },
       rawPrompt: (aPrompt, aModel, aTemperature, aJsonFlag, aTools) => {
+        if (isDef(aOptions.api) && _converse.route(aModel || _model, false, aTools, aPrompt) == "converse") {
+          return _converse.run(aPrompt, aModel || _model, aTemperature, aJsonFlag, aTools, __, false)
+        }
         aPrompt = _$(aPrompt, "aPrompt").default("")
         aModel = _$(aModel, "aModel").isString().default(_model)
         aTemperature = _$(aTemperature, "aTemperature").isNumber().default(_temperature)
@@ -1353,7 +1419,7 @@ ow.ai.__gpttypes.bedrock = {
         //if (aJsonFlag) msgs.unshift({ role: "system", content: "output json" })
         // JSON instructions are now handled per-model to avoid persisting in conversation history
 
-        if (_isOpenAIResponsesModel(aModel)) {
+        if ((_isOpenAIResponsesModel(aModel) && aOptions.api != "invoke") || aOptions.api == "responses" || (aOptions.api == "auto" && _converse.route(aModel, false, aTools, aPrompt) == "responses")) {
           var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse, aJsonFlag)
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client'}, merge({_t:nowNano(),_f:'client'}, responsesInput))
           var responsesResult = aws.BEDROCK_OpenAIResponses(aOptions.region, responsesInput)
@@ -2688,6 +2754,7 @@ ow.ai.__gpttypes.bedrock = {
        * @returns {Object} - {content, events, toolCalls?, finishReason?}
        */
       rawPromptStream: (aPrompt, aModel, aTemperature, aJsonFlag, aTools, aOnDelta) => {
+        var converseTemperature = aTemperature
         aPrompt = _$(aPrompt, "aPrompt").default("")
         if (isUnDef(aModel) || aModel == null) aModel = _model
         if (isUnDef(aTemperature) || aTemperature == null) aTemperature = _temperature
@@ -2697,6 +2764,9 @@ ow.ai.__gpttypes.bedrock = {
           aTools = __
         }
         aOnDelta = _$(aOnDelta, "aOnDelta").default(__)
+        if (isDef(aOptions.api) && _converse.route(aModel, true, aTools, aPrompt) == "converse") {
+          return _converse.run(aPrompt, aModel, converseTemperature, aJsonFlag, aTools, aOnDelta, true)
+        }
 
         // Resolve tools that should be exposed to the model and keep a lookup by name
         var toolRegistry = {}
@@ -2778,7 +2848,7 @@ ow.ai.__gpttypes.bedrock = {
           if (isDef(tool.fn)) toolRegistry[toolName] = tool
         })
 
-        if (_isOpenAIResponsesModel(aModel)) {
+        if ((_isOpenAIResponsesModel(aModel) && aOptions.api != "invoke") || aOptions.api == "responses" || (aOptions.api == "auto" && _converse.route(aModel, true, aTools, aPrompt) == "responses")) {
           var responsesInput = _buildOpenAIResponsesInput(aPrompt, aModel, aTemperature, toolsToUse, aJsonFlag)
           responsesInput.stream = true
           if (isDef(_debugCh)) $ch(_debugCh).set({_t:nowNano(),_f:'client-stream'}, merge({_t:nowNano(),_f:'client-stream'}, responsesInput))
@@ -3601,6 +3671,9 @@ ow.ai.__gpttypes.bedrock = {
        * @param {Function} aOnDelta - Callback function(contentChunk, fullChunk) for each chunk
        * @returns {Object} - Parsed JSON object or text if parsing fails
        */
+      rawPromptStreamJSON: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
+        return _r.rawPromptStream(aPrompt, aModel, aTemperature, true, aTools, aOnDelta)
+      },
       promptStreamJSON: (aPrompt, aModel, aTemperature, aTools, aOnDelta) => {
         var text = _r.promptStream(aPrompt, aModel, aTemperature, true, aTools, aOnDelta)
         if (_hasError(text)) return text

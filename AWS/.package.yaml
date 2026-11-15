@@ -34,7 +34,7 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261113'
+version: '20261115'
 dependencies:
   OpenAF: '>=20250315'
 files:
@@ -45,6 +45,7 @@ files:
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
+- aws_bedrock_converse.js
 - aws_cloudwatch.js
 - aws_codeartifact.js
 - aws_cognito.js
@@ -76,12 +77,13 @@ files:
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
-  .odoc.db: 236b0bfb259cd8fc128135f13b3cb56b5f3add06
+  .odoc.db: da551624d5ff44b2918fb434040dec8ea26cae07
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  README.md: 309b080dfc552d462675eb1cbaac3bb82c7c24ce
+  README.md: de3a6e492261d981daf7215dc1b817a862aa2c36
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
-  aws_bedrock.js: 8f3a6f91056c25077cf36498f43d2cb334fcceb3
+  aws_bedrock.js: 8ddcabc63c7ba36c3ff7ad0f4f43eda2e76fe52d
+  aws_bedrock_converse.js: 2ed90876ea88c0d6076c299a915ff8526c4dc934
   aws_cloudwatch.js: 61ac49e79e12883d3a91e7e8c9f4ce512fdd536f
   aws_codeartifact.js: c228ec19f2870c719eb1da0f2f09f66a47e88d2f
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf

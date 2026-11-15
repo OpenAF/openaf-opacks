@@ -342,3 +342,237 @@ Unicode, header immutability, expiration, timeout and concurrency checks. Also r
 `tests/credentials.js`, `tests/lambda.js` and `tests/bedrock.js`. The nAttrMon
 repository supplies `tests/opentelemetry-aws-live.js` as an opt-in end-to-end test
 against an existing log group/stream; offline checks do not establish live delivery.
+
+## Bedrock Converse and ConverseStream
+
+`options.api` selects the inference backend. Leaving it out preserves all existing
+routing, including Claude native thinking/caching and modern GPT Responses continuation.
+No AWS SDK or new runtime dependency is required.
+
+| Value | Selection |
+| --- | --- |
+| omitted | Existing model-native behavior, including existing GPT Responses routing |
+| `invoke` | Existing InvokeModel implementation; rejects IDs without a native handler |
+| `responses` | Signed Responses for recognized compatible GPT IDs, or an explicit capability override |
+| `converse` | Converse only; unknown model IDs can attempt text inference |
+| `auto` | Existing compatible native/Responses path, or an explicitly verified Converse entry for additional models |
+
+Selection happens before transport. Provider errors never trigger an endpoint switch,
+model substitution or region change. Capabilities describe protocol support, not account
+access or regional availability. Regional/global inference IDs and ARNs are sent unchanged.
+Opaque profile ARNs need exact capability overrides for advanced features.
+
+```javascript
+loadLib("aws_bedrock.js")
+var llm = $llm({
+  type: "bedrock",
+  timeout: 180000,
+  options: {
+    region: "eu-west-1",
+    model: "deepseek.v3-v1:0", // choose an ID available to your account and region
+    api: "converse",
+    temperature: 0.2,
+    params: { max_tokens: 2048 }
+  }
+})
+print(llm.prompt("Explain what a hash table does."))
+```
+
+A model can also be identified by an inference profile, for example
+`eu.anthropic.claude-sonnet-4-5-20250929-v1:0`, a global profile such as
+`global.openai.gpt-6.1-sol`, or a complete inference-profile/application-profile ARN.
+Use the identifier supported by AWS in your configured source region. The adapter does
+not resolve an opaque application profile to its underlying model through AWS calls.
+
+### Parameters and history
+
+Common aliases map as follows:
+
+| Parameter | Converse request field |
+| --- | --- |
+| `max_tokens`, `max_output_tokens` | `inferenceConfig.maxTokens` |
+| `temperature` | `inferenceConfig.temperature` |
+| `top_p` | `inferenceConfig.topP` |
+| `stop_sequences` | `inferenceConfig.stopSequences` |
+
+Precedence is generic options, then `params` aliases, then explicit prompt-call
+arguments, then explicit `params.inferenceConfig` fields. `max_output_tokens` wins
+when both token aliases are present. No temperature or token budget is added by default.
+An explicit field overrides its alias; other unrecognized parameters fail locally.
+
+`options.params` also accepts `additionalModelRequestFields`,
+`additionalModelResponseFieldPaths`, `performanceConfig`, `serviceTier`, `requestMetadata`,
+`guardrailConfig`, `outputConfig`, `toolConfig`, `system`, and `promptVariables`.
+Use `additionalModelRequestFields` for model-specific settings such as thinking or
+reasoning; native fields like `anthropic_version` are not Converse request fields.
+Explicit system instructions precede system messages extracted from the conversation.
+Prompt-management ARNs cannot combine their managed settings with generated system,
+inference, tool or additional-model settings.
+
+Conversation strings and existing portable tool histories are converted into Converse
+blocks without modifying caller arrays. `getConversation`/`setConversation` retain full
+backend blocks, including signatures and redacted reasoning. `exportConversation` and
+`importConversation` retain their existing portable text/tool format; portable export is
+not a lossless archive for signed reasoning, images or documents. Continue signed sessions
+using full history and the same backend. Incompatible opaque native/Responses history is
+rejected rather than converted into text.
+
+### Tools and streaming
+
+```javascript
+var chat = $llm({ type: "bedrock", timeout: 180000, options: {
+  region: "eu-west-1", model: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  api: "converse", params: { max_tokens: 2048 }
+} }).getGPT().model
+chat.setTool("lookup", "Look up a value", {
+  type: "object",
+  properties: { key: { type: "string" } },
+  required: ["key"],
+  additionalProperties: false
+}, function(args) { return { value: "value for " + args.key } })
+print(chat.rawPrompt("Use lookup for key example."))
+
+// Select only on models whose streamingTools capability is verified.
+var result = chat.rawPromptStream("Use lookup for key next.", undefined,
+  undefined, false, ["lookup"], function(delta, event) { printnl(delta) })
+if (result.error) printErr(stringify(result.error))
+```
+
+Tools use the existing registered handlers, JSON argument objects and tool IDs.
+Multiple calls execute in order. Exceptions become correlated error results. Both paths
+use the same continuation loop, with `options.maxToolRounds` defaulting to 10; zero
+disables execution. Repeated IDs cannot execute twice within one prompt invocation.
+Complete tool exchanges remain in history if a subsequent inference fails. Incomplete
+stream arguments never execute and incomplete assistant messages are not committed.
+
+For text-only streaming, pass `[]` for the tools argument. `promptStream`,
+`promptStreamJSON` and stats wrappers use the same transport; the provider also exposes
+`rawPromptStreamJSON`. Text callbacks retain `(delta, event)`. Indexed blocks are
+reconstructed in block order; callbacks retain event arrival order. Raw events/history
+retain reasoning, while displayed text hides reasoning unless `showReasoning` is true.
+Unknown streaming content variants fail clearly; video ingestion is not implemented.
+
+The low-level methods are `aws.BEDROCK_Converse(region, modelId, input)` and
+`aws.BEDROCK_ConverseStream(region, modelId, input, callback)`. The latter calls
+`callback(eventUnion, { headers })` incrementally and returns `{ events, error? }`.
+It validates framing, typed headers, UTF-8, prelude/message CRC32, frame lengths and
+truncation. Callback failures propagate as stream errors and resources close on failure.
+An individual frame is limited to 32 MiB to bound buffering. It never buffers the entire
+response before delivering events; the returned events array retains delivered events.
+
+### Structured output and decisions
+
+```javascript
+var person = llm.getGPT().jsonSchemaPromptWithStats("Extract Alice, age 30.", {
+  name: "person",
+  schema: {
+    type: "object",
+    properties: { name: { type: "string" }, age: { type: "integer" } },
+    required: ["name", "age"],
+    additionalProperties: false
+  }
+})
+print(stringify(person))
+var decision = llm.decideWithStats("The service is healthy.", {
+  healthy: { type: "boolean", instructions: "Is the service healthy?" }
+}, { strategy: "structured" })
+```
+
+Eligible models use native `outputConfig.textFormat` with a JSON-string schema.
+The adapter retains OpenAF's schema subset and validation: every object explicitly needs
+`additionalProperties: false`, numerical bounds and unsupported keywords fail locally,
+`minItems` is 0 or 1, and at most 12 optional properties are allowed. Decision score bounds
+become finite enums. GPT-6.1 Sol's profile additionally requires every property in
+`required` and injects `additionalModelRequestFields.text.format.strict=true`.
+Conflicting strict settings fail. Schema-specific methods own output configuration and
+do not execute tools. Refusals, truncation, invalid JSON and schema mismatches fail without
+committing history. Raw requests with explicit `outputConfig` also validate the schema
+and completed output. Plain JSON prompt flags remain best-effort instructions and parsing,
+not guaranteed native schema enforcement. Native Claude schemas retain their existing path.
+
+### Images, documents and caching
+
+On an image-capable model, `chat.promptImage("Describe this image", "image.png")`
+uses OpenAF's existing image preparation. The local path is not sent to AWS.
+Explicit user message blocks can contain `{ image: { format: "png", source: { bytes:
+"<base64>" } } }` or `{ document: { name: "Document 1", format: "txt", source: {
+bytes: "<base64>" } } }`. A document requires accompanying text. Binary blocks are not
+serialized as text. Sources use base64 bytes rather than file paths or remote URLs.
+
+Image limits are 20 per message, 3.75 MiB each, and 8000 pixels per side. Document limits
+are five per message and 4.5 MiB each. Model restrictions can be narrower. Use neutral
+alphanumeric document names without local paths. Images/documents require user roles.
+Explicit video input and unsupported content variants fail rather than being stringified.
+
+Converse caching uses explicit `cachePoint` blocks on verified models. Native
+`promptCaching:true` is not automatically translated; an explicit request for it fails
+with guidance to use cache points. Default native Claude caching is unaffected.
+GPT-6.1 Sol supports implicit caching but not Converse `cachePoint` blocks.
+
+### Capabilities and troubleshooting
+
+The conservative registry has exact entries, not an exhaustive model list. `?` means
+unverified by this adapter, not proven unsupported. Evidence was reviewed on 2026-11-15;
+no live account availability is implied. `stream` denotes documented runtime response
+streaming; tool streaming remains independently gated.
+
+| Model | Converse | Stream | Tools | Stream tools | Images | Documents | Native schema | Explicit cache |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [DeepSeek V3.1](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-deepseek-deepseek-v3-1.html) | Yes | Yes | Yes | ? | No | ? | Yes | ? |
+| [Qwen3 Coder 480B](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-qwen-qwen3-coder-480b-a35b-instruct.html) | Yes | Yes | Yes | ? | No | ? | Yes | ? |
+| [Llama 3.3 70B](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-meta-llama-3-3-70b-instruct.html) | Yes | Yes | Yes | No | No | ? | No | ? |
+| [Devstral 2](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-mistral-ai-devstral-2-123b.html) | Yes | Yes | ? | ? | No | ? | Yes | ? |
+| [Magistral Small 2509](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-mistral-ai-magistral-small-2509.html) | Yes | Yes | ? | ? | Yes | ? | Yes | ? |
+| [GLM 4.7](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-zai-glm-4-7.html) | Yes | Yes | ? | ? | No | ? | Yes | ? |
+| [Gemma 3 12B IT](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-google-gemma-3-12b-it.html) | Yes | Yes | ? | ? | Yes | ? | Yes | ? |
+| [Jamba 1.5 Large](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-ai21-labs-jamba-1-5-large.html) | Yes | ? | ? | ? | ? | ? | ? | ? |
+| [Claude Sonnet 4.5](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-4-5.html) | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| [GPT-6.1 Sol](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-sol.html) | Yes | Yes | ? | ? | Yes | No | Yes, strict | No |
+
+Reasoning blocks are retained without inferring model support from a family name.
+Cohere Command R is EOL according to its AWS card; explicit Converse text remains possible
+for other/new Cohere models without adding a handler. Unknown optional capabilities
+require an exact override after checking the model's AWS documentation:
+
+```javascript
+var options = {
+  model: "<exact-model-id-or-profile-arn>", region: "eu-west-1", api: "converse",
+  modelCapabilities: {
+    "<exact-model-id-or-profile-arn>": {
+      converse: { text: true, streaming: true, tools: true, streamingTools: true }
+    }
+  }
+}
+var custom = $llm({ type: "bedrock", options: options })
+```
+
+Overrides are instance-local caller assertions, not AWS verification. Boolean capability
+keys include `text`, `streaming`, `tools`, `streamingTools`, `images`, `documents`,
+`reasoning`, `promptCaching`, `structuredOutput`, and `strictOutput`; `schemaProfile`
+can be `required` for models requiring all properties. Inspect effective entries with
+`chat.getBedrockCapabilities(modelId, "converse")`. Unknown capabilities are omitted;
+`false` is an explicit negative. `auto` never treats unknown as supported.
+
+Converse requires `bedrock:InvokeModel`; streaming requires
+`bedrock:InvokeModelWithResponseStream`. IAM policies must cover the requested resource
+and any required cross-region inference resources. AccessDenied/ValidationException
+errors retain provider details and never cause fallback. Verify the exact model ID,
+profile, region and permissions. Schema compilation can be slow: configure a sufficient
+`$llm` timeout, for example 180000 ms. Converse uses that instance timeout and does not
+retry partial streams or tool executions automatically.
+
+Stats retain existing token field meanings, raw `usage`, cache-read/write counters and
+stop reasons, adding `api: "converse"` and `latencyMs` when supplied. Cache tokens are not
+added again to provider `totalTokens`. Stats represent the latest inference response,
+including the final tool continuation. Converse debug records use `setDebugCh` and report
+model/API/round/finish metadata without credentials, binary content or opaque reasoning.
+
+Run `oaf -f tests/bedrock.js` for existing and Converse offline regressions, or
+`oaf -f tests/bedrock-converse.js` for the focused fixtures. Live tests incur costs and are
+opt-in: set `OPENAF_BEDROCK_LIVE=1`, AWS credentials/region and `BEDROCK_MODEL_ID`, then
+`BEDROCK_API=converse` and `BEDROCK_LIVE_CASES=text,stream,tools,schema` before running
+`oaf -f tests/bedrock-live.js`. Use `image` with `BEDROCK_IMAGE_FILE` for images. Advanced
+unknown models can supply `BEDROCK_MODEL_CAPABILITIES` as the JSON override map above.
+Unverified/unsupported cases skip; unexpected provider failures fail. Repeat with another
+model ID to test another family. Without `BEDROCK_API=converse`, the original live native
+schema test remains the default.
