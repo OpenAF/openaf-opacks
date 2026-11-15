@@ -57,27 +57,6 @@ files:
 - src/openaf/plugins/grpc/Bridge.java
 - src/openaf/plugins/grpc/Conversion.java
 - src/openaf/plugins/grpc/Schema.java
-- tests/conversion.js
-- tests/hello.proto
-- tests/hello.protoset
-- tests/interop.js
-- tests/interop.sh
-- tests/oafp-cli.py
-- tests/oafp-command.js
-- tests/oafp.js
-- tests/ojob.js
-- tests/peer.py
-- tests/protoc-slow.sh
-- tests/run.sh
-- tests/schema.js
-- tests/schema/invalid.proto
-- tests/schema/root.proto
-- tests/schema/roundtrip2.proto
-- tests/schema/roundtrip3.proto
-- tests/schema/types.proto
-- tests/stream.js
-- tests/test.js
-- tests/tls.js
 filesHash:
   .gitignore: 4bcdd0ef500e36de0e5037ff7d3d7413a58c111e
   .maven.yaml: 275d07e8e99240270841e36fee8d7f35b90df588
@@ -113,24 +92,3 @@ filesHash:
   src/openaf/plugins/grpc/Bridge.java: 1ae341c58b26a8c8677c9d4848164ae2cc46f5b9
   src/openaf/plugins/grpc/Conversion.java: ebb20458728f8c8d2010f605c4ed9a27e28c7aad
   src/openaf/plugins/grpc/Schema.java: d4bf3e75f6098b772aa96139b93d927428eb60ad
-  tests/conversion.js: 8669fcc0835901450b4c251ad49ee4d08837fca3
-  tests/hello.proto: 4488d869b49f563e7a7d01da630ce37ece13e62f
-  tests/hello.protoset: 6b1df6284560d0d648688499c8e308cbfe547895
-  tests/interop.js: 7db7bc6ab4b2a2710c9567d4e3ffb8ddc431f769
-  tests/interop.sh: 8559fc962f427e8a39e6f363d3875ded1e85ac62
-  tests/oafp-cli.py: 734b8cfa3bb3e6162f67a68cbf7fa5b6ac78a0cb
-  tests/oafp-command.js: 15694e447575af27077eee4f98912380a0e66177
-  tests/oafp.js: 2472eeea471d737a9d093e0d67a0e871bfa5e38c
-  tests/ojob.js: d13d6eb32df493ad0a5965ea83af709c3c888b70
-  tests/peer.py: d06d5618b9d3b34001333744e12b9c61bc4500af
-  tests/protoc-slow.sh: a05aea4ab532ef8518140d52bd4e71f1eba9a258
-  tests/run.sh: 07916bbafde92921b2d8ea6829eeee25497880c1
-  tests/schema.js: f15f393dc26178250398717eb1a7b697e2b9b1f3
-  tests/schema/invalid.proto: 842493e002f71b7f64d1f0c2de11be82ace2ecf4
-  tests/schema/root.proto: 17178680adda319dae6cebca2a5b7bb32d2973e6
-  tests/schema/roundtrip2.proto: 0afd9b1408f8185a3bf5247cb469e7ff78f8f017
-  tests/schema/roundtrip3.proto: 6ab5c5caac4f7aa22c5dc359299488cb546a728e
-  tests/schema/types.proto: fbb0206c77cff123aded4971dce198886a22cc20
-  tests/stream.js: 4d4ba776cf798757bc2f6b25e18298473881f135
-  tests/test.js: 68dd9451f88e2a30706de2f9dfa65281cfb72573
-  tests/tls.js: 452adefa8695472e7e3e07ee6bfa4c439c2f95fa
