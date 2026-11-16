@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261014'
+version: '20261116'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -27,17 +27,17 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- annotations-26.1.0.jar
+- annotations-13.0.jar
 - bcprov-jdk18on-1.86.jar
 - error_prone_annotations-2.50.0.jar
+- error_prone_annotations-2.52.0.jar
 - failureaccess-1.0.3.jar
 - guava-33.7.2-jre.jar
+- guava-33.8.0-jre.jar
 - j2objc-annotations-3.1.jar
-- jackson-annotations-3.0-rc5.jar
 - jspecify-1.0.1.jar
-- kotlin-stdlib-2.4.20-RC3.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- minio-9.0.3.jar
+- minio-9.0.4.jar
 - oJobS3.yaml
 - oafp_S3.js
 - s3-ojob-test.yaml
@@ -47,21 +47,21 @@ files:
 - simple-xml-safe-2.7.1.jar
 - snappy-java-1.1.10.12.jar
 filesHash:
-  .maven.yaml: 5ead6d8c61d32c45a8045bce38c84a345eba3b05
+  .maven.yaml: c9c8d4854fa7a7dd294c40998daa27c026d9bd1c
   .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: 23293dc88647ee9f444e397a5ee59edefb02bd42
-  annotations-26.1.0.jar: c1e9226d7ca6661020c58c94397da0cc3673d5e4
+  annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
   bcprov-jdk18on-1.86.jar: 830c8467bed8e4c1148262386b09fc42aedcf262
   error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
+  error_prone_annotations-2.52.0.jar: 83177bbb5db5bfe120666ae93fdaf44625ad7a7d
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
   guava-33.7.2-jre.jar: e70def5b06cfb109ea050de99870e79c8ce80dbc
+  guava-33.8.0-jre.jar: bb3b79346325315062192205fa6636dd5873151f
   j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
-  jackson-annotations-3.0-rc5.jar: dc49f719f3e5b7acbe0cfcab6cafcd4203ccf48e
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
-  kotlin-stdlib-2.4.20-RC3.jar: 0b22a8a3bc0b2b58fb79d97d3cc7827d18463613
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  minio-9.0.3.jar: f44ec333c12a1a3773c92d8d48e9f5d52942d4e6
+  minio-9.0.4.jar: b648f80cc9397a5e307b0928d0e32ecf33a26d8c
   oJobS3.yaml: ec79e9f1a77531c289c24874cce955007f47c0f8
   oafp_S3.js: fb0d0321c744f3bbe210dd0478175fe2a2dc8f2d
   s3-ojob-test.yaml: e91b6b8cbaf922fca16d11727cd24e4701fd9e9c
