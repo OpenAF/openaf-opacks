@@ -18,6 +18,9 @@ ECR sorts repository names before fetching summaries for visible rows; sorting
 globally by summary fields is unsupported. CodeArtifact sorts complete candidate
 lists before paging and searches loaded package trees, reporting incomplete search
 coverage. Cache keys are isolated per browser and cold loads coalesce.
+CodeArtifact resets a carried sort column to the current view's name column when
+entering or clearing a search changes the available columns (for example,
+`Domain` to `Package`). Unknown sort columns remain invalid.
 
 ECR uses API pages of up to 1,000 entries and reuses its AWS client, renewing
 known temporary credentials one minute before expiration. Repository paths,

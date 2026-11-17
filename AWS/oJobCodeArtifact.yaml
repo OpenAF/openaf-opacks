@@ -295,7 +295,7 @@ jobs:
               values     : {
                 "Domain" : d.domainName || d.name,
                 "Owner"  : d.owner || "",
-                "Created": isDef(d.createdTime) ? new Date(d.createdTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                "Created": isDef(d.createdTime) ? new Date(d.createdTime * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
               }
             }
           }), reqPage, reqPageSize)
@@ -533,6 +533,20 @@ jobs:
         var max=options.query.maxResults||1000
         return {isList:true,fields:["Package"],alignFields:["left"],key:"Package",list:rows.slice(0,max),searchInfo:{complete:false,truncated:rows.length>max,totalExact:false,scanned:rows.length,coverage:"loaded package hierarchies"}}
       }
+      // The browser carries its sort field when entering or clearing search.
+      // Reset known columns from another view before the shared query validator runs.
+      var sortFields = ["Domain", "Owner", "Created", "Repository", "Description", "Package", "Format", "Namespace", "Version", "Status", "Published"]
+      ;["getList", "search"].forEach(name => {
+        var original = args.fns[name]
+        args.fns[name] = (request, options) => {
+          var result = original(request, options)
+          var params = request.params || {}
+          if (result.isList && options.query && options.query.enabled && sortFields.indexOf(params.sort) >= 0 && result.fields.indexOf(params.sort) < 0) {
+            params.sort = String(result.key)
+          }
+          return result
+        }
+      })
       args.fns.getStatus = () => merge(provider.status(), {
         refreshing: syncFn(() => Object.keys(treeState).filter(k => treeState[k].refreshing).length, treeLock)
       })

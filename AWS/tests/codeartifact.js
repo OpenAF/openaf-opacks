@@ -56,7 +56,7 @@ var clients = [], tasks = [], version = 1, fail = false, hold, large = false, ba
 var active = $atomic(0), peak = $atomic(0), activityLock = new java.lang.Object()
 function FixtureAWS(access, secret, token, region) { constructed.inc(); clients.push(this); ok(region == "eu-west-1", "client region") }
 FixtureAWS.prototype.assumeRole = function() { assumed.inc(); this.assumeRoleExp = clock.get() + 3600000; return this }
-FixtureAWS.prototype.CODEARTIFACT_ListDomains = () => [{ name: "domain" }, { name: "other" }]
+FixtureAWS.prototype.CODEARTIFACT_ListDomains = () => [{ name: "domain", createdTime: 1711050000 }, { name: "other" }]
 FixtureAWS.prototype.CODEARTIFACT_ListRepositories = () => {
   repoCalls.inc()
   return [{ name: "repo", domainName: "domain" }, { name: "elsewhere", domainName: "other" }]
@@ -83,7 +83,7 @@ FixtureAWS.prototype.CODEARTIFACT_ListPackages = function(region, repo, domain, 
   ]
   } finally { active.dec() }
 }
-FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions = () => [{ version: "1.0", publishedTime: 1 }]
+FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions = () => [{ version: "1.0", publishedTime: 1711050000 }]
 FixtureAWS.prototype.CODEARTIFACT_ListPackageVersionAssets = () => [{ name: "pkg.jar", size: 10, hashes: { "SHA-256": "abc" } }]
 var support = {}
 new Function("exports", "now", browse.code["ojob-browse-contract.js"])(support, () => clock.get())
@@ -103,12 +103,53 @@ ok(constructed.get() == 1 && assumed.get() == 1, "one assumed-role client")
 ok(args.fns.getList(req("domain/repo/"), options).list[0].values.Package == "maven", "indexed root")
 ok(args.fns.getList(req("domain/repo/maven/"), options).list[0].values.Package == "org.example", "format navigation")
 ok(args.fns.getList(req("domain/repo/maven/org.example/pkg1/"), options).list[0].values.Version == "1.0", "package versions")
+// AWS timestamps are epoch seconds; both columns must display the same UTC instant.
+var domainDates = args.fns.getList(req(""), options).list
+ok(domainDates.filter(row => row.values.Domain == "domain")[0].values.Created == "2024-03-21 19:40:00", "domain creation converts epoch seconds to milliseconds")
+ok(domainDates.filter(row => row.values.Domain == "other")[0].values.Created == "", "missing domain creation remains blank")
+ok(args.fns.getList(req("domain/repo/maven/org.example/pkg1/"), options).list[0].values.Published == "2024-03-21 19:40:00", "package publication converts epoch seconds exactly once")
+
 ok(args.fns.getList(req("domain/repo/maven/org.example/pkg1/1.0"), options).isFile, "version navigation")
 ok(args.fns.getObj(req("domain/repo/maven/org.example/pkg1/1.0"), options).data[0].name == "pkg.jar", "asset details")
 ok(packageCalls.get() == 1, "all warm navigation shares snapshot")
 ok(args.fns.getList(req("domain/"), options).list[0].values.Repository == "repo", "domain filter")
 ok(args.fns.getList(req("other/"), options).list[0].values.Repository == "elsewhere", "second domain filter")
 ok(repoCalls.get() == 1, "account repository scan shared across domains")
+// Use the installed query validator and renderer: callback-only checks miss the
+// hidden sort field that the search form carries between different schemas.
+var browseCode = browse.jobs.filter(j => String(j.exec).indexOf("var applyQuery =") >= 0)[0].exec
+var queryStart = browseCode.indexOf("var applyQuery =")
+var applyQuery = new Function(browseCode.substring(queryStart, browseCode.indexOf("// Wrap provider callbacks", queryStart)) + "\nreturn applyQuery")()
+var renderStart = browseCode.indexOf(".default((lst, server, request, options) => {") + ".default(".length
+var renderEnd = browseCode.indexOf("\nargs.fns.renderObj", renderStart)
+if (renderEnd < 0) renderEnd = browseCode.indexOf("\n    args.fns.renderObj", renderStart)
+var renderList = new Function("escapeText", "return " + browseCode.substring(renderStart, renderEnd).trim().slice(0, -1))(global.__ojobHttpEscapeText)
+ow.loadTemplate()
+global.__ojobHttpUriPrefix = {}
+;[
+  ["", ["Domain", "Owner", "Created"], "domain/repo/maven/org.example/pkg1"],
+  ["domain/", ["Repository", "Domain", "Owner", "Description"], "repo/maven/org.example/pkg1"],
+  ["domain/repo/", ["Package", "Format", "Namespace"], "maven/org.example/pkg1"]
+].forEach(spec => {
+  spec[1].forEach(sort => {
+    var searchRequest = req(spec[0])
+    searchRequest.params = { q: "pkg1", sort: sort, order: "desc", size: "25" }
+    var result = applyQuery(args.fns.search(searchRequest, options), searchRequest, options)
+    ok(result.list.length == 1 && result.list[0].values.Package == spec[2], "search path with carried " + sort + " at " + spec[0])
+    ok(result.sortInfo.field == "Package" && result.sortInfo.order == "desc", "search sort normalization")
+    var html = String(renderList(result, {}, searchRequest, options))
+    ok(html.indexOf('name="sort" value="Package"') >= 0, "rendered search form carries package sort")
+    ok(html.indexOf(spec[2]) >= 0, "rendered relative package link")
+    searchRequest.params.q = ""
+    var cleared = applyQuery(args.fns.getList(searchRequest, options), searchRequest, options)
+    ok(cleared.sortInfo.field == String(cleared.key), "clearing search restores listing sort")
+  })
+})
+var invalidSearch = req("")
+invalidSearch.params = { q: "pkg1", sort: "Unknown" }
+var invalidSort = false
+try { applyQuery(args.fns.search(invalidSearch, options), invalidSearch, options) } catch(e) { invalidSort = e.httpStatus == 400 }
+ok(invalidSort, "unknown search sort still rejected")
 clock.set(clock.get() + 1001); version = 2
 list = args.fns.getList(request, options)
 ok(list.list.some(r => r.values.Package == "pkg1") && packageCalls.get() == 1, "stale snapshot returns without network")
