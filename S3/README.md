@@ -2,6 +2,29 @@
 
 Client to access a compatible S3 object storage.
 
+## HTTP browsing
+
+`S3Browse` accepts the oJob-common browse contract through `options.query`,
+`options.preview`, and `options.operations`. Enhanced options require updated
+oJob-common definitions; legacy configurations continue working with the current
+OpenAF runtime. Browser caches are isolated per instance.
+
+Enable `query: { enabled: true }` for server sorting/paging and bounded literal
+search. Recursive listing snapshots are cached independently of query text and
+report completeness. `S3.walkObjects(bucket, prefix, callback, options)` supports
+`maxScanned` and `timeoutMs` and stops when the callback returns false. It leaves
+the existing `listObjects` API unchanged. The SDK may prefetch a remote page.
+
+`preview: { formats: { xml: xml, json: json }, maxBytes: 1048576 }` selects HTML
+viewers and ranged reads. An explicit formats map replaces the default set;
+an empty map disables viewers. Raw downloads and API object reads remain complete.
+Restrictions are checked before raw downloads as well as previews.
+
+`operations.enabled: true` exposes status/freshness/metrics and POST refresh
+under the browser's reserved `@@` path. API operations require an explicit
+`operationsBrowseUris` allowlist and the API route's authentication policy.
+See oJob-common for the shared operations and compatibility contract.
+
 ## Usage
 
 Install it:

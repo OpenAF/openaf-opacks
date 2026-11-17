@@ -322,6 +322,7 @@ jobs:
         cache    : cache
         sortTab  : sortTab
         options  : options
+        operationsBrowseUris: operationsBrowseUris
   check:
     in:
       url      : isString
@@ -341,6 +342,15 @@ jobs:
       sortTab  : toBoolean.isBoolean.default(false)
       options  : isMap.default({})
   exec    : &httpBrowseS3Exec | #js
+    var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)
+    if (enhanced) {
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+      provider = support.provider(args.options)
+    }
+    var cacheNamespace = "browse-" + genUUID() + "-"
+    var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
+
     args.options = merge(args.options, {
       showURI: args.incURI,
       sortTab: args.sortTab,
@@ -350,10 +360,19 @@ jobs:
     })
 
     load("s3.js")
+    if (enhanced && args.options.query && args.options.query.enabled && !isFunction(S3.prototype.walkObjects)) throw new Error("Enhanced S3 queries require S3.walkObjects; update the S3 oPack")
     var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
 
     args.fns = {
+      validate: (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
+        if (/(^|\/)\.\.(\/|$)/.test(path) || /[\\\x00]/.test(path)) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+        var patterns = isString(args.restrict) ? [args.restrict] : (args.restrict || [])
+        var prefixes=path.split("/").map((part,i,all)=>all.slice(0,i+1).join("/"))
+        if (patterns.some(p => prefixes.some(prefix => new RegExp(p).test(prefix) || new RegExp(p).test(String(options.parentPath || "")+prefix)))) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+      },
       getList: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
 
@@ -364,13 +383,14 @@ jobs:
 
         //print(`_s3p = ${_s3p}`)
         if (isDef(args.cache)) {
-          var _cache = "__oJobS3_" + md5(args.url + args.bucket)
-          lst = $cache(_cache).get({ puri: _s3p })
+          var _cache = cacheNamespace + "s3"
+          lst = browseCache("s3").get({ puri: _s3p })
         } else {
           lst = s3.listObjects(args.bucket, _s3p)
           if (_s3p.length > 1) lst = lst.filter(r => r.filename != _s3p)
         }
         origLst = lst
+        lst = lst.filter(f => {try {var key=String(f.filename),base=String(options.parentPath||"").replace(/^\/+/,"");if(base && key.startsWith(base))key=key.substring(base.length);args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+key.replace(/^\/+/,"")},options);return true}catch(e){return false}})
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
           lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
@@ -401,15 +421,12 @@ jobs:
         }
       },
       getObj: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
 
         var ext = String(puri).replace(/^.*\./, "")
         puri = puri.replace(/^\//, "")
-
-        if (request.params.raw == "true") {
-          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
-        }
 
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
@@ -417,9 +434,21 @@ jobs:
           if (args.restrict.length > 0) {
             _go = args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(puri)), true)
           }
-          if (!_go) return { data: "no content", type: "md" }
+          if (!_go) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
         }
 
+        if (request.params.raw == "true") {
+          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
+        }
+
+        if (support && options.preview && !options._api) {
+          var name = puri.substring(puri.lastIndexOf("/")+1)
+          var previewType = support.format(name, options.preview, support.defaults)
+          if (!previewType) return {stream:s3.getObjectStream(args.bucket,options.parentPath+puri)}
+          var limit = options.preview.maxBytes
+          var stream = isDef(limit) ? s3.getObjectStream(args.bucket,options.parentPath+puri,0,Number(limit)+1) : s3.getObjectStream(args.bucket,options.parentPath+puri)
+          return support.readPreview(stream,previewType,limit)
+        }
         log("get: " + options.parentPath + puri)
         switch(ext) {
         case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "md" }
@@ -439,11 +468,14 @@ jobs:
         }
       },
       search: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
 
         var q = _$(request.params.q, "q").isString().default(_$(request.params.search).isString().default(""))
-        var maxResults = Number(_$(request.params.maxResults).default(200))
+        var maxResults = Number(_$(request.params.maxResults).default(options.query && options.query.enabled ? options.query.maxResults || 1000 : 200))
+        if (!isFinite(maxResults) || maxResults < 1 || Math.floor(maxResults)!=maxResults || maxResults>1000) {var invalid=new Error("Invalid maxResults");invalid.httpStatus=400;throw invalid}
+        if (q.length > (options.query && options.query.maxQueryLength || 256)) {var invalid=new Error("Query too long");invalid.httpStatus=400;throw invalid}
 
         var _fields      = [ "Object", "Last modified", "Size", "Size in bytes" ]
         var _alignFields = [ "left", "left", "right", "right" ]
@@ -453,7 +485,16 @@ jobs:
         _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
         _s3p = _s3p.replace(/^\//, "")
 
-        var lst = s3.listObjects(args.bucket, _s3p, false, true)
+        var scanInfo, lst
+        if (support && options.query && options.query.enabled) {
+          if (!isFunction(s3.walkObjects)) throw new Error("Enhanced search requires S3.walkObjects; update S3")
+          var unit = browseCache("s3-search").ttl(args.cache || 30000).fn(k => {
+            var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query)
+            return {rows:rows,info:info}
+          }).create().get({puri:_s3p})
+          lst = unit.rows; scanInfo = unit.info
+        } else lst = s3.listObjects(args.bucket, _s3p, false, true)
+        lst = lst.filter(f => {try {var key=String(f.filename),base=String(options.parentPath||"").replace(/^\/+/,"");if(base && key.startsWith(base))key=key.substring(base.length);args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+key.replace(/^\/+/,"")},options);return true}catch(e){return false}})
 
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
@@ -468,7 +509,7 @@ jobs:
 
         return {
           isList: true, fields: _fields, alignFields: _alignFields, key: "Object",
-          pageInfo: { total: _total, truncated: _total > maxResults },
+          searchInfo: Object.assign({}, scanInfo || {complete:true,totalExact:true}, {truncated:_total > maxResults || scanInfo && !scanInfo.complete,totalExact:_total <= maxResults && (!scanInfo || scanInfo.complete)}),
           list: _hits.map(f => ({
             isDirectory: false,
             values: {
@@ -486,7 +527,7 @@ jobs:
         if (isNumber(args.cache)) {
           _cache = "__oJobS3_" + md5(args.url + args.bucket)
           log("Creating cache " + _cache + "...")
-          $cache(_cache)
+          browseCache("s3")
           .ttl(args.cache)
           .fn(k => {
             log("  cache get " + af.toSLON(k))
@@ -496,6 +537,18 @@ jobs:
           })
           .create()
         }
+      }
+    }
+
+    if (provider) {
+      args.fns.getStatus = () => provider.status()
+      args.fns.getFreshness = (request,options) => provider.freshness((name,key) => support.matchesUnit(global.__ojobHttpRelativePath(request.uri,options.parentURI),key,options.parentPath))
+      args.fns.refresh = (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        provider.invalidate((name,key) => {
+          return support.matchesUnit(path,key,options.parentPath)
+        })
+        args.fns.getList(request, options)
       }
     }
 
@@ -528,4 +581,9 @@ jobs:
       sortTab  : toBoolean.isBoolean.default(false)
       options  : isMap.default({})
       browseUri: isString.default(__)
-  exec    : *httpBrowseS3Exec
+  exec: | #js
+    if (args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)) {
+      var support
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+    }

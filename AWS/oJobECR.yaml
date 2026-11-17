@@ -53,6 +53,7 @@ jobs:
         cache      : cache
         sortTab    : sortTab
         options    : options
+        operationsBrowseUris: operationsBrowseUris
         s3url      : s3url           # optional s3 url for static markdown description files
         s3accesskey: s3accesskey     # optional s3 access key for static markdown description files
         s3secret   : s3secret        # optional s3 secret for static markdown description files
@@ -60,6 +61,15 @@ jobs:
         s3bucket   : s3bucket        # optional s3 bucket containing static markdown description files
         s3prefix   : s3prefix        # optional s3 prefix for static markdown description files
   exec : &httpBrowseECRExec | #js
+    var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)
+    if (enhanced) {
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+      provider = support.provider(args.options)
+    }
+    var cacheNamespace = "browse-" + genUUID() + "-"
+    var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
+
     args.options = merge(args.options, {
       showURI : args.incURI,
       sortTab : args.sortTab,
@@ -83,8 +93,15 @@ jobs:
     }
 
     args.fns = {
+      validate: (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
+        if (/(^|\/)\.\.(\/|$)/.test(path) || /[\\\x00]/.test(path)) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+        var patterns = isString(args.restrict) ? [args.restrict] : (args.restrict || [])
+        var prefixes=path.split("/").map((part,i,all)=>all.slice(0,i+1).join("/"))
+        if (patterns.some(p => prefixes.some(prefix => new RegExp(p).test(prefix)))) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+      },
       init   : () => {
-        $cache("ecr-desc")
+        browseCache("ecr-desc")
         .ttl(args.cache)
         .fn(k => {
           var _s3 
@@ -108,7 +125,7 @@ jobs:
         })
         .create()
 
-        $cache("ecr-imgs")
+        browseCache("ecr-imgs")
         .ttl(args.cache)
         .byDefault(true, __)
         .fn(k => {
@@ -139,7 +156,7 @@ jobs:
         })
         .create()
 
-        $cache("ecr-repo")
+        browseCache("ecr-repo")
         .ttl(args.cache)
         .fn(k => {
           var _aws = new AWS(args.accessKey, args.secret, args.token)
@@ -175,11 +192,12 @@ jobs:
         .create()
       },
       getList: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
 
         // Root level
-        var _r = $cache("ecr-repo").get({})
+        var _r = browseCache("ecr-repo").get({})
         var lst = _r.lst, lstParent = _r.lstParent
 
         // Determine level from puri
@@ -200,24 +218,35 @@ jobs:
           // Check for markdown description in S3
           var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
           if (useMDDesc) {
-            mddesc = $cache("ecr-desc").get({ uri: puri })
+            mddesc = browseCache("ecr-desc").get({ uri: puri })
             if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
               log(`No cached description found for image list ${puri}`)
               useMDDesc = false
             }
           }
 
+          var candidates = $from(lstParent).equals("level",level+1).starts("name",puri+(level>0?"/":"")).select()
+          candidates = candidates.filter(f => {try {args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+f.name},options);return true}catch(e){return false}})
+          var pageResult
+          if (support && options.query && options.query.enabled) {
+            pageResult = support.query({isList:true,fields:["Repository Name"],key:"Repository Name",list:candidates.map(f=>({isDirectory:f.isParent,values:{"Repository Name":f.name},entry:f}))},request,options)
+            candidates = pageResult.list.map(r=>r.entry)
+          }
           return {
+            pageInfo: pageResult ? pageResult.pageInfo : __,
+            queryInfo: pageResult ? pageResult.queryInfo : __,
+            sortInfo: pageResult ? pageResult.sortInfo : __,
+            sortFields: ["Repository Name"],
             isList: true,
             fields: _fields,
             alignFields: _aFields,
             content: useMDDesc && isDef(mddesc.result) ? mddesc.result : __,
             key   : [ "Repository Name" ],
-            list  : $from(lstParent).equals("level", level + 1).starts("name", puri + (level > 0 ? "/" : "")).pselect(f => {
+            list  : candidates.map(f => {
               var c = f.isParent ? $from(lstParent).greater("level" ,level).starts("name", f.name + "/").count() : 0
               var img, lastPush = 0, lastPull = 0
               if (!f.isParent) {
-                var img = $cache("ecr-imgs").get({ image: f.name })
+                var img = browseCache("ecr-imgs").get({ image: f.name })
                 if (isDef(img)) {
                   lastPush = img.reduce((aP, aC) => Math.max(aP, isDef(aC.imagePushedAt) ? aC.imagePushedAt : 0), 0)
                   lastPull = img.reduce((aP, aC) => Math.max(aP, isDef(aC.lastRecordedPullTime) ? aC.lastRecordedPullTime : 0), 0)
@@ -238,13 +267,14 @@ jobs:
         }
       },
       getObj: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
 
         var img, ini = now(), data = ""
         do {
-          img = $cache("ecr-imgs").get({ image: puri })
-          sleep(100, true)
+          img = browseCache("ecr-imgs").get({ image: puri })
+          if (isUnDef(img)) sleep(100, true)
         } while(isUnDef(img) && now() - ini < 15000)
 
         if (isUnDef(img)) {
@@ -257,7 +287,7 @@ jobs:
           // Check for markdown description in S3
           var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
           if (useMDDesc) {
-            mddesc = $cache("ecr-desc").get({ uri: puri })
+            mddesc = browseCache("ecr-desc").get({ uri: puri })
             if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
               log(`No cached description found for image ${puri}`)
               useMDDesc = false
@@ -339,6 +369,28 @@ jobs:
       }
     }
 
+    if (provider) {
+      args.fns.search = (request,options) => {
+        args.fns.validate(request, options)
+        if (!options.query || !options.query.enabled) support.error(501,"Enhanced search is not enabled")
+        var path=global.__ojobHttpRelativePath(request.uri,options.parentURI).replace(/\/+$/, ""), q=String((request.params||{}).q||"")
+        if(q.length>(options.query.maxQueryLength||256))support.error(400,"Query too long")
+        var all=browseCache("ecr-repo").get({}).lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&r.repositoryName.toLowerCase().indexOf(q.toLowerCase())>=0)
+        all=all.filter(r=>{try{args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+r.repositoryName},options);return true}catch(e){return false}})
+        var max=options.query.maxResults||1000
+        return {isList:true,fields:["Repository Name"],alignFields:["left"],key:"Repository Name",list:all.slice(0,max).map(r=>({isDirectory:false,values:{"Repository Name":path?r.repositoryName.substring(path.length+1):r.repositoryName}})),searchInfo:{complete:all.length<=max,truncated:all.length>max,totalExact:all.length<=max,scanned:all.length}}
+      }
+      args.fns.getStatus = () => provider.status()
+      args.fns.getFreshness = (request,options) => provider.freshness((name,key) => support.matchesUnit(global.__ojobHttpRelativePath(request.uri,options.parentURI),key,options.parentPath))
+      args.fns.refresh = (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        provider.invalidate((name,key) => {
+          return support.matchesUnit(path,key,options.parentPath)
+        })
+        args.fns.getList(request, options)
+      }
+    }
+
 # ----------------------------
 - name    : HTTP Browse - ecr - API
   to      : HTTP Browse API
@@ -347,5 +399,10 @@ jobs:
     shortcut:
       <<    : *httpBrowseECRTypeArgs
       name  : ECRBrowseAPI
-  exec    : *httpBrowseECRExec
+  exec: | #js
+    if (args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)) {
+      var support
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+    }
 

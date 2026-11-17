@@ -1,5 +1,26 @@
 # AWS oPack
 
+## HTTP browsing
+
+ECR and CodeArtifact browse jobs accept the oJob-common `options.query`,
+`options.preview`, and `options.operations` contract. Enhanced options require
+updated oJob-common definitions (browse contract 1), checked before clients are
+created. Legacy configurations retain support for the current OpenAF runtime.
+API jobs refer to an existing browser; register the browser before serving API
+requests. API operations additionally require `operationsBrowseUris` on the API.
+
+`query: { enabled: true, pageSize: 100 }` enables server sorting and paging.
+ECR sorts repository names before fetching summaries for visible rows; sorting
+globally by summary fields is unsupported. CodeArtifact sorts complete candidate
+lists before paging and searches loaded package trees, reporting incomplete search
+coverage. Cache keys are isolated per browser and cold loads coalesce.
+
+For CodeArtifact HTML asset previews, provide `preview.formats`, such as
+`{ xml: xml, pom: xml, json: json }`, and optional `preview.maxBytes`.
+The allowlist replaces default viewers; `{}` disables them. Raw/API object reads
+remain complete. Operations expose status, freshness, metrics and POST refresh;
+see the oJob-common browse documentation for authentication and refresh controls.
+
 Load the required service library, for example `loadLib("aws_sqs.js")`.
 
 SQS receive calls accept the requested maximum message count, and FIFO sends accept group IDs in either positional arguments or a message map. Performance Insights uses the client instance region. Each Bedrock provider keeps its own options.

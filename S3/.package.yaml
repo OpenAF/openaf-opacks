@@ -18,7 +18,7 @@ name: S3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261116'
+version: '20261117'
 dependencies:
   OpenAF: '>=20230812'
 files:
@@ -50,7 +50,7 @@ filesHash:
   .maven.yaml: c9c8d4854fa7a7dd294c40998daa27c026d9bd1c
   .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
-  README.md: 23293dc88647ee9f444e397a5ee59edefb02bd42
+  README.md: 649dcd6c05f2d7c2f374fd8caa291ee781af91f9
   annotations-13.0.jar: 919f0dfe192fb4e063e7dacadee7f8bb9a2672a9
   bcprov-jdk18on-1.86.jar: 830c8467bed8e4c1148262386b09fc42aedcf262
   error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
@@ -62,11 +62,11 @@ filesHash:
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
   minio-9.0.4.jar: b648f80cc9397a5e307b0928d0e32ecf33a26d8c
-  oJobS3.yaml: ec79e9f1a77531c289c24874cce955007f47c0f8
+  oJobS3.yaml: 2242c0619e584258838cfaffd4bc460d8b47f902
   oafp_S3.js: fb0d0321c744f3bbe210dd0478175fe2a2dc8f2d
   s3-ojob-test.yaml: e91b6b8cbaf922fca16d11727cd24e4701fd9e9c
   s3-test.yaml: 5add0613ccc22073cd61d852a2e4946d8186af7c
-  s3.js: fc42b5af38d1b3196e58d4fe02f580a1984d1231
+  s3.js: e32ca9a8547fbf2b6e034e90c0e2af3b2f9f0610
   s3.yaml: 258dcf5460fbf67d0fd98662a06ed55f984dff68
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.12.jar: c97fdfd953df72ae08be22384a1581ce665c2694
