@@ -57,20 +57,16 @@ jobs:
     })
 
     loadLib("aws.js")
-    var aws = new AWS(args.accessKey, args.secret, args.token)
-    if (isDef(args.assumeRole)) {
-      log("Assuming role " + args.assumeRole + "...")
-      aws = aws.assumeRole(args.assumeRole)
-    }
-
-    var getAWS = () => {
-      var _aws = new AWS(args.accessKey, args.secret, args.token)
-      if (isDef(args.assumeRole)) {
-        log("Assuming role " + args.assumeRole + "...")
-        _aws = _aws.assumeRole(args.assumeRole)
+    var aws, clientLock = new java.lang.Object()
+    var getAWS = () => syncFn(() => {
+      var expiry = aws && (isDef(aws.assumeRoleExp) ? aws.assumeRoleExp : Date.parse(String(aws._credentialExpiration)))
+      if (!aws || isFinite(expiry) && expiry <= now() + 60000) {
+        var next = new AWS(args.accessKey, args.secret, args.token, args.region)
+        if (isDef(args.assumeRole)) next = next.assumeRole(args.assumeRole)
+        aws = next
       }
-      return _aws
-    }
+      return aws
+    }, clientLock)
 
     var buildPackageTree = aPackages => {
       var _packages = (aPackages || []).map(p => {
@@ -81,9 +77,9 @@ jobs:
       })
 
       var _parents = []
-      var _parentsMap = {}
-      var _childrenMap = {}
-      var _leafByPath = {}
+      var _parentsMap = Object.create(null)
+      var _childrenMap = Object.create(null)
+      var _leafByPath = Object.create(null)
 
       for(var i = 0; i < _packages.length; i++) {
         var r = _packages[i]
@@ -95,15 +91,12 @@ jobs:
             var entry = { name: parent, isParent: parent != r.path, level: j + 1, pkg: r }
             _parentsMap[key] = entry
             _parents.push(entry)
+            var prefix = parts.slice(0, j).join("/")
+            if (!isDef(_childrenMap[prefix])) _childrenMap[prefix] = []
+            _childrenMap[prefix].push(parent)
           } else if (parent == r.path) {
             _parentsMap[key].isParent = false
             _parentsMap[key].pkg = r
-          }
-
-          if (j > 0) {
-            var prefix = parts.slice(0, j).join("/")
-            if (!isDef(_childrenMap[prefix])) _childrenMap[prefix] = []
-            if (_childrenMap[prefix].indexOf(parent) == -1) _childrenMap[prefix].push(parent)
           }
         }
         _leafByPath[r.path] = r
@@ -112,6 +105,58 @@ jobs:
       Object.keys(_childrenMap).forEach(k => _childrenMap[k].sort())
 
       return { list: _packages, parents: _parents, parentsMap: _parentsMap, childrenMap: _childrenMap, leafByPath: _leafByPath }
+    }
+
+    // Enhanced browsing retains the provider's expired tree while one refresh runs.
+    // Only refresh coordination is stored here; snapshots remain bounded by the provider.
+    var treeState = Object.create(null), treeLock = new java.lang.Object()
+    var treeSlots = new java.util.concurrent.Semaphore(3)
+    var treeTTL = isNumber(args.cache) ? args.cache : 5000
+    var readTree = key => {
+      if (!provider) return browseCache("codeartifact-package-tree").get(key)
+      var id = stringify(key, __, "")
+      var unit = provider.entries("codeartifact-package-tree").filter(u => u.key.domain == key.domain && u.key.repository == key.repository)[0]
+      var load = () => {
+        treeSlots.acquire()
+        try { return browseCache("codeartifact-package-tree").get(key) }
+        finally { treeSlots.release() }
+      }
+      if (!unit) return load()
+      if (now() < unit.expiresAt) return unit.value
+      var state = syncFn(() => {
+        // Remove expired backoff records so failed repositories cannot grow this map forever.
+        Object.keys(treeState).forEach(k => {
+          if (!treeState[k].refreshing && now() >= treeState[k].retryAt) delete treeState[k]
+        })
+        if (treeState[id] || Object.keys(treeState).length >= 1000) return __
+        var next = { key: key, refreshing: true }
+        treeState[id] = next
+        return next
+      }, treeLock)
+      if (state) {
+        var failed = e => {
+          syncFn(() => {
+            if (treeState[id] === state) {
+              state.refreshing = false
+              state.retryAt = now() + Math.max(1000, treeTTL)
+            }
+          }, treeLock)
+          logWarn("Error refreshing CodeArtifact packages: " + e)
+        }
+        try {
+          $doV(() => {
+            treeSlots.acquire()
+            try {
+              // Explicit refresh cancels queued work before invalidating snapshots.
+              if (!syncFn(() => treeState[id] === state, treeLock)) return
+              browseCache("codeartifact-package-tree").get(key)
+              syncFn(() => { if (treeState[id] === state) delete treeState[id] }, treeLock)
+            } catch(e) { failed(e) }
+            finally { treeSlots.release() }
+          })
+        } catch(e) { failed(e) }
+      }
+      return unit.value
     }
 
     var getPaging = (page, pageSize) => {
@@ -190,30 +235,18 @@ jobs:
         .fn(k => {
           var _aws = getAWS()
           var lst = _aws.CODEARTIFACT_ListRepositories(args.region, args.repository)
-          if (isDef(k.domain)) lst = lst.filter(f => f.domainName == k.domain)
           return lst
         })
         .create()
 
-        browseCache("codeartifact-packages")
-        .ttl(args.cache)
-        .fn(k => {
-          var _aws = getAWS()
-          log(`Fetching packages for domain ${k.domain} and repository ${k.repository}...`)
-          var lst = _aws.CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format)
-          if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
-          log(`Fetched ${lst.length} packages for domain ${k.domain} and repository ${k.repository}.`)
-          return lst
-        })
-        .create()
-
+        // Packages and indexes are loaded and replaced as one repository snapshot.
         browseCache("codeartifact-package-tree")
         .ttl(args.cache)
         .fn(k => {
-          log(`Building package tree for domain ${k.domain} and repository ${k.repository}...`)
-          var packages = browseCache("codeartifact-packages").get(k)
-          log(`Built package tree for domain ${k.domain} and repository ${k.repository}.`)
-          return buildPackageTree(packages)
+          var lst = getAWS().CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format, args.namespace)
+          if (!isArray(lst)) throw new Error("Invalid CodeArtifact package response")
+          if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
+          return buildPackageTree(lst)
         })
         .create()
 
@@ -237,7 +270,7 @@ jobs:
           $doV(() => {
             var _inits = af.fromJSSLON(args.initialize)
             pForEach(_inits, i => {
-              browseCache("codeartifact-package-tree").get({
+              readTree({
                 domain    : i.domain,
                 repository: i.repository
               })
@@ -248,7 +281,7 @@ jobs:
       getList: (request, options) => {
         args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI).replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
         var reqParams = isMap(request.params) ? request.params : {}
         var reqPage = isDef(reqParams.page) ? Number(reqParams.page) : __
@@ -277,7 +310,7 @@ jobs:
 
         if (parts.length == 1) {
           var domain = parts[0]
-          var repos = browseCache("codeartifact-repos").get({ domain: domain })
+          var repos = browseCache("codeartifact-repos").get({}).filter(r => r.domainName == domain)
           var paged = applyPaging($from(repos).sort("repositoryName").select(r => {
             return {
               isDirectory: true,
@@ -302,8 +335,7 @@ jobs:
         var repo = parts[1]
         var remaining = parts.slice(2).join("/")
 
-        var packages = browseCache("codeartifact-packages").get({ domain: domain, repository: repo })
-        var tree = browseCache("codeartifact-package-tree").get({ domain: domain, repository: repo })
+        var tree = readTree({ domain: domain, repository: repo })
         var lstParent = tree.parents
         var childrenMap = tree.childrenMap || {}
         var leafByPath = tree.leafByPath || {}
@@ -394,7 +426,7 @@ jobs:
           return {
             isDirectory: f.isParent,
             values     : {
-              "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), ""),
+              "Package"  : f.name.substring(remaining.length + 1),
               "Format"   : f.pkg.format || "",
               "Namespace": f.pkg.namespace || ""
             }
@@ -411,7 +443,7 @@ jobs:
       getObj: (request, options) => {
         args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI).replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
 
         var domain = parts[0]
@@ -501,13 +533,27 @@ jobs:
         var max=options.query.maxResults||1000
         return {isList:true,fields:["Package"],alignFields:["left"],key:"Package",list:rows.slice(0,max),searchInfo:{complete:false,truncated:rows.length>max,totalExact:false,scanned:rows.length,coverage:"loaded package hierarchies"}}
       }
-      args.fns.getStatus = () => provider.status()
-      args.fns.getFreshness = (request,options) => provider.freshness((name,key) => support.matchesUnit(global.__ojobHttpRelativePath(request.uri,options.parentURI),key,options.parentPath))
+      args.fns.getStatus = () => merge(provider.status(), {
+        refreshing: syncFn(() => Object.keys(treeState).filter(k => treeState[k].refreshing).length, treeLock)
+      })
+      args.fns.getFreshness = (request,options) => {
+        var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
+        var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
+        freshness.refreshing = syncFn(() => Object.keys(treeState).some(k => treeState[k].refreshing && support.matchesUnit(path,treeState[k].key,options.parentPath)), treeLock)
+        return freshness
+      }
       args.fns.refresh = (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
-        provider.invalidate((name,key) => {
-          return support.matchesUnit(path,key,options.parentPath)
-        })
+        // Drain active loads; queued callbacks check their identity before loading.
+        treeSlots.acquire(3)
+        try {
+          syncFn(() => {
+            Object.keys(treeState).forEach(k => {
+              if (support.matchesUnit(path,treeState[k].key,options.parentPath)) delete treeState[k]
+            })
+            provider.invalidate((name,key) => support.matchesUnit(path,key,options.parentPath))
+          }, treeLock)
+        } finally { treeSlots.release(3) }
         args.fns.getList(request, options)
       }
     }

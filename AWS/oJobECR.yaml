@@ -86,10 +86,110 @@ jobs:
 
     loadLib("aws.js")
     loadLib("s3.js")
-    var aws = new AWS(args.accessKey, args.secret, args.token)
-    if (isDef(args.assumeRole)) {
-      log("Assuming role " + args.assumeRole + "...")
-      aws = aws.assumeRole(args.assumeRole)
+    var aws, clientLock = new java.lang.Object()
+    var getAWS = () => syncFn(() => {
+      var expiry = aws && (isDef(aws.assumeRoleExp) ? aws.assumeRoleExp : Date.parse(String(aws._credentialExpiration)))
+      if (!aws || isFinite(expiry) && expiry <= now() + 60000) {
+        var next = new AWS(args.accessKey, args.secret, args.token, args.region)
+        if (isDef(args.assumeRole)) next = next.assumeRole(args.assumeRole)
+        aws = next
+      }
+      return aws
+    }, clientLock)
+    var imageState = Object.create(null), imageLock = new java.lang.Object()
+    var summaryQueue = [], summaryRunning = false
+    var imageSlots = new java.util.concurrent.Semaphore(3)
+    var imageTTL = isNumber(args.cache) ? args.cache : 5000
+    var summarize = images => {
+      var summary = { tags: 0, lastPush: 0, lastPull: 0 }
+      if (isArray(images)) images.forEach(i => {
+        summary.tags += isArray(i.imageTags) ? i.imageTags.length : 0
+        summary.lastPush = Math.max(summary.lastPush, i.imagePushedAt || 0)
+        summary.lastPull = Math.max(summary.lastPull, i.lastRecordedPullTime || 0)
+      })
+      return summary
+    }
+    var readImages = (image, allowStale) => {
+      if (!provider) return browseCache("ecr-imgs").get({ image: image })
+      var state = syncFn(() => {
+        if (!imageState[image]) {
+          // Bound the additional summary cache independently of the shared provider.
+          if (Object.keys(imageState).length >= 1000) {
+            var victim = Object.keys(imageState).filter(key => !imageState[key].refreshing)[0]
+            if (isUnDef(victim)) return __
+            delete imageState[victim]
+          }
+          imageState[image] = {}
+        }
+        return imageState[image]
+      }, imageLock)
+      var load = () => {
+        imageSlots.acquire()
+        try {
+          var images = browseCache("ecr-imgs").get({ image: image })
+          syncFn(() => {
+            if (state && imageState[image] === state) {
+              if (state.images !== images || isUnDef(state.expiresAt)) {
+                state.images = images
+                state.summary = summarize(images)
+                state.expiresAt = now() + imageTTL
+              }
+            }
+          }, imageLock)
+          return images
+        } finally { imageSlots.release() }
+      }
+      if (allowStale) {
+        if (!state) return __
+        syncFn(() => {
+          if ((isUnDef(state.images) || now() >= state.expiresAt) && now() >= (state.retryAt || 0) && !state.refreshing) {
+            state.refreshing = true
+            summaryQueue.push({ image: image, state: state, load: load })
+          }
+        }, imageLock)
+        return state.images
+      }
+      return load()
+    }
+
+    var startSummaries = () => {
+      var start = syncFn(() => {
+        if (summaryRunning || !summaryQueue.length) return false
+        summaryRunning = true
+        return true
+      }, imageLock)
+      if (!start) return
+      // One virtual coordinator drains all queued visible rows, three at a time.
+      // parallel4Array has an explicit worker count across supported OpenAF builds.
+      var failed = e => {
+        syncFn(() => {
+          summaryRunning = false
+          Object.keys(imageState).forEach(image => { imageState[image].refreshing = false })
+          summaryQueue = []
+        }, imageLock)
+        logWarn("Error scheduling ECR summaries: " + e)
+      }
+      try {
+        $doV(() => {
+          try {
+            while (true) {
+              var batch = syncFn(() => {
+                if (!summaryQueue.length) { summaryRunning = false; return [] }
+                return summaryQueue.splice(0, 3)
+              }, imageLock)
+              if (!batch.length) return
+              parallel4Array(batch, item => {
+                try {
+                  if (syncFn(() => imageState[item.image] === item.state, imageLock)) item.load()
+                } catch(e) {
+                  syncFn(() => { item.state.retryAt = now() + imageTTL }, imageLock)
+                  logWarn("Error refreshing ECR summary " + item.image + ": " + e)
+                } finally { syncFn(() => { item.state.refreshing = false }, imageLock) }
+              }, 3)
+            }
+          } catch(e) { failed(e) }
+        })
+      } catch(e) { failed(e) }
     }
 
     args.fns = {
@@ -138,16 +238,12 @@ jobs:
           }
           log(`Cache ECR image ${k.image}...`)
           try {
-            var _aws = new AWS(args.accessKey, args.secret, args.token)
-            if (isDef(args.assumeRole)) {
-              log("Assuming role " + args.assumeRole + "...")
-              _aws = _aws.assumeRole(args.assumeRole)
-            }
-            var _r = _aws.ECR_DescribeImages(args.region, k.image)
+            var _r = getAWS().ECR_DescribeImages(args.region, k.image, { maxResults: 1000 })
             if (isDef(_r) && isDef(_r.error)) {
               sprintErr(_r)
               throw new Error(af.fromSLON(_r.error))
             }
+            if (!isArray(_r)) throw new Error("Invalid ECR image response")
             return _r
           } catch (ee) {
             logWarn("Error retrieving image " + k.image + ": " + ee.message)
@@ -159,13 +255,9 @@ jobs:
         browseCache("ecr-repo")
         .ttl(args.cache)
         .fn(k => {
-          var _aws = new AWS(args.accessKey, args.secret, args.token)
-          if (isDef(args.assumeRole)) {
-            log("Assuming role " + args.assumeRole + "...")
-            _aws = _aws.assumeRole(args.assumeRole)
-          }
-          var lst = _aws.ECR_DescribeRepositories(args.region)
-          var lstParent = []
+          var lst = getAWS().ECR_DescribeRepositories(args.region, { maxResults: 1000 })
+          if (!isArray(lst)) throw new Error("Invalid ECR repository response")
+          var lstParent = [], byPath = Object.create(null), children = Object.create(null)
 
           // Apply restrict
           if (isDef(args.restrict)) {
@@ -180,34 +272,35 @@ jobs:
               var parts = r.repositoryName.split("/")
               for(var i = 0; i < parts.length; i++) {
                 var parent = parts.slice(0, i + 1).join("/")
-                if ($from(lstParent).equals("name", parent).equals("level", i+1).none()) {
-                  lstParent.push({ name: parent, isParent: parent != r.repositoryName, level: i+1 })
+                if (!byPath[parent]) {
+                  var entry = { name: parent, isParent: parent != r.repositoryName, level: i+1, descendants: 0 }
+                  byPath[parent] = entry
+                  lstParent.push(entry)
+                  var directory = parts.slice(0, i).join("/")
+                  if (!children[directory]) children[directory] = []
+                  children[directory].push(entry)
+                  for (var j = 1; j <= i; j++) byPath[parts.slice(0, j).join("/")].descendants++
                 }
+                if (parent == r.repositoryName) byPath[parent].isParent = false
               }
             }
           })
 
-          return { lst: lst, lstParent: lstParent }
+          return { lst: lst, lstParent: lstParent, byPath: byPath, children: children }
         })
         .create()
       },
       getList: (request, options) => {
         args.fns.validate(request, options)
-        const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
 
         // Root level
         var _r = browseCache("ecr-repo").get({})
-        var lst = _r.lst, lstParent = _r.lstParent
-
-        // Determine level from puri
-        var level = puri.split("/").filter(r => r.length > 0).length
-
-        if (puri.length > 0 && $from(lstParent).starts("name", puri).none()) {
+        if (puri.length > 0 && !_r.byPath[puri]) {
           // Not found
           return { isFile: false }
         } else {
-          if ($from(lstParent).equals("isParent", false).equals("name", puri).any()) {
+          if (_r.byPath[puri] && !_r.byPath[puri].isParent) {
             // File
             return { isFile: true }
           }
@@ -225,13 +318,35 @@ jobs:
             }
           }
 
-          var candidates = $from(lstParent).equals("level",level+1).starts("name",puri+(level>0?"/":"")).select()
+          var candidates = (_r.children[puri] || []).slice()
           candidates = candidates.filter(f => {try {args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+f.name},options);return true}catch(e){return false}})
           var pageResult
           if (support && options.query && options.query.enabled) {
             pageResult = support.query({isList:true,fields:["Repository Name"],key:"Repository Name",list:candidates.map(f=>({isDirectory:f.isParent,values:{"Repository Name":f.name},entry:f}))},request,options)
             candidates = pageResult.list.map(r=>r.entry)
           }
+          var rows = new Array(candidates.length)
+          var makeValues = f => {
+            var img, summary
+            if (!f.isParent && options.summaries !== false) {
+              img = readImages(f.name, true)
+              summary = syncFn(() => imageState[f.name] && imageState[f.name].summary, imageLock)
+              if (!summary && isArray(img)) summary = summarize(img)
+            }
+            summary = summary || { tags: "", lastPush: 0, lastPull: 0 }
+            return {
+              isDirectory: f.isParent,
+              values: {
+                "Repository Name": puri.length > 0 ? f.name.substring(puri.length + 1) : f.name,
+                "# images": f.isParent && f.descendants ? f.descendants : "",
+                "# tags": summary.tags,
+                "Last Push": summary.lastPush > 0 ? new Date(summary.lastPush * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : "",
+                "Last Pull": summary.lastPull > 0 ? new Date(summary.lastPull * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+              }
+            }
+          }
+          rows = candidates.map(makeValues)
+          if (provider) startSummaries()
           return {
             pageInfo: pageResult ? pageResult.pageInfo : __,
             queryInfo: pageResult ? pageResult.queryInfo : __,
@@ -242,38 +357,17 @@ jobs:
             alignFields: _aFields,
             content: useMDDesc && isDef(mddesc.result) ? mddesc.result : __,
             key   : [ "Repository Name" ],
-            list  : candidates.map(f => {
-              var c = f.isParent ? $from(lstParent).greater("level" ,level).starts("name", f.name + "/").count() : 0
-              var img, lastPush = 0, lastPull = 0
-              if (!f.isParent) {
-                var img = browseCache("ecr-imgs").get({ image: f.name })
-                if (isDef(img)) {
-                  lastPush = img.reduce((aP, aC) => Math.max(aP, isDef(aC.imagePushedAt) ? aC.imagePushedAt : 0), 0)
-                  lastPull = img.reduce((aP, aC) => Math.max(aP, isDef(aC.lastRecordedPullTime) ? aC.lastRecordedPullTime : 0), 0)
-                }
-              }
-              return {
-                isDirectory: f.isParent,
-                values     : {
-                  "Repository Name": f.name.replace(new RegExp("^" + puri + "/?"), "") + (f.isParent ? "/" : ""),
-                  "# images"       : c == 0 ? "" : c,
-                  "# tags"         : isUnDef(img) || f.isParent ? "" : img.reduce((aP, aC) => aP + (isDef(aC.imageTags) ? aC.imageTags.length : 0), 0),
-                  "Last Push"      : lastPush > 0 ? new Date(lastPush * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : "",
-                  "Last Pull"      : lastPull > 0 ? new Date(lastPull * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
-                }
-              }
-            })
+            list  : rows
           }
         }
       },
       getObj: (request, options) => {
         args.fns.validate(request, options)
-        const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
 
         var img, ini = now(), data = ""
         do {
-          img = browseCache("ecr-imgs").get({ image: puri })
+          img = readImages(puri, false)
           if (isUnDef(img)) sleep(100, true)
         } while(isUnDef(img) && now() - ini < 15000)
 
@@ -296,6 +390,7 @@ jobs:
 
           if (options._api) return { data: { ecrdesc: mddesc, ecrimgs: img }, type: "json" }
 
+          img = $from(img).sort("-imagePushedAt").select()
           data = "\n"
           data += "## Contents\n\n"
           if (useMDDesc) {
@@ -316,7 +411,7 @@ jobs:
           data += "### 🏷️ Details per tag\n\n"
           data += options.usePull ? "| Tag | Digest | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Digest | Pushed at | Size | Size in bytes |\n"
           data += options.usePull ? "|:---:|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---:|:---|----:|----:|\n"
-          $from(img).sort("-imagePushedAt").select(i => { 
+          img.forEach(i => {
             var _ref = isDef(i.imageTags) ? reg + puri + ":" + i.imageTags[0] : reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
             if (options.usePull)
               data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
@@ -330,7 +425,7 @@ jobs:
           }
           data += "| Tag | Digest | To retrieve |\n"
           data += "|:---:|---|---|\n"
-          $from(img).sort("-imagePushedAt").select(i => {
+          img.forEach(i => {
             if (isDef(i.imageTags)) {
               for(var j = 0; j < i.imageTags.length; j++) {
                 var _ret = reg + puri + ":" + i.imageTags[j]
@@ -355,7 +450,7 @@ jobs:
           data += "\n---\n\n### 🔎 Manifest and artifact types per tag\n\n"
           data += "| Tag | Digest | Manifest Type | Artifact Type |\n"
           data += "|:---:|:---|:---|:---|\n"
-          $from(img).sort("-imagePushedAt").select(i => {
+          img.forEach(i => {
             data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | \`${i.imageDigest}\` | ${i.imageManifestMediaType} | ${isDef(i.artifactMediaType) ? i.artifactMediaType : ""} |\n`
           })
         }
@@ -381,12 +476,25 @@ jobs:
         return {isList:true,fields:["Repository Name"],alignFields:["left"],key:"Repository Name",list:all.slice(0,max).map(r=>({isDirectory:false,values:{"Repository Name":path?r.repositoryName.substring(path.length+1):r.repositoryName}})),searchInfo:{complete:all.length<=max,truncated:all.length>max,totalExact:all.length<=max,scanned:all.length}}
       }
       args.fns.getStatus = () => provider.status()
-      args.fns.getFreshness = (request,options) => provider.freshness((name,key) => support.matchesUnit(global.__ojobHttpRelativePath(request.uri,options.parentURI),key,options.parentPath))
+      args.fns.getFreshness = (request,options) => {
+        var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
+        var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
+        freshness.refreshing = syncFn(() => Object.keys(imageState).some(image => imageState[image].refreshing && support.matchesUnit(path, { image: image }, options.parentPath)), imageLock)
+        return freshness
+      }
       args.fns.refresh = (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
-        provider.invalidate((name,key) => {
-          return support.matchesUnit(path,key,options.parentPath)
-        })
+        // Wait for in-flight image loads before invalidating, so they cannot republish old data.
+        imageSlots.acquire(3)
+        try {
+          syncFn(() => {
+            summaryQueue = summaryQueue.filter(item => !support.matchesUnit(path, { image: item.image }, options.parentPath))
+            Object.keys(imageState).forEach(image => {
+              if (support.matchesUnit(path, { image: image }, options.parentPath)) delete imageState[image]
+            })
+          }, imageLock)
+          provider.invalidate((name,key) => support.matchesUnit(path,key,options.parentPath))
+        } finally { imageSlots.release(3) }
         args.fns.getList(request, options)
       }
     }

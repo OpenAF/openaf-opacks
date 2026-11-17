@@ -9,11 +9,88 @@ created. Legacy configurations retain support for the current OpenAF runtime.
 API jobs refer to an existing browser; register the browser before serving API
 requests. API operations additionally require `operationsBrowseUris` on the API.
 
+ECR directory links use plain path segments (for example,
+`/internal/3rdparty/`); directory labels omit the trailing slash added by the
+shared browser renderer.
+
 `query: { enabled: true, pageSize: 100 }` enables server sorting and paging.
 ECR sorts repository names before fetching summaries for visible rows; sorting
 globally by summary fields is unsupported. CodeArtifact sorts complete candidate
 lists before paging and searches loaded package trees, reporting incomplete search
 coverage. Cache keys are isolated per browser and cold loads coalesce.
+
+ECR uses API pages of up to 1,000 entries and reuses its AWS client, renewing
+known temporary credentials one minute before expiration. Repository paths,
+children and descendant counts are indexed when the repository cache reloads.
+With enhanced browsing enabled, visible repository summaries load with up to
+three concurrent image requests in a background `$doV` coordinator using
+`parallel4Array`. Cold listings return immediately with blank summary columns;
+reload the page to see summaries after they finish. All visible rows are queued
+and drained without another visit. Warm listings keep their previous summaries
+while expired image data refreshes in the background; duplicate refreshes
+coalesce, and failed background refreshes retain their data and retry after one
+cache interval. Freshness reports expose queued and running background activity. Repository detail
+requests wait for the image cache, and explicit refresh clears retained summaries.
+Summary data may therefore be older than the configured TTL during refresh or
+service failures. Legacy browsing keeps its existing background-cache behavior.
+
+Set `options.summaries: false` to browse repository names without fetching image
+metadata for directory rows; opening a repository still loads its full details.
+Choose `cache` (milliseconds) according to your freshness requirements, for example:
+
+```yaml
+- (ECRBrowse): 18888
+  ((region)): eu-west-1
+  ((cache)): 300000
+  ((options)):
+    query:
+      enabled: true
+      pageSize: 25
+    # summaries: false
+```
+
+The enhanced cache defaults to five seconds when `cache` is omitted. Smaller
+browser pages reduce cold image requests; API page size is independent of browser
+page size. Detail HTML sorts images once, and raw/API image arrays remain complete.
+Run `oaf -f tests/ecr-browse.js` and `oaf -f tests/ecr-cache.js` for offline navigation,
+concurrency, caching, refresh and credential-renewal checks. These do not measure
+live AWS latency or verify account permissions.
+
+CodeArtifact requests API pages of up to 1,000 entries and reuses its AWS client,
+renewing known temporary credentials one minute before expiration. Repository
+listings share one account-wide cache across domains. When both `format` and
+`namespace` are configured, namespace filtering is also sent to AWS; the browser
+retains its exact namespace match.
+
+Packages and their sorted hierarchy indexes share one repository snapshot.
+Enhanced browsing serves an expired snapshot immediately while one background
+refresh runs per repository, with at most three concurrent package loads.
+Freshness/status operations report queued and running refreshes. Failed refreshes
+retain the previous tree and retry on a later visit after one cache interval
+(at least one second). Explicit refresh waits for active package loads, cancels
+matching queued refreshes and invalidates matching data. Version and asset caches
+still load on demand; cold repository requests wait for the complete snapshot.
+Legacy browsing retains the existing OpenAF cache behavior.
+
+Set `cache` explicitly for the desired freshness interval. For example, to warm a
+frequently used CodeArtifact repository at startup:
+
+```yaml
+- (CodeArtifactBrowse): 18888
+  ((region)): eu-west-1
+  ((cache)): 300000
+  ((initialize)): '[{domain: "my-domain", repository: "my-repo"}]'
+  ((options)):
+    query:
+      enabled: true
+      pageSize: 100
+```
+
+Initialization runs in the background; visits before it finishes still wait for
+that initial load. Browser paging reduces response size but does not reduce the
+initial complete package fetch. Run `oaf -f tests/codeartifact.js` for offline
+pagination, navigation, large-tree, credential renewal, concurrency and refresh
+checks. Live AWS latency and permissions require separate validation.
 
 For CodeArtifact HTML asset previews, provide `preview.formats`, such as
 `{ xml: xml, pom: xml, json: json }`, and optional `preview.maxBytes`.
