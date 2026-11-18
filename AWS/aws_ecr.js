@@ -75,6 +75,64 @@ AWS.prototype.ECR_DescribeImages = function(aRegion, aRepoName, params) {
 
 /**
  * <odoc>
+ * <key>AWS.ECR_ListImageReferrers(aRegion, aRepository, aRegistry, aDigest, aNextToken) : Map</key>
+ * Returns one page of OCI artifacts referencing the image digest.
+ * </odoc>
+ */
+AWS.prototype.ECR_ListImageReferrers = function(aRegion, aRepository, aRegistry, aDigest, aNextToken) {
+   aRegion = _$(aRegion).isString().default(this.region)
+   var host = "ecr." + aRegion + ".amazonaws.com"
+   var params = { repositoryName: aRepository, registryId: aRegistry, subjectId: { imageDigest: aDigest },
+      maxResults: 50, filter: { artifactStatus: "ANY" } }
+   if (aNextToken) params.nextToken = aNextToken
+   var response = this.postURLEncoded("https://" + host + "/", "/", "", params, "ecr", host, aRegion, {
+      "X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.ListImageReferrers"
+   }, __, "application/x-amz-json-1.1")
+   if (!response || !isArray(response.referrers)) throw new Error("ECR referrers unavailable")
+   return response
+}
+
+/**
+ * <odoc>
+ * <key>AWS.ECR_GetImageRuntimeUsage(aRegion, aRepository, aRegistry, aDigest) : Map</key>
+ * Returns the ECS/EKS workload count and last-in-use timestamp reported by Amazon Inspector.
+ * </odoc>
+ */
+AWS.prototype.ECR_GetImageRuntimeUsage = function(aRegion, aRepository, aRegistry, aDigest) {
+   aRegion = _$(aRegion).isString().default(this.region)
+   var host = "inspector2." + aRegion + ".amazonaws.com"
+   var path = "/findings/aggregation/list"
+   var equals = value => [{ comparison: "EQUALS", value: value }]
+   var params = {
+      aggregationType: "AWS_ECR_CONTAINER",
+      accountIds: equals(aRegistry),
+      aggregationRequest: { awsEcrContainerAggregation: { imageShas: equals(aDigest), repositories: equals(aRepository) } },
+      maxResults: 100
+   }
+   var tokens = new Set()
+   do {
+      var response = this.postURLEncoded("https://" + host + path, path, "", params, "inspector2", host, aRegion, {}, __, "application/json", true)
+      if (!response || (!isArray(response.responses) && response.aggregationType != params.aggregationType)) throw new Error("Inspector runtime usage unavailable")
+      for (var item of (response.responses || [])) {
+         var image = item.awsEcrContainerAggregation
+         if (!image) continue
+         var matchesDigest = image.imageSha == aDigest || image.imageSha == aDigest.substring(7) ||
+            (isString(image.resourceId) && image.resourceId.endsWith(":repository/" + aRepository + "/" + aDigest))
+         if (matchesDigest && (!image.accountId || image.accountId == aRegistry) && (!image.repository || image.repository == aRepository) &&
+             (isNumber(image.inUseCount) || isDef(image.lastInUseAt))) {
+            return { inUseCount: image.inUseCount, lastInUseAt: image.lastInUseAt }
+         }
+      }
+      var token = response.nextToken
+      if (!token) return {}
+      if (tokens.has(token) || tokens.size >= 4) throw new Error("Inspector runtime usage pagination limit reached")
+      tokens.add(token)
+      params.nextToken = token
+   } while (true)
+}
+
+/**
+ * <odoc>
  * <key>AWS.ECR_DescribeRepositories(aRegion, params) : Array</key>
  * List all repositories on aRegion. Optionally you can provide extra params.\
  * \

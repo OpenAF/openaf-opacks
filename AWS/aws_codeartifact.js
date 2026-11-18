@@ -72,7 +72,7 @@ AWS.prototype.CODEARTIFACT_ListRepositories = function(aRegion, aRepositoryPrefi
  * If no domain is given, all packages are returned.
  * </odoc>
  */
-AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain, aFormat, aNamespace) {
+AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain, aFormat, aNamespace, onPage) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/packages"
     var params = { maxResults: 1000 }
@@ -83,19 +83,17 @@ AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain
     var url = new java.net.URL(aURL)
     var aHost = String(url.getHost())
     var aURI = String(url.getPath())
-    var _res = []
-    var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
-    if (!isMap(_r) || !isArray(_r.packages)) throw new Error("Invalid CodeArtifact packages response")
-
-    if (isDef(_r.packages)) {
+    var _res = [], seen = new Set()
+    do {
+        var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
+        if (!isMap(_r) || !isArray(_r.packages)) throw new Error("Invalid CodeArtifact packages response")
         _res = _res.concat(_r.packages)
-        while(isDef(_r.nextToken)) {
-           params.nextToken = _r.nextToken
-           _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
-           if (!isMap(_r) || !isArray(_r.packages)) throw new Error("Invalid CodeArtifact packages response")
-           if (isDef(_r.packages)) _res = _res.concat(_r.packages)
-        }
-    }
+        if (isFunction(onPage)) onPage(_r.packages)
+        if (isDef(_r.nextToken) && seen.has(_r.nextToken)) throw new Error("Repeated CodeArtifact package page token")
+        if (isUnDef(_r.nextToken)) break
+        seen.add(_r.nextToken)
+        params.nextToken = _r.nextToken
+    } while (true)
     return _res
 }
 

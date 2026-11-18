@@ -199,14 +199,22 @@ jobs:
     const escapeDetail = value => String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     }[ch]))
+    const metadataTTL = Math.max(5000, imageTTL)
+    const digestTTL = Math.max(300000, metadataTTL)
     const detailCache = new Map(), detailLock = new java.lang.Object()
     const detailSlots = new java.util.concurrent.Semaphore(3)
     const detailLocks = Array.from({ length: 16 }, () => new java.lang.Object())
-    const readDetail = (key, load) => {
+    const readDetail = (repository, key, ttl, load) => {
       const lock = detailLocks[(new java.lang.String(key).hashCode() & 0x7fffffff) % detailLocks.length]
       return syncFn(() => {
-        const hit = syncFn(() => detailCache.get(key), detailLock)
-        if (hit && now() < hit.until) return hit.value
+        const hit = syncFn(() => {
+          const entry = detailCache.get(key)
+          if (!entry || now() - entry.loadedAt >= ttl) return
+          detailCache.delete(key)
+          detailCache.set(key, entry)
+          return entry
+        }, detailLock)
+        if (hit) return hit.value
         if (!detailSlots.tryAcquire()) {
           const busy = new Error("Image inspector busy")
           busy.httpStatus = 503
@@ -216,7 +224,7 @@ jobs:
           const value = load()
           syncFn(() => {
             detailCache.delete(key)
-            detailCache.set(key, { value: value, until: now() + Math.max(5000, imageTTL) })
+            detailCache.set(key, { repository: repository, value: value, loadedAt: now() })
             if (detailCache.size > 32) detailCache.delete(detailCache.keys().next().value)
           }, detailLock)
           return value
@@ -226,14 +234,16 @@ jobs:
 
     const inspectImage = (request, options, repository) => {
       const params = request.params || {}
-      const tabs = { overview: "Overview", platforms: "Platforms", layers: "Layers", history: "History", config: "Config", manifest: "Manifest" }
+      const tabs = { overview: "Overview", platforms: "Platforms", layers: "Layers", history: "History", config: "Config", manifest: "Manifest", artifacts: "Attached artifacts" }
       const digest = params.image, selected = params.platform, tab = params.tab || "overview"
+      const artifactPage = tab == "artifacts" ? params.artifactPage : __
       const error = (status, message) => {
         const e = new Error(message)
         e.httpStatus = status
         throw e
       }
-      if (!isDigest(digest) || isDef(selected) && !isDigest(selected) || !Object.prototype.hasOwnProperty.call(tabs, tab)) {
+      if (!isDigest(digest) || isDef(selected) && !isDigest(selected) || !Object.prototype.hasOwnProperty.call(tabs, tab) ||
+          isDef(artifactPage) && (!isString(artifactPage) || artifactPage.length > 4096)) {
         error(400, "Invalid image inspector selection")
       }
       if (!browseCache("ecr-repo").get({}).lst.some(repo => repo.repositoryName == repository)) error(404, "Repository not found")
@@ -245,31 +255,41 @@ jobs:
           '<th scope="row"><strong>' + cell + '</strong></th>' : '<td>' + cell + '</td>').join("") + "</tr>").join("") + "</tbody></table></div>\n\n"
       const textTable = (fields, rows, rowHeader) => table(fields, rows.map(row => row.map(escapeDetail)), rowHeader)
       const properties = rows => textTable(["Property", "Value"], rows, true)
-      const repositoryName = escapeDetail(repository)
-      var data = '\n<nav class="ecr-detail-nav" aria-label="Image details"><a href="?">← ' + repositoryName + '</a>' +
-        Object.keys(tabs).map(key => '<a href="' + url(key, selected) + '"' + (key == tab ? ' aria-current="page"' : '') + '>' + tabs[key] + '</a>').join("") + '</nav>\n\n'
-      data += '<style>.ecr-detail-nav{display:flex;flex-wrap:wrap;gap:.3em .75em;margin-bottom:1em}.ecr-detail-nav [aria-current=page]{font-weight:bold;text-decoration:underline}.ecr-detail-digest,.ecr-detail-table td{overflow-wrap:anywhere}.ecr-detail-table{overflow:auto}.ecr-detail-table th[scope="row"]{text-align:right}.ecr-detail-chart{max-width:48rem;position:relative}.ecr-detail-graph{overflow:auto}.ecr-detail-graph svg{max-width:100%;height:auto}</style>\n\n'
+      const date = value => {
+        if (!isNumber(value) && !isString(value)) return ""
+        const timestamp = isNumber(value) ? new Date(value * 1000) : new Date(value)
+        return isNaN(timestamp.getTime()) ? "" : ow.format.fromDate(timestamp, "yyyy-MM-dd HH:mm:ss")
+      }
+      const mapRows = value => isMap(value) ? Object.keys(value).sort().map(key => [key, value[key]]) : []
+      const fullDigest = selected || digest
+      const digestDisclosure = value => isDigest(value) ?
+        '<details class="ecr-digest"><summary aria-label="Show full digest"><code>' + value.slice(0, 12) + '…' + value.slice(-4) +
+        '</code></summary><code>' + value + '</code></details>' : escapeDetail(value)
+      var data = '\n' +
+        '<style>.ecr-detail-nav{display:flex;flex-wrap:wrap;gap:.3em .75em;margin-bottom:1em}.ecr-detail-nav [aria-current=page]{font-weight:bold;text-decoration:underline}.ecr-detail-digest,.ecr-detail-table td,.ecr-digest>code,.ecr-annotations th,.ecr-labels th{overflow-wrap:anywhere}.ecr-annotations td,.ecr-labels td{white-space:pre-wrap}.ecr-digest summary{cursor:pointer;white-space:nowrap;color:#626c78}.markdown-body-dark .ecr-digest summary{color:#a3adb8}.ecr-digest summary:focus-visible,.ecr-detail-nav a:focus-visible{outline:2px solid currentColor;outline-offset:2px}.ecr-detail-table td:last-child{min-width:5em}.ecr-detail-table{overflow:auto}.ecr-detail-table th[scope="row"]{text-align:right}.ecr-detail-chart{max-width:48rem;position:relative}.ecr-detail-graph{overflow:auto}.ecr-detail-graph svg{max-width:100%;height:auto}</style>\n\n'
       if (selected) {
         data += '<nav class="ecr-detail-digest" aria-label="Image breadcrumb"><a href="' + url("platforms") +
-          '">Original image <code>' + escapeDetail(digest.substring(7, 19)) + '</code></a> / <code aria-current="page">' +
-          escapeDetail(selected.substring(7, 19)) + '</code></nav>\n\n'
+          '">Original image <code>' + escapeDetail(digest.substring(7, 19)) + '</code></a></nav>\n\n'
       }
-      data += "### " + tabs[tab] + "\n\n"
-      data += '<p class="ecr-detail-digest"><code>' + escapeDetail(selected || digest) + "</code></p>\n\n"
+      data += digestDisclosure(fullDigest) + "\n\n"
+      data += '<nav class="ecr-detail-nav" aria-label="Image details">' +
+        Object.keys(tabs).map(key => '<a href="' + url(key, selected) + '"' + (key == tab ? ' aria-current="page"' : '') + '>' + tabs[key] + '</a>').join("") + '</nav>\n\n'
 
       var metadata, root, manifest
       try {
-        metadata = readDetail(repository + "|describe|" + digest, () => {
+        // Other tabs use only the registry ID from DescribeImages.
+        metadata = readDetail(repository, repository + "|describe|" + digest, tab == "overview" ? metadataTTL : digestTTL, () => {
           const result = getAWS().ECR_DescribeImages(args.region, repository, { imageIds: [{ imageDigest: digest }] })
           const image = isArray(result) && result.find(item => item.imageDigest == digest)
           if (!image) error(404, "Image digest not found")
           return image
         })
         const registry = String(metadata.registryId)
-        const read = (kind, reference) => readDetail(registry + "|" + repository + "|" + kind + "|" + reference,
+        const read = (kind, reference) => readDetail(repository, registry + "|" + repository + "|" + kind + "|" + reference, digestTTL,
           () => getAWS().ECR_ReadRegistryJSON(args.region, registry, repository, kind, reference))
-        root = read("manifests", digest)
-        const entries = isArray(root.manifests) ? root.manifests : []
+        const artifactsTab = tab == "artifacts"
+        if (!artifactsTab || selected) root = read("manifests", digest)
+        const entries = root && isArray(root.manifests) ? root.manifests : []
         const descriptorInfo = descriptor => {
           const platform = descriptor.platform || {}, annotations = descriptor.annotations || {}
           const label = [platform.os, platform.architecture, platform.variant].filter(Boolean).join("/")
@@ -280,38 +300,92 @@ jobs:
         const platforms = entries.filter(isMap).map(descriptorInfo)
         const platform = selected && platforms.find(entry => entry.descriptor.digest == selected)
         if (selected && !platform) error(404, "Child digest does not belong to this image index")
-        manifest = selected && tab != "platforms" ? read("manifests", selected) : root
+        manifest = selected && tab != "platforms" && !artifactsTab ? read("manifests", selected) : root
         const readConfig = () => {
           const config = manifest.config
           if (!config || !isDigest(config.digest) ||
               !["application/vnd.oci.image.config.v1+json", "application/vnd.docker.container.image.v1+json"].includes(config.mediaType)) return
           return read("blobs", config.digest)
         }
-        const singlePlatform = () => {
-          try {
-            const config = readConfig()
-            if (config && config.os && config.architecture) return [config.os, config.architecture, config.variant].filter(Boolean).join("/")
-          } catch (e) {}
-          return "Unavailable"
+        const optionalConfig = () => {
+          try { return readConfig() } catch (e) { return __ }
         }
+        const singlePlatform = config => config && config.os && config.architecture ?
+          [config.os, config.architecture, config.variant].filter(Boolean).join("/") : "Unavailable"
         const prefix = ow.server.httpd.getPrefix(options.port)
         const asset = name => escapeDetail(String(prefix || "").replace(/\/$/, "") + "/js/" + name + ".js")
 
-        if (tab == "overview") {
-          const pushed = metadata.imagePushedAt
+        if (tab == "artifacts") {
+          try {
+            const artifacts = readDetail(repository, JSON.stringify([registry, repository, "referrers", fullDigest, artifactPage]), metadataTTL,
+              () => getAWS().ECR_ListImageReferrers(args.region, repository, registry, fullDigest, artifactPage))
+            if (artifacts.referrers.length) {
+              data += table(["Artifact type", "Digest", "Media type", "Bytes", "Status", "Annotations"], artifacts.referrers.map(item => {
+                const annotations = mapRows(item.annotations)
+                return [escapeDetail(item.artifactType), digestDisclosure(item.digest), escapeDetail(item.mediaType),
+                  escapeDetail(item.size), escapeDetail(item.artifactStatus),
+                  annotations.length ? '<details><summary>Annotations</summary><dl>' +
+                    annotations.map(([key, value]) => '<dt>' + escapeDetail(key) + '</dt><dd>' + escapeDetail(value) + '</dd>').join("") +
+                    '</dl></details>' : ""]
+              }))
+            } else data += "<p>No attached artifacts reported for this digest.</p>\n\n"
+            const pageURL = url("artifacts", selected)
+            if (artifactPage) data += '<p><a href="' + pageURL + '">First page</a></p>\n\n'
+            if (artifacts.nextToken) data += '<p><a href="' + pageURL + '&amp;artifactPage=' + encodeURIComponent(artifacts.nextToken) + '">Next page</a></p>\n\n'
+          } catch (e) {
+            data += "<p>Attached artifacts are unavailable for this digest. Check ECR access and try again.</p>\n\n"
+          }
+        } else if (tab == "overview") {
+          const overviewConfig = optionalConfig()
           const details = [
             ["Tags", (metadata.imageTags || []).join(", ") || "Untagged"],
-            ["Pushed", isNumber(pushed) ? ow.format.fromDate(new Date(pushed * 1000), "yyyy-MM-dd HH:mm:ss") : ""],
+            ["Pushed", date(metadata.imagePushedAt)],
             ["Image size reported by ECR", isNumber(metadata.imageSizeInBytes) ? ow.format.toBytesAbbreviation(metadata.imageSizeInBytes) : ""],
             ["Media type", manifest.mediaType || metadata.imageManifestMediaType]
           ]
-          if (manifest.artifactType) details.push(["Artifact type", manifest.artifactType])
+          if (manifest.artifactType || metadata.artifactMediaType) details.push(["Artifact type", manifest.artifactType || metadata.artifactMediaType])
+          if (metadata.imageStatus) details.push(["Status", metadata.imageStatus])
+          ;[["Last recorded pull", metadata.lastRecordedPullTime], ["Last archived", metadata.lastArchivedAt],
+            ["Last activated", metadata.lastActivatedAt]].forEach(([label, value]) => {
+            const formatted = date(value)
+            if (formatted) details.push([label, formatted])
+          })
           if (platform) details.push([platform.runnable ? "Platform" : "Artifact", platform.label])
-          else if (!entries.length) details.push(["Platform", singlePlatform()])
+          else if (!entries.length) details.push(["Platform", singlePlatform(overviewConfig)])
           else details.push(["Platform entries", entries.length])
           data += properties(details)
+
+          const labels = mapRows(overviewConfig && overviewConfig.config && overviewConfig.config.Labels)
+          if (labels.length) {
+            data += '<section class="ecr-labels" aria-labelledby="ecr-labels-title"><h3 id="ecr-labels-title">Labels</h3>' +
+              textTable(["Key", "Value"], labels, true) + '</section>\n\n'
+          }
+
+          const annotations = []
+          const addAnnotations = (source, descriptor) => {
+            const rows = mapRows(descriptor && descriptor.annotations)
+            if (rows.length) annotations.push({ source: source, rows: rows })
+          }
+          const manifestSource = isArray(manifest.manifests) ? "Image index" : "Manifest"
+          addAnnotations(manifestSource, manifest)
+          if (platform) addAnnotations("Index descriptor", platform.descriptor)
+          else if (manifest === root) {
+            platforms.forEach((entry, index) => addAnnotations("Index entry " + (index + 1) + " · " + entry.label, entry.descriptor))
+          }
+          addAnnotations("Config descriptor", manifest.config)
+          if (isArray(manifest.layers)) {
+            manifest.layers.forEach((layer, index) => addAnnotations("Layer " + (index + 1), layer))
+          }
+
+          if (annotations.length) {
+            data += '<section class="ecr-annotations" aria-labelledby="ecr-annotations-title"><h3 id="ecr-annotations-title">Annotations</h3>' +
+              annotations.map(group =>
+                (annotations.length > 1 || group.source != manifestSource ? '<h4>' + escapeDetail(group.source) + '</h4>' : '') +
+                textTable(["Key", "Value"], group.rows, true)
+              ).join("") + '</section>\n\n'
+          }
         } else if (tab == "platforms") {
-          if (!platforms.length) data += properties([["Supported platform", singlePlatform()]])
+          if (!platforms.length) data += properties([["Supported platform", singlePlatform(optionalConfig())]])
           else {
             if (platforms.filter(entry => entry.runnable).length > 1 && isDef(getOPackPath("Mermaid"))) {
               const label = value => String(value).replace(/[^A-Za-z0-9 ./_-]/g, "").substring(0, 60)
@@ -321,14 +395,15 @@ jobs:
               data += '<div id="ecr-platform-graph" class="ecr-detail-graph" hidden data-graph="' + escapeDetail(graph.join("\n")) + '"></div>\n\n'
               data += '<script src="' + asset("mermaid") + '"></script><script>document.addEventListener("DOMContentLoaded", async function(){' +
                 'if(!window.mermaid)return; var view=document.getElementById("ecr-platform-graph"); try {' +
-                'mermaid.initialize({startOnLoad:false,securityLevel:"strict",theme:document.body.classList.contains("markdown-body-dark")?"dark":"default"});' +
-                'var diagram=await mermaid.render("ecr-platform-svg",view.dataset.graph); view.innerHTML=diagram.svg; view.hidden=false;}catch(e){} });</script>\n\n'
+                'var previous, queue=Promise.resolve(); function render(){var dark=document.body.classList.contains("markdown-body-dark");if(dark===previous)return;previous=dark;' +
+                'queue=queue.then(async function(){mermaid.initialize({startOnLoad:false,securityLevel:"strict",theme:dark?"dark":"default"});' +
+                'var diagram=await mermaid.render("ecr-platform-svg",view.dataset.graph);view.innerHTML=diagram.svg;view.hidden=false;}).catch(function(){});}render();new MutationObserver(render).observe(document.body,{attributeFilter:["class"]});}catch(e){} });</script>\n\n'
             }
             data += table(["Platform or artifact", "Digest", "Media type"], platforms.map(entry => {
               const desc = entry.descriptor
               const link = isDigest(desc.digest)
               return [link ? '<a href="' + url("overview", desc.digest) + '">' + escapeDetail(entry.label) + '</a>' : escapeDetail(entry.label),
-                escapeDetail(desc.digest), escapeDetail(desc.mediaType)]
+                digestDisclosure(desc.digest), escapeDetail(desc.mediaType)]
             }))
           }
         } else if (tab == "manifest") {
@@ -380,16 +455,30 @@ jobs:
             const chart = { type: "bar", data: { labels: chartLayers.map(layer => "Layer " + layer.number), datasets: [{
               label: "Compressed size (MiB)", data: chartLayers.map(layer => layer.size / 1048576), backgroundColor: "#5488cf", maxBarThickness: 22
             }] }, options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true } } } }
+            const caption = chartLayers.length < layers.length ?
+              "Largest " + chartLayers.length + " of " + layers.length + " layers · MiB" : "Compressed layer sizes · MiB"
+            data += '<p>' + caption + '</p>\n\n'
             data += '<div id="ecr-layer-chart" class="ecr-detail-chart" hidden style="height:' + (80 + chartLayers.length * 26) + 'px"><canvas role="img" aria-label="Largest compressed image layers in manifest order" data-chart="' +
               escapeDetail(JSON.stringify(chart)) + '"></canvas></div>\n\n'
             data += '<script src="' + asset("chart") + '"></script><script>document.addEventListener("DOMContentLoaded", function(){' +
               'if(!window.Chart)return; var view=document.getElementById("ecr-layer-chart"), canvas=view.firstElementChild; try {' +
-              'var config=JSON.parse(canvas.dataset.chart), dark=document.body.classList.contains("markdown-body-dark"), fg=dark?"#d0d7de":"#414951";' +
-              'config.options.scales.x.ticks={color:fg};config.options.scales.x.grid={color:dark?"#30363d":"#d8dee4"};config.options.scales.y={ticks:{color:fg},grid:{display:false}};config.options.plugins={legend:{labels:{color:fg}}};' +
-              'view.hidden=false;new Chart(canvas,config);}catch(e){view.hidden=true;} });</script>\n\n'
+              'var config=JSON.parse(canvas.dataset.chart), chart, previous;' +
+              'function render(){var dark=document.body.classList.contains("markdown-body-dark");if(dark===previous)return;previous=dark;var fg=dark?"#d0d7de":"#414951";' +
+              'if(chart)chart.destroy();config.options.scales.x.ticks={color:fg};config.options.scales.x.grid={color:dark?"#30363d":"#d8dee4"};config.options.scales.y={ticks:{color:fg},grid:{display:false}};config.options.plugins={legend:{display:false}};' +
+              'view.hidden=false;chart=new Chart(canvas,config);}render();new MutationObserver(render).observe(document.body,{attributeFilter:["class"]});}catch(e){view.hidden=true;} });</script>\n\n'
           }
-          data += layers.length ? textTable(["Layer", "Digest", "Compressed bytes", "Media type"],
-            layers.map((layer, i) => [i + 1, layer.digest, layer.size, layer.mediaType])) : "No filesystem layers reported.\n\n"
+          if (layers.length) {
+            const config = optionalConfig()
+            const ids = config && config.rootfs && config.rootfs.diff_ids
+            const diffIDs = isArray(ids) && ids.length == layers.length ? ids : null
+            const layerFields = ["Layer", "Digest", "Compressed bytes", "Media type"]
+            if (diffIDs) layerFields.push("Uncompressed digest (DiffID)")
+            data += table(layerFields, layers.map((layer, i) => {
+              const row = [i + 1, digestDisclosure(layer.digest), escapeDetail(layer.size), escapeDetail(layer.mediaType)]
+              if (diffIDs) row.push(digestDisclosure(diffIDs[i]))
+              return row
+            }))
+          } else data += "No filesystem layers reported.\n\n"
         } else {
           const imageConfig = readConfig()
           if (!imageConfig) {
@@ -397,19 +486,31 @@ jobs:
           } else {
             if (tab == "config") {
               const runtime = imageConfig.config || {}
-              data += properties([
+              const configRows = [
                 ["Entrypoint", runtime.Entrypoint ? JSON.stringify(runtime.Entrypoint) : ""],
                 ["Command", runtime.Cmd ? JSON.stringify(runtime.Cmd) : ""],
                 ["Working directory", runtime.WorkingDir], ["User", runtime.User],
                 ["Ports", Object.keys(runtime.ExposedPorts || {}).join(", ")],
                 ["Environment variable names", (isArray(runtime.Env) ? runtime.Env : []).filter(isString).map(value => value.split("=", 1)[0]).join(", ")]
-              ])
+              ]
+              ;[["Created", date(imageConfig.created)], ["Author", imageConfig.author],
+                ["Volumes", Object.keys(runtime.Volumes || {}).join(", ")], ["Stop signal", runtime.StopSignal],
+                ["Health check", runtime.Healthcheck && JSON.stringify(runtime.Healthcheck)]].forEach(([label, value]) => {
+                if (value) configRows.push([label, value])
+              })
+              data += properties(configRows)
             } else {
               var layerIndex = 0
               const history = isArray(imageConfig.history) ? imageConfig.history : []
-              data += history.length ? textTable(["Step", "Created", "Build command", "Layer", "Comment"], history.map((step, i) => {
+              const hasAuthors = history.some(step => step.author)
+              const historyFields = ["Step", "Created", "Build command", "Layer", "Comment"]
+              if (hasAuthors) historyFields.push("Author")
+              data += history.length ? table(historyFields, history.map((step, i) => {
                 const layer = !step.empty_layer && (manifest.layers || [])[layerIndex++]
-                return [i + 1, step.created, step.created_by, step.empty_layer ? "Metadata only" : layer && layer.digest || "", step.comment]
+                const row = [i + 1, escapeDetail(step.created), escapeDetail(step.created_by),
+                  step.empty_layer ? "Metadata only" : digestDisclosure(layer && layer.digest), escapeDetail(step.comment)]
+                if (hasAuthors) row.push(escapeDetail(step.author))
+                return row
               }), true) : "No build history reported.\n\n"
             }
           }
@@ -419,7 +520,42 @@ jobs:
         data += e.httpStatus == 403 ? "The registry denied access to this image metadata.\n\n" :
           "Image metadata is unavailable. Try again later.\n\n"
       }
-      return { data: data, type: "raw" }
+      return { data: data, type: "raw", browseDetail: true }
+    }
+
+    // Use the same image rows for the repository listing and contextual search.
+    const imageListing = (images, request, options, matches) => {
+      const params = request.params || {}
+      if (params.sort == "Repository Name") delete params.sort
+      if (!params.sort) {
+        params.sort = "Pushed"
+        if (!params.order) params.order = "desc"
+      }
+      const fields = ["Tag", "Digest", "Pushed", "Size", "Size in bytes"]
+      if (options.usePull) fields.push("Last Pull")
+      const rows = []
+      images.forEach(image => {
+        const digest = image.imageDigest
+        if (!isDigest(digest)) return
+        const tags = image.imageTags && image.imageTags.length ? image.imageTags : [""]
+        tags.forEach(tag => {
+          if (matches && !matches(tag) && !matches(digest) && !matches(digest.substring(7))) return
+          rows.push({
+            imageDigest: digest,
+            values: {
+              Tag: tag || "Untagged",
+              Digest: digest.substring(0, 14) + "…" + digest.slice(-4),
+              Pushed: isNumber(image.imagePushedAt) ? ow.format.fromDate(new Date(image.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss") : "",
+              Size: isNumber(image.imageSizeInBytes) ? ow.format.toBytesAbbreviation(image.imageSizeInBytes) : "",
+              "Size in bytes": image.imageSizeInBytes,
+              "Last Pull": isNumber(image.lastRecordedPullTime) ? ow.format.fromDate(new Date(image.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""
+            },
+            sortValues: { Tag: tag || "Untagged", Digest: digest, Pushed: image.imagePushedAt || 0, Size: image.imageSizeInBytes }
+          })
+        })
+      })
+      return { isList: true, fields: fields, alignFields: ["left", "left", "left", "right", "right"].concat(options.usePull ? ["left"] : []),
+        key: "Tag", list: rows, searchInfo: matches ? { complete: true, totalExact: true, scanned: rows.length } : __ }
     }
 
     args.fns = {
@@ -540,7 +676,17 @@ jobs:
           return { isFile: false }
         } else {
           if (_r.byPath[puri] && !_r.byPath[puri].isParent) {
-            // File
+            if (!options._api && options.imageDetails === true && options.query && options.query.enabled &&
+                !(request.params || {}).image && !(request.params || {}).action) {
+              const images = readImages(puri, false)
+              const listing = imageListing(images, request, options)
+              // Retain the repository description and the pull and artifact tables.
+              if ((request.header || {})["x-openaf-browse-fragment"] !== "1") {
+                listing.content = readRepositoryDetail(request, options, images).data
+                listing.hideContentOnSearch = true
+              }
+              return listing
+            }
             return { isFile: true }
           }
 
@@ -600,7 +746,7 @@ jobs:
           }
         }
       },
-      getObj: (request, options) => {
+      getObj: (request, options, images) => {
         args.fns.validate(request, options)
         var puri = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
 
@@ -609,11 +755,11 @@ jobs:
           return inspectImage(request, options, puri)
         }
 
-        var img, ini = now(), data = ""
-        do {
+        var img = images, ini = now(), data = ""
+        while (isUnDef(img) && now() - ini < 15000) {
           img = readImages(puri, false)
           if (isUnDef(img)) sleep(100, true)
-        } while(isUnDef(img) && now() - ini < 15000)
+        }
 
         if (isUnDef(img)) {
           if (options._api) return { data: { error: "Problem retrieving image data" }, type: "json" }
@@ -642,25 +788,65 @@ jobs:
             const tags = image.imageTags || []
             ;(tags.length ? tags : [""]).forEach(tag => tagRows.push({ image: image, tag: tag }))
           })
-          tagRows.sort((left, right) => {
+          const compareTagRows = (left, right) => {
             if (!left.tag || !right.tag) return Number(!left.tag) - Number(!right.tag) ||
               String(left.image.imageDigest).localeCompare(String(right.image.imageDigest))
             return compareTag(left.tag, right.tag) || (right.image.imagePushedAt || 0) - (left.image.imagePushedAt || 0) ||
               String(left.image.imageDigest).localeCompare(String(right.image.imageDigest))
-          })
+          }
+          tagRows.sort(compareTagRows)
           const tagLabel = row => {
             const image = row.image
-            if (options.imageDetails !== true || !isDigest(image.imageDigest)) return global.__ojobHttpEscapeText(row.tag)
+            if (options.imageDetails !== true || !isDigest(image.imageDigest)) return escapeDetail(row.tag)
             return '<a href="?image=' + encodeURIComponent(image.imageDigest) + '">' +
               escapeDetail(row.tag || image.imageDigest.substring(7, 19)) + '</a>'
           }
+          const reference = row => reg + puri + (row.tag ? ":" + row.tag : "@" + row.image.imageDigest)
+          const detailTable = (name, columns, renderRow) => {
+            const requested = params.detailTable == name && ["asc", "desc"].includes(params.detailOrder) ?
+              columns.findIndex(column => column[0] == params.detailSort) : -1
+            const selected = requested < 0 && name == "details" ? columns.findIndex(column => column[0] == "Pushed at") : requested
+            const order = requested < 0 ? "desc" : params.detailOrder
+            const rows = selected < 0 ? tagRows : tagRows.slice().sort((left, right) => {
+              const [label, value] = columns[selected]
+              const a = value(left), b = value(right)
+              const result = label == "Tag" ? compareTag(a, b) :
+                isNumber(a) && isNumber(b) ? a - b : String(a == null ? "" : a).localeCompare(String(b == null ? "" : b))
+              return (order == "desc" ? -result : result) || compareTagRows(left, right)
+            })
+            const controls = (column, index) => {
+              if (!options.sortTab) return ""
+              const keep = ["sort", "order", "page", "size", "pageSize"].filter(key => isDef(params[key]))
+                .map(key => key + "=" + encodeURIComponent(params[key]))
+              return '<span class="sorter-container ecr-server-sort" tabindex="0" aria-label="Sort ' + column + '">' +
+                [["asc", "&#9650;", "Ascending"], ["desc", "&#9660;", "Descending"], ["none", "x", "Reset"]].map(([direction, symbol, label]) => {
+                  const active = index == selected && direction == order
+                  const query = direction == "none" ? keep :
+                    keep.concat(["detailTable=" + name, "detailSort=" + encodeURIComponent(column), "detailOrder=" + direction])
+                  return '<a class="sort-button' + (active ? ' active' : '') + '" href="?' + query.join("&amp;") +
+                    '" aria-label="' + label + ' ' + column + '" title="' + label + ' ' + column + '"' +
+                    (active ? ' aria-current="true"' : '') + '>' + symbol + '</a>'
+                }).join("") + '</span>'
+            }
+            const alignment = column => column[2] == ":---:" ? ' style="text-align:center"' :
+              column[2] == "---:" ? ' style="text-align:right"' : ""
+            return '<table' + (options.sortTab ? ' data-browse-server-sort' : '') + '><thead><tr>' +
+              columns.map((column, index) => '<th scope="col"' + alignment(column) + '>' + column[0] +
+                controls(column[0], index) + '</th>').join("") + '</tr></thead><tbody>' +
+              rows.map(row => '<tr>' + renderRow(row).map((cell, index) =>
+                '<td' + alignment(columns[index]) + '>' + cell + '</td>').join("") + '</tr>').join("") +
+              '</tbody></table>\n'
+          }
           data = "\n"
+          if (options.sortTab) {
+            data += '<style>.ecr-server-sort{float:right;font-size:10px;margin-left:4px}.ecr-server-sort a{display:none;margin:0 2px}.ecr-server-sort a.active,th:hover .ecr-server-sort a,th:focus-within .ecr-server-sort a{display:inline-block}</style>\n\n'
+          }
           data += "## Contents\n\n"
           if (useMDDesc) {
             var s3key = options.s3prefix + puri + ".md"
             data += "* [📰 Description](#📰-description)\n"
           }
-          data += "* [🏷️ Details per tag](#🏷️-details-per-tag)\n"
+          if (!images) data += "* [🏷️ Details per tag](#🏷️-details-per-tag)\n"
           data += "* [💾 How to retrieve each](#💾-how-to-retrieve-each)\n"
           data += "* [🔎 Manifest and artifact types per tag](#🔎-manifest-and-artifact-types-per-tag)\n"
           data += "\n---\n"
@@ -671,41 +857,43 @@ jobs:
             data += "\n---\n"
           }
 
-          data += "### 🏷️ Details per tag\n\n"
-          data += options.usePull ? "| Tag | Digest | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Digest | Pushed at | Size | Size in bytes |\n"
-          data += options.usePull ? "|:---:|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---:|:---|----:|----:|\n"
-          tagRows.forEach(row => {
-            const i = row.image
-            if (options.usePull)
-              data += `| ${tagLabel(row)} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
-            else
-              data += `| ${tagLabel(row)} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
-          })
+          if (!images) {
+            data += "### 🏷️ Details per tag\n\n"
+            const columns = [["Tag", row => row.tag, ":---:"], ["Digest", row => row.image.imageDigest, ":---:"],
+              ["Pushed at", row => row.image.imagePushedAt || 0]]
+            if (options.usePull) columns.push(["Last Pull", row => row.image.lastRecordedPullTime])
+            columns.push(["Size", row => row.image.imageSizeInBytes, "---:"], ["Size in bytes", row => row.image.imageSizeInBytes, "---:"])
+            data += detailTable("details", columns, row => {
+              const i = row.image
+              const date = seconds => isNumber(seconds) ? ow.format.fromDate(new Date(seconds * 1000), "yyyy-MM-dd HH:mm:ss") : ""
+              const values = [tagLabel(row), escapeDetail(i.imageDigest.split(":").pop().substring(0, 7)) + "...", date(i.imagePushedAt)]
+              if (options.usePull) values.push(date(i.lastRecordedPullTime))
+              return values.concat([escapeDetail(ow.format.toBytesAbbreviation(i.imageSizeInBytes)), escapeDetail(i.imageSizeInBytes)])
+            })
+          }
 
           data += "\n---\n\n### 💾 How to retrieve each\n\n"
           if (isDef(options.refLink)) {
             data += "> **Note:** Click on the corresponding link, on the 'To retrieve' column, to get instructions on how to pull the image.\n\n"
           }
-          data += "| Tag | Digest | To retrieve |\n"
-          data += "|:---:|---|---|\n"
-          tagRows.forEach(row => {
+          data += detailTable("pull", [["Tag", row => row.tag, ":---:"], ["Digest", row => row.image.imageDigest],
+            ["To retrieve", reference]], row => {
             const i = row.image
-            const ref = reg + puri + (row.tag ? ":" + row.tag : "@" + i.imageDigest)
-            const pull = isDef(options.refLink) ? "[" + ref + "](<" + $t(options.refLink, { image: ref, type: i.artifactMediaType }) + ">)" :
-              "```" + ref + "```"
-            data += `| ${tagLabel(row)} | \`\`\`${i.imageDigest}\`\`\` | ${pull} |\n`
+            const ref = reference(row)
+            const pull = isDef(options.refLink) ?
+              '<a href="' + escapeDetail($t(options.refLink, { image: ref, type: i.artifactMediaType })) + '">' + escapeDetail(ref) + '</a>' :
+              '<code>' + escapeDetail(ref) + '</code>'
+            return [tagLabel(row), '<code>' + escapeDetail(i.imageDigest) + '</code>', pull]
           })
 
           data += "\n---\n\n### 🔎 Manifest and artifact types per tag\n\n"
-          data += "| Tag | Digest | Manifest Type | Artifact Type |\n"
-          data += "|:---:|:---|:---|:---|\n"
-          tagRows.forEach(row => {
+          data += detailTable("manifest", [["Tag", row => row.tag, ":---:"], ["Digest", row => row.image.imageDigest],
+            ["Manifest Type", row => row.image.imageManifestMediaType], ["Artifact Type", row => row.image.artifactMediaType]], row => {
             const i = row.image
-            data += `| ${tagLabel(row)} | \`${i.imageDigest}\` | ${i.imageManifestMediaType} | ${isDef(i.artifactMediaType) ? i.artifactMediaType : ""} |\n`
+            return [tagLabel(row), "<code>" + escapeDetail(i.imageDigest) + "</code>",
+              escapeDetail(i.imageManifestMediaType), escapeDetail(i.artifactMediaType)]
           })
         }
-
-        if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
 
         return {
           data: data,
@@ -713,6 +901,8 @@ jobs:
         }
       }
     }
+
+    const readRepositoryDetail = args.fns.getObj
 
     if (provider) {
       args.fns.search = (request,options) => {
@@ -723,7 +913,12 @@ jobs:
         if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
         var literal = q.toLowerCase()
         var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
-        var all=browseCache("ecr-repo").get({}).lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&matches(r.repositoryName))
+        var repositories = browseCache("ecr-repo").get({})
+        if (!options._api && options.imageDetails === true && repositories.byPath[path] && !repositories.byPath[path].isParent) {
+          return imageListing(readImages(path, false), request, options, matches)
+        }
+        if (["Tag", "Digest", "Pushed", "Size", "Size in bytes", "Last Pull"].includes((request.params || {}).sort)) delete request.params.sort
+        var all=repositories.lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&matches(r.repositoryName))
         all=all.filter(r=>{try{args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+r.repositoryName},options);return true}catch(e){return false}})
         var max=options.query.maxResults||1000
         return {isList:true,fields:["Repository Name"],alignFields:["left"],key:"Repository Name",list:all.slice(0,max).map(r=>({isDirectory:false,values:{"Repository Name":path?r.repositoryName.substring(path.length+1):r.repositoryName}})),searchInfo:{complete:all.length<=max,truncated:all.length>max,totalExact:all.length<=max,scanned:all.length}}
@@ -748,6 +943,14 @@ jobs:
           }, imageLock)
           provider.invalidate((name,key) => support.matchesUnit(path,key,options.parentPath))
         } finally { imageSlots.release(3) }
+        detailSlots.acquire(3)
+        try {
+          syncFn(() => {
+            detailCache.forEach((entry, key) => {
+              if (support.matchesUnit(path, { image: entry.repository }, options.parentPath)) detailCache.delete(key)
+            })
+          }, detailLock)
+        } finally { detailSlots.release(3) }
         args.fns.getList(request, options)
       }
     }

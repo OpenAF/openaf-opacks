@@ -376,6 +376,69 @@ jobs:
     // Use the same prefix for the startup load and the first listing request.
     var listingPrefix = (root, path) => (String(root || "") + path).replace(/\/?$/, "/").replace(/^\//, "")
 
+    // Share a bounded prefix walk across search terms and publish immutable batches.
+    var scans = new Map(), scanLock = new java.lang.Object()
+    var scanSlots = new java.util.concurrent.Semaphore(3)
+    var searchSnapshot = (prefix, query, start) => {
+      var next
+      var snapshot = syncFn(() => {
+        scans.forEach((state, key) => {
+          if (!state.refreshing && now() >= state.expires) scans.delete(key)
+        })
+        var state = scans.get(prefix)
+        if (start && state && state.failed) {
+          scans.delete(prefix)
+          state = undefined
+        }
+        if (!state && start && scans.size < 16 && scanSlots.tryAcquire()) {
+          state = { batches: [], scanned: 0, refreshing: true, complete: false }
+          scans.set(prefix, state)
+          next = state
+        }
+        if (!state) return { rows: [], info: { scanned: 0, complete: false, ready: false } }
+        return { batches: state.batches.slice(), info: {
+          scanned: state.scanned, complete: state.complete, refreshing: state.refreshing,
+          timedOut: state.timedOut, failed: state.failed, ready: true
+        } }
+      }, scanLock)
+      if (next) {
+        var finish = info => {
+          syncFn(() => Object.assign(next, info, { refreshing: false, expires: now() + (args.cache > 0 ? args.cache : 30000) }), scanLock)
+          scanSlots.release()
+        }
+        try {
+          $doV(() => {
+            var batch = []
+            var publish = () => {
+              if (!batch.length) return
+              syncFn(() => {
+                next.batches.push(batch)
+                next.updatedAt = now()
+                next.scanned += batch.length
+              }, scanLock)
+              batch = []
+            }
+            try {
+              var info = s3.walkObjects(args.bucket, prefix, row => {
+                batch.push(row)
+                // Expose the first result immediately and amortize subsequent updates.
+                if (next.scanned == 0 || batch.length >= 100) publish()
+                return syncFn(() => scans.get(prefix) === next, scanLock)
+              }, query)
+              publish()
+              finish(info)
+            } catch (e) {
+              publish()
+              finish({ failed: true })
+              logWarn("S3 browse search failed: " + e)
+            }
+          })
+        } catch (e) { finish({ failed: true }) }
+      }
+      if (snapshot.batches) snapshot.rows = [].concat.apply([], snapshot.batches)
+      return snapshot
+    }
+
     args.fns = {
       validate: (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
@@ -498,11 +561,16 @@ jobs:
         var scanInfo, lst
         if (support && options.query && options.query.enabled) {
           if (!isFunction(s3.walkObjects)) throw new Error("Enhanced search requires S3.walkObjects; update S3")
-          var unit = browseCache("s3-search").ttl(args.cache || 30000).fn(k => {
-            var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query)
-            return {rows:rows,info:info}
-          }).create().get({puri:_s3p})
-          lst = unit.rows; scanInfo = unit.info
+          if (!options._api && request.method == "GET") {
+            var unit = searchSnapshot(_s3p, options.query, (request.header || {})["x-openaf-browse-fragment"] !== "1")
+          } else {
+            var unit = browseCache("s3-search").ttl(args.cache || 30000).fn(k => {
+              var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query)
+              return {rows:rows,info:info}
+            }).create().get({puri:_s3p})
+          }
+          lst = unit.rows
+          scanInfo = unit.info
         } else lst = s3.listObjects(args.bucket, _s3p, false, true)
         lst = lst.filter(f => {try {var key=String(f.filename),base=String(options.parentPath||"").replace(/^\/+/,"");if(base && key.startsWith(base))key=key.substring(base.length);args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+key.replace(/^\/+/,"")},options);return true}catch(e){return false}})
 
@@ -511,12 +579,20 @@ jobs:
           lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
         }
 
-        var _rel = f => String(f.filename).replace(new RegExp("^" + _s3p), "")
+        var _rel = f => String(f.filename).substring(_s3p.length)
         var _q = q.toLowerCase()
         var matches = support && isFunction(support.searchMatcher) ? support.searchMatcher(q, wildcards) : name => name.toLowerCase().indexOf(_q) >= 0
         var _hits = lst.filter(f => f.isFile && matches(_rel(f)))
         var _total = _hits.length
         if (_hits.length > maxResults) _hits = _hits.slice(0, maxResults)
+        if (scanInfo && isDef(scanInfo.ready)) {
+          scanInfo.message = !scanInfo.ready ? ((request.header || {})["x-openaf-browse-fragment"] === "1" ?
+            "Apply to search this prefix." : "Search is busy. Apply to try again.") :
+            scanInfo.scanned + " objects scanned · " + _total + " matches" +
+            (scanInfo.refreshing ? " so far" : scanInfo.failed ? " · scan stopped on error" :
+              !scanInfo.complete ? " · scan limit reached" : "") +
+            (_total > maxResults ? " · showing " + maxResults : "")
+        }
 
         return {
           isList: true, fields: _fields, alignFields: _alignFields, key: "Object",
@@ -559,9 +635,22 @@ jobs:
 
     if (provider) {
       args.fns.getStatus = () => provider.status()
-      args.fns.getFreshness = (request,options) => provider.freshness((name,key) => support.matchesUnit(global.__ojobHttpRelativePath(request.uri,options.parentURI),key,options.parentPath))
+      args.fns.getFreshness = (request,options) => {
+        var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
+        var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
+        return syncFn(() => {
+          var scan = scans.get(listingPrefix(options.parentPath, path))
+          if (scan && (scan.refreshing || now() < scan.expires)) {
+            freshness.refreshing = scan.refreshing
+            freshness.lastUpdatedAt = Math.max(scan.updatedAt || 0, freshness.lastUpdatedAt || freshness.loadedAt || 0)
+          }
+          return freshness
+        }, scanLock)
+      }
       args.fns.refresh = (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        var prefix = listingPrefix(options.parentPath, path)
+        syncFn(() => scans.forEach((state, key) => { if (key.startsWith(prefix)) scans.delete(key) }), scanLock)
         provider.invalidate((name,key) => {
           return support.matchesUnit(path,key,options.parentPath)
         })

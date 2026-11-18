@@ -10,8 +10,10 @@ oJob-common definitions; legacy configurations continue working with the current
 OpenAF runtime. Browser caches are isolated per instance.
 
 Enable `query: { enabled: true }` for server sorting/paging and bounded literal
-search. Recursive listing snapshots are cached independently of query text and
-report completeness. `S3.walkObjects(bucket, prefix, callback, options)` supports
+search. Select **Apply** to start a cold recursive search. Results appear as the
+prefix scan progresses, with separate counts for scanned objects and matches.
+Typing reuses the same scan, and the status shows when the scan reaches its
+budget. `S3.walkObjects(bucket, prefix, callback, options)` supports
 `maxScanned` and `timeoutMs` and stops when the callback returns false. It leaves
 the existing `listObjects` API unchanged. The SDK may prefetch a remote page.
 

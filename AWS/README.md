@@ -77,7 +77,11 @@ retain the previous tree and retry on a later visit after one cache interval
 (at least one second). Explicit refresh waits for active package loads, cancels
 matching queued refreshes and invalidates matching data. Version and asset caches
 still load on demand; cold repository requests wait for the complete snapshot.
-Legacy browsing retains the existing OpenAF cache behavior.
+With enhanced search, Apply starts a missing package load for the current
+repository. Broader searches show the coverage of loaded repositories and offer
+**Search remaining repositories**. This action loads authorized repositories
+through the same worker limit and shows partial package matches as pages arrive.
+Typing reuses available data and in-flight loads.
 
 Set `cache` explicitly for the desired freshness interval. For example, to warm a
 frequently used CodeArtifact repository at startup:
@@ -111,16 +115,33 @@ prefetch requests queued, trees loaded, and prefetched trees used by a visit.
 ### Inspecting ECR images
 
 Set `options.imageDetails: true` on ECR Browse to link tags and untagged digests
-to image details. Repository tables show one row per tag in ascending SemVer
-order. Select a platform or artifact from an image index to inspect its
+to image details. The tag listing shows one row per tag, newest push first.
+Sorting by Tag uses SemVer precedence. Enable `options.query.enabled` to search
+tags and digests within the repository. Select a shortened digest in the detail tables to reveal the full
+value. Select a platform or artifact from an image index to inspect its
 details, with a breadcrumb back to the original index. For a single image
 manifest, the inspector reads the supported platform from the image config.
 The layer chart shows the largest compressed layers in manifest order and
 uses the local Chart.js asset. Install the optional Mermaid
 oPack for the platform diagram. Both tables are available independently of
-the diagrams. The Manifest tab displays a nested nJSMap view, with formatted
+the diagrams. The Overview tab shows an Annotations section when the image manifest, index,
+or its descriptors contain annotations. The Manifest tab displays a nested nJSMap view, with formatted
 JSON as a fallback. Config shows environment variable names. History displays
 the build commands stored by the image publisher.
+
+Inspector tabs share a bounded cache of manifests and configs keyed by digest.
+These entries are reusable for at least five minutes unless evicted. Overview
+refreshes tag and push metadata on the configured cache interval, with a
+five-second minimum. Browse refresh also invalidates cached inspector data for
+the selected repository scope.
+
+Overview includes image status and recorded pull, archive and activation times when
+available, and shows image labels when present. Config shows runtime settings. Layers and History
+can show uncompressed layer digests and build-step authors.
+
+**Attached artifacts** lists OCI referrers for the selected digest, one page at a
+time. The tab loads on demand and uses the metadata cache interval. It requires
+the permissions for [ECR ListImageReferrers](https://docs.aws.amazon.com/service-authorization/latest/reference/list_ecr.html).
 
 The inspector uses the browser's private ECR credentials. The IAM principal
 needs `ecr:DescribeImages`, `ecr:GetAuthorizationToken`,
@@ -140,7 +161,8 @@ conversion or rendering is unavailable.
 
 Install the optional Jsoup oPack for visual HTML previews. The preview renders
 static markup inside a sandbox without scripts, form submissions, navigation,
-or external resources. HTML source is always available. With `download: true`,
+or external resources. The preview uses browser theme colors instead of the
+asset’s inline styling. HTML source is always available. With `download: true`,
 the download action streams the complete original asset as an attachment,
 including binary assets. API asset reads continue to stream the original bytes.
 

@@ -73,13 +73,15 @@ jobs:
       return aws
     }, clientLock)
 
+    var packagePath = pkg => {
+      var parts = [pkg.format]
+      if (isDef(pkg.namespace) && pkg.namespace.length > 0) parts.push(pkg.namespace)
+      parts.push(pkg.package)
+      return parts.join("/")
+    }
+
     var buildPackageTree = aPackages => {
-      var _packages = (aPackages || []).map(p => {
-        var parts = [ p.format ]
-        if (isDef(p.namespace) && p.namespace.length > 0) parts.push(p.namespace)
-        parts.push(p.package)
-        return merge({ path: parts.join("/") }, p)
-      })
+      var _packages = (aPackages || []).map(pkg => merge({ path: packagePath(pkg) }, pkg))
 
       var _parents = []
       var _parentsMap = Object.create(null)
@@ -128,7 +130,7 @@ jobs:
         })
         if (treeState[id] || Object.keys(treeState).length >= 1000) return __
         if (speculative && !prefetchSlot.tryAcquire()) return __
-        var next = { key: key, refreshing: true, speculative: speculative }
+        var next = { key: key, refreshing: true, speculative: speculative, pages: [] }
         treeState[id] = next
         return next
       }, treeLock)
@@ -324,16 +326,23 @@ jobs:
       // An HTML block keeps Showdown from encoding the already escaped source a second time.
       const source = (language, content) => '<div><pre><code class="language-' + escapeAsset(language) + '">' +
         escapeAsset(content) + "</code></pre></div>\n\n"
-      var data = '\n<p><a href="' + versionURL + '">← Version assets</a>'
-      if (type == "html" || type == "xml") {
-        data += ' · <a href="' + url("preview") + '">Preview</a> · <a href="' + url("source") + '">Source</a>'
+      const showingSource = request.params.view == "source"
+      const showModes = ["html", "xml", "json"].includes(type)
+      var data = '\n<style>.codeartifact-actions{display:flex;flex-wrap:wrap;gap:.35em 1em;margin-bottom:1em}.codeartifact-actions a{white-space:nowrap}.codeartifact-actions a[aria-current]{font-weight:600;text-decoration:underline}.codeartifact-actions a:focus-visible{outline:2px solid currentColor;outline-offset:2px}.codeartifact-frame{display:block;box-sizing:border-box;width:100%;height:65vh;border:1px solid #b8c0c8;border-radius:4px;color-scheme:light}.markdown-body-dark .codeartifact-frame{border-color:#444c56;color-scheme:dark}@media(max-width:600px){.codeartifact-frame{height:42vh}}</style>\n\n'
+      data += '<h3 style="overflow-wrap:anywhere">' + escapeAsset(name) + '</h3>\n\n'
+      if (showModes || options.download) {
+        data += '<nav class="codeartifact-actions" aria-label="Asset views and actions">'
+        if (showModes) {
+          data += '<a href="' + url("preview") + '"' + (!showingSource ? ' aria-current="page"' : '') + '>Preview</a>' +
+            '<a href="' + url("source") + '"' + (showingSource ? ' aria-current="page"' : '') + '>Source</a>'
+        }
+        if (options.download) data += '<a href="' + url("raw") + '">Download raw</a>'
+        data += '</nav>\n\n'
       }
-      if (options.download) data += ' · <a href="' + url("raw") + '">Download raw</a>'
-      data += '</p>\n\n<h3 style="overflow-wrap:anywhere">' + escapeAsset(name) + "</h3>\n\n"
 
       if (preview.truncated) {
         data += "<p>Preview truncated at the configured size limit.</p>\n\n" + source("text", preview.data.replace(/\n\n\[Preview truncated; download the complete file\.\]$/, ""))
-      } else if (type == "html" && request.params.view != "source") {
+      } else if (type == "html" && !showingSource) {
         const jsoup = getOPackPath("Jsoup")
         if (isDef(jsoup)) {
           // Parse without network access and retain only static content and layout.
@@ -343,21 +352,18 @@ jobs:
             "h4", "h5", "h6", "ul", "ol", "li", "dl", "dt", "dd", "table", "thead", "tbody", "tfoot", "tr",
             "th", "td", "caption", "a", "pre", "code", "blockquote", "em", "strong", "b", "i", "u", "s",
             "small", "sup", "sub"].forEach(tag => allow.addTags(tag))
-          allow.addAttributes(":all", "style")
           allow.addAttributes("td", "colspan", "rowspan")
           allow.addAttributes("th", "colspan", "rowspan", "scope")
           const html = Packages.org.jsoup.Jsoup.clean(String(preview.data), allow)
           const csp = "default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'"
-          const darkMode = String(__flags.MD_DARKMODE)
-          const scheme = darkMode == "true" ? "dark" : darkMode == "false" ? "light" : "light dark"
           const document = '<!doctype html><meta http-equiv="Content-Security-Policy" content="' + csp +
-            '"><meta name="color-scheme" content="' + scheme + '"><style>body{font:16px system-ui;padding:1em;overflow-wrap:anywhere}pre{white-space:pre-wrap}table{border-collapse:collapse}th,td{padding:.3em;border:1px solid GrayText}</style>' + html
-          data += '<iframe title="HTML asset preview" sandbox="" referrerpolicy="no-referrer" style="display:block;width:100%;height:65vh;border:1px solid GrayText" srcdoc="' +
+            '"><meta name="color-scheme" content="light dark"><style>body{background:Canvas;color:CanvasText;font:16px system-ui;padding:.75em;overflow-wrap:anywhere}pre{white-space:pre-wrap}table{border-collapse:collapse}th,td{padding:.3em;border:1px solid GrayText}</style>' + html
+          data += '<iframe title="HTML asset preview" sandbox="" referrerpolicy="no-referrer" class="codeartifact-frame" srcdoc="' +
             escapeAsset(document) + '"></iframe>\n\n'
         } else {
           data += "<p>Install the Jsoup oPack to display HTML previews.</p>\n\n" + source("html", preview.data)
         }
-      } else if (type == "json" || type == "xml" && request.params.view != "source") {
+      } else if ((type == "json" || type == "xml") && !showingSource) {
         const fromXML = type == "xml"
         var value
         try {
@@ -380,7 +386,7 @@ jobs:
             source(type, preview.data) + '</div>\n\n<script>document.addEventListener("DOMContentLoaded",function(){var view=document.getElementById("codeartifact-json");' +
             'if(!window.nJSMap)return; var esc=function(s){return String(s).replace(/[&<>"\x27]/g,function(c){return "&#"+c.charCodeAt(0)+";";});};' +
             'var safe=function(v){if(Array.isArray(v))return v.map(safe);if(v&&typeof v==="object")return Object.fromEntries(Object.entries(v).map(function(x){return [esc(x[0]),safe(x[1])];}));return v==null?"null":typeof v==="string"?view.dataset.format==="xml"?"<span>"+esc(v)+"</span>":esc(v):v;};' +
-            'try{var dark=document.body.classList.contains("markdown-body-dark");view.classList.toggle("njsmap_dark",dark);var result=nJSMap(safe(JSON.parse(view.dataset.json)),undefined,dark);if(result)view.innerHTML=result;}catch(e){} });</script>\n\n'
+            'try{var value=safe(JSON.parse(view.dataset.json)),previous;function render(){var dark=document.body.classList.contains("markdown-body-dark");if(previous===dark)return;previous=dark;view.classList.toggle("njsmap_dark",dark);var result=nJSMap(value,undefined,dark);if(result)view.innerHTML=result;}render();new MutationObserver(render).observe(document.body,{attributeFilter:["class"]});}catch(e){} });</script>\n\n'
         } else {
           if (isUnDef(value)) data += "<p>This asset could not be parsed as " + type.toUpperCase() + ".</p>\n\n"
           data += source(type, preview.data)
@@ -388,7 +394,7 @@ jobs:
       } else {
         data += source(type, preview.data)
       }
-      return { data: data, type: "raw", truncated: !!preview.truncated }
+      return { data: data, type: "raw", browseDetail: true, truncated: !!preview.truncated }
     }
 
     args.fns = {
@@ -423,7 +429,15 @@ jobs:
         browseCache("codeartifact-package-tree")
         .ttl(args.cache)
         .fn(k => {
-          var lst = getAWS().CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format, args.namespace)
+          var id = stringify(k, __, "")
+          var state = provider && syncFn(() => treeState[id], treeLock)
+          var lst = getAWS().CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format, args.namespace,
+            state && (page => {
+              var paths = page.filter(pkg => !isDef(args.namespace) || pkg.namespace == args.namespace).map(packagePath)
+              syncFn(() => {
+                if (treeState[id] === state && state.refreshing) state.pages.push(paths)
+              }, treeLock)
+            }))
           if (!isArray(lst)) throw new Error("Invalid CodeArtifact package response")
           if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
           return buildPackageTree(lst)
@@ -752,13 +766,62 @@ jobs:
         if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
         var literal = q.toLowerCase()
         var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
-        var refreshing = isRefreshing(path,options)
-        provider.entries("codeartifact-package-tree").forEach(unit=>{
-          var prefix=unit.key.domain+"/"+unit.key.repository+"/"
-          unit.value.list.forEach(pkg=>{var name=prefix+pkg.path;if((!path||name.startsWith(path+"/"))&&matches(name))rows.push({isDirectory:true,values:{Package:path?name.substring(path.length+1):name}})})
+        var parts = path.split("/").filter(Boolean)
+        var browser = !options._api && request.method == "GET"
+        var explicit = browser && (request.header || {})["x-openaf-browse-fragment"] !== "1"
+        var units = provider.entries("codeartifact-package-tree")
+        var known = provider.entries("codeartifact-repos")[0]
+        if (!known && explicit && (parts.length >= 2 || request.params.searchAll == "1")) {
+          known = { value: browseCache("codeartifact-repos").get({}) }
+        }
+        var permitted = name => {
+          try {
+            args.fns.validate({ uri: options.parentURI.replace(/\/$/, "") + "/" + name }, options)
+            return true
+          } catch (e) { return false }
+        }
+        var repositories = known && known.value.filter(repo => {
+          var name = repo.domainName + "/" + (repo.name || repo.repositoryName)
+          return (!parts.length || repo.domainName == parts[0]) &&
+            (parts.length < 2 || name == parts.slice(0, 2).join("/")) && permitted(name)
         })
-        var max=options.query.maxResults||1000
-        return {isList:true,fields:["Package"],alignFields:["left"],key:"Package",list:rows.slice(0,max),searchInfo:{complete:false,refreshing:refreshing,truncated:rows.length>max,totalExact:false,scanned:rows.length,coverage:"loaded package hierarchies"}}
+        var missing = repositories && repositories.filter(repo => !units.some(unit =>
+          unit.key.domain == repo.domainName && unit.key.repository == (repo.name || repo.repositoryName)))
+        if (explicit && (parts.length >= 2 || request.params.searchAll == "1")) {
+          ;(missing || []).forEach(repo => queueTree({ domain: repo.domainName, repository: repo.name || repo.repositoryName }, false))
+        }
+
+        var refreshing = isRefreshing(path,options), scanned = 0
+        var names = new Set()
+        var collect = (key, packages) => {
+          var prefix = key.domain + "/" + key.repository + "/"
+          packages.forEach(pkg => {
+            var name = prefix + (isString(pkg) ? pkg : pkg.path)
+            if ((path && !name.startsWith(path + "/")) || !permitted(name) || names.has(name)) return
+            names.add(name)
+            scanned++
+            if (matches(name)) rows.push({ isDirectory: true, values: { Package: path ? name.substring(path.length + 1) : name } })
+          })
+        }
+        units.forEach(unit => collect(unit.key, unit.value.list))
+        var partial = syncFn(() => Object.keys(treeState).map(id => treeState[id])
+          .filter(state => state.pages.length && (!path || support.matchesUnit(path, state.key, options.parentPath)))
+          .map(state => ({ key: state.key, pages: state.pages.slice() })), treeLock)
+        partial.forEach(state => {
+          if (units.some(unit => unit.key.domain == state.key.domain && unit.key.repository == state.key.repository)) return
+          state.pages.forEach(page => collect(state.key, page))
+        })
+        var max = options.query.maxResults || 1000
+        var complete = browser && !!repositories && !missing.length && !refreshing
+        var message = browser && (repositories ? (repositories.length - missing.length) + " of " + repositories.length + " repositories searched." : "Searched loaded package trees.")
+        if (browser && refreshing) message += " Loading more packages…"
+        else if (browser && partial.length && !complete) message += " Some loads stopped early."
+        if (browser && rows.length > max) message += " Search results are limited."
+        return { isList: true, fields: ["Package"], alignFields: ["left"], key: "Package", list: rows.slice(0, max),
+          searchInfo: { complete: complete, refreshing: refreshing, truncated: rows.length > max,
+            totalExact: complete && rows.length <= max, scanned: scanned, coverage: "loaded package hierarchies",
+            message: message, canExpand: browser && parts.length < 2 && !refreshing && (!repositories || missing.length > 0) } }
+
       }
       // The browser carries its sort field when entering or clearing search.
       // Reset known columns from another view before the shared query validator runs.
