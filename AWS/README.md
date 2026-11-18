@@ -8,6 +8,14 @@ updated oJob-common definitions (browse contract 1), checked before clients are
 created. Legacy configurations retain support for the current OpenAF runtime.
 API jobs refer to an existing browser; register the browser before serving API
 requests. API operations additionally require `operationsBrowseUris` on the API.
+POST refresh also requires a configured API `operationsToken` and a matching
+`X-OpenAF-Browse-Token` header.
+
+CodeArtifact enforces the configured domain, repository name prefix, format,
+and exact namespace on direct requests as well as listings. Package versions
+and assets must belong to the selected repository's inventory. ECR's optional
+S3 descriptions use Jsoup to retain static Markdown formatting and discard
+active content. Descriptions larger than 4 MiB are omitted.
 
 ECR directory links use plain path segments (for example,
 `/internal/3rdparty/`); directory labels omit the trailing slash added by the
@@ -154,15 +162,16 @@ repository list continues to use its current listing permissions. Run
 Set `options.preview: {}` for the default previews, including JSON, POM/XML,
 HTML, and the Browse text formats. `preview.formats` replaces the default
 allowlist and accepts extension keys and exact `name:` keys. Set
-`preview.maxBytes` to override the 256 KiB default. Large assets show a
-truncated source preview. POM/XML assets use OpenAF XML conversion and nJSMap.
+`preview.maxBytes` to override the 4 MiB server-side preview limit. JSON
+streams to the browser's nJSMap viewer, which accepts up to 16 MiB. Larger or
+invalid JSON can be viewed as bounded source. POM/XML assets use OpenAF XML
+conversion and nJSMap, including POMs with leading license comments.
 The Source view shows the original XML, which is also the fallback when
 conversion or rendering is unavailable.
 
-Install the optional Jsoup oPack for visual HTML previews. The preview renders
-static markup inside a sandbox without scripts, form submissions, navigation,
-or external resources. The preview uses browser theme colors instead of the
-asset’s inline styling. HTML source is always available. With `download: true`,
+HTML previews stream the complete asset directly to the browser in a sandbox
+that blocks scripts, form submissions, and external resources. The
+`view=source` option displays bounded, escaped HTML. With `download: true`,
 the download action streams the complete original asset as an attachment,
 including binary assets. API asset reads continue to stream the original bytes.
 

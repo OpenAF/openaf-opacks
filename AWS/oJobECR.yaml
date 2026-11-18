@@ -54,6 +54,7 @@ jobs:
         sortTab    : sortTab
         options    : options
         operationsBrowseUris: operationsBrowseUris
+        operationsToken: operationsToken
         s3url      : s3url           # optional s3 url for static markdown description files
         s3accesskey: s3accesskey     # optional s3 access key for static markdown description files
         s3secret   : s3secret        # optional s3 secret for static markdown description files
@@ -415,31 +416,16 @@ jobs:
             escapeDetail(JSON.stringify(manifest, null, 2)) + '</code></pre></div>\n\n'
           data += `<script>
             document.addEventListener("DOMContentLoaded", function() {
-              if (typeof window.nJSMap !== "function") return
+              if (!window.nJSMap || typeof nJSMap.mount !== "function") return
               const view = document.getElementById("ecr-manifest")
-              const escapeHTML = text => String(text).replace(/[&<>"']/g, ch => "&#" + ch.charCodeAt(0) + ";")
-              const safeValue = value => {
-                if (Array.isArray(value)) return value.map(safeValue)
-                if (value && typeof value === "object") {
-                  return Object.fromEntries(Object.entries(value).map(([key, item]) => [escapeHTML(key), safeValue(item)]))
-                }
-                // A text span keeps manifest strings literal in nJSMap's date and link detection.
-                return typeof value === "string" || value === null ? "<span>" + escapeHTML(value) + "</span>" : value
-              }
               try {
-                const manifest = safeValue(JSON.parse(view.querySelector("code").textContent))
-                let previousTheme
-                const render = () => {
-                  const dark = document.body.classList.contains("markdown-body-dark")
-                  if (dark === previousTheme) return
-                  const html = nJSMap(manifest, undefined, dark)
-                  if (!html) return
-                  view.classList.toggle("njsmap_dark", dark)
-                  view.innerHTML = html
-                  previousTheme = dark
-                }
-                render()
-                new MutationObserver(render).observe(document.body, { attributeFilter: ["class"] })
+                const source = view.querySelector("code").textContent
+                const tree = document.createElement("div")
+                const theme = () => tree.classList.toggle("njsmap_dark", document.body.classList.contains("markdown-body-dark"))
+                theme()
+                nJSMap.mount(tree, JSON.parse(source), { collapseAll: source.length >= 1024 * 1024 })
+                view.replaceChildren(tree)
+                new MutationObserver(theme).observe(document.body, { attributeFilter: ["class"] })
               } catch (error) {}
             })
           </script>\n\n`
@@ -575,8 +561,14 @@ jobs:
             _s3 = new S3(args.s3url, args.s3accesskey, args.s3secret, args.s3region)
             var s3key = args.s3prefix + k.uri + ".md"
             log(`Cache ECR description from s3://${args.s3bucket}/${s3key}...`)
-            var jstream = _s3.getObjectStream(args.s3bucket, s3key)
-            return af.fromInputStream2String(jstream)
+            var limit = support.previewLimit()
+            var stream = _s3.getObjectStream(args.s3bucket, s3key, 0, limit + 1)
+            var preview = support.readPreview(stream, "text", limit)
+            if (preview.truncated) {
+              logWarn("ECR description exceeds the preview limit")
+              return __
+            }
+            return { result: preview.data, html: support.safeMarkdown(preview.data) }
           } catch(ee) {
             if (ee.message.indexOf("The specified key does not exist.") >= 0) {
               logWarn("No description file found for " + k.uri)
@@ -697,7 +689,7 @@ jobs:
           var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
           if (useMDDesc) {
             mddesc = browseCache("ecr-desc").get({ uri: puri })
-            if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
+            if (!mddesc || !isString(mddesc.html)) {
               log(`No cached description found for image list ${puri}`)
               useMDDesc = false
             }
@@ -740,7 +732,7 @@ jobs:
             isList: true,
             fields: _fields,
             alignFields: _aFields,
-            content: useMDDesc && isDef(mddesc.result) ? mddesc.result : __,
+            content: useMDDesc ? mddesc.html : __,
             key   : [ "Repository Name" ],
             list  : rows
           }
@@ -772,13 +764,13 @@ jobs:
           var useMDDesc = isDef(options.s3bucket) && isDef(options.s3prefix), mddesc = __
           if (useMDDesc) {
             mddesc = browseCache("ecr-desc").get({ uri: puri })
-            if (isUnDef(mddesc) || isUnDef(mddesc.result)) {
+            if (!mddesc || !isString(mddesc.html)) {
               log(`No cached description found for image ${puri}`)
               useMDDesc = false
             }
           }
 
-          if (options._api) return { data: { ecrdesc: mddesc, ecrimgs: img }, type: "json" }
+          if (options._api) return { data: { ecrdesc: useMDDesc ? { result: mddesc.result } : __, ecrimgs: img }, type: "json" }
 
           // Use one row per tag so aliases on the same digest can sort independently.
           const compareTag = support && isFunction(support.compareValues) ? support.compareValues :
@@ -853,7 +845,7 @@ jobs:
 
           if (useMDDesc) {
             data += "### 📰 Description\n\n"
-            data += mddesc.result
+            data += mddesc.html
             data += "\n---\n"
           }
 

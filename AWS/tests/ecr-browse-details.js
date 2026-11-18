@@ -171,7 +171,7 @@ check(scan.length == 3 && scan[1][2] == amd && scan[2][2] == config, "layers rea
 check(layerView.includes("Uncompressed digest (DiffID)") && layerView.includes(digest("3")), "layers show matching DiffIDs")
 const manifestView = view({ image: index, platform: amd, tab: "manifest" }).data
 check(manifestView.includes('id="ecr-manifest"') && manifestView.includes('/js/njsmap.js') &&
-  manifestView.includes('/css/nJSMap.css') && manifestView.includes('nJSMap(manifest, undefined, dark)'), "manifest tab uses the local nJSMap renderer")
+  manifestView.includes('/css/nJSMap.css') && manifestView.includes('nJSMap.mount(tree, JSON.parse(source)'), "manifest tab uses the local nJSMap renderer")
 check(manifestView.includes('&lt;b&gt;key&lt;/b&gt;') && manifestView.includes('&lt;i&gt;literal tag&lt;/i&gt;') &&
   !manifestView.includes('<i>literal tag</i>') && manifestView.includes('class="language-json"'), "manifest JSON fallback escapes keys and values")
 check(!layerView.includes('/js/njsmap.js') && scan.length == 3, "manifest map is tab-scoped and needs no additional registry reads")

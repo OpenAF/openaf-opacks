@@ -98,15 +98,20 @@ function create(realAsync, legacy, extraOptions) {
   return args
 }
 var previewAssets = {
+  "icon.svg": '<svg xmlns="http://www.w3.org/2000/svg"/>',
   "settings.json": '{"name":"<script>data</script>"}',
   "invalid.json": "{ invalid json",
   "build.pom": '<?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0"><version>1.2</version><name>&lt;i&gt;fixture&lt;/i&gt;</name><dependencies><dependency><artifactId>one</artifactId></dependency><dependency><artifactId>two</artifactId></dependency></dependencies></project>\n',
+  "commented.pom": '<!-- License header -->\n<project xmlns="http://maven.apache.org/POM/4.0.0"><artifactId>jbossorg-fonts</artifactId><!-- Build note --><directory>${basedir}/src/main/licenses</directory></project>',
+  "multiple-roots.xml": '<project/><project/>',
   "invalid.xml": "<project><name></project>",
   "dtd.xml": '<!DOCTYPE project [<!ENTITY local "static">]><project>&local;</project>',
   "index.html": '<h1>Fixture HTML</h1><img src="https://example.invalid/external"><a href="https://example.invalid/go">go</a><script>ACTIVE</script><form action="/bad">FORM</form>',
   "pkg.jar": "fixture bytes"
 }
 var assetReads = 0
+FixtureAWS.prototype.CODEARTIFACT_ListPackageVersionAssets = () => Object.keys(previewAssets).map(name =>
+  ({ name: name, size: previewAssets[name].length, hashes: { "SHA-256": "abc" } }))
 FixtureAWS.prototype.CODEARTIFACT_GetPackageVersionAsset = (region, repo, domain, format, namespace, pkg, version, name) => {
   assetReads++
   return {stream: new java.io.ByteArrayInputStream(new java.lang.String(previewAssets[name]).getBytes("UTF-8"))}
@@ -128,7 +133,7 @@ ok(domainDates.filter(row => row.values.Domain == "other")[0].values.Created == 
 ok(args.fns.getList(req("domain/repo/maven/org.example/pkg1/"), options).list[0].values.Published == "2024-03-21 19:40:00", "package publication converts epoch seconds exactly once")
 
 ok(args.fns.getList(req("domain/repo/maven/org.example/pkg1/1.0"), options).isFile, "version navigation")
-ok(args.fns.getObj(req("domain/repo/maven/org.example/pkg1/1.0"), options).data[0].name == "pkg.jar", "asset details")
+ok(args.fns.getObj(req("domain/repo/maven/org.example/pkg1/1.0"), options).data.some(row => row.name == "pkg.jar"), "asset details")
 ok(packageCalls.get() == 1, "all warm navigation shares snapshot")
 ok(args.fns.getList(req("domain/"), options).list[0].values.Repository == "repo", "domain filter")
 ok(args.fns.getList(req("other/"), options).list[0].values.Repository == "elsewhere", "second domain filter")
@@ -172,12 +177,19 @@ function asset(name, params, overrides) {
   request.params = Object.assign({ asset: name }, params)
   return args.fns.getObj(request, Object.assign({}, previewOptions, overrides))
 }
-ok(asset("settings.json").data.includes("codeartifact-json"), "JSON map preview")
-ok(asset("invalid.json").data.includes("could not be parsed as JSON"), "malformed JSON fallback")
+var beforeJSON = assetReads
+ok(asset("settings.json").jsonViewer && assetReads == beforeJSON, "JSON shell does not open the asset")
+var jsonData = asset("settings.json", {view:"json-data"})
+ok(jsonData.streamType.startsWith("application/json") && af.fromInputStream2String(jsonData.stream) == previewAssets["settings.json"], "JSON endpoint streams original bytes")
+ok(asset("invalid.json", {view:"source"}).data.includes("invalid json"), "malformed JSON can be viewed as source")
 var pomView = asset("build.pom").data
-ok(pomView.includes('data-format="xml"') && pomView.includes("/js/njsmap.js"), "POM uses the nJSMap renderer")
+ok(pomView.includes('data-format="xml"') && pomView.includes("/js/njsmap.js") && pomView.includes("nJSMap.mount(tree, JSON.parse(source)"), "POM uses the nJSMap renderer")
 ok(pomView.includes('&quot;project&quot;:{&quot;version&quot;:&quot;1.2&quot;') &&
   pomView.includes('&quot;dependency&quot;:[{&quot;artifactId&quot;:&quot;one&quot;},{&quot;artifactId&quot;:&quot;two&quot;}]'), "POM preserves namespaced root, literal versions and repeated dependencies")
+var commentedPom = asset("commented.pom").data
+ok(commentedPom.includes('data-format="xml"') && commentedPom.includes('&quot;artifactId&quot;:&quot;jbossorg-fonts&quot;') &&
+  commentedPom.includes('${basedir}/src/main/licenses'), "POM with a leading license comment preserves its root and Maven properties")
+ok(asset("multiple-roots.xml").data.includes("could not be parsed as XML"), "XML with multiple roots falls back to source")
 var pomSource = asset("build.pom", {view:"source"}).data
 ok(pomSource.includes('class="language-xml"') && !pomSource.includes("data-json="), "POM source view stays escaped XML")
 var pomSourceHTML = ow.template.parseMD2HTML(pomSource, true)
@@ -188,13 +200,15 @@ ok(asset("dtd.xml").data.includes("could not be parsed as XML") && !asset("dtd.x
 ok(asset("build.pom", {}, {preview:{maxBytes:20}}).truncated, "POM preview respects its size limit")
 ok(af.fromInputStream2String(asset("build.pom", {raw:"true"}).stream) == previewAssets["build.pom"], "POM download returns original XML bytes")
 ok(asset("index.html", {view:"source"}).data.includes("&lt;script&gt;ACTIVE&lt;/script&gt;"), "HTML source stays escaped")
-var htmlPreview = asset("index.html").data
-if (isDef(getOPackPath("Jsoup"))) {
-  ok(htmlPreview.includes('sandbox=""') && htmlPreview.includes("Fixture HTML") && !htmlPreview.includes("example.invalid") && !htmlPreview.includes("ACTIVE"), "sandbox HTML strips active and network content")
-} else {
-  ok(htmlPreview.includes("Install the Jsoup oPack") && htmlPreview.includes("&lt;script&gt;"), "source fallback without Jsoup")
-}
-ok(asset("index.html", {}, {preview:{maxBytes:6}}).truncated, "HTML preview obeys size bound")
+var icon = asset("icon.svg", {}, {preview:{maxBytes:1},download:false})
+ok(icon.streamType == "image/svg+xml" && icon.streamHeaders["Content-Disposition"] == "inline" &&
+  icon.streamHeaders["Content-Security-Policy"].startsWith("sandbox;"), "SVG opens as an isolated image")
+ok(af.fromInputStream2String(icon.stream) == previewAssets["icon.svg"], "image preview streams the complete asset")
+var htmlPreview = asset("index.html", {}, {preview:{maxBytes:6},download:false})
+ok(htmlPreview.streamType == "text/html" && htmlPreview.streamHeaders["Content-Security-Policy"].startsWith("sandbox;"),
+  "HTML opens directly with a sandbox policy")
+ok(af.fromInputStream2String(htmlPreview.stream) == previewAssets["index.html"], "HTML preview streams complete original bytes")
+ok(asset("index.html", {view:"source"}, {preview:{maxBytes:6}}).truncated, "HTML source obeys the size bound")
 ok(asset("build.pom", {}, {download:false}).data.indexOf("Download raw") < 0, "previews work independently of downloads")
 var raw = asset("index.html", {raw:"true"})
 ok(raw.streamType == "application/octet-stream" && raw.streamHeaders["Content-Disposition"].includes("index.html"), "raw HTML attachment headers")
@@ -206,6 +220,20 @@ try { asset("index.html", {raw:"true"}, {download:false}) } catch (e) { denied =
 ok(denied == 403 && assetReads == reads, "raw permission checked before backend fetch")
 var apiRaw = asset("index.html", {}, {_api:true})
 ok(af.fromInputStream2String(apiRaw.stream) == previewAssets["index.html"], "API keeps unmodified asset stream")
+reads = assetReads
+var loads = packageCalls.get()
+;["domain/unlisted/maven/org.example/pkg1/1.0", "domain/repo/generic/org.example/pkg1/1.0",
+  "domain/repo/maven/org.example.extra/pkg1/1.0", "domain/repo/maven/org.example/missing/1.0",
+  "domain/repo/maven/org.example/pkg1/unknown"].forEach(path => {
+  var request = req(path)
+  request.params.asset = "index.html"
+  var status
+  try { args.fns.getObj(request, Object.assign({}, options, { download: true })) } catch (e) { status = e.httpStatus }
+  ok(status == 403, "out-of-scope direct object rejected")
+})
+var unknownAsset
+try { asset("unlisted.txt") } catch (e) { unknownAsset = e.httpStatus }
+ok(unknownAsset == 403 && assetReads == reads && packageCalls.get() == loads, "out-of-scope reads never reach the asset backend")
 var invalidSearch = req("")
 invalidSearch.params = { q: "pkg1", sort: "Unknown" }
 var invalidSort = false
@@ -267,7 +295,11 @@ ok(packageCalls.get() == before + 1, "concurrent cold loads coalesce")
 var bounded = create()
 peak.set(0)
 barrier = new java.util.concurrent.CountDownLatch(3)
-pForEach([1,2,3,4,5,6], i => bounded.fns.getList(req("domain/repo" + i + "/"), options), e => { throw e })
+var listRepositories = FixtureAWS.prototype.CODEARTIFACT_ListRepositories
+FixtureAWS.prototype.CODEARTIFACT_ListRepositories = () => [1,2,3,4,5,6].map(i => ({ name: "repo" + i, domainName: "domain" }))
+try {
+  pForEach([1,2,3,4,5,6], i => bounded.fns.getList(req("domain/repo" + i + "/"), options), e => { throw e })
+} finally { FixtureAWS.prototype.CODEARTIFACT_ListRepositories = listRepositories }
 barrier = undefined
 ok(peak.get() == 3, "cold repository loads bounded to three")
 // Exercise real asynchronous refresh with a blocked service fixture.

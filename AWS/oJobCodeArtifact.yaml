@@ -31,6 +31,7 @@ jobs:
         sortTab   : sortTab
         options   : options
         operationsBrowseUris: operationsBrowseUris
+        operationsToken: operationsToken
         domain    : domain
         repository: repository
         format    : format
@@ -78,6 +79,23 @@ jobs:
       if (isDef(pkg.namespace) && pkg.namespace.length > 0) parts.push(pkg.namespace)
       parts.push(pkg.package)
       return parts.join("/")
+    }
+
+    var denyScope = () => {
+      var denied = new Error("Forbidden")
+      denied.httpStatus = 403
+      throw denied
+    }
+    var scopedPackage = pkg => (!isDef(args.format) || pkg.format === args.format) &&
+      (!isDef(args.namespace) || pkg.namespace === args.namespace)
+    var readInventory = name => {
+      var unit = provider && provider.entries(name).find(entry => now() < entry.expiresAt)
+      return unit ? unit.value : browseCache(name).get({})
+    }
+    var authorizeRepository = (domain, repository) => {
+      if (!readInventory("codeartifact-domains").some(d => (d.domainName || d.name) === domain)) denyScope()
+      if (isDef(repository) && !readInventory("codeartifact-repos").some(r =>
+        r.domainName === domain && (r.repositoryName || r.name) === repository)) denyScope()
     }
 
     var buildPackageTree = aPackages => {
@@ -328,12 +346,14 @@ jobs:
         escapeAsset(content) + "</code></pre></div>\n\n"
       const showingSource = request.params.view == "source"
       const showModes = ["html", "xml", "json"].includes(type)
-      var data = '\n<style>.codeartifact-actions{display:flex;flex-wrap:wrap;gap:.35em 1em;margin-bottom:1em}.codeartifact-actions a{white-space:nowrap}.codeartifact-actions a[aria-current]{font-weight:600;text-decoration:underline}.codeartifact-actions a:focus-visible{outline:2px solid currentColor;outline-offset:2px}.codeartifact-frame{display:block;box-sizing:border-box;width:100%;height:65vh;border:1px solid #b8c0c8;border-radius:4px;color-scheme:light}.markdown-body-dark .codeartifact-frame{border-color:#444c56;color-scheme:dark}@media(max-width:600px){.codeartifact-frame{height:42vh}}</style>\n\n'
+      var data = '\n<style>.codeartifact-actions{display:flex;flex-wrap:wrap;gap:.35em 1em;margin-bottom:1em}.codeartifact-actions a{white-space:nowrap}.codeartifact-actions a[aria-current]{font-weight:600;text-decoration:underline}.codeartifact-actions a:focus-visible{outline:2px solid currentColor;outline-offset:2px}</style>\n\n'
       data += '<h3 style="overflow-wrap:anywhere">' + escapeAsset(name) + '</h3>\n\n'
       if (showModes || options.download) {
         data += '<nav class="codeartifact-actions" aria-label="Asset views and actions">'
         if (showModes) {
-          data += '<a href="' + url("preview") + '"' + (!showingSource ? ' aria-current="page"' : '') + '>Preview</a>' +
+          const renderJSON = type == "json" && isFunction(support.jsonViewURL)
+          data += '<a href="' + (renderJSON ? support.jsonViewURL(request, "json") : url("preview")) + '"' +
+            (!showingSource ? ' aria-current="page"' : '') + '>' + (renderJSON ? "Render" : "Preview") + '</a>' +
             '<a href="' + url("source") + '"' + (showingSource ? ' aria-current="page"' : '') + '>Source</a>'
         }
         if (options.download) data += '<a href="' + url("raw") + '">Download raw</a>'
@@ -342,27 +362,6 @@ jobs:
 
       if (preview.truncated) {
         data += "<p>Preview truncated at the configured size limit.</p>\n\n" + source("text", preview.data.replace(/\n\n\[Preview truncated; download the complete file\.\]$/, ""))
-      } else if (type == "html" && !showingSource) {
-        const jsoup = getOPackPath("Jsoup")
-        if (isDef(jsoup)) {
-          // Parse without network access and retain only static content and layout.
-          loadExternalJars(jsoup)
-          const allow = new Packages.org.jsoup.safety.Safelist()
-          ;["article", "section", "header", "footer", "main", "div", "span", "p", "br", "hr", "h1", "h2", "h3",
-            "h4", "h5", "h6", "ul", "ol", "li", "dl", "dt", "dd", "table", "thead", "tbody", "tfoot", "tr",
-            "th", "td", "caption", "a", "pre", "code", "blockquote", "em", "strong", "b", "i", "u", "s",
-            "small", "sup", "sub"].forEach(tag => allow.addTags(tag))
-          allow.addAttributes("td", "colspan", "rowspan")
-          allow.addAttributes("th", "colspan", "rowspan", "scope")
-          const html = Packages.org.jsoup.Jsoup.clean(String(preview.data), allow)
-          const csp = "default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'"
-          const document = '<!doctype html><meta http-equiv="Content-Security-Policy" content="' + csp +
-            '"><meta name="color-scheme" content="light dark"><style>body{background:Canvas;color:CanvasText;font:16px system-ui;padding:.75em;overflow-wrap:anywhere}pre{white-space:pre-wrap}table{border-collapse:collapse}th,td{padding:.3em;border:1px solid GrayText}</style>' + html
-          data += '<iframe title="HTML asset preview" sandbox="" referrerpolicy="no-referrer" class="codeartifact-frame" srcdoc="' +
-            escapeAsset(document) + '"></iframe>\n\n'
-        } else {
-          data += "<p>Install the Jsoup oPack to display HTML previews.</p>\n\n" + source("html", preview.data)
-        }
       } else if ((type == "json" || type == "xml") && !showingSource) {
         const fromXML = type == "xml"
         var value
@@ -371,8 +370,15 @@ jobs:
             const xml = preview.data.trim().replace(/^<\?xml\s[^?]*\?>/, "").trim()
             // Registry assets are untrusted. Skip DTD and entity declarations before parsing.
             if (!/<!\s*(?:DOCTYPE|ENTITY)\b/i.test(xml)) {
-              const element = new XML(xml)
-              if (element.nodeKind() == "element") {
+              const document = new XML("<xml>" + xml + "</xml>")
+              const nodes = Array.from(document.children())
+              const elements = nodes.filter(node => node.nodeKind() == "element")
+              if (elements.length == 1 && nodes.every(node => {
+                const kind = node.nodeKind()
+                return kind == "element" || kind == "comment" || kind == "processing-instruction" ||
+                  (kind == "text" && String(node).trim() == "")
+              })) {
+                const element = elements[0]
                 value = Object.fromEntries([[String(element.localName()), af.fromXML2Obj(element)]])
               }
             }
@@ -383,10 +389,21 @@ jobs:
         if (isMap(value) || isArray(value)) {
           data += '<link rel="stylesheet" href="' + prefix + '/css/nJSMap.css"><script src="' + prefix + '/js/openafsigil.js"></script>' +
             '<script src="' + prefix + '/js/njsmap.js"></script>\n\n<div id="codeartifact-json" style="overflow:auto" data-format="' + type + '" data-json="' + escapeAsset(fromXML ? JSON.stringify(value) : preview.data) + '">' +
-            source(type, preview.data) + '</div>\n\n<script>document.addEventListener("DOMContentLoaded",function(){var view=document.getElementById("codeartifact-json");' +
-            'if(!window.nJSMap)return; var esc=function(s){return String(s).replace(/[&<>"\x27]/g,function(c){return "&#"+c.charCodeAt(0)+";";});};' +
-            'var safe=function(v){if(Array.isArray(v))return v.map(safe);if(v&&typeof v==="object")return Object.fromEntries(Object.entries(v).map(function(x){return [esc(x[0]),safe(x[1])];}));return v==null?"null":typeof v==="string"?view.dataset.format==="xml"?"<span>"+esc(v)+"</span>":esc(v):v;};' +
-            'try{var value=safe(JSON.parse(view.dataset.json)),previous;function render(){var dark=document.body.classList.contains("markdown-body-dark");if(previous===dark)return;previous=dark;view.classList.toggle("njsmap_dark",dark);var result=nJSMap(value,undefined,dark);if(result)view.innerHTML=result;}render();new MutationObserver(render).observe(document.body,{attributeFilter:["class"]});}catch(e){} });</script>\n\n'
+            source(type, preview.data) + `</div>\n\n<script>
+            document.addEventListener("DOMContentLoaded", function() {
+              if (!window.nJSMap || typeof nJSMap.mount !== "function") return
+              const view = document.getElementById("codeartifact-json")
+              try {
+                const source = view.dataset.json
+                const tree = document.createElement("div")
+                const theme = () => tree.classList.toggle("njsmap_dark", document.body.classList.contains("markdown-body-dark"))
+                theme()
+                nJSMap.mount(tree, JSON.parse(source), { collapseAll: source.length >= 1024 * 1024 })
+                view.replaceChildren(tree)
+                new MutationObserver(theme).observe(document.body, { attributeFilter: ["class"] })
+              } catch (error) {}
+            })
+          </script>\n\n`
         } else {
           if (isUnDef(value)) data += "<p>This asset could not be parsed as " + type.toUpperCase() + ".</p>\n\n"
           data += source(type, preview.data)
@@ -394,13 +411,21 @@ jobs:
       } else {
         data += source(type, preview.data)
       }
-      return { data: data, type: "raw", browseDetail: true, truncated: !!preview.truncated }
+      return { data: data, type: "raw", browseDetail: true, jsonSource: type == "json" && showingSource, truncated: !!preview.truncated }
     }
 
     args.fns = {
       validate: (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
-        if (/(^|\/)\.\.(\/|$)/.test(path) || /[\\\x00]/.test(path)) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+        var parts = path.replace(/\/+$/, "").split("/")
+        if (path && (parts.some(p => !p || p === "." || p === "..") || /[\\\x00]/.test(path))) denyScope()
+        if (parts[0] && isDef(args.domain) && parts[0] !== args.domain) denyScope()
+        if (parts.length >= 2 && isDef(args.repository) && !parts[1].startsWith(args.repository)) denyScope()
+        if (parts.length >= 3 && isDef(args.format) && parts[2] !== args.format) denyScope()
+        if (parts.length >= 4 && isDef(args.namespace)) {
+          var namespace = args.namespace.split("/")
+          if (namespace.some((part, i) => isDef(parts[3 + i]) && parts[3 + i] !== part)) denyScope()
+        }
         var patterns = isString(args.restrict) ? [args.restrict] : (args.restrict || [])
         var prefixes=path.split("/").map((part,i,all)=>all.slice(0,i+1).join("/"))
         if (patterns.some(p => prefixes.some(prefix => new RegExp(p).test(prefix)))) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
@@ -421,7 +446,8 @@ jobs:
         .fn(k => {
           var _aws = getAWS()
           var lst = _aws.CODEARTIFACT_ListRepositories(args.region, args.repository)
-          return lst
+          return lst.filter(r => (!isDef(args.domain) || r.domainName === args.domain) &&
+            (!isDef(args.repository) || String(r.repositoryName || r.name).startsWith(args.repository)))
         })
         .create()
 
@@ -433,14 +459,13 @@ jobs:
           var state = provider && syncFn(() => treeState[id], treeLock)
           var lst = getAWS().CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format, args.namespace,
             state && (page => {
-              var paths = page.filter(pkg => !isDef(args.namespace) || pkg.namespace == args.namespace).map(packagePath)
+              var paths = page.filter(scopedPackage).map(packagePath)
               syncFn(() => {
                 if (treeState[id] === state && state.refreshing) state.pages.push(paths)
               }, treeLock)
             }))
           if (!isArray(lst)) throw new Error("Invalid CodeArtifact package response")
-          if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
-          return buildPackageTree(lst)
+          return buildPackageTree(lst.filter(scopedPackage))
         })
         .create()
 
@@ -473,6 +498,7 @@ jobs:
           $doV(() => {
             var _inits = af.fromJSSLON(args.initialize)
             pForEach(_inits, i => {
+              authorizeRepository(i.domain, i.repository)
               readTree({
                 domain    : i.domain,
                 repository: i.repository
@@ -486,6 +512,7 @@ jobs:
         const uri = request.uri
         var puri = global.__ojobHttpRelativePath(uri, options.parentURI).replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
+        if (parts.length) authorizeRepository(parts[0], parts[1])
         var reqParams = isMap(request.params) ? request.params : {}
         var reqPage = isDef(reqParams.page) ? Number(reqParams.page) : __
         var reqPageSize = __
@@ -622,7 +649,7 @@ jobs:
             const order = options.sortTab && reqParams.order || "asc"
             if (fields.indexOf(field) < 0 || ["asc", "desc"].indexOf(order) < 0) support.error(400, "Invalid sort")
             const direction = order == "desc" ? -1 : 1
-            rows.sort((left, right) => direction * support.compareValues(left.values[field], right.values[field]))
+            rows.sort((left, right) => direction * support.compareValues(left.values[field], right.values[field], field == "Version"))
             sortInfo = { field: field, order: order }
           }
           var _paged = applyPaging(rows, reqPage, reqPageSize)
@@ -667,10 +694,15 @@ jobs:
         var domain = parts[0]
         var repo = parts[1]
         var version = parts[parts.length - 1]
-        var pkgParts = parts.slice(2, -1)
-        var format = pkgParts[0]
-        var pkg = pkgParts[pkgParts.length - 1]
-        var namespace = pkgParts.length > 2 ? pkgParts.slice(1, -1).join("/") : __
+        if (parts.length < 5) denyScope()
+        authorizeRepository(domain, repo)
+        var tree = readTree({ domain: domain, repository: repo }, false)
+        var leaf = tree.leafByPath[parts.slice(2, -1).join("/")]
+        if (!leaf || !scopedPackage(leaf)) denyScope()
+        var format = leaf.format, pkg = leaf.package, namespace = leaf.namespace
+        var packageKey = { domain: domain, repository: repo, format: format, namespace: namespace, package: pkg }
+        if (!browseCache("codeartifact-versions").get(packageKey).some(row => row.version === version)) denyScope()
+        var assetKey = Object.assign({}, packageKey, { version: version })
 
         var params = request.params || {}
         if (isDef(params.asset) && (!options._api || options.download)) {
@@ -686,27 +718,28 @@ jobs:
             denied.httpStatus = 403
             throw denied
           }
-          const result = getAWS().CODEARTIFACT_GetPackageVersionAsset(args.region, repo, domain, format, namespace, pkg, version, name)
+          if (!browseCache("codeartifact-assets").get(assetKey).some(row => (row.name || row.assetName) === name)) denyScope()
+          const openAsset = () => getAWS().CODEARTIFACT_GetPackageVersionAsset(args.region, repo, domain, format, namespace, pkg, version, name).stream
+          if (previewType == "json" && params.view != "source" && isFunction(support.jsonPreview)) {
+            return support.jsonPreview(request, options, openAsset, options.download === true)
+          }
+          const stream = openAsset()
+          var imageType = support && isFunction(support.imageType) && support.imageType(previewType)
+          if (imageType) return support.imagePreview(stream, imageType)
+          if (previewType == "html" && params.view != "source") return support.htmlPreview(stream)
           if (previewType) {
-            const preview = support.readPreview(result.stream, "text", (options.preview || {}).maxBytes || 262144)
+            const preview = support.readPreview(stream, "text", (options.preview || {}).maxBytes)
             return renderAssetPreview(preview, previewType, name, request, options)
           }
           const encodedName = encodeURIComponent(name).replace(/[!'()*]/g, ch => "%" + ch.charCodeAt(0).toString(16).toUpperCase())
           const fallbackName = name.replace(/[^a-zA-Z0-9_. -]/g, "_")
-          return { stream: result.stream, streamType: "application/octet-stream", streamHeaders: {
+          return { stream: stream, streamType: "application/octet-stream", streamHeaders: {
             "Content-Disposition": 'attachment; filename="' + fallbackName + '"; filename*=UTF-8' + "''" + encodedName,
             "X-Content-Type-Options": "nosniff"
           } }
         }
 
-        var assets = browseCache("codeartifact-assets").get({
-          domain    : domain,
-          repository: repo,
-          format    : format,
-          namespace : namespace,
-          package   : pkg,
-          version   : version
-        })
+        var assets = clone(browseCache("codeartifact-assets").get(assetKey))
         traverse(assets, (aK, aV, aP, aO) => {
           if (aK == "SHA-512") {
             delete aO[aK]
@@ -851,6 +884,8 @@ jobs:
       }
       args.fns.refresh = (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        var parts = path.split("/")
+        if (parts[0]) authorizeRepository(parts[0], parts[1])
         // Drain active loads; queued callbacks check their identity before loading.
         treeSlots.acquire(3)
         try {
