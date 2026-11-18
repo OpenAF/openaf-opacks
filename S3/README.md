@@ -18,13 +18,34 @@ budget. `S3.walkObjects(bucket, prefix, callback, options)` supports
 the existing `listObjects` API unchanged. The SDK may prefetch a remote page.
 
 `preview: { formats: { xml: xml, json: json }, maxBytes: 1048576 }` selects HTML
-viewers and ranged reads. An explicit formats map replaces the default set;
-an empty map disables viewers. Raw downloads and API object reads remain complete.
-Restrictions are checked before raw downloads as well as previews.
+viewers and ranged reads. The default preview limit is 4 MiB. An explicit
+formats map replaces the default set, and an empty map disables viewers.
+Markdown previews use Jsoup to keep static formatting. JSON streams to the
+browser's nJSMap viewer, which accepts up to 16 MiB and offers a bounded source
+preview for larger or invalid files. Other text, including AsciiDoc, is shown
+as escaped source. Raw downloads and API object
+reads stream the complete object as an attachment.
+
+### Serving a website from S3
+
+Set `options.web.enabled: true` on either `S3Browse` or `httpdS3Browse` to
+serve objects inline with their file MIME types. Use `path` to select the
+website folder and `default: index.html` to serve its landing page. In browse
+mode, clicking an HTML file streams it in a sandbox that blocks scripts, form
+submissions, and external resources. If you provide a custom formats map, add
+`html: html` or `htm: html` for the extensions you use. Explicit `?raw=true`
+requests download the original bytes in both modes. Path and restriction checks
+apply to both modes.
+
+Give the website a dedicated origin and enable web mode only for a prefix whose
+writers you trust. JavaScript served from that prefix runs with the privileges
+of the serving origin.
 
 `operations.enabled: true` exposes status/freshness/metrics and POST refresh
 under the browser's reserved `@@` path. API operations require an explicit
 `operationsBrowseUris` allowlist and the API route's authentication policy.
+POST refresh additionally requires an API `operationsToken` and a matching
+`X-OpenAF-Browse-Token` header.
 See oJob-common for the shared operations and compatibility contract.
 
 ## Usage
