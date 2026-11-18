@@ -2,7 +2,7 @@
 // oaf -f tests/codeartifact.js
 var checks = $atomic(0)
 function ok(value, label) { checks.inc(); if (!value) throw new Error(label) }
-var common = getOPackPath("oJob-common")
+var common = getEnv("BROWSE_SOURCE") || getOPackPath("oJob-common")
 var browse = io.readFileYAML(common + "/oJobBrowse.yaml")
 var job = io.readFileYAML("oJobCodeArtifact.yaml").jobs[0].exec
 var http = io.readFileYAML(common + "/oJobHTTPd.yaml")
@@ -51,6 +51,9 @@ noFormat.postURLEncoded = (url, uri, query, params) => {
 }
 noFormat.CODEARTIFACT_ListPackages("eu-west-1", "repo", "domain", undefined, "org.example")
 
+ow.loadServer()
+ow.loadFormat()
+
 var clock = $atomic(10000), constructed = $atomic(0), assumed = $atomic(0), packageCalls = $atomic(0), repoCalls = $atomic(0)
 var clients = [], tasks = [], version = 1, fail = false, hold, large = false, barrier
 var active = $atomic(0), peak = $atomic(0), activityLock = new java.lang.Object()
@@ -87,11 +90,26 @@ FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions = () => [{ version: "1.0",
 FixtureAWS.prototype.CODEARTIFACT_ListPackageVersionAssets = () => [{ name: "pkg.jar", size: 10, hashes: { "SHA-256": "abc" } }]
 var support = {}
 new Function("exports", "now", browse.code["ojob-browse-contract.js"])(support, () => clock.get())
-function create(realAsync, legacy) {
+function create(realAsync, legacy, extraOptions) {
   var args = { region: "eu-west-1", assumeRole: "fixture", cache: 1000, format: "maven", namespace: "org.example", options: legacy ? {} : { query: { enabled: true } } }
+  Object.assign(args.options, extraOptions)
   new Function("args", "AWS", "loadLib", "require", "now", "$doV", job)(args, FixtureAWS, () => {}, () => support, () => clock.get(), fn => realAsync ? $doV(fn) : tasks.push(fn))
   args.fns.init()
   return args
+}
+var previewAssets = {
+  "settings.json": '{"name":"<script>data</script>"}',
+  "invalid.json": "{ invalid json",
+  "build.pom": '<?xml version="1.0"?><project xmlns="http://maven.apache.org/POM/4.0.0"><version>1.2</version><name>&lt;i&gt;fixture&lt;/i&gt;</name><dependencies><dependency><artifactId>one</artifactId></dependency><dependency><artifactId>two</artifactId></dependency></dependencies></project>\n',
+  "invalid.xml": "<project><name></project>",
+  "dtd.xml": '<!DOCTYPE project [<!ENTITY local "static">]><project>&local;</project>',
+  "index.html": '<h1>Fixture HTML</h1><img src="https://example.invalid/external"><a href="https://example.invalid/go">go</a><script>ACTIVE</script><form action="/bad">FORM</form>',
+  "pkg.jar": "fixture bytes"
+}
+var assetReads = 0
+FixtureAWS.prototype.CODEARTIFACT_GetPackageVersionAsset = (region, repo, domain, format, namespace, pkg, version, name) => {
+  assetReads++
+  return {stream: new java.io.ByteArrayInputStream(new java.lang.String(previewAssets[name]).getBytes("UTF-8"))}
 }
 var args = create(), options = merge(args.options, { parentURI: "/code.v1+", _api: true })
 function req(path) { return { uri: options.parentURI + "/" + path, params: {} } }
@@ -119,13 +137,15 @@ ok(repoCalls.get() == 1, "account repository scan shared across domains")
 // hidden sort field that the search form carries between different schemas.
 var browseCode = browse.jobs.filter(j => String(j.exec).indexOf("var applyQuery =") >= 0)[0].exec
 var queryStart = browseCode.indexOf("var applyQuery =")
-var applyQuery = new Function(browseCode.substring(queryStart, browseCode.indexOf("// Wrap provider callbacks", queryStart)) + "\nreturn applyQuery")()
+var applyQuery = new Function("require", browseCode.substring(queryStart, browseCode.indexOf("// Wrap provider callbacks", queryStart)) + "\nreturn applyQuery")(() => support)
 var renderStart = browseCode.indexOf(".default((lst, server, request, options) => {") + ".default(".length
 var renderEnd = browseCode.indexOf("\nargs.fns.renderObj", renderStart)
 if (renderEnd < 0) renderEnd = browseCode.indexOf("\n    args.fns.renderObj", renderStart)
 var renderList = new Function("escapeText", "return " + browseCode.substring(renderStart, renderEnd).trim().slice(0, -1))(global.__ojobHttpEscapeText)
 ow.loadTemplate()
 global.__ojobHttpUriPrefix = {}
+
+
 ;[
   ["", ["Domain", "Owner", "Created"], "domain/repo/maven/org.example/pkg1"],
   ["domain/", ["Repository", "Domain", "Owner", "Description"], "repo/maven/org.example/pkg1"],
@@ -145,6 +165,47 @@ global.__ojobHttpUriPrefix = {}
     ok(cleared.sortInfo.field == String(cleared.key), "clearing search restores listing sort")
   })
 })
+var versionPath = "domain/repo/maven/org.example/pkg1/1.0"
+var previewOptions = Object.assign({}, options, { _api: false, preview: {}, download: true, port: 19862 })
+function asset(name, params, overrides) {
+  var request = req(versionPath)
+  request.params = Object.assign({ asset: name }, params)
+  return args.fns.getObj(request, Object.assign({}, previewOptions, overrides))
+}
+ok(asset("settings.json").data.includes("codeartifact-json"), "JSON map preview")
+ok(asset("invalid.json").data.includes("could not be parsed as JSON"), "malformed JSON fallback")
+var pomView = asset("build.pom").data
+ok(pomView.includes('data-format="xml"') && pomView.includes("/js/njsmap.js"), "POM uses the nJSMap renderer")
+ok(pomView.includes('&quot;project&quot;:{&quot;version&quot;:&quot;1.2&quot;') &&
+  pomView.includes('&quot;dependency&quot;:[{&quot;artifactId&quot;:&quot;one&quot;},{&quot;artifactId&quot;:&quot;two&quot;}]'), "POM preserves namespaced root, literal versions and repeated dependencies")
+var pomSource = asset("build.pom", {view:"source"}).data
+ok(pomSource.includes('class="language-xml"') && !pomSource.includes("data-json="), "POM source view stays escaped XML")
+var pomSourceHTML = ow.template.parseMD2HTML(pomSource, true)
+ok(pomSourceHTML.includes("&lt;project xmlns=") && !pomSourceHTML.includes("&amp;lt;project"), "Markdown renders tag delimiters once for XML ending in a newline")
+ok(pomSourceHTML.includes("&amp;lt;i&amp;gt;fixture&amp;lt;/i&amp;gt;"), "literal XML entities stay literal in the Source view")
+ok(asset("invalid.xml").data.includes("could not be parsed as XML") && !asset("invalid.xml").data.includes("data-json="), "malformed XML falls back to source")
+ok(asset("dtd.xml").data.includes("could not be parsed as XML") && !asset("dtd.xml").data.includes("data-json="), "DTD declarations fall back to source")
+ok(asset("build.pom", {}, {preview:{maxBytes:20}}).truncated, "POM preview respects its size limit")
+ok(af.fromInputStream2String(asset("build.pom", {raw:"true"}).stream) == previewAssets["build.pom"], "POM download returns original XML bytes")
+ok(asset("index.html", {view:"source"}).data.includes("&lt;script&gt;ACTIVE&lt;/script&gt;"), "HTML source stays escaped")
+var htmlPreview = asset("index.html").data
+if (isDef(getOPackPath("Jsoup"))) {
+  ok(htmlPreview.includes('sandbox=""') && htmlPreview.includes("Fixture HTML") && !htmlPreview.includes("example.invalid") && !htmlPreview.includes("ACTIVE"), "sandbox HTML strips active and network content")
+} else {
+  ok(htmlPreview.includes("Install the Jsoup oPack") && htmlPreview.includes("&lt;script&gt;"), "source fallback without Jsoup")
+}
+ok(asset("index.html", {}, {preview:{maxBytes:6}}).truncated, "HTML preview obeys size bound")
+ok(asset("build.pom", {}, {download:false}).data.indexOf("Download raw") < 0, "previews work independently of downloads")
+var raw = asset("index.html", {raw:"true"})
+ok(raw.streamType == "application/octet-stream" && raw.streamHeaders["Content-Disposition"].includes("index.html"), "raw HTML attachment headers")
+ok(af.fromInputStream2String(raw.stream) == previewAssets["index.html"], "raw asset bytes remain complete")
+var unsupported = asset("pkg.jar")
+ok(af.fromInputStream2String(unsupported.stream) == previewAssets["pkg.jar"], "unsupported asset stream")
+var reads = assetReads, denied
+try { asset("index.html", {raw:"true"}, {download:false}) } catch (e) { denied = e.httpStatus }
+ok(denied == 403 && assetReads == reads, "raw permission checked before backend fetch")
+var apiRaw = asset("index.html", {}, {_api:true})
+ok(af.fromInputStream2String(apiRaw.stream) == previewAssets["index.html"], "API keeps unmodified asset stream")
 var invalidSearch = req("")
 invalidSearch.params = { q: "pkg1", sort: "Unknown" }
 var invalidSort = false
@@ -156,7 +217,15 @@ ok(list.list.some(r => r.values.Package == "pkg1") && packageCalls.get() == 1, "
 args.fns.getList(request, options)
 ok(tasks.length == 1, "expired visits coalesce")
 ok(args.fns.getFreshness(request, options).refreshing && args.fns.getFreshness(request, options).stale, "stale refresh reported")
+var pendingRequest = req("domain/repo/")
+pendingRequest.params = { q: "pkg" }
+ok(args.fns.search(pendingRequest, options).searchInfo.refreshing, "search reports in-scope package tree refresh")
+var otherRequest = req("domain/other/")
+otherRequest.params = { q: "pkg" }
+ok(!args.fns.search(otherRequest, options).searchInfo.refreshing, "search ignores out-of-scope package tree refresh")
 while (tasks.length) tasks.shift()()
+var finishedSearch = args.fns.search(pendingRequest, options)
+ok(!finishedSearch.searchInfo.refreshing && finishedSearch.list.some(r => r.values.Package.endsWith("pkg2")), "search sees replacement tree after refresh")
 ok(args.fns.getList(request, options).list.some(r => r.values.Package == "pkg2"), "atomic fresh tree replacement")
 ok(!args.fns.getFreshness(request, options).refreshing, "refresh complete")
 clock.set(clock.get() + 1001); fail = true
@@ -225,5 +294,97 @@ ok(packageCalls.get() == before + 1, "explicit refresh loads again after invalid
 var deadline = now() + 5000
 while (async.fns.getFreshness(request, options).refreshing && now() < deadline) sleep(10, true)
 ok(!async.fns.getFreshness(request, options).refreshing, "real background refresh finishes")
+hold = undefined
+// With publication dates deliberately out of precedence order, test the complete list through both render paths.
+var originalVersions = FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions
+FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions = () =>
+  ["1.9.0", "1.10.0+build.z", "1.10.0-rc.10", "2.0.0", "1.10.0+build.a", "1.10.0-rc.2"]
+    .map((version, i) => ({ version: version, publishedTime: 1711050000 - i }))
+try {
+  var legacyVersionBrowser = create(false, true)
+  legacyVersionBrowser.options.pageSize = 3
+  var legacyVersionOptions = Object.assign({}, legacyVersionBrowser.options, { parentURI: options.parentURI, sortTab: true })
+  var versionQuery = req("domain/repo/maven/org.example/pkg" + version + "/")
+  function versionNames(result) { return result.list.map(row => row.values.Version).join(",") }
+  var page = legacyVersionBrowser.fns.getList(versionQuery, legacyVersionOptions)
+  ok(versionNames(page) == "1.9.0,1.10.0-rc.2,1.10.0-rc.10", "legacy version browser sorts before pagination")
+  ok(page.pageInfo.totalPages == 2 && page.sortInfo.field == "Version", "legacy provider reports the active server sort")
+  versionQuery.params = { sort: "Version", order: "desc" }
+  page = legacyVersionBrowser.fns.getList(versionQuery, legacyVersionOptions)
+  var firstPageNames = page.list.map(row => row.values.Version)
+  ok(firstPageNames[0] == "2.0.0" && firstPageNames.slice(1).sort().join(",") == "1.10.0+build.a,1.10.0+build.z" &&
+    support.compareValues(firstPageNames[1], firstPageNames[2]) == 0, "descending groups equal release builds above prereleases")
+  var versionTable = String(renderList(page, {}, versionQuery, legacyVersionOptions))
+  var body = versionTable.match(/<tbody>[\s\S]*?<\/tbody>/)[0]
+  var offsets = firstPageNames.map(name => body.indexOf(encodeURIComponent(name)))
+  ok(offsets[0] >= 0 && offsets[0] < offsets[1] && offsets[1] < offsets[2], "legacy renderer preserves SemVer row order")
+  ok(versionTable.includes('href="?sort=Version&amp;order=desc&amp;page=1"') && !versionTable.includes('/js/mdtablesort.js'),
+    "legacy Version header uses server-side sorting links")
+  versionQuery.params.page = "2"
+  ok(versionNames(legacyVersionBrowser.fns.getList(versionQuery, legacyVersionOptions)) == "1.10.0-rc.10,1.10.0-rc.2,1.9.0",
+    "descending pagination continues the same SemVer order")
+  ok(versionNames(legacyVersionBrowser.fns.getList(req("domain/repo/maven/org.example/pkg" + version + "/"), Object.assign({}, legacyVersionOptions, { _api: true }))) ==
+    "1.9.0,1.10.0+build.z,1.10.0-rc.10", "legacy API retains publication order")
+
+  var queryVersionBrowser = create()
+  var queryVersionOptions = Object.assign({}, queryVersionBrowser.options, { parentURI: options.parentURI })
+  versionQuery.params = { sort: "Version", order: "desc", size: "3" }
+  page = applyQuery(queryVersionBrowser.fns.getList(versionQuery, queryVersionOptions), versionQuery, queryVersionOptions)
+  ok(page.list[0].values.Version == "2.0.0" &&
+    page.list.slice(1).map(row => row.values.Version).sort().join(",") == "1.10.0+build.a,1.10.0+build.z", "enhanced query uses the same SemVer precedence")
+} finally { FixtureAWS.prototype.CODEARTIFACT_ListPackageVersions = originalVersions }
+// Prefetch-only mode shares cold snapshots, while ordinary lookups never depend on hints.
+var prefetch = create(false, true, { prefetch: true })
+var prefetchOptions = Object.assign({}, prefetch.options, { parentURI: options.parentURI, capabilities: {prefetch:1} })
+var repoRequest = req("domain/repo/"), otherRepo = req("other/elsewhere/")
+ok(!prefetch.fns.prefetch(repoRequest, prefetchOptions), "hint cannot discover repositories through AWS")
+var domainPage = prefetch.fns.getList(req("domain/"), prefetchOptions)
+ok(domainPage.content.includes("pointerover") && domainPage.content.includes("focusin"), "domain list listens for repository intent")
+ok(!prefetch.fns.getList(req(""), prefetchOptions).content, "domain links are not prefetch candidates")
+ok(!prefetch.fns.getList(req("domain/"), Object.assign({}, prefetchOptions, {capabilities:{}})).content, "older Browse routes emit no hints")
+ok(isUnDef(create(false, true).fns.prefetch), "legacy default has no prefetch callback")
+before = packageCalls.get()
+ok(prefetch.fns.prefetch(repoRequest, prefetchOptions) && packageCalls.get() == before, "cold repository warm is scheduled asynchronously")
+ok(!prefetch.fns.prefetch(repoRequest, prefetchOptions) && !prefetch.fns.prefetch(otherRepo, prefetchOptions), "duplicate hints coalesce and one speculative slot is allowed")
+ok(!prefetch.fns.prefetch(req("domain/missing/"), prefetchOptions) && !prefetch.fns.prefetch(req("domain/repo/maven/"), prefetchOptions), "unknown and deeper paths are skipped")
+while (tasks.length) tasks.shift()()
+ok(packageCalls.get() == before + 1 && !prefetch.fns.prefetch(repoRequest, prefetchOptions), "successful hint warms the existing tree cache")
+ok(prefetch.fns.getList(repoRequest, prefetchOptions).isList && packageCalls.get() == before + 1, "first visit reuses the prefetched tree")
+var prefetchStatus = prefetch.fns.getStatus().prefetch
+ok(prefetchStatus.queued == 1 && prefetchStatus.loaded == 1 && prefetchStatus.used == 1, "status counts queued, loaded and used prefetches")
+
+// Exercise the HTTP dispatch with the request shape exposed by HTTPServer.
+var genericBrowse = browse.jobs.filter(job => job.name == "HTTP Browse generic")[0]
+var prefetchRoute = new Function("request", "server", "port", "uri", genericBrowse.args.execURI)
+var previousBrowse = global.__GBHTTPD
+global.__GBHTTPD = { ["19862" + options.parentURI]: Object.assign({}, prefetchOptions, {_fns:prefetch.fns}) }
+try {
+  var hint = Object.assign({}, repoRequest, {method:"GET", params:{_browsePrefetch:"1"}, header:{"x-openaf-browse-prefetch":"1"}})
+  var cachedHint = prefetchRoute(hint, {}, 19862, options.parentURI)
+  ok(cachedHint.status == 204 && cachedHint.data === "" && cachedHint.header["Cache-Control"] == "private, no-store", "cached hint returns an empty private response")
+  hint.method = "POST"
+  ok(prefetchRoute(hint, {}, 19862, options.parentURI).status == 405, "the prefetch route only permits GET")
+  hint.method = "GET"
+  global.__GBHTTPD["19862" + options.parentURI].prefetch = false
+  ok(prefetchRoute(hint, {}, 19862, options.parentURI).status == 404, "disabled prefetch rejects explicit hint requests")
+} finally { global.__GBHTTPD = previousBrowse }
+
+var runningPrefetch = create(true, true, {prefetch:true})
+runningPrefetch.fns.getList(req("domain/"), prefetchOptions)
+hold = { entered:new java.util.concurrent.CountDownLatch(1), release:new java.util.concurrent.CountDownLatch(1) }
+var readDone = new java.util.concurrent.CountDownLatch(1)
+var readError
+before = packageCalls.get()
+try {
+  ok(runningPrefetch.fns.prefetch(repoRequest, prefetchOptions), "concurrent fixture starts prefetch")
+  ok(hold.entered.await(5, java.util.concurrent.TimeUnit.SECONDS), "prefetch reaches AWS fixture")
+  $doV(() => {
+    try { runningPrefetch.fns.getList(repoRequest, prefetchOptions) } catch(e) { readError = e }
+    finally { readDone.countDown() }
+  })
+  ok(!readDone.await(100, java.util.concurrent.TimeUnit.MILLISECONDS), "navigation waits for the same in-flight tree")
+} finally { hold.release.countDown() }
+ok(readDone.await(5, java.util.concurrent.TimeUnit.SECONDS) && isUnDef(readError) && packageCalls.get() == before + 1,
+  "navigation shares the in-flight prefetch without a second AWS load")
 hold = undefined
 print("PASS: " + checks.get() + " CodeArtifact checks (no AWS requests)")

@@ -145,6 +145,92 @@ AWS.prototype.ECR_BatchGetImage = function(aRegion, aRepoName, aImageTag, params
 
 /**
  * <odoc>
+ * <key>AWS.ECR_ReadRegistryJSON(aRegion, aRegistryId, aRepoName, aKind, aDigest) : Map</key>
+ * Reads a private registry manifest or configuration blob by digest, with bounded response size.
+ * </odoc>
+ */
+AWS.prototype.ECR_ReadRegistryJSON = function(aRegion, aRegistryId, aRepoName, aKind, aDigest) {
+   aRegion = _$(aRegion, "region").isString().default(this.region)
+   const registry = String(aRegistryId)
+   if (!/^\d{12}$/.test(registry) || !/^[a-z0-9-]+$/.test(aRegion) ||
+       !/^[a-z0-9]+(?:[._-]+[a-z0-9]+)*(?:\/[a-z0-9]+(?:[._-]+[a-z0-9]+)*)*$/.test(aRepoName) ||
+       !/^(manifests|blobs)$/.test(aKind) || !/^sha256:[0-9a-f]{64}$/.test(aDigest)) {
+      throw new Error("Invalid private ECR registry reference")
+   }
+
+   const suffix = aRegion.startsWith("cn-") ? "amazonaws.com.cn" : "amazonaws.com"
+   const host = registry + ".dkr.ecr." + aRegion + "." + suffix
+   const token = this.ECR_GetAuthorizationToken(aRegion)
+   if (!token || !isString(token.authorizationToken) || !/^[A-Za-z0-9+/=]+$/.test(token.authorizationToken)) {
+      throw new Error("Private ECR registry authorization unavailable")
+   }
+
+   const limit = aKind == "manifests" ? 4 * 1024 * 1024 : 1024 * 1024
+   const deadline = now() + 12000
+   const media = [
+      "application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json",
+      "application/vnd.oci.image.manifest.v1+json", "application/vnd.docker.distribution.manifest.v2+json",
+      "application/vnd.oci.artifact.manifest.v1+json"
+   ].join(", ")
+   const registryURL = new java.net.URL("https://" + host + "/v2/" + aRepoName + "/" + aKind + "/" + aDigest)
+   const request = (url, authorized) => {
+      const connection = url.openConnection()
+      connection.setInstanceFollowRedirects(false)
+      connection.setConnectTimeout(5000)
+      connection.setReadTimeout(5000)
+      if (authorized) {
+         connection.setRequestProperty("Authorization", "Basic " + token.authorizationToken)
+         if (aKind == "manifests") connection.setRequestProperty("Accept", media)
+      }
+
+      try {
+         const status = Number(connection.getResponseCode())
+         if (authorized && aKind == "blobs" && [301, 302, 303, 307, 308].indexOf(status) >= 0) {
+            const location = connection.getHeaderField("Location")
+            if (location == null) throw new Error("Missing ECR blob redirect")
+            return { redirect: String(location) }
+         }
+         if (status != 200) {
+            const error = new Error("ECR registry returned HTTP " + status)
+            error.httpStatus = status == 404 ? 404 : status == 401 || status == 403 ? 403 : 503
+            throw error
+         }
+         if (connection.getContentLengthLong() > limit) throw new Error("ECR metadata exceeds the size limit")
+         const stream = connection.getInputStream()
+         const output = new java.io.ByteArrayOutputStream()
+         const buffer = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 8192)
+         try {
+            var count
+            while ((count = stream.read(buffer)) != -1) {
+               if (now() > deadline || output.size() + count > limit) throw new Error("ECR metadata exceeds the read limit")
+               output.write(buffer, 0, count)
+            }
+         } finally { stream.close() }
+         const bytes = output.toByteArray()
+         if ("sha256:" + sha256(bytes) != aDigest) throw new Error("ECR metadata digest mismatch")
+         const result = JSON.parse(String(new java.lang.String(bytes, java.nio.charset.StandardCharsets.UTF_8)))
+         if (!isMap(result)) throw new Error("Invalid ECR metadata")
+         return { value: result }
+      } finally { connection.disconnect() }
+   }
+
+   const first = request(registryURL, true)
+   if (!first.redirect) return first.value
+
+   // Keep AWS credentials on the registry host when the blob is served by signed S3 URL.
+   const url = new java.net.URL(registryURL, first.redirect)
+   const redirectHost = String(url.getHost())
+   const s3 = redirectHost.slice(0, -("." + suffix).length).split(".")
+   if (String(url.getProtocol()) != "https" || url.getUserInfo() != null ||
+       (url.getPort() != -1 && url.getPort() != 443) || !redirectHost.endsWith("." + suffix) ||
+       !s3.some(label => /^s3(?:-[a-z0-9-]+)?$/.test(label))) {
+      throw new Error("Unsupported ECR blob redirect")
+   }
+   return request(url, false).value
+}
+
+/**
+ * <odoc>
  * <key>AWS.ECR_BatchDeleteImage(aRegion, aRepoName, aImageTag, params) : Map</key>
  * Deletes an aImageTag from aRepoName on aRegion. Optionally you can provide extra params.\
  * \

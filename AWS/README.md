@@ -18,6 +18,10 @@ ECR sorts repository names before fetching summaries for visible rows; sorting
 globally by summary fields is unsupported. CodeArtifact sorts complete candidate
 lists before paging and searches loaded package trees, reporting incomplete search
 coverage. Cache keys are isolated per browser and cold loads coalesce.
+CodeArtifact orders the Version column using SemVer 2 precedence before
+pagination. With `sortTab: true`, the version table sorts across all pages
+even when enhanced search is disabled. Labels outside SemVer use a text
+fallback.
 CodeArtifact resets a carried sort column to the current view's name column when
 entering or clearing a search changes the available columns (for example,
 `Domain` to `Package`). Unknown sort columns remain invalid.
@@ -95,11 +99,53 @@ initial complete package fetch. Run `oaf -f tests/codeartifact.js` for offline
 pagination, navigation, large-tree, credential renewal, concurrency and refresh
 checks. Live AWS latency and permissions require separate validation.
 
-For CodeArtifact HTML asset previews, provide `preview.formats`, such as
-`{ xml: xml, pom: xml, json: json }`, and optional `preview.maxBytes`.
-The allowlist replaces default viewers; `{}` disables them. Raw/API object reads
-remain complete. Operations expose status, freshness, metrics and POST refresh;
-see the oJob-common browse documentation for authentication and refresh controls.
+### Prefetching CodeArtifact repository trees
+
+Set `options.prefetch: true` with a positive cache TTL to warm one cold
+repository tree when its link is hovered or focused for 225 ms. This works
+independently of enhanced search. Prefetch shares the normal repository
+cache and skips a hint when the background slot is busy. It does not warm
+package versions or assets. With Browse operations enabled, Status shows
+prefetch requests queued, trees loaded, and prefetched trees used by a visit.
+
+### Inspecting ECR images
+
+Set `options.imageDetails: true` on ECR Browse to link tags and untagged digests
+to image details. Repository tables show one row per tag in ascending SemVer
+order. Select a platform or artifact from an image index to inspect its
+details, with a breadcrumb back to the original index. For a single image
+manifest, the inspector reads the supported platform from the image config.
+The layer chart shows the largest compressed layers in manifest order and
+uses the local Chart.js asset. Install the optional Mermaid
+oPack for the platform diagram. Both tables are available independently of
+the diagrams. The Manifest tab displays a nested nJSMap view, with formatted
+JSON as a fallback. Config shows environment variable names. History displays
+the build commands stored by the image publisher.
+
+The inspector uses the browser's private ECR credentials. The IAM principal
+needs `ecr:DescribeImages`, `ecr:GetAuthorizationToken`,
+`ecr:BatchGetImage`, and `ecr:GetDownloadUrlForLayer`. The existing
+repository list continues to use its current listing permissions. Run
+`oaf -f tests/ecr-browse-details.js` for offline inspector checks.
+
+### Previewing CodeArtifact assets
+
+Set `options.preview: {}` for the default previews, including JSON, POM/XML,
+HTML, and the Browse text formats. `preview.formats` replaces the default
+allowlist and accepts extension keys and exact `name:` keys. Set
+`preview.maxBytes` to override the 256 KiB default. Large assets show a
+truncated source preview. POM/XML assets use OpenAF XML conversion and nJSMap.
+The Source view shows the original XML, which is also the fallback when
+conversion or rendering is unavailable.
+
+Install the optional Jsoup oPack for visual HTML previews. The preview renders
+static markup inside a sandbox without scripts, form submissions, navigation,
+or external resources. HTML source is always available. With `download: true`,
+the download action streams the complete original asset as an attachment,
+including binary assets. API asset reads continue to stream the original bytes.
+
+Operations expose status, freshness, metrics and POST refresh. See the
+oJob-common browse documentation for authentication and refresh controls.
 
 Load the required service library, for example `loadLib("aws_sqs.js")`.
 

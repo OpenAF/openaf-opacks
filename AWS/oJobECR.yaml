@@ -67,6 +67,9 @@ jobs:
       support.check(args.options, support.capabilities)
       provider = support.provider(args.options)
     }
+    if (!support) {
+      try { support = require("ojob-browse-contract.js") } catch (e) {}
+    }
     var cacheNamespace = "browse-" + genUUID() + "-"
     var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
 
@@ -192,6 +195,233 @@ jobs:
       } catch(e) { failed(e) }
     }
 
+    const isDigest = value => isString(value) && /^sha256:[0-9a-f]{64}$/.test(value)
+    const escapeDetail = value => String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]))
+    const detailCache = new Map(), detailLock = new java.lang.Object()
+    const detailSlots = new java.util.concurrent.Semaphore(3)
+    const detailLocks = Array.from({ length: 16 }, () => new java.lang.Object())
+    const readDetail = (key, load) => {
+      const lock = detailLocks[(new java.lang.String(key).hashCode() & 0x7fffffff) % detailLocks.length]
+      return syncFn(() => {
+        const hit = syncFn(() => detailCache.get(key), detailLock)
+        if (hit && now() < hit.until) return hit.value
+        if (!detailSlots.tryAcquire()) {
+          const busy = new Error("Image inspector busy")
+          busy.httpStatus = 503
+          throw busy
+        }
+        try {
+          const value = load()
+          syncFn(() => {
+            detailCache.delete(key)
+            detailCache.set(key, { value: value, until: now() + Math.max(5000, imageTTL) })
+            if (detailCache.size > 32) detailCache.delete(detailCache.keys().next().value)
+          }, detailLock)
+          return value
+        } finally { detailSlots.release() }
+      }, lock)
+    }
+
+    const inspectImage = (request, options, repository) => {
+      const params = request.params || {}
+      const tabs = { overview: "Overview", platforms: "Platforms", layers: "Layers", history: "History", config: "Config", manifest: "Manifest" }
+      const digest = params.image, selected = params.platform, tab = params.tab || "overview"
+      const error = (status, message) => {
+        const e = new Error(message)
+        e.httpStatus = status
+        throw e
+      }
+      if (!isDigest(digest) || isDef(selected) && !isDigest(selected) || !Object.prototype.hasOwnProperty.call(tabs, tab)) {
+        error(400, "Invalid image inspector selection")
+      }
+      if (!browseCache("ecr-repo").get({}).lst.some(repo => repo.repositoryName == repository)) error(404, "Repository not found")
+
+      const url = (view, platform) => "?image=" + encodeURIComponent(digest) + "&amp;tab=" + view +
+        (platform ? "&amp;platform=" + encodeURIComponent(platform) : "")
+      const table = (fields, rows, rowHeader) => '<div class="ecr-detail-table"><table><thead><tr>' + fields.map(field => "<th scope=\"col\">" + field + "</th>").join("") +
+        "</tr></thead><tbody>" + rows.map(row => "<tr>" + row.map((cell, index) => rowHeader && index === 0 ?
+          '<th scope="row"><strong>' + cell + '</strong></th>' : '<td>' + cell + '</td>').join("") + "</tr>").join("") + "</tbody></table></div>\n\n"
+      const textTable = (fields, rows, rowHeader) => table(fields, rows.map(row => row.map(escapeDetail)), rowHeader)
+      const properties = rows => textTable(["Property", "Value"], rows, true)
+      const repositoryName = escapeDetail(repository)
+      var data = '\n<nav class="ecr-detail-nav" aria-label="Image details"><a href="?">← ' + repositoryName + '</a>' +
+        Object.keys(tabs).map(key => '<a href="' + url(key, selected) + '"' + (key == tab ? ' aria-current="page"' : '') + '>' + tabs[key] + '</a>').join("") + '</nav>\n\n'
+      data += '<style>.ecr-detail-nav{display:flex;flex-wrap:wrap;gap:.3em .75em;margin-bottom:1em}.ecr-detail-nav [aria-current=page]{font-weight:bold;text-decoration:underline}.ecr-detail-digest,.ecr-detail-table td{overflow-wrap:anywhere}.ecr-detail-table{overflow:auto}.ecr-detail-table th[scope="row"]{text-align:right}.ecr-detail-chart{max-width:48rem;position:relative}.ecr-detail-graph{overflow:auto}.ecr-detail-graph svg{max-width:100%;height:auto}</style>\n\n'
+      if (selected) {
+        data += '<nav class="ecr-detail-digest" aria-label="Image breadcrumb"><a href="' + url("platforms") +
+          '">Original image <code>' + escapeDetail(digest.substring(7, 19)) + '</code></a> / <code aria-current="page">' +
+          escapeDetail(selected.substring(7, 19)) + '</code></nav>\n\n'
+      }
+      data += "### " + tabs[tab] + "\n\n"
+      data += '<p class="ecr-detail-digest"><code>' + escapeDetail(selected || digest) + "</code></p>\n\n"
+
+      var metadata, root, manifest
+      try {
+        metadata = readDetail(repository + "|describe|" + digest, () => {
+          const result = getAWS().ECR_DescribeImages(args.region, repository, { imageIds: [{ imageDigest: digest }] })
+          const image = isArray(result) && result.find(item => item.imageDigest == digest)
+          if (!image) error(404, "Image digest not found")
+          return image
+        })
+        const registry = String(metadata.registryId)
+        const read = (kind, reference) => readDetail(registry + "|" + repository + "|" + kind + "|" + reference,
+          () => getAWS().ECR_ReadRegistryJSON(args.region, registry, repository, kind, reference))
+        root = read("manifests", digest)
+        const entries = isArray(root.manifests) ? root.manifests : []
+        const descriptorInfo = descriptor => {
+          const platform = descriptor.platform || {}, annotations = descriptor.annotations || {}
+          const label = [platform.os, platform.architecture, platform.variant].filter(Boolean).join("/")
+          const attestation = annotations["vnd.docker.reference.type"] == "attestation-manifest"
+          const runnable = !attestation && platform.os && platform.architecture && platform.os != "unknown" && platform.architecture != "unknown"
+          return { descriptor: descriptor, label: runnable ? label : attestation ? "Attestation" : "Artifact or unknown platform", runnable: !!runnable }
+        }
+        const platforms = entries.filter(isMap).map(descriptorInfo)
+        const platform = selected && platforms.find(entry => entry.descriptor.digest == selected)
+        if (selected && !platform) error(404, "Child digest does not belong to this image index")
+        manifest = selected && tab != "platforms" ? read("manifests", selected) : root
+        const readConfig = () => {
+          const config = manifest.config
+          if (!config || !isDigest(config.digest) ||
+              !["application/vnd.oci.image.config.v1+json", "application/vnd.docker.container.image.v1+json"].includes(config.mediaType)) return
+          return read("blobs", config.digest)
+        }
+        const singlePlatform = () => {
+          try {
+            const config = readConfig()
+            if (config && config.os && config.architecture) return [config.os, config.architecture, config.variant].filter(Boolean).join("/")
+          } catch (e) {}
+          return "Unavailable"
+        }
+        const prefix = ow.server.httpd.getPrefix(options.port)
+        const asset = name => escapeDetail(String(prefix || "").replace(/\/$/, "") + "/js/" + name + ".js")
+
+        if (tab == "overview") {
+          const pushed = metadata.imagePushedAt
+          const details = [
+            ["Tags", (metadata.imageTags || []).join(", ") || "Untagged"],
+            ["Pushed", isNumber(pushed) ? ow.format.fromDate(new Date(pushed * 1000), "yyyy-MM-dd HH:mm:ss") : ""],
+            ["Image size reported by ECR", isNumber(metadata.imageSizeInBytes) ? ow.format.toBytesAbbreviation(metadata.imageSizeInBytes) : ""],
+            ["Media type", manifest.mediaType || metadata.imageManifestMediaType]
+          ]
+          if (manifest.artifactType) details.push(["Artifact type", manifest.artifactType])
+          if (platform) details.push([platform.runnable ? "Platform" : "Artifact", platform.label])
+          else if (!entries.length) details.push(["Platform", singlePlatform()])
+          else details.push(["Platform entries", entries.length])
+          data += properties(details)
+        } else if (tab == "platforms") {
+          if (!platforms.length) data += properties([["Supported platform", singlePlatform()]])
+          else {
+            if (platforms.filter(entry => entry.runnable).length > 1 && isDef(getOPackPath("Mermaid"))) {
+              const label = value => String(value).replace(/[^A-Za-z0-9 ./_-]/g, "").substring(0, 60)
+              const graph = ['flowchart LR', '  root["Image index"]'].concat(platforms.slice(0, 12).map((entry, i) =>
+                '  root --> p' + i + '["' + label(entry.label) + '"]'))
+              if (platforms.length > 12) graph.push('  root --> more["' + (platforms.length - 12) + ' more in table"]')
+              data += '<div id="ecr-platform-graph" class="ecr-detail-graph" hidden data-graph="' + escapeDetail(graph.join("\n")) + '"></div>\n\n'
+              data += '<script src="' + asset("mermaid") + '"></script><script>document.addEventListener("DOMContentLoaded", async function(){' +
+                'if(!window.mermaid)return; var view=document.getElementById("ecr-platform-graph"); try {' +
+                'mermaid.initialize({startOnLoad:false,securityLevel:"strict",theme:document.body.classList.contains("markdown-body-dark")?"dark":"default"});' +
+                'var diagram=await mermaid.render("ecr-platform-svg",view.dataset.graph); view.innerHTML=diagram.svg; view.hidden=false;}catch(e){} });</script>\n\n'
+            }
+            data += table(["Platform or artifact", "Digest", "Media type"], platforms.map(entry => {
+              const desc = entry.descriptor
+              const link = isDigest(desc.digest)
+              return [link ? '<a href="' + url("overview", desc.digest) + '">' + escapeDetail(entry.label) + '</a>' : escapeDetail(entry.label),
+                escapeDetail(desc.digest), escapeDetail(desc.mediaType)]
+            }))
+          }
+        } else if (tab == "manifest") {
+          data += '<link rel="stylesheet" href="' + escapeDetail(prefix) + '/css/nJSMap.css">\n' +
+            '<script src="' + asset("openafsigil") + '"></script><script src="' + asset("njsmap") + '"></script>\n\n'
+          data += '<style>#ecr-manifest{overflow:auto}#ecr-manifest .njsmap_valueString{overflow-wrap:anywhere}</style>\n\n'
+          // Keep escaped JSON visible if nJSMap is missing or cannot render the manifest.
+          data += '<div id="ecr-manifest"><pre><code class="language-json">' +
+            escapeDetail(JSON.stringify(manifest, null, 2)) + '</code></pre></div>\n\n'
+          data += `<script>
+            document.addEventListener("DOMContentLoaded", function() {
+              if (typeof window.nJSMap !== "function") return
+              const view = document.getElementById("ecr-manifest")
+              const escapeHTML = text => String(text).replace(/[&<>"']/g, ch => "&#" + ch.charCodeAt(0) + ";")
+              const safeValue = value => {
+                if (Array.isArray(value)) return value.map(safeValue)
+                if (value && typeof value === "object") {
+                  return Object.fromEntries(Object.entries(value).map(([key, item]) => [escapeHTML(key), safeValue(item)]))
+                }
+                // A text span keeps manifest strings literal in nJSMap's date and link detection.
+                return typeof value === "string" || value === null ? "<span>" + escapeHTML(value) + "</span>" : value
+              }
+              try {
+                const manifest = safeValue(JSON.parse(view.querySelector("code").textContent))
+                let previousTheme
+                const render = () => {
+                  const dark = document.body.classList.contains("markdown-body-dark")
+                  if (dark === previousTheme) return
+                  const html = nJSMap(manifest, undefined, dark)
+                  if (!html) return
+                  view.classList.toggle("njsmap_dark", dark)
+                  view.innerHTML = html
+                  previousTheme = dark
+                }
+                render()
+                new MutationObserver(render).observe(document.body, { attributeFilter: ["class"] })
+              } catch (error) {}
+            })
+          </script>\n\n`
+        } else if (entries.length && !selected) {
+          data += '<p>Select an image in <a href="' + url("platforms") + '">Platforms</a> to view its ' + tabs[tab].toLowerCase() + ".</p>\n\n"
+        } else if (tab == "layers") {
+          const layers = isArray(manifest.layers) ? manifest.layers : []
+          const chartLayers = layers.map((layer, i) => ({ number: i + 1, size: layer.size }))
+            .filter(layer => isNumber(layer.size) && isFinite(layer.size) && layer.size >= 0)
+            .sort((left, right) => right.size - left.size || left.number - right.number).slice(0, 12)
+            .sort((left, right) => left.number - right.number)
+          if (chartLayers.length) {
+            const chart = { type: "bar", data: { labels: chartLayers.map(layer => "Layer " + layer.number), datasets: [{
+              label: "Compressed size (MiB)", data: chartLayers.map(layer => layer.size / 1048576), backgroundColor: "#5488cf", maxBarThickness: 22
+            }] }, options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true } } } }
+            data += '<div id="ecr-layer-chart" class="ecr-detail-chart" hidden style="height:' + (80 + chartLayers.length * 26) + 'px"><canvas role="img" aria-label="Largest compressed image layers in manifest order" data-chart="' +
+              escapeDetail(JSON.stringify(chart)) + '"></canvas></div>\n\n'
+            data += '<script src="' + asset("chart") + '"></script><script>document.addEventListener("DOMContentLoaded", function(){' +
+              'if(!window.Chart)return; var view=document.getElementById("ecr-layer-chart"), canvas=view.firstElementChild; try {' +
+              'var config=JSON.parse(canvas.dataset.chart), dark=document.body.classList.contains("markdown-body-dark"), fg=dark?"#d0d7de":"#414951";' +
+              'config.options.scales.x.ticks={color:fg};config.options.scales.x.grid={color:dark?"#30363d":"#d8dee4"};config.options.scales.y={ticks:{color:fg},grid:{display:false}};config.options.plugins={legend:{labels:{color:fg}}};' +
+              'view.hidden=false;new Chart(canvas,config);}catch(e){view.hidden=true;} });</script>\n\n'
+          }
+          data += layers.length ? textTable(["Layer", "Digest", "Compressed bytes", "Media type"],
+            layers.map((layer, i) => [i + 1, layer.digest, layer.size, layer.mediaType])) : "No filesystem layers reported.\n\n"
+        } else {
+          const imageConfig = readConfig()
+          if (!imageConfig) {
+            data += "Image configuration is unavailable for this manifest.\n\n"
+          } else {
+            if (tab == "config") {
+              const runtime = imageConfig.config || {}
+              data += properties([
+                ["Entrypoint", runtime.Entrypoint ? JSON.stringify(runtime.Entrypoint) : ""],
+                ["Command", runtime.Cmd ? JSON.stringify(runtime.Cmd) : ""],
+                ["Working directory", runtime.WorkingDir], ["User", runtime.User],
+                ["Ports", Object.keys(runtime.ExposedPorts || {}).join(", ")],
+                ["Environment variable names", (isArray(runtime.Env) ? runtime.Env : []).filter(isString).map(value => value.split("=", 1)[0]).join(", ")]
+              ])
+            } else {
+              var layerIndex = 0
+              const history = isArray(imageConfig.history) ? imageConfig.history : []
+              data += history.length ? textTable(["Step", "Created", "Build command", "Layer", "Comment"], history.map((step, i) => {
+                const layer = !step.empty_layer && (manifest.layers || [])[layerIndex++]
+                return [i + 1, step.created, step.created_by, step.empty_layer ? "Metadata only" : layer && layer.digest || "", step.comment]
+              }), true) : "No build history reported.\n\n"
+            }
+          }
+        }
+      } catch (e) {
+        if (e.httpStatus == 404 && !manifest) throw e
+        data += e.httpStatus == 403 ? "The registry denied access to this image metadata.\n\n" :
+          "Image metadata is unavailable. Try again later.\n\n"
+      }
+      return { data: data, type: "raw" }
+    }
+
     args.fns = {
       validate: (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
@@ -289,6 +519,15 @@ jobs:
           return { lst: lst, lstParent: lstParent, byPath: byPath, children: children }
         })
         .create()
+
+        // Warm the root cache at startup. A failed load can be retried on the first request.
+        if (args.browse !== false) {
+          try {
+            browseCache("ecr-repo").get({})
+          } catch (e) {
+            logWarn("Could not warm the browse root cache")
+          }
+        }
       },
       getList: (request, options) => {
         args.fns.validate(request, options)
@@ -365,6 +604,11 @@ jobs:
         args.fns.validate(request, options)
         var puri = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
 
+        var params = request.params || {}
+        if (!options._api && !params.action && options.imageDetails === true && isDef(params.image)) {
+          return inspectImage(request, options, puri)
+        }
+
         var img, ini = now(), data = ""
         do {
           img = readImages(puri, false)
@@ -390,7 +634,26 @@ jobs:
 
           if (options._api) return { data: { ecrdesc: mddesc, ecrimgs: img }, type: "json" }
 
-          img = $from(img).sort("-imagePushedAt").select()
+          // Use one row per tag so aliases on the same digest can sort independently.
+          const compareTag = support && isFunction(support.compareValues) ? support.compareValues :
+            (left, right) => isFunction(ow.format.compareVersion) ? ow.format.compareVersion(left, right) : left.localeCompare(right)
+          const tagRows = []
+          img.forEach(image => {
+            const tags = image.imageTags || []
+            ;(tags.length ? tags : [""]).forEach(tag => tagRows.push({ image: image, tag: tag }))
+          })
+          tagRows.sort((left, right) => {
+            if (!left.tag || !right.tag) return Number(!left.tag) - Number(!right.tag) ||
+              String(left.image.imageDigest).localeCompare(String(right.image.imageDigest))
+            return compareTag(left.tag, right.tag) || (right.image.imagePushedAt || 0) - (left.image.imagePushedAt || 0) ||
+              String(left.image.imageDigest).localeCompare(String(right.image.imageDigest))
+          })
+          const tagLabel = row => {
+            const image = row.image
+            if (options.imageDetails !== true || !isDigest(image.imageDigest)) return global.__ojobHttpEscapeText(row.tag)
+            return '<a href="?image=' + encodeURIComponent(image.imageDigest) + '">' +
+              escapeDetail(row.tag || image.imageDigest.substring(7, 19)) + '</a>'
+          }
           data = "\n"
           data += "## Contents\n\n"
           if (useMDDesc) {
@@ -411,12 +674,12 @@ jobs:
           data += "### 🏷️ Details per tag\n\n"
           data += options.usePull ? "| Tag | Digest | Pushed at | Last Pull | Size | Size in bytes | Reference |\n" : "| Tag | Digest | Pushed at | Size | Size in bytes |\n"
           data += options.usePull ? "|:---:|:---:|:---|:---|----:|----:|---|\n" : "|:---:|:---:|:---|----:|----:|\n"
-          img.forEach(i => {
-            var _ref = isDef(i.imageTags) ? reg + puri + ":" + i.imageTags[0] : reg + puri + ":" + i.imageDigest.substr(i.imageDigest.indexOf(":") + 1)
+          tagRows.forEach(row => {
+            const i = row.image
             if (options.usePull)
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
+              data += `| ${tagLabel(row)} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${isDef(i.lastRecordedPullTime) ? ow.format.fromDate(new Date(i.lastRecordedPullTime * 1000), "yyyy-MM-dd HH:mm:ss") : ""} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
             else
-              data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
+              data += `| ${tagLabel(row)} | ${i.imageDigest.substr(i.imageDigest.indexOf(":") +1, 7) + "..." } | ${ow.format.fromDate(new Date(i.imagePushedAt * 1000), "yyyy-MM-dd HH:mm:ss")} | ${ow.format.toBytesAbbreviation(i.imageSizeInBytes)} | ${i.imageSizeInBytes} |\n`
           })
 
           data += "\n---\n\n### 💾 How to retrieve each\n\n"
@@ -425,33 +688,20 @@ jobs:
           }
           data += "| Tag | Digest | To retrieve |\n"
           data += "|:---:|---|---|\n"
-          img.forEach(i => {
-            if (isDef(i.imageTags)) {
-              for(var j = 0; j < i.imageTags.length; j++) {
-                var _ret = reg + puri + ":" + i.imageTags[j]
-                if (isDef(options.refLink)) {
-                  _ret = "[" + _ret + "](<" + $t(options.refLink, { image: _ret, type: i.artifactMediaType }) + ">)"
-                } else {
-                  _ret = "\`\`\`" + _ret + "\`\`\`"
-                }
-                data += `| ${i.imageTags[j]} | \`\`\`${i.imageDigest}\`\`\` | ${_ret} |\n`
-              }
-            } else {
-              var _ret = reg + puri + "@" + i.imageDigest
-              if (isDef(options.refLink)) {
-                _ret = "[" + _ret + "](<" + $t(options.refLink, { image: _ret, type: i.artifactMediaType }) + ">)"
-              } else {
-                _ret = "\`\`\`" + _ret + "\`\`\`"
-              }
-              data += `|  | \`\`\`${i.imageDigest}\`\`\` | ${_ret} |\n`
-            }
+          tagRows.forEach(row => {
+            const i = row.image
+            const ref = reg + puri + (row.tag ? ":" + row.tag : "@" + i.imageDigest)
+            const pull = isDef(options.refLink) ? "[" + ref + "](<" + $t(options.refLink, { image: ref, type: i.artifactMediaType }) + ">)" :
+              "```" + ref + "```"
+            data += `| ${tagLabel(row)} | \`\`\`${i.imageDigest}\`\`\` | ${pull} |\n`
           })
-          
+
           data += "\n---\n\n### 🔎 Manifest and artifact types per tag\n\n"
           data += "| Tag | Digest | Manifest Type | Artifact Type |\n"
           data += "|:---:|:---|:---|:---|\n"
-          img.forEach(i => {
-            data += `| ${isDef(i.imageTags) ? i.imageTags.join(", ") : ""} | \`${i.imageDigest}\` | ${i.imageManifestMediaType} | ${isDef(i.artifactMediaType) ? i.artifactMediaType : ""} |\n`
+          tagRows.forEach(row => {
+            const i = row.image
+            data += `| ${tagLabel(row)} | \`${i.imageDigest}\` | ${i.imageManifestMediaType} | ${isDef(i.artifactMediaType) ? i.artifactMediaType : ""} |\n`
           })
         }
 
@@ -470,7 +720,10 @@ jobs:
         if (!options.query || !options.query.enabled) support.error(501,"Enhanced search is not enabled")
         var path=global.__ojobHttpRelativePath(request.uri,options.parentURI).replace(/\/+$/, ""), q=String((request.params||{}).q||"")
         if(q.length>(options.query.maxQueryLength||256))support.error(400,"Query too long")
-        var all=browseCache("ecr-repo").get({}).lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&r.repositoryName.toLowerCase().indexOf(q.toLowerCase())>=0)
+        if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
+        var literal = q.toLowerCase()
+        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
+        var all=browseCache("ecr-repo").get({}).lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&matches(r.repositoryName))
         all=all.filter(r=>{try{args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+r.repositoryName},options);return true}catch(e){return false}})
         var max=options.query.maxResults||1000
         return {isList:true,fields:["Repository Name"],alignFields:["left"],key:"Repository Name",list:all.slice(0,max).map(r=>({isDirectory:false,values:{"Repository Name":path?r.repositoryName.substring(path.length+1):r.repositoryName}})),searchInfo:{complete:all.length<=max,truncated:all.length>max,totalExact:all.length<=max,scanned:all.length}}

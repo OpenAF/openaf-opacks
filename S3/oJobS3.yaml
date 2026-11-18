@@ -263,8 +263,9 @@ jobs:
 
       var _cache, s3
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
-      if (isNumber(args.cache)) {
-        _cache = "__oJobS3_" + md5(args.url + args.bucket)
+      if (isUnDef(args.cache)) args.cache = 5000
+      if (args.cache > 0) {
+        _cache = "__oJobS3_" + genUUID()
         log("Creating cache " + _cache + "...")
         $cache(_cache)
         .ttl(args.cache)
@@ -275,6 +276,14 @@ jobs:
           return _r
         })
         .create()
+        // Warm the root cache at startup. A failed load can be retried on the first request.
+        if (args.browse !== false) {
+          try {
+            $cache(_cache).get({ puri: "" })
+          } catch (e) {
+            logWarn("Could not warm the browse root cache")
+          }
+        }
       }
 
       if (isDef(args.path) && args.path.length > 0) {
@@ -348,6 +357,7 @@ jobs:
       support.check(args.options, support.capabilities)
       provider = support.provider(args.options)
     }
+    if (isUnDef(args.cache)) args.cache = 5000
     var cacheNamespace = "browse-" + genUUID() + "-"
     var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
 
@@ -363,6 +373,9 @@ jobs:
     if (enhanced && args.options.query && args.options.query.enabled && !isFunction(S3.prototype.walkObjects)) throw new Error("Enhanced S3 queries require S3.walkObjects; update the S3 oPack")
     var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
 
+    // Use the same prefix for the startup load and the first listing request.
+    var listingPrefix = (root, path) => (String(root || "") + path).replace(/\/?$/, "/").replace(/^\//, "")
+
     args.fns = {
       validate: (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
@@ -377,13 +390,8 @@ jobs:
         var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
 
         var lst, origLst
-        var _s3p = options.parentPath + puri
-        _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
-        _s3p = _s3p.replace(/^\//, "")
-
-        //print(`_s3p = ${_s3p}`)
-        if (isDef(args.cache)) {
-          var _cache = cacheNamespace + "s3"
+        var _s3p = listingPrefix(options.parentPath, puri)
+        if (args.cache > 0) {
           lst = browseCache("s3").get({ puri: _s3p })
         } else {
           lst = s3.listObjects(args.bucket, _s3p)
@@ -485,6 +493,8 @@ jobs:
         _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
         _s3p = _s3p.replace(/^\//, "")
 
+        var wildcards = options.query && options.query.enabled && options.query.wildcards === true
+        if (wildcards && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
         var scanInfo, lst
         if (support && options.query && options.query.enabled) {
           if (!isFunction(s3.walkObjects)) throw new Error("Enhanced search requires S3.walkObjects; update S3")
@@ -503,7 +513,8 @@ jobs:
 
         var _rel = f => String(f.filename).replace(new RegExp("^" + _s3p), "")
         var _q = q.toLowerCase()
-        var _hits = lst.filter(f => f.isFile && _rel(f).toLowerCase().indexOf(_q) >= 0)
+        var matches = support && isFunction(support.searchMatcher) ? support.searchMatcher(q, wildcards) : name => name.toLowerCase().indexOf(_q) >= 0
+        var _hits = lst.filter(f => f.isFile && matches(_rel(f)))
         var _total = _hits.length
         if (_hits.length > maxResults) _hits = _hits.slice(0, maxResults)
 
@@ -521,12 +532,9 @@ jobs:
           }))
         }
       },
-      init  : () => {
-        var _cache
-
-        if (isNumber(args.cache)) {
-          _cache = "__oJobS3_" + md5(args.url + args.bucket)
-          log("Creating cache " + _cache + "...")
+      init  : options => {
+        if (args.cache > 0) {
+          log("Creating S3 browse cache...")
           browseCache("s3")
           .ttl(args.cache)
           .fn(k => {
@@ -536,6 +544,15 @@ jobs:
             return _r
           })
           .create()
+
+          // Warm the root cache at startup. A failed load can be retried on the first request.
+          if (args.browse !== false) {
+            try {
+              browseCache("s3").get({ puri: listingPrefix(options ? options.parentPath : args.path, "") })
+            } catch (e) {
+              logWarn("Could not warm the browse root cache")
+            }
+          }
         }
       }
     }
