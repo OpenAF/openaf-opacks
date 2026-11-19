@@ -13,4 +13,4 @@ artifacts:
   version: 1.85.1
 - group: com.google.protobuf
   id: protobuf-java-util
-  version: 3.25.9
+  version: 4.36.2

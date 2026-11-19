@@ -18,7 +18,7 @@ name: grpc
 main: grpc.js
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261107'
+version: '20261119'
 dependencies:
   openaf: '>=20261030'
 files:
@@ -27,10 +27,26 @@ files:
 - .package.yaml
 - GRPC-OJOB.md
 - README.md
+- animal-sniffer-annotations-1.29.1.jar
+- annotations-4.1.1.4.jar
 - build.sh
 - build.yaml
-- grpc-20261107.jar
+- error_prone_annotations-2.53.0.jar
+- failureaccess-1.0.3.jar
+- grpc-api-1.85.1.jar
+- grpc-context-1.85.1.jar
+- grpc-core-1.85.1.jar
+- grpc-netty-shaded-1.85.1.jar
+- grpc-protobuf-1.85.1.jar
+- grpc-protobuf-lite-1.85.1.jar
+- grpc-services-1.85.1.jar
+- grpc-stub-1.85.1.jar
+- grpc-util-1.85.1.jar
 - grpc.js
+- guava-33.8.0-jre.jar
+- j2objc-annotations-3.1.jar
+- jspecify-1.0.1.jar
+- jsr305-3.0.2.jar
 - lib/animal-sniffer-annotations-1.27.jar
 - lib/annotations-4.1.1.4.jar
 - lib/error_prone_annotations-2.50.0.jar
@@ -51,21 +67,55 @@ files:
 - lib/proto-google-common-protos-2.64.1.jar
 - lib/protobuf-java-3.25.9.jar
 - lib/protobuf-java-util-3.25.9.jar
+- listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
 - oJobGRPC.js
 - oJobGRPC.yaml
 - oafp_grpc.js
+- perfmark-api-0.27.0.jar
+- proto-google-common-protos-2.82.0.jar
+- protobuf-java-4.37.0-RC3.jar
+- protobuf-java-util-4.36.2.jar
+- protobuf-javalite-3.25.9.jar
 - src/openaf/plugins/grpc/Bridge.java
 - src/openaf/plugins/grpc/Conversion.java
 - src/openaf/plugins/grpc/Schema.java
+- target/classes/openaf/plugins/grpc/Bridge$1$1.class
+- target/classes/openaf/plugins/grpc/Bridge$1.class
+- target/classes/openaf/plugins/grpc/Bridge$2.class
+- target/classes/openaf/plugins/grpc/Bridge$3.class
+- target/classes/openaf/plugins/grpc/Bridge$4.class
+- target/classes/openaf/plugins/grpc/Bridge$Call.class
+- target/classes/openaf/plugins/grpc/Bridge$Handler.class
+- target/classes/openaf/plugins/grpc/Bridge$Pending.class
+- target/classes/openaf/plugins/grpc/Bridge$Stream.class
+- target/classes/openaf/plugins/grpc/Bridge.class
+- target/classes/openaf/plugins/grpc/Conversion.class
+- target/classes/openaf/plugins/grpc/Schema.class
 filesHash:
   .gitignore: 4bcdd0ef500e36de0e5037ff7d3d7413a58c111e
-  .maven.yaml: 275d07e8e99240270841e36fee8d7f35b90df588
+  .maven.yaml: facc995b7f4e0bcf47c258c5a8e550d17f7aea03
   GRPC-OJOB.md: d2de6bb20e1a0abfc0e37a9f4bc62ed5550f9cc0
   README.md: e7f13a7338e1dfc861422732a08f3548bcf4542e
+  animal-sniffer-annotations-1.29.1.jar: 66d61fdcc28531cbe23914ffdbe6b6a04ca6ef50
+  annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   build.sh: 40db574006196258490028d7d7621adb85c8e37e
   build.yaml: 4b83d21b2c1991b34b97f064293933253b38a0c1
-  grpc-20261107.jar: 5206660c1e5598e0243cf9b660ce7baab41647a7
+  error_prone_annotations-2.53.0.jar: 3ef546c188f4b4e700bba2afc833e37d44d2a0dd
+  failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
+  grpc-api-1.85.1.jar: b3c14915233d8062b2b30680fe91acdc5628f5e3
+  grpc-context-1.85.1.jar: e96db32f1ae261d8c6723635ede1f381f3e9f311
+  grpc-core-1.85.1.jar: f0920cb1aa4083e71c0c597ec09bffa57a2f927e
+  grpc-netty-shaded-1.85.1.jar: d7c60cf377496490518d37321cb0f6f2c866e64a
+  grpc-protobuf-1.85.1.jar: 023ab6f44d8f34266d12e39032fcb88dac54412f
+  grpc-protobuf-lite-1.85.1.jar: d3e35c16dd312575d37b3510a8e5fb88906882d5
+  grpc-services-1.85.1.jar: a667caa1b13f35800662f47aba44d0b9e6cc99a2
+  grpc-stub-1.85.1.jar: 88d9eda111aa813a3e4563c90eab4f77fed0edeb
+  grpc-util-1.85.1.jar: 2ee0224641f3e563aefe2495c980c9940f42ab8f
   grpc.js: 524585f09210e49db2b20af36a6b023c769edcde
+  guava-33.8.0-jre.jar: bb3b79346325315062192205fa6636dd5873151f
+  j2objc-annotations-3.1.jar: a892ca9507839bbdb900d64310ac98256cab992f
+  jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
+  jsr305-3.0.2.jar: 25ea2e8b0c338a877313bd4672d3fe056ea78f0d
   lib/animal-sniffer-annotations-1.27.jar: c8dc3113676f4d40d4cec38366d4e02ebb8c70cb
   lib/annotations-4.1.1.4.jar: a1678ba907bf92691d879fef34e1a187038f9259
   lib/error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
@@ -86,9 +136,27 @@ filesHash:
   lib/proto-google-common-protos-2.64.1.jar: a71d9a9867ed792e54e893b8c7864a0ba1b022cf
   lib/protobuf-java-3.25.9.jar: 64cdd0aac23f3c05740b6e6a15b041353cf6ffaa
   lib/protobuf-java-util-3.25.9.jar: 62aaa6521bbc050dc44431a4456f3bf99a1231c4
+  listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
   oJobGRPC.js: d07919ecb37259674e60ab56e6e7e2fc672e0f59
   oJobGRPC.yaml: b7e2f91ad45d7014022b94addc4c7aa11bddfaf9
   oafp_grpc.js: ac9ee7b7121b43ad6701844784a3e2623ab2015a
+  perfmark-api-0.27.0.jar: f86f575a41b091786a4b027cd9c0c1d2e3fc1c01
+  proto-google-common-protos-2.82.0.jar: dd74fdb4b3fb27cb4d0d916f299f10132182c274
+  protobuf-java-4.37.0-RC3.jar: aea761adbd7dc5119081684a78f8aca0d209fd2b
+  protobuf-java-util-4.36.2.jar: 6c476510c485fcca280cd4ae8104003404adbd26
+  protobuf-javalite-3.25.9.jar: bc590187075156411a4260664be3ed12e68ce3e5
   src/openaf/plugins/grpc/Bridge.java: 1ae341c58b26a8c8677c9d4848164ae2cc46f5b9
   src/openaf/plugins/grpc/Conversion.java: ebb20458728f8c8d2010f605c4ed9a27e28c7aad
   src/openaf/plugins/grpc/Schema.java: d4bf3e75f6098b772aa96139b93d927428eb60ad
+  target/classes/openaf/plugins/grpc/Bridge$1$1.class: 0271efe6c2c1c8452d9820d5c8e098ee93f168b2
+  target/classes/openaf/plugins/grpc/Bridge$1.class: b8006bbb0c1b8b59ddeeea349dccfb9e2ef588b9
+  target/classes/openaf/plugins/grpc/Bridge$2.class: dfe545368ac38bbe24928168109ad3a731fa0b2e
+  target/classes/openaf/plugins/grpc/Bridge$3.class: 977d843f70749c5fca7f3c94fd1118f491cabc4e
+  target/classes/openaf/plugins/grpc/Bridge$4.class: 241ac63964b7a7416f70f15f1f532877a4d949fc
+  target/classes/openaf/plugins/grpc/Bridge$Call.class: 7fc0c342044eaa12d9ff88dbfb0324ef99a46a93
+  target/classes/openaf/plugins/grpc/Bridge$Handler.class: 9576443d765b1ace43cdacf28f0d286469f2f042
+  target/classes/openaf/plugins/grpc/Bridge$Pending.class: 9423b07d31b814d9ff2f824f18cac842ce3a32c5
+  target/classes/openaf/plugins/grpc/Bridge$Stream.class: 904570433a563b00343f7645b37e8a010b94855c
+  target/classes/openaf/plugins/grpc/Bridge.class: aaa7a8ee8cbb0902ed4121d9444c2e66d9d14285
+  target/classes/openaf/plugins/grpc/Conversion.class: dbd7d1ab80c5b871a33e32ae7cf6cfb03beb89a7
+  target/classes/openaf/plugins/grpc/Schema.class: 2ca068dea58fc5ef7679d349c9f6f8cfa184c662
