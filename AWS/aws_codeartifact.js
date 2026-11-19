@@ -12,18 +12,20 @@ loadLib("aws_core.js");
 AWS.prototype.CODEARTIFACT_ListDomains = function(aRegion) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/domains"
-    var params = {}
+    var params = { maxResults: 1000 }
     var url = new java.net.URL(aURL)
     var aHost = String(url.getHost())
     var aURI = String(url.getPath())
     var _res = []
     var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListDomains" }, __, "application/x-amz-json-1.1")
+    if (!isMap(_r) || !isArray(_r.domains)) throw new Error("Invalid CodeArtifact domains response")
 
     if (isDef(_r.domains)) {
         _res = _res.concat(_r.domains)
         while(isDef(_r.nextToken)) {
            params.nextToken = _r.nextToken
            _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListDomains" }, __, "application/x-amz-json-1.1")
+           if (!isMap(_r) || !isArray(_r.domains)) throw new Error("Invalid CodeArtifact domains response")
            if (isDef(_r.domains)) _res = _res.concat(_r.domains)
         }
     }
@@ -40,19 +42,21 @@ AWS.prototype.CODEARTIFACT_ListDomains = function(aRegion) {
 AWS.prototype.CODEARTIFACT_ListRepositories = function(aRegion, aRepositoryPrefix) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/repositories"
-    var params = {}
+    var params = { maxResults: 1000 }
     if (isDef(aRepositoryPrefix)) params.repositoryPrefix = aRepositoryPrefix
     var url = new java.net.URL(aURL)
     var aHost = String(url.getHost())
     var aURI = String(url.getPath())
     var _res = []
     var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListRepositories" }, __, "application/x-amz-json-1.1")
+    if (!isMap(_r) || !isArray(_r.repositories)) throw new Error("Invalid CodeArtifact repositories response")
 
     if (isDef(_r.repositories)) {
         _res = _res.concat(_r.repositories)
         while(isDef(_r.nextToken)) {
            params.nextToken = _r.nextToken
            _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListRepositories" }, __, "application/x-amz-json-1.1")
+           if (!isMap(_r) || !isArray(_r.repositories)) throw new Error("Invalid CodeArtifact repositories response")
            if (isDef(_r.repositories)) _res = _res.concat(_r.repositories)
         }
     }
@@ -61,34 +65,35 @@ AWS.prototype.CODEARTIFACT_ListRepositories = function(aRegion, aRepositoryPrefi
 
 /**
  * <odoc>
- * <key>AWS.CODEARTIFACT_ListPackages(aRegion, aRepository, aDomain, aFormat) : array</key>
+ * <key>AWS.CODEARTIFACT_ListPackages(aRegion, aRepository, aDomain, aFormat, aNamespace) : array</key>
  * Given a region, a repository, a domain and a format, returns a list of packages in the account.
- * If no format is given, all packages are returned.
+ * If no format is given, all packages are returned. When format is supplied, aNamespace filters by namespace prefix.
  * If no repository is given, all packages are returned.
  * If no domain is given, all packages are returned.
  * </odoc>
  */
-AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain, aFormat) {
+AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain, aFormat, aNamespace, onPage) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/packages"
-    var params = {}
+    var params = { maxResults: 1000 }
     if (isDef(aRepository)) params.repository = aRepository
     if (isDef(aDomain)) params.domain = aDomain
     if (isDef(aFormat)) params.format = aFormat
+    if (isDef(aFormat) && isDef(aNamespace)) params.namespace = aNamespace
     var url = new java.net.URL(aURL)
     var aHost = String(url.getHost())
     var aURI = String(url.getPath())
-    var _res = []
-    var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
-
-    if (isDef(_r.packages)) {
+    var _res = [], seen = new Set()
+    do {
+        var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
+        if (!isMap(_r) || !isArray(_r.packages)) throw new Error("Invalid CodeArtifact packages response")
         _res = _res.concat(_r.packages)
-        while(isDef(_r.nextToken)) {
-           params.nextToken = _r.nextToken
-           _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackages" }, __, "application/x-amz-json-1.1")
-           if (isDef(_r.packages)) _res = _res.concat(_r.packages)
-        }
-    }
+        if (isFunction(onPage)) onPage(_r.packages)
+        if (isDef(_r.nextToken) && seen.has(_r.nextToken)) throw new Error("Repeated CodeArtifact package page token")
+        if (isUnDef(_r.nextToken)) break
+        seen.add(_r.nextToken)
+        params.nextToken = _r.nextToken
+    } while (true)
     return _res
 }
 
@@ -104,7 +109,7 @@ AWS.prototype.CODEARTIFACT_ListPackages = function(aRegion, aRepository, aDomain
 AWS.prototype.CODEARTIFACT_ListPackageVersions = function(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/package/versions"
-    var params = {}
+    var params = { maxResults: 1000 }
     if (isDef(aRepository)) params.repository = aRepository
     if (isDef(aDomain)) params.domain = aDomain
     if (isDef(aFormat)) params.format = aFormat
@@ -115,12 +120,14 @@ AWS.prototype.CODEARTIFACT_ListPackageVersions = function(aRegion, aRepository, 
     var aURI = String(url.getPath())
     var _res = []
     var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackageVersions" }, __, "application/x-amz-json-1.1")
+    if (!isMap(_r) || !isArray(_r.versions)) throw new Error("Invalid CodeArtifact versions response")
 
     if (isDef(_r.versions)) {
         _res = _res.concat(_r.versions)
         while(isDef(_r.nextToken)) {
            params.nextToken = _r.nextToken
            _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackageVersions" }, __, "application/x-amz-json-1.1")
+           if (!isMap(_r) || !isArray(_r.versions)) throw new Error("Invalid CodeArtifact versions response")
            if (isDef(_r.versions)) _res = _res.concat(_r.versions)
         }
     }
@@ -183,7 +190,7 @@ AWS.prototype.CODEARTIFACT_GetPackageVersionAsset = function(aRegion, aRepositor
 AWS.prototype.CODEARTIFACT_ListPackageVersionAssets = function(aRegion, aRepository, aDomain, aFormat, aNamespace, aPackage, aVersion) {
     aRegion = _$(aRegion).isString().default(this.region)
     var aURL = "https://codeartifact." + aRegion + ".amazonaws.com/v1/package/version/assets"
-    var params = {}
+    var params = { maxResults: 1000 }
     if (isDef(aRepository)) params.repository = aRepository
     if (isDef(aDomain)) params.domain = aDomain
     if (isDef(aFormat)) params.format = aFormat
@@ -195,12 +202,14 @@ AWS.prototype.CODEARTIFACT_ListPackageVersionAssets = function(aRegion, aReposit
     var aURI = String(url.getPath())
     var _res = []
     var _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackageVersionAssets" }, __, "application/x-amz-json-1.1")
+    if (!isMap(_r) || !isArray(_r.assets)) throw new Error("Invalid CodeArtifact assets response")
 
     if (isDef(_r.assets)) {
         _res = _res.concat(_r.assets)
         while(isDef(_r.nextToken)) {
            params.nextToken = _r.nextToken
            _r = this.postURLEncoded(aURL, aURI, "", params, "codeartifact", aHost, aRegion, { "X-Amz-Target": "CodeArtifact_20191031.ListPackageVersionAssets" }, __, "application/x-amz-json-1.1")
+           if (!isMap(_r) || !isArray(_r.assets)) throw new Error("Invalid CodeArtifact assets response")
            if (isDef(_r.assets)) _res = _res.concat(_r.assets)
         }
     }

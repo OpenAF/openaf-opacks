@@ -228,6 +228,31 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
 };
 
 /**
+ * <odoc format="markdown">
+ * <key>S3.walkObjects(aBucket, aPrefix, callback, options) : Map</key>
+ * Visits recursive entries until callback returns false or maxScanned/timeoutMs
+ * is reached. Returns completeness metadata. The SDK may prefetch one page.
+ * </odoc>
+ */
+S3.prototype.walkObjects = function(aBucket, aPrefix, callback, options) {
+    _$(aBucket).isString().$_(); _$(callback).isFunction().$_()
+    options = options || {}
+    var max = options.maxScanned || 10000, timeout = options.timeoutMs || 5000
+    if (!isNumber(max) || max < 1 || Math.floor(max) != max || !isNumber(timeout) || timeout < 1) throw new Error("Invalid S3 scan budget")
+    var builder = Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).prefix(aPrefix || "").recursive(true)
+    if (this.useVersion1) builder = builder.useApiVersion1(true)
+    var iterator = this.s3.listObjects(builder.build()).iterator(), scanned = 0, began = now(), complete = true, timedOut = false
+    while (iterator.hasNext()) {
+        if (scanned >= max || now()-began >= timeout) { complete = false; timedOut = now()-began >= timeout; break }
+        var item = iterator.next().get(), name = String(item.objectName()), directory = item.isDir() || name.endsWith("/")
+        scanned++
+        var row = {filename:name,filepath:name,canonicalPath:name,isDirectory:directory,isFile:!directory,size:Number(item.size()),etag:String(item.etag()),lastModified:directory ? __ : Number(new Date(this._normalizeDateString(item.lastModified().toString())).getTime())}
+        if (callback(row) === false) { complete = false; break }
+    }
+    return {scanned:scanned,complete:complete,timedOut:timedOut,truncated:!complete,totalExact:complete}
+};
+
+/**
  * <odoc>
  * <key>S3.statObject(aBucket, aObjectName) : Map</key>
  * Retrieves the available metadata for aObjectName in aBucket.

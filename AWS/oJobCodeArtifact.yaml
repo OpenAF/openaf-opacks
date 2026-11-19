@@ -30,6 +30,8 @@ jobs:
         cache     : cache
         sortTab   : sortTab
         options   : options
+        operationsBrowseUris: operationsBrowseUris
+        operationsToken: operationsToken
         domain    : domain
         repository: repository
         format    : format
@@ -37,6 +39,20 @@ jobs:
         initialize: initialize
         download  : download
   exec : &httpBrowseCodeArtifactExec | #js
+    var prefetchEnabled = args.options && args.options.prefetch === true && (!isNumber(args.cache) || args.cache > 0)
+    var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled || prefetchEnabled)
+    if (enhanced) {
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+      provider = support.provider(args.options)
+    }
+    // Legacy version listings also use the Browse comparator when it is available.
+    if (!support) {
+      try { support = require("ojob-browse-contract.js") } catch (e) {}
+    }
+    var cacheNamespace = "browse-" + genUUID() + "-"
+    var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
+
     args.options = merge(args.options, {
       showURI : args.incURI,
       sortTab : args.sortTab,
@@ -47,33 +63,48 @@ jobs:
     })
 
     loadLib("aws.js")
-    var aws = new AWS(args.accessKey, args.secret, args.token)
-    if (isDef(args.assumeRole)) {
-      log("Assuming role " + args.assumeRole + "...")
-      aws = aws.assumeRole(args.assumeRole)
+    var aws, clientLock = new java.lang.Object()
+    var getAWS = () => syncFn(() => {
+      var expiry = aws && (isDef(aws.assumeRoleExp) ? aws.assumeRoleExp : Date.parse(String(aws._credentialExpiration)))
+      if (!aws || isFinite(expiry) && expiry <= now() + 60000) {
+        var next = new AWS(args.accessKey, args.secret, args.token, args.region)
+        if (isDef(args.assumeRole)) next = next.assumeRole(args.assumeRole)
+        aws = next
+      }
+      return aws
+    }, clientLock)
+
+    var packagePath = pkg => {
+      var parts = [pkg.format]
+      if (isDef(pkg.namespace) && pkg.namespace.length > 0) parts.push(pkg.namespace)
+      parts.push(pkg.package)
+      return parts.join("/")
     }
 
-    var getAWS = () => {
-      var _aws = new AWS(args.accessKey, args.secret, args.token)
-      if (isDef(args.assumeRole)) {
-        log("Assuming role " + args.assumeRole + "...")
-        _aws = _aws.assumeRole(args.assumeRole)
-      }
-      return _aws
+    var denyScope = () => {
+      var denied = new Error("Forbidden")
+      denied.httpStatus = 403
+      throw denied
+    }
+    var scopedPackage = pkg => (!isDef(args.format) || pkg.format === args.format) &&
+      (!isDef(args.namespace) || pkg.namespace === args.namespace)
+    var readInventory = name => {
+      var unit = provider && provider.entries(name).find(entry => now() < entry.expiresAt)
+      return unit ? unit.value : browseCache(name).get({})
+    }
+    var authorizeRepository = (domain, repository) => {
+      if (!readInventory("codeartifact-domains").some(d => (d.domainName || d.name) === domain)) denyScope()
+      if (isDef(repository) && !readInventory("codeartifact-repos").some(r =>
+        r.domainName === domain && (r.repositoryName || r.name) === repository)) denyScope()
     }
 
     var buildPackageTree = aPackages => {
-      var _packages = pForEach(aPackages || [], p => {
-        var parts = [ p.format ]
-        if (isDef(p.namespace) && p.namespace.length > 0) parts.push(p.namespace)
-        parts.push(p.package)
-        return merge({ path: parts.join("/") }, p)
-      })
+      var _packages = (aPackages || []).map(pkg => merge({ path: packagePath(pkg) }, pkg))
 
       var _parents = []
-      var _parentsMap = {}
-      var _childrenMap = {}
-      var _leafByPath = {}
+      var _parentsMap = Object.create(null)
+      var _childrenMap = Object.create(null)
+      var _leafByPath = Object.create(null)
 
       for(var i = 0; i < _packages.length; i++) {
         var r = _packages[i]
@@ -85,15 +116,12 @@ jobs:
             var entry = { name: parent, isParent: parent != r.path, level: j + 1, pkg: r }
             _parentsMap[key] = entry
             _parents.push(entry)
+            var prefix = parts.slice(0, j).join("/")
+            if (!isDef(_childrenMap[prefix])) _childrenMap[prefix] = []
+            _childrenMap[prefix].push(parent)
           } else if (parent == r.path) {
             _parentsMap[key].isParent = false
             _parentsMap[key].pkg = r
-          }
-
-          if (j > 0) {
-            var prefix = parts.slice(0, j).join("/")
-            if (!isDef(_childrenMap[prefix])) _childrenMap[prefix] = []
-            if (_childrenMap[prefix].indexOf(parent) == -1) _childrenMap[prefix].push(parent)
           }
         }
         _leafByPath[r.path] = r
@@ -104,6 +132,149 @@ jobs:
       return { list: _packages, parents: _parents, parentsMap: _parentsMap, childrenMap: _childrenMap, leafByPath: _leafByPath }
     }
 
+    // Share the same repository snapshots and locks on prefetch, refresh, and navigation.
+    var treeState = Object.create(null), treeLock = new java.lang.Object()
+    var treeSlots = new java.util.concurrent.Semaphore(3), prefetchSlot = new java.util.concurrent.Semaphore(1)
+    var treeTTL = isNumber(args.cache) ? args.cache : 5000
+    var prefetchStats = { queued: $atomic(0), loaded: $atomic(0), used: $atomic(0) }
+    var treeUnit = key => provider.entries("codeartifact-package-tree").find(u =>
+      u.key.domain == key.domain && u.key.repository == key.repository)
+
+    var queueTree = (key, speculative) => {
+      var id = stringify(key, __, "")
+      var state = syncFn(() => {
+        Object.keys(treeState).forEach(k => {
+          if (!treeState[k].refreshing && now() >= treeState[k].retryAt) delete treeState[k]
+        })
+        if (treeState[id] || Object.keys(treeState).length >= 1000) return __
+        if (speculative && !prefetchSlot.tryAcquire()) return __
+        var next = { key: key, refreshing: true, speculative: speculative, pages: [] }
+        treeState[id] = next
+        return next
+      }, treeLock)
+      if (!state) return false
+
+      var discard = () => syncFn(() => { if (treeState[id] === state) delete treeState[id] }, treeLock)
+      var failed = e => {
+        syncFn(() => {
+          if (treeState[id] === state) {
+            state.refreshing = false
+            state.retryAt = now() + Math.max(1000, treeTTL)
+          }
+        }, treeLock)
+        logWarn("Error refreshing CodeArtifact packages: " + e)
+      }
+      try {
+        $doV(() => {
+          var acquired = false
+          try {
+            if (speculative) {
+              // A speculative miss must not queue behind normal navigation.
+              if (!treeSlots.tryAcquire()) { discard(); return }
+            } else {
+              treeSlots.acquire()
+            }
+            acquired = true
+            // Explicit refresh cancels queued work before invalidating snapshots.
+            if (!syncFn(() => treeState[id] === state, treeLock)) return
+            if (speculative && treeUnit(key)) { discard(); return }
+            browseCache("codeartifact-package-tree").get(key)
+            syncFn(() => {
+              if (treeState[id] !== state) return
+              if (!speculative) { delete treeState[id]; return }
+              prefetchStats.loaded.inc()
+              state.refreshing = false
+              state.prefetched = true
+              state.retryAt = now() + treeTTL
+              if (state.visited) {
+                prefetchStats.used.inc()
+                delete treeState[id]
+              }
+            }, treeLock)
+          } catch (e) { failed(e) }
+          finally {
+            if (acquired) treeSlots.release()
+            if (speculative) prefetchSlot.release()
+          }
+        })
+        if (speculative) prefetchStats.queued.inc()
+        return true
+      } catch (e) {
+        if (speculative) prefetchSlot.release()
+        failed(e)
+        return false
+      }
+    }
+
+    var readTree = (key, navigation) => {
+      if (!provider) return browseCache("codeartifact-package-tree").get(key)
+      var unit = treeUnit(key)
+      if (navigation && prefetchEnabled) {
+        var id = stringify(key, __, "")
+        syncFn(() => {
+          var state = treeState[id]
+          if (!state || !state.speculative) return
+          if (state.refreshing) state.visited = true
+          if (state.prefetched && now() < state.retryAt && (unit || treeUnit(key))) {
+            prefetchStats.used.inc()
+            delete treeState[id]
+          }
+        }, treeLock)
+      }
+      if (!unit) {
+        treeSlots.acquire()
+        try { return browseCache("codeartifact-package-tree").get(key) }
+        finally { treeSlots.release() }
+      }
+      if (now() >= unit.expiresAt) queueTree(key, false)
+      return unit.value
+    }
+
+    const repositoryPrefetch = `<script>
+      (function() {
+        const directory = location.pathname.replace(/\\/?$/, '/')
+        const requested = new Set()
+        let hovered, focused, target, timer
+        const repository = event => event.target instanceof Element && event.target.closest('#browse-listing tbody td:nth-child(2) a')
+        const update = next => {
+          if (target === next) return
+          clearTimeout(timer)
+          target = next
+          if (!next) return
+          const url = new URL(next.href)
+          if (url.origin !== location.origin || !url.pathname.startsWith(directory) ||
+              !/^[^/]+\\/?$/.test(url.pathname.slice(directory.length)) || requested.has(url.pathname)) return
+          timer = setTimeout(() => {
+            if (!next.isConnected) return
+            requested.add(url.pathname)
+            url.search = '?_browsePrefetch=1'
+            fetch(url, { credentials:'same-origin', cache:'no-store', redirect:'error', headers:{'X-OpenAF-Browse-Prefetch':'1'} }).catch(() => {})
+          }, 225)
+        }
+        document.addEventListener('pointerover', event => {
+          if (event.pointerType === 'touch') return
+          hovered = repository(event)
+          if (hovered) update(hovered)
+        })
+        document.addEventListener('pointerout', event => {
+          if (hovered && repository(event) === hovered && !hovered.contains(event.relatedTarget)) {
+            if (target === hovered) update(focused)
+            hovered = undefined
+          }
+        })
+        document.addEventListener('focusin', event => {
+          focused = repository(event)
+          update(focused || hovered)
+        })
+        document.addEventListener('focusout', event => {
+          if (focused && !focused.contains(event.relatedTarget)) {
+            if (target === focused) update(hovered)
+            focused = undefined
+          }
+        })
+      })()
+    </script>`
+
     var getPaging = (page, pageSize) => {
       var _pageSize = isDef(pageSize) ? Number(pageSize) : Number(isDef(args.pageSize) ? args.pageSize : (args.options || {}).pageSize)
       if (isNaN(_pageSize) || _pageSize <= 0) _pageSize = 0
@@ -113,7 +284,7 @@ jobs:
     }
 
     var applyPaging = (aList, page, pageSize) => {
-      var p = getPaging(page, pageSize)
+      var p = enhanced && args.options.query && args.options.query.enabled ? {page:1,pageSize:0} : getPaging(page, pageSize)
       var _list = isArray(aList) ? aList : []
       var total = _list.length
 
@@ -156,9 +327,111 @@ jobs:
     }, lst)
 
     // Paging options: pageSize/page can be passed as args or via args.options
+    const escapeAsset = value => String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]))
+    const assetFormat = (name, options) => support && options.preview &&
+      support.format(name, options.preview, Object.assign({}, support.defaults, { htm: "html", html: "html", pom: "xml", xml: "xml" }))
+    const assetURL = (name, mode) => "?asset=" + encodeURIComponent(name) +
+      (mode == "raw" ? "&amp;raw=true" : mode == "source" ? "&amp;view=source" : "")
+
+    const renderAssetPreview = (preview, type, name, request, options) => {
+      const path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
+      const versionURL = escapeAsset(ow.server.httpd.withPrefix(options.port, options.parentURI.replace(/\/$/, "") + "/" +
+        path.split("/").map(encodeURIComponent).join("/")))
+      const url = mode => versionURL + assetURL(name, mode)
+      const prefix = escapeAsset(ow.server.httpd.getPrefix(options.port))
+      // An HTML block keeps Showdown from encoding the already escaped source a second time.
+      const source = (language, content) => '<div><pre><code class="language-' + escapeAsset(language) + '">' +
+        escapeAsset(content) + "</code></pre></div>\n\n"
+      const showingSource = request.params.view == "source"
+      const showModes = ["html", "xml", "json"].includes(type)
+      var data = '\n<style>.codeartifact-actions{display:flex;flex-wrap:wrap;gap:.35em 1em;margin-bottom:1em}.codeartifact-actions a{white-space:nowrap}.codeartifact-actions a[aria-current]{font-weight:600;text-decoration:underline}.codeartifact-actions a:focus-visible{outline:2px solid currentColor;outline-offset:2px}</style>\n\n'
+      data += '<h3 style="overflow-wrap:anywhere">' + escapeAsset(name) + '</h3>\n\n'
+      if (showModes || options.download) {
+        data += '<nav class="codeartifact-actions" aria-label="Asset views and actions">'
+        if (showModes) {
+          const renderJSON = type == "json" && isFunction(support.jsonViewURL)
+          data += '<a href="' + (renderJSON ? support.jsonViewURL(request, "json") : url("preview")) + '"' +
+            (!showingSource ? ' aria-current="page"' : '') + '>' + (renderJSON ? "Render" : "Preview") + '</a>' +
+            '<a href="' + url("source") + '"' + (showingSource ? ' aria-current="page"' : '') + '>Source</a>'
+        }
+        if (options.download) data += '<a href="' + url("raw") + '">Download raw</a>'
+        data += '</nav>\n\n'
+      }
+
+      if (preview.truncated) {
+        data += "<p>Preview truncated at the configured size limit.</p>\n\n" + source("text", preview.data.replace(/\n\n\[Preview truncated; download the complete file\.\]$/, ""))
+      } else if ((type == "json" || type == "xml") && !showingSource) {
+        const fromXML = type == "xml"
+        var value
+        try {
+          if (fromXML) {
+            const xml = preview.data.trim().replace(/^<\?xml\s[^?]*\?>/, "").trim()
+            // Registry assets are untrusted. Skip DTD and entity declarations before parsing.
+            if (!/<!\s*(?:DOCTYPE|ENTITY)\b/i.test(xml)) {
+              const document = new XML("<xml>" + xml + "</xml>")
+              const nodes = Array.from(document.children())
+              const elements = nodes.filter(node => node.nodeKind() == "element")
+              if (elements.length == 1 && nodes.every(node => {
+                const kind = node.nodeKind()
+                return kind == "element" || kind == "comment" || kind == "processing-instruction" ||
+                  (kind == "text" && String(node).trim() == "")
+              })) {
+                const element = elements[0]
+                value = Object.fromEntries([[String(element.localName()), af.fromXML2Obj(element)]])
+              }
+            }
+          } else {
+            value = JSON.parse(preview.data)
+          }
+        } catch (e) {}
+        if (isMap(value) || isArray(value)) {
+          data += '<link rel="stylesheet" href="' + prefix + '/css/nJSMap.css"><script src="' + prefix + '/js/openafsigil.js"></script>' +
+            '<script src="' + prefix + '/js/njsmap.js"></script>\n\n<div id="codeartifact-json" style="overflow:auto" data-format="' + type + '" data-json="' + escapeAsset(fromXML ? JSON.stringify(value) : preview.data) + '">' +
+            source(type, preview.data) + `</div>\n\n<script>
+            document.addEventListener("DOMContentLoaded", function() {
+              if (!window.nJSMap || typeof nJSMap.mount !== "function") return
+              const view = document.getElementById("codeartifact-json")
+              try {
+                const source = view.dataset.json
+                const tree = document.createElement("div")
+                const theme = () => tree.classList.toggle("njsmap_dark", document.body.classList.contains("markdown-body-dark"))
+                theme()
+                nJSMap.mount(tree, JSON.parse(source), { collapseAll: source.length >= 1024 * 1024 })
+                view.replaceChildren(tree)
+                new MutationObserver(theme).observe(document.body, { attributeFilter: ["class"] })
+              } catch (error) {}
+            })
+          </script>\n\n`
+        } else {
+          if (isUnDef(value)) data += "<p>This asset could not be parsed as " + type.toUpperCase() + ".</p>\n\n"
+          data += source(type, preview.data)
+        }
+      } else {
+        data += source(type, preview.data)
+      }
+      return { data: data, type: "raw", browseDetail: true, jsonSource: type == "json" && showingSource, truncated: !!preview.truncated }
+    }
+
     args.fns = {
+      validate: (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI)
+        var parts = path.replace(/\/+$/, "").split("/")
+        if (path && (parts.some(p => !p || p === "." || p === "..") || /[\\\x00]/.test(path))) denyScope()
+        if (parts[0] && isDef(args.domain) && parts[0] !== args.domain) denyScope()
+        if (parts.length >= 2 && isDef(args.repository) && !parts[1].startsWith(args.repository)) denyScope()
+        if (parts.length >= 3 && isDef(args.format) && parts[2] !== args.format) denyScope()
+        if (parts.length >= 4 && isDef(args.namespace)) {
+          var namespace = args.namespace.split("/")
+          if (namespace.some((part, i) => isDef(parts[3 + i]) && parts[3 + i] !== part)) denyScope()
+        }
+        var patterns = isString(args.restrict) ? [args.restrict] : (args.restrict || [])
+        var prefixes=path.split("/").map((part,i,all)=>all.slice(0,i+1).join("/"))
+        if (patterns.some(p => prefixes.some(prefix => new RegExp(p).test(prefix)))) { var denied = new Error("Forbidden"); denied.httpStatus = 403; throw denied }
+      },
       init   : () => {
-        $cache("codeartifact-domains")
+        browseCache("codeartifact-domains")
         .ttl(args.cache)
         .fn(() => {
           var _aws = getAWS()
@@ -168,39 +441,35 @@ jobs:
         })
         .create()
 
-        $cache("codeartifact-repos")
+        browseCache("codeartifact-repos")
         .ttl(args.cache)
         .fn(k => {
           var _aws = getAWS()
           var lst = _aws.CODEARTIFACT_ListRepositories(args.region, args.repository)
-          if (isDef(k.domain)) lst = lst.filter(f => f.domainName == k.domain)
-          return lst
+          return lst.filter(r => (!isDef(args.domain) || r.domainName === args.domain) &&
+            (!isDef(args.repository) || String(r.repositoryName || r.name).startsWith(args.repository)))
         })
         .create()
 
-        $cache("codeartifact-packages")
+        // Packages and indexes are loaded and replaced as one repository snapshot.
+        browseCache("codeartifact-package-tree")
         .ttl(args.cache)
         .fn(k => {
-          var _aws = getAWS()
-          log(`Fetching packages for domain ${k.domain} and repository ${k.repository}...`)
-          var lst = _aws.CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format)
-          if (isDef(args.namespace)) lst = lst.filter(f => f.namespace == args.namespace)
-          log(`Fetched ${lst.length} packages for domain ${k.domain} and repository ${k.repository}.`)
-          return lst
+          var id = stringify(k, __, "")
+          var state = provider && syncFn(() => treeState[id], treeLock)
+          var lst = getAWS().CODEARTIFACT_ListPackages(args.region, k.repository, k.domain, args.format, args.namespace,
+            state && (page => {
+              var paths = page.filter(scopedPackage).map(packagePath)
+              syncFn(() => {
+                if (treeState[id] === state && state.refreshing) state.pages.push(paths)
+              }, treeLock)
+            }))
+          if (!isArray(lst)) throw new Error("Invalid CodeArtifact package response")
+          return buildPackageTree(lst.filter(scopedPackage))
         })
         .create()
 
-        $cache("codeartifact-package-tree")
-        .ttl(args.cache)
-        .fn(k => {
-          log(`Building package tree for domain ${k.domain} and repository ${k.repository}...`)
-          var packages = $cache("codeartifact-packages").get(k)
-          log(`Built package tree for domain ${k.domain} and repository ${k.repository}.`)
-          return buildPackageTree(packages)
-        })
-        .create()
-
-        $cache("codeartifact-versions")
+        browseCache("codeartifact-versions")
         .ttl(args.cache)
         .fn(k => {
           var _aws = getAWS()
@@ -208,7 +477,7 @@ jobs:
         })
         .create()
 
-        $cache("codeartifact-assets")
+        browseCache("codeartifact-assets")
         .ttl(args.cache)
         .fn(k => {
           var _aws = getAWS()
@@ -216,11 +485,21 @@ jobs:
         })
         .create()
 
+        // Warm the root cache at startup. A failed load can be retried on the first request.
+        if (args.browse !== false) {
+          try {
+            browseCache("codeartifact-domains").get({})
+          } catch (e) {
+            logWarn("Could not warm the browse root cache")
+          }
+        }
+
         if (isDef(args.initialize)) {
           $doV(() => {
             var _inits = af.fromJSSLON(args.initialize)
             pForEach(_inits, i => {
-              $cache("codeartifact-package-tree").get({
+              authorizeRepository(i.domain, i.repository)
+              readTree({
                 domain    : i.domain,
                 repository: i.repository
               })
@@ -229,22 +508,24 @@ jobs:
         }
       },
       getList: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI).replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
+        if (parts.length) authorizeRepository(parts[0], parts[1])
         var reqParams = isMap(request.params) ? request.params : {}
         var reqPage = isDef(reqParams.page) ? Number(reqParams.page) : __
         var reqPageSize = __
 
         if (parts.length == 0) {
-          var domains = $cache("codeartifact-domains").get({})
+          var domains = browseCache("codeartifact-domains").get({})
           var paged = applyPaging($from(domains).sort("domainName").select(d => {
             return {
               isDirectory: true,
               values     : {
                 "Domain" : d.domainName || d.name,
                 "Owner"  : d.owner || "",
-                "Created": isDef(d.createdTime) ? new Date(d.createdTime).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
+                "Created": isDef(d.createdTime) ? new Date(d.createdTime * 1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
               }
             }
           }), reqPage, reqPageSize)
@@ -259,7 +540,7 @@ jobs:
 
         if (parts.length == 1) {
           var domain = parts[0]
-          var repos = $cache("codeartifact-repos").get({ domain: domain })
+          var repos = browseCache("codeartifact-repos").get({}).filter(r => r.domainName == domain)
           var paged = applyPaging($from(repos).sort("repositoryName").select(r => {
             return {
               isDirectory: true,
@@ -276,6 +557,8 @@ jobs:
             fields: [ "Repository", "Domain", "Owner", "Description" ],
             alignFields: [ "left", "left", "left", "left" ],
             key   : [ "Repository" ],
+            content: prefetchEnabled && !options._api &&
+              options.capabilities && options.capabilities.prefetch === 1 ? repositoryPrefetch : __,
             list  : paged.list
           }, paged)
         }
@@ -284,8 +567,7 @@ jobs:
         var repo = parts[1]
         var remaining = parts.slice(2).join("/")
 
-        var packages = $cache("codeartifact-packages").get({ domain: domain, repository: repo })
-        var tree = $cache("codeartifact-package-tree").get({ domain: domain, repository: repo })
+        var tree = readTree({ domain: domain, repository: repo }, !options._api)
         var lstParent = tree.parents
         var childrenMap = tree.childrenMap || {}
         var leafByPath = tree.leafByPath || {}
@@ -321,7 +603,7 @@ jobs:
             var pkgPath = remParts.slice(0, -1).join("/")
             var leafPkg = leafByPath[pkgPath]
             if (isDef(leafPkg)) {
-              var versions = $cache("codeartifact-versions").get({
+              var versions = browseCache("codeartifact-versions").get({
                 domain    : domain,
                 repository: repo,
                 format    : leafPkg.format,
@@ -342,7 +624,7 @@ jobs:
 
         var leaf = leafByPath[remaining]
         if (isDef(leaf)) {
-          var versions = $cache("codeartifact-versions").get({
+          var versions = browseCache("codeartifact-versions").get({
             domain    : domain,
             repository: repo,
             format    : leaf.format,
@@ -350,7 +632,7 @@ jobs:
             package   : leaf.package
           })
 
-          var _paged = applyPaging($from(versions).sort("-publishedTime").select(v => {
+          var rows = $from(versions).sort("-publishedTime").select(v => {
             return {
               isDirectory: false,
               values     : {
@@ -359,14 +641,27 @@ jobs:
                 "Published": isDef(v.publishedTime) ? new Date(v.publishedTime*1000).toISOString().replace(/T/, " ").replace(/\..+/, "") : ""
               }
             }
-          }), reqPage, reqPageSize)
-          return withPagingInfo({
+          })
+          var fields = ["Version", "Status", "Published"]
+          var sortInfo
+          if (!options._api && !(options.query && options.query.enabled) && support && isFunction(support.compareValues)) {
+            const field = options.sortTab && reqParams.sort || "Version"
+            const order = options.sortTab && reqParams.order || "asc"
+            if (fields.indexOf(field) < 0 || ["asc", "desc"].indexOf(order) < 0) support.error(400, "Invalid sort")
+            const direction = order == "desc" ? -1 : 1
+            rows.sort((left, right) => direction * support.compareValues(left.values[field], right.values[field], field == "Version"))
+            sortInfo = { field: field, order: order }
+          }
+          var _paged = applyPaging(rows, reqPage, reqPageSize)
+          var result = withPagingInfo({
             isList: true,
-            fields: [ "Version", "Status", "Published" ],
+            fields: fields,
             alignFields: [ "left", "left", "left" ],
             key   : [ "Version" ],
             list  : _paged.list
           }, _paged)
+          if (sortInfo) result.sortInfo = sortInfo
+          return result
         }
 
         var listPrefix = remaining
@@ -376,7 +671,7 @@ jobs:
           return {
             isDirectory: f.isParent,
             values     : {
-              "Package"  : f.name.replace(new RegExp("^" + remaining + "/?"), ""),
+              "Package"  : f.name.substring(remaining.length + 1),
               "Format"   : f.pkg.format || "",
               "Namespace": f.pkg.namespace || ""
             }
@@ -391,37 +686,60 @@ jobs:
         }, paged)
       },
       getObj: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "").replace(/\/+$/, "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI).replace(/\/+$/, "")
         var parts = puri.split("/").filter(r => r.length > 0)
 
         var domain = parts[0]
         var repo = parts[1]
         var version = parts[parts.length - 1]
-        var pkgParts = parts.slice(2, -1)
-        var format = pkgParts[0]
-        var pkg = pkgParts[pkgParts.length - 1]
-        var namespace = pkgParts.length > 2 ? pkgParts.slice(1, -1).join("/") : __
+        if (parts.length < 5) denyScope()
+        authorizeRepository(domain, repo)
+        var tree = readTree({ domain: domain, repository: repo }, false)
+        var leaf = tree.leafByPath[parts.slice(2, -1).join("/")]
+        if (!leaf || !scopedPackage(leaf)) denyScope()
+        var format = leaf.format, pkg = leaf.package, namespace = leaf.namespace
+        var packageKey = { domain: domain, repository: repo, format: format, namespace: namespace, package: pkg }
+        if (!browseCache("codeartifact-versions").get(packageKey).some(row => row.version === version)) denyScope()
+        var assetKey = Object.assign({}, packageKey, { version: version })
 
-        if (options.download && isDef(request.params) && isDef(request.params.asset)) {
-          try {
-            var _aws = getAWS()
-            var result = _aws.CODEARTIFACT_GetPackageVersionAsset(args.region, repo, domain, format, namespace, pkg, version, request.params.asset)
-            return { stream: result.stream }
-          } catch(e) {
-            logErr("CodeArtifact download error [" + request.params.asset + "]: " + String(e))
-            throw e
+        var params = request.params || {}
+        if (isDef(params.asset) && (!options._api || options.download)) {
+          if (!isString(params.asset) || !params.asset.length || params.asset.length > 512 || /[\x00-\x1f\x7f]/.test(params.asset)) {
+            const invalid = new Error("Invalid asset name")
+            invalid.httpStatus = 400
+            throw invalid
           }
+          const name = params.asset
+          const previewType = !options._api && params.raw != "true" && assetFormat(name, options)
+          if (!previewType && !options.download) {
+            const denied = new Error("Asset download is disabled")
+            denied.httpStatus = 403
+            throw denied
+          }
+          if (!browseCache("codeartifact-assets").get(assetKey).some(row => (row.name || row.assetName) === name)) denyScope()
+          const openAsset = () => getAWS().CODEARTIFACT_GetPackageVersionAsset(args.region, repo, domain, format, namespace, pkg, version, name).stream
+          if (previewType == "json" && params.view != "source" && isFunction(support.jsonPreview)) {
+            return support.jsonPreview(request, options, openAsset, options.download === true)
+          }
+          const stream = openAsset()
+          var imageType = support && isFunction(support.imageType) && support.imageType(previewType)
+          if (imageType) return support.imagePreview(stream, imageType)
+          if (previewType == "html" && params.view != "source") return support.htmlPreview(stream)
+          if (previewType) {
+            const preview = support.readPreview(stream, "text", (options.preview || {}).maxBytes)
+            return renderAssetPreview(preview, previewType, name, request, options)
+          }
+          const encodedName = encodeURIComponent(name).replace(/[!'()*]/g, ch => "%" + ch.charCodeAt(0).toString(16).toUpperCase())
+          const fallbackName = name.replace(/[^a-zA-Z0-9_. -]/g, "_")
+          return { stream: stream, streamType: "application/octet-stream", streamHeaders: {
+            "Content-Disposition": 'attachment; filename="' + fallbackName + '"; filename*=UTF-8' + "''" + encodedName,
+            "X-Content-Type-Options": "nosniff"
+          } }
         }
 
-        var assets = $cache("codeartifact-assets").get({
-          domain    : domain,
-          repository: repo,
-          format    : format,
-          namespace : namespace,
-          package   : pkg,
-          version   : version
-        })
+        var assets = clone(browseCache("codeartifact-assets").get(assetKey))
         traverse(assets, (aK, aV, aP, aO) => {
           if (aK == "SHA-512") {
             delete aO[aK]
@@ -443,13 +761,12 @@ jobs:
         data += "|:---|---:|---|\n"
         $from(assets).sort("assetName").select(a => {
           var assetName = a.name || a.assetName || ""
-          var dlLink = (options.download && assetName.length > 0)
-            ? `<a href="?asset=${encodeURIComponent(assetName)}" download="${assetName}">⬇</a> `
-            : ""
-          var assetDisplay = (options.download && assetName.length > 0)
-            ? `<a href="?asset=${encodeURIComponent(assetName)}" download="${assetName}">${assetName}</a>`
-            : assetName
-          data += `| ${dlLink}${assetDisplay} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${af.toYAML(a.hashes).replace(/\n/g, "</br>") || ""} |\n`
+          const rawURL = assetURL(assetName, "raw")
+          const name = escapeAsset(assetName).replace(/\|/g, "&#124;")
+          const dlLink = options.download && assetName ? '<a href="' + rawURL + '" aria-label="Download raw" title="Download raw">↓</a> ' : ""
+          const previewURL = assetName && assetFormat(assetName, options) ? assetURL(assetName, "preview") : options.download && assetName ? rawURL : ""
+          const assetDisplay = previewURL ? '<a href="' + previewURL + '">' + name + '</a>' : name
+          data += `| ${dlLink}${assetDisplay} | ${isDef(a.size) ? ow.format.toBytesAbbreviation(a.size) : ""} | ${escapeAsset(af.toYAML(a.hashes)).replace(/\|/g, "&#124;").replace(/\n/g, "<br>")} |\n`
         })
 
         if (options.sortTab) data += "<script src=\"/js/mdtablesort.js\"></script>\n"
@@ -462,6 +779,127 @@ jobs:
     }
 
 
+    if (provider) {
+      if (prefetchEnabled) args.fns.prefetch = (request, options) => {
+        args.fns.validate(request, options)
+        var parts = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/$/, "").split("/")
+        if (parts.length != 2 || !parts[0] || !parts[1]) return false
+        var key = { domain: parts[0], repository: parts[1] }
+        var known = provider.entries("codeartifact-repos").some(unit => unit.value.some(repo =>
+          repo.domainName == key.domain && (repo.repositoryName || repo.name) == key.repository))
+        return known && !treeUnit(key) && queueTree(key, true)
+      }
+      var isRefreshing = (path,options) => syncFn(() =>
+        Object.keys(treeState).some(k => treeState[k].refreshing && support.matchesUnit(path,treeState[k].key,options.parentPath)), treeLock)
+      args.fns.search = (request,options) => {
+        args.fns.validate(request, options)
+        if (!options.query || !options.query.enabled) support.error(501,"Enhanced search is not enabled")
+        var path=global.__ojobHttpRelativePath(request.uri,options.parentURI).replace(/\/+$/, ""),q=String((request.params||{}).q||""),rows=[]
+        if(q.length>(options.query.maxQueryLength||256))support.error(400,"Query too long")
+        if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
+        var literal = q.toLowerCase()
+        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
+        var parts = path.split("/").filter(Boolean)
+        var browser = !options._api && request.method == "GET"
+        var explicit = browser && (request.header || {})["x-openaf-browse-fragment"] !== "1"
+        var units = provider.entries("codeartifact-package-tree")
+        var known = provider.entries("codeartifact-repos")[0]
+        if (!known && explicit && (parts.length >= 2 || request.params.searchAll == "1")) {
+          known = { value: browseCache("codeartifact-repos").get({}) }
+        }
+        var permitted = name => {
+          try {
+            args.fns.validate({ uri: options.parentURI.replace(/\/$/, "") + "/" + name }, options)
+            return true
+          } catch (e) { return false }
+        }
+        var repositories = known && known.value.filter(repo => {
+          var name = repo.domainName + "/" + (repo.name || repo.repositoryName)
+          return (!parts.length || repo.domainName == parts[0]) &&
+            (parts.length < 2 || name == parts.slice(0, 2).join("/")) && permitted(name)
+        })
+        var missing = repositories && repositories.filter(repo => !units.some(unit =>
+          unit.key.domain == repo.domainName && unit.key.repository == (repo.name || repo.repositoryName)))
+        if (explicit && (parts.length >= 2 || request.params.searchAll == "1")) {
+          ;(missing || []).forEach(repo => queueTree({ domain: repo.domainName, repository: repo.name || repo.repositoryName }, false))
+        }
+
+        var refreshing = isRefreshing(path,options), scanned = 0
+        var names = new Set()
+        var collect = (key, packages) => {
+          var prefix = key.domain + "/" + key.repository + "/"
+          packages.forEach(pkg => {
+            var name = prefix + (isString(pkg) ? pkg : pkg.path)
+            if ((path && !name.startsWith(path + "/")) || !permitted(name) || names.has(name)) return
+            names.add(name)
+            scanned++
+            if (matches(name)) rows.push({ isDirectory: true, values: { Package: path ? name.substring(path.length + 1) : name } })
+          })
+        }
+        units.forEach(unit => collect(unit.key, unit.value.list))
+        var partial = syncFn(() => Object.keys(treeState).map(id => treeState[id])
+          .filter(state => state.pages.length && (!path || support.matchesUnit(path, state.key, options.parentPath)))
+          .map(state => ({ key: state.key, pages: state.pages.slice() })), treeLock)
+        partial.forEach(state => {
+          if (units.some(unit => unit.key.domain == state.key.domain && unit.key.repository == state.key.repository)) return
+          state.pages.forEach(page => collect(state.key, page))
+        })
+        var max = options.query.maxResults || 1000
+        var complete = browser && !!repositories && !missing.length && !refreshing
+        var message = browser && (repositories ? (repositories.length - missing.length) + " of " + repositories.length + " repositories searched." : "Searched loaded package trees.")
+        if (browser && refreshing) message += " Loading more packages…"
+        else if (browser && partial.length && !complete) message += " Some loads stopped early."
+        if (browser && rows.length > max) message += " Search results are limited."
+        return { isList: true, fields: ["Package"], alignFields: ["left"], key: "Package", list: rows.slice(0, max),
+          searchInfo: { complete: complete, refreshing: refreshing, truncated: rows.length > max,
+            totalExact: complete && rows.length <= max, scanned: scanned, coverage: "loaded package hierarchies",
+            message: message, canExpand: browser && parts.length < 2 && !refreshing && (!repositories || missing.length > 0) } }
+
+      }
+      // The browser carries its sort field when entering or clearing search.
+      // Reset known columns from another view before the shared query validator runs.
+      var sortFields = ["Domain", "Owner", "Created", "Repository", "Description", "Package", "Format", "Namespace", "Version", "Status", "Published"]
+      ;["getList", "search"].forEach(name => {
+        var original = args.fns[name]
+        args.fns[name] = (request, options) => {
+          var result = original(request, options)
+          var params = request.params || {}
+          if (result.isList && options.query && options.query.enabled && sortFields.indexOf(params.sort) >= 0 && result.fields.indexOf(params.sort) < 0) {
+            params.sort = String(result.key)
+          }
+          return result
+        }
+      })
+      args.fns.getStatus = () => merge(provider.status(), {
+        refreshing: syncFn(() => Object.keys(treeState).filter(k => treeState[k].refreshing).length, treeLock),
+        prefetch: prefetchEnabled ? {
+          queued: prefetchStats.queued.get(), loaded: prefetchStats.loaded.get(), used: prefetchStats.used.get()
+        } : __
+      })
+      args.fns.getFreshness = (request,options) => {
+        var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
+        var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
+        freshness.refreshing = isRefreshing(path,options)
+        return freshness
+      }
+      args.fns.refresh = (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        var parts = path.split("/")
+        if (parts[0]) authorizeRepository(parts[0], parts[1])
+        // Drain active loads; queued callbacks check their identity before loading.
+        treeSlots.acquire(3)
+        try {
+          syncFn(() => {
+            Object.keys(treeState).forEach(k => {
+              if (support.matchesUnit(path,treeState[k].key,options.parentPath)) delete treeState[k]
+            })
+            provider.invalidate((name,key) => support.matchesUnit(path,key,options.parentPath))
+          }, treeLock)
+        } finally { treeSlots.release(3) }
+        args.fns.getList(request, options)
+      }
+    }
+
 # ------------------------------------------
 - name    : HTTP Browse - codeartifact - API
   to      : HTTP Browse API
@@ -470,7 +908,12 @@ jobs:
     shortcut:
       <<    : *httpBrowseCodeArtifactTypeArgs
       name  : CodeArtifactBrowseAPI
-  exec    : *httpBrowseCodeArtifactExec
+  exec: | #js
+    if (args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)) {
+      var support
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+    }
 
 
 #todo:

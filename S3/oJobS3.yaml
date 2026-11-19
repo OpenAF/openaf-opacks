@@ -1,6 +1,66 @@
 include:
 - oJobHTTPd.yaml
 - oJobBrowse.yaml
+
+code:
+  s3-browse-view.js: |
+    var support = require("ojob-browse-contract.js")
+
+    exports.url = (route, relative) => String(route).replace(/\/+$/, "") + "/" +
+      relative.replace(/^\/+/, "").split("/").map(global.__ojobHttpFileLink).join("/")
+
+    exports.prefix = path => String(path || "").replace(/^\/+|\/+$/g, "").replace(/(.+)$/, "$1/")
+
+    exports.validate = (relative, prefix, restrict) => {
+      var patterns = (isString(restrict) ? [restrict] : restrict || []).map(p => new RegExp(p))
+      var parts = relative.replace(/\/+$/, "").split("/")
+      if (parts.some(p => p == "." || p == "..") || /[\\\x00]/.test(relative) || relative.startsWith("/") ||
+          parts.some((part, i) => {
+            var parent = parts.slice(0, i + 1).join("/")
+            return patterns.some(p => p.test(parent) || p.test(prefix + parent) || p.test(prefix + parent + "/"))
+          })) support.error(403, "Forbidden")
+    }
+
+    exports.read = (s3, bucket, key, request, options) => {
+      var params = request.params || {}
+      var name = key.substring(key.lastIndexOf("/") + 1)
+      var headers = { "X-Content-Type-Options": "nosniff" }
+      var preview = options.preview || {}
+      var web = !options._api && params.action != "preview" && options.web && options.web.enabled === true && params.raw != "true"
+      var formats = Object.assign({}, support.defaults, { log: "text", html: "html", htm: "html" })
+      var type = !web && !options._api && params.raw != "true" && support.format(name, preview, formats)
+      if (!type) {
+        if (!web) headers["Content-Disposition"] = 'attachment; filename="' +
+          name.replace(/[^a-zA-Z0-9_. -]/g, "_") + "\"; filename*=UTF-8''" + global.__ojobHttpFileLink(name)
+        return { stream: s3.getObjectStream(bucket, key), streamHeaders: headers,
+          streamType: web ? ow.server.httpd.getMimeType(name) : "application/octet-stream" }
+      }
+
+      if (type == "json" && (params.view == "json" || params.view == "json-data" ||
+          (params.parse != "false" && params.view != "source"))) {
+        return support.jsonPreview(request, options, () => s3.getObjectStream(bucket, key))
+      }
+
+      var imageType = isFunction(support.imageType) && support.imageType(type)
+      if (imageType) return support.imagePreview(s3.getObjectStream(bucket, key), imageType)
+      if (type == "html" && params.view != "source") return support.htmlPreview(s3.getObjectStream(bucket, key))
+
+      // Keep untrusted source out of HTML and script contexts.
+      var limit = support.previewLimit(preview.maxBytes)
+      var object = support.readPreview(s3.getObjectStream(bucket, key, 0, limit + 1), "text", limit)
+      var markup
+      if (!object.truncated && (type == "markdown" || type == "md")) markup = support.safeMarkdown(object.data)
+      else {
+        var language = object.truncated ? "text" : type
+        markup = '<div><pre><code class="language-' + language + '">' +
+          ow.format.escapeHTML(object.data).replace(/\r?\n/g, "&#10;") + '</code></pre></div>'
+      }
+      if (type == "json") markup = '<p><a href="' + support.jsonViewURL(request, "json") + '">Render</a></p>' +
+        "\n\n" + markup
+      return { data: markup, type: "raw", browseDetail: true, jsonSource: type == "json", truncated: object.truncated }
+    }
+
+    exports.previewBackArrow = support.previewBackArrow
  
 jobs:
 # ---------------------
@@ -28,6 +88,7 @@ jobs:
         incURI   : incURI
         cache    : cache
         sortTab  : sortTab
+        options  : options
   help : 
    text   : Provides a HTTP S3 objects browse definition. 
    expects:
@@ -78,14 +139,29 @@ jobs:
       var s3           = global.__MHTTPD[String(port) + uri].S3
       var bucket       = global.__MHTTPD[String(port) + uri].BUCKET
       var restrict     = global.__MHTTPD[String(port) + uri].RESTRICT
-      var incURI       = global.__MHTTPD[String(port) + uri].INCURI
-      var origuri      = global.__MHTTPD[String(port) + uri].URI
+      var options      = global.__MHTTPD[String(port) + uri].OPTIONS
       var cache        = global.__MHTTPD[String(port) + uri].CACHE
       var sortTab      = global.__MHTTPD[String(port) + uri].SORTTAB
 
       var content = ""
-      var puri = String(request.uri).replace(new RegExp("^" + uri), (uri == "/" ? "" : "/")).replace(/\/+/g, "/")
-      var furi = String(puri).replace(/\\+/g, "/")
+      var view = require("s3-browse-view.js")
+      var furi = global.__ojobHttpRelativePath(request.uri, uri)
+      try { view.validate(furi, path, restrict) } catch (e) {
+        if (e.httpStatus == 403) return server.reply("Forbidden", "text/plain", 403)
+        throw e
+      }
+      var puri = "/" + furi
+
+      var serveObject = relative => {
+        view.validate(relative, path, restrict)
+        var objectRequest = Object.assign({}, request, { uri: uri.replace(/\/+$/, "") + "/" + relative })
+        var result = view.read(s3, bucket, path + relative, objectRequest, Object.assign({}, options, { port: port }))
+        if (result.stream) return server.replyStream(result.stream, result.streamType, 200, result.streamHeaders)
+        var download = result.jsonViewer ? "" :
+          '<a href="' + ow.format.escapeHTML(view.url(uri, relative)) + '?raw=true" download>Download raw</a>'
+        var header = view.previewBackArrow + "\n\n" + tmplh({ puri: relative })
+        return server.replyOKHTML(ow.template.parseMD2HTML(header + "\n\n" + download + "\n\n" + result.data, true))
+      }
 
       if (!puri.endsWith("/")) puri += "/"
 
@@ -120,15 +196,15 @@ jobs:
         if (origLst.length > 0) {
           var _defaultKey = path + (puri == "/" ? "" : puri).replace(/^\//, "") + String(fdefault)
           if (isDef(fdefault) && $from(lst).equals("filepath", _defaultKey).any()) {
-              return (fdefault.endsWith(".md") ?
-                      ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, _defaultKey), uri, request.uri + "/" + fdefault) : ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, _defaultKey), uri, request.uri + "/" + fdefault))
+              if (!String(request.uri).endsWith("/")) return ow.server.httpd.replyRedirect(server, view.url(uri, puri), {})
+              return serveObject(_defaultKey.substring(path.length))
           } else {
               if (shouldBrowse) { 
                 content += tmplh({ puri: (puri == "" ? "/" : puri) })
                 content += "|   | Filename | Last modified | Size | Size in bytes |\n"
                 content += "|---|----------|:--------------|-----:|--------------:|\n"
                 if (puri != "/" && puri != "") 
-                  content += "| <span style=\"color: #a0a0a0;\">&#8598;</span> | __[..](<" + uri + puri.replace(/[^\/]+\/$/, "") + ">)__ | | |\n"
+                  content += "| <span style=\"color: #a0a0a0;\">&#8598;</span> | __[..](<" + view.url(uri, puri.replace(/[^\/]+\/$/, "")) + ">)__ | | |\n"
 
                 var theList = $from(lst).sort("-isDirectory", "filename").notEquals("filepath", "/").select(f => {
                   if (f.filename.endsWith("/")) f.filename = f.filename.substr(0, f.filename.length-1)
@@ -137,76 +213,18 @@ jobs:
                     fSize        : ow.format.toBytesAbbreviation(f.size),
                     puri         : puri,
                     uri          : uri,
-                    filename     : f.filename.substr(f.filename.substr(0, f.filename.length-1).lastIndexOf("/") + 1).replace(/\+/g, "%2B")
+                    filename     : f.filename.substring(f.filename.lastIndexOf("/") + 1)
                   })
                 })
                 content += tmplb(theList)
               }
           }
         } else {
-          if (request.params.raw == "true") {
-              return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
-          } else {
-              var ext = String(furi).replace(/^.*\./, "")
-              var _downloadcode = `<span><script>
-                function downloadText(aFile) {
-                  var selectedText = document.querySelectorAll("pre")[0].innerText
-                  const blob = new Blob([selectedText], { type: "text/plain" })
-                  const url = URL.createObjectURL(blob)
-                  const a = document.createElement("a")
-                  a.href = url
-                  a.download = aFile
-                  document.body.appendChild(a)
-                  a.click()
-                  document.body.removeChild(a)
-                  URL.revokeObjectURL(url)
-                }
-              </script></span>`
-              var fn = () => ow.server.httpd.replyFileMD(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
-              var fnLang = (lang, puri) => {
-                ow.loadTemplate()
-                var _displayURI = uri.replace(/\/$/, "")
-                _displayURI = _displayURI.replace(new RegExp("^" + origuri), "")
-                _displayURI += puri
-                return server.reply( ow.template.parseMD2HTML("## " + $t("{{{s3-buildBreadcrumbs '" + _displayURI + "' '" + uri + "' " + incURI + "}}}") + "<span onclick=\"history.back()\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\"><a href=\"javascript:history.back()\">&larr;</a></span><span onclick=\"downloadText('" + puri.replace(/\/?$/,"").substr(puri.replace(/\/?$/,"").lastIndexOf("/")+1) + "')\" onmouseout=\"this.style.textDecoration='none';\" onmouseover=\"this.style.textDecoration='underline';\" style=\"padding-left: 1em; float: right; text-decoration: none; cursor: pointer;\"><a href=\"javascript:downloadText('" + puri.replace(/\/?$/,"").substr(puri.replace(/\/?$/,"").lastIndexOf("/")+1) + "')\">&darr;</a></span>\n\n```" + lang + "\n" + af.fromInputStream2String(s3.getObjectStream(bucket, path + furi.replace(/^\//, ""))) + "\n```\n" + _downloadcode, true, true), "text/html", 200)
-              }
-              switch(ext) {
-              case "md"  : return fn()
-              case "yml" :
-              case "yaml": return fnLang("yaml", puri)
-              case "sh"  : return fnLang("sh", puri)
-              case "css" : return fnLang("css", puri)
-              case "sh"  : return fnLang("sh", puri)
-              case "js"  : return fnLang("js", puri)
-              case "java": return fnLang("java", puri)
-              case "py"  : return fnLang("python", puri)
-              case "toml": return fnLang("toml", puri)
-              case "hbs" : return fnLang("handlebars", puri)
-              case "log" : return fnLang("text", puri)
-              case "json":
-                if (request.params.parse == "false") {
-                  return fnLang("json", puri)
-                } else {
-                  var _d = jsonParse( af.fromInputStream2String( s3.getObjectStream(bucket, path + furi.replace(/^\//, "")) ) )
-                  if (isMap(_d) || isArray(_d))
-                    return ow.server.httpd.replyJSMap(server, _d)
-                  else
-                    return fn()           
-                }        
-              case "adoc":
-                if (isDef(getOPackPath("Asciidoc"))) {
-                  loadLib("asciidoc.js")
-                  return ow.server.httpd.replyAsciidoc(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri)
-                }
-              default: 
-                return ow.server.httpd.replyFile(server, s3.getObjectStream(bucket, path + furi.replace(/^\//, "")), uri, request.uri, __, __, {
-                  "Content-Type": ow.server.httpd.getMimeType(furi)
-                })
-              }
-          }
+          return serveObject(furi)
         }
       } catch(eg) {
-        logErr(af.toSLON(request) + " | " + eg)
+        if (eg.httpStatus == 403) return server.reply("Forbidden", "text/plain", 403)
+        logErr(String(eg))
         return server.replyOKHTML(ow.template.parseMD2HTML(tmplh({ puri : (puri == "" ? "/" : puri) }) + "\n" + "\n*no content available*\n", true))
       }
 
@@ -225,46 +243,35 @@ jobs:
 
       args.uri  = _$(args.uri).isString().default("/")
       args.path = _$(args.path).isString().default("")
+      var view = require("s3-browse-view.js")
+      args.path = view.prefix(args.path)
 
       ow.template.addHelper("escapeMDTable", str => str.replace(/\|/g, "\\|"))
-      ow.template.addHelper("s3-buildBreadcrumbs", (path, _uri, _incURI) => {
-        // Remove any leading or trailing slashes and split into segments.
-        const trimmedPath = path.replace(/^\/|\/$/g, '')
-        const segments = trimmedPath ? trimmedPath.split('/') : []
-        
-        // Start with the clickable root.
-        let html = ""
-        if (_incURI) 
-          html = `<a href="/" title="Navigate to root"> / </a> <a href="${_uri}" title="Navigate to main">${_uri.replace(/^\/*|\/*$/, "")} / </a>`
-        else 
-          html = `<a href="${_uri}" title="Navigate to root"> / </a>`
-        
-        let currentPath = _uri
-        segments.forEach((segment, index) => {
-          currentPath += "/" + segment  // Build up the path.
-          // Add separator before each segment.
-          if (index > 0) html += ' / '
-          
-          // If it's the last segment (current location), show as plain text.
-          if (index === segments.length - 1) {
-            html += `<span>${segment}</span>`
-          } else {
-            html += `<a href="${currentPath}/" title="Navigate to ${currentPath}/">${segment}</a>`
-          }
+      ow.template.addHelper("s3-browse-url", (uri, path, name) => view.url(uri, path + name))
+      ow.template.addHelper("s3-browse-label", global.__ojobHttpEscapeText)
+      ow.template.addHelper("s3-buildBreadcrumbs", (path, uri, incURI) => {
+        var escape = global.__ojobHttpEscapeText
+        var parts = path.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean)
+        var html = incURI ? '<a href="/">/</a> ' : ""
+        html += '<a href="' + escape(view.url(uri, "")) + '">' + (incURI ? escape(uri.replace(/^\/|\/$/g, "")) : "/") + '</a>'
+        parts.forEach((part, index) => {
+          var label = escape(part)
+          html += ' / ' + (index == parts.length - 1 ? '<span>' + label + '</span>' :
+            '<a href="' + escape(view.url(uri, parts.slice(0, index + 1).join("/") + "/")) + '">' + label + '</a>')
         })
-
         return html
       })
 
       args.logo = _$(args.logo, "logo").isString().default("/fonts/openaf_small.png")
 
       var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
-      var templ = _$(args.template).isString().default("{{#each this}}| {{#if isDirectory}}<span style=\"color: #a0a0a0;\">&#8600;</span>{{else}}<a href=\"{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}?raw=true\" download=\"{{encodeURI filename}}\">&darr;</a>{{/if}} | {{#if isDirectory}}__[{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>)__ | {{fLastModified}} | | {{else}} [{{escapeMDTable filename}}](<{{encodeURI uri}}{{encodeURI puri}}{{encodeURI filename}}>) | {{fLastModified}} {{/if}} | {{fSize}} | {{size}} | \n{{/each}}")
+      var templ = _$(args.template).isString().default('{{#each this}}| {{#if isDirectory}}&#8600;{{else}}<a href="{{s3-browse-url uri puri filename}}?raw=true" download>&darr;</a>{{/if}} | <a href="{{s3-browse-url uri puri filename}}{{#if isDirectory}}/{{/if}}">{{{s3-browse-label filename}}}</a> | {{fLastModified}} | {{fSize}} | {{size}} |\n{{/each}}')
 
       var _cache, s3
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
-      if (isNumber(args.cache)) {
-        _cache = "__oJobS3_" + md5(args.url + args.bucket)
+      if (isUnDef(args.cache)) args.cache = 5000
+      if (args.cache > 0) {
+        _cache = "__oJobS3_" + genUUID()
         log("Creating cache " + _cache + "...")
         $cache(_cache)
         .ttl(args.cache)
@@ -275,11 +282,14 @@ jobs:
           return _r
         })
         .create()
-      }
-
-      if (isDef(args.path) && args.path.length > 0) {
-        if (isUnDef(args.restrict)) args.restrict = []
-        args.restrict.push("^(?!" + args.path.replace(/^\//, "") + ").*")
+        // Warm the root cache at startup. A failed load can be retried on the first request.
+        if (args.browse !== false) {
+          try {
+            $cache(_cache).get({ puri: "" })
+          } catch (e) {
+            logWarn("Could not warm the browse root cache")
+          }
+        }
       }
 
       global.__MHTTPD = _$(global.__MHTTPD).isMap().default({})
@@ -295,7 +305,8 @@ jobs:
         BUCKET  : args.bucket,
         RESTRICT: args.restrict,
         CACHE   : _cache,
-        SORTTAB : args.sortTab
+        SORTTAB : args.sortTab,
+        OPTIONS : args.options || {}
       }
 
 # -----------------------
@@ -322,6 +333,7 @@ jobs:
         cache    : cache
         sortTab  : sortTab
         options  : options
+        operationsBrowseUris: operationsBrowseUris
   check:
     in:
       url      : isString
@@ -341,6 +353,18 @@ jobs:
       sortTab  : toBoolean.isBoolean.default(false)
       options  : isMap.default({})
   exec    : &httpBrowseS3Exec | #js
+    var view = require("s3-browse-view.js")
+    args.path = view.prefix(args.path)
+    var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)
+    if (enhanced) {
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+      provider = support.provider(args.options)
+    }
+    if (isUnDef(args.cache)) args.cache = 5000
+    var cacheNamespace = "browse-" + genUUID() + "-"
+    var browseCache = name => provider ? provider.cache(name) : $cache(cacheNamespace + name)
+
     args.options = merge(args.options, {
       showURI: args.incURI,
       sortTab: args.sortTab,
@@ -350,41 +374,110 @@ jobs:
     })
 
     load("s3.js")
+    if (enhanced && args.options.query && args.options.query.enabled && !isFunction(S3.prototype.walkObjects)) throw new Error("Enhanced S3 queries require S3.walkObjects; update the S3 oPack")
     var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
 
+    // Use the same prefix for the startup load and the first listing request.
+    var listingPrefix = (root, path) => (String(root || "") + path).replace(/\/?$/, "/").replace(/^\//, "")
+
+    // Share a bounded prefix walk across search terms and publish immutable batches.
+    var scans = new Map(), scanLock = new java.lang.Object()
+    var scanSlots = new java.util.concurrent.Semaphore(3)
+    var searchSnapshot = (prefix, query, start) => {
+      var next
+      var snapshot = syncFn(() => {
+        scans.forEach((state, key) => {
+          if (!state.refreshing && now() >= state.expires) scans.delete(key)
+        })
+        var state = scans.get(prefix)
+        if (start && state && state.failed) {
+          scans.delete(prefix)
+          state = undefined
+        }
+        if (!state && start && scans.size < 16 && scanSlots.tryAcquire()) {
+          state = { batches: [], scanned: 0, refreshing: true, complete: false }
+          scans.set(prefix, state)
+          next = state
+        }
+        if (!state) return { rows: [], info: { scanned: 0, complete: false, ready: false } }
+        return { batches: state.batches.slice(), info: {
+          scanned: state.scanned, complete: state.complete, refreshing: state.refreshing,
+          timedOut: state.timedOut, failed: state.failed, ready: true
+        } }
+      }, scanLock)
+      if (next) {
+        var finish = info => {
+          syncFn(() => Object.assign(next, info, { refreshing: false, expires: now() + (args.cache > 0 ? args.cache : 30000) }), scanLock)
+          scanSlots.release()
+        }
+        try {
+          $doV(() => {
+            var batch = []
+            var publish = () => {
+              if (!batch.length) return
+              syncFn(() => {
+                next.batches.push(batch)
+                next.updatedAt = now()
+                next.scanned += batch.length
+              }, scanLock)
+              batch = []
+            }
+            try {
+              var info = s3.walkObjects(args.bucket, prefix, row => {
+                batch.push(row)
+                // Expose the first result immediately and amortize subsequent updates.
+                if (next.scanned == 0 || batch.length >= 100) publish()
+                return syncFn(() => scans.get(prefix) === next, scanLock)
+              }, query)
+              publish()
+              finish(info)
+            } catch (e) {
+              publish()
+              finish({ failed: true })
+              logWarn("S3 browse search failed: " + e)
+            }
+          })
+        } catch (e) { finish({ failed: true }) }
+      }
+      if (snapshot.batches) snapshot.rows = [].concat.apply([], snapshot.batches)
+      return snapshot
+    }
+
     args.fns = {
+      validate: (request, options) => {
+        view.validate(global.__ojobHttpRelativePath(request.uri, options.parentURI), String(options.parentPath || ""), args.restrict)
+      },
       getList: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI)
 
         var lst, origLst
-        var _s3p = options.parentPath + puri
-        _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
-        _s3p = _s3p.replace(/^\//, "")
-
-        //print(`_s3p = ${_s3p}`)
-        if (isDef(args.cache)) {
-          var _cache = "__oJobS3_" + md5(args.url + args.bucket)
-          lst = $cache(_cache).get({ puri: _s3p })
+        var _s3p = listingPrefix(options.parentPath, puri)
+        if (args.cache > 0) {
+          lst = browseCache("s3").get({ puri: _s3p })
         } else {
           lst = s3.listObjects(args.bucket, _s3p)
           if (_s3p.length > 1) lst = lst.filter(r => r.filename != _s3p)
         }
         origLst = lst
+        lst = lst.filter(f => {try {var key=String(f.filename),base=String(options.parentPath||"").replace(/^\/+/,"");if(base && key.startsWith(base))key=key.substring(base.length);args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+key.replace(/^\/+/,"")},options);return true}catch(e){return false}})
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
           lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
         }
 
         if (origLst.length > 0) {
+          var defaultKey = _s3p + options.default
           return {
             isList: true,
+            defaultPresent: isDef(options.default) && !(request.params || {}).q &&
+              lst.some(row => row.isFile && row.filename === defaultKey),
             fields: [ "Object", "Last modified", "Size", "Size in bytes" ],
             alignFields: [ "left", "left", "right", "right" ],
             key: "Object",
             list: lst.filter(r => r.filename != "/").map(f => {
               var _f = f.filename.replace(/\/$/, "").replace(new RegExp("^.+/"), "")
-              if (isDef(options.parentPath)) _f = _f.replace(new RegExp("^" + options.parentPath), "")
               return {
                 isDirectory: f.isDirectory,
                 values: {
@@ -401,49 +494,23 @@ jobs:
         }
       },
       getObj: (request, options) => {
-        const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
-
-        var ext = String(puri).replace(/^.*\./, "")
-        puri = puri.replace(/^\//, "")
-
-        if (request.params.raw == "true") {
-          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
-        }
-
-        if (isDef(args.restrict)) {
-          if (isString(args.restrict)) args.restrict = [ args.restrict ]
-          var _go = true
-          if (args.restrict.length > 0) {
-            _go = args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(puri)), true)
-          }
-          if (!_go) return { data: "no content", type: "md" }
-        }
-
-        log("get: " + options.parentPath + puri)
-        switch(ext) {
-        case "md"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "md" }
-        case "yml" :
-        case "yaml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "yaml" }
-        case "css" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "css" }
-        case "sh"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "sh" }
-        case "js"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "js" }
-        case "java": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "java" }
-        case "py"  : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "python" }
-        case "toml": return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "toml" }
-        case "hbs" : return { data: af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri)), type: "handlebars" }
-        case "json": return { data: jsonParse(af.fromInputStream2String(s3.getObjectStream(args.bucket, options.parentPath + puri))), type: "json" }  
-        case "adoc": return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri), type: "asciidoc" }            
-        default:
-          return { stream: s3.getObjectStream(args.bucket, options.parentPath + puri) }
-        }
+        args.fns.validate(request, options)
+        var relative = global.__ojobHttpRelativePath(request.uri, options.parentURI)
+        var object = view.read(s3, args.bucket, options.parentPath + relative, request, options)
+        if (!object.stream && !object.jsonViewer) object.data = '<p><a href="' +
+          ow.format.escapeHTML(view.url(options.parentURI, relative)) + '?raw=true" download>Download raw</a></p>' +
+          "\n\n" + object.data
+        return object
       },
       search: (request, options) => {
+        args.fns.validate(request, options)
         const uri = request.uri
-        var puri = uri.replace(new RegExp("^" + options.parentURI + "/?"), "")
+        var puri = global.__ojobHttpRelativePath(uri, options.parentURI)
 
         var q = _$(request.params.q, "q").isString().default(_$(request.params.search).isString().default(""))
-        var maxResults = Number(_$(request.params.maxResults).default(200))
+        var maxResults = Number(_$(request.params.maxResults).default(options.query && options.query.enabled ? options.query.maxResults || 1000 : 200))
+        if (!isFinite(maxResults) || maxResults < 1 || Math.floor(maxResults)!=maxResults || maxResults>1000) {var invalid=new Error("Invalid maxResults");invalid.httpStatus=400;throw invalid}
+        if (q.length > (options.query && options.query.maxQueryLength || 256)) {var invalid=new Error("Query too long");invalid.httpStatus=400;throw invalid}
 
         var _fields      = [ "Object", "Last modified", "Size", "Size in bytes" ]
         var _alignFields = [ "left", "left", "right", "right" ]
@@ -453,22 +520,47 @@ jobs:
         _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
         _s3p = _s3p.replace(/^\//, "")
 
-        var lst = s3.listObjects(args.bucket, _s3p, false, true)
+        var wildcards = options.query && options.query.enabled && options.query.wildcards === true
+        if (wildcards && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
+        var scanInfo, lst
+        if (support && options.query && options.query.enabled) {
+          if (!isFunction(s3.walkObjects)) throw new Error("Enhanced search requires S3.walkObjects; update S3")
+          if (!options._api && request.method == "GET") {
+            var unit = searchSnapshot(_s3p, options.query, (request.header || {})["x-openaf-browse-fragment"] !== "1")
+          } else {
+            var unit = browseCache("s3-search").ttl(args.cache || 30000).fn(k => {
+              var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query)
+              return {rows:rows,info:info}
+            }).create().get({puri:_s3p})
+          }
+          lst = unit.rows
+          scanInfo = unit.info
+        } else lst = s3.listObjects(args.bucket, _s3p, false, true)
+        lst = lst.filter(f => {try {var key=String(f.filename),base=String(options.parentPath||"").replace(/^\/+/,"");if(base && key.startsWith(base))key=key.substring(base.length);args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+key.replace(/^\/+/,"")},options);return true}catch(e){return false}})
 
         if (isDef(args.restrict)) {
           if (isString(args.restrict)) args.restrict = [ args.restrict ]
           lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
         }
 
-        var _rel = f => String(f.filename).replace(new RegExp("^" + _s3p), "")
+        var _rel = f => String(f.filename).substring(_s3p.length)
         var _q = q.toLowerCase()
-        var _hits = lst.filter(f => f.isFile && _rel(f).toLowerCase().indexOf(_q) >= 0)
+        var matches = support && isFunction(support.searchMatcher) ? support.searchMatcher(q, wildcards) : name => name.toLowerCase().indexOf(_q) >= 0
+        var _hits = lst.filter(f => f.isFile && matches(_rel(f)))
         var _total = _hits.length
         if (_hits.length > maxResults) _hits = _hits.slice(0, maxResults)
+        if (scanInfo && isDef(scanInfo.ready)) {
+          scanInfo.message = !scanInfo.ready ? ((request.header || {})["x-openaf-browse-fragment"] === "1" ?
+            "Apply to search this prefix." : "Search is busy. Apply to try again.") :
+            scanInfo.scanned + " objects scanned · " + _total + " matches" +
+            (scanInfo.refreshing ? " so far" : scanInfo.failed ? " · scan stopped on error" :
+              !scanInfo.complete ? " · scan limit reached" : "") +
+            (_total > maxResults ? " · showing " + maxResults : "")
+        }
 
         return {
           isList: true, fields: _fields, alignFields: _alignFields, key: "Object",
-          pageInfo: { total: _total, truncated: _total > maxResults },
+          searchInfo: Object.assign({}, scanInfo || {complete:true,totalExact:true}, {truncated:_total > maxResults || scanInfo && !scanInfo.complete,totalExact:_total <= maxResults && (!scanInfo || scanInfo.complete)}),
           list: _hits.map(f => ({
             isDirectory: false,
             values: {
@@ -480,13 +572,10 @@ jobs:
           }))
         }
       },
-      init  : () => {
-        var _cache
-
-        if (isNumber(args.cache)) {
-          _cache = "__oJobS3_" + md5(args.url + args.bucket)
-          log("Creating cache " + _cache + "...")
-          $cache(_cache)
+      init  : options => {
+        if (args.cache > 0) {
+          log("Creating S3 browse cache...")
+          browseCache("s3")
           .ttl(args.cache)
           .fn(k => {
             log("  cache get " + af.toSLON(k))
@@ -495,7 +584,41 @@ jobs:
             return _r
           })
           .create()
+
+          // Warm the root cache at startup. A failed load can be retried on the first request.
+          if (args.browse !== false) {
+            try {
+              browseCache("s3").get({ puri: listingPrefix(options ? options.parentPath : args.path, "") })
+            } catch (e) {
+              logWarn("Could not warm the browse root cache")
+            }
+          }
         }
+      }
+    }
+
+    if (provider) {
+      args.fns.getStatus = () => provider.status()
+      args.fns.getFreshness = (request,options) => {
+        var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
+        var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
+        return syncFn(() => {
+          var scan = scans.get(listingPrefix(options.parentPath, path))
+          if (scan && (scan.refreshing || now() < scan.expires)) {
+            freshness.refreshing = scan.refreshing
+            freshness.lastUpdatedAt = Math.max(scan.updatedAt || 0, freshness.lastUpdatedAt || freshness.loadedAt || 0)
+          }
+          return freshness
+        }, scanLock)
+      }
+      args.fns.refresh = (request, options) => {
+        var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
+        var prefix = listingPrefix(options.parentPath, path)
+        syncFn(() => scans.forEach((state, key) => { if (key.startsWith(prefix)) scans.delete(key) }), scanLock)
+        provider.invalidate((name,key) => {
+          return support.matchesUnit(path,key,options.parentPath)
+        })
+        args.fns.getList(request, options)
       }
     }
 
@@ -510,6 +633,7 @@ jobs:
       args  :
         <<        : *httpBrowseS3Args
         browseUri : browseUri
+        operationsToken: operationsToken
   check:
     in:
       url      : isString
@@ -528,4 +652,9 @@ jobs:
       sortTab  : toBoolean.isBoolean.default(false)
       options  : isMap.default({})
       browseUri: isString.default(__)
-  exec    : *httpBrowseS3Exec
+  exec: | #js
+    if (args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)) {
+      var support
+      try { support = require("ojob-browse-contract.js") } catch(e) { throw new Error("Enhanced browsing requires updated oJob-common (browse contract 1)") }
+      support.check(args.options, support.capabilities)
+    }

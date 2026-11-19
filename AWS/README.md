@@ -1,5 +1,183 @@
 # AWS oPack
 
+## HTTP browsing
+
+ECR and CodeArtifact browse jobs accept the oJob-common `options.query`,
+`options.preview`, and `options.operations` contract. Enhanced options require
+updated oJob-common definitions (browse contract 1), checked before clients are
+created. Legacy configurations retain support for the current OpenAF runtime.
+API jobs refer to an existing browser; register the browser before serving API
+requests. API operations additionally require `operationsBrowseUris` on the API.
+POST refresh also requires a configured API `operationsToken` and a matching
+`X-OpenAF-Browse-Token` header.
+
+CodeArtifact enforces the configured domain, repository name prefix, format,
+and exact namespace on direct requests as well as listings. Package versions
+and assets must belong to the selected repository's inventory. ECR's optional
+S3 descriptions use Jsoup to retain static Markdown formatting and discard
+active content. Descriptions larger than 4 MiB are omitted.
+
+ECR directory links use plain path segments (for example,
+`/internal/3rdparty/`); directory labels omit the trailing slash added by the
+shared browser renderer.
+
+`query: { enabled: true, pageSize: 100 }` enables server sorting and paging.
+ECR sorts repository names before fetching summaries for visible rows; sorting
+globally by summary fields is unsupported. CodeArtifact sorts complete candidate
+lists before paging and searches loaded package trees, reporting incomplete search
+coverage. Cache keys are isolated per browser and cold loads coalesce.
+CodeArtifact orders the Version column using SemVer 2 precedence before
+pagination. With `sortTab: true`, the version table sorts across all pages
+even when enhanced search is disabled. Labels outside SemVer use a text
+fallback.
+CodeArtifact resets a carried sort column to the current view's name column when
+entering or clearing a search changes the available columns (for example,
+`Domain` to `Package`). Unknown sort columns remain invalid.
+
+ECR uses API pages of up to 1,000 entries and reuses its AWS client, renewing
+known temporary credentials one minute before expiration. Repository paths,
+children and descendant counts are indexed when the repository cache reloads.
+With enhanced browsing enabled, visible repository summaries load with up to
+three concurrent image requests in a background `$doV` coordinator using
+`parallel4Array`. Cold listings return immediately with blank summary columns;
+reload the page to see summaries after they finish. All visible rows are queued
+and drained without another visit. Warm listings keep their previous summaries
+while expired image data refreshes in the background; duplicate refreshes
+coalesce, and failed background refreshes retain their data and retry after one
+cache interval. Freshness reports expose queued and running background activity. Repository detail
+requests wait for the image cache, and explicit refresh clears retained summaries.
+Summary data may therefore be older than the configured TTL during refresh or
+service failures. Legacy browsing keeps its existing background-cache behavior.
+
+Set `options.summaries: false` to browse repository names without fetching image
+metadata for directory rows; opening a repository still loads its full details.
+Choose `cache` (milliseconds) according to your freshness requirements, for example:
+
+```yaml
+- (ECRBrowse): 18888
+  ((region)): eu-west-1
+  ((cache)): 300000
+  ((options)):
+    query:
+      enabled: true
+      pageSize: 25
+    # summaries: false
+```
+
+The enhanced cache defaults to five seconds when `cache` is omitted. Smaller
+browser pages reduce cold image requests; API page size is independent of browser
+page size. Detail HTML sorts images once, and raw/API image arrays remain complete.
+Run `oaf -f tests/ecr-browse.js` and `oaf -f tests/ecr-cache.js` for offline navigation,
+concurrency, caching, refresh and credential-renewal checks. These do not measure
+live AWS latency or verify account permissions.
+
+CodeArtifact requests API pages of up to 1,000 entries and reuses its AWS client,
+renewing known temporary credentials one minute before expiration. Repository
+listings share one account-wide cache across domains. When both `format` and
+`namespace` are configured, namespace filtering is also sent to AWS; the browser
+retains its exact namespace match.
+
+Packages and their sorted hierarchy indexes share one repository snapshot.
+Enhanced browsing serves an expired snapshot immediately while one background
+refresh runs per repository, with at most three concurrent package loads.
+Freshness/status operations report queued and running refreshes. Failed refreshes
+retain the previous tree and retry on a later visit after one cache interval
+(at least one second). Explicit refresh waits for active package loads, cancels
+matching queued refreshes and invalidates matching data. Version and asset caches
+still load on demand; cold repository requests wait for the complete snapshot.
+With enhanced search, Apply starts a missing package load for the current
+repository. Broader searches show the coverage of loaded repositories and offer
+**Search remaining repositories**. This action loads authorized repositories
+through the same worker limit and shows partial package matches as pages arrive.
+Typing reuses available data and in-flight loads.
+
+Set `cache` explicitly for the desired freshness interval. For example, to warm a
+frequently used CodeArtifact repository at startup:
+
+```yaml
+- (CodeArtifactBrowse): 18888
+  ((region)): eu-west-1
+  ((cache)): 300000
+  ((initialize)): '[{domain: "my-domain", repository: "my-repo"}]'
+  ((options)):
+    query:
+      enabled: true
+      pageSize: 100
+```
+
+Initialization runs in the background; visits before it finishes still wait for
+that initial load. Browser paging reduces response size but does not reduce the
+initial complete package fetch. Run `oaf -f tests/codeartifact.js` for offline
+pagination, navigation, large-tree, credential renewal, concurrency and refresh
+checks. Live AWS latency and permissions require separate validation.
+
+### Prefetching CodeArtifact repository trees
+
+Set `options.prefetch: true` with a positive cache TTL to warm one cold
+repository tree when its link is hovered or focused for 225 ms. This works
+independently of enhanced search. Prefetch shares the normal repository
+cache and skips a hint when the background slot is busy. It does not warm
+package versions or assets. With Browse operations enabled, Status shows
+prefetch requests queued, trees loaded, and prefetched trees used by a visit.
+
+### Inspecting ECR images
+
+Set `options.imageDetails: true` on ECR Browse to link tags and untagged digests
+to image details. The tag listing shows one row per tag, newest push first.
+Sorting by Tag uses SemVer precedence. Enable `options.query.enabled` to search
+tags and digests within the repository. Select a shortened digest in the detail tables to reveal the full
+value. Select a platform or artifact from an image index to inspect its
+details, with a breadcrumb back to the original index. For a single image
+manifest, the inspector reads the supported platform from the image config.
+The layer chart shows the largest compressed layers in manifest order and
+uses the local Chart.js asset. Install the optional Mermaid
+oPack for the platform diagram. Both tables are available independently of
+the diagrams. The Overview tab shows an Annotations section when the image manifest, index,
+or its descriptors contain annotations. The Manifest tab displays a nested nJSMap view, with formatted
+JSON as a fallback. Config shows environment variable names. History displays
+the build commands stored by the image publisher.
+
+Inspector tabs share a bounded cache of manifests and configs keyed by digest.
+These entries are reusable for at least five minutes unless evicted. Overview
+refreshes tag and push metadata on the configured cache interval, with a
+five-second minimum. Browse refresh also invalidates cached inspector data for
+the selected repository scope.
+
+Overview includes image status and recorded pull, archive and activation times when
+available, and shows image labels when present. Config shows runtime settings. Layers and History
+can show uncompressed layer digests and build-step authors.
+
+**Attached artifacts** lists OCI referrers for the selected digest, one page at a
+time. The tab loads on demand and uses the metadata cache interval. It requires
+the permissions for [ECR ListImageReferrers](https://docs.aws.amazon.com/service-authorization/latest/reference/list_ecr.html).
+
+The inspector uses the browser's private ECR credentials. The IAM principal
+needs `ecr:DescribeImages`, `ecr:GetAuthorizationToken`,
+`ecr:BatchGetImage`, and `ecr:GetDownloadUrlForLayer`. The existing
+repository list continues to use its current listing permissions. Run
+`oaf -f tests/ecr-browse-details.js` for offline inspector checks.
+
+### Previewing CodeArtifact assets
+
+Set `options.preview: {}` for the default previews, including JSON, POM/XML,
+HTML, and the Browse text formats. `preview.formats` replaces the default
+allowlist and accepts extension keys and exact `name:` keys. Set
+`preview.maxBytes` to override the 4 MiB server-side preview limit. JSON
+streams to the browser's nJSMap viewer, which accepts up to 16 MiB. Larger or
+invalid JSON can be viewed as bounded source. POM/XML assets use OpenAF XML
+conversion and nJSMap, including POMs with leading license comments.
+The Source view shows the original XML, which is also the fallback when
+conversion or rendering is unavailable.
+
+HTML previews stream the complete asset directly to the browser in a sandbox
+that blocks scripts, form submissions, and external resources. The
+`view=source` option displays bounded, escaped HTML. With `download: true`,
+the download action streams the complete original asset as an attachment,
+including binary assets. API asset reads continue to stream the original bytes.
+
+Operations expose status, freshness, metrics and POST refresh. See the
+oJob-common browse documentation for authentication and refresh controls.
+
 Load the required service library, for example `loadLib("aws_sqs.js")`.
 
 SQS receive calls accept the requested maximum message count, and FIFO sends accept group IDs in either positional arguments or a message map. Performance Insights uses the client instance region. Each Bedrock provider keeps its own options.
