@@ -27,18 +27,22 @@ files:
 - .package.yaml
 - JavaEWAH-1.2.3.jar
 - README.md
+- commons-codec-1.22.1.jar
 - compile.yaml
 - org.eclipse.jgit-7.8.1.202611041320-r.jar
-- plugin-GIT.jar
+- plugin-git.jar
+- slf4j-api-2.0.18.jar
 - src/openaf/plugins/GIT.class
 - src/openaf/plugins/GIT.java
 filesHash:
   .maven.yaml: 04516b3b6b097b47713e84cb52f1fbda6c3a1af5
-  .odoc.db: 388ed9795a9d31fd9e7e9a67bc663460c0b77716
+  .odoc.db: a5c0dd5cde9abcbba7c2dedf1b1e12d684a03173
   JavaEWAH-1.2.3.jar: 13a27c856e0c8808cee9a64032c58eee11c3adc9
   README.md: 011be36e1d91b0821155c5d20acef18bbcb5203d
+  commons-codec-1.22.1.jar: da09bcdb330deef7cfee70f30c6889fda70d5ebf
   compile.yaml: 8cba5f4eac9724a275b3c9f1484ae8bc3f950cc2
   org.eclipse.jgit-7.8.1.202611041320-r.jar: d5b20c74d3ceb81a4aaba56e4d5e9e875931db9a
-  plugin-GIT.jar: afebb76dd9c01825aa19d9253d00c1d1146fa089
+  plugin-git.jar: 00e9865c8fe9dceb105f6014e5ab23526c5e1357
+  slf4j-api-2.0.18.jar: 78a9e7a37cd6360e0b818e86341b24123d28d4df
   src/openaf/plugins/GIT.class: d7d5caf6148eeea0a006d923101b4c940cd0d52f
   src/openaf/plugins/GIT.java: 07dfe293e47804f434c22ef1013a3ee6ec798e11
