@@ -17,7 +17,7 @@ name: etcd3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261023'
+version: '20261118'
 dependencies:
   openaf: '>=20220822'
 files:
@@ -28,90 +28,86 @@ files:
 - etcd3.js
 - failsafe-3.3.2.jar
 - failureaccess-1.0.3.jar
-- grpc-api-1.82.0.jar
-- grpc-context-1.82.0.jar
-- grpc-core-1.82.0.jar
-- grpc-netty-1.82.0.jar
-- grpc-protobuf-1.82.0.jar
-- grpc-protobuf-lite-1.82.0.jar
-- grpc-stub-1.82.0.jar
-- grpc-util-1.82.0.jar
-- guava-33.6.0-jre.jar
+- grpc-api-1.84.0.jar
+- grpc-context-1.84.0.jar
+- grpc-core-1.84.0.jar
+- grpc-netty-1.84.0.jar
+- grpc-protobuf-1.84.0.jar
+- grpc-protobuf-lite-1.84.0.jar
+- grpc-stub-1.84.0.jar
+- grpc-util-1.84.0.jar
+- guava-33.7.1-jre.jar
+- jackson-core-2.21.5.jar
 - javax.annotation-api-1.3.2.jar
-- jetcd-api-0.8.7.jar
-- jetcd-common-0.8.7.jar
-- jetcd-core-0.8.7.jar
-- jetcd-grpc-0.8.7.jar
-- jspecify-1.0.0.jar
+- jetcd-api-0.8.8.jar
+- jetcd-common-0.8.8.jar
+- jetcd-core-0.8.8.jar
+- jetcd-grpc-0.8.8.jar
+- jspecify-1.0.1.jar
 - listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-- netty-buffer-4.2.15.Final.jar
-- netty-codec-4.1.133.Final.jar
-- netty-codec-base-4.2.15.Final.jar
-- netty-codec-classes-quic-4.2.15.Final.jar
-- netty-codec-compression-4.2.15.Final.jar
-- netty-codec-dns-4.2.15.Final.jar
-- netty-codec-http-4.2.15.Final.jar
-- netty-codec-http2-4.1.133.Final.jar
-- netty-codec-http3-4.2.15.Final.jar
-- netty-codec-socks-4.1.133.Final.jar
-- netty-common-4.2.15.Final.jar
-- netty-handler-4.2.15.Final.jar
-- netty-handler-proxy-4.1.133.Final.jar
-- netty-resolver-4.2.15.Final.jar
-- netty-resolver-dns-4.2.15.Final.jar
-- netty-tcnative-classes-2.0.77.Final.jar
-- netty-transport-4.2.15.Final.jar
-- netty-transport-native-unix-common-4.1.133.Final.jar
+- netty-buffer-4.1.137.Final.jar
+- netty-codec-4.1.137.Final.jar
+- netty-codec-base-4.2.16.Final.jar
+- netty-codec-dns-4.1.137.Final.jar
+- netty-codec-http-4.1.137.Final.jar
+- netty-codec-http2-4.2.16.Final.jar
+- netty-codec-socks-4.2.16.Final.jar
+- netty-common-4.1.137.Final.jar
+- netty-handler-4.1.137.Final.jar
+- netty-handler-proxy-4.2.16.Final.jar
+- netty-resolver-4.1.137.Final.jar
+- netty-resolver-dns-4.1.137.Final.jar
+- netty-tcnative-classes-2.0.81.Final.jar
+- netty-transport-4.1.137.Final.jar
+- netty-transport-native-unix-common-4.2.16.Final.jar
 - perfmark-api-0.27.0.jar
 - proto-google-common-protos-2.64.1.jar
-- protobuf-java-3.25.8.jar
-- vertx-core-5.1.2.jar
-- vertx-core-logging-5.1.2.jar
-- vertx-grpc-5.1.2.jar
+- protobuf-java-3.25.9.jar
+- slf4j-api-2.0.20.jar
+- vertx-core-4.5.32.jar
+- vertx-grpc-4.5.32.jar
 filesHash:
-  .maven.yaml: 74e48e9920b10515a3d4f46b4fbc98a5817ed993
+  .maven.yaml: 6f295fdc0f111850c27954f27e632fbb4a882fd4
   .precompile: f469636ceae98d4c1e551ff89b87b2939a48e2a6
   README.md: 45670873943f17d8813ef8e1c12bce7ccb157577
   etcd3.js: 57f6a0cb60a36ac2db63411f8d91e339c7e0f791
   failsafe-3.3.2.jar: 738a986f1f0e4b6c6a49d351dddc772d1378c5a8
   failureaccess-1.0.3.jar: aeaffd00d57023a2c947393ed251f0354f0985fc
-  grpc-api-1.82.0.jar: 0762946c656faf417f4dcaa0bd431d023ff1235c
-  grpc-context-1.82.0.jar: b5208007e0e00ad8ab39670446213c27b930e09d
-  grpc-core-1.82.0.jar: e65a4a584672bda99e677178d93fea045c818e35
-  grpc-netty-1.82.0.jar: bb2e92c518f044a194fbc06a769a1ec89efa3544
-  grpc-protobuf-1.82.0.jar: 2609abec887f37957672847e84a5b4a9f9321687
-  grpc-protobuf-lite-1.82.0.jar: fc1d32592343f69e2e6fd01c257bf8f4cae1ec81
-  grpc-stub-1.82.0.jar: 737819b3e1040282a3c5cc10908d6385b2027b33
-  grpc-util-1.82.0.jar: e7fb2823fa103b69413d6527aa56166a40caf9ce
-  guava-33.6.0-jre.jar: c376b13067cc99a5774403530953f7b05a91e218
+  grpc-api-1.84.0.jar: 16630e2bc8581f08fd486df70094da368155a8ee
+  grpc-context-1.84.0.jar: 214c022a1267b85e75ca7a7670b937a22e5f9767
+  grpc-core-1.84.0.jar: b6852cdd0e696848920847f76d17584a5251f419
+  grpc-netty-1.84.0.jar: af4ac9a8cc625866065165c605e3afb32fa5c55b
+  grpc-protobuf-1.84.0.jar: 590378c7e1eb202c24131412062268a28e5f37b9
+  grpc-protobuf-lite-1.84.0.jar: 79a952c6a29db5b32c70257476cc17b140ceff14
+  grpc-stub-1.84.0.jar: e096606644a861868524be035e3c69a57b1c8a7e
+  grpc-util-1.84.0.jar: f68b53189fcf477e4a100fdedae8a811fc6be02c
+  guava-33.7.1-jre.jar: 77e37866fb969b4ff6710faaefd3a86067730ada
+  jackson-core-2.21.5.jar: 7ec0c8bf8402fa998f64b2009632d6566a42ceb7
   javax.annotation-api-1.3.2.jar: 934c04d3cfef185a8008e7bf34331b79730a9d43
-  jetcd-api-0.8.7.jar: 2ad14aed781c4a73ed4dbb421966d408a0a06686
-  jetcd-common-0.8.7.jar: 02ca8fc827c1c28b52aa9ff40e6e96113f456c72
-  jetcd-core-0.8.7.jar: 00a7f57305f9c6bfb76aa2270f2560d34ccf75c9
-  jetcd-grpc-0.8.7.jar: 2297a5ee5eee9d9d822b6aad3ff8912be6402b6a
-  jspecify-1.0.0.jar: 7425a601c1c7ec76645a78d22b8c6a627edee507
+  jetcd-api-0.8.8.jar: 2ad14aed781c4a73ed4dbb421966d408a0a06686
+  jetcd-common-0.8.8.jar: 02ca8fc827c1c28b52aa9ff40e6e96113f456c72
+  jetcd-core-0.8.8.jar: 3272047ea191583340022ddeadf6fe433fbde902
+  jetcd-grpc-0.8.8.jar: 9057eaaa6984ce4628b8cb5e91e88b0fc42c920a
+  jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
-  netty-buffer-4.2.15.Final.jar: 2beb620803bf871cda2dd5d46b8f831e8015dd34
-  netty-codec-4.1.133.Final.jar: 4db650327db64ded98d9d074161e427c4102907e
-  netty-codec-base-4.2.15.Final.jar: e97149fdd5fb04858efa90e314651c8d700dc68b
-  netty-codec-classes-quic-4.2.15.Final.jar: 4268161f4676c79e657eda74141c309aaaa2c9a7
-  netty-codec-compression-4.2.15.Final.jar: 89fc4a20b7ae6af974304b1695405e62c4f9b16d
-  netty-codec-dns-4.2.15.Final.jar: 3da23523d91eaf8af81d2b9080a61d9b1af0762c
-  netty-codec-http-4.2.15.Final.jar: e611826aa054371bb9a17f27bdb05755a4cac5f0
-  netty-codec-http2-4.1.133.Final.jar: c5c76bca512388aea1e4b238a51b1f54cedd42a8
-  netty-codec-http3-4.2.15.Final.jar: 39c3e24013ecb21832aebb36609de45c5cb111cd
-  netty-codec-socks-4.1.133.Final.jar: 5af26639632f9854cbd5ee00f80381dd5e70321b
-  netty-common-4.2.15.Final.jar: 7222492c1af9c2d4d78d521eea340a619e242fda
-  netty-handler-4.2.15.Final.jar: d5344afd1148e3b9927a74be019605ebb0937a93
-  netty-handler-proxy-4.1.133.Final.jar: c5e3651dfce03c392e6cf805765c71e3dcee79d7
-  netty-resolver-4.2.15.Final.jar: b961a16d379b508b473e064ba06842bba280f4e3
-  netty-resolver-dns-4.2.15.Final.jar: 1b3eaebe62b905c780e181b5f3fd18c013ca73a4
-  netty-tcnative-classes-2.0.77.Final.jar: f58362f70036d0738e995347987b6462f3408204
-  netty-transport-4.2.15.Final.jar: a000c3a6196ee40207b73ac619dcb339409dd62f
-  netty-transport-native-unix-common-4.1.133.Final.jar: cf9089c2f0b7b75cf32dfe118464d98ba8dded09
+  netty-buffer-4.1.137.Final.jar: e048dbf1e7e5077b36cf7c1a6417f2ddfbcc59f6
+  netty-codec-4.1.137.Final.jar: 8f678378e027d567b270afd8552e68e4b460c4dc
+  netty-codec-base-4.2.16.Final.jar: 01a01d45a9efc228c6d747525848b065e0656b5f
+  netty-codec-dns-4.1.137.Final.jar: 73a6407b1324eae856c75168ef2b0ff8ef44650f
+  netty-codec-http-4.1.137.Final.jar: a0525968e918c2ca2f6e7f3b66c35de1542a09a5
+  netty-codec-http2-4.2.16.Final.jar: 7af476eb447afe6e933938f09a5097823cf6c46c
+  netty-codec-socks-4.2.16.Final.jar: 0d227dd8807b28382ade355eaae4678d4a7cd13c
+  netty-common-4.1.137.Final.jar: 4ec7a33ef9a11da3f5a2cd5fa8e1d41732dd1968
+  netty-handler-4.1.137.Final.jar: ac2cfd0501b38d1749cff5f40c6b7bc4ddf6d477
+  netty-handler-proxy-4.2.16.Final.jar: df9f359db740a1dd2d3a02608cb8b43daf63c9d2
+  netty-resolver-4.1.137.Final.jar: a34345634d7e21946257d4afd2d0c44ff2b15b6b
+  netty-resolver-dns-4.1.137.Final.jar: fc85b3033cb6f2bdd773a765df6b33f6782fbc51
+  netty-tcnative-classes-2.0.81.Final.jar: 31a9794a9fd168a0ba787afd0ab66a6dfc4a95de
+  netty-transport-4.1.137.Final.jar: 8a4a3d0e953076c63c15eac6d0d1a5f5856cae16
+  netty-transport-native-unix-common-4.2.16.Final.jar: 3cf32390f1b80af890ac44aa0698c2ff58c2a4d7
   perfmark-api-0.27.0.jar: f86f575a41b091786a4b027cd9c0c1d2e3fc1c01
   proto-google-common-protos-2.64.1.jar: a71d9a9867ed792e54e893b8c7864a0ba1b022cf
-  protobuf-java-3.25.8.jar: 2ba593767658038775b2ea9724c3686609874470
-  vertx-core-5.1.2.jar: b2217ef7872ff5320bb4f5b815756823aa7a9bd4
-  vertx-core-logging-5.1.2.jar: daadc7cf3adb843f0edd163aba2d910396cc1763
-  vertx-grpc-5.1.2.jar: 1ea3228cd2eeb77eb554b88f5d6dc070fe4a27fb
+  protobuf-java-3.25.9.jar: 64cdd0aac23f3c05740b6e6a15b041353cf6ffaa
+  slf4j-api-2.0.20.jar: 7fea9d92ba67e9b3c8f03515fb202b86a1fe44f6
+  vertx-core-4.5.32.jar: 26194cf5396d21bdf477e8faa2558dcb88582242
+  vertx-grpc-4.5.32.jar: 90b40ca7012a3576aa1792819341ee964092cf4b
