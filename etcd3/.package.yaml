@@ -17,7 +17,7 @@ name: etcd3
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261023'
+version: '20261118'
 dependencies:
   openaf: '>=20220822'
 files:
