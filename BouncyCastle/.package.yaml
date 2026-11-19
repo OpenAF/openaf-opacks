@@ -24,12 +24,12 @@ files:
 - .maven.yaml
 - .package.yaml
 - README.md
-- bcpkix-jdk18on-1.86.jar
-- bcprov-jdk18on-1.86.jar
-- bcutil-jdk18on-1.86.jar
+- bcpkix-jdk18on-1.87.jar
+- bcprov-jdk18on-1.87.jar
+- bcutil-jdk18on-1.87.jar
 filesHash:
-  .maven.yaml: eebbfad951fa3c224fa197141228123b75089e5c
+  .maven.yaml: 6c7a1fcf430d0a4f47ab401a57599bbb31bb4727
   README.md: b8986ec86470879bb4719902059c967d0ded9099
-  bcpkix-jdk18on-1.86.jar: fb5ea65959db10fe5d61148bb2b77f6e231455b1
-  bcprov-jdk18on-1.86.jar: 830c8467bed8e4c1148262386b09fc42aedcf262
-  bcutil-jdk18on-1.86.jar: 2c8e77f5601c2b84c8773af4caf403a34daca357
+  bcpkix-jdk18on-1.87.jar: ce798f0dafb058963024bbe1096f77192cf3edd7
+  bcprov-jdk18on-1.87.jar: 3cf2bbc1280a743fd3d4d7d556883c13e5d28be5
+  bcutil-jdk18on-1.87.jar: 90400832bd1c3395f354775c0a3f18bd552fccff
