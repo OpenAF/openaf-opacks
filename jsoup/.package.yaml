@@ -18,7 +18,7 @@ name: Jsoup
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20260805'
+version: '20261119'
 dependencies:
   OpenAF: '>=20250725'
 files:
@@ -26,15 +26,15 @@ files:
 - .odoc.db
 - .package.yaml
 - README.md
-- jsoup-1.23.2.jar
+- jsoup-1.24.1.jar
 - jsoup.js
 - oafp_Jsoup.js
 - webSearch.js
 filesHash:
-  .maven.yaml: 635be83192b53f99b4808d754f10932a5fa4e60d
+  .maven.yaml: fab652f05a40ad40c16f666c6d850d3ff3dc9024
   .odoc.db: 18ff307774b898688de4009c50215ba81734001b
   README.md: cfb8d80d8d4f3413217aba5270e8e848183c4ef1
-  jsoup-1.23.2.jar: 514805efcc430bfb04e82f20bb998e39e3fd5c9c
+  jsoup-1.24.1.jar: 03ee34e547542332c4599725028992a3e825d70e
   jsoup.js: 201cf66e0758b32b276e76914d491690fadff56c
   oafp_Jsoup.js: 186cf0388c81baed1807348be4d2ae813036596d
   webSearch.js: 37705b4849db8263429c73156d6a2185a4a6f3a3
