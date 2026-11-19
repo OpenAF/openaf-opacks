@@ -19,7 +19,7 @@ name: FalkorDB
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: 20261022
+version: '20261119'
 dependencies:
   openaf: '>=20240318'
 files:
@@ -29,25 +29,27 @@ files:
 - README.md
 - commons-pool2-2.13.1.jar
 - commons-text-1.15.0.jar
-- error_prone_annotations-2.48.0.jar
+- error_prone_annotations-2.50.0.jar
 - falkordb.js
-- jedis-8.1.0-beta1.jar
-- jfalkordb-0.14.0.jar
+- jedis-jedis-3.6.2.jar
+- jfalkordb-0.17.0.jar
 - json-20260814.jar
 - jspecify-1.0.1.jar
 - oafp_falkordb.js
 - redis-authx-core-0.2.0.jar
+- slf4j-api-2.1.0-alpha1.jar
 filesHash:
-  .maven.yaml: a430958ef492b7e9acac4c1c6d3efc24fb31e1dc
+  .maven.yaml: 296b168f92b18bcd2c07bed8b9e9cea810241160
   .odoc.db: afd12a94cc2640f0b9feb660c218ef1b5e059ba8
   README.md: f29b7fec1e77cf225bec26785dedbc46e1c70da5
   commons-pool2-2.13.1.jar: cf7e8c0242d4c483c42c083b8188ab360ab60f9a
   commons-text-1.15.0.jar: 9899093aa40f0199d6c39b131b8f087cdb37e399
-  error_prone_annotations-2.48.0.jar: bbe30942a31d1778c74cb272321267eca82dc708
+  error_prone_annotations-2.50.0.jar: 74ba43e49ab1184d41634af2ef0047e82c4064b0
   falkordb.js: bb65149de3a5a2d44d009d6a7dc2e58cc40379a2
-  jedis-8.1.0-beta1.jar: 6eac90782c0580c847b837176e0ea3a189ec463e
-  jfalkordb-0.14.0.jar: 82d15ceb94bf630c523c013be70883242c297880
+  jedis-jedis-3.6.2.jar: 870b0fb4d01a888260bfea61f75617c0bde0346e
+  jfalkordb-0.17.0.jar: 1eca15b62c5c16525d1dd8626bea6a3ed9ce6d64
   json-20260814.jar: a1d979d4b336516526d00ff423e4a8d4ba27670f
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
   oafp_falkordb.js: 95a2b1281cae7c93a0c1633a4e65f85ae50aa542
   redis-authx-core-0.2.0.jar: f89ca03edd1dc04b1c8705ebbbc6f343a5c61595
+  slf4j-api-2.1.0-alpha1.jar: 4e2525fc4327cc553c52e3937427c7cf2114735f

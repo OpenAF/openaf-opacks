@@ -177,7 +177,7 @@
         <dependency>
             <groupId>com.falkordb</groupId>
             <artifactId>jfalkordb</artifactId>
-            <version>0.13.1</version>
+            <version>0.17.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -583,6 +583,11 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
             <version>10.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.22.0</version>
         </dependency>
 </dependencies>
 </project>
