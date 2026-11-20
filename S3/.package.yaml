@@ -70,11 +70,11 @@ filesHash:
   jspecify-1.0.1.jar: 3d60fd98eb8ade73004f4195c37b6317e02cf3d7
   listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar: b421526c5f297295adef1c886e5246c39d4ac629
   minio-9.0.4.jar: b648f80cc9397a5e307b0928d0e32ecf33a26d8c
-  oJobS3.yaml: 0470df69ed051684c94678d321a74aee404a3940
+  oJobS3.yaml: eb241cf833a73acd5ed1f0b5bb93d25da016ee08
   oafp_S3.js: fb0d0321c744f3bbe210dd0478175fe2a2dc8f2d
   s3-ojob-test.yaml: e91b6b8cbaf922fca16d11727cd24e4701fd9e9c
   s3-test.yaml: 5add0613ccc22073cd61d852a2e4946d8186af7c
-  s3.js: e32ca9a8547fbf2b6e034e90c0e2af3b2f9f0610
+  s3.js: 5f371d3c00de0eb88889a6226c050881c92d2f5a
   s3.yaml: 258dcf5460fbf67d0fd98662a06ed55f984dff68
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.12.jar: c97fdfd953df72ae08be22384a1581ce665c2694

@@ -396,20 +396,22 @@ jobs:
     // Share a bounded prefix walk across search terms and publish immutable batches.
     var scans = new Map(), scanLock = new java.lang.Object()
     var scanSlots = new java.util.concurrent.Semaphore(3)
-    var searchSnapshot = (prefix, query, start) => {
+    var scanKey = (prefix, recursive) => JSON.stringify([prefix, recursive])
+    var searchSnapshot = (prefix, query, start, recursive) => {
+      var key = scanKey(prefix, recursive)
       var next
       var snapshot = syncFn(() => {
         scans.forEach((state, key) => {
           if (!state.refreshing && now() >= state.expires) scans.delete(key)
         })
-        var state = scans.get(prefix)
+        var state = scans.get(key)
         if (start && state && state.failed) {
-          scans.delete(prefix)
+          scans.delete(key)
           state = undefined
         }
         if (!state && start && scans.size < 16 && scanSlots.tryAcquire()) {
-          state = { batches: [], scanned: 0, refreshing: true, complete: false }
-          scans.set(prefix, state)
+          state = { prefix:prefix, batches: [], scanned: 0, refreshing: true, complete: false }
+          scans.set(key, state)
           next = state
         }
         if (!state) return { rows: [], info: { scanned: 0, complete: false, ready: false } }
@@ -440,8 +442,8 @@ jobs:
                 batch.push(row)
                 // Expose the first result immediately and amortize subsequent updates.
                 if (next.scanned == 0 || batch.length >= 100) publish()
-                return syncFn(() => scans.get(prefix) === next, scanLock)
-              }, query)
+                return syncFn(() => scans.get(key) === next, scanLock)
+              }, query, recursive)
               publish()
               finish(info)
             } catch (e) {
@@ -529,22 +531,20 @@ jobs:
         var _alignFields = [ "left", "left", "right", "right" ]
         if (q.length == 0) return { isList: true, fields: _fields, alignFields: _alignFields, key: "Object", list: [] }
 
-        var _s3p = options.parentPath + puri
-        _s3p = _s3p + (_s3p.endsWith("/") ? "" : "/")
-        _s3p = _s3p.replace(/^\//, "")
-
-        var wildcards = options.query && options.query.enabled && options.query.wildcards === true
+        var _s3p = listingPrefix(options.parentPath, puri)
+        var wildcards = options.query && options.query.enabled && options.query.wildcards === true && request.params.wildcards != "0"
         if (wildcards && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
+        var shallow = options.query && options.query.enabled && request.params.recursive == "0"
         var scanInfo, lst
         if (support && options.query && options.query.enabled) {
           if (!isFunction(s3.walkObjects)) throw new Error("Enhanced search requires S3.walkObjects; update S3")
           if (!options._api && request.method == "GET") {
-            var unit = searchSnapshot(_s3p, options.query, (request.header || {})["x-openaf-browse-fragment"] !== "1")
+            var unit = searchSnapshot(_s3p, options.query, (request.header || {})["x-openaf-browse-fragment"] !== "1", !shallow)
           } else {
             var unit = browseCache("s3-search").ttl(args.cache || 30000).fn(k => {
-              var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query)
+              var rows = [], info = s3.walkObjects(args.bucket,k.puri,row => { rows.push(row) },options.query,k.recursive)
               return {rows:rows,info:info}
-            }).create().get({puri:_s3p})
+            }).create().get({puri:_s3p, recursive:!shallow})
           }
           lst = unit.rows
           scanInfo = unit.info
@@ -556,10 +556,10 @@ jobs:
           lst = lst.filter(f => args.restrict.reduce((aP, aC) => (aP && !(new RegExp(aC)).test(f.filename)), true))
         }
 
-        var _rel = f => String(f.filename).substring(_s3p.length)
+        var _rel = f => String(f.filename).substring(_s3p.length).replace(/\/$/, "")
         var _q = q.toLowerCase()
         var matches = support && isFunction(support.searchMatcher) ? support.searchMatcher(q, wildcards) : name => name.toLowerCase().indexOf(_q) >= 0
-        var _hits = lst.filter(f => f.isFile && matches(_rel(f)))
+        var _hits = lst.filter(f => (f.isFile || shallow && f.isDirectory) && _rel(f) && matches(_rel(f)))
         var _total = _hits.length
         if (_hits.length > maxResults) _hits = _hits.slice(0, maxResults)
         if (scanInfo && isDef(scanInfo.ready)) {
@@ -575,12 +575,12 @@ jobs:
           isList: true, fields: _fields, alignFields: _alignFields, key: "Object",
           searchInfo: Object.assign({}, scanInfo || {complete:true,totalExact:true}, {truncated:_total > maxResults || scanInfo && !scanInfo.complete,totalExact:_total <= maxResults && (!scanInfo || scanInfo.complete)}),
           list: _hits.map(f => ({
-            isDirectory: false,
+            isDirectory: f.isDirectory === true,
             values: {
               Object: _rel(f),
               "Last modified": isUnDef(f.lastModified) ? "" : ow.format.fromDate(new Date(f.lastModified), "yyyy-MM-dd HH:mm:ss"),
-              Size: ow.format.toBytesAbbreviation(f.size),
-              "Size in bytes": f.size
+              Size: f.isFile ? ow.format.toBytesAbbreviation(f.size) : "",
+              "Size in bytes": f.isFile ? f.size : ""
             }
           }))
         }
@@ -616,7 +616,7 @@ jobs:
         var path = global.__ojobHttpRelativePath(request.uri,options.parentURI)
         var freshness = provider.freshness((name,key) => support.matchesUnit(path,key,options.parentPath))
         return syncFn(() => {
-          var scan = scans.get(listingPrefix(options.parentPath, path))
+          var scan = scans.get(scanKey(listingPrefix(options.parentPath, path), (request.params || {}).recursive != "0"))
           if (scan && (scan.refreshing || now() < scan.expires)) {
             freshness.refreshing = scan.refreshing
             freshness.lastUpdatedAt = Math.max(scan.updatedAt || 0, freshness.lastUpdatedAt || freshness.loadedAt || 0)
@@ -627,7 +627,7 @@ jobs:
       args.fns.refresh = (request, options) => {
         var path = global.__ojobHttpRelativePath(request.uri, options.parentURI).replace(/\/+$/, "")
         var prefix = listingPrefix(options.parentPath, path)
-        syncFn(() => scans.forEach((state, key) => { if (key.startsWith(prefix)) scans.delete(key) }), scanLock)
+        syncFn(() => scans.forEach((state, key) => { if (state.prefix.startsWith(prefix)) scans.delete(key) }), scanLock)
         provider.invalidate((name,key) => {
           return support.matchesUnit(path,key,options.parentPath)
         })

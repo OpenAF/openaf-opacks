@@ -791,6 +791,7 @@ jobs:
       }
       var isRefreshing = (path,options) => syncFn(() =>
         Object.keys(treeState).some(k => treeState[k].refreshing && support.matchesUnit(path,treeState[k].key,options.parentPath)), treeLock)
+      var listFolder = args.fns.getList
       args.fns.search = (request,options) => {
         args.fns.validate(request, options)
         if (!options.query || !options.query.enabled) support.error(501,"Enhanced search is not enabled")
@@ -798,7 +799,27 @@ jobs:
         if(q.length>(options.query.maxQueryLength||256))support.error(400,"Query too long")
         if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
         var literal = q.toLowerCase()
-        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
+        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards === true && (request.params || {}).wildcards != "0") : name => name.toLowerCase().indexOf(literal) >= 0
+        var permitted = name => {
+          try {
+            args.fns.validate({ uri: options.parentURI.replace(/\/$/, "") + "/" + name }, options)
+            return true
+          } catch (e) { return false }
+        }
+        if ((request.params || {}).recursive == "0") {
+          var folder = listFolder(request, options)
+          if (!folder.isList) folder = { isList:true, fields:["Package"], alignFields:["left"], key:"Package", list:[] }
+          var scanned = folder.list.length, limit = options.query.maxResults || 1000
+          var hits = folder.list.filter(row => {
+            var name = String(row.values[folder.key])
+            return matches(name) && permitted(path ? path + "/" + name : name)
+          })
+          folder.list = hits.slice(0, limit)
+          delete folder.pageInfo
+          delete folder.content
+          folder.searchInfo = { scanned:scanned, complete:hits.length <= limit, truncated:hits.length > limit, totalExact:hits.length <= limit }
+          return folder
+        }
         var parts = path.split("/").filter(Boolean)
         var browser = !options._api && request.method == "GET"
         var explicit = browser && (request.header || {})["x-openaf-browse-fragment"] !== "1"
@@ -806,12 +827,6 @@ jobs:
         var known = provider.entries("codeartifact-repos")[0]
         if (!known && explicit && (parts.length >= 2 || request.params.searchAll == "1")) {
           known = { value: browseCache("codeartifact-repos").get({}) }
-        }
-        var permitted = name => {
-          try {
-            args.fns.validate({ uri: options.parentURI.replace(/\/$/, "") + "/" + name }, options)
-            return true
-          } catch (e) { return false }
         }
         var repositories = known && known.value.filter(repo => {
           var name = repo.domainName + "/" + (repo.name || repo.repositoryName)

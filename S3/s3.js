@@ -229,17 +229,18 @@ S3.prototype.listObjects = function(aBucket, aPrefix, needFull, needRecursive) {
 
 /**
  * <odoc format="markdown">
- * <key>S3.walkObjects(aBucket, aPrefix, callback, options) : Map</key>
- * Visits recursive entries until callback returns false or maxScanned/timeoutMs
- * is reached. Returns completeness metadata. The SDK may prefetch one page.
+ * <key>S3.walkObjects(aBucket, aPrefix, callback, options, recursive) : Map</key>
+ * Visits entries recursively by default. Pass false for recursive to visit only
+ * immediate objects and common prefixes. Stops when the callback returns false
+ * or maxScanned/timeoutMs is reached. Returns completeness metadata. The SDK may prefetch one page.
  * </odoc>
  */
-S3.prototype.walkObjects = function(aBucket, aPrefix, callback, options) {
+S3.prototype.walkObjects = function(aBucket, aPrefix, callback, options, recursive) {
     _$(aBucket).isString().$_(); _$(callback).isFunction().$_()
     options = options || {}
     var max = options.maxScanned || 10000, timeout = options.timeoutMs || 5000
     if (!isNumber(max) || max < 1 || Math.floor(max) != max || !isNumber(timeout) || timeout < 1) throw new Error("Invalid S3 scan budget")
-    var builder = Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).prefix(aPrefix || "").recursive(true)
+    var builder = Packages.io.minio.ListObjectsArgs.builder().bucket(aBucket).prefix(aPrefix || "").recursive(recursive !== false)
     if (this.useVersion1) builder = builder.useApiVersion1(true)
     var iterator = this.s3.listObjects(builder.build()).iterator(), scanned = 0, began = now(), complete = true, timedOut = false
     while (iterator.hasNext()) {

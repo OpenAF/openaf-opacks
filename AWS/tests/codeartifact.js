@@ -144,8 +144,7 @@ var browseCode = browse.jobs.filter(j => String(j.exec).indexOf("var applyQuery 
 var queryStart = browseCode.indexOf("var applyQuery =")
 var applyQuery = new Function("require", browseCode.substring(queryStart, browseCode.indexOf("// Wrap provider callbacks", queryStart)) + "\nreturn applyQuery")(() => support)
 var renderStart = browseCode.indexOf(".default((lst, server, request, options) => {") + ".default(".length
-var renderEnd = browseCode.indexOf("\nargs.fns.renderObj", renderStart)
-if (renderEnd < 0) renderEnd = browseCode.indexOf("\n    args.fns.renderObj", renderStart)
+var renderEnd = browseCode.indexOf("args.fns.renderObj =", renderStart)
 var renderList = new Function("escapeText", "return " + browseCode.substring(renderStart, renderEnd).trim().slice(0, -1))(global.__ojobHttpEscapeText)
 ow.loadTemplate()
 global.__ojobHttpUriPrefix = {}
@@ -170,6 +169,16 @@ global.__ojobHttpUriPrefix = {}
     ok(cleared.sortInfo.field == String(cleared.key), "clearing search restores listing sort")
   })
 })
+var shallowOptions = merge(options, { query: { enabled:true, wildcards:true } })
+function shallow(path, q, mode) {
+  var request = req(path)
+  request.params = { q:q, wildcards:mode, recursive:"0", size:"1" }
+  return applyQuery(args.fns.search(request, shallowOptions), request, shallowOptions)
+}
+ok(shallow("domain/", "rep?", "1").list[0].values.Repository == "repo", "shallow search matches immediate repositories")
+ok(shallow("domain/", "rep?", "0").list.length == 0, "shallow literal punctuation")
+ok(shallow("domain/", "pkg1", "0").list.length == 0, "shallow search excludes packages in child repositories")
+ok(shallow("domain/repo/maven/org.example/", "pkg1", "0").list.length == 1, "filter before pagination")
 var versionPath = "domain/repo/maven/org.example/pkg1/1.0"
 var previewOptions = Object.assign({}, options, { _api: false, preview: {}, download: true, port: 19862 })
 function asset(name, params, overrides) {
@@ -387,7 +396,7 @@ ok(prefetchStatus.queued == 1 && prefetchStatus.loaded == 1 && prefetchStatus.us
 
 // Exercise the HTTP dispatch with the request shape exposed by HTTPServer.
 var genericBrowse = browse.jobs.filter(job => job.name == "HTTP Browse generic")[0]
-var prefetchRoute = new Function("request", "server", "port", "uri", genericBrowse.args.execURI)
+var prefetchRoute = new Function("require", "request", "server", "port", "uri", genericBrowse.args.execURI).bind(null, () => support)
 var previousBrowse = global.__GBHTTPD
 global.__GBHTTPD = { ["19862" + options.parentURI]: Object.assign({}, prefetchOptions, {_fns:prefetch.fns}) }
 try {

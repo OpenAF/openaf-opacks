@@ -533,7 +533,7 @@ jobs:
         if (!isDigest(digest)) return
         const tags = image.imageTags && image.imageTags.length ? image.imageTags : [""]
         tags.forEach(tag => {
-          if (matches && !matches(tag) && !matches(digest) && !matches(digest.substring(7))) return
+          if (matches && !matches(tag || "Untagged") && !matches(digest) && !matches(digest.substring(7))) return
           rows.push({
             imageDigest: digest,
             values: {
@@ -912,12 +912,25 @@ jobs:
         if(q.length>(options.query.maxQueryLength||256))support.error(400,"Query too long")
         if (options.query.wildcards === true && !isFunction(support.searchMatcher)) support.error(501, "Wildcard search requires updated oJob-common")
         var literal = q.toLowerCase()
-        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards) : name => name.toLowerCase().indexOf(literal) >= 0
+        var matches = isFunction(support.searchMatcher) ? support.searchMatcher(q, options.query.wildcards === true && (request.params || {}).wildcards != "0") : name => name.toLowerCase().indexOf(literal) >= 0
         var repositories = browseCache("ecr-repo").get({})
-        if (!options._api && options.imageDetails === true && repositories.byPath[path] && !repositories.byPath[path].isParent) {
+        if ((!options._api || (request.params || {}).recursive == "0") && options.imageDetails === true && repositories.byPath[path] && !repositories.byPath[path].isParent) {
           return imageListing(readImages(path, false), request, options, matches)
         }
         if (["Tag", "Digest", "Pushed", "Size", "Size in bytes", "Last Pull"].includes((request.params || {}).sort)) delete request.params.sort
+        if ((request.params || {}).recursive == "0") {
+          var children = repositories.children[path] || [], rows = [], max = options.query.maxResults || 1000
+          for (var child of children) {
+            var name = path ? child.name.substring(path.length + 1) : child.name
+            if (!matches(name)) continue
+            try { args.fns.validate({uri:options.parentURI.replace(/\/$/, "") + "/" + child.name}, options) } catch (e) { continue }
+            rows.push({isDirectory:child.isParent, values:{"Repository Name":name}})
+            if (rows.length > max) break
+          }
+          var complete = rows.length <= max
+          return {isList:true, fields:["Repository Name"], alignFields:["left"], key:"Repository Name", list:rows.slice(0,max),
+            searchInfo:{complete:complete, truncated:!complete, totalExact:complete}}
+        }
         var all=repositories.lst.filter(r=>(!path||r.repositoryName.startsWith(path+"/"))&&matches(r.repositoryName))
         all=all.filter(r=>{try{args.fns.validate({uri:options.parentURI.replace(/\/$/,"")+"/"+r.repositoryName},options);return true}catch(e){return false}})
         var max=options.query.maxResults||1000

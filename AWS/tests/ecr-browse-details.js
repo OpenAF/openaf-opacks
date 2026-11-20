@@ -148,6 +148,14 @@ const opts = merge(args.options, { parentURI: "/ecr", port: 19861 })
 function view(params, options) {
   return args.fns.getObj({ uri: "/ecr/team/image", params: params || {} }, options || opts)
 }
+const searchOptions = merge(opts, { query: { enabled:true, wildcards:true } })
+function searchFolder(path, q, wildcards) {
+  return args.fns.search({ uri:"/ecr/" + path, params:{ q:q, recursive:"0", wildcards:wildcards } }, searchOptions).list
+}
+check(searchFolder("", "te?m", "1").some(row => row.isDirectory && row.values["Repository Name"] == "team"), "shallow ECR search includes virtual folders")
+check(!searchFolder("", "te?m", "0").length && !searchFolder("", "image", "0").length, "shallow literal ECR search excludes deeper repositories")
+check(searchFolder("team", "image", "0").length == 1, "shallow repository name is relative")
+check(searchFolder("team/image", "lat*", "1").some(row => row.values.Tag == "latest"), "shallow image search preserves tag rows")
 const repository = view()
 check(repository.data.includes("?image=" + encodeURIComponent(index)), "tag links to index digest")
 check(repository.data.includes("?image=" + encodeURIComponent(amd)), "untagged digest links")
