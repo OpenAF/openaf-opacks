@@ -26,6 +26,14 @@ preview for larger or invalid files. Other text, including AsciiDoc, is shown
 as escaped source. Raw downloads and API object
 reads stream the complete object as an attachment.
 
+Set `options.browse: true` on `S3Browse` or `httpdS3Browse` to render regular
+`.md` requests as full pages with OpenAF's Markdown renderer. Use
+`default: index.md` to select a Markdown landing page. This setting also
+applies when web serving is enabled. Only enable it for objects whose writers
+you trust, since the rendered page can include HTML from the Markdown.
+Explicit preview requests still use the sanitized viewer. Browse mode
+ignores `?raw=true` and hides the raw download links.
+
 ### Serving a website from S3
 
 Set `options.web.enabled: true` on either `S3Browse` or `httpdS3Browse` to
@@ -33,8 +41,8 @@ serve objects inline with their file MIME types. Use `path` to select the
 website folder and `default: index.html` to serve its landing page. In browse
 mode, clicking an HTML file streams it in a sandbox that blocks scripts, form
 submissions, and external resources. If you provide a custom formats map, add
-`html: html` or `htm: html` for the extensions you use. Explicit `?raw=true`
-requests download the original bytes in both modes. Path and restriction checks
+`html: html` or `htm: html` for the extensions you use. When browse mode is disabled, `?raw=true`
+downloads the original bytes. Path and restriction checks
 apply to both modes.
 
 Give the website a dedicated origin and enable web mode only for a prefix whose

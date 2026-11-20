@@ -21,14 +21,23 @@ code:
           })) support.error(403, "Forbidden")
     }
 
-    exports.read = (s3, bucket, key, request, options) => {
+    exports.read = (s3, bucket, key, request, options, renderMarkdown) => {
       var params = request.params || {}
+      var allowRaw = options.browse !== true && !renderMarkdown
+      var raw = allowRaw && params.raw == "true"
       var name = key.substring(key.lastIndexOf("/") + 1)
+      if (renderMarkdown && !options._api && !request._browsePreview &&
+          params.action != "preview" && !raw && /\.md$/i.test(name)) {
+        var stream = s3.getObjectStream(bucket, key)
+        try { return { data: af.fromInputStream2String(stream, "UTF-8"), type: "md" } }
+        finally { stream.close() }
+      }
+
       var headers = { "X-Content-Type-Options": "nosniff" }
       var preview = options.preview || {}
-      var web = !options._api && params.action != "preview" && options.web && options.web.enabled === true && params.raw != "true"
+      var web = !options._api && params.action != "preview" && options.web && options.web.enabled === true && !raw
       var formats = Object.assign({}, support.defaults, { log: "text", html: "html", htm: "html" })
-      var type = !web && !options._api && params.raw != "true" && support.format(name, preview, formats)
+      var type = !web && !options._api && !raw && support.format(name, preview, formats)
       if (!type) {
         if (!web) headers["Content-Disposition"] = 'attachment; filename="' +
           name.replace(/[^a-zA-Z0-9_. -]/g, "_") + "\"; filename*=UTF-8''" + global.__ojobHttpFileLink(name)
@@ -38,7 +47,7 @@ code:
 
       if (type == "json" && (params.view == "json" || params.view == "json-data" ||
           (params.parse != "false" && params.view != "source"))) {
-        return support.jsonPreview(request, options, () => s3.getObjectStream(bucket, key))
+        return support.jsonPreview(request, options, () => s3.getObjectStream(bucket, key), allowRaw)
       }
 
       var imageType = isFunction(support.imageType) && support.imageType(type)
@@ -155,9 +164,10 @@ jobs:
       var serveObject = relative => {
         view.validate(relative, path, restrict)
         var objectRequest = Object.assign({}, request, { uri: uri.replace(/\/+$/, "") + "/" + relative })
-        var result = view.read(s3, bucket, path + relative, objectRequest, Object.assign({}, options, { port: port }))
+        var result = view.read(s3, bucket, path + relative, objectRequest, Object.assign({}, options, { port: port, browse: shouldBrowse }), options.browse === true)
         if (result.stream) return server.replyStream(result.stream, result.streamType, 200, result.streamHeaders)
-        var download = result.jsonViewer ? "" :
+        if (result.type == "md") return server.replyOKHTML(ow.template.parseMD2HTML(result.data, true))
+        var download = result.jsonViewer || shouldBrowse || options.browse === true ? "" :
           '<a href="' + ow.format.escapeHTML(view.url(uri, relative)) + '?raw=true" download>Download raw</a>'
         var header = view.previewBackArrow + "\n\n" + tmplh({ puri: relative })
         return server.replyOKHTML(ow.template.parseMD2HTML(header + "\n\n" + download + "\n\n" + result.data, true))
@@ -265,7 +275,7 @@ jobs:
       args.logo = _$(args.logo, "logo").isString().default("/fonts/openaf_small.png")
 
       var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
-      var templ = _$(args.template).isString().default('{{#each this}}| {{#if isDirectory}}&#8600;{{else}}<a href="{{s3-browse-url uri puri filename}}?raw=true" download>&darr;</a>{{/if}} | <a href="{{s3-browse-url uri puri filename}}{{#if isDirectory}}/{{/if}}">{{{s3-browse-label filename}}}</a> | {{fLastModified}} | {{fSize}} | {{size}} |\n{{/each}}')
+      var templ = _$(args.template).isString().default('{{#each this}}| {{#if isDirectory}}&#8600;{{/if}} | <a href="{{s3-browse-url uri puri filename}}{{#if isDirectory}}/{{/if}}">{{{s3-browse-label filename}}}</a> | {{fLastModified}} | {{fSize}} | {{size}} |\n{{/each}}')
 
       var _cache, s3
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
@@ -354,6 +364,7 @@ jobs:
       options  : isMap.default({})
   exec    : &httpBrowseS3Exec | #js
     var view = require("s3-browse-view.js")
+    var renderMarkdown = args.options.browse === true
     args.path = view.prefix(args.path)
     var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)
     if (enhanced) {
@@ -496,8 +507,8 @@ jobs:
       getObj: (request, options) => {
         args.fns.validate(request, options)
         var relative = global.__ojobHttpRelativePath(request.uri, options.parentURI)
-        var object = view.read(s3, args.bucket, options.parentPath + relative, request, options)
-        if (!object.stream && !object.jsonViewer) object.data = '<p><a href="' +
+        var object = view.read(s3, args.bucket, options.parentPath + relative, request, options, renderMarkdown)
+        if (options.browse !== true && !renderMarkdown && !object.stream && !object.jsonViewer && object.type != "md") object.data = '<p><a href="' +
           ow.format.escapeHTML(view.url(options.parentURI, relative)) + '?raw=true" download>Download raw</a></p>' +
           "\n\n" + object.data
         return object
