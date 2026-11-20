@@ -505,9 +505,9 @@
             <version>0.64.8</version>
         </dependency>
         <dependency>
-            <groupId>com.github</groupId>
-            <artifactId>copilot-sdk-java</artifactId>
-            <version>1.0.18-preview.4</version>
+            <groupId>com.microsoft</groupId>
+            <artifactId>copilot-sdk</artifactId>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.uber</groupId>

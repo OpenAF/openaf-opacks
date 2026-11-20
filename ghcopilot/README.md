@@ -10,17 +10,10 @@ OpenAF wrapper around the official GitHub Java SDK [copilot-sdk-java](https://gi
 
 ## Compatibility note
 
-This opack currently wraps the official GitHub Java SDK shipped in this folder. If you see an error like:
-
-```text
-SDK protocol version mismatch: SDK expects version 2, but server reports version 3
-```
-
-your local `copilot` CLI/server is newer than the bundled Java SDK protocol. In that case, either:
-
-- point `options.cliPath` at an older compatible `copilot` binary
-- pin/downgrade the installed `@github/copilot` CLI to a compatible version
-- update the bundled Java SDK when upstream adds support for the newer protocol
+The bundled Java SDK 2.0.0 requires CLI protocol 4. Copilot CLI 1.0.114
+completed the SDK handshake. CLI 1.0.103 reports protocol 3 and fails at startup.
+If the SDK reports a protocol mismatch, update the CLI or set `options.cliPath`
+to a compatible executable.
 
 Check the active CLI with:
 
@@ -166,8 +159,8 @@ Adding or removing tools causes the session to be transparently recreated on the
 - `autoRestart` (boolean, default: `false`): Automatically recreates the session after failures or disconnects.
 - `useLoggedInUser` (boolean, optional): Prefer the local Copilot logged-in account/session instead of explicit token-only auth. Set this to `true` if a model works in the interactive `copilot` CLI but session creation reports it as unavailable — see [Model "X" is not available](#model-x-is-not-available-but-works-in-the-interactive-cli).
 - `logLevel` (string, optional): SDK/CLI logging verbosity for troubleshooting (for example `debug`, `info`, `warn`, `error`).
-- `reasoningEffort` (string, optional): Reasoning intensity hint forwarded to `SessionConfig.setReasoningEffort`.
-- `configDir` (string, optional): Custom configuration directory forwarded to `SessionConfig.setConfigDir`.
+- `reasoningEffort` (string, optional): Reasoning intensity hint forwarded to `the session inference options`.
+- `configDir` (string, optional): Custom configuration directory forwarded to `the SDK session configuration`.
 - `onPermissionRequest` (internal, default: `PermissionHandler.APPROVE_ALL`): Session permission requests are auto-approved by default to satisfy SDK session creation requirements.
 - `skillDirectories` (array of strings, optional): Additional directories where Copilot skills are loaded from.
 - `disabledSkills` (array of strings, optional): Skill IDs/names to disable, even if available in configured skill directories.
@@ -260,10 +253,13 @@ docker run --rm -ti -e OAF_MODEL=$OAF_MODEL my-image
 - `aJsonFlag=true` appends a JSON-only instruction and attempts to parse the answer.
 - Provider API compatibility with `ow.ai.gpt` now includes `setDebugCh(aChName)`, `promptImage(...)`, `promptStream(...)`, `getModelInfo(aModelId)`, `exportConversation()`, and `importConversation(...)`.
 
-## Dependency refresh (2026-10-09)
+## Bundled SDK
 
-The 20261009 local package bundles copilot-sdk-java 1.0.18-preview.4, matching
-the SDK already shipped on master. The Maven maintenance configuration holds
-this preview version explicitly because automatic discovery selects stable
-releases only. Copilot authentication and CLI/server compatibility still need
-to be verified in the target environment.
+This oPack uses `com.microsoft:copilot-sdk:2.0.0`. Package version 20261119
+shipped this JAR with the older JavaScript wrapper. If Mini-A reports that
+`com.github.copilot.rpc.CopilotClientOptions` is a `JavaPackage`, update the
+oPack and restart Mini-A so it loads the matching wrapper and JAR.
+
+With `cliUrl`, configure authentication and logging on the external CLI
+server. SDK 2.0 accepts client-level token, login and log-level options
+only for a runtime started by the client.

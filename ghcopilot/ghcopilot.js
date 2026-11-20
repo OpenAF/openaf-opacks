@@ -5,6 +5,7 @@ ow.loadAI()
 
 ow.ai.__gpttypes.ghcopilot = {
   create: _p => {
+    var sdk = Packages.com.microsoft.copilot
     var aOptions = _$(isDef(_p) ? _p.options : __, "aOptions").isMap().default({})
     aOptions.params           = _$(aOptions.params,           "aOptions.params").isMap().default({})
     aOptions.model            = _$(aOptions.model,            "aOptions.model").isString().default("gpt-4.1")
@@ -58,20 +59,15 @@ ow.ai.__gpttypes.ghcopilot = {
     }
 
     var _buildProtocolMismatchError = (aErr) => {
-      var _sdkVersion = "2"
+      var _sdkVersion = "unknown"
       try {
-        _sdkVersion = String(Packages.com.github.copilot.SdkProtocolVersion.get())
+        _sdkVersion = String(sdk.SdkProtocolVersion.get())
       } catch(pe) {}
 
       var lines = [
         "GitHub Copilot CLI/server protocol is incompatible with the bundled Java SDK.",
         "Bundled SDK protocol version: " + _sdkVersion,
-        "The local Copilot CLI/server reports a newer protocol version.",
-        "This opack currently uses the official GitHub Java SDK, and that SDK must match the Copilot CLI/server protocol.",
-        "Use one of the following:",
-        "  - pin or downgrade your Copilot CLI to a version compatible with protocol " + _sdkVersion,
-        "  - point options.cliPath to a compatible Copilot CLI binary",
-        "  - update this opack once the upstream Java SDK adds support for the newer protocol",
+        "Use a Copilot CLI/server that supports protocol " + _sdkVersion + ", or set options.cliPath to a compatible CLI executable.",
         "Check the installed CLI with: copilot --version",
         "Original error: " + String(aErr)
       ]
@@ -211,12 +207,8 @@ ow.ai.__gpttypes.ghcopilot = {
     // Convert a plain JS object to java.util.LinkedHashMap (handles nested objects via Jackson)
     var _toJavaMap = (obj) => {
       if (isUnDef(obj)) return new java.util.LinkedHashMap()
-      try {
-        var mapper = new Packages.com.fasterxml.jackson.databind.ObjectMapper()
-        return mapper.readValue(stringify(obj, __, ""), java.util.LinkedHashMap.class)
-      } catch(e) {
-        return new java.util.LinkedHashMap()
-      }
+      var mapper = new Packages.com.fasterxml.jackson.databind.ObjectMapper()
+      return mapper.readValue(stringify(obj, __, ""), java.lang.Class.forName("java.util.LinkedHashMap"))
     }
 
     // Build a Java ArrayList of strings from a JS array
@@ -252,30 +244,30 @@ ow.ai.__gpttypes.ghcopilot = {
     }
 
     var _modelVisionLimits = (vision) => _compactMap({
-      supportedMediaTypes: _javaListToArray(_call(vision, v => v.getSupportedMediaTypes())),
-      maxPromptImages   : _num(_call(vision, v => v.getMaxPromptImages())),
-      maxPromptImageSize: _num(_call(vision, v => v.getMaxPromptImageSize()))
+      supportedMediaTypes: _javaListToArray(_call(vision, v => v.supportedMediaTypes())),
+      maxPromptImages   : _num(_call(vision, v => v.maxPromptImages())),
+      maxPromptImageSize: _num(_call(vision, v => v.maxPromptImageSize()))
     })
 
     var _modelCapabilities = (capabilities) => {
-      var supports = _call(capabilities, c => c.getSupports())
-      var limits   = _call(capabilities, c => c.getLimits())
+      var supports = _call(capabilities, c => c.supports())
+      var limits   = _call(capabilities, c => c.limits())
       return _compactMap({
         supports: _compactMap({
-          vision         : _call(supports, s => s.isVision()),
-          reasoningEffort: _call(supports, s => s.isReasoningEffort())
+          vision         : _call(supports, s => s.vision()),
+          reasoningEffort: _call(supports, s => s.reasoningEffort())
         }),
         limits: _compactMap({
-          maxPromptTokens       : _num(_call(limits, l => l.getMaxPromptTokens())),
-          maxContextWindowTokens: _num(_call(limits, l => l.getMaxContextWindowTokens())),
-          vision                : _modelVisionLimits(_call(limits, l => l.getVision()))
+          maxPromptTokens       : _num(_call(limits, l => l.maxPromptTokens())),
+          maxContextWindowTokens: _num(_call(limits, l => l.maxContextWindowTokens())),
+          vision                : _modelVisionLimits(_call(limits, l => l.vision()))
         })
       })
     }
 
     var _modelPolicy = (policy) => _compactMap({
-      state: _str(_call(policy, p => p.getState())),
-      terms: _str(_call(policy, p => p.getTerms()))
+      state: _str(_call(policy, p => p.state().getValue())),
+      terms: _str(_call(policy, p => p.terms()))
     })
 
     var _modelTokenPricesLongContext = (prices) => _compactMap({
@@ -301,18 +293,18 @@ ow.ai.__gpttypes.ghcopilot = {
     })
 
     var _modelBilling = (billing) => _compactMap({
-      multiplier : _num(_call(billing, b => b.getMultiplier())),
-      tokenPrices: _modelTokenPrices(_call(billing, b => b.getTokenPrices()))
+      multiplier : _num(_call(billing, b => b.multiplier())),
+      tokenPrices: _modelTokenPrices(_call(billing, b => b.tokenPrices()))
     })
 
     var _modelInfo = (m) => _compactMap({
-      id                       : _str(_call(m, x => x.getId())),
-      name                     : _str(_call(m, x => x.getName())),
-      policy                   : _modelPolicy(_call(m, x => x.getPolicy())),
-      capabilities             : _modelCapabilities(_call(m, x => x.getCapabilities())),
-      billing                  : _modelBilling(_call(m, x => x.getBilling())),
-      supportedReasoningEfforts: _javaListToArray(_call(m, x => x.getSupportedReasoningEfforts())),
-      defaultReasoningEffort   : _str(_call(m, x => x.getDefaultReasoningEffort()))
+      id                       : _str(_call(m, x => x.id())),
+      name                     : _str(_call(m, x => x.name())),
+      policy                   : _modelPolicy(_call(m, x => x.policy())),
+      capabilities             : _modelCapabilities(_call(m, x => x.capabilities())),
+      billing                  : _modelBilling(_call(m, x => x.billing())),
+      supportedReasoningEfforts: _javaListToArray(_call(m, x => x.supportedReasoningEfforts())),
+      defaultReasoningEffort   : _str(_call(m, x => x.defaultReasoningEffort()))
     })
 
     // SDK 1.0.1 separates send mode (enqueue/immediate) from agent mode.
@@ -329,7 +321,7 @@ ow.ai.__gpttypes.ghcopilot = {
       if (isString(agentMode)) {
         if (agentModes.indexOf(agentMode) < 0)
           throw "aOptions.agentMode needs to be one of: " + agentModes.join(", ")
-        aMessageOptions.setAgentMode(Packages.com.github.copilot.rpc.AgentMode.fromValue(agentMode))
+        aMessageOptions.setAgentMode(sdk.rpc.AgentMode.fromValue(agentMode))
       }
       if (isString(sendMode)) aMessageOptions.setMode(sendMode)
       return aMessageOptions
@@ -347,7 +339,7 @@ ow.ai.__gpttypes.ghcopilot = {
     var _getToolsKey = () => Object.keys(_tools).sort().join(",")
 
     // Build a flat prompt string from the conversation, skipping system messages
-    // (system messages are delivered to the SDK via SessionConfig.setSystemMessage)
+    // (system messages are delivered to the SDK via CreateSessionOptions.setSystemMessage)
     var _buildPrompt = (aPrompt) => {
       if (isArray(aPrompt)) {
         _conversation   = aPrompt
@@ -369,33 +361,48 @@ ow.ai.__gpttypes.ghcopilot = {
 
     // Start the Copilot CLI client if not already running
     var _ensureClient = () => {
-      if (isDef(_client)) return
+      if (isDef(_client)) {
+        if (!aOptions.autoRestart || sdk.ConnectionState.CONNECTED.equals(_client.getState())) return
+        _r.close()
+      }
 
-      var co = new Packages.com.github.copilot.rpc.CopilotClientOptions()
+      var co = new sdk.rpc.CopilotClientOptions()
       var _cliDetected = __
-      if (isUnDef(aOptions.cliUrl)) {
+      var runtime
+      if (isString(aOptions.cliUrl)) {
+        var endpoint = aOptions.cliUrl
+        if (/^\d+$/.test(endpoint)) endpoint = "localhost:" + endpoint
+        if (endpoint.indexOf("://") < 0) endpoint = "http://" + endpoint
+        var uri = java.net.URI.create(endpoint)
+        if (String(uri.getScheme()).toLowerCase() !== "http" || uri.getHost() === null ||
+            uri.getPort() < 1 || uri.getPort() > 65535)
+          throw "cliUrl requires a plaintext TCP host and port"
+        runtime = sdk.rpc.RuntimeConnection.forTcp(uri.getHost(), uri.getPort())
+      } else {
         _cliDetected = _resolveCliPath()
         if (!_cliDetected.found) throw _buildCliNotFoundError(__, _cliDetected)
+        runtime = aOptions.useStdio ? sdk.rpc.RuntimeConnection.forSpawnedStdio() : sdk.rpc.RuntimeConnection.forSpawnedTcp()
+        runtime.setPath(_cliDetected.path)
+        if (isString(aOptions.cwd)) runtime.setWorkingDirectory(aOptions.cwd)
       }
-      if (isString(aOptions.cliPath)) co.setCliPath(aOptions.cliPath)
-      if (isString(aOptions.cliUrl))  co.setCliUrl(aOptions.cliUrl)
-      if (isString(aOptions.cwd))     co.setCwd(aOptions.cwd)
-      if (isString(aOptions.logLevel)) co.setLogLevel(aOptions.logLevel)
-      co.setUseStdio(aOptions.useStdio)
+      co.setRuntime(runtime)
+      co.setMode(sdk.rpc.CopilotClientMode.CODING_AGENT)
       co.setAutoStart(aOptions.autoStart)
-      co.setAutoRestart(aOptions.autoRestart)
+      if (isString(aOptions.logLevel)) co.getObservability().setLogLevel(aOptions.logLevel)
       var _token = isString(aOptions.token) ? aOptions.token : aOptions.githubToken
       if (isString(_token)) {
-        co.setGithubToken(_token)
-        var _env = new java.util.HashMap()
-        _env.put("COPILOT_GITHUB_TOKEN", _token)
-        _env.put("GH_TOKEN",     _token)
-        _env.put("GITHUB_TOKEN", _token)
-        co.setEnvironment(_env)
+        co.getGitHub().setToken(_token)
+        if (isUnDef(aOptions.cliUrl)) {
+          var _env = new java.util.HashMap()
+          _env.put("COPILOT_GITHUB_TOKEN", _token)
+          _env.put("GH_TOKEN", _token)
+          _env.put("GITHUB_TOKEN", _token)
+          runtime.setEnvironment(_env)
+        }
       }
-      if (isDef(aOptions.useLoggedInUser)) co.setUseLoggedInUser(aOptions.useLoggedInUser)
+      if (isDef(aOptions.useLoggedInUser)) co.getGitHub().setUseLoggedInUser(aOptions.useLoggedInUser)
 
-      _client = new Packages.com.github.copilot.CopilotClient(co)
+      _client = new sdk.CopilotClient(co)
       try {
         _client.start().get(aOptions.timeout, java.util.concurrent.TimeUnit.MILLISECONDS)
       } catch(e) {
@@ -414,6 +421,7 @@ ow.ai.__gpttypes.ghcopilot = {
       var _currentSysMsg   = _getSystemContent()
       var _currentToolsKey = _getToolsKey()
 
+      _ensureClient()
       if (isDef(_session) &&
           _sessionStreaming === _wantStreaming &&
           _sessionModel    === aOptions.model  &&
@@ -426,22 +434,18 @@ ow.ai.__gpttypes.ghcopilot = {
         _session = __
       }
 
-      _ensureClient()
-
-      var sc = new Packages.com.github.copilot.rpc.SessionConfig().setModel(aOptions.model)
+      var sc = new sdk.rpc.CreateSessionOptions().setModel(aOptions.model)
       if (isString(aOptions.cwd))            sc.setWorkingDirectory(aOptions.cwd)
-      if (isString(aOptions.reasoningEffort)) sc.setReasoningEffort(aOptions.reasoningEffort)
+      if (isString(aOptions.reasoningEffort)) sc.getInference().setReasoningEffort(aOptions.reasoningEffort)
       if (isString(aOptions.configDir))       sc.setConfigDirectory(aOptions.configDir)
-      sc.setStreaming(_wantStreaming)
-      try {
-        sc.setOnPermissionRequest(Packages.com.github.copilot.rpc.PermissionHandler.APPROVE_ALL)
-      } catch(e) {}
+      sc.getEvents().setStreaming(_wantStreaming)
+      sc.getPermissions().setOnRequest(sdk.rpc.PermissionHandler.APPROVE_ALL)
 
       // System message — use the SDK's native SystemMessageConfig
       if (_currentSysMsg.length > 0) {
-        var smc = new Packages.com.github.copilot.rpc.SystemMessageConfig()
+        var smc = new sdk.rpc.SystemMessageConfig()
         smc.setContent(_currentSysMsg)
-        smc.setMode(Packages.com.github.copilot.SystemMessageMode.APPEND)
+        smc.setMode(sdk.SystemMessageMode.APPEND)
         sc.setSystemMessage(smc)
       }
 
@@ -450,7 +454,7 @@ ow.ai.__gpttypes.ghcopilot = {
       Object.keys(_tools).forEach(tName => {
         var t   = _tools[tName]
         var _fn = t.fn
-        var handler = new JavaAdapter(Packages.com.github.copilot.rpc.ToolHandler, {
+        var handler = new JavaAdapter(sdk.rpc.ToolHandler, {
           invoke: function(invocation) {
             var cf = new java.util.concurrent.CompletableFuture()
             try {
@@ -467,27 +471,27 @@ ow.ai.__gpttypes.ghcopilot = {
         var params = isMap(t.function) && isDef(t.function.parameters)
           ? _toJavaMap(t.function.parameters)
           : new java.util.LinkedHashMap()
-        toolDefs.add(Packages.com.github.copilot.rpc.ToolDefinition.create(
+        toolDefs.add(sdk.rpc.ToolDefinition.create(
           String(t.function.name),
           String(t.function.description),
           params,
           handler
         ))
       })
-      if (toolDefs.size() > 0) sc.setTools(toolDefs)
+      if (toolDefs.size() > 0) sc.getTools().setDefinitions(toolDefs)
 
       // Optional SDK list options
       if (isArray(aOptions.skillDirectories) && aOptions.skillDirectories.length > 0)
-        sc.setSkillDirectories(_toJavaList(aOptions.skillDirectories))
+        sc.getSkills().setDirectories(_toJavaList(aOptions.skillDirectories))
       if (isArray(aOptions.disabledSkills) && aOptions.disabledSkills.length > 0)
-        sc.setDisabledSkills(_toJavaList(aOptions.disabledSkills))
+        sc.getSkills().setDisabledSkills(_toJavaList(aOptions.disabledSkills))
       if (toBoolean(aOptions.excludeAllExistingTools)) {
-        sc.setAvailableTools(new java.util.ArrayList())
+        sc.getTools().setAvailableTools(_toJavaList(Object.keys(_tools)))
       } else if (isArray(aOptions.availableTools) && aOptions.availableTools.length > 0) {
-        sc.setAvailableTools(_toJavaList(aOptions.availableTools))
+        sc.getTools().setAvailableTools(_toJavaList(aOptions.availableTools))
       }
       if (isArray(aOptions.excludedTools) && aOptions.excludedTools.length > 0)
-        sc.setExcludedTools(_toJavaList(aOptions.excludedTools))
+        sc.getTools().setExcludedTools(_toJavaList(aOptions.excludedTools))
 
       try {
         _setDebug("session-create", { model: aOptions.model })
@@ -732,13 +736,13 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(sdk.generated.SessionUsageInfoEvent, usageHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
           if (toBoolean(aJsonFlag)) p += "\n\nReply strictly with valid JSON."
 
-          var mo = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
+          var mo = _applyMessageMode(new sdk.rpc.MessageOptions().setPrompt(p))
 
           _setDebug("client", {
             vendor      : "ghcopilot",
@@ -803,14 +807,14 @@ ow.ai.__gpttypes.ghcopilot = {
             } catch(e) {}
           }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
-        var deltaClose = _session.on(Packages.com.github.copilot.generated.AssistantMessageDeltaEvent, deltaHandler)
+        var usageClose = _session.on(sdk.generated.SessionUsageInfoEvent, usageHandler)
+        var deltaClose = _session.on(sdk.generated.AssistantMessageDeltaEvent, deltaHandler)
 
         try {
           var p = _buildPrompt(aPrompt)
           if (toBoolean(aJsonFlag)) p += "\n\nReply strictly with valid JSON."
 
-          var mo = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
+          var mo = _applyMessageMode(new sdk.rpc.MessageOptions().setPrompt(p))
 
           _setDebug("client", {
             vendor      : "ghcopilot",
@@ -893,7 +897,7 @@ ow.ai.__gpttypes.ghcopilot = {
       },
       addUserPrompt: aPrompt => _r.addPrompt("user", aPrompt),
       // Push system messages into the conversation array (like all reference providers).
-      // _ensureSession picks them up via _getSystemContent() and sets SessionConfig.setSystemMessage().
+      // _ensureSession picks them up via _getSystemContent() and sets CreateSessionOptions.setSystemMessage().
       addSystemPrompt: aPrompt => {
         _$(aPrompt, "aPrompt").isString().$_()
         _conversation.push({ role: "system", content: aPrompt })
@@ -911,25 +915,25 @@ ow.ai.__gpttypes.ghcopilot = {
         var usageHandler = new JavaAdapter(java.util.function.Consumer, {
           accept: function(evt) { _usage = _extractUsage(evt) }
         })
-        var usageClose = _session.on(Packages.com.github.copilot.generated.SessionUsageInfoEvent, usageHandler)
+        var usageClose = _session.on(sdk.generated.SessionUsageInfoEvent, usageHandler)
 
         var _tmpFile = __
         try {
           var ptxt = isString(aPrompt) ? aPrompt : stringify(aPrompt, __, "")
           var p    = _buildPrompt([{ role: aRole.toLowerCase(), content: ptxt }])
-          var mo   = _applyMessageMode(new Packages.com.github.copilot.rpc.MessageOptions().setPrompt(p))
+          var mo   = _applyMessageMode(new sdk.rpc.MessageOptions().setPrompt(p))
 
           // Attach the image via SDK Attachment (path-based) instead of embedding base64 in text
           var attList = new java.util.ArrayList()
           if (io.fileExists(aImage)) {
             var _fname = String(new java.io.File(aImage).getName())
-            attList.add(new Packages.com.github.copilot.rpc.Attachment("image", aImage, _fname))
+            attList.add(new sdk.rpc.Attachment("image", aImage, _fname))
           } else if (isString(aImage)) {
             // Base64 string: write to a temp file, attach, then clean up
             var _tmpJFile = java.io.File.createTempFile("ghcopilot_img_", ".jpg")
             _tmpFile      = String(_tmpJFile.getAbsolutePath())
             io.writeFileBytes(_tmpFile, af.fromBase64(aImage))
-            attList.add(new Packages.com.github.copilot.rpc.Attachment("image", _tmpFile, "image.jpg"))
+            attList.add(new sdk.rpc.Attachment("image", _tmpFile, "image.jpg"))
           } else {
             throw "aImage should be a file path or a base64 string"
           }
