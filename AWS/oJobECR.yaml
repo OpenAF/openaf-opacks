@@ -251,7 +251,8 @@ jobs:
 
       const url = (view, platform) => "?image=" + encodeURIComponent(digest) + "&amp;tab=" + view +
         (platform ? "&amp;platform=" + encodeURIComponent(platform) : "")
-      const table = (fields, rows, rowHeader) => '<div class="ecr-detail-table"><table><thead><tr>' + fields.map(field => "<th scope=\"col\">" + field + "</th>").join("") +
+      const table = (fields, rows, rowHeader) => '<div class="ecr-detail-table"><table' +
+        (fields[0] === "Property" ? ' class="ecr-properties"' : '') + '><thead><tr>' + fields.map(field => "<th scope=\"col\">" + field + "</th>").join("") +
         "</tr></thead><tbody>" + rows.map(row => "<tr>" + row.map((cell, index) => rowHeader && index === 0 ?
           '<th scope="row"><strong>' + cell + '</strong></th>' : '<td>' + cell + '</td>').join("") + "</tr>").join("") + "</tbody></table></div>\n\n"
       const textTable = (fields, rows, rowHeader) => table(fields, rows.map(row => row.map(escapeDetail)), rowHeader)
@@ -267,7 +268,7 @@ jobs:
         '<details class="ecr-digest"><summary aria-label="Show full digest"><code>' + value.slice(0, 12) + '…' + value.slice(-4) +
         '</code></summary><code>' + value + '</code></details>' : escapeDetail(value)
       var data = '\n' +
-        '<style>.ecr-detail-nav{display:flex;flex-wrap:wrap;gap:.3em .75em;margin-bottom:1em}.ecr-detail-nav [aria-current=page]{font-weight:bold;text-decoration:underline}.ecr-detail-digest,.ecr-detail-table td,.ecr-digest>code,.ecr-annotations th,.ecr-labels th{overflow-wrap:anywhere}.ecr-annotations td,.ecr-labels td{white-space:pre-wrap}.ecr-digest summary{cursor:pointer;white-space:nowrap;color:#626c78}.markdown-body-dark .ecr-digest summary{color:#a3adb8}.ecr-digest summary:focus-visible,.ecr-detail-nav a:focus-visible{outline:2px solid currentColor;outline-offset:2px}.ecr-detail-table td:last-child{min-width:5em}.ecr-detail-table{overflow:auto}.ecr-detail-table th[scope="row"]{text-align:right}.ecr-detail-chart{max-width:48rem;position:relative}.ecr-detail-graph{overflow:auto}.ecr-detail-graph svg{max-width:100%;height:auto}</style>\n\n'
+        '<style>.ecr-detail-nav{display:flex;flex-wrap:wrap;gap:.3em .75em;margin-bottom:1em}.ecr-detail-nav [aria-current=page]{font-weight:bold;text-decoration:underline}.ecr-detail-digest,.ecr-detail-table td,.ecr-digest>code,.ecr-annotations th,.ecr-labels th,.ecr-env th{overflow-wrap:anywhere}.ecr-annotations td,.ecr-labels td,.ecr-env td{white-space:pre-wrap}.ecr-digest summary{cursor:pointer;white-space:nowrap;color:#626c78}.markdown-body-dark .ecr-digest summary{color:#a3adb8}.ecr-digest summary:focus-visible,.ecr-detail-nav a:focus-visible{outline:2px solid currentColor;outline-offset:2px}.ecr-detail-table td:last-child{min-width:5em}.ecr-detail-table{overflow:auto}.ecr-detail-table th[scope="row"]{text-align:right}.ecr-properties thead th:first-child,.ecr-labels thead th:first-child,.ecr-env thead th:first-child{text-align:right}.ecr-properties thead th:last-child,.ecr-labels thead th:last-child,.ecr-env thead th:last-child{text-align:left}.ecr-detail-chart{max-width:48rem;position:relative}.ecr-detail-graph{overflow:auto}.ecr-detail-graph svg{max-width:100%;height:auto}</style>\n\n'
       if (selected) {
         data += '<nav class="ecr-detail-digest" aria-label="Image breadcrumb"><a href="' + url("platforms") +
           '">Original image <code>' + escapeDetail(digest.substring(7, 19)) + '</code></a></nav>\n\n'
@@ -358,7 +359,7 @@ jobs:
 
           const labels = mapRows(overviewConfig && overviewConfig.config && overviewConfig.config.Labels)
           if (labels.length) {
-            data += '<section class="ecr-labels" aria-labelledby="ecr-labels-title"><h3 id="ecr-labels-title">Labels</h3>' +
+            data += '<section class="ecr-labels" aria-labelledby="ecr-labels-title"><h3 id="ecr-labels-title"><span aria-hidden="true">🏷️</span> Labels</h3>' +
               textTable(["Key", "Value"], labels, true) + '</section>\n\n'
           }
 
@@ -379,9 +380,9 @@ jobs:
           }
 
           if (annotations.length) {
-            data += '<section class="ecr-annotations" aria-labelledby="ecr-annotations-title"><h3 id="ecr-annotations-title">Annotations</h3>' +
+            data += '<section class="ecr-annotations" aria-labelledby="ecr-annotations-title"><h3 id="ecr-annotations-title"><span aria-hidden="true">📝</span> Annotations</h3>' +
               annotations.map(group =>
-                (annotations.length > 1 || group.source != manifestSource ? '<h4>' + escapeDetail(group.source) + '</h4>' : '') +
+                (annotations.length > 1 || group.source != manifestSource ? '<h4><span aria-hidden="true">📄</span> ' + escapeDetail(group.source) + '</h4>' : '') +
                 textTable(["Key", "Value"], group.rows, true)
               ).join("") + '</section>\n\n'
           }
@@ -476,8 +477,7 @@ jobs:
                 ["Entrypoint", runtime.Entrypoint ? JSON.stringify(runtime.Entrypoint) : ""],
                 ["Command", runtime.Cmd ? JSON.stringify(runtime.Cmd) : ""],
                 ["Working directory", runtime.WorkingDir], ["User", runtime.User],
-                ["Ports", Object.keys(runtime.ExposedPorts || {}).join(", ")],
-                ["Environment variable names", (isArray(runtime.Env) ? runtime.Env : []).filter(isString).map(value => value.split("=", 1)[0]).join(", ")]
+                ["Ports", Object.keys(runtime.ExposedPorts || {}).join(", ")]
               ]
               ;[["Created", date(imageConfig.created)], ["Author", imageConfig.author],
                 ["Volumes", Object.keys(runtime.Volumes || {}).join(", ")], ["Stop signal", runtime.StopSignal],
@@ -485,6 +485,14 @@ jobs:
                 if (value) configRows.push([label, value])
               })
               data += properties(configRows)
+              const envRows = (isArray(runtime.Env) ? runtime.Env : []).filter(isString).map(entry => {
+                const separator = entry.indexOf("=")
+                return separator < 0 ? [entry, ""] : [entry.slice(0, separator), entry.slice(separator + 1)]
+              })
+              if (envRows.length) {
+                data += '<section class="ecr-env" aria-labelledby="ecr-env-title"><h3 id="ecr-env-title"><span aria-hidden="true">⚙️</span> Environment variables</h3>' +
+                  textTable(["Name", "Value"], envRows, true) + '</section>\n\n'
+              }
             } else {
               var layerIndex = 0
               const history = isArray(imageConfig.history) ? imageConfig.history : []

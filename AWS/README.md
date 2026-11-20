@@ -134,7 +134,7 @@ uses the local Chart.js asset. Install the optional Mermaid
 oPack for the platform diagram. Both tables are available independently of
 the diagrams. The Overview tab shows an Annotations section when the image manifest, index,
 or its descriptors contain annotations. The Manifest tab displays a nested nJSMap view, with formatted
-JSON as a fallback. Config shows environment variable names. History displays
+JSON as a fallback. Config lists the environment variable names and values stored in the image. History displays
 the build commands stored by the image publisher.
 
 Inspector tabs share a bounded cache of manifests and configs keyed by digest.

@@ -93,7 +93,7 @@ const referrerCalls = []
 const configs = { os: "linux", architecture: "amd64", variant: "v2", created: "2024-03-21T19:40:00Z", author: "Image builder",
   rootfs: { diff_ids: [digest("3"), digest("4")] }, config: {
   Entrypoint: ["/app"], Cmd: ["start"], WorkingDir: "/work", User: "app", ExposedPorts: { "8080/tcp": {} },
-  Env: ["VISIBLE_NAME=SECRET_VALUE"], Labels: { "org.example.title": "<b>literal label</b>" },
+  Env: ["EXAMPLE_URL=https://example.test/?q=<test>&page=1", "EMPTY="], Labels: { "org.example.title": "<b>literal label</b>" },
   Volumes: { "/data": {} }, StopSignal: "SIGTERM", Healthcheck: { Test: ["CMD", "/health"] }
 }, history: [
   { created_by: "ADD base", author: "Layer builder" }, { created_by: "LABEL <script>danger</script>", empty_layer: true }, { created_by: "COPY app" }
@@ -183,26 +183,30 @@ check(history.includes("Layer builder"), "history shows step author")
 check(history.indexOf(digest("1")) > history.indexOf("COPY app"), "history keeps layer association after metadata-only step")
 const runtime = view({ image: index, platform: amd, tab: "config" }).data
 check(runtime.includes('<th scope="row"><strong>Entrypoint</strong></th>'), "configuration properties have bold row headings")
-check(runtime.includes("VISIBLE_NAME") && !runtime.includes("SECRET_VALUE") && runtime.includes("8080/tcp"), "config displays names with no environment values")
+check(runtime.includes('id="ecr-env-title"><span aria-hidden="true">⚙️</span> Environment variables</h3>') &&
+  runtime.includes('<th scope="col">Name</th><th scope="col">Value</th>') &&
+  runtime.includes('<strong>EXAMPLE_URL</strong></th><td>https://example.test/?q=&lt;test&gt;&amp;page=1</td>') &&
+  runtime.includes('<strong>EMPTY</strong></th><td></td>'), "config shows escaped environment values, including embedded equals signs and empty values")
+check(runtime.includes("8080/tcp"), "config shows exposed ports")
 check(runtime.includes("Image builder") && runtime.includes("/data") && runtime.includes("SIGTERM") &&
   runtime.includes("Health check") && !runtime.includes("org.example.title"), "config shows build and runtime properties")
 check(scan.length == 3 && scan[2][1] == "blobs" && scan[2][2] == config, "Layers, History and Config share one config read")
 const single = view({ image: amd, tab: "platforms" }).data
 check(single.includes('<strong>Supported platform</strong>') && single.includes("linux/amd64/v2"), "single manifest platform comes from image config")
 const overview = view({ image: index, platform: amd }).data
-check(overview.includes('id="ecr-labels-title">Labels</h3>') && overview.includes("org.example.title") &&
+check(overview.includes('id="ecr-labels-title"><span aria-hidden="true">🏷️</span> Labels</h3>') && overview.includes("org.example.title") &&
   overview.includes("&lt;b&gt;literal label&lt;/b&gt;"), "overview shows escaped image labels")
 check(!overview.includes("Runtime usage") && !view({ image: index }).data.includes('id="ecr-labels-title"'),
   "overview omits Runtime usage and empty Labels sections")
 check(overview.includes("Last recorded pull") && overview.includes("Last archived") && overview.includes("Last activated") && overview.includes("ACTIVE"), "overview shows registry lifecycle metadata")
 check(overview.includes('<strong>Platform</strong>') && overview.includes("linux/amd64"), "selected platform overview uses its index descriptor")
-check(overview.includes('id="ecr-annotations-title">Annotations</h3>') &&
+check(overview.includes('id="ecr-annotations-title"><span aria-hidden="true">📝</span> Annotations</h3>') &&
   overview.includes("&lt;b&gt;key&lt;/b&gt;") && overview.includes("&lt;i&gt;literal tag&lt;/i&gt;") &&
   !overview.includes("<i>literal tag</i>") && overview.includes("org.example.layer"), "overview shows escaped manifest and layer annotations")
 check(view({ image: index }).data.includes("Index entry 3 · Attestation"), "index overview shows its annotated entries")
 check(!view({ image: attestation }).data.includes('id="ecr-annotations-title"'), "unannotated images omit the section")
 const artifactView = view({ image: index, platform: attestation }).data
-check(artifactView.includes("<h4>Index descriptor</h4>") && artifactView.includes("vnd.docker.reference.type"),
+check(artifactView.includes('<h4><span aria-hidden="true">📄</span> Index descriptor</h4>') && artifactView.includes("vnd.docker.reference.type"),
   "selected artifact overview shows the parent descriptor annotations")
 check(platforms.includes(encodeURIComponent(attestation) + '">Attestation</a>') &&
   artifactView.includes('aria-label="Image breadcrumb"') && artifactView.includes('<strong>Artifact</strong>'), "artifact details retain the original image breadcrumb")
