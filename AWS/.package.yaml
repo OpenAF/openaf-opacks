@@ -43,7 +43,6 @@ files:
 - .package.yaml
 - .precompile
 - README.md
-- a.yaml
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
@@ -76,14 +75,12 @@ files:
 - oJobECR.yaml
 - oJobLambda.yaml
 - oafp_aws.js
-- ojob.pid
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
   .odoc.db: da551624d5ff44b2918fb434040dec8ea26cae07
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
   README.md: a5c2591d85ace68366d4da3be4475fb0bf605ad4
-  a.yaml: 9f49c6492b5f40ffed81173109feab8bc15890fc
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
   aws_bedrock.js: 8ddcabc63c7ba36c3ff7ad0f4f43eda2e76fe52d
@@ -116,6 +113,5 @@ filesHash:
   oJobECR.yaml: 1c9b2945aa3d80b5fc546a24aa076430dc885333
   oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
   oafp_aws.js: d71ff1c00d292d16442321e78eccf470fc0c1be1
-  ojob.pid: a11d59462209e8f85c44002d91e14fede98783a8
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9
