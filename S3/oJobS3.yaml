@@ -23,7 +23,7 @@ code:
 
     exports.read = (s3, bucket, key, request, options, renderMarkdown) => {
       var params = request.params || {}
-      var allowRaw = options.browse !== true && !renderMarkdown
+      var allowRaw = options.noRaw !== true
       var raw = allowRaw && params.raw == "true"
       var name = key.substring(key.lastIndexOf("/") + 1)
       if (renderMarkdown && !options._api && !request._browsePreview &&
@@ -167,7 +167,7 @@ jobs:
         var result = view.read(s3, bucket, path + relative, objectRequest, Object.assign({}, options, { port: port, browse: shouldBrowse }), options.browse === true)
         if (result.stream) return server.replyStream(result.stream, result.streamType, 200, result.streamHeaders)
         if (result.type == "md") return server.replyOKHTML(ow.template.parseMD2HTML(result.data, true))
-        var download = result.jsonViewer || shouldBrowse || options.browse === true ? "" :
+        var download = result.jsonViewer || shouldBrowse || options.browse === true || options.noRaw === true ? "" :
           '<a href="' + ow.format.escapeHTML(view.url(uri, relative)) + '?raw=true" download>Download raw</a>'
         var header = view.previewBackArrow + "\n\n" + tmplh({ puri: relative })
         return server.replyOKHTML(ow.template.parseMD2HTML(header + "\n\n" + download + "\n\n" + result.data, true))
@@ -275,7 +275,9 @@ jobs:
       args.logo = _$(args.logo, "logo").isString().default("/fonts/openaf_small.png")
 
       var temph = _$(args.templateHead).isString().default("## {{{s3-buildBreadcrumbs puri '" + args.uri + "' " + args.incURI + "}}}<img style=\"padding-left: 1em;\" align=\"right\" src=\"" + args.logo + "\">\n")
-      var templ = _$(args.template).isString().default('{{#each this}}| {{#if isDirectory}}&#8600;{{/if}} | <a href="{{s3-browse-url uri puri filename}}{{#if isDirectory}}/{{/if}}">{{{s3-browse-label filename}}}</a> | {{fLastModified}} | {{fSize}} | {{size}} |\n{{/each}}')
+      var noRaw = args.options && args.options.noRaw === true
+      var rawArrow = noRaw ? "" : '<a href="{{s3-browse-url uri puri filename}}?raw=true" download>&darr;</a>'
+      var templ = _$(args.template).isString().default('{{#each this}}| {{#if isDirectory}}&#8600;{{else}}' + rawArrow + '{{/if}} | <a href="{{s3-browse-url uri puri filename}}{{#if isDirectory}}/{{/if}}">{{{s3-browse-label filename}}}</a> | {{fLastModified}} | {{fSize}} | {{size}} |\n{{/each}}')
 
       var _cache, s3
       var s3 = new S3(args.url, args.accessKey, args.secret, args.region)
@@ -508,7 +510,7 @@ jobs:
         args.fns.validate(request, options)
         var relative = global.__ojobHttpRelativePath(request.uri, options.parentURI)
         var object = view.read(s3, args.bucket, options.parentPath + relative, request, options, renderMarkdown)
-        if (options.browse !== true && !renderMarkdown && !object.stream && !object.jsonViewer && object.type != "md") object.data = '<p><a href="' +
+        if (options.browse !== true && options.noRaw !== true && !renderMarkdown && !object.stream && !object.jsonViewer && object.type != "md") object.data = '<p><a href="' +
           ow.format.escapeHTML(view.url(options.parentURI, relative)) + '?raw=true" download>Download raw</a></p>' +
           "\n\n" + object.data
         return object
