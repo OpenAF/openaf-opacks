@@ -167,7 +167,7 @@ jobs:
         var result = view.read(s3, bucket, path + relative, objectRequest, Object.assign({}, options, { port: port, browse: shouldBrowse }), options.browse === true)
         if (result.stream) return server.replyStream(result.stream, result.streamType, 200, result.streamHeaders)
         if (result.type == "md") return server.replyOKHTML(ow.template.parseMD2HTML(result.data, true))
-        var download = result.jsonViewer || shouldBrowse || options.browse === true || options.noRaw === true ? "" :
+        var download = result.jsonViewer || options.noRaw === true ? "" :
           '<a href="' + ow.format.escapeHTML(view.url(uri, relative)) + '?raw=true" download>Download raw</a>'
         var header = view.previewBackArrow + "\n\n" + tmplh({ puri: relative })
         return server.replyOKHTML(ow.template.parseMD2HTML(header + "\n\n" + download + "\n\n" + result.data, true))
@@ -510,7 +510,7 @@ jobs:
         args.fns.validate(request, options)
         var relative = global.__ojobHttpRelativePath(request.uri, options.parentURI)
         var object = view.read(s3, args.bucket, options.parentPath + relative, request, options, renderMarkdown)
-        if (options.browse !== true && options.noRaw !== true && !renderMarkdown && !object.stream && !object.jsonViewer && object.type != "md") object.data = '<p><a href="' +
+        if (options.noRaw !== true && !renderMarkdown && !object.stream && !object.jsonViewer && object.type != "md") object.data = '<p><a href="' +
           ow.format.escapeHTML(view.url(options.parentURI, relative)) + '?raw=true" download>Download raw</a></p>' +
           "\n\n" + object.data
         return object

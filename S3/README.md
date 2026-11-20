@@ -32,7 +32,7 @@ Set `options.browse: true` on `S3Browse` or `httpdS3Browse` to render regular
 applies when web serving is enabled. Only enable it for objects whose writers
 you trust, since the rendered page can include HTML from the Markdown.
 Explicit preview requests still use the sanitized viewer. Browse mode
-keeps `?raw=true` downloads working and shows a download arrow for each file in the listing. Preview pages still hide the separate "Download raw" link.
+keeps `?raw=true` downloads working. The listing shows a download arrow for each file, and preview pages show a "Download raw" link, unless `options.noRaw: true` is set.
 
 Set `options.noRaw: true` on `S3Browse` or `httpdS3Browse` to opt out of raw
 downloads. It removes the download arrow from the listing, hides the "Download
