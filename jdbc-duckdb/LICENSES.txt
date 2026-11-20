@@ -1,7 +1,7 @@
-duckdb_jdbc-2.0.0.1.jar:
+duckdb_jdbc-2.0.1.0.jar:
   name: MIT License
   url: https://raw.githubusercontent.com/duckdb/duckdb/main/LICENSE
-  version: 2.0.0.1
+  version: 2.0.1.0
   changed from original: false
   comments: ''
   license: |-
