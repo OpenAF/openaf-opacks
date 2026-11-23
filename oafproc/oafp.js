@@ -1,4 +1,4 @@
-// (author: Nuno Aguiar, version: 20261112, license: Apache 2.0, url: https://github.com/openaf/oafp)
+// (author: Nuno Aguiar, version: 20261122, license: Apache 2.0, url: https://github.com/openaf/oafp)
 // ---
 var _params=processExpr(" ");
 const oafp=b=>{if(!isUnDef(b)&&!isDef(b.____ojob)){if(toBoolean(b.inparams)){var Mb=b.input||b.type||b.in,zc={javadiag:"javapid javadiagop javaoptions javafile jcmdcommand javabundledir",hprof:"file hprofmode hprofindex hprofid javaoptions",jcmd:"javapid jcmdcommand javaoptions",httpd:"inhttpdport inhttpdhost inhttpdpath inhttpdtimeout inhttpdcount inhttpdmax inhttpdstatus inhttpdreply inhttpdtype inhttpdenvelope",llmmodels:"llmenv llmoptions",javas:"javasinception",jmx:"jmxop jmxurl jmxpid jmxuser jmxpass jmxprovider",javathread:"javathreadpid",

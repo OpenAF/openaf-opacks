@@ -1,0 +1,83 @@
+include:
+- oJobHTTPd.yaml
+- oJobBrowse.yaml
+
+jobs:
+- name: HTTP Browse - dynamodb
+  to: HTTP Browse generic
+  typeArgs:
+    shortcut:
+      name: DynamoDBBrowse
+      keyArg: port
+      args:
+        accessKey: accessKey
+        secret: secret
+        token: token
+        region: region
+        assumeRole: assumeRole
+        uri: uri
+        cache: cache
+        options: options
+  help:
+    text: Provides a HTTP browser over an allowlist of AWS DynamoDB tables with search, paging, sorting, named filters and item inspection (register it on a port started with httpdStart).
+    expects:
+    - name: port
+      desc: (Number) The port where the server was made available (default is 8091)
+    - name: uri
+      desc: (String) The URI where the DynamoDB browser will be available (default is "/")
+    - name: region
+      desc: (String) The AWS region to use (AWS client default is us-east-1)
+    - name: accessKey
+      desc: (String) Optional AWS access key id (defaults to the AWS oPack credential chain)
+    - name: secret
+      desc: (String) Optional AWS secret access key
+    - name: token
+      desc: (String) Optional AWS session token
+    - name: assumeRole
+      desc: (String) Optional IAM role ARN to assume before accessing DynamoDB
+    - name: cache
+      desc: (Number) Per-table inventory cache lifetime in ms (default is 5000)
+    - name: options
+      desc: (Map) Browser options; options.tables (Array, required) lists the allowed tables with name, columns, hideColumns, hidePrimaryKeys, maxItems, complexFormat, baseFilter, filters and fullItem. options.query defaults to enabled with pageSize 50.
+  exec: | #js
+    loadLib("aws_dynamo.js")
+    loadLib("aws_sts.js")
+    var client, lock = new java.lang.Object()
+    var credentials = { accessKey: args.accessKey, secret: args.secret, token: args.token, region: args.region, role: args.assumeRole }
+    var getClient = () => syncFn(() => {
+      var expiry = client && (client.assumeRoleExp || Date.parse(String(client._credentialExpiration)))
+      if (!client || (isFinite(expiry) && expiry <= now() + 60000)) {
+        var next = new AWS(credentials.accessKey, credentials.secret, credentials.token, credentials.region)
+        client = credentials.role ? next.assumeRole(credentials.role) : next
+      }
+      return client
+    }, lock)
+    var options = args.options || {}
+    options.query = Object.assign({ enabled: true, pageSize: 50 }, options.query)
+    args.options = options
+    args.fns = require("aws_dynamo_browse.js").create(options, args.cache, getClient, credentials.region, require("ojob-browse-contract.js"))
+
+- name: HTTP Browse - dynamodb - API
+  to: HTTP Browse API
+  typeArgs:
+    shortcut:
+      name: DynamoDBBrowseAPI
+      keyArg: port
+      args:
+        uri: uri
+        browseUri: browseUri
+        operationsBrowseUris: operationsBrowseUris
+        operationsToken: operationsToken
+  help:
+    text: Provides a JSON HTTP API (list, obj, search, preview, status, freshness, metrics, refresh) over a registered DynamoDBBrowse browser.
+    expects:
+    - name: port
+      desc: (Number) The port where the server was made available (default is 8091)
+    - name: uri
+      desc: (String) The API URI (default is "/api/browse")
+    - name: browseUri
+      desc: (String) Default DynamoDB browser mount URI to read (can also be given per request)
+    - name: operationsBrowseUris
+      desc: (Array) Exact browser mount URIs allowed for operations (default is none)
+    - name: operationsToken
+      desc: (String) Secret required for POST refresh, sent in the X-OpenAF-Browse-Token header

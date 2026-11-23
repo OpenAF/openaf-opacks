@@ -13,11 +13,7 @@ var httpCode = http.jobs.filter(j => j.name == "HTTP Start Server")[0]
 if (isUnDef(httpCode)) httpCode = http.jobs.filter(j => String(j.exec).indexOf("global.__ojobHttpRelativePath =") >= 0)[0]
 new Function(httpCode.exec.substring(0, httpCode.exec.indexOf("var ks")))()
 global.__ojobHttpUriPrefix = {}
-var browseCode = browse.jobs.filter(j => String(j.exec).indexOf("args.fns.renderList =") >= 0)[0].exec
-var start = browseCode.indexOf(".default((lst, server, request, options) => {") + ".default(".length
-var end = browseCode.indexOf("\nargs.fns.renderObj", start)
-if (end < 0) end = browseCode.indexOf("\n    args.fns.renderObj", start)
-var renderList = new Function("escapeText", "return " + browseCode.substring(start, end).trim().slice(0, -1))(global.__ojobHttpEscapeText)
+var browseCode = browse.jobs.find(j => j.name == "HTTP Browse generic").exec
 
 // Substitute only AWS and cache I/O; execute the complete ECR provider job.
 var imageRequests = [], caches = {}
@@ -40,9 +36,9 @@ function fixtureCache(name) {
   }
   return caches[name]
 }
-var args = { options: {}, cache: 1000 }
+var args = { options: {}, cache: 1000, uri: "/", port: 18888 }
 new Function("args", "AWS", "loadLib", "$cache", ecr.jobs[0].exec)(args, FixtureAWS, () => {}, fixtureCache)
-args.fns.init()
+new Function("args", browseCode)(args)
 ;["/", "/ecr.v1+"].forEach(parentURI => {
   var options = { parentURI: parentURI, port: 18888, _api: true }
   var base = parentURI.replace(/\/$/, "")
@@ -52,7 +48,7 @@ args.fns.init()
     var expected = ["internal", "3rdparty", "tool"][depth]
     var row = list.list.filter(r => r.values["Repository Name"] == expected)[0]
     ok(isDef(row), "plain child name at " + request.uri)
-    var html = String(renderList(list, {}, request, options))
+    var html = String(args.fns.renderList(list, {}, request, options))
     var link = expected + (row.isDirectory ? "/" : "")
     ok(html.indexOf('href="' + link + '"') >= 0, "rendered child link " + link)
     ok(!/%2f/i.test(html), "no encoded directory separators")

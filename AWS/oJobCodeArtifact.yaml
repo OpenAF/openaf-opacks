@@ -38,6 +38,49 @@ jobs:
         namespace : namespace
         initialize: initialize
         download  : download
+  help :
+    text   : Provides a HTTP browser over AWS CodeArtifact domains, repositories, packages, versions and assets (register it on a port started with httpdStart).
+    expects:
+    - name: port
+      desc: (Number) The port where the server was made available (default is 8091)
+    - name: uri
+      desc: (String) The URI where the CodeArtifact browser will be available (default is "/")
+    - name: region
+      desc: (String) The AWS region to use (AWS client default is us-east-1)
+    - name: accessKey
+      desc: (String) Optional AWS access key id (defaults to the AWS oPack credential chain)
+    - name: secret
+      desc: (String) Optional AWS secret access key
+    - name: token
+      desc: (String) Optional AWS session token
+    - name: assumeRole
+      desc: (String) Optional IAM role ARN to assume before accessing CodeArtifact
+    - name: path
+      desc: (String) Optional base path used when matching cache locations for operations
+    - name: cache
+      desc: (Number) Provider cache lifetime in ms (enhanced browsing defaults to 5000)
+    - name: browse
+      desc: (Boolean) Set to false to suppress listings
+    - name: logo
+      desc: (String) Logo URL for the rendered pages
+    - name: incURI
+      desc: (Boolean) Include the mount URI in breadcrumbs (maps to options.showURI)
+    - name: sortTab
+      desc: (Boolean) Enable sortable table headers
+    - name: domain
+      desc: (String) Optional exact domain to restrict browsing to
+    - name: repository
+      desc: (String) Optional repository name prefix to restrict browsing to
+    - name: format
+      desc: (String) Optional exact package format filter (e.g. maven, npm, pypi)
+    - name: namespace
+      desc: (String) Optional exact package namespace filter (e.g. com.example)
+    - name: initialize
+      desc: (String) SLON/JSON array of {domain, repository} pairs to warm in the background at startup
+    - name: download
+      desc: (Boolean) Enable original asset downloads in the browser and the API
+    - name: options
+      desc: (Map) Browser options (query, preview, operations, prefetch, page, pageSize, footer, noRaw, old, ...)
   exec : &httpBrowseCodeArtifactExec | #js
     var prefetchEnabled = args.options && args.options.prefetch === true && (!isNumber(args.cache) || args.cache > 0)
     var support, provider, enhanced = args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled || prefetchEnabled)
@@ -923,6 +966,19 @@ jobs:
     shortcut:
       <<    : *httpBrowseCodeArtifactTypeArgs
       name  : CodeArtifactBrowseAPI
+  help :
+    text   : Provides a JSON HTTP API (list, obj, search, preview, status, freshness, metrics, refresh) over a registered CodeArtifactBrowse browser.
+    expects:
+    - name: port
+      desc: (Number) The port where the server was made available (default is 8091)
+    - name: uri
+      desc: (String) The API URI (default is "/api/browse"); select the target with the browseUri request parameter
+    - name: operationsBrowseUris
+      desc: (Array) Exact browser mount URIs allowed for operations (default is none)
+    - name: operationsToken
+      desc: (String) Secret required for POST refresh, sent in the X-OpenAF-Browse-Token header
+    - name: options
+      desc: (Map) Options whose query/preview/operations capabilities are checked against the target mount
   exec: | #js
     if (args.options && (args.options.query && args.options.query.enabled || args.options.preview || args.options.operations && args.options.operations.enabled)) {
       var support

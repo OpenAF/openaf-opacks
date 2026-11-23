@@ -1,8 +1,55 @@
 # AWS oPack
 
+## oJob YAML files
+
+The oPack ships four oJob definition files. Include them from your own oJob
+(with the `AWS` and `oJob-common` oPacks listed under `ojob.opacks`) and call
+their shortcuts from `todo`. Every shortcut registers on a port that must first
+be started with `httpdStart` (from `oJobHTTPd.yaml`, pulled in automatically).
+
+| File | Job name | Shortcut | Purpose | Details |
+| --- | --- | --- | --- | --- |
+| `oJobECR.yaml` | `HTTP Browse - ecr` | `ECRBrowse` | HTML browser for ECR repositories, tags and the image inspector | [ECR options](#ecr-options), [Inspecting ECR images](#inspecting-ecr-images) |
+| `oJobECR.yaml` | `HTTP Browse - ecr - API` | `ECRBrowseAPI` | JSON API over a registered ECR browser | [API registration](#api-registration-and-request-parameters) |
+| `oJobCodeArtifact.yaml` | `HTTP Browse - codeartifact` | `CodeArtifactBrowse` | HTML browser for CodeArtifact domains, repositories, packages, versions and assets | [CodeArtifact options](#codeartifact-options), [Previewing assets](#previewing-codeartifact-assets) |
+| `oJobCodeArtifact.yaml` | `HTTP Browse - codeartifact - API` | `CodeArtifactBrowseAPI` | JSON API over a registered CodeArtifact browser | [API registration](#api-registration-and-request-parameters) |
+| `oJobDynamoDB.yaml` | `HTTP Browse - dynamodb` | `DynamoDBBrowse` | HTML browser for an allowlist of DynamoDB tables | [DynamoDB options](#dynamodb-options), [Browsing DynamoDB tables](#browsing-dynamodb-tables) |
+| `oJobDynamoDB.yaml` | `HTTP Browse - dynamodb - API` | `DynamoDBBrowseAPI` | JSON API over a registered DynamoDB browser | [API registration](#api-registration-and-request-parameters) |
+| `oJobLambda.yaml` | `HTTP AWS Lambda` | `httpdAWSLambda` | Forwards HTTP requests to a Lambda function | [Serving a Lambda function over HTTP](#serving-a-lambda-function-over-http) |
+
+Each job carries a `help` section listing its arguments, which is the
+authoritative short reference. A minimal oJob combining several of them:
+
+```yaml
+include:
+- oJobECR.yaml
+- oJobCodeArtifact.yaml
+
+ojob:
+  daemon: true
+  opacks:
+  - oJob-common
+  - AWS
+
+todo:
+- (httpdStart): 8091
+  ((mapLibs)): true
+- (ECRBrowse): 8091
+  ((uri)): /ecr
+  ((region)): eu-west-1
+- (CodeArtifactBrowse): 8091
+  ((uri)): /codeartifact
+  ((region)): eu-west-1
+- (ECRBrowseAPI): 8091
+  ((uri)): /api/browse
+```
+
+Run it with `ojob myBrowse.yaml` and open `http://localhost:8091/ecr` or
+`http://localhost:8091/api/browse?browseUri=/ecr&action=list`.
+
 ## HTTP browsing
 
-ECR and CodeArtifact browse jobs accept the oJob-common `options.query`,
+ECR, CodeArtifact and DynamoDB browse jobs accept the oJob-common `options.query`,
 `options.preview`, and `options.operations` contract. Enhanced options require
 updated oJob-common definitions (browse contract 1), checked before clients are
 created. Legacy configurations retain support for the current OpenAF runtime.
@@ -10,6 +57,145 @@ API jobs refer to an existing browser; register the browser before serving API
 requests. API operations additionally require `operationsBrowseUris` on the API.
 POST refresh also requires a configured API `operationsToken` and a matching
 `X-OpenAF-Browse-Token` header.
+
+### Browse job shortcuts
+
+Include the YAML file for the provider you want, then register the browser on
+the same port as `httpdStart`. The AWS jobs include `oJobBrowse.yaml` from
+oJob-common. In a `todo` entry, the shortcut value is the server `port`
+(default `8091`). Sibling arguments use double parentheses, such as
+`((uri)): /ecr`. Keys inside `((options))` are ordinary YAML keys.
+
+| Include | Browser shortcut | API shortcut |
+| --- | --- | --- |
+| `oJobBrowse.yaml` | `httpdBrowse` (generic filesystem or callbacks), `httpdBrowser` (registered OpenAF browser type) | `httpdBrowserAPI` |
+| `oJobECR.yaml` | `ECRBrowse` | `ECRBrowseAPI` |
+| `oJobCodeArtifact.yaml` | `CodeArtifactBrowse` | `CodeArtifactBrowseAPI` |
+| `oJobDynamoDB.yaml` | `DynamoDBBrowse` | `DynamoDBBrowseAPI` |
+
+#### Browser registration arguments
+
+| Argument | Browser shortcuts | Meaning and default |
+| --- | --- | --- |
+| `uri` | All | Browser mount URI. Defaults to `/`. Give each browser on a port its own URI. |
+| `options` | All | Map of settings for the chosen browser. Shared renderer, query and provider settings are listed below. |
+| `type` | `httpdBrowser` | Name registered under `ow.server.httpd.browse`. Defaults to `files`. The selected type receives `options` directly. |
+| `path` | `httpdBrowse`, ECR, CodeArtifact | Generic base path, empty by default. For the filesystem this selects the directory to serve. The AWS providers use the base when matching cache locations for operations. Use the provider's scope settings to limit AWS content. |
+| `templates`, `fns` | `httpdBrowse` | Optional maps for custom implementations. The built-in renderer supplies its own markup. Callback names include `init`, `getList`, `getObj`, `renderList`, `renderObj`, `renderEmpty`, `search`, `validate`, `prefetch`, `getStatus`, `getFreshness` and `refresh`. Custom providers enabling operations must supply `validate`. |
+| `accessKey`, `secret`, `token` | All three AWS browsers | Optional AWS access key ID, secret access key and session token. Omit them to use the AWS oPack credential chain. |
+| `region`, `assumeRole` | All three AWS browsers | AWS region (client default `us-east-1`) and optional IAM role ARN to assume before accessing the service. |
+| `cache` | All three AWS browsers | Provider cache lifetime in milliseconds. Enhanced ECR, enhanced CodeArtifact and DynamoDB default to `5000`. |
+| `browse`, `logo`, `incURI`, `sortTab` | ECR, CodeArtifact | Shortcut arguments for the shared renderer's `browse`, `logo`, `showURI` and `sortTab` settings, respectively. |
+
+#### Shared browser options
+
+These keys go inside `((options))`. Presentation settings apply to views
+drawn by the shared renderer. DynamoDB uses its search, paging and sorting controls
+and supplies the record cells and item inspector. In oJob-common `20261119`,
+the shared search popup starts in literal mode with **Include subfolders**
+selected. Enabling `query.wildcards` adds the **Use wildcards** button. ECR,
+CodeArtifact and S3 use the subfolder setting for hierarchical searches.
+DynamoDB searches the current list of tables or records.
+
+| Option | Effect |
+| --- | --- |
+| `browse` | Listings are visible by default. Set `false` to suppress them. Explicit `true` also opens a filesystem Markdown file as a complete page. |
+| `default`, `web.enabled` | `default` names the entry to open automatically when present. With `web.enabled: true`, a provider that reports the default entry can open it even when listings are suppressed. |
+| `logo`, `showURI`, `footer` | Set the logo URL (default `/fonts/openaf_small.png`), include the mount URI in breadcrumbs (off by default), or append Markdown to rendered pages. |
+| `sortTab`, `sortTabAsc`, `fullWidth` | Enable sortable table headers, initially sort the first data column ascending with client-side sorting, or stretch the listing table to the page width. All default to off. |
+| `noRaw` | Set `true` to ignore `raw=true` on browser and preview requests and hide the shared renderer's raw-download controls. The API's `obj` action is separate. |
+| `old` | Set `true` for the legacy renderer. It drops enhanced query, preview, operations, prefetch, web and full-width settings. |
+| `path`, `_fns`, `useMDRaw`, `useMDTemplate` | For the legacy `httpdBrowser` type `files`, `path` selects the local root (default `.`) and `_fns` supplies callbacks. `useMDRaw` returns Markdown as raw content. `useMDTemplate` expands Markdown as an OpenAF template with the request in scope. |
+| `serverOrPort` | Optional server or port used to resolve the HTTP prefix for JSON viewer assets and legacy Markdown rendering. |
+| `prefetch` | Allows a provider's optional prefetch callback. CodeArtifact uses this to warm repository trees when users hover or focus a link. |
+
+| Query, preview or operations option | Default | Meaning |
+| --- | --- | --- |
+| `query.enabled` | `false`, DynamoDB `true` | Enables server-side search, sorting and pagination for supported views. |
+| `query.pageSize`, `query.maxPageSize` | `100` (DynamoDB `50`), `500` | Default rows per page and largest permitted request. Use positive integers up to 500 and keep the default within the configured maximum. |
+| `query.wildcards` | `false` | Allows case-insensitive wildcard search. Plain text matches a substring. With wildcards active, `*` matches any sequence and `?` one character against the whole name, path or value being searched. |
+| `query.maxQueryLength` | `256` | Maximum search text length, configurable from 1 to 4096. |
+| `query.maxResults` | `1000` | Maximum matches collected by filesystem, ECR repository and CodeArtifact searches (1–1000). DynamoDB bounds the scanned inventory with `maxItems`. |
+| `query.maxScanned`, `query.timeoutMs` | `10000`, `5000` | Filesystem search walk budgets in entries and milliseconds. Maximums are 1,000,000 entries and 60,000 ms. |
+| `preview.formats` | Provider defaults | Map extensions (e.g. `pom: xml`) or exact filenames (e.g. `'name:Dockerfile': dockerfile`) to renderers. A supplied map replaces the defaults. An empty map disables format matching. |
+| `preview.maxBytes` | `4194304` | Byte limit for bounded source/text previews, from 1 to 16777216. See the CodeArtifact section for streamed formats and raw downloads. |
+| `operations.enabled` | `false` | Enables `@@/status`, `@@/freshness`, `@@/metrics` and POST `@@/refresh` under the browser URI. |
+| `operations.ttlMs` | `30000` | Lifetime in milliseconds recorded by the shared operations tracker. Use the AWS job's `cache` argument to change provider data freshness. |
+
+#### ECR options
+
+| Setting | Meaning |
+| --- | --- |
+| `((restrict))` | A regular expression string or list of strings. Matching repository names are excluded and requests matching a restricted path prefix are denied. |
+| `((s3bucket))`, `((s3prefix))` | Set both to look up Markdown descriptions. The object key is the prefix followed by the relative path and `.md`, so include any separating slash in the prefix. |
+| `((s3url))`, `((s3region))`, `((s3accesskey))`, `((s3secret))` | Optional endpoint URL, region, access key and secret for the description S3 client. The ECR job loads the S3 oPack library. |
+| `options.summaries` | Defaults to `true`. Set `false` to skip per-repository image summaries on directory rows. |
+| `options.usePull` | Set `true` to show the last recorded pull time. |
+| `options.registry` | Registry host to prefix displayed pull references, for example `registry.example.com`. Defaults to an empty prefix. |
+| `options.refLink` | URL template for pull instructions. It receives `{{image}}` (the pull reference) and `{{type}}` (the artifact media type). |
+| `options.imageDetails` | Set `true` to link tags and digests to the image inspector. Add `query.enabled` to search a repository's tag listing. |
+
+#### CodeArtifact options
+
+| Setting | Meaning |
+| --- | --- |
+| `((domain))`, `((repository))` | Limit browsing to an exact domain and/or a repository **name prefix**. Omit either to leave that scope open. |
+| `((format))`, `((namespace))` | Exact package format and namespace filters. For example, use `maven` and `com.example`. |
+| `((initialize))` | SLON/JSON string containing an array of `{domain, repository}` pairs to warm at startup. |
+| `((download))` | Set `true` to enable original asset downloads in the browser and via the API. Formatted previews can be enabled independently with `options.preview`. |
+| `options.page`, `options.pageSize` | Starting page and page size for legacy provider paging. Defaults are page 1 and no paging. With enhanced queries, use `options.query.pageSize`. |
+| `options.prefetch` | Defaults to off. Set `true` with a positive cache lifetime to enable hover/focus prefetch. |
+
+When using full job names with an `args` map, both AWS repository jobs also
+read `default` for the default entry. CodeArtifact additionally reads
+`restrict` (regexes checked against request path prefixes) and `page` and
+`pageSize` (override legacy paging defaults). These keys have no dedicated
+argument in the corresponding browser shortcuts.
+
+#### DynamoDB options
+
+`options.tables` is a required array. Each entry configures one allowed table.
+
+| Table key | Default | Meaning |
+| --- | --- | --- |
+| `name` | Required | Unique DynamoDB table name. |
+| `columns` | All visible attributes | Omit to discover top-level attributes across the loaded records that pass `baseFilter`. A list sets the display order after the primary keys. An empty list shows only visible primary keys. |
+| `hideColumns`, `hidePrimaryKeys` | `[]`, `false` | Omit named top-level attributes or both primary key fields from visible data, including item inspection and downloads. |
+| `maxItems` | `1000` | Positive integer limiting the number of records scanned per inventory load, before filtering and paging. |
+| `complexFormat` | `njsmap` | Display maps and arrays as `slon`, `json`, `yaml` or `njsmap`. |
+| `baseFilter` | None | One `path`, `from`, `jq` or `sql` expression selecting original records before column hiding. |
+| `filters` | None | Map of preset names to expressions, each with one of the same four keys. Presets run on visible rows and may project or aggregate them. |
+| `fullItem` | `false` | Enables item inspection and download for rows that identify a single original record. |
+
+#### API registration and request parameters
+
+API shortcuts use the server port as their value. Their `uri` defaults to
+`/api/browse`. Register a browser first. The API reads its credentials, scope
+and data from the selected browser.
+
+| Registration argument | Applies to | Meaning |
+| --- | --- | --- |
+| `browseUri` | `httpdBrowserAPI`, `DynamoDBBrowseAPI` | Default browser mount to read. Optional if supplied in the request. |
+| `operationsBrowseUris` | All four API shortcuts | Array of exact browser mount URIs allowed for operations. Defaults to empty. |
+| `operationsToken` | All four API shortcuts | Secret required for API refresh. Send the matching value in the `X-OpenAF-Browse-Token` header with POST. |
+
+`ECRBrowseAPI` and `CodeArtifactBrowseAPI` inherit their provider's shortcut
+argument map. Their `options` can require capabilities from the target mount.
+Select the target in the request (e.g. `/api/browse?browseUri=/ecr&action=list`),
+or register `httpdBrowserAPI` with a fixed `((browseUri))`.
+
+| Request parameters | Use |
+| --- | --- |
+| `browseUri`, `uri`, `path`, `action` | The API checks the request's `browseUri`, the configured default, then the request's `uri`. `path` is relative to the mount and defaults to the root. Actions are `list` (default), `obj`, `search`, `preview`, `status`, `freshness`, `metrics` and POST `refresh`, subject to mount capabilities. |
+| `q`, `wildcards`, `recursive` | Search text and per-request switches. Use `wildcards=0` for literal text or `1` when enabled. Filesystem, ECR and CodeArtifact search recursively by default. Use `recursive=0` for immediate children. |
+| `page`, `size` or `pageSize`, `sort`, `order` | One-based page, rows per page, displayed column name and `asc` or `desc` order for server queries. |
+| `raw`, `parse`, `view` | `raw=true` requests original content where enabled. For filesystem JSON, `parse=false` or `view=source` shows source. The JSON viewer uses `view=json` and `view=json-data`. |
+| ECR `image`, `platform`, `tab`, `artifactPage` | The inspector selects an image digest and optional child digest. Tabs are `overview` (default), `platforms`, `layers`, `history`, `config`, `manifest` and `artifacts`. The artifacts pager supplies the continuation token. |
+| ECR `detailTable`, `detailSort`, `detailOrder` | Sort a repository detail table (`details`, `pull` or `manifest`) by its column label in `asc` or `desc` order. |
+| CodeArtifact `asset`, `view`, `raw`, `searchAll` | Select a version asset by name. Use `view=source` for its source preview or `raw=true` for an enabled download. An explicit browser search with `searchAll=1` can load remaining repositories in scope. |
+| DynamoDB `preset`, `format` | Select a configured named filter and override the display format for complex cells. To inspect an item, append its returned token to the table path. |
+
+### Repository browsing behavior
 
 CodeArtifact enforces the configured domain, repository name prefix, format,
 and exact namespace on direct requests as well as listings. Package versions
@@ -111,6 +297,117 @@ initial complete package fetch. Run `oaf -f tests/codeartifact.js` for offline
 pagination, navigation, large-tree, credential renewal, concurrency and refresh
 checks. Live AWS latency and permissions require separate validation.
 
+### Browsing DynamoDB tables
+
+Include `oJobDynamoDB.yaml` and register a browser before its API. The table list
+is an allowlist. Opening or searching the root uses only the configured names.
+
+```yaml
+include:
+- oJobDynamoDB.yaml
+
+ojob:
+  daemon: true
+  opacks:
+  - AWS
+  - oJob-common
+
+todo:
+- (httpdStart): 18888
+  ((mapLibs)): true
+- (DynamoDBBrowse): 18888
+  ((uri)): /dynamo
+  ((region)): eu-west-1
+  ((cache)): 60000
+  ((options)):
+    query: { enabled: true, pageSize: 50, wildcards: true }
+    tables:
+    - name: Orders
+      columns: [orderNumber, status, total, shipping]
+      hideColumns: [internalNotes, archived]
+      hidePrimaryKeys: true
+      maxItems: 1000
+      complexFormat: slon
+      fullItem: true
+      baseFilter:
+        path: "[?archived == `false`]"
+      filters:
+        open: { from: "equals(status,'OPEN')" }
+        porto: { path: "[?shipping.city == 'Porto']" }
+        towns: { jq: 'map({town: .shipping.city})' }
+        totals: { sql: "select status, sum(total) as amount from data group by status" }
+    - name: Customers
+      columns: [displayName, tier]
+- (DynamoDBBrowseAPI): 18888
+  ((uri)): /api/dynamo
+  ((browseUri)): /dynamo
+```
+
+Each table scan reads up to `maxItems` records (default 1,000), following
+DynamoDB continuation keys with eventually consistent reads. A browser caches
+each table independently for `cache` milliseconds (default 5,000). Concurrent
+loads share the scan. Changing the preset, search, sort, page or display format
+reuses that inventory until expiry. When a continuation key remains, the page
+labels the results and aggregates as partial. The API reports
+`searchInfo.truncated` and `searchInfo.scanned`. [DynamoDB Scan](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html)
+
+When configured, `baseFilter` applies to every view and must select original
+records. It receives all attributes, including fields omitted from
+`columns`. The listing shows the partition key, sort key (if present), then
+the configured columns. If you omit `columns`, every visible top-level attribute
+in the base-filtered inventory gets a column, even if it first appears on a later
+scan page. Use `hideColumns` for exact top-level names and
+`hidePrimaryKeys: true` for both discovered keys. Hiding applies throughout
+listings, named filters, detail pages, previews and downloads.
+
+Each preset takes one configured oafp `path`, `from`, `jq` or `sql` expression.
+The browser runs it across all visible rows that passed the base filter, then
+applies text search, sorting and pagination. Choose **All records** to clear
+the preset. Object results use their output field names, scalar results use
+`Value`, and an empty selection shows zero rows. SQL exposes the rows as the
+table `data`, with nested cells available as JSON text in SQL expressions.
+The interface and API identify invalid expressions by filter name and engine.
+
+For example, open `/dynamo/Orders/?preset=totals&sort=amount&order=desc`, or
+request `/api/dynamo?path=Orders&action=search&preset=porto&q=OPEN&page=1`.
+On the table list or inside a table, open **Table options** or press `/` to search.
+Typing previews matches, Enter applies the search and Shift+Enter clears it.
+The active preset and complex-value format carry through each search. Use `size`
+to request a different page size. Search is case-insensitive.
+When enabled, wildcard patterns use `*` for any sequence and `?` for one
+character. Use `wildcards=0` for literal text.
+
+Each column containing an object or array has two header buttons beside its
+sort controls. The format button cycles through the rendered nJSMap tree (the
+default), inline SLON, YAML and inline JSON. Complex cells start collapsed. The
+double chevron in the header collapses or expands every complex cell in that
+column on the current page, and each cell has its own chevron to collapse or
+expand just that value. The browser remembers each column’s format and
+collapse choice in local storage, so it persists across sorting, paging, live
+searches and later visits. Set `complexFormat` on a table to change the
+starting format, or pass `format=slon|json|yaml|njsmap` in the URL to override
+the remembered format. The API returns
+structured values in all four modes. Binary values use base64 and numbers
+that exceed JavaScript precision retain their decimal text.
+
+With `fullItem: true`, **Inspect** opens an nJSMap tree with a readable JSON
+fallback. Extra item attributes follow the same hiding rules. Original rows
+and unambiguous whole-record selections have an opaque `item` token.
+Projections, aggregates and ambiguous preset matches are standalone. Read
+`/api/dynamo?action=obj&path=Orders/<item>` for detail JSON, or use
+`action=preview` for the inspector. The browser retains the original typed
+key and rechecks the base filter against the freshly read item in its bounded
+inventory. Deleted or excluded records return HTTP 404. [DynamoDB GetItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html)
+
+Use the existing AWS credential chain or the shortcut's `accessKey`, `secret`,
+`token` and optional `assumeRole`. Grant `dynamodb:DescribeTable` and
+`dynamodb:Scan` on the configured table ARNs, plus `dynamodb:GetItem` on
+tables with full inspection. Role assumption also requires `sts:AssumeRole`.
+Enable `options.operations.enabled` for cache status and protected refresh.
+API operations use `operationsBrowseUris` and the refresh token described
+above. Run `oaf -f tests/dynamodb-browse.js` from the AWS directory for
+fixture checks.
+
 ### Prefetching CodeArtifact repository trees
 
 Set `options.prefetch: true` with a positive cache TTL to warm one cold
@@ -195,6 +492,54 @@ These checks use local fixtures and test doubles; they do not verify a live exte
 `EKS_GetToken` signs an STS `GetCallerIdentity` URL locally without calling STS. Tokens use unpadded Base64URL encoding and report expiration in UTC (14 minutes by default). STS presigning hashes the empty request body; S3 presigning retains `UNSIGNED-PAYLOAD`.
 
 Run the focused offline EKS token and STS/S3 signing checks with `oaf -f tests/eks.js`. These use dummy credentials and do not verify live EKS authentication.
+
+## Serving a Lambda function over HTTP
+
+`oJobLambda.yaml` provides the `httpdAWSLambda` shortcut (job `HTTP AWS Lambda`).
+It registers a URI on an `httpdStart` server and, for every request, invokes a
+Lambda function with an API Gateway-style event, then replies with the
+function's `body`, `statusCode`, `mimeType` and `headers`.
+
+```yaml
+include:
+- oJobLambda.yaml
+
+ojob:
+  daemon: true
+  opacks:
+  - oJob-common
+  - AWS
+
+todo:
+- (httpdStart): 17878
+- (httpdAWSLambda): 17878
+  ((uri)): /echo
+  ((region)): eu-west-1
+  ((lambda)): echo
+  ((params)):
+    stage: prod
+  ((timeout)): 30000
+  ((debug)): true
+```
+
+| Argument | Default | Meaning |
+| --- | --- | --- |
+| port (shortcut value) | `8091` | Port of an existing `httpdStart` server. |
+| `uri` | `/` | URI to serve. Each URI gets its own handler, so several functions can share a port. |
+| `region` | `us-east-1` | Region of the Lambda function. |
+| `lambda` | Required | Function name or ARN to invoke. |
+| `version` | None | Optional version or alias (qualifier). |
+| `params` | `{}` | Base event map. The request is merged over it as `resource`, `path` (both the request URI), `httpMethod`, `headers`, `queryStringParameters`, `pathParameters` (both the query/form parameters) and `body` (POST data, when present). |
+| `accessKey`, `secret`, `token` | Credential chain | Optional explicit AWS credentials. |
+| `assumeRole` | None | IAM role ARN to assume before invoking the function. |
+| `timeout` | OpenAF default | HTTP connect and read timeout in milliseconds for the Lambda calls (sets `__flags.HTTP_CON_TIMEOUT` and `HTTP_READ_TIMEOUT`). |
+| `debug` | `false` | Logs each Lambda request and response. |
+
+The function should return a map such as
+`{ statusCode: 200, body: "...", headers: { ... } }`. Invocation failures are
+logged and answered with HTTP 500 `Internal error!`. The principal needs
+`lambda:InvokeFunction` on the function (plus `sts:AssumeRole` when assuming a
+role).
 
 ## Lambda Web Functions, MicroVMs, and network connectors
 

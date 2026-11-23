@@ -18,9 +18,9 @@
       "version": "2.0.0-alpha-2",
       "reason": "Preserve the existing HTTP transporter API used by the wrapper; latest stable belongs to Resolver 1.x."
     },
-    "ghcopilot/com.github:copilot-sdk-java": {
-      "version": "1.0.18-preview.4",
-      "reason": "Match the preview SDK already shipped on master; the stable-only selector cannot select this SDK release."
+    "ghcopilot/com.microsoft:copilot-sdk": {
+      "version": "2.0.0",
+      "reason": "Keep the SDK aligned with the Java API and CLI protocol verified by the ghcopilot provider."
     }
   },
   "opacks": {

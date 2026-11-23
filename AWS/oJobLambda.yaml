@@ -24,32 +24,32 @@ jobs:
         debug     : debug
         timeout   : timeout
   help   :
-    text   : Adds a HTTP service to call AWS Lambda functions and return the result.
+    text   : Adds a HTTP service, on a port started with httpdStart, that forwards each request to an AWS Lambda function (API Gateway-style event) and replies with its body, statusCode, mimeType and headers.
     expects:
     - name: port
-      desc: The port to listen on.
+      desc: (Number) The port where the server was made available (default is 8091)
     - name: uri
-      desc: The URI to listen on.
+      desc: (String) The URI to listen on; also the key of the registered handler (default is "/")
     - name: region
-      desc: The AWS region to use.
+      desc: (String) The AWS region of the Lambda function (default is us-east-1)
     - name: lambda
-      desc: The AWS Lambda function to call.
+      desc: (String) The AWS Lambda function name or ARN to invoke (required)
     - name: params
-      desc: The parameters to pass to the Lambda function.
+      desc: (Map) Base event map merged with the request fields resource, path, httpMethod, headers, queryStringParameters, pathParameters and body (default is {})
     - name: version
-      desc: The version of the Lambda function to call.
+      desc: (String) Optional function version or alias to invoke
     - name: assumeRole
-      desc: The role to assume when calling the Lambda function.
+      desc: (String) Optional IAM role ARN to assume before invoking the function
     - name: accessKey
-      desc: The AWS access key to use.
+      desc: (String) Optional AWS access key id (defaults to the AWS oPack credential chain)
     - name: secret
-      desc: The AWS secret key to use.
+      desc: (String) Optional AWS secret access key
     - name: token
-      desc: The AWS token to use.
+      desc: (String) Optional AWS session token
     - name: debug
-      desc: Whether to enable debug mode.
+      desc: (Boolean) Log each Lambda request and response (default is false)
     - name: timeout
-      desc: HTTP timeout in milliseconds.
+      desc: (Number) Optional HTTP connect/read timeout in milliseconds for the Lambda calls
   check  :
     in:
       port      : toNumber.isNumber.default(8091)

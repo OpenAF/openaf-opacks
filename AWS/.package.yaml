@@ -34,16 +34,17 @@ name: AWS
 main: ''
 mainJob: ''
 license: https://github.com/OpenAF/openaf-opacks/blob/master/LICENSE
-version: '20261120'
+version: '20261122'
 dependencies:
   OpenAF: '>=20250315'
   Jsoup: '>=20260805'
 files:
+- .claude/settings.local.json
+- .mini-a
 - .odoc.db
 - .package.yaml
 - .precompile
 - README.md
-- a.yaml
 - aws.js
 - aws_athena.js
 - aws_bedrock.js
@@ -54,6 +55,8 @@ files:
 - aws_core.js
 - aws_cost.js
 - aws_dynamo.js
+- aws_dynamo_browse.js
+- aws_dynamo_browse_view.js
 - aws_ec2.js
 - aws_ecr.js
 - aws_ecs.js
@@ -73,17 +76,30 @@ files:
 - aws_sqs.js
 - aws_sts.js
 - oJobCodeArtifact.yaml
+- oJobDynamoDB.yaml
 - oJobECR.yaml
 - oJobLambda.yaml
 - oafp_aws.js
-- ojob.pid
+- tests/bedrock-converse.js
+- tests/bedrock-live.js
+- tests/bedrock.js
+- tests/codeartifact.js
+- tests/credentials.js
+- tests/dynamodb-browse.js
+- tests/ecr-browse-details.js
+- tests/ecr-browse.js
+- tests/ecr-cache.js
+- tests/lambda-fixtures.json
+- tests/lambda.js
+- tests/signing.js
 - utils/genTestRegions.yaml
 - utils/testRegions.js
 filesHash:
+  .claude/settings.local.json: 214e59d2d5ff4f58035b7cbde64b44243fa30f18
+  .mini-a: 779b8017a46eef485e71c65d6e825cae75c3c52f
   .odoc.db: da551624d5ff44b2918fb434040dec8ea26cae07
   .precompile: f5d5df4dcce65d6a6e83ca0d90de07495389661d
-  README.md: a5c2591d85ace68366d4da3be4475fb0bf605ad4
-  a.yaml: 9f49c6492b5f40ffed81173109feab8bc15890fc
+  README.md: de23e853e6b8608da20b7d08f647471e37791e0e
   aws.js: 1bbc7e81042ed11aaabe738d98a9caaf439529a2
   aws_athena.js: 268155d5fcaf2de07063461e4c8af5beef02d4a6
   aws_bedrock.js: 8ddcabc63c7ba36c3ff7ad0f4f43eda2e76fe52d
@@ -93,7 +109,9 @@ filesHash:
   aws_cognito.js: 2c0ed19209dee6e2a0f2f8d00bf84bdf3958edbf
   aws_core.js: 854ba9b1480a7432c077b8b0841212b6fdb7e9b8
   aws_cost.js: f08568697b25eb4386130f94ac417851d0a99809
-  aws_dynamo.js: 775a0fd8de6d4b9d8eff97be9a402406093f0d4a
+  aws_dynamo.js: 007739c5c7f60cb621586edfd75f8e47c48e9f95
+  aws_dynamo_browse.js: f6c93a036d93042ceb32f8bce46aad5443cac049
+  aws_dynamo_browse_view.js: 1752a8e7420f974ba42d753e2120439a7a6f9c0d
   aws_ec2.js: f66531788d08761589c4afa55c9268a08df58320
   aws_ecr.js: dc90a662845e029d48457bd202b0501b2e09a874
   aws_ecs.js: 861b53afa0b9776d3dfa3364480928d2f9217b7b
@@ -112,10 +130,22 @@ filesHash:
   aws_secrets_sec.js: c93c3710af91b3c03369c15c6ee9227602e772fc
   aws_sqs.js: a3a603829c5c8d51cf032cdb1ffc02250db7cb9b
   aws_sts.js: 3eafbe7d1acba1c3fa7d0b8323455be6e64dec51
-  oJobCodeArtifact.yaml: 88ea260cab12123183b818e5f0d803a50eafe2df
-  oJobECR.yaml: 1c9b2945aa3d80b5fc546a24aa076430dc885333
-  oJobLambda.yaml: 5335ca9fb6d204160d841f6ddbbd83c69f6010e1
+  oJobCodeArtifact.yaml: aa9337ca2cde3079bd184a447f9447314d79960e
+  oJobDynamoDB.yaml: ac6531237174b87cefccff4fe15b9e0d64f206b8
+  oJobECR.yaml: 59279b0debe599489b2c464aafda5cd8072ea18d
+  oJobLambda.yaml: 532f3d91d58fda40a5400ee165d308f65fdf5980
   oafp_aws.js: d71ff1c00d292d16442321e78eccf470fc0c1be1
-  ojob.pid: a11d59462209e8f85c44002d91e14fede98783a8
+  tests/bedrock-converse.js: 08bfeff135f18aeee4469fbb9bfc82c42c47b960
+  tests/bedrock-live.js: d0421111b85c3e939227e0cf000e0dea42f316b1
+  tests/bedrock.js: ebee298a7fc649f4de4955b6a4bbc225405109ec
+  tests/codeartifact.js: 8121f6e588f5592218cd0386661cc6d701f2942d
+  tests/credentials.js: 17b8e9f4b6d3dbed4e8bc75760a12943630ec879
+  tests/dynamodb-browse.js: d50bf603fbdd620cf1e7f7524a7f20f70f8f33f3
+  tests/ecr-browse-details.js: d79380848511d6da2e3fa51a4c300a1f390f10b2
+  tests/ecr-browse.js: 1838c7681ee4079a6a91c0d1e956a55686b598fc
+  tests/ecr-cache.js: e4e30774474660fcaac01722402f0a6c80991697
+  tests/lambda-fixtures.json: 2b8ff1e91dac9d0c12af2fdeb0c647c94b14d61d
+  tests/lambda.js: dd5d24002db02375c7fe22fd85ebc2037d72ad46
+  tests/signing.js: 4f75a2d8b60c3cdc30f111bc819d6d63539cfe33
   utils/genTestRegions.yaml: 6291e84d69694a79d6f73896ad7571fe3d81b00e
   utils/testRegions.js: 8f48ba60691cb0a7e7c06b8cfbcdd08d4dc691e9

@@ -388,25 +388,17 @@ AWS.prototype.DYNAMO_UpdateItem = function(aRegion, aTableName, aKeyList, aUpdat
   * </odoc>
   */
  AWS.prototype.DYNAMO_DescribeTable = function(aRegion, aTableName) {
-    var aURL;
-    aRegion = _$(aRegion).isString().default(this.region);
-    if (aRegion == "local") {
-       aURL = "http://127.0.0.1:8000";
-    } else {
-       aURL = "https://dynamodb." + aRegion + ".amazonaws.com/";
-    }
-    var url = new java.net.URL(aURL);
-    var aHost = String(url.getHost());
-    var aURI = String(url.getPath());
- 
-    var params = {
-       TableName: aTableName
-    };
- 
-    var res = this.postURLEncoded(aURL, aURI, "", params, "dynamodb", aHost, aRegion, {
-       "X-Amz-Target": "DynamoDB_20120810.DescribeTable"
-    }, void 0, "application/json");
-    return res;
+    return this.__DYNAMO_Request(aRegion, "DescribeTable", { TableName: aTableName })
+ };
+
+ // Preserve wire-format AttributeValues for paged scans and exact composite keys.
+ AWS.prototype.__DYNAMO_Request = function(aRegion, operation, params) {
+    aRegion = _$(aRegion).isString().default(this.region)
+    var endpoint = aRegion == "local" ? "http://127.0.0.1:8000" : "https://dynamodb." + aRegion + ".amazonaws.com/"
+    var url = new java.net.URL(endpoint)
+    return this.postURLEncoded(endpoint, String(url.getPath()), "", params, "dynamodb", String(url.getHost()), aRegion, {
+       "X-Amz-Target": "DynamoDB_20120810." + operation
+    }, void 0, "application/json")
  };
  
  ow.loadCh();
