@@ -26,7 +26,7 @@ code:
       var allowRaw = options.noRaw !== true
       var raw = allowRaw && params.raw == "true"
       var name = key.substring(key.lastIndexOf("/") + 1)
-      if (renderMarkdown && !options._api && !request._browsePreview &&
+      if (renderMarkdown && !options._api && !request._browsePreview && !request._browseInline &&
           params.action != "preview" && !raw && /\.md$/i.test(name)) {
         var stream = s3.getObjectStream(bucket, key)
         try { return { data: af.fromInputStream2String(stream, "UTF-8"), type: "md" } }

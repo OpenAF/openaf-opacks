@@ -50,6 +50,28 @@ submissions, and external resources. If you provide a custom formats map, add
 in both modes. Path and restriction checks
 apply to both modes.
 
+With `S3Browse` and an updated oJob-common, configure
+`options.web.fileActions` to select how files open from listings and search:
+
+```yaml
+options:
+  web:
+    enabled: true
+    fileActions:
+      json: preview
+      js: inline
+      zip: download
+      "name:report.json": download
+  query:
+    enabled: true
+```
+
+Here JSON links open the interactive viewer, except for `report.json`, which
+downloads as an attachment. JavaScript links serve the original bytes with
+their MIME type. Plain object URLs keep serving as before, and `noRaw: true`
+disables download actions. The standalone `httpdS3Browse` shortcut does not
+apply these rules.
+
 Give the website a dedicated origin and enable web mode only for a prefix whose
 writers you trust. JavaScript served from that prefix runs with the privileges
 of the serving origin.
