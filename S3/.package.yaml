@@ -24,7 +24,6 @@ dependencies:
   Jsoup: '>=20260805'
 files:
 - .maven.yaml
-- .mini-a
 - .odoc.db
 - .package.yaml
 - .precompile
@@ -48,14 +47,8 @@ files:
 - s3.yaml
 - simple-xml-safe-2.7.1.jar
 - snappy-java-1.1.10.12.jar
-- tests/config.yaml
-- tests/fixtures/sync.txt
-- tests/legacy.js
-- tests/minio.sh
-- tests/regression.js
 filesHash:
   .maven.yaml: c9c8d4854fa7a7dd294c40998daa27c026d9bd1c
-  .mini-a: 7d01008032b9974d9dc58660b803c5afb5c5e70c
   .odoc.db: c5b6da5457e9cc8cef957331fe1236527617965a
   .precompile: 038c6246a6bdaec932004b87ac32e22f90af1cca
   README.md: eda113c339da7c60773c9a90bbe0e13724fcf6a9
@@ -78,8 +71,3 @@ filesHash:
   s3.yaml: 258dcf5460fbf67d0fd98662a06ed55f984dff68
   simple-xml-safe-2.7.1.jar: 045fda5ac6087bc82a209d8cdb73f8d0dbdcfc7b
   snappy-java-1.1.10.12.jar: c97fdfd953df72ae08be22384a1581ce665c2694
-  tests/config.yaml: 0003b5ad5498775daeab451f46fdcbd50021420e
-  tests/fixtures/sync.txt: 0efd7ac983d5ec3fb7b3f98ddac1e0b2ea6e3189
-  tests/legacy.js: 759b4192cbdf9aff1b6be3adea420dd70c0993d7
-  tests/minio.sh: afb171e440b7ac6131faa6446ffb3b2aec0cef58
-  tests/regression.js: 07a1d53e610c53f3cd08a437e06b5d4188621713
